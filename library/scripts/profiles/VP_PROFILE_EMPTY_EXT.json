@@ -1,0 +1,16 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
+    "comments": {
+        "info": "Empty profile",
+        "desc": "Profile for debugging the trivial case of device creation."
+    },
+    "enum": "VP_PROFILE_EMPTY_EXT",
+    "VkPhysicalDeviceProperties": {
+    },
+    "VkPhysicalDeviceFeatures": {
+    },
+    "extended": [
+    ],
+    "ArrayOfVkExtensionProperties": [
+    ]
+}

@@ -1,0 +1,73 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
+    "comments": {
+        "info": "Strawman Vulkan profile definition",
+        "desc": "ANGLE Layer Support for GLES 3.1"
+    },
+    "enum": "VP_PROFILE_ANGLE_GOOGLE",
+    "VkPhysicalDeviceProperties": {
+        "limits": {
+            "maxPerStageDescriptorUniformBuffers": {
+                "value": 14,
+                "type": "min"
+            }
+        }
+    },
+    "VkPhysicalDeviceFeatures": {
+        "independentBlend": 1,
+        "shaderSampledImageArrayDynamicIndexing": 1,
+        "shaderStorageBufferArrayDynamicIndexing": 1,
+        "textureCompressionETC2": 1
+    },
+    "extended": [
+        {
+            "type": "VkPhysicalDeviceLineRasterizationFeaturesEXT",
+            "members": {
+                "bresenhamLines": 1
+            }
+        }
+    ],
+    "ArrayOfVkExtensionProperties": [
+        {
+            "extensionName": "VK_EXT_line_rasterization",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_EXT_vertex_attribute_aliasing",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_EXT_provoking_vertex",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_EXT_image_robustness",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_EXT_generate_mipmap",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_EXT_index_type_uint8",
+            "specVersion": 1
+        }
+    ],
+    "ArrayOfArrayOfAlternatives": [
+        [
+            {
+                "ArrayOfVkExtensionProperties": [
+                    {
+                        "extensionName": "VK_EXT_transform_feedback",
+                        "specVersion": 1
+                    }
+                ]
+            },
+            {
+                "VkPhysicalDeviceFeatures": {
+                    "vertexPipelineStoresAndAtomics": 1
+                }
+            }
+        ]
+    ]
+}
