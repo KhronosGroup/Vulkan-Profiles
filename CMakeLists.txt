@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11.0)
+cmake_minimum_required(VERSION 3.14.0)
 
 enable_testing()
 
@@ -48,6 +48,8 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_OBJECT_LIBS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(jsoncpp)
 
+execute_process(COMMAND python ${jsoncpp_SOURCE_DIR}/amalgamate.py WORKING_DIRECTORY ${jsoncpp_SOURCE_DIR})
+
 set(UPDATE_DEPS ON)
 set(BUILD_TESTS OFF)
 set(_build_type ${CMAKE_BUILD_TYPE})
@@ -70,6 +72,10 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Vulkan-Loader)
 
+set(API_NAME "Vulkan" CACHE STRING "API name to use when building")
+string(TOLOWER ${API_NAME} API_LOWERCASE)
+add_definitions(-DAPI_NAME="${API_NAME}")
+
 FetchContent_Declare(
 	Vulkan-ValidationLayers
 	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-ValidationLayers
@@ -86,3 +92,6 @@ add_subdirectory(library)
 
 # Layer project
 add_subdirectory(layer)
+
+add_subdirectory(vku)
+add_subdirectory(device_simulation)
