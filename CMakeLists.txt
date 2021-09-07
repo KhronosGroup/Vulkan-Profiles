@@ -9,6 +9,9 @@ project (VULKAN_PROFILES)
 # Define GNU standard installation directories.
 include(GNUInstallDirs)
 
+# Using Python 3
+find_package(PythonInterp 3 REQUIRED)
+
 # Third-party libraries
 include(FetchContent)
 
