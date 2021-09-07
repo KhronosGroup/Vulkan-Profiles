@@ -33,6 +33,20 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(json)
 
 FetchContent_Declare(
+  jsoncpp
+  GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp
+  GIT_TAG 1.9.4
+)
+
+set(JSONCPP_WITH_TESTS OFF CACHE BOOL "" FORCE)
+set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "" FORCE)
+set(JSONCPP_WITH_WARNING_AS_ERROR OFF CACHE BOOL "" FORCE)
+set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(BUILD_OBJECT_LIBS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(jsoncpp)
+
+FetchContent_Declare(
   vulkan-headers
   GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers
   GIT_TAG v1.2.182
