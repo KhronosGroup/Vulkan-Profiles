@@ -154,7 +154,7 @@ class ProfileLibraryBuilder():
                          f"{builder.genProfileImpl()}",
                          "\t\t} break;\n")
             cases.append(case)
-        return _JOIN(f"\tswitch(profile) {{",
+        return _JOIN(f"switch(profile) {{",
                      *cases,
                      "\t}")
 
@@ -169,23 +169,22 @@ class ProfileLibraryBuilder():
     uint32_t extensionPropertyCount;
     result = vkEnumerateInstanceExtensionProperties(NULL, &extensionPropertyCount, NULL);
     std::vector<VkExtensionProperties> extensionProperties(extensionPropertyCount);
-    result = vkEnumerateInstanceExtensionProperties(NULL, &extensionPropertyCount, extensionProperties.data());
-        '''
+    result = vkEnumerateInstanceExtensionProperties(NULL, &extensionPropertyCount, extensionProperties.data());'''
 
     def _genGetPhysicalDeviceFeatures(self):
         return '''
-    VkPhysicalDeviceFeatures deviceFeatures = {{}};
-    vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
-        '''
+    VkPhysicalDeviceFeatures deviceFeatures = {};
+    vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);'''
 
     def _genProfileCreateImpl(self):
-        return _JOIN(f"inline {self._getProfileCreateSign()} {{",
-                     f"\tVkResult result;",
-                     f"{self._genEnumerateInstanceExtensionProperties()}",
-                     f"{self._genGetPhysicalDeviceFeatures()}",
-                     f"{self._genProfilesSwitch()}",
-                     f"\treturn result;",
-                     "}")
+        return f'''
+inline {self._getProfileCreateSign()} {{
+    VkResult result;
+    {self._genEnumerateInstanceExtensionProperties()}
+    {self._genGetPhysicalDeviceFeatures()}
+    {self._genProfilesSwitch()}
+    return result;
+}}'''
 
     def _registerProfile(self, profile_dict):
         enum = profile_dict.get('enum')
@@ -249,21 +248,21 @@ class ProfileLibraryBuilder():
     }}'''
 
         def _genProfileCheck(self, profile_dict):
-            return _JOIN(f"{self._genCheckExtensionProperties(profile_dict)}",
-                         f"{self._genCheckPhysicalDeviceProperties(profile_dict)}",
-                         f"{self._genCheckPhysicalDeviceFeatures(profile_dict)}",
-                         f"{self._getCheckImageFormatSupport(profile_dict)}"
-                         f"{self._genCheckAlternatives(profile_dict)}")
+            return f'''
+                {self._genCheckExtensionProperties(profile_dict)}
+                {self._genCheckPhysicalDeviceFeatures(profile_dict)}
+                {self._getCheckImageFormatSupport(profile_dict)}
+                {self._genCheckAlternatives(profile_dict)}'''
 
         def _genCheckExtensionProperties(self, profile_dict, isAlt=False):
             check_str = ""
             extensions = profile_dict.get('ArrayOfVkExtensionProperties')
             if extensions and len(extensions) > 0:
-                literals = "{" + ',\n'.join(
-                    map(lambda ext: 'VkExtensionProperties{{"{}", {}}}'.format(ext['extensionName'], ext['specVersion']), extensions)) + "}"
+                literals = "{" + ','.join(map(lambda ext: '\n\t\t\t\t\t\t\tVkExtensionProperties{{"{}", {}}}'.format(ext['extensionName'], ext['specVersion']), extensions)) + "}"
                 expr_str = f"checkExtensionProperties(profileExts, extensionProperties)"
-                check_str += f"std::vector<VkExtensionProperties> profileExts = {literals};\n"\
-                    f"{self._genCheckMacroCall(expr_str, isAlt)}\n"
+                check_str += f'''
+                std::vector<VkExtensionProperties> profileExts = {literals};
+                {self._genCheckMacroCall(expr_str, isAlt)}'''
             return check_str
 
         def _genCheckPhysicalDeviceProperties(self, profile_dict, isAlt=False):
@@ -279,7 +278,7 @@ class ProfileLibraryBuilder():
                         else:
                             op = '<='
                         expr_str = f"deviceProperties.limits.{member} {op} {limit['value']}"
-                        check_str += f"{self._genCheckMacroCall(expr_str, isAlt)};\n"
+                        check_str += f"\t\t\t\t{self._genCheckMacroCall(expr_str, isAlt)};"
             return check_str
 
         def _genCheckPhysicalDeviceFeatures(self, profile_dict, isAlt=False):
@@ -288,18 +287,15 @@ class ProfileLibraryBuilder():
             if features:
                 for member, value in features.items():
                     expr_str = f"deviceFeatures.{member} == {value}"
-                    check_str += f"{self._genCheckMacroCall(expr_str, isAlt)};\n"
+                    check_str += f"\t\t\t\t{self._genCheckMacroCall(expr_str, isAlt)};\n"
             return check_str
 
         def _getCheckImageFormatSupport(self, profile_dict, isAlt=False):
-            IMG_FMT_PROPS_NAME = "imageFormatProperties"
-            USAGE_FLAGS_NAME = "usage"
-            CREATE_FLAGS_NAME = "flags"
             format_reqs = profile_dict.get('ArrayOfImageFormatRequirements')
 
             if format_reqs and len(format_reqs) > 0:
                 format_checks = [
-                    f"VkImageFormatProperties {IMG_FMT_PROPS_NAME} = {{}};"]
+                    f"VkImageFormatProperties imageFormatProperties = {{}};"]
                 for format_req in format_reqs:
                     format_name = format_req.get("format")
                     type_name = format_req.get("type")
@@ -312,10 +308,10 @@ class ProfileLibraryBuilder():
                         format_checks.append(
                             f"std::vector<VkImageUsageFlagBits> usageFlagBits = {usage_flag_bits};")
                         format_checks.append(
-                            f"VkImageUsageFlags {USAGE_FLAGS_NAME} = maskBitFlags(usageFlagBits);")
+                            f"VkImageUsageFlags usage = maskBitFlags(usageFlagBits);")
                     else:
                         format_checks.append(
-                            f"VkImageUsageFlags {USAGE_FLAGS_NAME} = 0;")
+                            f"VkImageUsageFlags usage = 0;")
 
                     if create_flag_names:
                         create_flag_bits = "{" + ',\n'.join(
@@ -323,61 +319,50 @@ class ProfileLibraryBuilder():
                         format_checks.append(
                             f"std::vector<VkImageCreateFlagBits> createFlagBits = {create_flag_bits};")
                         format_checks.append(
-                            f"VkImageCreateFlags {CREATE_FLAGS_NAME} = maskBitFlags(createFlagBits);")
+                            f"VkImageCreateFlags flags = maskBitFlags(createFlagBits);")
                     else:
                         format_checks.append(
-                            f"VkImageCreateFlags {CREATE_FLAGS_NAME} = 0;")
-                    format_checks.append(_JOIN(
-                        f"result = vkGetPhysicalDeviceImageFormatProperties(",
-                        f"physicalDevice,",
-                        f"{format_name},",
-                        f"{type_name},",
-                        f"{tiling},",
-                        f"{USAGE_FLAGS_NAME},",
-                        f"{CREATE_FLAGS_NAME},",
-                        f"&{IMG_FMT_PROPS_NAME}",
-                        f");",
-                    ))
-                    check_expr = f"result == VK_SUCCESS"
-                    format_checks.append(
-                        f"{self._genCheckMacroCall(check_expr, isAlt)};")
+                            f"VkImageCreateFlags flags = 0;")
+                        format_checks.append(f'''
+                result = vkGetPhysicalDeviceImageFormatProperties(physicalDevice, {format_name}, {type_name}, {tiling}, usage, flags, &imageFormatProperties);''')
+                        format_checks.append(
+                        f"{self._genCheckMacroCall('result == VK_SUCCESS', isAlt)};")
                     return _JOIN(*format_checks)
             else:
                 return ""
 
         def _genCheckAlternatives(self, profile_dict):
-            ALT_GROUP_SUPPORTED_NAME = "altGroupSupported"
             alt_groups = profile_dict.get('ArrayOfArrayOfAlternatives')
             if alt_groups and len(alt_groups) > 0:
                 alt_group_checks = []
                 for alt_group in alt_groups:
-                    alt_group_checks.append("{")
+                    alt_group_checks.append("\t\t\t\t{")
                     if alt_group and len(alt_group) > 0:
                         alts_checks = [
-                            f"bool {ALT_GROUP_SUPPORTED_NAME} = false;"]
+                            "\t\t\t\t\tbool altGroupSupported = false;"]
                         for alt in alt_group:
-                            alts_checks.append(_JOIN(
-                                "{",
-                                f"bool altSupported = true;",
-                                f"{self._genCheckExtensionProperties(alt, True)}",
-                                f"{self._genCheckPhysicalDeviceProperties(alt, True)}",
-                                f"{self._genCheckPhysicalDeviceFeatures(alt, True)}",
-                                f"{self._getCheckImageFormatSupport(alt, True)}"
-                                f"{ALT_GROUP_SUPPORTED_NAME} = {ALT_GROUP_SUPPORTED_NAME} || altSupported;",
-                                "}"))
+                            alts_checks.append(f'''
+                    {{
+                        bool altSupported = true;
+                        {self._genCheckExtensionProperties(alt, True)}
+                        {self._genCheckPhysicalDeviceProperties(alt, True)}
+                        {self._genCheckPhysicalDeviceFeatures(alt, True)}
+                        {self._getCheckImageFormatSupport(alt, True)}
+                        altGroupSupported = altGroupSupported || altSupported;
+                    }}''')
 
                         alt_group_checks.append(_JOIN(*alts_checks))
                     alt_group_checks.append(_JOIN(
-                        f"{self._genCheckMacroCall(ALT_GROUP_SUPPORTED_NAME)};", "}"))
+                        f"{self._genCheckMacroCall('altGroupSupported')};", "}"))
                 return _JOIN(*alt_group_checks)
             else:
                 return ""
 
         def _genCheckMacroCall(self, expr_str, isAlt=False):
             if isAlt:
-                return f"ALT_CHECK_SUPPORT_EXPR({expr_str}, \"{expr_str}\")"
+                return f'ALT_CHECK_SUPPORT_EXPR({expr_str}, \"{expr_str}\")'
             else:
-                return f"CHECK_SUPPORT_EXPR({expr_str}, \"{expr_str}\")"
+                return f'CHECK_SUPPORT_EXPR({expr_str}, \"{expr_str}\")'
 
         def _genGetPhysicalDeviceProperties(self):
             return '''
@@ -414,7 +399,7 @@ class ProfileLibraryBuilder():
             if features_list:
                 for feature, value in features_list.items():
                     struct_blocks.append(
-                        f"enabledFeatures.{feature} = {value};")
+                        f"\t\t\tenabledFeatures.{feature} = {value};")
             alt_groups = self._profile_dict.get('ArrayOfArrayOfAlternatives')
             if alt_groups:
                 for alt_group in alt_groups:
@@ -422,9 +407,9 @@ class ProfileLibraryBuilder():
                         alt_features = alt.get('VkPhysicalDeviceFeatures')
                         if alt_features:
                             for feature_name, value in alt_features.items():
-                                struct_blocks += [f'if (deviceFeatures.{feature_name} == {value}) {{',
-                                                  f'enabledFeatures.{feature_name} = {value};',
-                                                  '}']
+                                struct_blocks += [f'\t\t\tif (deviceFeatures.{feature_name} == {value}) {{',
+                                                  f'\t\t\t\tenabledFeatures.{feature_name} = {value};',
+                                                  '\t\t\t}']
             return _JOIN(*struct_blocks)
 
         def _genEnabledExtensions(self):
@@ -442,8 +427,7 @@ class ProfileLibraryBuilder():
                             for alt_ext in alt_exts:
                                 extensions.append(alt_ext)
             if extensions:
-                literals = "{" + ',\n'.join(
-                    map(lambda ext: 'VkExtensionProperties{{"{}", {}}}'.format(ext['extensionName'], ext['specVersion']), extensions)) + "}"
+                literals = "{" + ','.join(map(lambda ext: '\n\t\t\t\tVkExtensionProperties{{"{}", {}}}'.format(ext['extensionName'], ext['specVersion']), extensions)) + "}"
                 return f'''
             std::vector<VkExtensionProperties> profileExtProps = {literals};
             std::vector<const char*> profileExtNames = getSupportedExtensionNames(profileExtProps, extensionProperties);
@@ -470,17 +454,17 @@ class ProfileLibraryBuilder():
                     typeName = next_struct_desc['type']
                     members = next_struct_desc['members']
                     name = self.NEXT_STRUCT_NAME_FMT.format(i)
-                    struct_decl = f"{typeName} {name} = {{}};\n"
-                    struct_decl += f"{name}.sType = {self._getSType(typeName)};\n"
+                    struct_decl = f"\t\t\t{typeName} {name} = {{}};\n"
+                    struct_decl += f"\t\t\t{name}.sType = {self._getSType(typeName)};\n"
                     if i == len(next_struct_descs) - 1:
-                        struct_decl += f"{name}.pNext = const_cast<void*>(pCreateInfo->pNext);\n"
+                        struct_decl += f"\t\t\t{name}.pNext = const_cast<void*>(pCreateInfo->pNext);\n"
                     else:
-                        struct_decl += f"{name}.pNext = &{self.NEXT_STRUCT_NAME_FMT.format(i+1)};\n"
+                        struct_decl += f"\t\t\t{name}.pNext = &{self.NEXT_STRUCT_NAME_FMT.format(i+1)};\n"
                     for field, value in members.items():
-                        struct_decl += f"{name}.{field} = {value};\n"
+                        struct_decl += f"\t\t\t{name}.{field} = {value};\n"
                     struct_decls.insert(0, struct_decl)
                 struct_decls.append(
-                    f"void* pNext = &{self.NEXT_STRUCT_NAME_FMT.format(0)};")
+                    f"\t\t\tvoid* pNext = &{self.NEXT_STRUCT_NAME_FMT.format(0)};")
                 return _JOIN(*struct_decls)
             else:
                 return "\t\t\tvoid* pNext = NULL;"
@@ -516,7 +500,17 @@ class ProfileLibraryBuilder():
 if __name__ == "__main__":
     # python ./scripts/generate_library.py ./registry/vk.xml ./scripts/profiles ./include/vulkan
     print(sys.argv[1])
-    xml_tree = etree.parse(sys.argv[1])
+    tree = etree.parse(sys.argv[1])
+    root = tree.getroot()
+    types = root.find("types")
+
+    # root.find("..//type[@id='4']")
+
+    for type in types.findall("type"):
+        if type.get("category") != "struct":
+            continue
+        print(type.get("name"))
+
     profile_dir = sys.argv[2]
     header_path = sys.argv[3]
     builder = ProfileLibraryBuilder(profile_dir, header_path)
