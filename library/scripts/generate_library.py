@@ -3,6 +3,7 @@ import os
 import os.path
 import sys
 import re
+import xml.etree.ElementTree as etree
 
 license_header = '''
 /*
@@ -513,9 +514,11 @@ class ProfileLibraryBuilder():
 
 
 if __name__ == "__main__":
-    # python ./scripts/generate_library.py ./scripts/profiles ./include/vulkan
-    profile_dir = sys.argv[1]
-    header_path = sys.argv[2]
+    # python ./scripts/generate_library.py ./registry/vk.xml ./scripts/profiles ./include/vulkan
+    print(sys.argv[1])
+    xml_tree = etree.parse(sys.argv[1])
+    profile_dir = sys.argv[2]
+    header_path = sys.argv[3]
     builder = ProfileLibraryBuilder(profile_dir, header_path)
     builder.genProfilesHeader()
 
