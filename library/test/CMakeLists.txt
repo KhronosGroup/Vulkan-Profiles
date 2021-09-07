@@ -3,7 +3,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 find_package(Vulkan REQUIRED)
 
 link_libraries(${Vulkan_LIBRARIES})
-include_directories(${Vulkan_INCLUDE_DIRS} ../include)
+include_directories(${vulkan-headers_SOURCE_DIR}/include ../include)
 
 function(add_unit_test NAME)
 	set(TEST_FILE ./${NAME}.cpp)
