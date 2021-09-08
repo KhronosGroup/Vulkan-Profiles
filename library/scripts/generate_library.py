@@ -117,7 +117,8 @@ def _JOIN(*argv):
 
 
 class ProfileLibraryBuilder():
-    def __init__(self, profile_json_dir, header_path):
+    def __init__(self, database_file, profile_json_dir, header_path):
+        self._database_tree = etree.parse(database_file)
         self._profileCreateBuilders = {}
         self._profileDicts = {}
         self._scanAndRegisterProfiles(profile_json_dir)
@@ -269,6 +270,16 @@ inline {self._getProfileCreateSign()} {{
 
         def _genCheckPhysicalDeviceProperties(self, profile_dict, isAlt=False):
             # TODO support members other than just limits
+
+#            root = self._database_tree.getroot()
+#            types_element = root.find("types")
+#            properties_limit = types_element.get('VkPhysicalDeviceLimits')
+#            if properties_limit:
+#                limits_element = properties_limit.get()
+#                if limits_element:
+
+
+
             properties = profile_dict.get('VkPhysicalDeviceProperties')
             check_str = ""
             if properties:
@@ -305,28 +316,24 @@ inline {self._getProfileCreateSign()} {{
                     usage_flag_names = format_req.get("usage")
                     create_flag_names = format_req.get("flags")
                     if usage_flag_names:
-                        usage_flag_bits = "{" + ',\n'.join(
-                            map(lambda flag_name: f'{flag_name}', usage_flag_names)) + "}"
-                        format_checks.append(
-                            f"std::vector<VkImageUsageFlagBits> usageFlagBits = {usage_flag_bits};")
-                        format_checks.append(
-                            f"VkImageUsageFlags usage = maskBitFlags(usageFlagBits);")
+                        usage_flag_bits = '|'.join(
+                            map(lambda flag_name: f'{flag_name}', usage_flag_names))
+                        format_checks.append(f'''
+                        VkImageUsageFlags usage = {usage_flag_bits};''')
                     else:
-                        format_checks.append(
-                            f"VkImageUsageFlags usage = 0;")
+                        format_checks.append(f'''
+                        VkImageUsageFlags usage = 0;''')
 
                     if create_flag_names:
-                        create_flag_bits = "{" + ',\n'.join(
-                            map(lambda flag_name: f'{flag_name}', create_flag_names)) + "}"
-                        format_checks.append(
-                            f"std::vector<VkImageCreateFlagBits> createFlagBits = {create_flag_bits};")
-                        format_checks.append(
-                            f"VkImageCreateFlags flags = maskBitFlags(createFlagBits);")
-                    else:
-                        format_checks.append(
-                            f"VkImageCreateFlags flags = 0;")
+                        create_flag_bits = '|'.join(
+                            map(lambda flag_name: f'{flag_name}', create_flag_names))
                         format_checks.append(f'''
-                result = vkGetPhysicalDeviceImageFormatProperties(physicalDevice, {format_name}, {type_name}, {tiling}, usage, flags, &imageFormatProperties);''')
+                        VkImageCreateFlags flags = {create_flag_bits};''')
+                    else:
+                        format_checks.append(f'''
+                        VkImageCreateFlags flags = 0;''')
+                        format_checks.append(f'''
+                        result = vkGetPhysicalDeviceImageFormatProperties(physicalDevice, {format_name}, {type_name}, {tiling}, usage, flags, &imageFormatProperties);''')
                         format_checks.append(
                         f"{self._genCheckMacroCall('result == VK_SUCCESS', isAlt)};")
                     return _JOIN(*format_checks)
@@ -501,20 +508,21 @@ inline {self._getProfileCreateSign()} {{
 
 if __name__ == "__main__":
     # python ./scripts/generate_library.py ./registry/vk.xml ./scripts/profiles ./include/vulkan
-    print(sys.argv[1])
-    tree = etree.parse(sys.argv[1])
-    root = tree.getroot()
-    types = root.find("types")
+    #print(sys.argv[1])
+    #tree = etree.parse(sys.argv[1])
+    #root = tree.getroot()
+    #types = root.find("types")
 
     # root.find("..//type[@id='4']")
 
-    for type in types.findall("type"):
-        if type.get("category") != "struct":
-            continue
-        print(type.get("name"))
+    #for type in types.findall("type"):
+    #    if type.get("category") != "struct":
+    #        continue
+    #    print(type.get("name"))
 
+    database = sys.argv[1]
     profile_dir = sys.argv[2]
     header_path = sys.argv[3]
-    builder = ProfileLibraryBuilder(profile_dir, header_path)
+    builder = ProfileLibraryBuilder(database, profile_dir, header_path)
     builder.genProfilesHeader()
 
