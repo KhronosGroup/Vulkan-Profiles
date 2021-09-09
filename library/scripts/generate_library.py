@@ -123,6 +123,7 @@ class ProfileLibraryBuilder():
         self._profileDicts = {}
         self._scanAndRegisterProfiles(profile_json_dir)
         self._profileSupportCheckBuilder = self.ProfileSupportCheckBuilder(
+            self._database_tree,
             self._profileDicts, self)
         self._headerPath = os.path.join(
             os.path.abspath(header_path), "vulkan_profiles.h")
@@ -218,7 +219,8 @@ inline {self._getProfileCreateSign()} {{
             header_fp.write(header_str)
 
     class ProfileSupportCheckBuilder():
-        def __init__(self, profile_dicts, parent_inst):
+        def __init__(self, database_tree, profile_dicts, parent_inst):
+            self._database_tree = database_tree
             self._profile_dicts = profile_dicts
             self._parent_inst = parent_inst
 
@@ -271,14 +273,7 @@ inline {self._getProfileCreateSign()} {{
         def _genCheckPhysicalDeviceProperties(self, profile_dict, isAlt=False):
             # TODO support members other than just limits
 
-#            root = self._database_tree.getroot()
-#            types_element = root.find("types")
-#            properties_limit = types_element.get('VkPhysicalDeviceLimits')
-#            if properties_limit:
-#                limits_element = properties_limit.get()
-#                if limits_element:
-
-
+            root = self._database_tree.getroot()
 
             properties = profile_dict.get('VkPhysicalDeviceProperties')
             check_str = ""
@@ -286,10 +281,14 @@ inline {self._getProfileCreateSign()} {{
                 limits = properties.get('limits')
                 if limits:
                     for member, limit in limits.items():
-                        if limit['type'] == 'min':
-                            op = '>='
-                        else:
-                            op = '<='
+                        op = '<='
+
+                        for element in root.findall("./types/type[@category='struct']/member"):
+                            if element.find('name').text == f'{member}':
+                                if element.get('limittype') == 'min':
+                                    op = '>='
+                                break
+
                         expr_str = f"deviceProperties.limits.{member} {op} {limit['value']}"
                         check_str += f"\t\t\t\t{self._genCheckMacroCall(expr_str, isAlt)};"
             return check_str
@@ -508,21 +507,15 @@ inline {self._getProfileCreateSign()} {{
 
 if __name__ == "__main__":
     # python ./scripts/generate_library.py ./registry/vk.xml ./scripts/profiles ./include/vulkan
-    #print(sys.argv[1])
-    #tree = etree.parse(sys.argv[1])
-    #root = tree.getroot()
-    #types = root.find("types")
+    #database = etree.parse(sys.argv[1])
+    #root = database.getroot()
 
-    # root.find("..//type[@id='4']")
+    #for element in root.findall("./types/type[@category='struct']/member"):
+    #    if element.find('name').text == 'maxImageDimension1D':
+    #        print(element.get('limittype'))
 
-    #for type in types.findall("type"):
-    #    if type.get("category") != "struct":
-    #        continue
-    #    print(type.get("name"))
-
-    database = sys.argv[1]
     profile_dir = sys.argv[2]
     header_path = sys.argv[3]
-    builder = ProfileLibraryBuilder(database, profile_dir, header_path)
+    builder = ProfileLibraryBuilder(sys.argv[1], profile_dir, header_path)
     builder.genProfilesHeader()
 
