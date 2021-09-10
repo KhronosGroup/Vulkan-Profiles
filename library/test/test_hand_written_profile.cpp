@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <vector>
 #include <vulkan/vulkan_core.h>
-#include <vulkan/vulkan_profiles.hpp>
+#include "vulkan_profiles.hpp"
 
 class TestScaffold {
    public:
@@ -56,22 +56,22 @@ class TestScaffold {
 };
 
 int main() {
-    std::vector<VpProfile> profiles;
+    std::vector<VpProfileProperties> profiles;
     uint32_t profileCount = 0;
 
     {
         TestScaffold scaffold;
-        vpGetPhysicalDeviceProfiles(scaffold.physicalDevice, &profileCount, nullptr);
+        vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
 
         profiles.resize(profileCount);
-        vpGetPhysicalDeviceProfiles(scaffold.physicalDevice, &profileCount, &profiles[0]);
+        vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
 
-        for (VpProfile profile : profiles) {
-            std::cout << "Profile supported: " << profile << std::endl;
+        for (VpProfileProperties profile : profiles) {
+            std::cout << "Profile supported: " << profile.profileName << " - version: " << profile.specVersion << std::endl;
         }
     }
 
-    for (VpProfile profile : profiles) {
+    for (const VpProfileProperties& profile : profiles) {
         TestScaffold scaffold;
         VkDevice device;
         VkDeviceCreateInfo info = {};
@@ -79,7 +79,7 @@ int main() {
         info.pQueueCreateInfos = &scaffold.queueCreateInfo;
         info.enabledExtensionCount = 0;
         info.ppEnabledExtensionNames = nullptr;
-        auto res = vpCreateDevice(scaffold.physicalDevice, profile, &info, nullptr, &device);
+        auto res = vpCreateDevice(scaffold.physicalDevice, &profile, &info, nullptr, &device);
         if (res != VK_SUCCESS) {
             std::cout << "FAILURE: " << res << std::endl;
         } else {

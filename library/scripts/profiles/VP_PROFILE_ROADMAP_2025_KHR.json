@@ -1,11 +1,11 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
+    "name": "VP_PROFILE_ROADMAP_2025_KHR",
     "comments": {
         "info": "Khronos Roadmap 2025 Profile",
         "desc": "Collection on nonsensical features to test completeness"
     },
-    "enum": "VP_PROFILE_ROADMAP_2025_KHR",
-    "VkPhysicalDeviceProperties": {
+    "VkPhysicalDeviceLimits": {
         "limits": {
             "maxPerStageDescriptorUniformBuffers": {
                 "value": 14,
@@ -18,6 +18,11 @@
         "shaderSampledImageArrayDynamicIndexing": 1,
         "shaderStorageBufferArrayDynamicIndexing": 1
     },
+
+    "VkPhysicalDevicePouetEXT": {
+        "hyperPouet": 1
+    },
+
     "extended": [
         {
             "type": "VkPhysicalDeviceLineRasterizationFeaturesEXT",
