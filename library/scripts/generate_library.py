@@ -211,6 +211,8 @@ inline {self._getProfileCreateSign()} {{
             "\n",
             self._profileSupportCheckBuilder.genSupportCheckImpl(),
             "\n")
+        header_dir = os.path.dirname(self._headerPath)
+        os.makedirs(header_dir, exist_ok=True)
         with open(self._headerPath, 'w') as header_fp:
             header_fp.write(header_str)
 
