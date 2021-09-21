@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
-    "name": "VP_PROFILE_ROADMAP_2022_KHR",
+    "name": "VP_KHR_1_2_roadmap_2022",
     "comments": {
         "info": "Khronos Roadmap 2022 Profile",
         "desc": "Collection on nonsensical features to test completeness"

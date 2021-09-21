@@ -1,8 +1,0 @@
-{
-    "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
-    "name": "VP_PROFILE_NULL_EXT",
-    "comments": {
-        "info": "Null profile",
-        "desc": "Profile for debugging the trivial case of device creation."
-    }
-}

@@ -501,6 +501,12 @@ if __name__ == "__main__":
     #database_file = sys.argv[1]
     #profile_dir = sys.argv[2]
     #header_path = sys.argv[3]
-    builder = ProfileLibraryBuilder('E:/Github/lunarg/VulkanProfiles/library/scripts/vk.xml', 'E:/Github/lunarg/VulkanProfiles/library/scripts/profiles', 'E:/Github/lunarg/VulkanProfiles/library/include/vulkan')
+
+    dirname = os.path.dirname(__file__)
+    database = os.path.join(dirname, 'vk.xml')
+    profiles = os.path.join(dirname, '../../profiles')
+    output = os.path.join(dirname, '../include/vulkan')
+
+    builder = ProfileLibraryBuilder(database, profiles, output)
     builder.genProfilesHeaderFile()
 

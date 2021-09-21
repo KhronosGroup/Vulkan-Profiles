@@ -16,5 +16,7 @@ function(add_unit_test NAME)
 endfunction(add_unit_test)
 
 add_unit_test(test_util)
+add_unit_test(test_profile_get)
+add_unit_test(test_profile_get_generated)
 add_unit_test(test_profile_create)
-add_unit_test(test_hand_written_profile)
+add_unit_test(test_profile_create_generated)

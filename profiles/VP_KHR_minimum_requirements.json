@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
-    "name": "VP_PROFILE_EMPTY_EXT",
+    "name": "VP_KHR_minimum_requirements",
     "comments": {
         "info": "Empty profile",
         "desc": "Profile for debugging the trivial case of device creation."

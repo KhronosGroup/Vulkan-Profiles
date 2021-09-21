@@ -1,9 +1,9 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
-    "name": "VP_PROFILE_DESKTOP_PORTABILITY_LUNARG",
+	"name": "VP_LUNARG_desktop_portability_2022",
     "comments": {
         "info": "LunarG Desktop Portability Profile",
-        "desc": "Common desktop platforms with drivers supporting Vulkan 1.2 on Windows and Linux."
+        "desc": "Common desktop platforms with drivers supporting Vulkan 1.0 on Windows, Linux and macOS."
     },
     "extensions": [
         {

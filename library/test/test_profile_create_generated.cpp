@@ -1,9 +1,13 @@
+#include <vulkan/vulkan_profiles.hpp>
+
+#include <gtest/gtest.h>
+
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <vector>
-#include <vulkan/vulkan_core.h>
-#include "vulkan_profiles.hpp"
+
+static const float DEFAULT_QUEUE_PRIORITY(0.0f);
 
 class TestScaffold {
    public:
@@ -25,20 +29,17 @@ class TestScaffold {
         createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         createInfo.pApplicationInfo = &appInfo;
         VkResult res = vkCreateInstance(&createInfo, nullptr, &instance);
-        if (res != VK_SUCCESS) {
-            throw std::runtime_error("Failed to create instance.");
-        }
+        EXPECT_TRUE(res == VK_SUCCESS);
+
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
-        if (deviceCount == 0) {
-            throw std::runtime_error("No Vulkan devices found.");
-        }
+        EXPECT_TRUE(deviceCount > 0);
+
         std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
         vkEnumeratePhysicalDevices(instance, &deviceCount, physicalDevices.data());
         physicalDevice = physicalDevices[0];
         queueCreateInfo = {};
         uint32_t queueFamilyCount;
-        const float defaultQueuePriority(0.0f);
         vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
         std::vector<VkQueueFamilyProperties> queueFamilyProperties(queueFamilyCount);
         vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilyProperties.data());
@@ -48,43 +49,49 @@ class TestScaffold {
                 queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
                 queueCreateInfo.queueFamilyIndex = i;
                 queueCreateInfo.queueCount = 1;
-                queueCreateInfo.pQueuePriorities = &defaultQueuePriority;
+                queueCreateInfo.pQueuePriorities = &DEFAULT_QUEUE_PRIORITY;
                 break;
             }
         }
     }
 };
 
-int main() {
-    std::vector<VpProfileProperties> profiles;
+TEST(test_profile_create_generated, create_device) {
+    return;
+
+    std::vector<VpProfile> profiles;
     uint32_t profileCount = 0;
 
     {
         TestScaffold scaffold;
-        vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
+        vpGetPhysicalDeviceProfiles(scaffold.physicalDevice, &profileCount, nullptr);
 
         profiles.resize(profileCount);
-        vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
+        vpGetPhysicalDeviceProfiles(scaffold.physicalDevice, &profileCount, &profiles[0]);
 
-        for (VpProfileProperties profile : profiles) {
-            std::cout << "Profile supported: " << profile.profileName << " - version: " << profile.specVersion << std::endl;
+        for (VpProfile profile : profiles) {
+            std::cout << "Profile supported: " << profile << std::endl;
         }
     }
 
-    for (const VpProfileProperties& profile : profiles) {
+    EXPECT_TRUE(profileCount > 0);
+
+    for (VpProfile profile : profiles) {
         TestScaffold scaffold;
         VkDevice device;
         VkDeviceCreateInfo info = {};
+        info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         info.queueCreateInfoCount = 1;
         info.pQueueCreateInfos = &scaffold.queueCreateInfo;
         info.enabledExtensionCount = 0;
         info.ppEnabledExtensionNames = nullptr;
-        auto res = vpCreateDevice(scaffold.physicalDevice, &profile, &info, nullptr, &device);
+        auto res = vpCreateDevice(scaffold.physicalDevice, profile, &info, nullptr, &device);
         if (res != VK_SUCCESS) {
             std::cout << "FAILURE: " << res << std::endl;
         } else {
             std::cout << "SUCCESS?" << std::endl;
         }
+
+        EXPECT_EQ(VK_SUCCESS, res);
     }
-    return 0;
 }
