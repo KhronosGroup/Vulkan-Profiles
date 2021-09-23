@@ -5,7 +5,7 @@ import sys
 import re
 import xml.etree.ElementTree as etree
 
-license_header = '''
+header_template = '''
 /*
  * Copyright (c) 2021-2022 LunarG, Inc.",
  *
@@ -22,25 +22,48 @@ license_header = '''
  * limitations under the License.
  *
  * Authors:
- * - Christophe Riccio <christophe@lunarg.com>",
+ * - Christophe Riccio <christophe@lunarg.com>
+ * - Adam Bodnar
  *
  * DO NOT EDIT: This file is generated from the Khronos Vulkan XML API Registry.
  */
-'''
 
-helper_code = '''
+ #include <vulkan/vulkan_core.h>
+
+ {0}
+
+VkResult vpCreateDevice(
+    VkPhysicalDevice physicalDevice, 
+    const VpProfile profile, 
+    const VkDeviceCreateInfo *pCreateInfo, 
+    const VkAllocationCallbacks *pAllocator, 
+    VkDevice *pDevice);
+
+void vpGetPhysicalDeviceProfiles(
+    VkPhysicalDevice physicalDevice, 
+    uint32_t *profileCount, 
+    VpProfile *pProfiles);
+
+// Implementation details:
 #include <iostream>
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
+'''
 
-typedef struct FakeVulkanStruct {
-    VkStructureType sType;
-    const void *pNext;
-} FakeVulkanStruct;
+helper_code = '''
+inline bool isListed(const std::vector<const char*>& extensions, const char *extensionName) 
+{
+    for (std::size_t i = 0, n = extensions.size(); i < n; ++i) {
+        if (extensions[i] == std::string(extensionName))
+            return true;
+    }
 
-std::vector<const char *> mergeExtensionList(int firstLength,
+    return false;
+}
+
+inline std::vector<const char *> mergeExtensionList(int firstLength,
                                              const char *const *firstList,
                                              int secondLength,
                                              const char *const *secondList) {
@@ -64,7 +87,7 @@ std::vector<const char *> mergeExtensionList(int firstLength,
     return mergedList;
 }
 
-std::map<std::string, uint32_t> createExtensionPropMap(const std::vector<VkExtensionProperties> &supportedExts) {
+inline std::map<std::string, uint32_t> createExtensionPropMap(const std::vector<VkExtensionProperties> &supportedExts) {
     std::map<std::string, uint32_t> propertiesMap;
     for (const auto &ext : supportedExts) {
         propertiesMap[std::string(ext.extensionName)] = ext.specVersion;
@@ -72,21 +95,7 @@ std::map<std::string, uint32_t> createExtensionPropMap(const std::vector<VkExten
     return propertiesMap;
 }
 
-std::vector<const char *> getSupportedExtensionNames(const std::vector<VkExtensionProperties> &requestedExts,
-                                                     const std::vector<VkExtensionProperties> &supportedExts) {
-    std::vector<const char *> supportedExtNames;
-    std::map<std::string, uint32_t> propertiesMap = createExtensionPropMap(supportedExts);
-    
-    for (const auto &reqExt : requestedExts) {
-        auto ext = std::string(reqExt.extensionName);
-        if (propertiesMap.count(ext) > 0 && propertiesMap.at(ext) >= reqExt.specVersion) {
-            supportedExtNames.push_back(reqExt.extensionName);
-        }
-    }
-    return supportedExtNames;
-}
-
-bool checkExtensionProperties(const std::vector<VkExtensionProperties> &requestedExts,
+inline bool checkExtensionProperties(const std::vector<VkExtensionProperties> &requestedExts,
                               const std::vector<VkExtensionProperties> &supportedExts) {
     std::map<std::string, uint32_t> propertiesMap = createExtensionPropMap(supportedExts);
     
@@ -101,15 +110,6 @@ bool checkExtensionProperties(const std::vector<VkExtensionProperties> &requeste
     }
     return extsSupported;
 }
-
-template<class T>
-uint32_t maskBitFlags(std::vector<T> flags) {
-    uint32_t mask = 0;
-    for (const auto &flag : flags) {
-        mask |= flag;
-    }
-    return mask;
-}
 '''
 
 def _JOIN(*argv):
@@ -117,14 +117,16 @@ def _JOIN(*argv):
 
 
 class ProfileLibraryBuilder():
-    def __init__(self, profile_json_dir, header_path):
+    def __init__(self, database_file, profile_json_dir, header_path):
+        self._database_tree = etree.parse(database_file)
         self._profileCreateBuilders = {}
         self._profileDicts = {}
         self._scanAndRegisterProfiles(profile_json_dir)
-        self._profileSupportCheckBuilder = self.ProfileSupportCheckBuilder(
+        self._profileSupportCheckBuilder = self.GetPhysicalDeviceProfilesBuilder(
+            self._database_tree,
             self._profileDicts, self)
         self._headerPath = os.path.join(
-            os.path.abspath(header_path), "vulkan_profiles.h")
+            os.path.abspath(header_path), "vulkan_profiles.hpp")
 
     def _scanAndRegisterProfiles(self, profile_json_dir):
         json_dir_abspath = os.path.abspath(profile_json_dir)
@@ -136,118 +138,68 @@ class ProfileLibraryBuilder():
                     profile_dict = json.load(json_fp)
                     self._registerProfile(profile_dict)
 
-    def _genCIncludes(self):
-        return "#include <vulkan/vulkan_core.h>\n"
-
-    def _genCPPIncludes(self):
-        return _JOIN("#include <vector>",
-                     helper_code)
-
-    def _genEnumDecl(self):
-        symbol_decl = ",\n\t".join(sorted(list(self._profileDicts)))
-        return f"typedef enum VpProfile {{ \n\t{symbol_decl} \n}} VpProfile;\n"
+    def _genProfileEnumDecl(self):
+        enum_values = ",\n\t".join(sorted(list(self._profileDicts)))
+        return f"typedef enum VpProfile {{ \n\t{enum_values} \n}} VpProfile;"
 
     def _genProfilesSwitch(self):
         cases = []
         for enum, builder in self._profileCreateBuilders.items():
-            case = _JOIN(f"\t\tcase {enum}: {{", 
-                         f"{builder.genProfileImpl()}",
-                         "\t\t} break;\n")
+            case = f'''
+        case {enum}: {{
+            {builder.genProfileImpl()}
+        }} break;'''
             cases.append(case)
-        return _JOIN(f"switch(profile) {{",
-                     *cases,
-                     "\t}")
+        return _JOIN(*cases)
 
-    def _getProfileCreateSign(self):
-        return _JOIN(f'VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfile profile, const VkDeviceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDevice *pDevice)')
-
-    def _genProfileCreateDecl(self):
-        return f"{self._getProfileCreateSign()};\n"
-
-    def _genEnumerateInstanceExtensionProperties(self):
-        return '''
-    uint32_t extensionPropertyCount;
-    result = vkEnumerateInstanceExtensionProperties(NULL, &extensionPropertyCount, NULL);
-    std::vector<VkExtensionProperties> extensionProperties(extensionPropertyCount);
-    result = vkEnumerateInstanceExtensionProperties(NULL, &extensionPropertyCount, extensionProperties.data());'''
-
-    def _genGetPhysicalDeviceFeatures(self):
-        return '''
-    VkPhysicalDeviceFeatures deviceFeatures = {};
-    vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);'''
-
-    def _genProfileCreateImpl(self):
+    def _genCreateDeviceImpl(self):
         return f'''
-inline {self._getProfileCreateSign()} {{
+inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfile profile, const VkDeviceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {{
     VkResult result;
-    {self._genEnumerateInstanceExtensionProperties()}
-    {self._genGetPhysicalDeviceFeatures()}
-    {self._genProfilesSwitch()}
+
+    VkPhysicalDeviceFeatures deviceFeatures = {{}};
+    vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
+
+    std::vector<const char *> extensions;
+
+    switch(profile) {{
+        {self._genProfilesSwitch()}
+    }}
     return result;
 }}'''
 
     def _registerProfile(self, profile_dict):
-        enum = profile_dict.get('enum')
-        if enum != None and not self._profileDicts.get('enum'):
-            print("Registering: ", enum)
-            self._profileDicts[enum] = profile_dict
-            self._profileCreateBuilders[enum] = self.ProfileCreateBuilder(
+        profile_name = profile_dict.get('name')
+        if profile_name != None and not self._profileDicts.get('name'):
+            print("Registering: ", profile_name)
+            self._profileDicts[profile_name] = profile_dict
+            self._profileCreateBuilders[profile_name] = self.CreateDeviceBuilder(
                 profile_dict, self)
         else:
-            raise KeyError(f'Missing or duplicate profile enum for {enum}')
+            raise KeyError(f'Missing or duplicate profile name for {name}')
 
-    def genProfilesHeader(self):
-        """
-        docstring
-        """
-        header_str = _JOIN(
-            license_header,
-            self._genCIncludes(),
-            self._genEnumDecl(),
-            self._genProfileCreateDecl(),
-            self._profileSupportCheckBuilder.genSupportCheckDecl(),
-            self._genCPPIncludes(),
-            self._genProfileCreateImpl(),
-            "\n",
-            self._profileSupportCheckBuilder.genSupportCheckImpl(),
-            "\n")
+    def genProfilesHeaderFile(self):
+        header_str = header_template.format(self._genProfileEnumDecl()) + helper_code + self._genCreateDeviceImpl() + '\n' + _JOIN(self._profileSupportCheckBuilder.genGetPhysicalDeviceProfilesImpl())
         header_dir = os.path.dirname(self._headerPath)
         os.makedirs(header_dir, exist_ok=True)
         with open(self._headerPath, 'w') as header_fp:
             header_fp.write(header_str)
 
-    class ProfileSupportCheckBuilder():
-        def __init__(self, profile_dicts, parent_inst):
+    class GetPhysicalDeviceProfilesBuilder():
+        def __init__(self, database_tree, profile_dicts, parent_inst):
+            self._database_tree = database_tree
             self._profile_dicts = profile_dicts
             self._parent_inst = parent_inst
-
-        def _genMacros(self):
-            return '''
-    #define CHECK_SUPPORT_EXPR(expr, msg) supported = supported && expr;\\
-        std::cout << msg << " " << (expr ? " PASS" : " FAIL") << std::endl;
-    #define ALT_CHECK_SUPPORT_EXPR(expr, msg) altSupported = altSupported && expr;\\
-        std::cout << msg << " " << (expr ? " PASS" : " FAIL") << std::endl;'''
 
         def _genProfileSwitch(self):
             cases = []
             for enum, profile_dict in self._profile_dicts.items():
                 case = f'''
             case {enum}: {{
-                {self._genProfileCheck(profile_dict)}\n
+                {self._genProfileCheck(profile_dict)}
             }} break;'''
                 cases.append(case)
-            return _JOIN("switch(profile) {",
-                         *cases,
-                         "\t\t}\n")
-
-        def _genProfileCheckLoop(self):
-            return f'''
-    for (int i = 0; i < profileCount; ++i) {{
-        VkBool32 supported = VK_TRUE;
-        VpProfile profile = pProfiles[i];
-        {self._genProfileSwitch()}
-        pSupportedProfiles[i] = supported;
-    }}'''
+            return _JOIN(*cases)
 
         def _genProfileCheck(self, profile_dict):
             return f'''
@@ -269,16 +221,28 @@ inline {self._getProfileCreateSign()} {{
 
         def _genCheckPhysicalDeviceProperties(self, profile_dict, isAlt=False):
             # TODO support members other than just limits
+
+            root = self._database_tree.getroot()
+
             properties = profile_dict.get('VkPhysicalDeviceProperties')
+
+
             check_str = ""
+            print("Limits 0")
             if properties:
+                print("Limits 1")
                 limits = properties.get('limits')
                 if limits:
+                    print("Limits 2")
                     for member, limit in limits.items():
-                        if limit['type'] == 'min':
-                            op = '>='
-                        else:
-                            op = '<='
+                        op = '<='
+
+                        for element in root.findall("./types/type[@category='struct']/member"):
+                            if element.find('name').text == f'{member}':
+                                if element.get('limittype') == 'min':
+                                    op = '>='
+                                break
+
                         expr_str = f"deviceProperties.limits.{member} {op} {limit['value']}"
                         check_str += f"\t\t\t\t{self._genCheckMacroCall(expr_str, isAlt)};"
             return check_str
@@ -305,28 +269,24 @@ inline {self._getProfileCreateSign()} {{
                     usage_flag_names = format_req.get("usage")
                     create_flag_names = format_req.get("flags")
                     if usage_flag_names:
-                        usage_flag_bits = "{" + ',\n'.join(
-                            map(lambda flag_name: f'{flag_name}', usage_flag_names)) + "}"
-                        format_checks.append(
-                            f"std::vector<VkImageUsageFlagBits> usageFlagBits = {usage_flag_bits};")
-                        format_checks.append(
-                            f"VkImageUsageFlags usage = maskBitFlags(usageFlagBits);")
+                        usage_flag_bits = '|'.join(
+                            map(lambda flag_name: f'{flag_name}', usage_flag_names))
+                        format_checks.append(f'''
+                        VkImageUsageFlags usage = {usage_flag_bits};''')
                     else:
-                        format_checks.append(
-                            f"VkImageUsageFlags usage = 0;")
+                        format_checks.append(f'''
+                        VkImageUsageFlags usage = 0;''')
 
                     if create_flag_names:
-                        create_flag_bits = "{" + ',\n'.join(
-                            map(lambda flag_name: f'{flag_name}', create_flag_names)) + "}"
-                        format_checks.append(
-                            f"std::vector<VkImageCreateFlagBits> createFlagBits = {create_flag_bits};")
-                        format_checks.append(
-                            f"VkImageCreateFlags flags = maskBitFlags(createFlagBits);")
-                    else:
-                        format_checks.append(
-                            f"VkImageCreateFlags flags = 0;")
+                        create_flag_bits = '|'.join(
+                            map(lambda flag_name: f'{flag_name}', create_flag_names))
                         format_checks.append(f'''
-                result = vkGetPhysicalDeviceImageFormatProperties(physicalDevice, {format_name}, {type_name}, {tiling}, usage, flags, &imageFormatProperties);''')
+                        VkImageCreateFlags flags = {create_flag_bits};''')
+                    else:
+                        format_checks.append(f'''
+                        VkImageCreateFlags flags = 0;''')
+                        format_checks.append(f'''
+                        result = vkGetPhysicalDeviceImageFormatProperties(physicalDevice, {format_name}, {type_name}, {tiling}, usage, flags, &imageFormatProperties);''')
                         format_checks.append(
                         f"{self._genCheckMacroCall('result == VK_SUCCESS', isAlt)};")
                     return _JOIN(*format_checks)
@@ -366,42 +326,72 @@ inline {self._getProfileCreateSign()} {{
             else:
                 return f'CHECK_SUPPORT_EXPR({expr_str}, \"{expr_str}\")'
 
-        def _genGetPhysicalDeviceProperties(self):
-            return '''
-    VkPhysicalDeviceProperties deviceProperties = {};
-    vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);'''
+        def genGetPhysicalDeviceProfilesImpl(self):
+            return f'''
+inline void vpGetPhysicalDeviceProfiles(VkPhysicalDevice physicalDevice, uint32_t *profileCount, VpProfile *pProfiles) {{
+    #define CHECK_SUPPORT_EXPR(expr, msg) supported = supported && expr; \\
+        std::cout << msg << " " << (expr ? " PASS" : " FAIL") << std::endl;
+    #define ALT_CHECK_SUPPORT_EXPR(expr, msg) altSupported = altSupported && expr;\\
+        std::cout << msg << " " << (expr ? " PASS" : " FAIL") << std::endl;
 
-        def _getSupportCheckSign(self):
-            return "void vpGetPhysicalDeviceProfiles(VkPhysicalDevice physicalDevice, uint32_t profileCount, const VpProfile *pProfiles, VkBool32 *pSupportedProfiles)"
+    VkResult result;
 
-        def genSupportCheckDecl(self):
-            return f"{self._getSupportCheckSign()};\n"
+    uint32_t extensionPropertyCount;
+    result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionPropertyCount, nullptr);
+    std::vector<VkExtensionProperties> extensionProperties(extensionPropertyCount);
+    result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionPropertyCount, extensionProperties.data());
 
-        def genSupportCheckImpl(self):
-            return _JOIN(f"{self._getSupportCheckSign()} {{",
-                         f"{self._genMacros()}",
-                         f"\tVkResult result;",
-                         f"{self._parent_inst._genEnumerateInstanceExtensionProperties()}",
-                         f"{self._parent_inst._genGetPhysicalDeviceFeatures()}",
-                         f"{self._genGetPhysicalDeviceProperties()}",
-                         f"{self._genProfileCheckLoop()}}}")
+    uint32_t deviceExtensionCount;
+    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &deviceExtensionCount, nullptr);
+    std::vector<VkExtensionProperties> deviceExtensions(deviceExtensionCount);
+    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &deviceExtensionCount, deviceExtensions.data());
 
-    class ProfileCreateBuilder():
-        NEXT_STRUCT_NAME_FMT = "pNext_{}"
+    VkPhysicalDeviceFeatures deviceFeatures = {{}};
+    vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
 
+    VkPhysicalDeviceProperties deviceProperties = {{}};
+    vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
+
+    uint32_t supported_profile_count = 0;
+    const int VP_PROFILE_COUNT = {len(self._profile_dicts)};
+
+    for (int profile_index = 0; profile_index < VP_PROFILE_COUNT; ++profile_index) {{
+        VkBool32 supported = VK_TRUE;
+
+        switch(profile_index) {{
+            {self._genProfileSwitch()}
+        }}
+
+        if (supported) {{
+            if (pProfiles != nullptr && supported_profile_count < *profileCount) {{
+                pProfiles[supported_profile_count] = static_cast<VpProfile>(profile_index);
+            }}
+            supported_profile_count++;
+        }}
+    }}
+
+    if (pProfiles == nullptr) {{
+        *profileCount = supported_profile_count;
+    }}
+}}'''
+
+    class CreateDeviceBuilder():
         def __init__(self, profile_dict, parent_inst):
             self._profile_dict = profile_dict
             self._parent_inst = parent_inst
 
         def _genPhysicalDeviceFeatures(self):
-            struct_blocks = ["\t\t\tVkPhysicalDeviceFeatures enabledFeatures = {};",
-                             "\t\t\tif (pCreateInfo->pEnabledFeatures != NULL)",
-                             "\t\t\t\tenabledFeatures = *pCreateInfo->pEnabledFeatures;"]
+            struct_blocks = '''
+            VkPhysicalDeviceFeatures enabledFeatures = {};
+            if (pCreateInfo->pEnabledFeatures != nullptr)
+                enabledFeatures = *pCreateInfo->pEnabledFeatures;
+            '''
+
             features_list = self._profile_dict.get("VkPhysicalDeviceFeatures")
             if features_list:
                 for feature, value in features_list.items():
-                    struct_blocks.append(
-                        f"\t\t\tenabledFeatures.{feature} = {value};")
+                    struct_blocks += f'''
+            enabledFeatures.{feature} = {value};'''
             alt_groups = self._profile_dict.get('ArrayOfArrayOfAlternatives')
             if alt_groups:
                 for alt_group in alt_groups:
@@ -409,10 +399,11 @@ inline {self._getProfileCreateSign()} {{
                         alt_features = alt.get('VkPhysicalDeviceFeatures')
                         if alt_features:
                             for feature_name, value in alt_features.items():
-                                struct_blocks += [f'\t\t\tif (deviceFeatures.{feature_name} == {value}) {{',
-                                                  f'\t\t\t\tenabledFeatures.{feature_name} = {value};',
-                                                  '\t\t\t}']
-            return _JOIN(*struct_blocks)
+                                struct_blocks += f'''
+            if (deviceFeatures.{feature_name} == {value}) {{
+                enabledFeatures.{feature_name} = {value};
+            }}'''
+            return struct_blocks
 
         def _genEnabledExtensions(self):
             extensions = []
@@ -432,11 +423,17 @@ inline {self._getProfileCreateSign()} {{
                 literals = "{" + ','.join(map(lambda ext: '\n\t\t\t\tVkExtensionProperties{{"{}", {}}}'.format(ext['extensionName'], ext['specVersion']), extensions)) + "}"
                 return f'''
             std::vector<VkExtensionProperties> profileExtProps = {literals};
-            std::vector<const char*> profileExtNames = getSupportedExtensionNames(profileExtProps, extensionProperties);
-            std::vector<const char*> extensions = mergeExtensionList(profileExtNames.size(), profileExtNames.data(),
-            pCreateInfo->enabledExtensionCount, pCreateInfo->ppEnabledExtensionNames);
-            const char* const* enabledExtensions = extensions.data();
-            uint32_t enabledExtensionCount = extensions.size();'''
+
+            for (uint32_t i = 0; i < profileExtProps.size(); ++i) {{
+                extensions.push_back(profileExtProps[i].extensionName);
+            }}
+
+            for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; ++i) {{
+                if (isListed(extensions, pCreateInfo->ppEnabledExtensionNames[i]))
+                    continue;
+                extensions.push_back(pCreateInfo->ppEnabledExtensionNames[i]);
+            }}
+            '''
             else:
                 return '''
             const char* const* enabledExtensions = pCreateInfo->ppEnabledExtensionNames;
@@ -455,45 +452,38 @@ inline {self._getProfileCreateSign()} {{
                 for i, next_struct_desc in enumerate(next_struct_descs):
                     typeName = next_struct_desc['type']
                     members = next_struct_desc['members']
-                    name = self.NEXT_STRUCT_NAME_FMT.format(i)
+                    name = "pNext_{0}".format(i)
                     struct_decl = f"\t\t\t{typeName} {name} = {{}};\n"
                     struct_decl += f"\t\t\t{name}.sType = {self._getSType(typeName)};\n"
                     if i == len(next_struct_descs) - 1:
                         struct_decl += f"\t\t\t{name}.pNext = const_cast<void*>(pCreateInfo->pNext);\n"
                     else:
-                        struct_decl += f"\t\t\t{name}.pNext = &{self.NEXT_STRUCT_NAME_FMT.format(i+1)};\n"
+                        struct_decl += f"\t\t\t{name}.pNext = &{'pNext_{0}'.format(i+1)};\n"
                     for field, value in members.items():
                         struct_decl += f"\t\t\t{name}.{field} = {value};\n"
                     struct_decls.insert(0, struct_decl)
-                struct_decls.append(
-                    f"\t\t\tvoid* pNext = &{self.NEXT_STRUCT_NAME_FMT.format(0)};")
+                struct_decls.append('''
+            void* pNext = &pNext_0;''')
                 return _JOIN(*struct_decls)
             else:
-                return "\t\t\tvoid* pNext = NULL;"
+                return f'''
+            void* pNext = nullptr;'''
 
-        def _genDeviceCreateInfo(self):
-            return '''
-            VkDeviceCreateInfo deviceCreateInfo = {};
+        def genProfileImpl(self):
+            return f'''
+            {self._genEnabledExtensions()}
+            {self._genPhysicalDeviceFeatures()}
+            {self._genNextChain()}
+
+            VkDeviceCreateInfo deviceCreateInfo = {{}};
             deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
             deviceCreateInfo.pNext = pNext;
             deviceCreateInfo.queueCreateInfoCount = pCreateInfo->queueCreateInfoCount;
             deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pQueueCreateInfos;
-            deviceCreateInfo.enabledExtensionCount = enabledExtensionCount;
-            deviceCreateInfo.ppEnabledExtensionNames = enabledExtensions;
-            deviceCreateInfo.pEnabledFeatures = &enabledFeatures;'''
-
-        def _genCreateDevice(self):
-            return _JOIN(self._genEnabledExtensions(),
-                         self._genPhysicalDeviceFeatures(),
-                         self._genNextChain(),
-                         self._genDeviceCreateInfo(),
-                         "\t\t\tresult = vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);")
-
-        def genProfileImpl(self):
-            """
-            docstring
-            """
-            return f"{self._genCreateDevice()}"
+            deviceCreateInfo.enabledExtensionCount = extensions.empty() ? 0 : static_cast<uint32_t>(extensions.size());
+            deviceCreateInfo.ppEnabledExtensionNames = extensions.empty() ? nullptr : static_cast<const char* const*>(extensions.data());
+            deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
+            result = vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);'''
 
     class ProfileTestBuilder():
         pass
@@ -501,20 +491,22 @@ inline {self._getProfileCreateSign()} {{
 
 if __name__ == "__main__":
     # python ./scripts/generate_library.py ./registry/vk.xml ./scripts/profiles ./include/vulkan
-    print(sys.argv[1])
-    tree = etree.parse(sys.argv[1])
-    root = tree.getroot()
-    types = root.find("types")
+    #database = etree.parse(sys.argv[1])
+    #root = database.getroot()
 
-    # root.find("..//type[@id='4']")
+    #for element in root.findall("./types/type[@category='struct']/member"):
+    #    if element.find('name').text == 'maxImageDimension1D':
+    #        print(element.get('limittype'))
 
-    for type in types.findall("type"):
-        if type.get("category") != "struct":
-            continue
-        print(type.get("name"))
+    #database_file = sys.argv[1]
+    #profile_dir = sys.argv[2]
+    #header_path = sys.argv[3]
 
-    profile_dir = sys.argv[2]
-    header_path = sys.argv[3]
-    builder = ProfileLibraryBuilder(profile_dir, header_path)
-    builder.genProfilesHeader()
+    dirname = os.path.dirname(__file__)
+    database = os.path.join(dirname, 'vk.xml')
+    profiles = os.path.join(dirname, '../../profiles')
+    output = os.path.join(dirname, '../include/vulkan')
+
+    builder = ProfileLibraryBuilder(database, profiles, output)
+    builder.genProfilesHeaderFile()
 

@@ -1,8 +1,8 @@
-#include "vulkan_profiles.hpp"
+#include <vulkan/vulkan_profiles.hpp>
 
 #include <gtest/gtest.h>
 
-#include <cstdio>
+#include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <vector>
@@ -43,7 +43,7 @@ class TestScaffold {
         vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
         std::vector<VkQueueFamilyProperties> queueFamilyProperties(queueFamilyCount);
         vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilyProperties.data());
-        for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size()); ++i) {
+        for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size()); i++) {
             if (queueFamilyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
                 queueFamilyIndex = i;
                 queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -56,56 +56,42 @@ class TestScaffold {
     }
 };
 
-TEST(test_profile_create, create_device) {
+TEST(test_profile_create_generated, create_device) {
     return;
 
-    TestScaffold scaffold;
-
-    std::vector<VpProfileProperties> profiles;
+    std::vector<VpProfile> profiles;
     uint32_t profileCount = 0;
+
     {
-        vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
+        TestScaffold scaffold;
+        vpGetPhysicalDeviceProfiles(scaffold.physicalDevice, &profileCount, nullptr);
 
         profiles.resize(profileCount);
-        vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
+        vpGetPhysicalDeviceProfiles(scaffold.physicalDevice, &profileCount, &profiles[0]);
 
-        for (VpProfileProperties profile : profiles) {
-            std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
+        for (VpProfile profile : profiles) {
+            std::cout << "Profile supported: " << profile << std::endl;
         }
     }
 
     EXPECT_TRUE(profileCount > 0);
 
-    int error = 0;
-
-    static const char* extensions[] = {"VK_KHR_synchronization2", "VK_KHR_zero_initialize_workgroup_memory",
-                                       "VK_KHR_shader_terminate_invocation", "VK_KHR_imageless_framebuffer"};
-
-    for (const VpProfileProperties& profile : profiles) {
-        std::printf("Creating a Vulkan device using profile %s, version %d: ", profile.profileName, profile.specVersion);
-
+    for (VpProfile profile : profiles) {
+        TestScaffold scaffold;
         VkDevice device;
-
-        VkPhysicalDeviceFeatures enabledFeatures = {};
-        enabledFeatures.robustBufferAccess = VK_TRUE;
-
         VkDeviceCreateInfo info = {};
         info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        info.pNext = nullptr;
         info.queueCreateInfoCount = 1;
         info.pQueueCreateInfos = &scaffold.queueCreateInfo;
-        info.enabledExtensionCount = countof(extensions);
-        info.ppEnabledExtensionNames = extensions;
-        info.pEnabledFeatures = &enabledFeatures;
-
-        VkResult res = vpCreateDevice(scaffold.physicalDevice, &profile, &info, nullptr, &device);
+        info.enabledExtensionCount = 0;
+        info.ppEnabledExtensionNames = nullptr;
+        auto res = vpCreateDevice(scaffold.physicalDevice, profile, &info, nullptr, &device);
         if (res != VK_SUCCESS) {
-            ++error;
-            std::printf("FAILURE: %d\n", res);
+            std::cout << "FAILURE: " << res << std::endl;
         } else {
-            std::printf("SUCCESS!\n");
+            std::cout << "SUCCESS?" << std::endl;
         }
-    }
 
-    EXPECT_EQ(0, error);
+        EXPECT_EQ(VK_SUCCESS, res);
+    }
 }
