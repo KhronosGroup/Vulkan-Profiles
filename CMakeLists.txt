@@ -4,7 +4,8 @@ enable_testing()
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
 
-project (VULKAN_PROFILES)
+project(VULKAN_PROFILES)
+set(VULKAN_TAG v1.2.189)
 
 # Define GNU standard installation directories.
 include(GNUInstallDirs)
@@ -16,26 +17,26 @@ find_package(PythonInterp 3 REQUIRED)
 include(FetchContent)
 
 FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest
-  GIT_TAG release-1.11.0
+	googletest
+	GIT_REPOSITORY https://github.com/google/googletest
+	GIT_TAG release-1.11.0
 )
 
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 FetchContent_Declare(
-  json
-  GIT_REPOSITORY https://github.com/nlohmann/json
-  GIT_TAG v3.10.0
+	json
+	GIT_REPOSITORY https://github.com/nlohmann/json
+	GIT_TAG v3.10.0
 )
 
 FetchContent_MakeAvailable(json)
 
 FetchContent_Declare(
-  jsoncpp
-  GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp
-  GIT_TAG 1.9.4
+	jsoncpp
+	GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp
+	GIT_TAG 1.9.4
 )
 
 set(JSONCPP_WITH_TESTS OFF CACHE BOOL "" FORCE)
@@ -47,12 +48,12 @@ set(BUILD_OBJECT_LIBS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(jsoncpp)
 
 FetchContent_Declare(
-  vulkan-headers
+  Vulkan-Headers
   GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers
-  GIT_TAG v1.2.182
+  GIT_TAG ${VULKAN_TAG}
 )
 
-FetchContent_MakeAvailable(vulkan-headers)
+FetchContent_MakeAvailable(Vulkan-Headers)
 
 # Library project
 add_subdirectory(library)
