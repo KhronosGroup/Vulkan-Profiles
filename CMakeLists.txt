@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.11.0)
 enable_testing()
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
+set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION_MAXIMUM FALSE) # Workaround to fix C.I. build on VS2015
 
 project(VULKAN_PROFILES)
 set(VULKAN_TAG v1.2.189)
@@ -47,13 +48,25 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_OBJECT_LIBS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(jsoncpp)
 
+set(UPDATE_DEPS ON)
+set(BUILD_TESTS OFF)
+set(VVL_CPP_STANDARD 11)
+
 FetchContent_Declare(
-  Vulkan-Headers
-  GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers
-  GIT_TAG ${VULKAN_TAG}
+	Vulkan-Headers
+	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers
+	GIT_TAG main
 )
 
 FetchContent_MakeAvailable(Vulkan-Headers)
+
+FetchContent_Declare(
+	Vulkan-Loader
+	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Loader
+	GIT_TAG master
+)
+
+FetchContent_MakeAvailable(Vulkan-Loader)
 
 # Library project
 add_subdirectory(library)
