@@ -8,7 +8,7 @@ function(add_unit_test NAME)
     set(TEST_NAME library_${NAME})
 
     add_executable(${TEST_NAME} ${TEST_FILE})
-    target_link_libraries(${TEST_NAME} PRIVATE gtest gtest_main Vulkan::Headers Vulkan::Profiles)
+    target_link_libraries(${TEST_NAME} PRIVATE gtest gtest_main Vulkan::Headers Vulkan::Profiles vulkan)
     add_dependencies(${TEST_NAME} vulkan_profiles)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 endfunction(add_unit_test)

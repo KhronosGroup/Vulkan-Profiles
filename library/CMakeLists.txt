@@ -4,7 +4,6 @@ add_library(VulkanProfiles INTERFACE)
 target_include_directories(VulkanProfiles INTERFACE include)
 add_library(Vulkan::Profiles ALIAS VulkanProfiles)
 
-
 source_group("Python Files" FILES ${CMAKE_SOURCE_DIR}/library/scripts/generate_library.py)
 
 add_custom_target(vulkan_profiles
