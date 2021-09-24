@@ -56,7 +56,27 @@ class TestScaffold {
     }
 };
 
-TEST(test_profile_create, create_device) {
+TEST(test_profile, enumerate) {
+    TestScaffold scaffold;
+
+    std::vector<VpProfileProperties> profiles;
+    uint32_t profileCount = 0;
+    {
+        vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
+
+        profiles.resize(profileCount);
+        vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
+
+        for (VpProfileProperties profile : profiles) {
+            std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
+        }
+    }
+
+    EXPECT_TRUE(profileCount > 0);
+}
+
+
+TEST(test_profile, create_device) {
     return;
 
     TestScaffold scaffold;
