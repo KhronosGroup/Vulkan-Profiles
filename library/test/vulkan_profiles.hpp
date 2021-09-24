@@ -80,6 +80,18 @@ static const VkExtensionProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSION
     VkExtensionProperties{"VK_EXT_separate_stencil_usage", 1},
     VkExtensionProperties{"VK_EXT_shader_viewport_index_layer", 1}};
 
+struct VpFormatProperties {
+    VkFormat format;
+    VkFormatFeatureFlags linearTilingFeatures;
+    VkFormatFeatureFlags optimalTilingFeatures;
+    VkFormatFeatureFlags bufferFeatures;
+};
+
+static const VpFormatProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[] = {
+    {VK_FORMAT_B4G4R4A4_UNORM_PACK16, VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT, VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT, 0},
+    {VK_FORMAT_R5G6B5_UNORM_PACK16, VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT, VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT, 0},
+};
+
 #define countof(arr) sizeof(arr) / sizeof(arr[0])
 
 typedef struct VpProfileProperties {
@@ -106,7 +118,7 @@ inline bool vpCheckExtension(const VkExtensionProperties *supportedProperties, s
     return false;
 }
 
-inline void *vpGetStructure(void* pNext, VkStructureType type) {
+inline void *vpGetStructure(void *pNext, VkStructureType type) {
     if (pNext == nullptr) {
         return nullptr;
     }
@@ -127,7 +139,6 @@ inline void *vpGetStructure(void* pNext, VkStructureType type) {
 
 inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile,
                                const VkDeviceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {
-
     if (pProfile == nullptr) {
         return vkCreateDevice(physicalDevice, pCreateInfo, pAllocator, pDevice);
     } else if (strcmp(pProfile->profileName, VP_KHR_MINIMUM_REQUIREMENTS_NAME) == 0) {
@@ -747,6 +758,17 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                                                                  VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i].extensionName);
 
                 if (!supportedInstanceExt && !supportedDeviceExt) {
+                    supported = VK_FALSE;
+                }
+            }
+
+            for (std::size_t i = 0, n = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS); i < n && supported; ++i) {
+                const VpFormatProperties &requiredProps = VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[i];
+
+                VkFormatProperties2 deviceProps;
+                vkGetPhysicalDeviceFormatProperties2(physicalDevice, requiredProps.format, &deviceProps);
+
+                if (false) {
                     supported = VK_FALSE;
                 }
             }
