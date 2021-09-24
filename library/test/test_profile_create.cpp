@@ -61,15 +61,16 @@ TEST(test_profile, enumerate) {
 
     std::vector<VpProfileProperties> profiles;
     uint32_t profileCount = 0;
-    {
-        vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
+    
+    VkResult result_count = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
+    assert(result_count == VK_SUCCESS);
 
-        profiles.resize(profileCount);
-        vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
+    profiles.resize(profileCount);
+    VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
+    assert(result_profile == VK_SUCCESS);
 
-        for (VpProfileProperties profile : profiles) {
-            std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
-        }
+    for (VpProfileProperties profile : profiles) {
+        std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
     }
 
     EXPECT_TRUE(profileCount > 0);
