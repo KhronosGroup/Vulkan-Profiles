@@ -145,7 +145,7 @@ TEST(test_profile, create_profile) {
 }
 
 
-TEST(test_profile, create_extensions) {
+TEST(test_profile, create_extensions_supported) {
     TestScaffold scaffold;
 
     std::vector<VpProfileProperties> profiles;
@@ -165,8 +165,7 @@ TEST(test_profile, create_extensions) {
 
     int error = 0;
 
-    static const char* extensions[] = {"VK_KHR_synchronization2", "VK_KHR_zero_initialize_workgroup_memory",
-                                       "VK_KHR_shader_terminate_invocation", "VK_KHR_imageless_framebuffer"};
+    static const char* extensions[] = {"VK_KHR_image_format_list", "VK_KHR_maintenance3", "VK_KHR_imageless_framebuffer"};
 
     for (const VpProfileProperties& profile : profiles) {
         std::printf("Creating a Vulkan device using profile %s, version %d: ", profile.profileName, profile.specVersion);
@@ -192,6 +191,59 @@ TEST(test_profile, create_extensions) {
         } else {
             vkDestroyDevice(device, nullptr);
             std::printf("SUCCESS!\n");
+        }
+    }
+
+    EXPECT_EQ(0, error);
+}
+
+TEST(test_profile, create_extensions_unsupported) {
+    TestScaffold scaffold;
+
+    std::vector<VpProfileProperties> profiles;
+    uint32_t profileCount = 0;
+
+    VkResult result_count = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
+    ASSERT_TRUE(result_count == VK_SUCCESS);
+
+    profiles.resize(profileCount);
+    VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
+    ASSERT_TRUE(result_profile == VK_SUCCESS);
+    EXPECT_TRUE(profileCount > 0);
+
+    for (VpProfileProperties profile : profiles) {
+        std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
+    }
+
+    int error = 0;
+
+    static const char* extensions[] = {"VK_KHR_ray_tracing_pipeline", "VK_KHR_zero_initialize_workgroup_memory",
+                                       "VK_KHR_shader_terminate_invocation", "VK_KHR_imageless_framebuffer"};
+
+    for (const VpProfileProperties& profile : profiles) {
+        std::printf("Creating a Vulkan device using profile %s, version %d: ", profile.profileName, profile.specVersion);
+
+        VkPhysicalDeviceFeatures enabledFeatures = {};
+        enabledFeatures.robustBufferAccess = VK_TRUE;
+
+        VkDeviceCreateInfo info = {};
+        info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        info.pNext = nullptr;
+        info.queueCreateInfoCount = 1;
+        info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+        info.enabledExtensionCount = countof(extensions);
+        info.ppEnabledExtensionNames = extensions;
+        info.pEnabledFeatures = nullptr;
+
+        VkDevice device = VK_NULL_HANDLE;
+        VkResult res = vpCreateDevice(scaffold.physicalDevice, &profile, &info, nullptr, &device);
+        if (res == VK_SUCCESS) {
+            ASSERT_TRUE(device == VK_NULL_HANDLE);
+            std::printf("UNEXPECTED FAILURE: %d\n", res);
+        } else {
+            ++error;
+            vkDestroyDevice(device, nullptr);
+            std::printf("UNEXPECTED SUCCESS\n");
         }
     }
 
