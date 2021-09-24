@@ -4,7 +4,6 @@
 
 #include <cstdio>
 #include <memory>
-#include <stdexcept>
 #include <vector>
 
 #if defined(_WIN32)
