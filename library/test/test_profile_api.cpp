@@ -26,61 +26,12 @@
 #include <memory>
 #include <vector>
 
-static const float DEFAULT_QUEUE_PRIORITY(0.0f);
-
-class TestScaffold {
-   public:
-    VkInstance instance;
-    VkPhysicalDevice physicalDevice;
-    uint32_t queueFamilyIndex;
-    VkDeviceQueueCreateInfo queueCreateInfo;
-
-    TestScaffold() {
-        VkApplicationInfo appInfo{};
-        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName = "Testing scaffold";
-        appInfo.applicationVersion = VK_MAKE_VERSION(1, 2, 0);
-        appInfo.pEngineName = "No Engine";
-        appInfo.engineVersion = VK_MAKE_VERSION(1, 2, 0);
-        appInfo.apiVersion = VK_API_VERSION_1_2;
-
-        VkInstanceCreateInfo createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        createInfo.pApplicationInfo = &appInfo;
-        VkResult res = vkCreateInstance(&createInfo, nullptr, &instance);
-        EXPECT_TRUE(res == VK_SUCCESS);
-
-        uint32_t deviceCount = 0;
-        vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
-        EXPECT_TRUE(deviceCount > 0);
-
-        std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
-        vkEnumeratePhysicalDevices(instance, &deviceCount, physicalDevices.data());
-        physicalDevice = physicalDevices[0];
-        queueCreateInfo = {};
-        uint32_t queueFamilyCount;
-        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
-        std::vector<VkQueueFamilyProperties> queueFamilyProperties(queueFamilyCount);
-        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilyProperties.data());
-        for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size()); ++i) {
-            if (queueFamilyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-                queueFamilyIndex = i;
-                queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-                queueCreateInfo.queueFamilyIndex = i;
-                queueCreateInfo.queueCount = 1;
-                queueCreateInfo.pQueuePriorities = &DEFAULT_QUEUE_PRIORITY;
-                break;
-            }
-        }
-    }
-};
-
 TEST(test_profile, enumerate) {
     TestScaffold scaffold;
 
     std::vector<VpProfileProperties> profiles;
     uint32_t profileCount = 0;
-    
+
     VkResult result_count = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
     ASSERT_TRUE(result_count == VK_SUCCESS);
 
@@ -139,7 +90,6 @@ TEST(test_profile, create_profile) {
 
     EXPECT_EQ(0, error);
 }
-
 
 TEST(test_profile, create_extensions_supported) {
     TestScaffold scaffold;
