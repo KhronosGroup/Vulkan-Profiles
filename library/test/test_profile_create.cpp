@@ -217,14 +217,11 @@ TEST(test_profile, create_extensions_unsupported) {
 
     int error = 0;
 
-    static const char* extensions[] = {"VK_KHR_ray_tracing_pipeline", "VK_KHR_zero_initialize_workgroup_memory",
-                                       "VK_KHR_shader_terminate_invocation", "VK_KHR_imageless_framebuffer"};
+    static const char* extensions[] = {"VK_LUNARG_doesnot_exist", "VK_GTRUC_automagic_rendering",
+                                       "VK_GTRUC_portability_everywhere"};
 
     for (const VpProfileProperties& profile : profiles) {
         std::printf("Creating a Vulkan device using profile %s, version %d: ", profile.profileName, profile.specVersion);
-
-        VkPhysicalDeviceFeatures enabledFeatures = {};
-        enabledFeatures.robustBufferAccess = VK_TRUE;
 
         VkDeviceCreateInfo info = {};
         info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -237,9 +234,9 @@ TEST(test_profile, create_extensions_unsupported) {
 
         VkDevice device = VK_NULL_HANDLE;
         VkResult res = vpCreateDevice(scaffold.physicalDevice, &profile, &info, nullptr, &device);
-        if (res == VK_SUCCESS) {
+        if (res != VK_SUCCESS) {
             ASSERT_TRUE(device == VK_NULL_HANDLE);
-            std::printf("UNEXPECTED FAILURE: %d\n", res);
+            std::printf("EXPECTED FAILURE: %d\n", res);
         } else {
             ++error;
             vkDestroyDevice(device, nullptr);
