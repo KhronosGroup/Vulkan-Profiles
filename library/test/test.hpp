@@ -45,11 +45,10 @@ struct DisableDebugPopup {
 #endif
     }
 };
-static const DisableDebugPopup disable_debug_popup;
 
 static const float DEFAULT_QUEUE_PRIORITY(0.0f);
 
-class TestScaffold {
+class TestScaffold : public DisableDebugPopup {
    public:
     VkInstance instance;
     VkPhysicalDevice physicalDevice;
