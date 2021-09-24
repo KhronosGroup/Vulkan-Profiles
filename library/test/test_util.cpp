@@ -18,7 +18,7 @@
  * - Christophe Riccio <christophe@lunarg.com>
  */
 
-#include <gtest/gtest.h>
+#include "test.hpp"
 
 #include "vulkan_profiles.hpp"
 
