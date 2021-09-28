@@ -51,6 +51,7 @@ FetchContent_MakeAvailable(jsoncpp)
 set(UPDATE_DEPS ON)
 set(BUILD_TESTS OFF)
 set(VVL_CPP_STANDARD 11)
+set(_build_type ${CMAKE_BUILD_TYPE})
 
 FetchContent_Declare(
 	Vulkan-Headers
