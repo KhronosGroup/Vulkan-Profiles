@@ -22,7 +22,51 @@
 
 #include "vulkan_profiles.hpp"
 
-TEST(test_library_util, GetStructure) { 
+struct FormatFeatureFlagBits {
+    int flag;
+    std::string label;
+};
+
+std::vector<std::string> GetFormatFeatures(int flags) {
+    static const FormatFeatureFlagBits format_features[] = {
+        {VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT, "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"},
+        {VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT, "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT"},
+        {VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT, "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT"},
+        {VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT, "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT"},
+        {VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT, "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT"},
+        {VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT, "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"},
+        {VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT, "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT"},
+        {VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT, "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT"},
+        {VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT, "VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT"},
+        {VK_FORMAT_FEATURE_BLIT_SRC_BIT, "VK_FORMAT_FEATURE_BLIT_SRC_BIT"},
+        {VK_FORMAT_FEATURE_BLIT_DST_BIT, "VK_FORMAT_FEATURE_BLIT_DST_BIT"},
+        {VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT, "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"},
+        {VK_FORMAT_FEATURE_TRANSFER_SRC_BIT, "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT"},
+        {VK_FORMAT_FEATURE_TRANSFER_DST_BIT, "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"},
+        {VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT, "VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT"}
+    };
+
+    std::vector<std::string> results;
+
+    for (std::size_t i = 0, n = countof(format_features); i < n; ++i) {
+        if (flags & format_features[i].flag) results.push_back(format_features[i].label);
+    }
+
+    return results;
+}
+
+TEST(test_library_util, GetPropertiesDesktopPortability1_0) { 
+    std::vector<std::string> VK_FORMAT_B4G4R4A4_UNORM_PACK16 = GetFormatFeatures(5121);
+    std::vector<std::string> VK_FORMAT_R5G6B5_UNORM_PACK16 = GetFormatFeatures(7553);
+    std::vector<std::string> VK_FORMAT_R8_UINT = GetFormatFeatures(3201);
+    std::vector<std::string> VK_FORMAT_R8_UINT_buffer = GetFormatFeatures(72);
+    std::vector<std::string> VK_FORMAT_R8G8B8A8_UNORM_buffer = GetFormatFeatures(88);
+
+
+    EXPECT_TRUE(true);
+}
+
+TEST(test_library_util, GetStructure) {
     VkPhysicalDeviceVulkan11Features pNext_1 = {};
     pNext_1.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
     pNext_1.pNext = nullptr;
