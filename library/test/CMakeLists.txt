@@ -1,8 +1,5 @@
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-find_package(Vulkan REQUIRED)
-link_libraries(${Vulkan_LIBRARIES})
-
 function(add_unit_test NAME)
 	set(TEST_FILE ./${NAME}.cpp)
     set(TEST_NAME library_${NAME})
