@@ -27,6 +27,10 @@
 #include <vector>
 
 TEST(test_profile_generated, enumerate) {
+#if (defined(NDEBUG) && defined(_WIN32))
+    return;
+#endif
+
     TestScaffold scaffold;
 
     uint32_t profileCount = 0;
@@ -45,6 +49,10 @@ TEST(test_profile_generated, enumerate) {
 }
 
 TEST(test_profile_create_generated, create_device) {
+#if (defined(NDEBUG) && defined(_WIN32))
+    return;
+#endif
+
     TestScaffold scaffold;
 
     uint32_t profileCount = 0;
