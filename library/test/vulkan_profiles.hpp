@@ -1319,6 +1319,178 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                     break;
                 }
             }
+
+            VkPhysicalDeviceImagelessFramebufferFeaturesKHR imagelessFramebufferFeatures = {};
+            imagelessFramebufferFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES;
+            imagelessFramebufferFeatures.pNext = nullptr;
+
+            VkPhysicalDevice16BitStorageFeatures storage16bit = {};
+            storage16bit.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES;
+            storage16bit.pNext = &imagelessFramebufferFeatures;
+
+            VkPhysicalDeviceMultiviewFeatures multiviewFeatures = {};
+            multiviewFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES;
+            multiviewFeatures.pNext = &storage16bit;
+
+            VkPhysicalDevice8BitStorageFeatures storage8bit = {};
+            storage8bit.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES;
+            storage8bit.pNext = &multiviewFeatures;
+
+            VkPhysicalDeviceDescriptorIndexingFeatures descriptorIndexingFeatures = {};
+            descriptorIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+            descriptorIndexingFeatures.pNext = &storage8bit;
+
+            VkPhysicalDeviceHostQueryResetFeatures queryResetFeatures = {};
+            queryResetFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES;
+            queryResetFeatures.pNext = &descriptorIndexingFeatures;
+
+            VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures subgroupExtendedTypesFeatures = {};
+            subgroupExtendedTypesFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES;
+            subgroupExtendedTypesFeatures.pNext = &queryResetFeatures;
+
+            VkPhysicalDeviceUniformBufferStandardLayoutFeatures uniformBufferStandardLayoutFeatures = {};
+            uniformBufferStandardLayoutFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES;
+            uniformBufferStandardLayoutFeatures.pNext = &subgroupExtendedTypesFeatures;
+
+            VkPhysicalDeviceFeatures2 deviceFeatures = {};
+            deviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+            deviceFeatures.pNext = &uniformBufferStandardLayoutFeatures;
+
+            vkGetPhysicalDeviceFeatures2(physicalDevice, &deviceFeatures);
+
+            if (deviceFeatures.features.robustBufferAccess != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.fullDrawIndexUint32 != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.imageCubeArray != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.independentBlend != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.tessellationShader != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.sampleRateShading != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.multiDrawIndirect != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.drawIndirectFirstInstance != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.depthClamp != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.depthBiasClamp != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.fillModeNonSolid != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.largePoints != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.multiViewport != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.textureCompressionBC != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.occlusionQueryPrecise != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.vertexPipelineStoresAndAtomics != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.fragmentStoresAndAtomics != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.shaderTessellationAndGeometryPointSize != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.shaderImageGatherExtended != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.shaderStorageImageWriteWithoutFormat != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (deviceFeatures.features.shaderClipDistance != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+
+            if (imagelessFramebufferFeatures.imagelessFramebuffer != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (storage16bit.storageBuffer16BitAccess != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (storage16bit.uniformAndStorageBuffer16BitAccess != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (multiviewFeatures.multiview != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (storage8bit.storageBuffer8BitAccess != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (storage8bit.uniformAndStorageBuffer8BitAccess != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.shaderUniformTexelBufferArrayDynamicIndexing != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.shaderStorageTexelBufferArrayDynamicIndexing != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.shaderUniformTexelBufferArrayNonUniformIndexing != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.descriptorBindingStorageImageUpdateAfterBind != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.descriptorBindingUniformTexelBufferUpdateAfterBind != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.descriptorBindingStorageTexelBufferUpdateAfterBind != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.descriptorBindingPartiallyBound != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.descriptorBindingVariableDescriptorCount != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingFeatures.runtimeDescriptorArray != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (queryResetFeatures.hostQueryReset != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (subgroupExtendedTypesFeatures.shaderSubgroupExtendedTypes != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (uniformBufferStandardLayoutFeatures.uniformBufferStandardLayout != VK_TRUE) {
+                supported = VK_FALSE;
+            }
         }
 
         if (supported) {
