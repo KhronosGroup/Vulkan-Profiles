@@ -1301,11 +1301,22 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             for (std::size_t i = 0, n = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS); i < n && supported; ++i) {
                 const VpFormatProperties &requiredProps = VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[i];
 
-                VkFormatProperties2 deviceProps;
-                //vkGetPhysicalDeviceFormatProperties2(physicalDevice, requiredProps.format, &deviceProps);
+                VkFormatProperties2 deviceProps = {};
+                deviceProps.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+                vkGetPhysicalDeviceFormatProperties2(physicalDevice, requiredProps.format, &deviceProps);
 
-                if (false) {
+                if ((deviceProps.formatProperties.linearTilingFeatures & requiredProps.linearTilingFeatures) !=
+                    requiredProps.linearTilingFeatures) {
                     supported = VK_FALSE;
+                    break;
+                } else if ((deviceProps.formatProperties.optimalTilingFeatures & requiredProps.optimalTilingFeatures) !=
+                           requiredProps.optimalTilingFeatures) {
+                    supported = VK_FALSE;
+                    break;
+                } else if ((deviceProps.formatProperties.bufferFeatures & requiredProps.bufferFeatures) !=
+                           requiredProps.bufferFeatures) {
+                    supported = VK_FALSE;
+                    break;
                 }
             }
         }
