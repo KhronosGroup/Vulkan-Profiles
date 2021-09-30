@@ -29,16 +29,18 @@
 TEST(test_profile, enumerate) {
     TestScaffold scaffold;
 
-    std::vector<VpProfileProperties> profiles;
     uint32_t profileCount = 0;
 
     VkResult result_count = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
-    ASSERT_TRUE(result_count == VK_SUCCESS);
-
-    profiles.resize(profileCount);
-    VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
-    ASSERT_TRUE(result_profile == VK_SUCCESS);
+    EXPECT_TRUE(result_count == VK_SUCCESS);
     EXPECT_TRUE(profileCount > 0);
+
+    std::vector<VpProfileProperties> profiles;
+    if (profileCount > 0) {
+        profiles.resize(profileCount);
+        VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
+        EXPECT_TRUE(result_profile == VK_SUCCESS);
+    }
 
     for (VpProfileProperties profile : profiles) {
         std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
@@ -48,18 +50,20 @@ TEST(test_profile, enumerate) {
 TEST(test_profile, create_profile) {
     TestScaffold scaffold;
 
-    std::vector<VpProfileProperties> profiles;
     uint32_t profileCount = 0;
 
     VkResult result_count = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
-    ASSERT_TRUE(result_count == VK_SUCCESS);
-
-    profiles.resize(profileCount);
-    VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
-    ASSERT_TRUE(result_profile == VK_SUCCESS);
+    EXPECT_TRUE(result_count == VK_SUCCESS);
     EXPECT_TRUE(profileCount > 0);
 
-    for (VpProfileProperties profile : profiles) {
+    std::vector<VpProfileProperties> profiles;
+    if (profileCount > 0) {
+        profiles.resize(profileCount);
+        VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
+        EXPECT_TRUE(result_profile == VK_SUCCESS);
+    }
+
+    for (const VpProfileProperties& profile : profiles) {
         std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
     }
 
@@ -81,7 +85,7 @@ TEST(test_profile, create_profile) {
         VkResult res = vpCreateDevice(scaffold.physicalDevice, &profile, &info, nullptr, &device);
         if (res != VK_SUCCESS) {
             ++error;
-            ASSERT_TRUE(device == VK_NULL_HANDLE);
+            EXPECT_TRUE(device == VK_NULL_HANDLE);
             std::printf("FAILURE: %d\n", res);
         } else {
             std::printf("SUCCESS!\n");
@@ -94,18 +98,20 @@ TEST(test_profile, create_profile) {
 TEST(test_profile, create_extensions_supported) {
     TestScaffold scaffold;
 
-    std::vector<VpProfileProperties> profiles;
     uint32_t profileCount = 0;
 
     VkResult result_count = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
-    ASSERT_TRUE(result_count == VK_SUCCESS);
-
-    profiles.resize(profileCount);
-    VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
-    ASSERT_TRUE(result_profile == VK_SUCCESS);
+    EXPECT_TRUE(result_count == VK_SUCCESS);
     EXPECT_TRUE(profileCount > 0);
 
-    for (VpProfileProperties profile : profiles) {
+    std::vector<VpProfileProperties> profiles;
+    if (profileCount > 0) {
+        profiles.resize(profileCount);
+        VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
+        EXPECT_TRUE(result_profile == VK_SUCCESS);
+    }
+
+    for (const VpProfileProperties& profile : profiles) {
         std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
     }
 
@@ -132,7 +138,7 @@ TEST(test_profile, create_extensions_supported) {
         VkResult res = vpCreateDevice(scaffold.physicalDevice, &profile, &info, nullptr, &device);
         if (res != VK_SUCCESS) {
             ++error;
-            ASSERT_TRUE(device == VK_NULL_HANDLE);
+            EXPECT_TRUE(device == VK_NULL_HANDLE);
             std::printf("FAILURE: %d\n", res);
         } else {
             vkDestroyDevice(device, nullptr);
@@ -146,18 +152,20 @@ TEST(test_profile, create_extensions_supported) {
 TEST(test_profile, create_extensions_unsupported) {
     TestScaffold scaffold;
 
-    std::vector<VpProfileProperties> profiles;
     uint32_t profileCount = 0;
 
     VkResult result_count = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
-    ASSERT_TRUE(result_count == VK_SUCCESS);
-
-    profiles.resize(profileCount);
-    VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
-    ASSERT_TRUE(result_profile == VK_SUCCESS);
+    EXPECT_TRUE(result_count == VK_SUCCESS);
     EXPECT_TRUE(profileCount > 0);
 
-    for (VpProfileProperties profile : profiles) {
+    std::vector<VpProfileProperties> profiles;
+    if (profileCount > 0) {
+        profiles.resize(profileCount);
+        VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
+        EXPECT_TRUE(result_profile == VK_SUCCESS);
+    }
+
+    for (const VpProfileProperties& profile : profiles) {
         std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
     }
 
@@ -181,7 +189,7 @@ TEST(test_profile, create_extensions_unsupported) {
         VkDevice device = VK_NULL_HANDLE;
         VkResult res = vpCreateDevice(scaffold.physicalDevice, &profile, &info, nullptr, &device);
         if (res != VK_SUCCESS) {
-            ASSERT_TRUE(device == VK_NULL_HANDLE);
+            EXPECT_TRUE(device == VK_NULL_HANDLE);
             std::printf("EXPECTED FAILURE: %d\n", res);
         } else {
             ++error;
@@ -196,18 +204,20 @@ TEST(test_profile, create_extensions_unsupported) {
 TEST(test_profile, create_features) {
     TestScaffold scaffold;
 
-    std::vector<VpProfileProperties> profiles;
     uint32_t profileCount = 0;
 
     VkResult result_count = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
-    ASSERT_TRUE(result_count == VK_SUCCESS);
-
-    profiles.resize(profileCount);
-    VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
-    ASSERT_TRUE(result_profile == VK_SUCCESS);
+    EXPECT_TRUE(result_count == VK_SUCCESS);
     EXPECT_TRUE(profileCount > 0);
 
-    for (VpProfileProperties profile : profiles) {
+    std::vector<VpProfileProperties> profiles;
+    if (profileCount > 0) {
+        profiles.resize(profileCount);
+        VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
+        EXPECT_TRUE(result_profile == VK_SUCCESS);
+    }
+
+    for (const VpProfileProperties& profile : profiles) {
         std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
     }
 
@@ -232,7 +242,7 @@ TEST(test_profile, create_features) {
         VkResult res = vpCreateDevice(scaffold.physicalDevice, &profile, &info, nullptr, &device);
         if (res != VK_SUCCESS) {
             ++error;
-            ASSERT_TRUE(device == VK_NULL_HANDLE);
+            EXPECT_TRUE(device == VK_NULL_HANDLE);
             std::printf("FAILURE: %d\n", res);
         } else {
             std::printf("SUCCESS!\n");

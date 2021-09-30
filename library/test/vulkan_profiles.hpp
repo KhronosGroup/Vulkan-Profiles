@@ -1302,7 +1302,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                 const VpFormatProperties &requiredProps = VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[i];
 
                 VkFormatProperties2 deviceProps;
-                vkGetPhysicalDeviceFormatProperties2(physicalDevice, requiredProps.format, &deviceProps);
+                //vkGetPhysicalDeviceFormatProperties2(physicalDevice, requiredProps.format, &deviceProps);
 
                 if (false) {
                     supported = VK_FALSE;
