@@ -1491,6 +1491,323 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (uniformBufferStandardLayoutFeatures.uniformBufferStandardLayout != VK_TRUE) {
                 supported = VK_FALSE;
             }
+
+            VkPhysicalDeviceVulkan12Properties devicePropertiesVulkan12 = {};
+            devicePropertiesVulkan12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES;
+            devicePropertiesVulkan12.pNext = nullptr;
+
+            VkPhysicalDeviceVulkan11Properties devicePropertiesVulkan11 = {};
+            devicePropertiesVulkan11.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
+            devicePropertiesVulkan11.pNext = &devicePropertiesVulkan12;
+
+            VkPhysicalDeviceProperties2 deviceProperties{};
+            deviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR;
+            deviceProperties.pNext = &devicePropertiesVulkan11;
+
+            vkGetPhysicalDeviceProperties2(physicalDevice, &deviceProperties);
+
+            if (deviceProperties.properties.limits.maxImageDimension1D < 16384) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxImageDimension2D < 16384) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxImageDimension3D < 2048) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxImageDimensionCube < 16384) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxImageArrayLayers < 2048) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxTexelBufferElements < 67108900) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxUniformBufferRange < 65536) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxStorageBufferRange < 134217728) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxPushConstantsSize < 128) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxMemoryAllocationCount < 4096) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxSamplerAllocationCount < 1024) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.bufferImageGranularity > 1024) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.sparseAddressSpaceSize < 1073741824) {
+                supported = VK_FALSE;
+            }
+
+            if (deviceProperties.properties.limits.maxBoundDescriptorSets < 8) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxPerStageDescriptorSamplers < 16) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxPerStageDescriptorUniformBuffers < 15) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxPerStageDescriptorStorageBuffers < 16) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxPerStageDescriptorSampledImages < 128) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxPerStageDescriptorStorageImages < 8) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxPerStageDescriptorInputAttachments < 8) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxPerStageResources < 128) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxDescriptorSetSamplers < 80) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxDescriptorSetUniformBuffers < 90) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxDescriptorSetUniformBuffersDynamic < 8) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxDescriptorSetStorageBuffers < 155) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxDescriptorSetStorageBuffersDynamic < 8) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxDescriptorSetSampledImages < 256) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxDescriptorSetStorageImages < 40) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxDescriptorSetInputAttachments < 8) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxVertexInputAttributes < 28) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxVertexInputBindings < 28) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxVertexInputAttributeOffset < 2047) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxVertexInputBindingStride < 2048) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxVertexOutputComponents < 124) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxTessellationGenerationLevel < 64) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxTessellationPatchSize < 32) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxTessellationControlPerVertexInputComponents < 124) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxTessellationControlPerVertexOutputComponents < 124) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxTessellationControlPerPatchOutputComponents < 120) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxTessellationControlTotalOutputComponents < 2048) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxTessellationEvaluationInputComponents < 124) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxTessellationEvaluationOutputComponents < 124) {
+                supported = VK_FALSE;
+            }
+
+            if (deviceProperties.properties.limits.maxFragmentInputComponents < 116) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxFragmentOutputAttachments < 8) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxFragmentDualSrcAttachments < 1) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxFragmentCombinedOutputResources < 8) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxComputeSharedMemorySize < 32768) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxComputeWorkGroupCount[0] < 65535 ||
+                deviceProperties.properties.limits.maxComputeWorkGroupCount[1] < 65535 ||
+                deviceProperties.properties.limits.maxComputeWorkGroupCount[2] < 65535) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxComputeWorkGroupInvocations < 1024) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxComputeWorkGroupSize[0] < 1024 ||
+                deviceProperties.properties.limits.maxComputeWorkGroupSize[1] < 1024 ||
+                deviceProperties.properties.limits.maxComputeWorkGroupSize[2] < 1024) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.subPixelPrecisionBits < 4) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.subTexelPrecisionBits < 4) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.mipmapPrecisionBits < 4) {
+                supported = VK_FALSE;
+            }
+
+            if (deviceProperties.properties.limits.maxDrawIndexedIndexValue < 4294970000) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.mipmapPrecisionBits < 1073740000) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxSamplerLodBias < 14) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxSamplerAnisotropy < 16) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxViewports < 16) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxViewportDimensions[0] < 16384 ||
+                deviceProperties.properties.limits.maxViewportDimensions[1] < 16384) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.viewportBoundsRange[0] > -32768 ||
+                deviceProperties.properties.limits.viewportBoundsRange[1] < 32767) {
+                supported = VK_FALSE;
+            }
+
+            if (deviceProperties.properties.limits.minMemoryMapAlignment < 64) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.minTexelBufferOffsetAlignment < 64) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.minUniformBufferOffsetAlignment < 256) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.minStorageBufferOffsetAlignment < 64) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.minTexelOffset > -8) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxTexelOffset < 7) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.minTexelGatherOffset > -8) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxTexelGatherOffset < 7) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.minInterpolationOffset > -0.5) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxInterpolationOffset < 0.4375) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.subPixelInterpolationOffsetBits < 4) {
+                supported = VK_FALSE;
+            }
+
+
+            if (deviceProperties.properties.limits.maxFramebufferWidth < 16384) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxFramebufferHeight < 16384) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxFramebufferLayers < 1024) {
+                supported = VK_FALSE;
+            }
+
+            if (deviceProperties.properties.limits.framebufferColorSampleCounts < 9) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.framebufferDepthSampleCounts < 9) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.framebufferStencilSampleCounts < 9) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.framebufferNoAttachmentsSampleCounts < 9) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxColorAttachments < 8) {
+                supported = VK_FALSE;
+            }
+
+
+            if (deviceProperties.properties.limits.sampledImageColorSampleCounts < 9) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.sampledImageIntegerSampleCounts < 9) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.sampledImageDepthSampleCounts < 9) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.sampledImageStencilSampleCounts < 9) {
+                supported = VK_FALSE;
+            }
+
+            if (deviceProperties.properties.limits.storageImageSampleCounts < 1) {
+                supported = VK_FALSE;
+            }
+
+            if (deviceProperties.properties.limits.maxSampleMaskWords > 1) {
+                supported = VK_FALSE;
+            }
+
+            if (deviceProperties.properties.limits.maxClipDistances < 8) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxCullDistances < 8) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.maxCombinedClipAndCullDistances < 8) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.discreteQueuePriorities < 2) {
+                supported = VK_FALSE;
+            }
+
+            if (deviceProperties.properties.limits.pointSizeRange[0] > 1.0 ||
+                deviceProperties.properties.limits.pointSizeRange[1] < 64.0) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.lineWidthRange[0] > 1.0 ||
+                deviceProperties.properties.limits.lineWidthRange[1] < 1.0) {
+                supported = VK_FALSE;
+            }
+
+
+            if (deviceProperties.properties.limits.pointSizeGranularity > 0.125) {
+                supported = VK_FALSE;
+            }
+            if (deviceProperties.properties.limits.lineWidthGranularity > 0.5) {
+                supported = VK_FALSE;
+            }
         }
 
         if (supported) {
