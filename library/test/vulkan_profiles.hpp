@@ -1492,17 +1492,17 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                 supported = VK_FALSE;
             }
 
-            VkPhysicalDeviceVulkan12Properties devicePropertiesVulkan12 = {};
-            devicePropertiesVulkan12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES;
-            devicePropertiesVulkan12.pNext = nullptr;
+            VkPhysicalDeviceMultiviewPropertiesKHR multiviewProperties = {};
+            multiviewProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES;
+            multiviewProperties.pNext = nullptr;
 
-            VkPhysicalDeviceVulkan11Properties devicePropertiesVulkan11 = {};
-            devicePropertiesVulkan11.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
-            devicePropertiesVulkan11.pNext = &devicePropertiesVulkan12;
+            VkPhysicalDeviceDescriptorIndexingProperties descriptorIndexingProperties = {};
+            descriptorIndexingProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES;
+            descriptorIndexingProperties.pNext = &multiviewProperties;
 
             VkPhysicalDeviceProperties2 deviceProperties{};
             deviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR;
-            deviceProperties.pNext = &devicePropertiesVulkan11;
+            deviceProperties.pNext = &descriptorIndexingProperties;
 
             vkGetPhysicalDeviceProperties2(physicalDevice, &deviceProperties);
 
@@ -1808,6 +1808,39 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (deviceProperties.properties.limits.lineWidthGranularity > 0.5) {
                 supported = VK_FALSE;
             }
+
+            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindInputAttachments < 640) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSampledImages < 640) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSamplers < 80) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffers < 155) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic < 8) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageImages < 40) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffers < 90) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic < 8) {
+                supported = VK_FALSE;
+            }
+
+            if (multiviewProperties.maxMultiviewInstanceIndex < 134217727) {
+                supported = VK_FALSE;
+            }
+            if (multiviewProperties.maxMultiviewViewCount < 6) {
+                supported = VK_FALSE;
+            }
+
         }
 
         if (supported) {
