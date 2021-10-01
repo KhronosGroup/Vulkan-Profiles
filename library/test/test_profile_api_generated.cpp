@@ -27,6 +27,10 @@
 #include <vector>
 
 TEST(test_profile_generated, enumerate) {
+#if (defined(NDEBUG) && defined(_WIN32))
+    return;
+#endif
+
     TestScaffold scaffold;
 
     uint32_t profileCount = 0;
@@ -34,8 +38,10 @@ TEST(test_profile_generated, enumerate) {
     EXPECT_TRUE(profileCount > 0);
 
     std::vector<VpProfile> profiles;
-    profiles.resize(profileCount);
-    vpGetPhysicalDeviceProfiles(scaffold.physicalDevice, &profileCount, &profiles[0]);
+    if (profileCount > 0) {
+        profiles.resize(profileCount);
+        vpGetPhysicalDeviceProfiles(scaffold.physicalDevice, &profileCount, &profiles[0]);
+    }
 
     for (VpProfile profile : profiles) {
         std::printf("Profile supported: %d\n", profile);
@@ -43,14 +49,21 @@ TEST(test_profile_generated, enumerate) {
 }
 
 TEST(test_profile_create_generated, create_device) {
+#if (defined(NDEBUG) && defined(_WIN32))
+    return;
+#endif
+
     TestScaffold scaffold;
 
     uint32_t profileCount = 0;
     vpGetPhysicalDeviceProfiles(scaffold.physicalDevice, &profileCount, nullptr);
     EXPECT_TRUE(profileCount > 0);
 
-    std::vector<VpProfile> profiles(profileCount);
-    vpGetPhysicalDeviceProfiles(scaffold.physicalDevice, &profileCount, &profiles[0]);
+    std::vector<VpProfile> profiles;
+    if (profileCount > 0) {
+        profiles.resize(profileCount);
+        vpGetPhysicalDeviceProfiles(scaffold.physicalDevice, &profileCount, &profiles[0]);
+    }
 
     for (VpProfile profile : profiles) {
         std::printf("Profile supported: %d\n", profile);
