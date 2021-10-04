@@ -27,10 +27,6 @@
 #include <vector>
 
 TEST(test_profile, enumerate) {
-#if (defined(NDEBUG) && defined(_WIN32))
-    return;
-#endif
-
     TestScaffold scaffold;
 
     uint32_t profileCount = 0;
@@ -52,10 +48,6 @@ TEST(test_profile, enumerate) {
 }
 
 TEST(test_profile, create_profile) {
-#if (defined(NDEBUG) && defined(_WIN32))
-    return;
-#endif
-
     TestScaffold scaffold;
 
     uint32_t profileCount = 0;
@@ -104,10 +96,6 @@ TEST(test_profile, create_profile) {
 }
 
 TEST(test_profile, create_extensions_supported) {
-#if (defined(NDEBUG) && defined(_WIN32))
-    return;
-#endif
-
     TestScaffold scaffold;
 
     uint32_t profileCount = 0;
@@ -162,10 +150,6 @@ TEST(test_profile, create_extensions_supported) {
 }
 
 TEST(test_profile, create_extensions_unsupported) {
-#if (defined(NDEBUG) && defined(_WIN32))
-    return;
-#endif
-
     TestScaffold scaffold;
 
     uint32_t profileCount = 0;
@@ -218,10 +202,6 @@ TEST(test_profile, create_extensions_unsupported) {
 }
 
 TEST(test_profile, create_features) {
-#if (defined(NDEBUG) && defined(_WIN32))
-    return;
-#endif
-
     TestScaffold scaffold;
 
     uint32_t profileCount = 0;
