@@ -50,34 +50,26 @@ static const VkExtensionProperties VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[] = {
 
 static const VkExtensionProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[] = {
     // Vulkan 1.2 extensions
-    VkExtensionProperties{"VK_KHR_8bit_storage", 1},
-    VkExtensionProperties{"VK_KHR_create_renderpass2", 1},
-    VkExtensionProperties{"VK_KHR_depth_stencil_resolve", 1},
-    VkExtensionProperties{"VK_KHR_driver_properties", 1},
+    VkExtensionProperties{"VK_KHR_8bit_storage", 1}, VkExtensionProperties{"VK_KHR_create_renderpass2", 1},
+    VkExtensionProperties{"VK_KHR_depth_stencil_resolve", 1}, VkExtensionProperties{"VK_KHR_driver_properties", 1},
     VkExtensionProperties{"VK_KHR_image_format_list", 1},
-    VkExtensionProperties{"VK_KHR_imageless_framebuffer", 1}, // Not supported by Intel 6000 https://vulkan.gpuinfo.org/displayreport.php?id=11332#extensions
-    VkExtensionProperties{"VK_KHR_sampler_mirror_clamp_to_edge", 1},
-    VkExtensionProperties{"VK_KHR_shader_float16_int8", 1},
-    VkExtensionProperties{"VK_KHR_shader_subgroup_extended_types", 1}, // Not supported by Intel 6000 https://vulkan.gpuinfo.org/displayreport.php?id=11332#extensions
-    VkExtensionProperties{"VK_KHR_timeline_semaphore", 1},
-    VkExtensionProperties{"VK_KHR_uniform_buffer_standard_layout", 1},    
-    VkExtensionProperties{"VK_EXT_descriptor_indexing", 1},
-    VkExtensionProperties{"VK_EXT_host_query_reset", 1},
-    VkExtensionProperties{"VK_EXT_scalar_block_layout", 1},
-    VkExtensionProperties{"VK_EXT_shader_viewport_index_layer", 1},
+    VkExtensionProperties{"VK_KHR_imageless_framebuffer",
+                          1},  // Not supported by Intel 6000 https://vulkan.gpuinfo.org/displayreport.php?id=11332#extensions
+    VkExtensionProperties{"VK_KHR_sampler_mirror_clamp_to_edge", 1}, VkExtensionProperties{"VK_KHR_shader_float16_int8", 1},
+    VkExtensionProperties{"VK_KHR_shader_subgroup_extended_types",
+                          1},  // Not supported by Intel 6000 https://vulkan.gpuinfo.org/displayreport.php?id=11332#extensions
+    VkExtensionProperties{"VK_KHR_timeline_semaphore", 1}, VkExtensionProperties{"VK_KHR_uniform_buffer_standard_layout", 1},
+    VkExtensionProperties{"VK_EXT_descriptor_indexing", 1}, VkExtensionProperties{"VK_EXT_host_query_reset", 1},
+    VkExtensionProperties{"VK_EXT_scalar_block_layout", 1}, VkExtensionProperties{"VK_EXT_shader_viewport_index_layer", 1},
 
     // Additional Vulkan extensions
-    VkExtensionProperties{"VK_KHR_swapchain", 70},
-    VkExtensionProperties{"VK_KHR_swapchain_mutable_format", 1},
-    VkExtensionProperties{"VK_KHR_portability_subset", 1}, // MacOS only
-    VkExtensionProperties{"VK_KHR_sampler_ycbcr_conversion", 1}, // Not supported by Intel 520 https://vulkan.gpuinfo.org/displayreport.php?id=12491#extensions
-    VkExtensionProperties{"VK_EXT_inline_uniform_block", 1},
-    VkExtensionProperties{"VK_EXT_image_robustness", 1},
-    VkExtensionProperties{"VK_EXT_robustness2", 1},
-    VkExtensionProperties{"VK_EXT_subgroup_size_control", 1},
-    VkExtensionProperties{"VK_EXT_texel_buffer_alignment", 1}, 
-    VkExtensionProperties{"VK_EXT_vertex_attribute_divisor", 1}
-};
+    VkExtensionProperties{"VK_KHR_swapchain", 70}, VkExtensionProperties{"VK_KHR_swapchain_mutable_format", 1},
+    // VkExtensionProperties{"VK_KHR_portability_subset", 1},  // MacOS only
+    VkExtensionProperties{"VK_KHR_sampler_ycbcr_conversion",
+                          1},  // Not supported by Intel 520 https://vulkan.gpuinfo.org/displayreport.php?id=12491#extensions
+    VkExtensionProperties{"VK_EXT_inline_uniform_block", 1}, VkExtensionProperties{"VK_EXT_image_robustness", 1},
+    VkExtensionProperties{"VK_EXT_robustness2", 1}, VkExtensionProperties{"VK_EXT_subgroup_size_control", 1},
+    VkExtensionProperties{"VK_EXT_texel_buffer_alignment", 1}, VkExtensionProperties{"VK_EXT_vertex_attribute_divisor", 1}};
 
 struct VpFormatProperties {
     VkFormat format;
@@ -85,6 +77,13 @@ struct VpFormatProperties {
     VkFormatFeatureFlags optimalTilingFeatures;
     VkFormatFeatureFlags bufferFeatures;
 };
+
+static const VkQueueFamilyProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES[] = {
+    {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT, 1, 36, {1, 1, 1}}};
+
+static const VkMemoryPropertyFlags VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[] = {
+    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
 
 static const VpFormatProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[] = {
     // VK_FORMAT_R8_UNORM
@@ -112,8 +111,8 @@ static const VpFormatProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[] = 
      VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
          VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
      VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT |
-         VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT |
-         VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
+         VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
+         VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
      VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT},
 
     // VK_FORMAT_R8_SINT
@@ -121,8 +120,8 @@ static const VpFormatProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[] = 
      VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
          VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
      VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT |
-         VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT |
-         VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
+         VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
+         VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
      VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT},
 
     // VK_FORMAT_R8G8_UNORM
@@ -205,10 +204,9 @@ static const VpFormatProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[] = 
     {VK_FORMAT_R8G8B8A8_SRGB,
      VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT |
          VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
-     VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT |
-         VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT |
-         VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
-         VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
+     VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT |
+         VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT |
+         VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
      0},
 
     // VK_FORMAT_B8G8R8A8_SRGB
@@ -653,6 +651,46 @@ inline bool vpCheckExtension(const VkExtensionProperties *supportedProperties, s
     return false;
 }
 
+inline bool vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memoryProperties,
+                                  const VkMemoryPropertyFlags &memoryPropertyFlags) {
+    assert(&memoryProperties != nullptr);
+
+    for (size_t i = 0, n = memoryProperties.memoryTypeCount; i < n; ++i) {
+        if ((memoryProperties.memoryTypes[i].propertyFlags & memoryPropertyFlags) == memoryPropertyFlags) return true;
+    }
+
+    return false;
+}
+
+inline bool vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties, std::size_t queueFamilyPropertiesCount,
+                                       const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
+    assert(queueFamilyProperties != nullptr);
+
+    for (size_t i = 0, n = queueFamilyPropertiesCount; i < n; ++i) {
+        if (queueFamilyProperties[i].queueCount < profileQueueFamilyPropertie.queueCount) {
+            continue;
+        } else if (queueFamilyProperties[i].timestampValidBits < profileQueueFamilyPropertie.timestampValidBits) {
+            continue;
+        } else if (queueFamilyProperties[i].minImageTransferGranularity.width >
+                   profileQueueFamilyPropertie.minImageTransferGranularity.width) {
+            continue;
+        } else if (queueFamilyProperties[i].minImageTransferGranularity.height >
+                   profileQueueFamilyPropertie.minImageTransferGranularity.height) {
+            continue;
+        } else if (queueFamilyProperties[i].minImageTransferGranularity.depth >
+                   profileQueueFamilyPropertie.minImageTransferGranularity.depth) {
+            continue;
+        } else if ((queueFamilyProperties[i].queueFlags & profileQueueFamilyPropertie.queueFlags) !=
+                   profileQueueFamilyPropertie.queueFlags) {
+            continue;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
 inline void *vpGetStructure(void *pNext, VkStructureType type) {
     if (pNext == nullptr) {
         return nullptr;
@@ -973,7 +1011,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         Next_7.uniformBufferStandardLayout = VK_TRUE;
         if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES) == nullptr) {
             pNext = &Next_7;
-        }    
+        }
 
         VkPhysicalDeviceShaderDrawParametersFeatures Next_8 = {};
         Next_8.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES;
@@ -981,7 +1019,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         Next_8.shaderDrawParameters = VK_TRUE;
         if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES) == nullptr) {
             pNext = &Next_8;
-        }   
+        }
 
         VkPhysicalDevice8BitStorageFeatures Next_9 = {};
         Next_9.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES;
@@ -1364,10 +1402,12 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
 
         } else if (strcmp(supportedProfiles[i].profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             for (std::size_t i = 0, n = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS); i < n && supported; ++i) {
-                const bool supportedInstanceExt = vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(),
-                                                                   VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i].extensionName);
-                const bool supportedDeviceExt = vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(),
-                                                                 VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i].extensionName);
+                const VkExtensionProperties &extensionProperties = VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
+
+                const bool supportedInstanceExt =
+                    vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(), extensionProperties.extensionName);
+                const bool supportedDeviceExt =
+                    vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(), extensionProperties.extensionName);
 
                 if (!supportedInstanceExt && !supportedDeviceExt) {
                     supported = VK_FALSE;
@@ -1391,6 +1431,30 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                     break;
                 } else if ((deviceProps.formatProperties.bufferFeatures & requiredProps.bufferFeatures) !=
                            requiredProps.bufferFeatures) {
+                    supported = VK_FALSE;
+                    break;
+                }
+            }
+
+            VkPhysicalDeviceMemoryProperties memoryProperties;
+            vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
+            for (uint32_t i = 0, n = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES); i < n && supported; ++i) {
+                const VkMemoryPropertyFlags memoryPropertyFlags = VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[i];
+
+                if (!vpCheckMemoryProperty(memoryProperties, VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[i])) {
+                    supported = VK_FALSE;
+                    break;
+                }
+            }
+
+            std::uint32_t queueFamilyCount = 0;
+            vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
+            std::vector<VkQueueFamilyProperties> queueFamily(queueFamilyCount);
+            vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamily.data());
+            for (uint32_t i = 0, n = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES); i < n && supported;
+                 ++i) {
+                if (!vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount,
+                                               VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES[i])) {
                     supported = VK_FALSE;
                     break;
                 }
@@ -1806,7 +1870,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             }
             if (deviceProperties.properties.limits.maxComputeWorkGroupSize[0] < 1024 ||
                 deviceProperties.properties.limits.maxComputeWorkGroupSize[1] < 1024 ||
-                deviceProperties.properties.limits.maxComputeWorkGroupSize[2] < 1024) {
+                deviceProperties.properties.limits.maxComputeWorkGroupSize[2] < 64) {
                 supported = VK_FALSE;
             }
             if (deviceProperties.properties.limits.subPixelPrecisionBits < 4) {
@@ -1818,11 +1882,10 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (deviceProperties.properties.limits.mipmapPrecisionBits < 4) {
                 supported = VK_FALSE;
             }
-
-            if (deviceProperties.properties.limits.maxDrawIndexedIndexValue < 4294970000) {
+            if (deviceProperties.properties.limits.maxDrawIndexedIndexValue < 4294967295u) {
                 supported = VK_FALSE;
             }
-            if (deviceProperties.properties.limits.mipmapPrecisionBits < 1073740000) {
+            if (deviceProperties.properties.limits.maxDrawIndirectCount < 1073740000) {
                 supported = VK_FALSE;
             }
             if (deviceProperties.properties.limits.maxSamplerLodBias < 14) {
@@ -1846,13 +1909,13 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (deviceProperties.properties.limits.minMemoryMapAlignment < 64) {
                 supported = VK_FALSE;
             }
-            if (deviceProperties.properties.limits.minTexelBufferOffsetAlignment < 64) {
+            if (deviceProperties.properties.limits.minTexelBufferOffsetAlignment > 64) {
                 supported = VK_FALSE;
             }
-            if (deviceProperties.properties.limits.minUniformBufferOffsetAlignment < 256) {
+            if (deviceProperties.properties.limits.minUniformBufferOffsetAlignment > 256) {
                 supported = VK_FALSE;
             }
-            if (deviceProperties.properties.limits.minStorageBufferOffsetAlignment < 64) {
+            if (deviceProperties.properties.limits.minStorageBufferOffsetAlignment > 64) {
                 supported = VK_FALSE;
             }
             if (deviceProperties.properties.limits.minTexelOffset > -8) {
@@ -1985,7 +2048,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                 supported = VK_FALSE;
             }
 
-            if (inlineUniformBlockProperties.maxInlineUniformBlockSize < 4096) {
+            if (inlineUniformBlockProperties.maxInlineUniformBlockSize < 256) {
                 supported = VK_FALSE;
             }
 
@@ -2010,8 +2073,6 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (deviceMaintenance3Properties.maxMemoryAllocationSize < 2147483648) {
                 supported = VK_FALSE;
             }
-
-
         }
 
         if (supported) {
