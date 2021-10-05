@@ -189,3 +189,16 @@ TEST(test_library_util, CheckQueueFamilyProperty) {
         EXPECT_TRUE(!vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
     }
 }
+
+TEST(test_library_util, CheckMemoryProperty) {
+    TestScaffold scaffold;
+
+    VkPhysicalDeviceMemoryProperties memoryProperties;
+    vkGetPhysicalDeviceMemoryProperties(scaffold.physicalDevice, &memoryProperties);
+
+    EXPECT_TRUE(vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
+    EXPECT_TRUE(vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                            VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+
+    EXPECT_TRUE(!vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | (1 << 29)));
+}
