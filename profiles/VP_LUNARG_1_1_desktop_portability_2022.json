@@ -399,21 +399,23 @@
 			"platforms": [ "MACOS" ]
 		}
 	],
-    "formats": [
+	"formats": [
 		{
 			"VK_FORMAT_R16G16B16A16_SFLOAT": [
 				{
-					"struct": "VkFormatProperties",
+					"struct": "VkFormatProperties2",
 					"members": {
 						"linearTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT" ],
 						"optimalTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT" ],
 						"bufferFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT" ]
 					}
 				}
-			],
+			]
+		},
+		{
 			"VK_FORMAT_R32G32B32A32_SFLOAT": [
 				{
-					"struct": "VkFormatProperties",
+					"struct": "VkFormatProperties2",
 					"members": {
 						"linearTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT" ],
 						"optimalTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT" ],
@@ -422,5 +424,5 @@
 				}
 			]
 		}
-    ]
+	]
 }
