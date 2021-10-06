@@ -5,132 +5,97 @@
         "info": "LunarG Desktop Portability Profile",
         "desc": "Common desktop platforms with drivers supporting Vulkan 1.0 on Windows, Linux and macOS."
     },
-    "extensions": [
-        {
-            "extensionName": "VK_KHR_bind_memory2",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_create_renderpass2",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_dedicated_allocation",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_depth_stencil_resolve",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_descriptor_update_template",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_device_group",
-            "specVersion": 4
-        },
-        {
-            "extensionName": "VK_KHR_driver_properties",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_external_fence",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_external_memory",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_external_semaphore",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_get_memory_requirements2",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_image_format_list",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_imageless_framebuffer",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_maintenance1",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_maintenance2",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_maintenance3",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_multiview",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_portability_subset",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_relaxed_block_layout",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_separate_depth_stencil_layouts",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_shader_float_controls",
-            "specVersion": 4
-        },
-        {
-            "extensionName": "VK_KHR_shader_subgroup_extended_types",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_spirv_1_4",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_storage_buffer_storage_class",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_swapchain",
-            "specVersion": 70
-        },
-        {
-            "extensionName": "VK_KHR_timeline_semaphore",
-            "specVersion": 2
-        },
-        {
-            "extensionName": "VK_KHR_uniform_buffer_standard_layout",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_EXT_host_query_reset",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_EXT_sampler_filter_minmax",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_EXT_separate_stencil_usage",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_EXT_shader_viewport_index_layer",
-            "specVersion": 1
-        }
-    ],
+	"extensions": [
+		{
+			"extensionName": "VK_KHR_8bit_storage",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_KHR_create_renderpass2",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_KHR_depth_stencil_resolve",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_KHR_driver_properties",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_KHR_image_format_list",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_KHR_imageless_framebuffer",
+			"specVersion": 4
+		},
+		{
+			"extensionName": "VK_KHR_sampler_mirror_clamp_to_edge",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_KHR_shader_subgroup_extended_types",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_KHR_timeline_semaphore",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_KHR_uniform_buffer_standard_layout",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_EXT_descriptor_indexing",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_EXT_host_query_reset",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_EXT_scalar_block_layout",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_KHR_swapchain",
+			"specVersion": 70
+		},
+		{
+			"extensionName": "VK_KHR_swapchain_mutable_format",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_KHR_portability_subset",
+			"specVersion": 1,
+			"platforms": ["MACOS"]
+		},
+		{
+			"extensionName": "VK_KHR_sampler_ycbcr_conversion",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_EXT_inline_uniform_block",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_EXT_robustness2",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_EXT_subgroup_size_control",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_EXT_texel_buffer_alignment",
+			"specVersion": 1
+		},
+		{
+			"extensionName": "VK_EXT_vertex_attribute_divisor",
+			"specVersion": 1
+		}
+	],
     "features": [
         {
             "VkPhysicalDeviceFeatures": {
