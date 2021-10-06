@@ -43,8 +43,7 @@ std::vector<std::string> GetFormatFeatures(int flags) {
         {VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT, "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"},
         {VK_FORMAT_FEATURE_TRANSFER_SRC_BIT, "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT"},
         {VK_FORMAT_FEATURE_TRANSFER_DST_BIT, "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"},
-        {VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT, "VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT"}
-    };
+        {VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT, "VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT"}};
 
     std::vector<std::string> results;
 
@@ -55,7 +54,7 @@ std::vector<std::string> GetFormatFeatures(int flags) {
     return results;
 }
 
-TEST(test_library_util, GetPropertiesDesktopPortability1_0) { 
+TEST(test_library_util, GetPropertiesDesktopPortability1_0) {
     std::vector<std::string> VK_FORMAT_B4G4R4A4_UNORM_PACK16 = GetFormatFeatures(5121);
     // VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT
 
@@ -63,7 +62,8 @@ TEST(test_library_util, GetPropertiesDesktopPortability1_0) {
     // VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT
 
     std::vector<std::string> VK_FORMAT_R8_UINT = GetFormatFeatures(3201);
-    // VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT
+    // VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT |
+    // VK_FORMAT_FEATURE_BLIT_DST_BIT
 
     std::vector<std::string> VK_FORMAT_R8_UINT_buffer = GetFormatFeatures(72);
     // VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT
@@ -72,16 +72,23 @@ TEST(test_library_util, GetPropertiesDesktopPortability1_0) {
     // VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT
 
     std::vector<std::string> VK_FORMAT_R32G32_SFLOAT = GetFormatFeatures(52355);
-    // VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT
+    // VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT |
+    // VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
+    // VK_FORMAT_FEATURE_TRANSFER_DST_BIT
 
     std::vector<std::string> VK_FORMAT_R32_SINT = GetFormatFeatures(52359);
-    // VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT
+    // VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT |
+    // VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT |
+    // VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT
 
     std::vector<std::string> VK_FORMAT_R16G16B16A16_SFLOAT = GetFormatFeatures(56707);
-    // VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT
+    // VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT |
+    // VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT |
+    // VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT
 
     std::vector<std::string> VK_FORMAT_R8G8B8A8_SNORM = GetFormatFeatures(54275);
-    // VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT
+    // VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT |
+    // VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT
 
     EXPECT_TRUE(true);
 }
@@ -126,4 +133,123 @@ TEST(test_library_util, GetStructure) {
     EXPECT_EQ(&pNext_9, vpGetStructure(&pNext_9, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT));
     EXPECT_EQ(&pNext_2, vpGetStructure(&pNext_9, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES));
     EXPECT_EQ(nullptr, vpGetStructure(&pNext_9, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT));
+}
+
+TEST(test_library_util, CheckExtension) {
+    static const VkExtensionProperties test_data[] = {VkExtensionProperties{"VK_EXT_extended_dynamic_state2", 1},
+                                                      VkExtensionProperties{"VK_EXT_texel_buffer_alignment", 1},
+                                                      VkExtensionProperties{"VK_EXT_subgroup_size_control", 2},
+                                                      VkExtensionProperties{"VK_EXT_shader_demote_to_helper_invocation", 1},
+                                                      VkExtensionProperties{"VK_EXT_private_data", 1},
+                                                      VkExtensionProperties{"VK_EXT_pipeline_creation_cache_control", 1},
+                                                      VkExtensionProperties{"VK_EXT_inline_uniform_block", 1},
+                                                      VkExtensionProperties{"VK_EXT_image_robustness", 1},
+                                                      VkExtensionProperties{"VK_KHR_zero_initialize_workgroup_memory", 1},
+                                                      VkExtensionProperties{"VK_KHR_synchronization2", 1},
+                                                      VkExtensionProperties{"VK_KHR_shader_terminate_invocation", 1},
+                                                      VkExtensionProperties{"VK_KHR_imageless_framebuffer", 1}};
+
+    EXPECT_TRUE(vpCheckExtension(test_data, countof(test_data), "VK_KHR_synchronization2"));
+
+    EXPECT_TRUE(!vpCheckExtension(test_data, countof(test_data), "VK_KHR_synchronization"));
+    EXPECT_TRUE(!vpCheckExtension(test_data, countof(test_data), "KHR_synchronization2"));
+    EXPECT_TRUE(!vpCheckExtension(test_data, countof(test_data), "VK_EXT_synchronization2"));
+}
+
+TEST(test_library_util, CheckQueueFamilyProperty) {
+    TestScaffold scaffold;
+
+    std::uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(scaffold.physicalDevice, &queueFamilyCount, nullptr);
+    std::vector<VkQueueFamilyProperties> queueFamily(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(scaffold.physicalDevice, &queueFamilyCount, queueFamily.data());
+
+    {
+        static const VkQueueFamilyProperties test_data[] = {
+            {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT, 1, 36, {1, 1, 1}}};
+        EXPECT_TRUE(vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
+    }
+
+    // Check unsupported flag
+    {
+        static const VkQueueFamilyProperties test_data[] = {
+            {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | (1 << 29), 1, 36, {1, 1, 1}}};
+        EXPECT_TRUE(!vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
+    }
+
+    // Check unsupported timestampValidBits
+    {
+        static const VkQueueFamilyProperties test_data[] = {{VK_QUEUE_GRAPHICS_BIT, 1, 4894042, {1, 1, 1}}};
+        EXPECT_TRUE(!vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
+    }
+
+    // Check unsupported queue count
+    {
+        static const VkQueueFamilyProperties test_data[] = {{VK_QUEUE_GRAPHICS_BIT, 46848646, 32, {1, 1, 1}}};
+        EXPECT_TRUE(!vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
+    }
+}
+
+TEST(test_library_util, CheckMemoryProperty) {
+    TestScaffold scaffold;
+
+    VkPhysicalDeviceMemoryProperties memoryProperties;
+    vkGetPhysicalDeviceMemoryProperties(scaffold.physicalDevice, &memoryProperties);
+
+    EXPECT_TRUE(vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
+    EXPECT_TRUE(vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                            VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+
+    EXPECT_TRUE(!vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | (1 << 29)));
+}
+
+TEST(test_library_util, CheckFormatProperty) {
+    TestScaffold scaffold;
+
+    VpFormatProperties profileProps;
+    profileProps.format = VK_FORMAT_R8G8B8A8_UNORM;
+    profileProps.linearTilingFeatures = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT |
+                                        VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
+                                        VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    profileProps.optimalTilingFeatures =
+        VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT |
+        VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT |
+        VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    profileProps.bufferFeatures = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT |
+                                  VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
+
+    {
+        VkFormatProperties2 deviceProps = {};
+        deviceProps.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        vkGetPhysicalDeviceFormatProperties2(scaffold.physicalDevice, VK_FORMAT_R8G8B8A8_UNORM, &deviceProps);
+
+        EXPECT_TRUE(vpCheckFormatProperty(&deviceProps, profileProps));
+    }
+
+    {
+        VkFormatProperties2 deviceProps = {};
+        deviceProps.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        vkGetPhysicalDeviceFormatProperties2(scaffold.physicalDevice, VK_FORMAT_R8G8B8A8_UNORM, &deviceProps);
+        deviceProps.formatProperties.linearTilingFeatures = 0;
+
+        EXPECT_TRUE(!vpCheckFormatProperty(&deviceProps, profileProps));
+    }
+
+    {
+        VkFormatProperties2 deviceProps = {};
+        deviceProps.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        vkGetPhysicalDeviceFormatProperties2(scaffold.physicalDevice, VK_FORMAT_R8G8B8A8_UNORM, &deviceProps);
+        deviceProps.formatProperties.optimalTilingFeatures = 0;
+
+        EXPECT_TRUE(!vpCheckFormatProperty(&deviceProps, profileProps));
+    }
+
+    {
+        VkFormatProperties2 deviceProps = {};
+        deviceProps.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        vkGetPhysicalDeviceFormatProperties2(scaffold.physicalDevice, VK_FORMAT_R8G8B8A8_UNORM, &deviceProps);
+        deviceProps.formatProperties.bufferFeatures = 0;
+
+        EXPECT_TRUE(!vpCheckFormatProperty(&deviceProps, profileProps));
+    }
 }

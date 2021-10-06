@@ -26,6 +26,14 @@
 #include <memory>
 #include <vector>
 
+bool IsFound(std::vector<VpProfileProperties>& profiles, const char* profileName) {
+    for (std::size_t i = 0, n = profiles.size(); i < n; ++i) {
+        if (strcmp(profiles[i].profileName, profileName) == 0) return true;
+    }
+
+    return false;
+}
+
 TEST(test_profile, enumerate) {
     TestScaffold scaffold;
 
@@ -45,6 +53,9 @@ TEST(test_profile, enumerate) {
     for (VpProfileProperties profile : profiles) {
         std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
     }
+
+    EXPECT_TRUE(IsFound(profiles, VP_KHR_MINIMUM_REQUIREMENTS_NAME));
+    EXPECT_TRUE(IsFound(profiles, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME));
 }
 
 TEST(test_profile, create_profile) {
