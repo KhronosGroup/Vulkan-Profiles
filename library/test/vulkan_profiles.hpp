@@ -18,6 +18,9 @@
  */
 
 #include <vulkan/vulkan_core.h>
+#if defined(__APPLE__)
+#include <vulkan/vulkan_beta.h>
+#endif
 
 #define VP_MAX_PROFILE_NAME_SIZE 256U
 
@@ -64,12 +67,14 @@ static const VkExtensionProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSION
 
     // Additional Vulkan extensions
     VkExtensionProperties{"VK_KHR_swapchain", 70}, VkExtensionProperties{"VK_KHR_swapchain_mutable_format", 1},
-    // VkExtensionProperties{"VK_KHR_portability_subset", 1},  // MacOS only
+#if defined(__APPLE__)
+    VkExtensionProperties{"VK_KHR_portability_subset", 1},  // MacOS only
+#endif
     VkExtensionProperties{"VK_KHR_sampler_ycbcr_conversion",
                           1},  // Not supported by Intel 520 https://vulkan.gpuinfo.org/displayreport.php?id=12491#extensions
-    VkExtensionProperties{"VK_EXT_inline_uniform_block", 1},
-    VkExtensionProperties{"VK_EXT_robustness2", 1}, VkExtensionProperties{"VK_EXT_subgroup_size_control", 1},
-    VkExtensionProperties{"VK_EXT_texel_buffer_alignment", 1}, VkExtensionProperties{"VK_EXT_vertex_attribute_divisor", 1}};
+    VkExtensionProperties{"VK_EXT_inline_uniform_block", 1}, VkExtensionProperties{"VK_EXT_robustness2", 1},
+    VkExtensionProperties{"VK_EXT_subgroup_size_control", 1}, VkExtensionProperties{"VK_EXT_texel_buffer_alignment", 1},
+    VkExtensionProperties{"VK_EXT_vertex_attribute_divisor", 1}};
 
 struct VpFormatProperties {
     VkFormat format;
@@ -662,7 +667,7 @@ inline bool vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memory
     return false;
 }
 
-inline bool vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const VpFormatProperties& profileProps) {
+inline bool vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const VpFormatProperties &profileProps) {
     if ((deviceProps->formatProperties.linearTilingFeatures & profileProps.linearTilingFeatures) !=
         profileProps.linearTilingFeatures) {
         return false;
@@ -1444,15 +1449,24 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             for (uint32_t i = 0, n = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES); i < n && supported;
                  ++i) {
                 if (!vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount,
-                                               VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES[i])) {
+                                                VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES[i])) {
                     supported = VK_FALSE;
                     break;
                 }
             }
 
+            void* pNext = nullptr;
+
+#if defined(__APPLE__)
+            VkPhysicalDevicePortabilitySubsetFeaturesKHR devicePortabilitySubset = {};
+            devicePortabilitySubset.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR;
+            devicePortabilitySubset.pNext = pNext;
+            pNext = &devicePortabilitySubset;
+#endif
+
             VkPhysicalDeviceSamplerYcbcrConversionFeatures deviceSamplerYcbcrConversionFeatires = {};
             deviceSamplerYcbcrConversionFeatires.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES;
-            deviceSamplerYcbcrConversionFeatires.pNext = nullptr;
+            deviceSamplerYcbcrConversionFeatires.pNext = pNext;
 
             VkPhysicalDeviceShaderFloat16Int8Features deviceShaderFloat16Int8Features = {};
             deviceShaderFloat16Int8Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES;
@@ -1681,9 +1695,45 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                 supported = VK_FALSE;
             }
 
+#if defined(__APPLE__)
+            if (devicePortabilitySubset.vertexAttributeAccessBeyondStride != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (devicePortabilitySubset.separateStencilMaskRef != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (devicePortabilitySubset.mutableComparisonSamplers != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (devicePortabilitySubset.multisampleArrayImage != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (devicePortabilitySubset.imageViewFormatSwizzle != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (devicePortabilitySubset.imageViewFormatReinterpretation != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (devicePortabilitySubset.events != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+            if (devicePortabilitySubset.constantAlphaColorBlendFactors != VK_TRUE) {
+                supported = VK_FALSE;
+            }
+#endif
+
+            void *pNext = nullptr;
+
+#if defined(__APPLE__)
+            VkPhysicalDevicePortabilitySubsetPropertiesKHR devicePortabilitySubsetProperties = {};
+            devicePortabilitySubsetProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR;
+            devicePortabilitySubsetProperties.pNext = pNext;
+            pNext = &devicePortabilitySubsetProperties;
+#endif
+
             VkPhysicalDeviceMaintenance3Properties deviceMaintenance3Properties = {};
             deviceMaintenance3Properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES;
-            deviceMaintenance3Properties.pNext = nullptr;
+            deviceMaintenance3Properties.pNext = pNext;
 
             VkPhysicalDeviceDepthStencilResolveProperties deviceDepthStencilResolveProperties = {};
             deviceDepthStencilResolveProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES;
@@ -2082,6 +2132,12 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (deviceMaintenance3Properties.maxMemoryAllocationSize < 2147483648) {
                 supported = VK_FALSE;
             }
+
+#if defined(__APPLE__)
+            if (devicePortabilitySubsetProperties.minVertexInputBindingStrideAlignment < 4) {
+                supported = VK_FALSE;
+            }
+#endif
         }
 
         if (supported) {
