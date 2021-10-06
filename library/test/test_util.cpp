@@ -202,3 +202,54 @@ TEST(test_library_util, CheckMemoryProperty) {
 
     EXPECT_TRUE(!vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | (1 << 29)));
 }
+
+TEST(test_library_util, CheckFormatProperty) {
+    TestScaffold scaffold;
+
+    VpFormatProperties profileProps;
+    profileProps.format = VK_FORMAT_R8G8B8A8_UNORM;
+    profileProps.linearTilingFeatures = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT |
+                                        VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
+                                        VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    profileProps.optimalTilingFeatures =
+        VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT |
+        VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT |
+        VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    profileProps.bufferFeatures = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT |
+                                  VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
+
+    {
+        VkFormatProperties2 deviceProps = {};
+        deviceProps.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        vkGetPhysicalDeviceFormatProperties2(scaffold.physicalDevice, VK_FORMAT_R8G8B8A8_UNORM, &deviceProps);
+
+        EXPECT_TRUE(vpCheckFormatProperty(&deviceProps, profileProps));
+    }
+
+    {
+        VkFormatProperties2 deviceProps = {};
+        deviceProps.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        vkGetPhysicalDeviceFormatProperties2(scaffold.physicalDevice, VK_FORMAT_R8G8B8A8_UNORM, &deviceProps);
+        deviceProps.formatProperties.linearTilingFeatures = 0;
+
+        EXPECT_TRUE(!vpCheckFormatProperty(&deviceProps, profileProps));
+    }
+
+    {
+        VkFormatProperties2 deviceProps = {};
+        deviceProps.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        vkGetPhysicalDeviceFormatProperties2(scaffold.physicalDevice, VK_FORMAT_R8G8B8A8_UNORM, &deviceProps);
+        deviceProps.formatProperties.optimalTilingFeatures = 0;
+
+        EXPECT_TRUE(!vpCheckFormatProperty(&deviceProps, profileProps));
+    }
+
+    {
+        VkFormatProperties2 deviceProps = {};
+        deviceProps.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        vkGetPhysicalDeviceFormatProperties2(scaffold.physicalDevice, VK_FORMAT_R8G8B8A8_UNORM, &deviceProps);
+        deviceProps.formatProperties.bufferFeatures = 0;
+
+        EXPECT_TRUE(!vpCheckFormatProperty(&deviceProps, profileProps));
+    }
+}

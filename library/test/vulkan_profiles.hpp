@@ -662,6 +662,20 @@ inline bool vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memory
     return false;
 }
 
+inline bool vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const VpFormatProperties& profileProps) {
+    if ((deviceProps->formatProperties.linearTilingFeatures & profileProps.linearTilingFeatures) !=
+        profileProps.linearTilingFeatures) {
+        return false;
+    } else if ((deviceProps->formatProperties.optimalTilingFeatures & profileProps.optimalTilingFeatures) !=
+               profileProps.optimalTilingFeatures) {
+        return false;
+    } else if ((deviceProps->formatProperties.bufferFeatures & profileProps.bufferFeatures) != profileProps.bufferFeatures) {
+        return false;
+    }
+
+    return true;
+}
+
 inline bool vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties, std::size_t queueFamilyPropertiesCount,
                                        const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
     assert(queueFamilyProperties != nullptr);
@@ -1421,16 +1435,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                 deviceProps.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
                 vkGetPhysicalDeviceFormatProperties2(physicalDevice, requiredProps.format, &deviceProps);
 
-                if ((deviceProps.formatProperties.linearTilingFeatures & requiredProps.linearTilingFeatures) !=
-                    requiredProps.linearTilingFeatures) {
-                    supported = VK_FALSE;
-                    break;
-                } else if ((deviceProps.formatProperties.optimalTilingFeatures & requiredProps.optimalTilingFeatures) !=
-                           requiredProps.optimalTilingFeatures) {
-                    supported = VK_FALSE;
-                    break;
-                } else if ((deviceProps.formatProperties.bufferFeatures & requiredProps.bufferFeatures) !=
-                           requiredProps.bufferFeatures) {
+                if (!vpCheckFormatProperty(&deviceProps, requiredProps)) {
                     supported = VK_FALSE;
                     break;
                 }
