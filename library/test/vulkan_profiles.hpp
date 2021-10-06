@@ -60,14 +60,14 @@ static const VkExtensionProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSION
                           1},  // Not supported by Intel 6000 https://vulkan.gpuinfo.org/displayreport.php?id=11332#extensions
     VkExtensionProperties{"VK_KHR_timeline_semaphore", 1}, VkExtensionProperties{"VK_KHR_uniform_buffer_standard_layout", 1},
     VkExtensionProperties{"VK_EXT_descriptor_indexing", 1}, VkExtensionProperties{"VK_EXT_host_query_reset", 1},
-    VkExtensionProperties{"VK_EXT_scalar_block_layout", 1}, VkExtensionProperties{"VK_EXT_shader_viewport_index_layer", 1},
+    VkExtensionProperties{"VK_EXT_scalar_block_layout", 1},
 
     // Additional Vulkan extensions
     VkExtensionProperties{"VK_KHR_swapchain", 70}, VkExtensionProperties{"VK_KHR_swapchain_mutable_format", 1},
     // VkExtensionProperties{"VK_KHR_portability_subset", 1},  // MacOS only
     VkExtensionProperties{"VK_KHR_sampler_ycbcr_conversion",
                           1},  // Not supported by Intel 520 https://vulkan.gpuinfo.org/displayreport.php?id=12491#extensions
-    VkExtensionProperties{"VK_EXT_inline_uniform_block", 1}, VkExtensionProperties{"VK_EXT_image_robustness", 1},
+    VkExtensionProperties{"VK_EXT_inline_uniform_block", 1},
     VkExtensionProperties{"VK_EXT_robustness2", 1}, VkExtensionProperties{"VK_EXT_subgroup_size_control", 1},
     VkExtensionProperties{"VK_EXT_texel_buffer_alignment", 1}, VkExtensionProperties{"VK_EXT_vertex_attribute_divisor", 1}};
 
@@ -821,20 +821,12 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
             pNext = &Next_5;
         }
 
-        VkPhysicalDeviceImageRobustnessFeaturesEXT Next_6 = {};
-        Next_6.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT;
-        Next_6.pNext = pNext;
-        Next_6.robustImageAccess = VK_TRUE;
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT) == nullptr) {
-            pNext = &Next_6;
-        }
-
         VkPhysicalDeviceInlineUniformBlockFeaturesEXT Next_7 = {};
         Next_7.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
         Next_7.pNext = pNext;
         Next_7.inlineUniformBlock = VK_TRUE;
         if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT) == nullptr) {
-            pNext = &Next_7;
+            pNext = &Next_5;
         }
 
         VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT Next_8 = {};
@@ -1149,13 +1141,9 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             deviceInlineUniformBlock.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
             deviceInlineUniformBlock.pNext = &devicePipelineCreation;
 
-            VkPhysicalDeviceImageRobustnessFeaturesEXT deviceImageRobustness = {};
-            deviceImageRobustness.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT;
-            deviceImageRobustness.pNext = &deviceInlineUniformBlock;
-
             VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR deviceZeroInitialize = {};
             deviceZeroInitialize.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR;
-            deviceZeroInitialize.pNext = &deviceImageRobustness;
+            deviceZeroInitialize.pNext = &deviceInlineUniformBlock;
 
             VkPhysicalDeviceSynchronization2FeaturesKHR deviceSynchronization2 = {};
             deviceSynchronization2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR;
@@ -1276,9 +1264,6 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                 supported = VK_FALSE;
             }
             if (deviceZeroInitialize.shaderZeroInitializeWorkgroupMemory != VK_TRUE) {
-                supported = VK_FALSE;
-            }
-            if (deviceImageRobustness.robustImageAccess != VK_TRUE) {
                 supported = VK_FALSE;
             }
             if (deviceInlineUniformBlock.inlineUniformBlock != VK_TRUE) {
