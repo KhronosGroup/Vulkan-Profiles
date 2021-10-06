@@ -226,6 +226,19 @@
 				"variablePointersStorageBuffer": true,
 				"variablePointers": true
 			}
+		},
+		{
+			"struct": "VkPhysicalDevicePortabilitySubsetFeaturesKHR",
+			"members": {
+				"vertexAttributeAccessBeyondStride": true,
+				"separateStencilMaskRef": true,
+				"mutableComparisonSamplers": true,
+				"multisampleArrayImage": true,
+				"imageViewFormatSwizzle": true,
+				"imageViewFormatReinterpretation": true,
+				"events" : true,
+				"constantAlphaColorBlendFactors": true
+			}
 		}
 	],
 	"properties": [
