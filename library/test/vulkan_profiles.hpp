@@ -1051,10 +1051,10 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         }
 
         VkPhysicalDeviceSamplerYcbcrConversionFeatures Next_11 = {};
-        Next_11.sType = VK_STRUCTURE_TYPE_SAMPLER_YCBCR_CONVERSION_IMAGE_FORMAT_PROPERTIES;
+        Next_11.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES;
         Next_11.pNext = pNext;
         Next_11.samplerYcbcrConversion = VK_TRUE;
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_SAMPLER_YCBCR_CONVERSION_IMAGE_FORMAT_PROPERTIES) == nullptr) {
+        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES) == nullptr) {
             pNext = &Next_11;
         }
 
@@ -1067,15 +1067,32 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
             pNext = &Next_12;
         }
 
+#if defined(__APPLE__)
+        VkPhysicalDevicePortabilitySubsetFeaturesKHR devicePortabilitySubset = {};
+        devicePortabilitySubset.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR;
+        devicePortabilitySubset.pNext = pNext;
+        devicePortabilitySubset.vertexAttributeAccessBeyondStride = VK_TRUE;
+        devicePortabilitySubset.separateStencilMaskRef = VK_TRUE;
+        devicePortabilitySubset.mutableComparisonSamplers = VK_TRUE;
+        devicePortabilitySubset.multisampleArrayImage = VK_TRUE;
+        devicePortabilitySubset.imageViewFormatSwizzle = VK_TRUE;
+        devicePortabilitySubset.imageViewFormatReinterpretation = VK_TRUE;
+        devicePortabilitySubset.events = VK_TRUE;
+        devicePortabilitySubset.constantAlphaColorBlendFactors = VK_TRUE;
+        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR) == nullptr) {
+            pNext = &devicePortabilitySubset;
+        }
+#endif
+
         VkDeviceCreateInfo deviceCreateInfo = {};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        deviceCreateInfo.pNext = &Next_12;
+        deviceCreateInfo.pNext = pNext;
         deviceCreateInfo.queueCreateInfoCount = pCreateInfo->queueCreateInfoCount;
         deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pQueueCreateInfos;
         deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         deviceCreateInfo.ppEnabledExtensionNames = static_cast<const char *const *>(extensions.data());
         deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
-        return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
+         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
     } else {
         return VK_ERROR_UNKNOWN;
     }
@@ -1464,13 +1481,13 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             pNext = &devicePortabilitySubset;
 #endif
 
-            VkPhysicalDeviceSamplerYcbcrConversionFeatures deviceSamplerYcbcrConversionFeatires = {};
-            deviceSamplerYcbcrConversionFeatires.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES;
-            deviceSamplerYcbcrConversionFeatires.pNext = pNext;
+            VkPhysicalDeviceSamplerYcbcrConversionFeatures deviceSamplerYcbcrConversionFeatures = {};
+            deviceSamplerYcbcrConversionFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES;
+            deviceSamplerYcbcrConversionFeatures.pNext = pNext;
 
             VkPhysicalDeviceShaderFloat16Int8Features deviceShaderFloat16Int8Features = {};
             deviceShaderFloat16Int8Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES;
-            deviceShaderFloat16Int8Features.pNext = &deviceSamplerYcbcrConversionFeatires;
+            deviceShaderFloat16Int8Features.pNext = &deviceSamplerYcbcrConversionFeatures;
 
             VkPhysicalDevice8BitStorageFeatures device8BitStorageFeatures = {};
             device8BitStorageFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES;
@@ -1722,7 +1739,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             }
 #endif
 
-            void *pNext = nullptr;
+            pNext = nullptr;
 
 #if defined(__APPLE__)
             VkPhysicalDevicePortabilitySubsetPropertiesKHR devicePortabilitySubsetProperties = {};
