@@ -1,0 +1,318 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
+    "name": "VP_KHR_1_2_roadmap_2022",
+    "comments": {
+        "info": "Khronos Roadmap 2022 Profile",
+        "desc": "Collection on nonsensical features to test completeness"
+    },
+    "extensions": [
+        {
+            "extensionName": "VK_KHR_get_physical_device_properties2",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_KHR_external_memory_capabilities",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_KHR_external_fence_capabilities",
+            "specVersion": 1
+        }
+    ],
+    "features": [
+        {
+            "struct": "VkPhysicalDeviceFeatures",
+            "members": {
+                "robustBufferAccess": true,
+                "imageCubeArray": true,
+                "independentBlend": true,
+                "sampleRateShading": true,
+                "drawIndirectFirstInstance": true,
+                "depthBiasClamp": true,
+                "samplerAnisotropy": true,
+                "occlusionQueryPrecise": true,
+                "fragmentStoresAndAtomics": true,
+                "shaderStorageImageExtendedFormats": true,
+                "shaderStorageImageReadWithoutFormat": true,
+                "shaderUniformBufferArrayDynamicIndexing": true,
+                "shaderSampledImageArrayDynamicIndexing": true,
+                "shaderStorageBufferArrayDynamicIndexing": true,
+                "shaderStorageImageArrayDynamicIndexing": true
+            }
+        },
+        {
+            "struct": "VkPhysicalDeviceVulkan11Features",
+            "members": {
+                "multiview": true,
+                "samplerYcbcrConversion": true
+            }
+        },
+        {
+            "struct": "VkPhysicalDeviceVulkan12Features",
+            "members": {
+                "samplerMirrorClampToEdge": true,
+                "shaderUniformTexelBufferArrayDynamicIndexing": true,
+                "uniformBufferStandardLayout": true,
+                "shaderSubgroupExtendedTypes": true,
+                "separateDepthStencilLayouts": true,
+                "hostQueryReset": true,
+                "bufferDeviceAddress": true,
+                "vulkanMemoryModel": true,
+                "vulkanMemoryModelDeviceScope": true,
+                "vulkanMemoryModelAvailabilityVisibilityChains": true,
+                "subgroupBroadcastDynamicId": true,
+                "imagelessFramebuffer": true
+            }
+        },
+        {
+            "struct": "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR",
+            "members": {
+                "shaderTerminateInvocation": true
+            }
+        },
+        {
+            "struct": "VkPhysicalDeviceSynchronization2FeaturesKHR",
+            "members": {
+                "shaderTerminateInvocation": true
+            }
+        },
+        {
+            "struct": "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR",
+            "members": {
+                "shaderZeroInitializeWorkgroupMemory": true
+            }
+        },
+        {
+            "struct": "VkPhysicalDeviceInlineUniformBlockFeaturesEXT",
+            "members": {
+                "inlineUniformBlock": true
+            }
+        },
+        {
+            "struct": "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT",
+            "members": {
+                "pipelineCreationCacheControl": true
+            }
+        },
+        {
+            "struct": "VkPhysicalDevicePrivateDataFeaturesEXT",
+            "members": {
+                "privateData": true
+            }
+        },
+        {
+            "struct": "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT",
+            "members": {
+                "shaderDemoteToHelperInvocation": true
+            }
+        },
+        {
+            "struct": "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT",
+            "members": {
+                "subgroupSizeControl": true,
+                "computeFullSubgroups": true
+            }
+        },
+        {
+            "struct": "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT",
+            "members": {
+                "texelBufferAlignment": true
+            }
+        },
+        {
+            "struct": "VkPhysicalDeviceExtendedDynamicState2FeaturesEXT",
+            "members": {
+                "extendedDynamicState2": true
+            }
+        }
+    ],
+    "properties": [
+        {
+            "struct": "VkPhysicalDeviceLimits",
+            "members": [
+                {
+                    "name": "maxImageDimension1D",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 8192
+                },
+                {
+                    "name": "maxImageDimension2D",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 8192
+                },
+                {
+                    "name": "maxImageDimensionCube",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 8192
+                },
+                {
+                    "name": "maxImageArrayLayers",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 2048
+                },
+                {
+                    "name": "maxUniformBufferRange",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 65536
+                },
+                {
+                    "name": "bufferImageGranularity",
+                    "type": "INT",
+                    "limit": "MAX",
+                    "value": 4096
+                },
+                {
+                    "name": "maxPerStageDescriptorSamplers",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 64
+                },
+                {
+                    "name": "maxPerStageDescriptorUniformBuffers",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 15
+                },
+                {
+                    "name": "maxPerStageDescriptorStorageBuffers",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 30
+                },
+                {
+                    "name": "maxPerStageDescriptorSampledImages",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 200
+                },
+                {
+                    "name": "maxPerStageDescriptorStorageImages",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 16
+                },
+                {
+                    "name": "maxPerStageResources",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 200
+                },
+                {
+                    "name": "maxDescriptorSetSamplers",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 576
+                },
+                {
+                    "name": "maxDescriptorSetUniformBuffers",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 90
+                },
+                {
+                    "name": "maxDescriptorSetStorageBuffers",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 96
+                },
+                {
+                    "name": "maxDescriptorSetSampledImages",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 1800
+                },
+                {
+                    "name": "maxDescriptorSetStorageImages",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 144
+                },
+                {
+                    "name": "maxFragmentCombinedOutputResources",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 16
+                },
+                {
+                    "name": "maxComputeWorkGroupInvocations",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 256
+                },
+                {
+                    "name": "maxComputeWorkGroupSize",
+                    "type": "UINT3",
+                    "limit": "MIN",
+                    "value": [ 1024, 1024, 64 ]
+                },
+                {
+                    "name": "subTexelPrecisionBits",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 8
+                },
+                {
+                    "name": "mipmapPrecisionBits",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 6
+                },
+                {
+                    "name": "maxSamplerLodBias",
+                    "type": "FLOAT",
+                    "limit": "MIN",
+                    "value": 14
+                },
+                {
+                    "name": "pointSizeGranularity",
+                    "type": "FLOAT",
+                    "limit": "MAX",
+                    "value": 0.125
+                },
+                {
+                    "name": "lineWidthGranularity",
+                    "type": "FLOAT",
+                    "limit": "MAX",
+                    "value": 0.5
+                }
+            ]
+        },
+        {
+            "struct": "devicePropertiesVulkan11",
+            "members": [
+                {
+                    "name": "subgroupSize",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "struct": "VkPhysicalDeviceVulkan12Properties",
+            "members": [
+                {
+                    "name": "shaderSignedZeroInfNanPreserveFloat16",
+                    "type": "BOOL",
+                    "value": true
+                },
+                {
+                    "name": "shaderSignedZeroInfNanPreserveFloat32",
+                    "type": "BOOL",
+                    "value": true
+                },
+                {
+                    "name": "maxPerStageDescriptorUpdateAfterBindInputAttachments",
+                    "type": "INT",
+                    "limit": "MIN",
+                    "value": 7
+                }
+            ]
+        }
+    ]
+}
