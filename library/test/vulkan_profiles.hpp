@@ -1685,15 +1685,15 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             deviceMaintenance3Properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES;
             deviceMaintenance3Properties.pNext = nullptr;
 
-            VkPhysicalDeviceDepthStencilResolvePropertiesKHR deviceDepthStencilResolveProperties = {};
-            deviceDepthStencilResolveProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR;
+            VkPhysicalDeviceDepthStencilResolveProperties deviceDepthStencilResolveProperties = {};
+            deviceDepthStencilResolveProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES;
             deviceDepthStencilResolveProperties.pNext = &deviceMaintenance3Properties;
 
             VkPhysicalDeviceInlineUniformBlockPropertiesEXT inlineUniformBlockProperties = {};
             inlineUniformBlockProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT;
             inlineUniformBlockProperties.pNext = &deviceDepthStencilResolveProperties;
 
-            VkPhysicalDeviceMultiviewPropertiesKHR multiviewProperties = {};
+            VkPhysicalDeviceMultiviewProperties multiviewProperties = {};
             multiviewProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES;
             multiviewProperties.pNext = &inlineUniformBlockProperties;
 
@@ -1746,7 +1746,6 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (deviceProperties.properties.limits.sparseAddressSpaceSize < 1073741824) {
                 supported = VK_FALSE;
             }
-
             if (deviceProperties.properties.limits.maxBoundDescriptorSets < 8) {
                 supported = VK_FALSE;
             }
@@ -1834,7 +1833,6 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (deviceProperties.properties.limits.maxTessellationEvaluationOutputComponents < 124) {
                 supported = VK_FALSE;
             }
-
             if (deviceProperties.properties.limits.maxFragmentInputComponents < 116) {
                 supported = VK_FALSE;
             }
@@ -1939,7 +1937,6 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (deviceProperties.properties.limits.maxFramebufferLayers < 1024) {
                 supported = VK_FALSE;
             }
-
             if (deviceProperties.properties.limits.framebufferColorSampleCounts < 9) {
                 supported = VK_FALSE;
             }
@@ -1955,7 +1952,6 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (deviceProperties.properties.limits.maxColorAttachments < 8) {
                 supported = VK_FALSE;
             }
-
             if (deviceProperties.properties.limits.sampledImageColorSampleCounts < 9) {
                 supported = VK_FALSE;
             }
@@ -1968,15 +1964,12 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (deviceProperties.properties.limits.sampledImageStencilSampleCounts < 9) {
                 supported = VK_FALSE;
             }
-
             if (deviceProperties.properties.limits.storageImageSampleCounts < 1) {
                 supported = VK_FALSE;
             }
-
             if (deviceProperties.properties.limits.maxSampleMaskWords > 1) {
                 supported = VK_FALSE;
             }
-
             if (deviceProperties.properties.limits.maxClipDistances < 8) {
                 supported = VK_FALSE;
             }
@@ -2006,13 +1999,39 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                 supported = VK_FALSE;
             }
 
-            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindInputAttachments < 640) {
+            if (descriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools < 1048576) {
                 supported = VK_FALSE;
             }
-            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSampledImages < 640) {
+
+            if (descriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers < 16) {
                 supported = VK_FALSE;
             }
+            if (descriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindUniformBuffers < 15) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageBuffers < 31) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSampledImages < 128) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageImages < 8) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindInputAttachments < 128) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxPerStageUpdateAfterBindResources < 159) {
+                supported = VK_FALSE;
+            }
+
             if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSamplers < 80) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffers < 90) {
+                supported = VK_FALSE;
+            }
+            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic < 8) {
                 supported = VK_FALSE;
             }
             if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffers < 155) {
@@ -2021,13 +2040,13 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic < 8) {
                 supported = VK_FALSE;
             }
+            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSampledImages < 640) {
+                supported = VK_FALSE;
+            }
             if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageImages < 40) {
                 supported = VK_FALSE;
             }
-            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffers < 90) {
-                supported = VK_FALSE;
-            }
-            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic < 8) {
+            if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindInputAttachments < 640) {
                 supported = VK_FALSE;
             }
 
