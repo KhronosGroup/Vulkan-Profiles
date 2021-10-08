@@ -28,7 +28,309 @@
         "members": {
             "type": "array",
             "items": {
-
+                "oneOf": [
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "VkResolveModeFlagBits" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT", "VK_RESOLVE_MODE_AVERAGE_BIT", "VK_RESOLVE_MODE_MIN_BIT", "VK_RESOLVE_MODE_MAX_BIT" ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "INT" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "UINT" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "INT2" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "UINT2" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "INT3" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                },
+                                "minItems": 3,
+                                "maxItems": 3
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "UINT3" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                "minItems": 3,
+                                "maxItems": 3
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "FLOAT" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "FLOAT2" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "VkBool32" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "boolean"
+                            }
+                        }
+                    }
+                ]
             }
         },
         "VkFormatFeatureFlagBits": {
