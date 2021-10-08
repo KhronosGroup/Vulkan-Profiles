@@ -64,6 +64,10 @@
 			"specVersion": 70
 		},
 		{
+			"extensionName": "VK_KHR_get_surface_capabilities2",
+			"specVersion": 1
+		},
+		{
 			"extensionName": "VK_KHR_swapchain_mutable_format",
 			"specVersion": 1
 		},
@@ -1075,13 +1079,23 @@
 		[ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT" ]
 	],
 	"surfaceFormat": [
-		{
-			"format": "VK_FORMAT_B8G8R8A8_SRGB",
-			"colorSpace": "VK_COLORSPACE_SRGB_NONLINEAR_KHR"
-		},
-		{
-			"format": "VK_FORMAT_B8G8R8A8_UNORM",
-			"colorSpace": "VK_COLORSPACE_SRGB_NONLINEAR_KHR"
-		}
+		[
+			{
+				"struct": "VkSurfaceFormat2KHR",
+				"members": {
+					"format": "VK_FORMAT_B8G8R8A8_SRGB",
+					"colorSpace": "VK_COLORSPACE_SRGB_NONLINEAR_KHR"
+				}
+			}
+		],
+		[
+			{
+				"struct": "VkSurfaceFormat2KHR",
+				"members": {
+					"format": "VK_FORMAT_B8G8R8A8_UNORM",
+					"colorSpace": "VK_COLORSPACE_SRGB_NONLINEAR_KHR"
+				}
+			}
+		]
 	]
 }
