@@ -1,0 +1,1936 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "TODO",
+    "title": "TODO",
+    "description": "TODO",
+    "additionalProperties": true,
+    "required": [
+        "name",
+        "comments",
+        "requiredVersion"
+    ],
+    "definitions": {
+        "platforms": {
+            "description": "The platforms where the setting is available. When missing, this property is inherited from parent nodes. If no parent node defines it, the default value is all platforms.",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [ "WINDOWS", "LINUX", "MACOS", "IOS", "ANDROID" ],
+                "uniqueItems": true
+            }
+        },
+        "limit": {
+            "description": "TODO",
+            "type": "string",
+            "enum": [ "MIN", "MAX", "RANGE", "EQUAL", "NEQUAL", "ALL", "ANY" ],
+            "uniqueItems": true
+        },
+        "extension": {
+            "description": "TODO",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "description",
+                "extensionName"
+            ],
+            "properties": {
+                "extensionName": {
+                    "description": "TODO",
+                    "type": "string"
+                },
+                "specVersion": {
+                    "description": "TODO",
+                    "type": "integer"
+                },
+                "platforms": {
+                    "$ref": "#/definitions/platforms"
+                }
+            }
+        },
+        "members": {
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "INT" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "UINT" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "INT2" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "UINT2" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "INT3" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                },
+                                "minItems": 3,
+                                "maxItems": 3
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "UINT3" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                "minItems": 3,
+                                "maxItems": 3
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "FLOAT" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "FLOAT2" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "BOOL" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "boolean"
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "BOOL" ]
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            },
+                            "value": {
+                                "type": "boolean"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+
+
+
+
+
+        "version": {
+            "description": "Version with a 'major', 'minor' and 'patch' format",
+            "type": "string",
+            "pattern": "^[0-9]+.[0-9]+.[0-9]+$"
+        },
+        "status": {
+            "description": "The development status of the setting. When missing, this property is inherited from parent nodes. If no parent node defines it, the default value is 'STABLE'.",
+            "type": "string",
+            "enum": [ "ALPHA", "BETA", "STABLE", "DEPRECATED" ]
+        },
+        "view": {
+            "description": "The level of visibility of the setting ('STANDARD' by default). This property is inherited by child nodes.",
+            "type": "string",
+            "enum": [ "STANDARD", "ADVANCED", "HIDDEN" ]
+        },
+        "dependence": {
+            "type": "object",
+            "items": {
+                "additionalProperties": false,
+                "properties": {
+                    "mode": {
+                        "description": "How dependence need to be repected for the setting to be enable ('NONE' by default)",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [ "NONE", "ALL", "ANY" ]
+                        }
+                    },
+                    "settings": {
+                        "$ref": "#/definitions/settings_data"
+                    }
+                }
+            }
+        },
+        "int_range": {
+            "description": "A range of integer values",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "min": {
+                    "type": "integer"
+                },
+                "max": {
+                    "type": "integer"
+                }
+            }
+        },
+        "float_range": {
+            "description": "A range of floating-point values",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "min": {
+                    "type": "number"
+                },
+                "max": {
+                    "type": "number"
+                },
+                "width": {
+                    "type": "integer"
+                },
+                "precision": {
+                    "type": "integer"
+                }
+            }
+        },
+        "number_or_string": {
+            "items": {
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "number"
+                    }
+                ]
+            }
+        },
+        "enabled_number_or_string": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "required": [
+                        "key",
+                        "enabled"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "key": {
+                            "type": "string"
+                        },
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                {
+                    "type": "object",
+                    "required": [
+                        "key",
+                        "enabled"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "key": {
+                            "type": "number"
+                        },
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            ]
+        },
+        "flags": {
+            "type": "array",
+            "items": {
+                "required": [
+                    "key",
+                    "label",
+                    "description"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    },
+                    "platforms": {
+                        "$ref": "#/definitions/platforms"
+                    },
+                    "status": {
+                        "$ref": "#/definitions/status"
+                    },
+                    "view": {
+                        "$ref": "#/definitions/view"
+                    },
+                    "expanded": {
+                        "description": "Whether the children are expanded/visible by default in the UI, true by default",
+                        "type": "boolean"
+                    },
+                    "settings": {
+                        "$ref": "#/definitions/settings_meta"
+                    }
+                }
+            }
+        },
+        "settings_data": {
+            "description": "The different kind of settings stored in a preset",
+            "additionalProperties": false,
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    {
+                        "description": "For preset STRING, FRAMES, ENUM, LOAD_FILE, SAVE_FILE, SAVE_FOLDER setting type values",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "value"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "description": "For preset BOOL setting type values",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "value"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "type": "boolean"
+                            }
+                        }
+                    },
+                    {
+                        "description": "For preset INT setting type values",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "value"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    {
+                        "description": "For preset FLAGS setting type values",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "value"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "type": "array",
+                                "contains": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "description": "For preset LIST setting type values",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "value"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/enabled_number_or_string"
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "settings_meta": {
+            "description": "The different kind of settings of layers",
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    {
+                        "description": "layer setting for GROUP type",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "label",
+                            "description",
+                            "type"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "GROUP" ]
+                            },
+                            "label": {
+                                "description": "The string used to identify the setting to the user",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "The description of the setting",
+                                "type": "string"
+                            },
+                            "url": {
+                                "description": "The URL to find more information about the setting",
+                                "type": "string"
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "status": {
+                                "$ref": "#/definitions/status"
+                            },
+                            "view": {
+                                "$ref": "#/definitions/view"
+                            },
+                            "expanded": {
+                                "description": "Whether the children are expanded/visible by default in the UI, true by default",
+                                "type": "boolean"
+                            },
+                            "dependence": {
+                                "$ref": "#/definitions/dependence"
+                            },
+                            "settings": {
+                                "$ref": "#/definitions/settings_meta"
+                            }
+                        },
+                        "examples": [
+                            {
+                                "key": "log",
+                                "label": "Log",
+                                "description": "Control log messages.",
+                                "type": "GROUP",
+                                "settings": [
+                                    {
+                                        "key": "log_action",
+                                        "label": "Log Action",
+                                        "description": "This indicates what action is to be taken when a layer wants to report information",
+                                        "type": "FLAGS",
+                                        "flags": [
+                                            {
+                                                "key": "ACTION_LOG_MSG",
+                                                "label": "Log Message",
+                                                "description": "Log a txt message to stdout or to a log filename.",
+                                                "settings": [
+                                                    {
+                                                        "key": "log_filename",
+                                                        "label": "Log Filename",
+                                                        "description": "Specifies the output filename",
+                                                        "type": "SAVE_FILE",
+                                                        "default": "stdout",
+                                                        "dependence": {
+                                                            "mode": "ALL",
+                                                            "settings": [
+                                                                {
+                                                                    "key": "debug_action",
+                                                                    "value": [ "ACTION_LOG_MSG" ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "ACTION_DEBUG_OUTPUT",
+                                                "label": "Debug Output",
+                                                "description": "Log a txt message using the Windows OutputDebugString function.",
+                                                "platforms": [ "WINDOWS" ]
+                                            },
+                                            {
+                                                "key": "ACTION_BREAK",
+                                                "label": "Break",
+                                                "description": "Trigger a breakpoint if a debugger is in use."
+                                            }
+                                        ],
+                                        "default": [ "ACTION_LOG_MSG" ]
+                                    },
+                                    {
+                                        "key": "report_flags",
+                                        "label": "Log Report",
+                                        "description": "This is a comma-delineated list of options telling the layer what types of messages it should report back",
+                                        "type": "FLAGS",
+                                        "flags": [
+                                            {
+                                                "key": "REPORT_INFO",
+                                                "label": "Info",
+                                                "description": "Report informational messages."
+                                            },
+                                            {
+                                                "key": "REPORT_WARN",
+                                                "label": "Warning",
+                                                "description": "Report warnings from using the API in a manner which may lead to undefined behavior or to warn the user of common trouble spots. A warning does NOT necessarily signify illegal application behavior."
+                                            },
+                                            {
+                                                "key": "REPORT_PERF",
+                                                "label": "performance",
+                                                "description": "Report using the API in a way that may cause suboptimal performance."
+                                            },
+                                            {
+                                                "key": "REPORT_ERROR",
+                                                "label": "Error",
+                                                "description": "Report errors in API usage."
+                                            },
+                                            {
+                                                "key": "REPORT_DEBUG",
+                                                "label": "Debug",
+                                                "description": "For layer development. Report messages for debugging layer behavior.",
+                                                "view": "ADVANCED"
+                                            }
+                                        ],
+                                        "default": [
+                                            "error",
+                                            "warn",
+                                            "perf"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "layer setting for STRING and SAVE_FOLDER types",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "label",
+                            "description",
+                            "type",
+                            "default"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "env": {
+                                "description": "The environment variable that may be used to set this setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "STRING", "SAVE_FOLDER" ]
+                            },
+                            "default": {
+                                "type": "string"
+                            },
+                            "label": {
+                                "description": "The string used to identify the setting to the user",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "The description of the setting",
+                                "type": "string"
+                            },
+                            "url": {
+                                "description": "The URL to find more information about the setting",
+                                "type": "string"
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "status": {
+                                "$ref": "#/definitions/status"
+                            },
+                            "view": {
+                                "$ref": "#/definitions/view"
+                            },
+                            "expanded": {
+                                "description": "Whether the children are expanded/visible by default in the UI, true by default",
+                                "type": "boolean"
+                            },
+                            "dependence": {
+                                "$ref": "#/definitions/dependence"
+                            },
+                            "settings": {
+                                "$ref": "#/definitions/settings_meta"
+                            }
+                        },
+                        "examples": [
+                            {
+                                "key": "string_required_only",
+                                "type": "STRING",
+                                "label": "String",
+                                "description": "string",
+                                "default": "A string"
+                            },
+                            {
+                                "key": "save_folder_required_only",
+                                "type": "SAVE_FOLDER",
+                                "label": "Save folder",
+                                "description": "Save folder path",
+                                "default": "./test"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "layer setting for SAVE_FILE and LOAD_FILE types",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "label",
+                            "description",
+                            "type",
+                            "default"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "env": {
+                                "description": "The environment variable that may be used to set this setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "SAVE_FILE", "LOAD_FILE" ]
+                            },
+                            "filter": {
+                                "type": "string"
+                            },
+                            "default": {
+                                "type": "string"
+                            },
+                            "label": {
+                                "description": "The string used to identify the setting to the user",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "The description of the setting",
+                                "type": "string"
+                            },
+                            "url": {
+                                "description": "The URL to find more information about the setting",
+                                "type": "string"
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "status": {
+                                "$ref": "#/definitions/status"
+                            },
+                            "view": {
+                                "$ref": "#/definitions/view"
+                            },
+                            "expanded": {
+                                "description": "Whether the children are expanded/visible by default in the UI, true by default",
+                                "type": "boolean"
+                            },
+                            "dependence": {
+                                "$ref": "#/definitions/dependence"
+                            },
+                            "settings": {
+                                "$ref": "#/definitions/settings_meta"
+                            }
+                        },
+                        "examples": [
+                            {
+                                "key": "load_file_required_only",
+                                "type": "LOAD_FILE",
+                                "label": "Load file",
+                                "description": "Load file path",
+                                "default": "./test.txt"
+                            },
+                            {
+                                "key": "load_file_with_optional",
+                                "env": "VK_REF_LOAD_FILE",
+                                "type": "LOAD_FILE",
+                                "label": "Load file",
+                                "description": "Load file path",
+                                "url": "https://vulkan.lunarg.com/doc/sdk/latest/windows/layer_dummy.html#load_file",
+                                "status": "BETA",
+                                "view": "ADVANCED",
+                                "platforms": [ "WINDOWS", "LINUX" ],
+                                "filter": "*.txt",
+                                "default": "./test.txt"
+                            },
+                            {
+                                "key": "save_file_required_only",
+                                "type": "SAVE_FILE",
+                                "label": "Save file",
+                                "description": "Save file path",
+                                "default": "./test.json"
+                            },
+                            {
+                                "key": "save_file_with_optional",
+                                "env": "VK_REF_SAVE_FILE",
+                                "type": "SAVE_FILE",
+                                "label": "Save file",
+                                "description": "Save file path",
+                                "url": "https://vulkan.lunarg.com/doc/sdk/latest/windows/layer_dummy.html#save_file",
+                                "status": "BETA",
+                                "view": "ADVANCED",
+                                "platforms": [ "WINDOWS", "LINUX" ],
+                                "filter": "*.json",
+                                "default": "./test.json"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "layer setting for FRAMES type",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "label",
+                            "description",
+                            "type",
+                            "default"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "env": {
+                                "description": "The environment variable that may be used to set this setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "FRAMES" ]
+                            },
+                            "default": {
+                                "type": "string",
+                                "pattern": "^([0-9]+([-][0-9]+){0,2})(,([0-9]+([-][0-9]+){0,2}))*$"
+                            },
+                            "label": {
+                                "description": "The string used to identify the setting to the user",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "The description of the setting",
+                                "type": "string"
+                            },
+                            "url": {
+                                "description": "The URL to find more information about the setting",
+                                "type": "string"
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "status": {
+                                "$ref": "#/definitions/status"
+                            },
+                            "view": {
+                                "$ref": "#/definitions/view"
+                            },
+                            "expanded": {
+                                "description": "Whether the children are expanded/visible by default in the UI, true by default",
+                                "type": "boolean"
+                            },
+                            "dependence": {
+                                "$ref": "#/definitions/dependence"
+                            },
+                            "settings": {
+                                "$ref": "#/definitions/settings_meta"
+                            }
+                        },
+                        "examples": [
+                            {
+                                "key": "toogle",
+                                "env": "VK_REF_TOGGLE",
+                                "label": "toogle",
+                                "type": "BOOL",
+                                "description": "true or false",
+                                "default": true,
+                                "settings": [
+                                    {
+                                        "key": "frames_required_only",
+                                        "type": "FRAMES",
+                                        "label": "Frames",
+                                        "description": "Frames Description",
+                                        "default": "76-82,75"
+                                    },
+                                    {
+                                        "key": "frames_with_optional",
+                                        "env": "VK_REF_FRAMES",
+                                        "type": "FRAMES",
+                                        "label": "Frames",
+                                        "description": "Frames Description",
+                                        "url": "https://vulkan.lunarg.com/doc/sdk/latest/windows/layer_dummy.html#frames",
+                                        "status": "BETA",
+                                        "view": "ADVANCED",
+                                        "platforms": [ "WINDOWS", "LINUX" ],
+                                        "default": "76-82,75",
+                                        "dependence": {
+                                            "mode": "ALL",
+                                            "settings": [
+                                                {
+                                                    "key": "toogle",
+                                                    "value": true
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "layer setting for BOOL type",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "label",
+                            "description",
+                            "type",
+                            "default"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "env": {
+                                "description": "The environment variable that may be used to set this setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "BOOL" ]
+                            },
+                            "default": {
+                                "type": "boolean"
+                            },
+                            "label": {
+                                "description": "The string used to identify the setting to the user",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "The description of the setting",
+                                "type": "string"
+                            },
+                            "url": {
+                                "description": "The URL to find more information about the setting",
+                                "type": "string"
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "status": {
+                                "$ref": "#/definitions/status"
+                            },
+                            "view": {
+                                "$ref": "#/definitions/view"
+                            },
+                            "expanded": {
+                                "description": "Whether the children are expanded/visible by default in the UI, true by default",
+                                "type": "boolean"
+                            },
+                            "dependence": {
+                                "$ref": "#/definitions/dependence"
+                            },
+                            "settings": {
+                                "$ref": "#/definitions/settings_meta"
+                            }
+                        },
+                        "examples": [
+                            {
+                                "key": "show_timestamp",
+                                "env": "LAYER_TIMESTAMP",
+                                "label": "Show Timestamp",
+                                "description": "Show the timestamp of function calls since start in microseconds",
+                                "type": "BOOL",
+                                "default": false
+                            },
+                            {
+                                "key": "use_spaces",
+                                "label": "Use Spaces",
+                                "description": "Setting this to true causes all tab characters to be replaced with spaces",
+                                "type": "BOOL",
+                                "default": true,
+                                "settings": [
+                                    {
+                                        "key": "indent_size",
+                                        "label": "Indent Size",
+                                        "description": "Specifies the number of spaces that a tab is equal to",
+                                        "type": "INT",
+                                        "default": 4,
+                                        "range": {
+                                            "min": 1,
+                                            "max": 16
+                                        },
+                                        "unit": "chars",
+                                        "dependence": {
+                                            "mode": "ALL",
+                                            "settings": [
+                                                {
+                                                    "key": "use_spaces",
+                                                    "value": true
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "layer setting for FLOAT type",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "label",
+                            "description",
+                            "type",
+                            "default"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "FLOAT" ]
+                            },
+                            "env": {
+                                "description": "The environment variable that may be used to set this setting",
+                                "type": "string"
+                            },
+                            "label": {
+                                "description": "The string used to identify the setting to the user",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "The description of the setting",
+                                "type": "string"
+                            },
+                            "url": {
+                                "description": "The URL to find more information about the setting",
+                                "type": "string"
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "status": {
+                                "$ref": "#/definitions/status"
+                            },
+                            "view": {
+                                "$ref": "#/definitions/view"
+                            },
+                            "range": {
+                                "$ref": "#/definitions/float_range"
+                            },
+                            "unit": {
+                                "description": "The unit of measurement",
+                                "type": "string"
+                            },
+                            "default": {
+                                "type": "number"
+                            },
+                            "expanded": {
+                                "description": "Whether the children are expanded/visible by default in the UI, true by default",
+                                "type": "boolean"
+                            },
+                            "dependence": {
+                                "$ref": "#/definitions/dependence"
+                            },
+                            "settings": {
+                                "$ref": "#/definitions/settings_meta"
+                            }
+                        },
+                        "examples": [
+                            {
+                                "key": "toogle",
+                                "env": "VK_REF_TOGGLE",
+                                "label": "toogle",
+                                "type": "BOOL",
+                                "description": "true or false",
+                                "default": true,
+                                "settings": [
+                                    {
+                                        "key": "float_required_only",
+                                        "type": "FLOAT",
+                                        "label": "Float",
+                                        "description": "Float Description",
+                                        "default": 76.5
+                                    },
+                                    {
+                                        "key": "float_with_optional",
+                                        "env": "VK_REF_FLOAT",
+                                        "type": "FLOAT",
+                                        "label": "Float",
+                                        "description": "Float Description",
+                                        "url": "https://vulkan.lunarg.com/doc/sdk/latest/windows/layer_dummy.html#float",
+                                        "status": "BETA",
+                                        "view": "ADVANCED",
+                                        "platforms": [ "WINDOWS", "LINUX" ],
+                                        "default": 76.5,
+                                        "range": {
+                                            "min": 75.1,
+                                            "max": 82.2,
+                                            "width": 2,
+                                            "precision": 3
+                                        },
+                                        "unit": "second",
+                                        "dependence": {
+                                            "mode": "ALL",
+                                            "settings": [
+                                                {
+                                                    "key": "toogle",
+                                                    "value": true
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "layer setting for INT type",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "label",
+                            "description",
+                            "type",
+                            "default"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "env": {
+                                "description": "The environment variable that may be used to set this setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "INT" ]
+                            },
+                            "label": {
+                                "description": "The string used to identify the setting to the user",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "The description of the setting",
+                                "type": "string"
+                            },
+                            "url": {
+                                "description": "The URL to find more information about the setting",
+                                "type": "string"
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "status": {
+                                "$ref": "#/definitions/status"
+                            },
+                            "view": {
+                                "$ref": "#/definitions/view"
+                            },
+                            "expanded": {
+                                "description": "Whether the children are expanded/visible by default in the UI, true by default",
+                                "type": "boolean"
+                            },
+                            "range": {
+                                "$ref": "#/definitions/int_range"
+                            },
+                            "unit": {
+                                "description": "The unit of measurement",
+                                "type": "string"
+                            },
+                            "default": {
+                                "type": "integer"
+                            },
+                            "dependence": {
+                                "$ref": "#/definitions/dependence"
+                            },
+                            "settings": {
+                                "$ref": "#/definitions/settings_meta"
+                            }
+                        },
+                        "examples": [
+                            {
+                                "key": "duplicate_message_limit",
+                                "env": "VK_LAYER_DUPLICATE_MESSAGE_LIMIT",
+                                "label": "Duplicated Messages Limit",
+                                "description": "Limit the number of times any single validation message would be reported. Empty is unlimited.",
+                                "type": "INT",
+                                "default": 10,
+                                "range": {
+                                    "min": 0
+                                }
+                            },
+                            {
+                                "key": "printf_buffer_size",
+                                "label": "Printf buffer size",
+                                "description": "The size in bytes of the buffer used by debug printf",
+                                "platforms": [ "WINDOWS", "LINUX" ],
+                                "type": "INT",
+                                "default": 1024,
+                                "range": {
+                                    "min": 128,
+                                    "max": 1048576
+                                },
+                                "unit": "bytes"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "layer setting for ENUM type",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "label",
+                            "description",
+                            "type",
+                            "default",
+                            "flags"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "env": {
+                                "description": "The environment variable that may be used to set this setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "ENUM" ]
+                            },
+                            "label": {
+                                "description": "The string used to identify the setting to the user",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "The description of the setting",
+                                "type": "string"
+                            },
+                            "url": {
+                                "description": "The URL to find more information about the setting",
+                                "type": "string"
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "status": {
+                                "$ref": "#/definitions/status"
+                            },
+                            "view": {
+                                "$ref": "#/definitions/view"
+                            },
+                            "expanded": {
+                                "description": "Whether the children are expanded/visible by default in the UI, true by default",
+                                "type": "boolean"
+                            },
+                            "flags": {
+                                "$ref": "#/definitions/flags"
+                            },
+                            "default": {
+                                "type": "string"
+                            },
+                            "dependence": {
+                                "$ref": "#/definitions/dependence"
+                            },
+                            "settings": {
+                                "$ref": "#/definitions/settings_meta"
+                            }
+                        },
+                        "examples": [
+                            {
+                                "key": "capture_compression_type",
+                                "env": "LAYER_CAPTURE_COMPRESSION_TYPE",
+                                "label": "Compression Format",
+                                "description": "Compression format to use with the capture file. Valid values are: LZ4, ZLIB, ZSTD, and NONE. Default is: LZ4",
+                                "type": "ENUM",
+                                "flags": [
+                                    {
+                                        "key": "LZ4",
+                                        "label": "LZ4",
+                                        "description": "Fastest compression algorithm that favors performance over compression ratio."
+                                    },
+                                    {
+                                        "key": "ZLIB",
+                                        "label": "ZLIB",
+                                        "description": "Widely used compression algorithm with better compression ratio than LZ4 but worse performance."
+                                    },
+                                    {
+                                        "key": "ZSTD",
+                                        "label": "ZSTD",
+                                        "description": "Newer compression algorithm with better compression ratio and performance than ZLIB, though not as fast as LZ4."
+                                    },
+                                    {
+                                        "key": "NONE",
+                                        "label": "NONE",
+                                        "description": "No compression"
+                                    }
+                                ],
+                                "default": "LZ4"
+                            },
+                            {
+                                "key": "memory_tracking_mode",
+                                "env": "LAYER_MEMORY_TRACKING_MODE",
+                                "label": "Memory Tracking Mode",
+                                "description": "Specifies the memory tracking mode to use for detecting modifications to mapped Vulkan memory objects. Available options are: page_guard, assisted, and unassisted.",
+                                "type": "ENUM",
+                                "flags": [
+                                    {
+                                        "key": "page_guard",
+                                        "label": "page_guard",
+                                        "description": "Tracks modifications to individual memory pages, which are written to the capture file on calls to vkFlushMappedMemoryRanges, vkUnmapMemory, and vkQueueSubmit. Tracking modifications requires allocating shadow memory for all mapped memory."
+                                    },
+                                    {
+                                        "key": "assisted",
+                                        "label": "assisted",
+                                        "description": "Expects the application to call vkFlushMappedMemoryRanges after memory is modified; the memory ranges specified to the vkFlushMappedMemoryRanges call will be written to the capture file during the call."
+                                    },
+                                    {
+                                        "key": "unassisted",
+                                        "label": "unassisted",
+                                        "description": "Writes the full content of mapped memory to the capture file on calls to vkUnmapMemory and vkQueueSubmit. It is very inefficient and may be unusable with real-world applications that map large amounts of memory."
+                                    }
+                                ],
+                                "default": "page_guard",
+                                "settings": [
+                                    {
+                                        "key": "page_guard_copy_on_map",
+                                        "env": "LAYER_PAGE_GUARD_COPY_ON_MAP",
+                                        "label": "Page Guard Copy on Map",
+                                        "description": "When the page_guard memory tracking mode is enabled, copies the content of the mapped memory to the shadow memory immediately after the memory is mapped.",
+                                        "type": "BOOL",
+                                        "default": true,
+                                        "dependence": {
+                                            "mode": "ALL",
+                                            "settings": [
+                                                {
+                                                    "key": "memory_tracking_mode",
+                                                    "value": "page_guard"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "key": "page_guard_separate_read",
+                                        "env": "LAYER_PAGE_GUARD_SEPARATE_READ",
+                                        "label": "Page Guard Separate Read Tracking",
+                                        "description": "When the page_guard memory tracking mode is enabled, copies the content of pages accessed for read from mapped memory to shadow memory on each read. Can overwrite unprocessed shadow memory content when an application is reading from and writing to the same page.",
+                                        "type": "BOOL",
+                                        "default": true,
+                                        "dependence": {
+                                            "mode": "ALL",
+                                            "settings": [
+                                                {
+                                                    "key": "memory_tracking_mode",
+                                                    "value": "page_guard"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "key": "page_guard_external_memory",
+                                        "env": "LAYER_PAGE_GUARD_EXTERNAL_MEMORY",
+                                        "label": "Page Guard External Memory",
+                                        "description": "When the page_guard memory tracking mode is enabled, use the VK_EXT_external_memory_host extension to eliminate the need for shadow memory allocations. For each memory allocation from a host visible memory type, the capture layer will create an allocation from system memory, which it can monitor for write access, and provide that allocation to vkAllocateMemory as external memory. Only available on Windows.",
+                                        "platforms": [ "WINDOWS" ],
+                                        "type": "BOOL",
+                                        "default": false,
+                                        "dependence": {
+                                            "mode": "ALL",
+                                            "settings": [
+                                                {
+                                                    "key": "memory_tracking_mode",
+                                                    "value": "page_guard"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "key": "page_guard_persistent_memory",
+                                        "env": "LAYER_PAGE_GUARD_PERSISTENT_MEMORY",
+                                        "label": "Page Guard Persisent Memory",
+                                        "description": "When the page_guard memory tracking mode is enabled, this option changes the way that the shadow memory used to detect modifications to mapped memory is allocated. The default behavior is to allocate and copy the mapped memory range on map and free the allocation on unmap. When this option is enabled, an allocation with a size equal to that of the object being mapped is made once on the first map and is not freed until the object is destroyed. This option is intended to be used with applications that frequently map and unmap large memory ranges, to avoid frequent allocation and copy operations that can have a negative impact on performance. This option is ignored when GFXRECON_PAGE_GUARD_EXTERNAL_MEMORY is enabled.",
+                                        "type": "BOOL",
+                                        "default": false,
+                                        "dependence": {
+                                            "mode": "ALL",
+                                            "settings": [
+                                                {
+                                                    "key": "memory_tracking_mode",
+                                                    "value": "page_guard"
+                                                },
+                                                {
+                                                    "key": "page_guard_external_memory",
+                                                    "value": false
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "layer setting for FLAGS type",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "label",
+                            "description",
+                            "type",
+                            "default",
+                            "flags"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "env": {
+                                "description": "The environment variable that may be used to set this setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "FLAGS" ]
+                            },
+                            "label": {
+                                "description": "The string used to identify the setting to the user",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "The description of the setting",
+                                "type": "string"
+                            },
+                            "url": {
+                                "description": "The URL to find more information about the setting",
+                                "type": "string"
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "status": {
+                                "$ref": "#/definitions/status"
+                            },
+                            "view": {
+                                "$ref": "#/definitions/view"
+                            },
+                            "expanded": {
+                                "description": "Whether the children are expanded/visible by default in the UI, true by default",
+                                "type": "boolean"
+                            },
+                            "flags": {
+                                "$ref": "#/definitions/flags"
+                            },
+                            "default": {
+                                "type": "array",
+                                "uniqueItems": true,
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "dependence": {
+                                "$ref": "#/definitions/dependence"
+                            },
+                            "settings": {
+                                "$ref": "#/definitions/settings_meta"
+                            }
+                        },
+                        "examples": [
+                            {
+                                "key": "report_flags",
+                                "label": "Message Severity",
+                                "description": "This is a comma-delineated list of options telling the layer what types of messages it should report back",
+                                "type": "FLAGS",
+                                "flags": [
+                                    {
+                                        "key": "info",
+                                        "label": "Info",
+                                        "description": "Report informational messages."
+                                    },
+                                    {
+                                        "key": "warn",
+                                        "label": "Warning",
+                                        "description": "Report warnings from using the API in a manner which may lead to undefined behavior or to warn the user of common trouble spots. A warning does NOT necessarily signify illegal application behavior."
+                                    },
+                                    {
+                                        "key": "perf",
+                                        "label": "performance",
+                                        "description": "Report using the API in a way that may cause suboptimal performance."
+                                    },
+                                    {
+                                        "key": "error",
+                                        "label": "Error",
+                                        "description": "Report errors in API usage."
+                                    },
+                                    {
+                                        "key": "debug",
+                                        "label": "Debug",
+                                        "description": "For layer development. Report messages for debugging layer behavior.",
+                                        "view": "ADVANCED"
+                                    }
+                                ],
+                                "default": [
+                                    "error",
+                                    "warn",
+                                    "perf"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "layer setting for LIST type",
+                        "type": "object",
+                        "required": [
+                            "key",
+                            "label",
+                            "description",
+                            "type",
+                            "default"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "key": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "env": {
+                                "description": "The environment variable that may be used to set this setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "LIST" ]
+                            },
+                            "default": {
+                                "description": "Default value of the setting",
+                                "type": "array",
+                                "uniqueItems": true,
+                                "items": {
+                                    "$ref": "#/definitions/enabled_number_or_string"
+                                }
+                            },
+                            "label": {
+                                "description": "The string used to identify the setting to the user",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "The description of the setting",
+                                "type": "string"
+                            },
+                            "url": {
+                                "description": "The URL to find more information about the setting",
+                                "type": "string"
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "status": {
+                                "$ref": "#/definitions/status"
+                            },
+                            "view": {
+                                "$ref": "#/definitions/view"
+                            },
+                            "expanded": {
+                                "description": "Whether the children are expanded/visible by default in the UI, true by default",
+                                "type": "boolean"
+                            },
+                            "list": {
+                                "description": "Default value of the setting",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/number_or_string"
+                                }
+                            },
+                            "list_only": {
+                                "description": "To exclude any additional values that the values in the list",
+                                "type": "boolean"
+                            },
+                            "dependence": {
+                                "$ref": "#/definitions/dependence"
+                            },
+                            "settings": {
+                                "$ref": "#/definitions/settings_meta"
+                            }
+                        },
+                        "examples": [
+                            {
+                                "key": "vuid",
+                                "env": "LAYER_VUID",
+                                "label": "VUID list",
+                                "description": "List of VUIDs and VUID identifers which are to be IGNORED by the validation layer",
+                                "type": "LIST",
+                                "default": [
+                                    [
+                                        {
+                                            "key": "0x1234ABCF",
+                                            "enabled": true
+                                        },
+                                        {
+                                            "key": 12345678,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "key": "12345678",
+                                            "enabled": true
+                                        },
+                                        {
+                                            "key": "stringA",
+                                            "enabled": true
+                                        },
+                                        {
+                                            "key": "stringB",
+                                            "enabled": true
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "key": 1,
+                                            "enabled": false
+                                        },
+                                        {
+                                            "key": 2,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "key": 3,
+                                            "enabled": false
+                                        }
+                                    ]
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "properties": {
+        "name": {
+            "description": "The string used to uniquely identify this layer to applications.",
+            "type": "string",
+            "pattern": "^VP_[A-Z0-9]+_[A-Za-z0-9_]+"
+        },
+        "comments": {
+            "description": "TODO",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "info",
+                "desc"
+            ],
+            "properties": {
+                "info": {
+                    "description": "TODO",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "TODO",
+                    "type": "string"
+                }
+            }
+        },
+        "requiredVersion": {
+            "description": "TODO",
+            "type": "string",
+            "pattern": "^[0-9]+.[0-9]+$"
+        },
+        "extensions": {
+            "description": "TODO",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "extensionName",
+                "specVersion"
+            ],
+            "properties": {
+                "extensionName": {
+                    "description": "TODO",
+                    "type": "string"
+                },
+                "specVersion": {
+                    "description": "TODO",
+                    "type": "integer"
+                }
+            }
+        },
+        "features": {
+            "description": "TODO",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "description": "TODO",
+                    "type": "string",
+                    "pattern": "[A-Za-z0-9_]+"
+                },
+                "members": {
+                    "description": "TODO",
+                    "type": "object"
+                },
+                "platforms": {
+                    "$ref": "#/definitions/platforms"
+                }
+            }
+        },
+        "properties": {
+            "description": "TODO",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "name": {
+                    "description": "TODO",
+                    "type": "string"
+                },
+                "members": {
+                    "description": "TODO",
+                    "type": "object"
+                },
+                "platforms": {
+                    "$ref": "#/definitions/platforms"
+                }
+            }
+        },
+        "formats": {
+            "description": "TODO",
+            "type": "array",
+            "additionalProperties": false,
+            "items": {
+
+            }
+        },
+        "queueFamilies": {
+            "description": "TODO",
+            "type": "array",
+            "additionalProperties": false,
+            "items": {
+                "required": [
+                    "key",
+                    "label",
+                    "description"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "queueFlags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [ "VK_QUEUE_GRAPHICS_BIT", "VK_QUEUE_COMPUTE_BIT", "VK_QUEUE_TRANSFER_BIT", "VK_QUEUE_SPARSE_BINDING_BIT", "VK_QUEUE_PROTECTED_BIT", "VK_QUEUE_VIDEO_DECODE_BIT_KHR", "VK_QUEUE_VIDEO_ENCODE_BIT_KHR" ],
+                            "uniqueItems": true
+                        }
+                    },
+                    "queueCount": {
+                        "type": "integer"
+                    },
+                    "timestampValidBits": {
+                        "type": "integer"
+                    },
+                    "minImageTransferGranularity": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                    }
+                }
+            }
+        },
+        "memoryTypes": {
+            "description": "TODO VkMemoryPropertyFlagBits",
+            "type": "array",
+            "additionalProperties": false,
+            "items": {
+                "type": "string",
+                "enum": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT", "VK_MEMORY_PROPERTY_HOST_CACHED_BIT", "VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT" ],
+                "uniqueItems": true
+            }
+        }
+    }
+}
+
