@@ -1397,7 +1397,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (deviceProperties.properties.limits.mipmapPrecisionBits < 6) {
                 supported = VK_FALSE;
             }
-            if (deviceProperties.properties.limits.maxSamplerLodBias < 14) {
+            if (deviceProperties.properties.limits.maxSamplerLodBias < 14.0) {
                 supported = VK_FALSE;
             }
             if (deviceProperties.properties.limits.pointSizeGranularity > 0.125) {
