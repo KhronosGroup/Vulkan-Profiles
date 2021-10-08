@@ -2,20 +2,53 @@
     "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
     "name": "VP_KHR_1_2_roadmap_2022",
     "comments": {
-        "info": "Khronos Roadmap 2022 Profile",
+        "info": "Khronos Vulkan 1.2 roadmap 2022 Profile",
         "desc": "Collection on nonsensical features to test completeness"
     },
+    "required-version": "1.2",
     "extensions": [
         {
-            "extensionName": "VK_KHR_get_physical_device_properties2",
+            "extensionName": "VK_KHR_shader_terminate_invocation",
             "specVersion": 1
         },
         {
-            "extensionName": "VK_KHR_external_memory_capabilities",
+            "extensionName": "VK_KHR_synchronization2",
             "specVersion": 1
         },
         {
-            "extensionName": "VK_KHR_external_fence_capabilities",
+            "extensionName": "VK_KHR_zero_initialize_workgroup_memory",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_EXT_image_robustness",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_EXT_inline_uniform_block",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_EXT_pipeline_creation_cache_control",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_EXT_private_data",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_EXT_shader_demote_to_helper_invocation",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_EXT_subgroup_size_control",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_EXT_texel_buffer_alignment",
+            "specVersion": 1
+        },
+        {
+            "extensionName": "VK_EXT_extended_dynamic_state2",
             "specVersion": 1
         }
     ],
@@ -83,6 +116,12 @@
             }
         },
         {
+            "struct": "VkPhysicalDeviceImageRobustnessFeaturesEXT",
+            "members": {
+                "robustImageAccess": true
+            }
+        },
+        {
             "struct": "VkPhysicalDeviceInlineUniformBlockFeaturesEXT",
             "members": {
                 "inlineUniformBlock": true
@@ -123,6 +162,13 @@
             "struct": "VkPhysicalDeviceExtendedDynamicState2FeaturesEXT",
             "members": {
                 "extendedDynamicState2": true
+            }
+        },
+        {
+            "struct": "VkPhysicalDevice4444FormatsFeaturesEXT",
+            "members": {
+                "formatA4R4G4B4": true,
+                "formatA4B4G4R4": true
             }
         }
     ],
@@ -283,7 +329,7 @@
             ]
         },
         {
-            "struct": "devicePropertiesVulkan11",
+            "struct": "VkPhysicalDeviceVulkan11Properties",
             "members": [
                 {
                     "name": "subgroupSize",
