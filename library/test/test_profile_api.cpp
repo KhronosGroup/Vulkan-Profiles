@@ -316,3 +316,50 @@ TEST(test_profile, create_pnext) {
 
     EXPECT_EQ(0, error);
 }
+
+TEST(test_profile, get_device_features) { 
+    TestScaffold scaffold;
+
+    VkPhysicalDeviceFeatures enabledFeatures = {};
+    enabledFeatures.robustBufferAccess = VK_TRUE;
+
+    VkPhysicalDeviceVulkan12Features deviceVulkan12Features = {};
+    deviceVulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+    deviceVulkan12Features.pNext = nullptr;
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = &deviceVulkan12Features;
+    info.queueCreateInfoCount = 1;
+    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.enabledExtensionCount = 0;
+    info.ppEnabledExtensionNames = nullptr;
+    info.pEnabledFeatures = &enabledFeatures;
+
+    const VpProfileProperties Profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
+
+    vpGetDeviceProfileFeatures(&Profile, &info);
+
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.samplerMirrorClampToEdge);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.drawIndirectCount);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.storageBuffer8BitAccess);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.uniformAndStorageBuffer8BitAccess);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.storagePushConstant8);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.shaderBufferInt64Atomics);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.shaderSharedInt64Atomics);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.shaderFloat16);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.shaderInt8);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.descriptorIndexing);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.shaderUniformTexelBufferArrayDynamicIndexing);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.uniformBufferStandardLayout);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.shaderSubgroupExtendedTypes);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.separateDepthStencilLayouts);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.hostQueryReset);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.bufferDeviceAddress);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.vulkanMemoryModel);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.vulkanMemoryModelDeviceScope);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.vulkanMemoryModelAvailabilityVisibilityChains);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.subgroupBroadcastDynamicId);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.imagelessFramebuffer);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.shaderOutputLayer);
+}
