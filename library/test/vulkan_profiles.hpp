@@ -644,6 +644,8 @@ VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileProperti
 VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const char *pLayerName, uint32_t *pPropertyCount,
                                    VpProfileProperties *pProperties);
 
+void vpGetDeviceProfileFeatures(const VpProfileProperties *pProfile, VkDeviceCreateInfo *pCreateInfo);
+
 // Implementation details:
 #include <cstring>
 #include <vector>
