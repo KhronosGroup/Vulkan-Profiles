@@ -262,3 +262,57 @@ TEST(test_profile, create_features) {
 
     EXPECT_EQ(0, error);
 }
+
+TEST(test_profile, create_pnext) {
+    TestScaffold scaffold;
+
+    uint32_t profileCount = 0;
+
+    VkResult result_count = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
+    EXPECT_TRUE(result_count == VK_SUCCESS);
+    EXPECT_TRUE(profileCount > 0);
+
+    std::vector<VpProfileProperties> profiles;
+    if (profileCount > 0) {
+        profiles.resize(profileCount);
+        VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
+        EXPECT_TRUE(result_profile == VK_SUCCESS);
+    }
+
+    for (const VpProfileProperties& profile : profiles) {
+        std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
+    }
+
+    int error = 0;
+
+    for (const VpProfileProperties& profile : profiles) {
+        std::printf("Creating a Vulkan device using profile %s, version %d: ", profile.profileName, profile.specVersion);
+
+        VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceFeatures = {};
+        deviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
+        deviceFeatures.pNext = nullptr;
+        deviceFeatures.subgroupSizeControl = VK_TRUE;
+        deviceFeatures.computeFullSubgroups = VK_TRUE;
+
+        VkDeviceCreateInfo info = {};
+        info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        info.pNext = &deviceFeatures;
+        info.queueCreateInfoCount = 1;
+        info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+        info.enabledExtensionCount = 0;
+        info.ppEnabledExtensionNames = nullptr;
+        info.pEnabledFeatures = nullptr;
+
+        VkDevice device = VK_NULL_HANDLE;
+        VkResult res = vpCreateDevice(scaffold.physicalDevice, &profile, &info, nullptr, &device);
+        if (res != VK_SUCCESS) {
+            ++error;
+            EXPECT_TRUE(device == VK_NULL_HANDLE);
+            std::printf("FAILURE: %d\n", res);
+        } else {
+            std::printf("SUCCESS!\n");
+        }
+    }
+
+    EXPECT_EQ(0, error);
+}
