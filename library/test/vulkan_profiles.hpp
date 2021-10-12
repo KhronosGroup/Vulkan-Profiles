@@ -66,7 +66,7 @@ static const VkExtensionProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSION
     VkExtensionProperties{"VK_EXT_scalar_block_layout", 1},
 
     // Additional Vulkan extensions
-    VkExtensionProperties{"VK_KHR_swapchain", 70}, VkExtensionProperties{"VK_KHR_swapchain_mutable_format", 1},
+    //VkExtensionProperties{"VK_KHR_swapchain", 70}, VkExtensionProperties{"VK_KHR_swapchain_mutable_format", 1},
 #if defined(__APPLE__)
     VkExtensionProperties{"VK_KHR_portability_subset", 1},  // MacOS only
 #endif
@@ -975,6 +975,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         Next_3.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES;
         Next_3.pNext = pNext;
         Next_3.storageBuffer8BitAccess = VK_TRUE;
+        Next_3.storagePushConstant8 = VK_TRUE;
         Next_3.uniformAndStorageBuffer8BitAccess = VK_TRUE;
         if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES) == nullptr) {
             pNext = &Next_3;
@@ -1031,16 +1032,6 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         Next_8.shaderDrawParameters = VK_TRUE;
         if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES) == nullptr) {
             pNext = &Next_8;
-        }
-
-        VkPhysicalDevice8BitStorageFeatures Next_9 = {};
-        Next_9.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES;
-        Next_9.pNext = pNext;
-        Next_9.storageBuffer8BitAccess = VK_TRUE;
-        Next_9.storagePushConstant8 = VK_TRUE;
-        Next_9.uniformAndStorageBuffer8BitAccess = VK_TRUE;
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES) == nullptr) {
-            pNext = &Next_9;
         }
 
         VkPhysicalDeviceShaderFloat16Int8Features Next_10 = {};
