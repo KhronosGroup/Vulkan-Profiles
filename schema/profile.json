@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "TODO",
-    "title": "TODO",
+    "$id": "https://schema.khronos.org/vulkan/profiles-1.3.120.json#",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.200",
     "description": "TODO",
     "additionalProperties": true,
     "required": [
@@ -22,8 +22,36 @@
         "limit": {
             "description": "TODO",
             "type": "string",
-            "enum": [ "MIN", "MAX", "RANGE", "EQUAL", "NEQUAL", "ALL", "ANY" ],
-            "uniqueItems": true
+            "enum": [ "MIN", "MAX", "RANGE", "EQUAL", "NEQUAL", "ALL", "ANY" ]
+        },
+        "support": {
+            "description": "TODO",
+            "type": "string",
+            "enum": [ "DISABLED", "ENABLED", "REQUIRED", "OPTIONAL", "IGNORED" ]
+        },
+        "memoryType": {
+            "description": "TODO VkMemoryPropertyFlagBits",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "memoryType"
+            ],
+            "properties": {
+                "memoryType": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT", "VK_MEMORY_PROPERTY_HOST_CACHED_BIT", "VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT" ],
+                        "uniqueItems": true
+                    }
+                },
+                "platforms": {
+                    "$ref": "#/definitions/platforms"
+                },
+                "support": {
+                    "$ref": "#/definitions/support"
+                }
+            }
         },
         "members": {
             "type": "array",
@@ -57,6 +85,12 @@
                                     "type": "string",
                                     "enum": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT", "VK_RESOLVE_MODE_AVERAGE_BIT", "VK_RESOLVE_MODE_MIN_BIT", "VK_RESOLVE_MODE_MAX_BIT" ]
                                 }
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "support": {
+                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -84,6 +118,12 @@
                             },
                             "value": {
                                 "type": "integer"
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "support": {
+                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -112,6 +152,12 @@
                             "value": {
                                 "type": "integer",
                                 "minimum": 0
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "support": {
+                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -144,6 +190,12 @@
                                 },
                                 "minItems": 2,
                                 "maxItems": 2
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "support": {
+                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -177,6 +229,12 @@
                                 },
                                 "minItems": 2,
                                 "maxItems": 2
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "support": {
+                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -209,6 +267,12 @@
                                 },
                                 "minItems": 3,
                                 "maxItems": 3
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "support": {
+                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -242,6 +306,12 @@
                                 },
                                 "minItems": 3,
                                 "maxItems": 3
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "support": {
+                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -269,6 +339,12 @@
                             },
                             "value": {
                                 "type": "number"
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "support": {
+                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -301,6 +377,12 @@
                                 },
                                 "minItems": 2,
                                 "maxItems": 2
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "support": {
+                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -327,6 +409,12 @@
                             },
                             "value": {
                                 "type": "boolean"
+                            },
+                            "platforms": {
+                                "$ref": "#/definitions/platforms"
+                            },
+                            "support": {
+                                "$ref": "#/definitions/support"
                             }
                         }
                     }
@@ -393,6 +481,9 @@
                     },
                     "platforms": {
                         "$ref": "#/definitions/platforms"
+                    },
+                    "support": {
+                        "$ref": "#/definitions/support"
                     }
                 }
             }
@@ -418,6 +509,9 @@
                     },
                     "platforms": {
                         "$ref": "#/definitions/platforms"
+                    },
+                    "support": {
+                        "$ref": "#/definitions/support"
                     }
                 }
             }
@@ -442,6 +536,9 @@
                     },
                     "platforms": {
                         "$ref": "#/definitions/platforms"
+                    },
+                    "support": {
+                        "$ref": "#/definitions/support"
                     }
                 }
             }
@@ -495,12 +592,15 @@
                                             "$ref": "#/definitions/VkFormatFeatureFlagBits"
                                         }
                                     }
-                                },
-                                "platforms": {
-                                    "$ref": "#/definitions/platforms"
                                 }
                             }
                         }
+                    },
+                    "platforms": {
+                        "$ref": "#/definitions/platforms"
+                    },
+                    "support": {
+                        "$ref": "#/definitions/support"
                     }
                 }
             }
@@ -509,6 +609,8 @@
             "description": "TODO",
             "type": "array",
             "items": {
+                "description": "TODO",
+                "type": "object",
                 "additionalProperties": false,
                 "required": [
                     "queueFlags",
@@ -538,6 +640,12 @@
                         },
                         "minItems": 3,
                         "maxItems": 3
+                    },
+                    "platforms": {
+                        "$ref": "#/definitions/platforms"
+                    },
+                    "support": {
+                        "$ref": "#/definitions/support"
                     }
                 }
             }
@@ -547,12 +655,7 @@
             "type": "array",
             "additionalProperties": false,
             "items": {
-                "type": "array",
-                "items": {
-                    "type": "string",
-                    "enum": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT", "VK_MEMORY_PROPERTY_HOST_CACHED_BIT", "VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT" ],
-                    "uniqueItems": true
-                }
+                "$ref": "#/definitions/memoryType"
             }
         }
     }
