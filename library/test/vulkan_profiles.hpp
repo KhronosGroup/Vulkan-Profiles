@@ -1224,7 +1224,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pQueueCreateInfos;
         deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         deviceCreateInfo.ppEnabledExtensionNames = static_cast<const char *const *>(extensions.data());
-        deviceCreateInfo.pEnabledFeatures = nullptr;
+        deviceCreateInfo.pEnabledFeatures = pCreateInfo->pEnabledFeatures != nullptr ? &deviceFeatures2.features : nullptr;
         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
     } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         std::vector<const char *> extensions;
@@ -1275,6 +1275,8 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         deviceFeatures2.features.tessellationShader = VK_TRUE;
         deviceFeatures2.features.textureCompressionBC = VK_TRUE;
         deviceFeatures2.features.vertexPipelineStoresAndAtomics = VK_TRUE;
+
+
         if (pCreateInfo->pEnabledFeatures != nullptr) {
             deviceFeatures2.features = *pCreateInfo->pEnabledFeatures;
         }
@@ -1419,7 +1421,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pQueueCreateInfos;
         deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         deviceCreateInfo.ppEnabledExtensionNames = static_cast<const char *const *>(extensions.data());
-        deviceCreateInfo.pEnabledFeatures = nullptr;
+        deviceCreateInfo.pEnabledFeatures = pCreateInfo->pEnabledFeatures != nullptr ? &deviceFeatures2.features : nullptr;
         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
     } else {
         return VK_ERROR_UNKNOWN;
