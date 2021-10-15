@@ -262,7 +262,45 @@ TEST(test_profile, create_features) {
 
     EXPECT_EQ(0, error);
 }
+/*
+TEST(test_profile, create_features_fail) {
+    TestScaffold scaffold;
 
+    int error = 0;
+
+    VpProfileProperties profile = {VP_KHR_MINIMUM_REQUIREMENTS_NAME, VP_KHR_MINIMUM_REQUIREMENTS_SPEC_VERSION};
+
+    std::printf("Creating a Vulkan device using profile %s, version %d: ", profile.profileName, profile.specVersion);
+
+    VkPhysicalDeviceFeatures enabledFeatures = {};
+    enabledFeatures.robustBufferAccess = VK_TRUE;
+
+    VkPhysicalDeviceFeatures2 enabledFeatures2 = {};
+    enabledFeatures2.features = enabledFeatures;
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = &enabledFeatures2;
+    info.queueCreateInfoCount = 1;
+    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.enabledExtensionCount = 0;
+    info.ppEnabledExtensionNames = nullptr;
+    info.pEnabledFeatures = &enabledFeatures;
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profile, &info, nullptr, &device);
+    if (res != VK_SUCCESS) {
+        EXPECT_TRUE(device == VK_NULL_HANDLE);
+        std::printf("EXPECTED FAILURE: %d\n", res);
+    } else {
+        ++error;
+        vkDestroyDevice(device, nullptr);
+        std::printf("UNEXPECTED SUCCESS\n");
+    }
+
+    EXPECT_EQ(0, error);
+}
+*/
 TEST(test_profile, create_pnext) {
     TestScaffold scaffold;
 
@@ -291,7 +329,7 @@ TEST(test_profile, create_pnext) {
         VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceFeatures = {};
         deviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
         deviceFeatures.pNext = nullptr;
-        deviceFeatures.subgroupSizeControl = VK_TRUE;
+        deviceFeatures.subgroupSizeControl = VK_FALSE;
         deviceFeatures.computeFullSubgroups = VK_TRUE;
 
         VkDeviceCreateInfo info = {};
