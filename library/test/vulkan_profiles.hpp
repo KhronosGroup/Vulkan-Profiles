@@ -761,6 +761,26 @@ inline void vpGetDeviceProfileFeatures(const VpProfileProperties *pProfile, VkDe
 
         void *pNext = const_cast<void *>(pCreateInfo->pNext);
 
+        VkPhysicalDeviceFeatures2 *deviceVulkanFeatures2 =
+            static_cast<VkPhysicalDeviceFeatures2 *>(vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2));
+        if (deviceVulkanFeatures2 != nullptr) {
+            deviceVulkanFeatures2->features.robustBufferAccess = VK_TRUE;
+            deviceVulkanFeatures2->features.imageCubeArray = VK_TRUE;
+            deviceVulkanFeatures2->features.independentBlend = VK_TRUE;
+            deviceVulkanFeatures2->features.sampleRateShading = VK_TRUE;
+            deviceVulkanFeatures2->features.drawIndirectFirstInstance = VK_TRUE;
+            deviceVulkanFeatures2->features.depthBiasClamp = VK_TRUE;
+            deviceVulkanFeatures2->features.samplerAnisotropy = VK_TRUE;
+            deviceVulkanFeatures2->features.occlusionQueryPrecise = VK_TRUE;
+            deviceVulkanFeatures2->features.fragmentStoresAndAtomics = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderStorageImageExtendedFormats = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderStorageImageReadWithoutFormat = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderUniformBufferArrayDynamicIndexing = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderStorageBufferArrayDynamicIndexing = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderStorageImageArrayDynamicIndexing = VK_TRUE;
+        }
+
         VkPhysicalDeviceVulkan11Features *deviceVulkan11Features = static_cast<VkPhysicalDeviceVulkan11Features *>(
             vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES));
         if (deviceVulkan11Features != nullptr) {
@@ -889,6 +909,47 @@ inline void vpGetDeviceProfileFeatures(const VpProfileProperties *pProfile, VkDe
         }
 
         void *pNext = const_cast<void *>(pCreateInfo->pNext);
+
+        VkPhysicalDeviceFeatures2 *deviceVulkanFeatures2 =
+            static_cast<VkPhysicalDeviceFeatures2 *>(vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2));
+        if (deviceVulkanFeatures2 != nullptr) {
+            deviceVulkanFeatures2->features.depthBiasClamp = VK_TRUE;
+            deviceVulkanFeatures2->features.depthClamp = VK_TRUE;
+            deviceVulkanFeatures2->features.drawIndirectFirstInstance = VK_TRUE;
+            deviceVulkanFeatures2->features.dualSrcBlend = VK_TRUE;
+            deviceVulkanFeatures2->features.fillModeNonSolid = VK_TRUE;
+            deviceVulkanFeatures2->features.fragmentStoresAndAtomics = VK_TRUE;
+            deviceVulkanFeatures2->features.fullDrawIndexUint32 = VK_TRUE;
+            deviceVulkanFeatures2->features.imageCubeArray = VK_TRUE;
+            deviceVulkanFeatures2->features.independentBlend = VK_TRUE;
+            deviceVulkanFeatures2->features.inheritedQueries = VK_TRUE;
+            deviceVulkanFeatures2->features.largePoints = VK_TRUE;
+            deviceVulkanFeatures2->features.multiDrawIndirect = VK_TRUE;
+            deviceVulkanFeatures2->features.multiViewport = VK_TRUE;
+            deviceVulkanFeatures2->features.occlusionQueryPrecise = VK_TRUE;
+            deviceVulkanFeatures2->features.robustBufferAccess = VK_TRUE;
+            deviceVulkanFeatures2->features.sampleRateShading = VK_TRUE;
+            deviceVulkanFeatures2->features.samplerAnisotropy = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderClipDistance = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderImageGatherExtended = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderStorageBufferArrayDynamicIndexing = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderStorageImageArrayDynamicIndexing = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderStorageImageExtendedFormats = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderStorageImageWriteWithoutFormat = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderTessellationAndGeometryPointSize = VK_TRUE;
+            deviceVulkanFeatures2->features.shaderUniformBufferArrayDynamicIndexing = VK_TRUE;
+            deviceVulkanFeatures2->features.tessellationShader = VK_TRUE;
+            deviceVulkanFeatures2->features.textureCompressionBC = VK_TRUE;
+            deviceVulkanFeatures2->features.vertexPipelineStoresAndAtomics = VK_TRUE;
+        }
+
+        VkPhysicalDeviceImagelessFramebufferFeatures *deviceImagelessFeatures =
+            static_cast<VkPhysicalDeviceImagelessFramebufferFeatures *>(
+                vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES));
+        if (deviceImagelessFeatures != nullptr) {
+            deviceImagelessFeatures->imagelessFramebuffer = VK_TRUE;
+        }
 
         VkPhysicalDeviceImagelessFramebufferFeatures *deviceImagelessFeatures =
             static_cast<VkPhysicalDeviceImagelessFramebufferFeatures *>(
