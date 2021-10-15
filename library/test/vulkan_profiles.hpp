@@ -1028,11 +1028,6 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         }
 
         VkPhysicalDeviceFeatures enabledFeatures = {};
-
-        if (pCreateInfo->pEnabledFeatures != nullptr) {
-            enabledFeatures = *pCreateInfo->pEnabledFeatures;
-        }
-
         enabledFeatures.robustBufferAccess = VK_TRUE;
         enabledFeatures.imageCubeArray = VK_TRUE;
         enabledFeatures.independentBlend = VK_TRUE;
@@ -1048,6 +1043,10 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         enabledFeatures.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
         enabledFeatures.shaderStorageBufferArrayDynamicIndexing = VK_TRUE;
         enabledFeatures.shaderStorageImageArrayDynamicIndexing = VK_TRUE;
+
+        if (pCreateInfo->pEnabledFeatures != nullptr) {
+            enabledFeatures = *pCreateInfo->pEnabledFeatures;
+        }
 
         void *pRoot = const_cast<void *>(pCreateInfo->pNext);
         void *pNext = pRoot;
@@ -1186,10 +1185,6 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         }
 
         VkPhysicalDeviceFeatures enabledFeatures = {};
-        if (pCreateInfo->pEnabledFeatures != nullptr) {
-            enabledFeatures = *pCreateInfo->pEnabledFeatures;
-        }
-
         enabledFeatures.depthBiasClamp = VK_TRUE;
         enabledFeatures.depthClamp = VK_TRUE;
         enabledFeatures.drawIndirectFirstInstance = VK_TRUE;
@@ -1219,6 +1214,10 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         enabledFeatures.tessellationShader = VK_TRUE;
         enabledFeatures.textureCompressionBC = VK_TRUE;
         enabledFeatures.vertexPipelineStoresAndAtomics = VK_TRUE;
+
+        if (pCreateInfo->pEnabledFeatures != nullptr) {
+            enabledFeatures = *pCreateInfo->pEnabledFeatures;
+        }
 
         void *pRoot = const_cast<void *>(pCreateInfo->pNext);
         void *pNext = pRoot;
