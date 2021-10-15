@@ -951,13 +951,6 @@ inline void vpGetDeviceProfileFeatures(const VpProfileProperties *pProfile, VkDe
             deviceImagelessFeatures->imagelessFramebuffer = VK_TRUE;
         }
 
-        VkPhysicalDeviceImagelessFramebufferFeatures *deviceImagelessFeatures =
-            static_cast<VkPhysicalDeviceImagelessFramebufferFeatures *>(
-                vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES));
-        if (deviceImagelessFeatures != nullptr) {
-            deviceImagelessFeatures->imagelessFramebuffer = VK_TRUE;
-        }
-
         VkPhysicalDevice16BitStorageFeatures *device16BitsFeatures = static_cast<VkPhysicalDevice16BitStorageFeatures *>(
             vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES));
         if (device16BitsFeatures != nullptr) {
@@ -1088,29 +1081,32 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
             extensions.push_back(pCreateInfo->ppEnabledExtensionNames[i]);
         }
 
-        VkPhysicalDeviceFeatures enabledFeatures = {};
-        enabledFeatures.robustBufferAccess = VK_TRUE;
-        enabledFeatures.imageCubeArray = VK_TRUE;
-        enabledFeatures.independentBlend = VK_TRUE;
-        enabledFeatures.sampleRateShading = VK_TRUE;
-        enabledFeatures.drawIndirectFirstInstance = VK_TRUE;
-        enabledFeatures.depthBiasClamp = VK_TRUE;
-        enabledFeatures.samplerAnisotropy = VK_TRUE;
-        enabledFeatures.occlusionQueryPrecise = VK_TRUE;
-        enabledFeatures.fragmentStoresAndAtomics = VK_TRUE;
-        enabledFeatures.shaderStorageImageExtendedFormats = VK_TRUE;
-        enabledFeatures.shaderStorageImageReadWithoutFormat = VK_TRUE;
-        enabledFeatures.shaderUniformBufferArrayDynamicIndexing = VK_TRUE;
-        enabledFeatures.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
-        enabledFeatures.shaderStorageBufferArrayDynamicIndexing = VK_TRUE;
-        enabledFeatures.shaderStorageImageArrayDynamicIndexing = VK_TRUE;
-
-        if (pCreateInfo->pEnabledFeatures != nullptr) {
-            enabledFeatures = *pCreateInfo->pEnabledFeatures;
-        }
-
         void *pRoot = const_cast<void *>(pCreateInfo->pNext);
         void *pNext = pRoot;
+
+        VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
+        deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+        deviceFeatures2.features.robustBufferAccess = VK_TRUE;
+        deviceFeatures2.features.imageCubeArray = VK_TRUE;
+        deviceFeatures2.features.independentBlend = VK_TRUE;
+        deviceFeatures2.features.sampleRateShading = VK_TRUE;
+        deviceFeatures2.features.drawIndirectFirstInstance = VK_TRUE;
+        deviceFeatures2.features.depthBiasClamp = VK_TRUE;
+        deviceFeatures2.features.samplerAnisotropy = VK_TRUE;
+        deviceFeatures2.features.occlusionQueryPrecise = VK_TRUE;
+        deviceFeatures2.features.fragmentStoresAndAtomics = VK_TRUE;
+        deviceFeatures2.features.shaderStorageImageExtendedFormats = VK_TRUE;
+        deviceFeatures2.features.shaderStorageImageReadWithoutFormat = VK_TRUE;
+        deviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing = VK_TRUE;
+        deviceFeatures2.features.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
+        deviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing = VK_TRUE;
+        deviceFeatures2.features.shaderStorageImageArrayDynamicIndexing = VK_TRUE;
+        if (pCreateInfo->pEnabledFeatures != nullptr) {
+            deviceFeatures2.features = *pCreateInfo->pEnabledFeatures;
+        }
+        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) == nullptr) {
+            pNext = &deviceFeatures2;
+        }
 
         VkPhysicalDeviceVulkan11Features deviceVulkan11Features = {};
         deviceVulkan11Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
@@ -1228,7 +1224,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pQueueCreateInfos;
         deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         deviceCreateInfo.ppEnabledExtensionNames = static_cast<const char *const *>(extensions.data());
-        deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
+        deviceCreateInfo.pEnabledFeatures = nullptr;
         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
     } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         std::vector<const char *> extensions;
@@ -1245,43 +1241,46 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
             extensions.push_back(pCreateInfo->ppEnabledExtensionNames[i]);
         }
 
-        VkPhysicalDeviceFeatures enabledFeatures = {};
-        enabledFeatures.depthBiasClamp = VK_TRUE;
-        enabledFeatures.depthClamp = VK_TRUE;
-        enabledFeatures.drawIndirectFirstInstance = VK_TRUE;
-        enabledFeatures.dualSrcBlend = VK_TRUE;
-        enabledFeatures.fillModeNonSolid = VK_TRUE;
-        enabledFeatures.fragmentStoresAndAtomics = VK_TRUE;
-        enabledFeatures.fullDrawIndexUint32 = VK_TRUE;
-        enabledFeatures.imageCubeArray = VK_TRUE;
-        enabledFeatures.independentBlend = VK_TRUE;
-        enabledFeatures.inheritedQueries = VK_TRUE;
-        enabledFeatures.largePoints = VK_TRUE;
-        enabledFeatures.multiDrawIndirect = VK_TRUE;
-        enabledFeatures.multiViewport = VK_TRUE;
-        enabledFeatures.occlusionQueryPrecise = VK_TRUE;
-        enabledFeatures.robustBufferAccess = VK_TRUE;
-        enabledFeatures.sampleRateShading = VK_TRUE;
-        enabledFeatures.samplerAnisotropy = VK_TRUE;
-        enabledFeatures.shaderClipDistance = VK_TRUE;
-        enabledFeatures.shaderImageGatherExtended = VK_TRUE;
-        enabledFeatures.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
-        enabledFeatures.shaderStorageBufferArrayDynamicIndexing = VK_TRUE;
-        enabledFeatures.shaderStorageImageArrayDynamicIndexing = VK_TRUE;
-        enabledFeatures.shaderStorageImageExtendedFormats = VK_TRUE;
-        enabledFeatures.shaderStorageImageWriteWithoutFormat = VK_TRUE;
-        enabledFeatures.shaderTessellationAndGeometryPointSize = VK_TRUE;
-        enabledFeatures.shaderUniformBufferArrayDynamicIndexing = VK_TRUE;
-        enabledFeatures.tessellationShader = VK_TRUE;
-        enabledFeatures.textureCompressionBC = VK_TRUE;
-        enabledFeatures.vertexPipelineStoresAndAtomics = VK_TRUE;
-
-        if (pCreateInfo->pEnabledFeatures != nullptr) {
-            enabledFeatures = *pCreateInfo->pEnabledFeatures;
-        }
-
         void *pRoot = const_cast<void *>(pCreateInfo->pNext);
         void *pNext = pRoot;
+
+        VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
+        deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+        deviceFeatures2.features.depthBiasClamp = VK_TRUE;
+        deviceFeatures2.features.depthClamp = VK_TRUE;
+        deviceFeatures2.features.drawIndirectFirstInstance = VK_TRUE;
+        deviceFeatures2.features.dualSrcBlend = VK_TRUE;
+        deviceFeatures2.features.fillModeNonSolid = VK_TRUE;
+        deviceFeatures2.features.fragmentStoresAndAtomics = VK_TRUE;
+        deviceFeatures2.features.fullDrawIndexUint32 = VK_TRUE;
+        deviceFeatures2.features.imageCubeArray = VK_TRUE;
+        deviceFeatures2.features.independentBlend = VK_TRUE;
+        deviceFeatures2.features.inheritedQueries = VK_TRUE;
+        deviceFeatures2.features.largePoints = VK_TRUE;
+        deviceFeatures2.features.multiDrawIndirect = VK_TRUE;
+        deviceFeatures2.features.multiViewport = VK_TRUE;
+        deviceFeatures2.features.occlusionQueryPrecise = VK_TRUE;
+        deviceFeatures2.features.robustBufferAccess = VK_TRUE;
+        deviceFeatures2.features.sampleRateShading = VK_TRUE;
+        deviceFeatures2.features.samplerAnisotropy = VK_TRUE;
+        deviceFeatures2.features.shaderClipDistance = VK_TRUE;
+        deviceFeatures2.features.shaderImageGatherExtended = VK_TRUE;
+        deviceFeatures2.features.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
+        deviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing = VK_TRUE;
+        deviceFeatures2.features.shaderStorageImageArrayDynamicIndexing = VK_TRUE;
+        deviceFeatures2.features.shaderStorageImageExtendedFormats = VK_TRUE;
+        deviceFeatures2.features.shaderStorageImageWriteWithoutFormat = VK_TRUE;
+        deviceFeatures2.features.shaderTessellationAndGeometryPointSize = VK_TRUE;
+        deviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing = VK_TRUE;
+        deviceFeatures2.features.tessellationShader = VK_TRUE;
+        deviceFeatures2.features.textureCompressionBC = VK_TRUE;
+        deviceFeatures2.features.vertexPipelineStoresAndAtomics = VK_TRUE;
+        if (pCreateInfo->pEnabledFeatures != nullptr) {
+            deviceFeatures2.features = *pCreateInfo->pEnabledFeatures;
+        }
+        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) == nullptr) {
+            pNext = &deviceFeatures2;
+        }
 
         VkPhysicalDeviceImagelessFramebufferFeatures deviceImagelessFeatures = {};
         deviceImagelessFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES;
@@ -1420,7 +1419,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pQueueCreateInfos;
         deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         deviceCreateInfo.ppEnabledExtensionNames = static_cast<const char *const *>(extensions.data());
-        deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
+        deviceCreateInfo.pEnabledFeatures = nullptr;
         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
     } else {
         return VK_ERROR_UNKNOWN;
