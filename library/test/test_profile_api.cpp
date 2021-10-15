@@ -327,18 +327,9 @@ TEST(test_profile, get_device_features) {
     deviceVulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
     deviceVulkan12Features.pNext = nullptr;
 
-    VkDeviceCreateInfo info = {};
-    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    info.pNext = &deviceVulkan12Features;
-    info.queueCreateInfoCount = 1;
-    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
-    info.enabledExtensionCount = 0;
-    info.ppEnabledExtensionNames = nullptr;
-    info.pEnabledFeatures = &enabledFeatures;
-
     const VpProfileProperties Profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
 
-    vpGetDeviceProfileFeatures(&Profile, &info);
+    vpGetDeviceProfileFeatures(&Profile, &deviceVulkan12Features);
 
     EXPECT_EQ(VK_TRUE, deviceVulkan12Features.samplerMirrorClampToEdge);
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.drawIndirectCount);
