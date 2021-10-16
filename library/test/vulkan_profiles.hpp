@@ -31,6 +31,7 @@
 #define VP_KHR_1_2_roadmap_2022 1
 #define VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION 1
 #define VP_KHR_1_2_ROADMAP_2022_NAME "VP_KHR_1_2_roadmap_2022"
+#define VP_KHR_1_2_ROADMAP_2022_MIN_VERSION VK_MAKE_VERSION(1, 2, 142)
 
 static const VkExtensionProperties VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[] = {
     VkExtensionProperties{"VK_EXT_extended_dynamic_state2", 1},
@@ -46,10 +47,26 @@ static const VkExtensionProperties VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[] = {
     VkExtensionProperties{"VK_KHR_shader_terminate_invocation", 1},
     VkExtensionProperties{"VK_KHR_imageless_framebuffer", 1}};
 
+static const VkStructureType VP_KHR_1_2_ROADMAP_2022_STRUCTURES[] = {
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT};
+
 #define VP_LUNARG_1_1_desktop_portability_2022 1
 #define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION 1
 #define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME "VP_LUNARG_1_1_desktop_portability_2022"
-#define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 131)
+#define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
 
 static const VkExtensionProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[] = {
     // Vulkan 1.2 extensions
@@ -749,7 +766,8 @@ inline void vpGetDeviceProfileFeatures(const VpProfileProperties *pProfile, void
 
     VkStruct *p = static_cast<VkStruct *>(pNext);
 
-    if (strcmp(pProfile->profileName, VP_KHR_MINIMUM_REQUIREMENTS_NAME) == 0) return;
+    if (strcmp(pProfile->profileName, VP_KHR_MINIMUM_REQUIREMENTS_NAME) == 0)
+        return;
     else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
         while (p != nullptr) {
             switch (p->sType) {
@@ -806,13 +824,11 @@ inline void vpGetDeviceProfileFeatures(const VpProfileProperties *pProfile, void
                     features->shaderZeroInitializeWorkgroupMemory = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT: {
-                    VkPhysicalDeviceImageRobustnessFeaturesEXT *features =
-                        (VkPhysicalDeviceImageRobustnessFeaturesEXT *)p;
+                    VkPhysicalDeviceImageRobustnessFeaturesEXT *features = (VkPhysicalDeviceImageRobustnessFeaturesEXT *)p;
                     features->robustImageAccess = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT: {
-                    VkPhysicalDeviceInlineUniformBlockFeaturesEXT *features =
-                        (VkPhysicalDeviceInlineUniformBlockFeaturesEXT *)p;
+                    VkPhysicalDeviceInlineUniformBlockFeaturesEXT *features = (VkPhysicalDeviceInlineUniformBlockFeaturesEXT *)p;
                     features->inlineUniformBlock = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT: {
@@ -830,8 +846,7 @@ inline void vpGetDeviceProfileFeatures(const VpProfileProperties *pProfile, void
                     features->shaderDemoteToHelperInvocation = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT: {
-                    VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *features =
-                        (VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *)p;
+                    VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *features = (VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *)p;
                     features->subgroupSizeControl = VK_TRUE;
                     features->computeFullSubgroups = VK_TRUE;
                 } break;
@@ -850,9 +865,9 @@ inline void vpGetDeviceProfileFeatures(const VpProfileProperties *pProfile, void
             }
             p = static_cast<VkStruct *>(p->pNext);
         }
-     } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+    } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         while (p != nullptr) {
-             switch (p->sType) {
+            switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {
                     VkPhysicalDeviceFeatures2 *features = (VkPhysicalDeviceFeatures2 *)p;
                     features->features.depthBiasClamp = VK_TRUE;
@@ -967,8 +982,8 @@ inline void vpGetDeviceProfileFeatures(const VpProfileProperties *pProfile, void
 #endif
                 default:
                     break;
-             }
-             p = static_cast<VkStruct *>(p->pNext);
+            }
+            p = static_cast<VkStruct *>(p->pNext);
         }
     }
 }
