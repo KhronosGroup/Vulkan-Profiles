@@ -27,6 +27,7 @@
 #define VP_KHR_minimum_requirements 1
 #define VP_KHR_MINIMUM_REQUIREMENTS_SPEC_VERSION 1
 #define VP_KHR_MINIMUM_REQUIREMENTS_NAME "VP_KHR_minimum_requirements"
+#define VP_KHR_MINIMUM_REQUIREMENTS_MIN_VERSION VK_MAKE_VERSION(1, 0, 68)
 
 #define VP_KHR_1_2_roadmap_2022 1
 #define VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION 1
@@ -1181,7 +1182,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                 }
             }
 
-static const VpFormatProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[] = {
+            static const VpFormatProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[] = {
                 // VK_FORMAT_R8_UNORM
                 {VK_FORMAT_R8_UNORM,
                  VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT |
