@@ -668,7 +668,7 @@ VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileProperti
 VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const char *pLayerName, uint32_t *pPropertyCount,
                                    VpProfileProperties *pProperties);
 
-void vpGetDeviceProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
+void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
 
 // Implementation details:
 #include <cstring>
@@ -756,7 +756,7 @@ inline void *vpGetStructure(void *pNext, VkStructureType type) {
     }
 }
 
-inline void vpGetDeviceProfileFeatures(const VpProfileProperties *pProfile, void *pNext) {
+inline void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext) {
     if (pProfile == nullptr || pNext == nullptr) return;
 
     struct VkStruct {
@@ -1080,7 +1080,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         deviceExtendedDynamicState2Features.pNext = pProfileNext;
         pProfileNext = &deviceExtendedDynamicState2Features;
 
-        vpGetDeviceProfileFeatures(pProfile, pProfileNext);
+        vpGetProfileFeatures(pProfile, pProfileNext);
 
         void *pRoot = const_cast<void *>(pCreateInfo->pNext);
         void *pNext = pRoot;
@@ -1257,7 +1257,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         pProfileNext = &devicePortabilitySubset;
 #endif
 
-        vpGetDeviceProfileFeatures(pProfile, pProfileNext);
+        vpGetProfileFeatures(pProfile, pProfileNext);
 
         void *pRoot = const_cast<void *>(pCreateInfo->pNext);
         void *pNext = pRoot;

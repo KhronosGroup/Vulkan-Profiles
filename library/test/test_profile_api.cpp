@@ -362,7 +362,7 @@ TEST(test_profile, get_device_features) {
 
     const VpProfileProperties Profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
 
-    vpGetDeviceProfileFeatures(&Profile, &deviceVulkan12Features);
+    vpGetProfileFeatures(&Profile, &deviceVulkan12Features);
 
     EXPECT_EQ(VK_TRUE, deviceVulkan12Features.samplerMirrorClampToEdge);
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.drawIndirectCount);
