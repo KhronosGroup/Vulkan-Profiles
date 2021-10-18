@@ -356,11 +356,6 @@ TEST(test_profile, create_pnext) {
 }
 
 TEST(test_profile, get_device_features) { 
-    TestScaffold scaffold;
-
-    VkPhysicalDeviceFeatures enabledFeatures = {};
-    enabledFeatures.robustBufferAccess = VK_TRUE;
-
     VkPhysicalDeviceVulkan12Features deviceVulkan12Features = {};
     deviceVulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
     deviceVulkan12Features.pNext = nullptr;
