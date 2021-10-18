@@ -631,51 +631,51 @@ void vpEnumerateProfileExtensionProperties(const VpProfileProperties *pProfile, 
 #include <cstring>
 #include <vector>
 
-    static const VkExtensionProperties VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[] = {
-    VkExtensionProperties{"VK_EXT_extended_dynamic_state2", 1},
-    VkExtensionProperties{"VK_EXT_texel_buffer_alignment", 1},
-    VkExtensionProperties{"VK_EXT_subgroup_size_control", 2},
-    VkExtensionProperties{"VK_EXT_shader_demote_to_helper_invocation", 1},
-    VkExtensionProperties{"VK_EXT_private_data", 1},
-    VkExtensionProperties{"VK_EXT_pipeline_creation_cache_control", 1},
-    VkExtensionProperties{"VK_EXT_inline_uniform_block", 1},
-    VkExtensionProperties{"VK_EXT_image_robustness", 1},
-    VkExtensionProperties{"VK_KHR_zero_initialize_workgroup_memory", 1},
-    VkExtensionProperties{"VK_KHR_synchronization2", 1},
-    VkExtensionProperties{"VK_KHR_shader_terminate_invocation", 1},
-    VkExtensionProperties{"VK_KHR_imageless_framebuffer", 1}};
+static const VkExtensionProperties VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[] = {
+    VkExtensionProperties{VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 2},
+    VkExtensionProperties{VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_PRIVATE_DATA_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, 1}};
 
 static const VkExtensionProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[] = {
     // Vulkan 1.2 extensions
-    VkExtensionProperties{"VK_KHR_8bit_storage", 1},
-    VkExtensionProperties{"VK_KHR_create_renderpass2", 1},
-    VkExtensionProperties{"VK_KHR_depth_stencil_resolve", 1},
-    VkExtensionProperties{"VK_KHR_driver_properties", 1},
-    VkExtensionProperties{"VK_KHR_image_format_list", 1},
-    VkExtensionProperties{"VK_KHR_imageless_framebuffer",
+    VkExtensionProperties{VK_KHR_8BIT_STORAGE_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME,
                           1},  // Not supported by Intel 6000 https://vulkan.gpuinfo.org/displayreport.php?id=11332#extensions
-    VkExtensionProperties{"VK_KHR_sampler_mirror_clamp_to_edge", 1},
-    VkExtensionProperties{"VK_KHR_shader_float16_int8", 1},
-    VkExtensionProperties{"VK_KHR_shader_subgroup_extended_types",
+    VkExtensionProperties{VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME,
                           1},  // Not supported by Intel 6000 https://vulkan.gpuinfo.org/displayreport.php?id=11332#extensions
-    VkExtensionProperties{"VK_KHR_timeline_semaphore", 1},
-    VkExtensionProperties{"VK_KHR_uniform_buffer_standard_layout", 1},
-    VkExtensionProperties{"VK_EXT_descriptor_indexing", 1},
-    VkExtensionProperties{"VK_EXT_host_query_reset", 1},
-    VkExtensionProperties{"VK_EXT_scalar_block_layout", 1},
+    VkExtensionProperties{VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, 1},
 
 // Additional Vulkan extensions
-// VkExtensionProperties{"VK_KHR_swapchain", 70}, VkExtensionProperties{"VK_KHR_swapchain_mutable_format", 1},
+// VkExtensionProperties{VK_KHR_SWAPCHAIN_EXTENSION_NAME, 70}, VkExtensionProperties{VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME, 1},
 #if defined(__APPLE__)
-    VkExtensionProperties{"VK_KHR_portability_subset", 1},  // MacOS only
+    VkExtensionProperties{VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, 1},  // MacOS only
 #endif
-    VkExtensionProperties{"VK_KHR_sampler_ycbcr_conversion",
+    VkExtensionProperties{VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
                           1},  // Not supported by Intel 520 https://vulkan.gpuinfo.org/displayreport.php?id=12491#extensions
-    VkExtensionProperties{"VK_EXT_inline_uniform_block", 1},
-    VkExtensionProperties{"VK_EXT_robustness2", 1},
-    VkExtensionProperties{"VK_EXT_subgroup_size_control", 1},
-    VkExtensionProperties{"VK_EXT_texel_buffer_alignment", 1},
-    VkExtensionProperties{"VK_EXT_vertex_attribute_divisor", 1}};
+    VkExtensionProperties{VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 1}};
 
 inline bool vpCheckExtension(const VkExtensionProperties *supportedProperties, std::size_t supportedSize,
                              const char *requestedExtension) {
