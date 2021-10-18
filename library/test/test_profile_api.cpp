@@ -54,7 +54,7 @@ TEST(test_profile, enumerate) {
         std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
     }
 
-    EXPECT_TRUE(IsFound(profiles, VP_KHR_MINIMUM_REQUIREMENTS_NAME));
+    EXPECT_TRUE(IsFound(profiles, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME));
     EXPECT_TRUE(IsFound(profiles, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME));
 }
 

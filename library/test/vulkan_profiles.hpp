@@ -24,10 +24,10 @@
 
 #define VP_MAX_PROFILE_NAME_SIZE 256U
 
-#define VP_KHR_minimum_requirements 1
-#define VP_KHR_MINIMUM_REQUIREMENTS_SPEC_VERSION 1
-#define VP_KHR_MINIMUM_REQUIREMENTS_NAME "VP_KHR_minimum_requirements"
-#define VP_KHR_MINIMUM_REQUIREMENTS_MIN_VERSION VK_MAKE_VERSION(1, 0, 68)
+#define VP_LUNARG_minimum_requirements 1
+#define VP_LUNARG_MINIMUM_REQUIREMENTS_SPEC_VERSION 1
+#define VP_LUNARG_MINIMUM_REQUIREMENTS_NAME "VP_KHR_minimum_requirements"
+#define VP_LUNARG_MINIMUM_REQUIREMENTS_MIN_VERSION VK_MAKE_VERSION(1, 0, 68)
 
 #define VP_KHR_1_2_roadmap_2022 1
 #define VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION 1
@@ -260,7 +260,7 @@ inline void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNex
 
     VkStruct *p = static_cast<VkStruct *>(pNext);
 
-    if (strcmp(pProfile->profileName, VP_KHR_MINIMUM_REQUIREMENTS_NAME) == 0)
+    if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0)
         return;
     else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
         while (p != nullptr) {
@@ -486,7 +486,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
                                const VkDeviceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {
     if (pProfile == nullptr) {
         return vkCreateDevice(physicalDevice, pCreateInfo, pAllocator, pDevice);
-    } else if (strcmp(pProfile->profileName, VP_KHR_MINIMUM_REQUIREMENTS_NAME) == 0) {
+    } else if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
         return vkCreateDevice(physicalDevice, pCreateInfo, pAllocator, pDevice);
     } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
         std::vector<const char *> extensions;
@@ -862,14 +862,14 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
     uint32_t supportedProfileCount = 0;
 
     const VpProfileProperties supportedProfiles[] = {
-        VpProfileProperties{VP_KHR_MINIMUM_REQUIREMENTS_NAME, VP_KHR_MINIMUM_REQUIREMENTS_SPEC_VERSION},
+        VpProfileProperties{VP_LUNARG_MINIMUM_REQUIREMENTS_NAME, VP_LUNARG_MINIMUM_REQUIREMENTS_SPEC_VERSION},
         VpProfileProperties{VP_KHR_1_2_ROADMAP_2022_NAME, VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION},
         VpProfileProperties{VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION}};
 
     for (int i = 0, n = countof(supportedProfiles); i < n; ++i) {
         VkBool32 supported = VK_TRUE;
 
-        if (strcmp(supportedProfiles[i].profileName, VP_KHR_MINIMUM_REQUIREMENTS_NAME) == 0) {
+        if (strcmp(supportedProfiles[i].profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
         } else if (strcmp(supportedProfiles[i].profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
             for (std::size_t i = 0, n = countof(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS); i < n && supported; ++i) {
                 const bool supportedInstanceExt = vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(),
@@ -2582,7 +2582,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
 inline void vpEnumerateProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                                   VkExtensionProperties *pProperties) {
     if (pProperties == nullptr) {
-        if (strcmp(pProfile->profileName, VP_KHR_MINIMUM_REQUIREMENTS_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
             *pPropertyCount = 0;
         } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
             *pPropertyCount = countof(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS);
@@ -2592,7 +2592,7 @@ inline void vpEnumerateProfileExtensionProperties(const VpProfileProperties *pPr
         return;
     }
 
-    if (strcmp(pProfile->profileName, VP_KHR_MINIMUM_REQUIREMENTS_NAME) == 0) {
+    if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
     } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
         for (std::size_t i = 0, n = std::min<std::size_t>(countof(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS), *pPropertyCount); i < n;
              ++i) {
@@ -2609,7 +2609,7 @@ inline void vpEnumerateProfileExtensionProperties(const VpProfileProperties *pPr
 inline void vpEnumerateProfileStructureTypes(const VpProfileProperties *pProfile, VpStructureArea structureArea,
                                              uint32_t *pStructureTypesCount, VkStructureType *pStructureTypes) {
     if (pStructureTypes == nullptr) {
-        if (strcmp(pProfile->profileName, VP_KHR_MINIMUM_REQUIREMENTS_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
             *pStructureTypesCount = 0;
         } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
             switch (structureArea) {
@@ -2633,7 +2633,7 @@ inline void vpEnumerateProfileStructureTypes(const VpProfileProperties *pProfile
         return;
     }
 
-    if (strcmp(pProfile->profileName, VP_KHR_MINIMUM_REQUIREMENTS_NAME) == 0) {
+    if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
     } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
         switch (structureArea) {
             case VP_STRUCTURE_FEATURES: {
