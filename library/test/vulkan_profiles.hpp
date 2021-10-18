@@ -1762,13 +1762,9 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             multiviewFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES;
             multiviewFeatures.pNext = &storage16bit;
 
-            VkPhysicalDevice8BitStorageFeatures storage8bit = {};
-            storage8bit.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES;
-            storage8bit.pNext = &multiviewFeatures;
-
             VkPhysicalDeviceDescriptorIndexingFeatures descriptorIndexingFeatures = {};
             descriptorIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
-            descriptorIndexingFeatures.pNext = &storage8bit;
+            descriptorIndexingFeatures.pNext = &multiviewFeatures;
 
             VkPhysicalDeviceHostQueryResetFeatures queryResetFeatures = {};
             queryResetFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES;
@@ -1892,12 +1888,6 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                 supported = VK_FALSE;
             }
             if (multiviewFeatures.multiview != VK_TRUE) {
-                supported = VK_FALSE;
-            }
-            if (storage8bit.storageBuffer8BitAccess != VK_TRUE) {
-                supported = VK_FALSE;
-            }
-            if (storage8bit.uniformAndStorageBuffer8BitAccess != VK_TRUE) {
                 supported = VK_FALSE;
             }
             if (descriptorIndexingFeatures.shaderUniformTexelBufferArrayDynamicIndexing != VK_TRUE) {
