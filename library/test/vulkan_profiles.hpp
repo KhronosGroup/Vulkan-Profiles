@@ -33,20 +33,6 @@
 #define VP_KHR_1_2_ROADMAP_2022_NAME "VP_KHR_1_2_roadmap_2022"
 #define VP_KHR_1_2_ROADMAP_2022_MIN_VERSION VK_MAKE_VERSION(1, 2, 142)
 
-static const VkExtensionProperties VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[] = {
-    VkExtensionProperties{"VK_EXT_extended_dynamic_state2", 1},
-    VkExtensionProperties{"VK_EXT_texel_buffer_alignment", 1},
-    VkExtensionProperties{"VK_EXT_subgroup_size_control", 2},
-    VkExtensionProperties{"VK_EXT_shader_demote_to_helper_invocation", 1},
-    VkExtensionProperties{"VK_EXT_private_data", 1},
-    VkExtensionProperties{"VK_EXT_pipeline_creation_cache_control", 1},
-    VkExtensionProperties{"VK_EXT_inline_uniform_block", 1},
-    VkExtensionProperties{"VK_EXT_image_robustness", 1},
-    VkExtensionProperties{"VK_KHR_zero_initialize_workgroup_memory", 1},
-    VkExtensionProperties{"VK_KHR_synchronization2", 1},
-    VkExtensionProperties{"VK_KHR_shader_terminate_invocation", 1},
-    VkExtensionProperties{"VK_KHR_imageless_framebuffer", 1}};
-
 static const VkStructureType VP_KHR_1_2_ROADMAP_2022_STRUCTURES[] = {
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES,
@@ -67,38 +53,6 @@ static const VkStructureType VP_KHR_1_2_ROADMAP_2022_STRUCTURES[] = {
 #define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION 1
 #define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME "VP_LUNARG_1_1_desktop_portability_2022"
 #define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
-
-static const VkExtensionProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[] = {
-    // Vulkan 1.2 extensions
-    VkExtensionProperties{"VK_KHR_8bit_storage", 1},
-    VkExtensionProperties{"VK_KHR_create_renderpass2", 1},
-    VkExtensionProperties{"VK_KHR_depth_stencil_resolve", 1},
-    VkExtensionProperties{"VK_KHR_driver_properties", 1},
-    VkExtensionProperties{"VK_KHR_image_format_list", 1},
-    VkExtensionProperties{"VK_KHR_imageless_framebuffer",
-                          1},  // Not supported by Intel 6000 https://vulkan.gpuinfo.org/displayreport.php?id=11332#extensions
-    VkExtensionProperties{"VK_KHR_sampler_mirror_clamp_to_edge", 1},
-    VkExtensionProperties{"VK_KHR_shader_float16_int8", 1},
-    VkExtensionProperties{"VK_KHR_shader_subgroup_extended_types",
-                          1},  // Not supported by Intel 6000 https://vulkan.gpuinfo.org/displayreport.php?id=11332#extensions
-    VkExtensionProperties{"VK_KHR_timeline_semaphore", 1},
-    VkExtensionProperties{"VK_KHR_uniform_buffer_standard_layout", 1},
-    VkExtensionProperties{"VK_EXT_descriptor_indexing", 1},
-    VkExtensionProperties{"VK_EXT_host_query_reset", 1},
-    VkExtensionProperties{"VK_EXT_scalar_block_layout", 1},
-
-// Additional Vulkan extensions
-// VkExtensionProperties{"VK_KHR_swapchain", 70}, VkExtensionProperties{"VK_KHR_swapchain_mutable_format", 1},
-#if defined(__APPLE__)
-    VkExtensionProperties{"VK_KHR_portability_subset", 1},  // MacOS only
-#endif
-    VkExtensionProperties{"VK_KHR_sampler_ycbcr_conversion",
-                          1},  // Not supported by Intel 520 https://vulkan.gpuinfo.org/displayreport.php?id=12491#extensions
-    VkExtensionProperties{"VK_EXT_inline_uniform_block", 1},
-    VkExtensionProperties{"VK_EXT_robustness2", 1},
-    VkExtensionProperties{"VK_EXT_subgroup_size_control", 1},
-    VkExtensionProperties{"VK_EXT_texel_buffer_alignment", 1},
-    VkExtensionProperties{"VK_EXT_vertex_attribute_divisor", 1}};
 
 struct VpFormatProperties {
     VkFormat format;
@@ -670,9 +624,58 @@ VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const char *
 
 void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
 
+void vpEnumerateProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                           VkExtensionProperties *pProperties);
+
 // Implementation details:
 #include <cstring>
 #include <vector>
+
+    static const VkExtensionProperties VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[] = {
+    VkExtensionProperties{"VK_EXT_extended_dynamic_state2", 1},
+    VkExtensionProperties{"VK_EXT_texel_buffer_alignment", 1},
+    VkExtensionProperties{"VK_EXT_subgroup_size_control", 2},
+    VkExtensionProperties{"VK_EXT_shader_demote_to_helper_invocation", 1},
+    VkExtensionProperties{"VK_EXT_private_data", 1},
+    VkExtensionProperties{"VK_EXT_pipeline_creation_cache_control", 1},
+    VkExtensionProperties{"VK_EXT_inline_uniform_block", 1},
+    VkExtensionProperties{"VK_EXT_image_robustness", 1},
+    VkExtensionProperties{"VK_KHR_zero_initialize_workgroup_memory", 1},
+    VkExtensionProperties{"VK_KHR_synchronization2", 1},
+    VkExtensionProperties{"VK_KHR_shader_terminate_invocation", 1},
+    VkExtensionProperties{"VK_KHR_imageless_framebuffer", 1}};
+
+static const VkExtensionProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[] = {
+    // Vulkan 1.2 extensions
+    VkExtensionProperties{"VK_KHR_8bit_storage", 1},
+    VkExtensionProperties{"VK_KHR_create_renderpass2", 1},
+    VkExtensionProperties{"VK_KHR_depth_stencil_resolve", 1},
+    VkExtensionProperties{"VK_KHR_driver_properties", 1},
+    VkExtensionProperties{"VK_KHR_image_format_list", 1},
+    VkExtensionProperties{"VK_KHR_imageless_framebuffer",
+                          1},  // Not supported by Intel 6000 https://vulkan.gpuinfo.org/displayreport.php?id=11332#extensions
+    VkExtensionProperties{"VK_KHR_sampler_mirror_clamp_to_edge", 1},
+    VkExtensionProperties{"VK_KHR_shader_float16_int8", 1},
+    VkExtensionProperties{"VK_KHR_shader_subgroup_extended_types",
+                          1},  // Not supported by Intel 6000 https://vulkan.gpuinfo.org/displayreport.php?id=11332#extensions
+    VkExtensionProperties{"VK_KHR_timeline_semaphore", 1},
+    VkExtensionProperties{"VK_KHR_uniform_buffer_standard_layout", 1},
+    VkExtensionProperties{"VK_EXT_descriptor_indexing", 1},
+    VkExtensionProperties{"VK_EXT_host_query_reset", 1},
+    VkExtensionProperties{"VK_EXT_scalar_block_layout", 1},
+
+// Additional Vulkan extensions
+// VkExtensionProperties{"VK_KHR_swapchain", 70}, VkExtensionProperties{"VK_KHR_swapchain_mutable_format", 1},
+#if defined(__APPLE__)
+    VkExtensionProperties{"VK_KHR_portability_subset", 1},  // MacOS only
+#endif
+    VkExtensionProperties{"VK_KHR_sampler_ycbcr_conversion",
+                          1},  // Not supported by Intel 520 https://vulkan.gpuinfo.org/displayreport.php?id=12491#extensions
+    VkExtensionProperties{"VK_EXT_inline_uniform_block", 1},
+    VkExtensionProperties{"VK_EXT_robustness2", 1},
+    VkExtensionProperties{"VK_EXT_subgroup_size_control", 1},
+    VkExtensionProperties{"VK_EXT_texel_buffer_alignment", 1},
+    VkExtensionProperties{"VK_EXT_vertex_attribute_divisor", 1}};
 
 inline bool vpCheckExtension(const VkExtensionProperties *supportedProperties, std::size_t supportedSize,
                              const char *requestedExtension) {
@@ -2423,4 +2426,31 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
     }
 
     return result;
+}
+
+inline void vpEnumerateProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                  VkExtensionProperties *pProperties) {
+    if (pProperties == nullptr) {
+        if (strcmp(pProfile->profileName, VP_KHR_MINIMUM_REQUIREMENTS_NAME) == 0) {
+            *pPropertyCount = 0;
+        } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+            *pPropertyCount = countof(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS);
+        } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+            *pPropertyCount = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS);
+        }
+        return;
+    }
+
+    if (strcmp(pProfile->profileName, VP_KHR_MINIMUM_REQUIREMENTS_NAME) == 0) {
+    } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+        for (std::size_t i = 0, n = std::min<std::size_t>(countof(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS), *pPropertyCount); i < n;
+             ++i) {
+            pProperties[i] = VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i];
+        }
+    } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        for (std::size_t i = 0, n = std::min<std::size_t>(countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS), *pPropertyCount);
+             i < n; ++i) {
+            pProperties[i] = VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
+        }
+    }
 }
