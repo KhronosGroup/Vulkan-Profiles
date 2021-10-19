@@ -509,3 +509,35 @@ TEST(test_profile, get_profile_properties_structure_types_partial) {
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, structureTypes[0]);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, structureTypes[1]);
 }
+
+TEST(test_profile, get_profile_formats_full) {
+    const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
+
+    uint32_t formatCount = 0;
+    vpGetProfileFormats(&profile, &formatCount, nullptr);
+    EXPECT_EQ(66, formatCount);
+
+    std::vector<VkFormat> formats(formatCount);
+    vpGetProfileFormats(&profile, &formatCount, &formats[0]);
+
+    EXPECT_EQ(VK_FORMAT_R8_UNORM, formats[0]);
+    EXPECT_EQ(VK_FORMAT_R8_SNORM, formats[1]);
+    EXPECT_EQ(VK_FORMAT_R8_UINT, formats[2]);
+}
+
+TEST(test_profile, get_profile_formats_partial) {
+    const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
+
+    uint32_t formatCount = 0;
+    vpGetProfileFormats(&profile, &formatCount, nullptr);
+    EXPECT_EQ(66, formatCount);
+
+    formatCount = 3;
+
+    std::vector<VkFormat> formats(formatCount);
+    vpGetProfileFormats(&profile, &formatCount, &formats[0]);
+
+    EXPECT_EQ(VK_FORMAT_R8_UNORM, formats[0]);
+    EXPECT_EQ(VK_FORMAT_R8_SNORM, formats[1]);
+    EXPECT_EQ(VK_FORMAT_R8_UINT, formats[2]);
+}

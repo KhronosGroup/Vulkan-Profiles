@@ -62,6 +62,8 @@ typedef enum VpStructureArea { VP_STRUCTURE_FEATURES = 0, VP_STRUCTURE_PROPERTIE
 void vpGetProfileStructureTypes(const VpProfileProperties *pProfile, VpStructureArea structureArea, uint32_t *pStructureTypesCount,
                                 VkStructureType *pStructureTypes);
 
+void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormat);
+
 // Implementation details:
 #include <cstring>
 #include <vector>
@@ -2560,6 +2562,24 @@ inline void vpGetProfileStructureTypes(const VpProfileProperties *pProfile, VpSt
                     pStructureTypes[i] = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES[i];
                 }
             } break;
+        }
+    }
+}
+
+inline void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormat) {
+    if (pFormat == nullptr) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+            *pFormatCount = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS);
+        } else {
+            *pFormatCount = 0;
+        }
+        return;
+    }
+
+    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        std::size_t n = std::min<std::size_t>(countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS), *pFormatCount);
+        for (std::size_t i = 0; i < n; ++i) {
+            pFormat[i] = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[i].format;
         }
     }
 }
