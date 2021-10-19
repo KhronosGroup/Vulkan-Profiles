@@ -66,6 +66,12 @@ void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatC
 
 void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
+void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryPropertyFlagsCount,
+                             VkMemoryPropertyFlags *pMemoryPropertyFlags);
+
+void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
+                               VkQueueFamilyProperties *pQueueFamilyProperties);
+
 // Implementation details:
 #include <cstring>
 #include <vector>
@@ -712,6 +718,13 @@ static const VkStructureType _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUC
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
+
+static const VkMemoryPropertyFlags _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[] = {
+    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
+
+static const VkQueueFamilyProperties _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES[] = {
+    {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT, 1, 36, {1, 1, 1}}};
 
 inline bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, std::size_t supportedSize,
                               const char *requestedExtension) {
@@ -1741,35 +1754,25 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                 }
             }
 
-            static const VkMemoryPropertyFlags VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[] = {
-                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
-
             VkPhysicalDeviceMemoryProperties memoryProperties;
             vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
-            for (uint32_t i = 0, n = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES); i < n && supported; ++i) {
-                const VkMemoryPropertyFlags memoryPropertyFlags = VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[i];
+            for (uint32_t i = 0, n = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES); i < n && supported; ++i) {
+                const VkMemoryPropertyFlags memoryPropertyFlags = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[i];
 
-                if (!_vpCheckMemoryProperty(memoryProperties, VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[i])) {
+                if (!_vpCheckMemoryProperty(memoryProperties, _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[i])) {
                     supported = VK_FALSE;
                     break;
                 }
             }
 
-            static const VkQueueFamilyProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES[] = {
-                {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT,
-                 1,
-                 36,
-                 {1, 1, 1}}};
-
             std::uint32_t queueFamilyCount = 0;
             vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
             std::vector<VkQueueFamilyProperties> queueFamily(queueFamilyCount);
             vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamily.data());
-            for (uint32_t i = 0, n = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES); i < n && supported;
+            for (uint32_t i = 0, n = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES); i < n && supported;
                  ++i) {
                 if (!_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount,
-                                                 VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES[i])) {
+                                                 _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES[i])) {
                     supported = VK_FALSE;
                     break;
                 }
@@ -2598,8 +2601,10 @@ inline void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, Vk
                     case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
                         VkFormatProperties2 *pProperties = (VkFormatProperties2 *)p;
                         pProperties->formatProperties.bufferFeatures = static_cast<VkFormatFeatureFlags>(props.bufferFeatures);
-                        pProperties->formatProperties.linearTilingFeatures = static_cast<VkFormatFeatureFlags>(props.linearTilingFeatures);
-                        pProperties->formatProperties.optimalTilingFeatures = static_cast<VkFormatFeatureFlags>(props.optimalTilingFeatures);
+                        pProperties->formatProperties.linearTilingFeatures =
+                            static_cast<VkFormatFeatureFlags>(props.linearTilingFeatures);
+                        pProperties->formatProperties.optimalTilingFeatures =
+                            static_cast<VkFormatFeatureFlags>(props.optimalTilingFeatures);
                     } break;
                     case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR: {
                         VkFormatProperties3KHR *pProperties = (VkFormatProperties3KHR *)p;
@@ -2610,6 +2615,46 @@ inline void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, Vk
                 }
                 p = static_cast<VkStruct *>(p->pNext);
             }
+        }
+    }
+}
+
+inline void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryPropertyFlagsCount,
+                             VkMemoryPropertyFlags *pMemoryPropertyFlags) {
+    if (pMemoryPropertyFlags == nullptr) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+            *pMemoryPropertyFlagsCount = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES);
+        } else {
+            *pMemoryPropertyFlagsCount = 0;
+        }
+        return;
+    }
+
+    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        std::size_t n =
+            std::min<std::size_t>(countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES), *pMemoryPropertyFlagsCount);
+        for (std::size_t i = 0; i < n; ++i) {
+            pMemoryPropertyFlags[i] = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[i];
+        }
+    }
+}
+
+inline void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
+                                      VkQueueFamilyProperties *pQueueFamilyProperties) {
+    if (pQueueFamilyProperties == nullptr) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+            *pQueueFamilyPropertiesCount = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES);
+        } else {
+            *pQueueFamilyPropertiesCount = 0;
+        }
+        return;
+    }
+
+    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        std::size_t n = std::min<std::size_t>(countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES),
+                                              *pQueueFamilyPropertiesCount);
+        for (std::size_t i = 0; i < n; ++i) {
+            pQueueFamilyProperties[i] = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES[i];
         }
     }
 }
