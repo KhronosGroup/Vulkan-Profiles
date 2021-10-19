@@ -478,7 +478,15 @@ TEST(test_profile, get_profile_features_structure_types_partial) {
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR, structureTypes[4]);
 }
 
-TEST(test_profile, get_profile_properties_structure_types_full) {
+TEST(test_profile, get_profile_features_structure_types_unspecified) {
+    const VpProfileProperties profile = {VP_LUNARG_MINIMUM_REQUIREMENTS_NAME, 1};
+
+    uint32_t structureTypesCount = 0;
+    vpGetProfileStructureTypes(&profile, VP_STRUCTURE_FEATURES, &structureTypesCount, nullptr);
+    EXPECT_EQ(0, structureTypesCount);
+}
+
+TEST(test_profile, get_profile_structure_types_full) {
     const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
 
     uint32_t structureTypesCount = 0;
@@ -493,7 +501,7 @@ TEST(test_profile, get_profile_properties_structure_types_full) {
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, structureTypes[2]);
 }
 
-TEST(test_profile, get_profile_properties_structure_types_partial) {
+TEST(test_profile, get_profile_structure_types_partial) {
     const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
 
     uint32_t structureTypesCount = 0;
@@ -510,6 +518,14 @@ TEST(test_profile, get_profile_properties_structure_types_partial) {
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, structureTypes[1]);
 }
 
+TEST(test_profile, get_profile_properties_structure_types_unspecified) {
+    const VpProfileProperties profile = {VP_LUNARG_MINIMUM_REQUIREMENTS_NAME, 1};
+
+    uint32_t structureTypesCount = 0;
+    vpGetProfileStructureTypes(&profile, VP_STRUCTURE_PROPERTIES, &structureTypesCount, nullptr);
+    EXPECT_EQ(0, structureTypesCount);
+}
+
 TEST(test_profile, get_profile_formats_full) {
     const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
 
@@ -519,6 +535,7 @@ TEST(test_profile, get_profile_formats_full) {
 
     std::vector<VkFormat> formats(formatCount);
     vpGetProfileFormats(&profile, &formatCount, &formats[0]);
+    EXPECT_EQ(66, formatCount);
 
     EXPECT_EQ(VK_FORMAT_R8_UNORM, formats[0]);
     EXPECT_EQ(VK_FORMAT_R8_SNORM, formats[1]);
@@ -536,10 +553,19 @@ TEST(test_profile, get_profile_formats_partial) {
 
     std::vector<VkFormat> formats(formatCount);
     vpGetProfileFormats(&profile, &formatCount, &formats[0]);
+    EXPECT_EQ(3, formatCount);
 
     EXPECT_EQ(VK_FORMAT_R8_UNORM, formats[0]);
     EXPECT_EQ(VK_FORMAT_R8_SNORM, formats[1]);
     EXPECT_EQ(VK_FORMAT_R8_UINT, formats[2]);
+}
+
+TEST(test_profile, get_profile_formats_unspecified) {
+    const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
+
+    uint32_t formatCount = 0;
+    vpGetProfileFormats(&profile, &formatCount, nullptr);
+    EXPECT_EQ(0, formatCount);
 }
 
 TEST(test_profile, get_profile_format_properties) {
@@ -592,4 +618,44 @@ TEST(test_profile, get_profile_format_properties_chained) {
                   VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
               properties3.optimalTilingFeatures);
     EXPECT_EQ(0, properties3.linearTilingFeatures);
+}
+
+TEST(test_profile, get_profile_memory_types_full) {
+    const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
+
+    uint32_t memoryPropertyFlagsCount = 0;
+    vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, nullptr);
+    EXPECT_EQ(2, memoryPropertyFlagsCount);
+
+    std::vector<VkMemoryPropertyFlags> memoryPropertyFlags(memoryPropertyFlagsCount);
+    vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, &memoryPropertyFlags[0]);
+    EXPECT_EQ(2, memoryPropertyFlagsCount);
+
+    EXPECT_EQ(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, memoryPropertyFlags[0]);
+    EXPECT_EQ(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+              memoryPropertyFlags[1]);
+}
+
+TEST(test_profile, get_profile_memory_types_partial) {
+    const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
+
+    uint32_t memoryPropertyFlagsCount = 0;
+    vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, nullptr);
+    EXPECT_EQ(2, memoryPropertyFlagsCount);
+
+    memoryPropertyFlagsCount = 1;
+
+    std::vector<VkMemoryPropertyFlags> memoryPropertyFlags(memoryPropertyFlagsCount);
+    vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, &memoryPropertyFlags[0]);
+    EXPECT_EQ(1, memoryPropertyFlagsCount);
+
+    EXPECT_EQ(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, memoryPropertyFlags[0]);
+}
+
+TEST(test_profile, get_profile_memory_types_unspecified) {
+    const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
+
+    uint32_t memoryPropertyFlagsCount = 0;
+    vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, nullptr);
+    EXPECT_EQ(0, memoryPropertyFlagsCount);
 }
