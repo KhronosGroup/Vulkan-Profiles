@@ -659,3 +659,31 @@ TEST(test_profile, get_profile_memory_types_unspecified) {
     vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, nullptr);
     EXPECT_EQ(0, memoryPropertyFlagsCount);
 }
+
+TEST(test_profile, get_profile_queue_families_full) {
+    const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
+
+    uint32_t count = 0;
+    vpGetProfileQueueFamilies(&profile, &count, nullptr);
+    EXPECT_EQ(1, count);
+
+    std::vector<VkQueueFamilyProperties> data(count);
+    vpGetProfileQueueFamilies(&profile, &count, &data[0]);
+    EXPECT_EQ(1, count);
+
+    EXPECT_EQ(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT,
+              data[0].queueFlags);
+    EXPECT_EQ(1, data[0].queueCount);
+    EXPECT_EQ(36, data[0].timestampValidBits);
+    EXPECT_EQ(1, data[0].minImageTransferGranularity.width);
+    EXPECT_EQ(1, data[0].minImageTransferGranularity.height);
+    EXPECT_EQ(1, data[0].minImageTransferGranularity.depth);
+}
+
+TEST(test_profile, get_profile_queue_families_unspecified) {
+    const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
+
+    uint32_t count = 0;
+    vpGetProfileQueueFamilies(&profile, &count, nullptr);
+    EXPECT_EQ(0, count);
+}
