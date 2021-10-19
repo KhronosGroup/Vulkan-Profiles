@@ -1655,8 +1655,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
     for (int i = 0, n = countof(supportedProfiles); i < n; ++i) {
         VkBool32 supported = VK_TRUE;
 
-        if (strcmp(supportedProfiles[i].profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
-        } else if (strcmp(supportedProfiles[i].profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+        if (strcmp(supportedProfiles[i].profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
             for (std::size_t i = 0, n = countof(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS); i < n && supported; ++i) {
                 const bool supportedInstanceExt = _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(),
                                                                     _VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i].extensionName);
