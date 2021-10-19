@@ -54,6 +54,8 @@ VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const char *
 
 void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
 
+void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext);
+
 void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                      VkExtensionProperties *pProperties);
 
@@ -1033,6 +1035,231 @@ inline void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNex
                     features->constantAlphaColorBlendFactors = VK_TRUE;
                 } break;
 #endif
+                default:
+                    break;
+            }
+            p = static_cast<VkStruct *>(p->pNext);
+        }
+    }
+}
+
+inline void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext) {
+    if (pProfile == nullptr || pNext == nullptr) return;
+
+    struct VkStruct {
+        VkStructureType sType;
+        void *pNext;
+    };
+
+    VkStruct *p = static_cast<VkStruct *>(pNext);
+
+    if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0)
+        return;
+    else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+        while (p != nullptr) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
+                    VkPhysicalDeviceProperties2 *properties = (VkPhysicalDeviceProperties2 *)p;
+                    properties->properties.limits.maxImageDimension1D = 8192;
+                    properties->properties.limits.maxImageDimension2D = 8192;
+                    properties->properties.limits.maxImageDimensionCube = 8192;
+                    properties->properties.limits.maxImageArrayLayers = 2048;
+                    properties->properties.limits.maxUniformBufferRange = 65536;
+                    properties->properties.limits.bufferImageGranularity = 4096;
+                    properties->properties.limits.maxPerStageDescriptorSamplers = 64;
+                    properties->properties.limits.maxPerStageDescriptorUniformBuffers = 15;
+                    properties->properties.limits.maxPerStageDescriptorStorageBuffers = 30;
+                    properties->properties.limits.maxPerStageDescriptorSampledImages = 200;
+                    properties->properties.limits.maxPerStageDescriptorStorageImages = 16;
+                    properties->properties.limits.maxPerStageResources = 200;
+                    properties->properties.limits.maxDescriptorSetSamplers = 576;
+                    properties->properties.limits.maxDescriptorSetUniformBuffers = 90;
+                    properties->properties.limits.maxDescriptorSetStorageBuffers = 96;
+                    properties->properties.limits.maxDescriptorSetSampledImages = 1800;
+                    properties->properties.limits.maxDescriptorSetStorageImages = 144;
+                    properties->properties.limits.maxFragmentCombinedOutputResources = 16;
+                    properties->properties.limits.maxComputeWorkGroupInvocations = 256;
+                    properties->properties.limits.maxComputeWorkGroupSize[0] = 256;
+                    properties->properties.limits.maxComputeWorkGroupSize[1] = 256;
+                    properties->properties.limits.maxComputeWorkGroupSize[2] = 64;
+                    properties->properties.limits.subTexelPrecisionBits = 8;
+                    properties->properties.limits.mipmapPrecisionBits = 6;
+                    properties->properties.limits.maxSamplerLodBias = 14.0;
+                    properties->properties.limits.pointSizeGranularity = 0.125;
+                    properties->properties.limits.lineWidthGranularity = 0.5;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES: {
+                    VkPhysicalDeviceVulkan11Properties *properties = (VkPhysicalDeviceVulkan11Properties *)p;
+                    properties->subgroupSize = 4;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES: {
+                    VkPhysicalDeviceVulkan12Properties *properties = (VkPhysicalDeviceVulkan12Properties *)p;
+                    properties->shaderSignedZeroInfNanPreserveFloat16 = VK_TRUE;
+                    properties->shaderSignedZeroInfNanPreserveFloat32 = VK_TRUE;
+                    properties->maxPerStageDescriptorUpdateAfterBindInputAttachments = 7;
+                } break;
+                default:
+                    break;
+            }
+            p = static_cast<VkStruct *>(p->pNext);
+        }
+    } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        while (p != nullptr) {
+            switch (p->sType) {
+#if defined(__APPLE__)
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR: {
+                    VkPhysicalDevicePortabilitySubsetPropertiesKHR *properties =
+                        (VkPhysicalDevicePortabilitySubsetPropertiesKHR *)p;
+                    properties->minVertexInputBindingStrideAlignment = 4;
+
+                } break;
+#endif
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES: {
+                    VkPhysicalDeviceMaintenance3Properties *properties = (VkPhysicalDeviceMaintenance3Properties *)p;
+                    properties->maxPerSetDescriptors = 700;
+                    properties->maxMemoryAllocationSize = 2147483648;
+
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES: {
+                    VkPhysicalDeviceDepthStencilResolveProperties *properties = (VkPhysicalDeviceDepthStencilResolveProperties *)p;
+                    properties->independentResolve = VK_TRUE;
+                    properties->independentResolveNone = VK_TRUE;
+                    properties->supportedDepthResolveModes = VK_RESOLVE_MODE_SAMPLE_ZERO_BIT;
+                    properties->supportedStencilResolveModes = VK_RESOLVE_MODE_SAMPLE_ZERO_BIT;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT: {
+                    VkPhysicalDeviceInlineUniformBlockPropertiesEXT *properties =
+                        (VkPhysicalDeviceInlineUniformBlockPropertiesEXT *)p;
+                    properties->maxInlineUniformBlockSize = 256;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES: {
+                    VkPhysicalDeviceMultiviewProperties *properties = (VkPhysicalDeviceMultiviewProperties *)p;
+                    properties->maxMultiviewInstanceIndex = 134217727;
+                    properties->maxMultiviewViewCount = 6;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES: {
+                    VkPhysicalDeviceDescriptorIndexingProperties *properties = (VkPhysicalDeviceDescriptorIndexingProperties *)p;
+                    properties->maxUpdateAfterBindDescriptorsInAllPools = 1048576;
+                    properties->maxPerStageDescriptorUpdateAfterBindSamplers = 16;
+                    properties->maxPerStageDescriptorUpdateAfterBindUniformBuffers = 15;
+                    properties->maxPerStageDescriptorUpdateAfterBindStorageBuffers = 31;
+                    properties->maxPerStageDescriptorUpdateAfterBindSampledImages = 128;
+                    properties->maxPerStageDescriptorUpdateAfterBindStorageImages = 8;
+                    properties->maxPerStageDescriptorUpdateAfterBindInputAttachments = 128;
+                    properties->maxPerStageUpdateAfterBindResources = 159;
+                    properties->maxDescriptorSetUpdateAfterBindSamplers = 80;
+                    properties->maxDescriptorSetUpdateAfterBindUniformBuffers = 90;
+                    properties->maxDescriptorSetUpdateAfterBindUniformBuffersDynamic = 8;
+                    properties->maxDescriptorSetUpdateAfterBindStorageBuffers = 155;
+                    properties->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic = 8;
+                    properties->maxDescriptorSetUpdateAfterBindSampledImages = 640;
+                    properties->maxDescriptorSetUpdateAfterBindStorageImages = 40;
+                    properties->maxDescriptorSetUpdateAfterBindInputAttachments = 640;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
+                    VkPhysicalDeviceProperties2 *properties = (VkPhysicalDeviceProperties2 *)p;
+                    properties->properties.limits.maxImageDimension1D = 16384;
+                    properties->properties.limits.maxImageDimension2D = 16384;
+                    properties->properties.limits.maxImageDimension3D = 2048;
+                    properties->properties.limits.maxImageDimensionCube = 16384;
+                    properties->properties.limits.maxImageArrayLayers = 2048;
+                    properties->properties.limits.maxTexelBufferElements = 67108900;
+                    properties->properties.limits.maxUniformBufferRange = 65536;
+                    properties->properties.limits.maxStorageBufferRange = 134217728;
+                    properties->properties.limits.maxPushConstantsSize = 128;
+                    properties->properties.limits.maxMemoryAllocationCount = 4096;
+                    properties->properties.limits.maxSamplerAllocationCount = 1024;
+                    properties->properties.limits.bufferImageGranularity = 1024;
+                    properties->properties.limits.sparseAddressSpaceSize = 1073741824;
+                    properties->properties.limits.maxBoundDescriptorSets = 8;
+                    properties->properties.limits.maxPerStageDescriptorSamplers = 16;
+                    properties->properties.limits.maxPerStageDescriptorUniformBuffers = 15;
+                    properties->properties.limits.maxPerStageDescriptorStorageBuffers = 16;
+                    properties->properties.limits.maxPerStageDescriptorSampledImages = 128;
+                    properties->properties.limits.maxPerStageDescriptorStorageImages = 8;
+                    properties->properties.limits.maxPerStageDescriptorInputAttachments = 8;
+                    properties->properties.limits.maxPerStageResources = 128;
+                    properties->properties.limits.maxDescriptorSetSamplers = 80;
+                    properties->properties.limits.maxDescriptorSetUniformBuffers = 90;
+                    properties->properties.limits.maxDescriptorSetUniformBuffersDynamic = 8;
+                    properties->properties.limits.maxDescriptorSetStorageBuffers = 155;
+                    properties->properties.limits.maxDescriptorSetStorageBuffersDynamic = 8;
+                    properties->properties.limits.maxDescriptorSetSampledImages = 256;
+                    properties->properties.limits.maxDescriptorSetStorageImages = 40;
+                    properties->properties.limits.maxDescriptorSetInputAttachments = 8;
+                    properties->properties.limits.maxVertexInputAttributes = 28;
+                    properties->properties.limits.maxVertexInputBindings = 28;
+                    properties->properties.limits.maxVertexInputAttributeOffset = 2047;
+                    properties->properties.limits.maxVertexInputBindingStride = 2048;
+                    properties->properties.limits.maxVertexOutputComponents = 124;
+                    properties->properties.limits.maxTessellationGenerationLevel = 64;
+                    properties->properties.limits.maxTessellationPatchSize = 32;
+                    properties->properties.limits.maxTessellationControlPerVertexInputComponents = 124;
+                    properties->properties.limits.maxTessellationControlPerVertexOutputComponents = 124;
+                    properties->properties.limits.maxTessellationControlPerPatchOutputComponents = 120;
+                    properties->properties.limits.maxTessellationControlTotalOutputComponents = 2048;
+                    properties->properties.limits.maxTessellationEvaluationInputComponents = 124;
+                    properties->properties.limits.maxTessellationEvaluationOutputComponents = 124;
+                    properties->properties.limits.maxFragmentInputComponents = 116;
+                    properties->properties.limits.maxFragmentOutputAttachments = 8;
+                    properties->properties.limits.maxFragmentDualSrcAttachments = 1;
+                    properties->properties.limits.maxFragmentCombinedOutputResources = 8;
+                    properties->properties.limits.maxComputeSharedMemorySize = 32768;
+                    properties->properties.limits.maxComputeWorkGroupCount[0] = 65535;
+                    properties->properties.limits.maxComputeWorkGroupCount[1] = 65535;
+                    properties->properties.limits.maxComputeWorkGroupCount[2] = 65535;
+                    properties->properties.limits.maxComputeWorkGroupInvocations = 1024;
+                    properties->properties.limits.maxComputeWorkGroupSize[0] = 1024;
+                    properties->properties.limits.maxComputeWorkGroupSize[1] = 1024;
+                    properties->properties.limits.maxComputeWorkGroupSize[2] = 64;
+                    properties->properties.limits.subPixelPrecisionBits = 4;
+                    properties->properties.limits.subTexelPrecisionBits = 4;
+                    properties->properties.limits.mipmapPrecisionBits = 4;
+                    properties->properties.limits.maxDrawIndexedIndexValue = 4294967295u;
+                    properties->properties.limits.maxDrawIndirectCount = 1073740000;
+                    properties->properties.limits.maxSamplerLodBias = 14;
+                    properties->properties.limits.maxSamplerAnisotropy = 16;
+                    properties->properties.limits.maxViewports = 16;
+                    properties->properties.limits.maxViewportDimensions[0] = 16384;
+                    properties->properties.limits.maxViewportDimensions[1] = 16384;
+                    properties->properties.limits.viewportBoundsRange[0] = -32768;
+                    properties->properties.limits.viewportBoundsRange[1] = 32767;
+                    properties->properties.limits.minMemoryMapAlignment = 64;
+                    properties->properties.limits.minTexelBufferOffsetAlignment = 64;
+                    properties->properties.limits.minUniformBufferOffsetAlignment = 256;
+                    properties->properties.limits.minStorageBufferOffsetAlignment = 64;
+                    properties->properties.limits.minTexelOffset = -8;
+                    properties->properties.limits.maxTexelOffset = 7;
+                    properties->properties.limits.minTexelGatherOffset = -8;
+                    properties->properties.limits.maxTexelGatherOffset = 7;
+                    properties->properties.limits.minInterpolationOffset = -0.5;
+                    properties->properties.limits.maxInterpolationOffset = 0.4375;
+                    properties->properties.limits.subPixelInterpolationOffsetBits = 4;
+                    properties->properties.limits.maxFramebufferWidth = 16384;
+                    properties->properties.limits.maxFramebufferHeight = 16384;
+                    properties->properties.limits.maxFramebufferLayers = 1024;
+                    properties->properties.limits.framebufferColorSampleCounts = 9;
+                    properties->properties.limits.framebufferDepthSampleCounts = 9;
+                    properties->properties.limits.framebufferStencilSampleCounts = 9;
+                    properties->properties.limits.framebufferNoAttachmentsSampleCounts = 9;
+                    properties->properties.limits.maxColorAttachments = 8;
+                    properties->properties.limits.sampledImageColorSampleCounts = 9;
+                    properties->properties.limits.sampledImageIntegerSampleCounts = 9;
+                    properties->properties.limits.sampledImageDepthSampleCounts = 9;
+                    properties->properties.limits.sampledImageStencilSampleCounts = 9;
+                    properties->properties.limits.storageImageSampleCounts = 1;
+                    properties->properties.limits.maxSampleMaskWords = 1;
+                    properties->properties.limits.maxClipDistances = 8;
+                    properties->properties.limits.maxCullDistances = 8;
+                    properties->properties.limits.maxCombinedClipAndCullDistances = 8;
+                    properties->properties.limits.discreteQueuePriorities = 2;
+                    properties->properties.limits.pointSizeRange[0] = 1.0;
+                    properties->properties.limits.pointSizeRange[1] = 64.0;
+                    properties->properties.limits.lineWidthRange[0] = 1.0;
+                    properties->properties.limits.lineWidthRange[1] = 1.0;
+                    properties->properties.limits.pointSizeGranularity = 0.125;
+                    properties->properties.limits.lineWidthGranularity = 0.5;
+                } break;
                 default:
                     break;
             }
@@ -2365,7 +2592,6 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (descriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools < 1048576) {
                 supported = VK_FALSE;
             }
-
             if (descriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers < 16) {
                 supported = VK_FALSE;
             }
@@ -2387,7 +2613,6 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             if (descriptorIndexingProperties.maxPerStageUpdateAfterBindResources < 159) {
                 supported = VK_FALSE;
             }
-
             if (descriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSamplers < 80) {
                 supported = VK_FALSE;
             }
