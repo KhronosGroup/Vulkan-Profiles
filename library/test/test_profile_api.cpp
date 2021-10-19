@@ -355,6 +355,54 @@ TEST(test_profile, create_pnext) {
     EXPECT_EQ(0, error);
 }
 
+TEST(test_profile, get_device_properties2) {
+    VkPhysicalDeviceProperties2 profileProperties2{};
+    profileProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    profileProperties2.pNext = nullptr;
+
+    const VpProfileProperties Profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
+
+    vpGetProfileProperties(&Profile, &profileProperties2);
+
+    EXPECT_EQ(16384, profileProperties2.properties.limits.maxImageDimension1D);
+    EXPECT_EQ(16384, profileProperties2.properties.limits.maxImageDimension2D);
+    EXPECT_EQ(2048, profileProperties2.properties.limits.maxImageDimension3D);
+    EXPECT_EQ(16384, profileProperties2.properties.limits.maxImageDimensionCube);
+    EXPECT_EQ(2048, profileProperties2.properties.limits.maxImageArrayLayers);
+    EXPECT_EQ(8, profileProperties2.properties.limits.maxColorAttachments);
+}
+
+TEST(test_profile, get_device_descriptor_indexing_properties) {
+    VkPhysicalDeviceDescriptorIndexingProperties properties{};
+    properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES;
+    properties.pNext = nullptr;
+
+    const VpProfileProperties Profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
+
+    vpGetProfileProperties(&Profile, &properties);
+
+    EXPECT_EQ(1048576, properties.maxUpdateAfterBindDescriptorsInAllPools);
+    EXPECT_EQ(16, properties.maxPerStageDescriptorUpdateAfterBindSamplers);
+}
+
+TEST(test_profile, get_device_properties_chain) {
+    VkPhysicalDeviceDescriptorIndexingProperties properties0{};
+    properties0.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES;
+    properties0.pNext = nullptr;
+
+    VkPhysicalDeviceInlineUniformBlockPropertiesEXT properties1{};
+    properties1.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT;
+    properties1.pNext = &properties0;
+
+    const VpProfileProperties Profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
+
+    vpGetProfileProperties(&Profile, &properties1);
+
+    EXPECT_EQ(1048576, properties0.maxUpdateAfterBindDescriptorsInAllPools);
+    EXPECT_EQ(16, properties0.maxPerStageDescriptorUpdateAfterBindSamplers);
+    EXPECT_EQ(256, properties1.maxInlineUniformBlockSize);
+}
+
 TEST(test_profile, get_device_features) {
     VkPhysicalDeviceVulkan12Features deviceVulkan12Features = {};
     deviceVulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
