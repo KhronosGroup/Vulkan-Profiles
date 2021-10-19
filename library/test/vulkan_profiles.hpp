@@ -62,6 +62,10 @@ typedef enum VpStructureArea { VP_STRUCTURE_FEATURES = 0, VP_STRUCTURE_PROPERTIE
 void vpGetProfileStructureTypes(const VpProfileProperties *pProfile, VpStructureArea structureArea, uint32_t *pStructureTypesCount,
                                 VkStructureType *pStructureTypes);
 
+void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormat);
+
+void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
+
 // Implementation details:
 #include <cstring>
 #include <vector>
@@ -135,9 +139,9 @@ static const VkStructureType _VP_KHR_1_2_ROADMAP_2022_PROPERTY_STRUCTURE_TYPES[]
 
 struct VpFormatProperties {
     VkFormat format;
-    VkFormatFeatureFlags linearTilingFeatures;
-    VkFormatFeatureFlags optimalTilingFeatures;
-    VkFormatFeatureFlags bufferFeatures;
+    VkFlags64 linearTilingFeatures;
+    VkFlags64 optimalTilingFeatures;
+    VkFlags64 bufferFeatures;
 };
 
 static const VpFormatProperties _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[] = {
@@ -2550,6 +2554,62 @@ inline void vpGetProfileStructureTypes(const VpProfileProperties *pProfile, VpSt
                     pStructureTypes[i] = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES[i];
                 }
             } break;
+        }
+    }
+}
+
+inline void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormat) {
+    if (pFormat == nullptr) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+            *pFormatCount = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS);
+        } else {
+            *pFormatCount = 0;
+        }
+        return;
+    }
+
+    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        std::size_t n = std::min<std::size_t>(countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS), *pFormatCount);
+        for (std::size_t i = 0; i < n; ++i) {
+            pFormat[i] = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[i].format;
+        }
+    }
+}
+
+inline void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext) {
+    if (pProfile == nullptr || pNext == nullptr) {
+        return;
+    }
+
+    struct VkStruct {
+        VkStructureType sType;
+        void *pNext;
+    };
+
+    VkStruct *p = static_cast<VkStruct *>(pNext);
+
+    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        for (std::size_t i = 0, n = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS); i < n; ++i) {
+            const VpFormatProperties &props = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[i];
+            if (props.format != format) continue;
+
+            while (p != nullptr) {
+                switch (p->sType) {
+                    case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
+                        VkFormatProperties2 *pProperties = (VkFormatProperties2 *)p;
+                        pProperties->formatProperties.bufferFeatures = static_cast<VkFormatFeatureFlags>(props.bufferFeatures);
+                        pProperties->formatProperties.linearTilingFeatures = static_cast<VkFormatFeatureFlags>(props.linearTilingFeatures);
+                        pProperties->formatProperties.optimalTilingFeatures = static_cast<VkFormatFeatureFlags>(props.optimalTilingFeatures);
+                    } break;
+                    case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR: {
+                        VkFormatProperties3KHR *pProperties = (VkFormatProperties3KHR *)p;
+                        pProperties->bufferFeatures = props.bufferFeatures;
+                        pProperties->linearTilingFeatures = props.linearTilingFeatures;
+                        pProperties->optimalTilingFeatures = props.optimalTilingFeatures;
+                    } break;
+                }
+                p = static_cast<VkStruct *>(p->pNext);
+            }
         }
     }
 }

@@ -509,3 +509,87 @@ TEST(test_profile, get_profile_properties_structure_types_partial) {
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, structureTypes[0]);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, structureTypes[1]);
 }
+
+TEST(test_profile, get_profile_formats_full) {
+    const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
+
+    uint32_t formatCount = 0;
+    vpGetProfileFormats(&profile, &formatCount, nullptr);
+    EXPECT_EQ(66, formatCount);
+
+    std::vector<VkFormat> formats(formatCount);
+    vpGetProfileFormats(&profile, &formatCount, &formats[0]);
+
+    EXPECT_EQ(VK_FORMAT_R8_UNORM, formats[0]);
+    EXPECT_EQ(VK_FORMAT_R8_SNORM, formats[1]);
+    EXPECT_EQ(VK_FORMAT_R8_UINT, formats[2]);
+}
+
+TEST(test_profile, get_profile_formats_partial) {
+    const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
+
+    uint32_t formatCount = 0;
+    vpGetProfileFormats(&profile, &formatCount, nullptr);
+    EXPECT_EQ(66, formatCount);
+
+    formatCount = 3;
+
+    std::vector<VkFormat> formats(formatCount);
+    vpGetProfileFormats(&profile, &formatCount, &formats[0]);
+
+    EXPECT_EQ(VK_FORMAT_R8_UNORM, formats[0]);
+    EXPECT_EQ(VK_FORMAT_R8_SNORM, formats[1]);
+    EXPECT_EQ(VK_FORMAT_R8_UINT, formats[2]);
+}
+
+TEST(test_profile, get_profile_format_properties) {
+    const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
+
+    VkFormatProperties2 properties2 = {};
+    properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+    vpGetProfileFormatProperties(&profile, VK_FORMAT_D16_UNORM, &properties2);
+    EXPECT_EQ(0, properties2.formatProperties.bufferFeatures);
+    EXPECT_EQ(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT |
+                  VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
+                  VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
+              properties2.formatProperties.optimalTilingFeatures);
+    EXPECT_EQ(0, properties2.formatProperties.linearTilingFeatures);
+
+    VkFormatProperties3KHR properties3 = {};
+    properties3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR;
+    vpGetProfileFormatProperties(&profile, VK_FORMAT_D16_UNORM, &properties3);
+    EXPECT_EQ(0, properties3.bufferFeatures);
+    EXPECT_EQ(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT |
+                  VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
+                  VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
+              properties3.optimalTilingFeatures);
+    EXPECT_EQ(0, properties3.linearTilingFeatures);
+}
+
+TEST(test_profile, get_profile_format_properties_chained) {
+    const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
+
+    VkFormatProperties2 properties2 = {};
+    properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+    properties2.pNext = nullptr;
+
+    VkFormatProperties3KHR properties3 = {};
+    properties3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR;
+    properties3.pNext = &properties2;
+
+    vpGetProfileFormatProperties(&profile, VK_FORMAT_D16_UNORM, &properties3);
+
+    EXPECT_EQ(0, properties2.formatProperties.bufferFeatures);
+    EXPECT_EQ(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT |
+                  VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
+                  VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
+              properties2.formatProperties.optimalTilingFeatures);
+    EXPECT_EQ(0, properties2.formatProperties.linearTilingFeatures);
+
+    EXPECT_EQ(0, properties3.bufferFeatures);
+    EXPECT_EQ(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT |
+                  VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
+                  VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
+              properties3.optimalTilingFeatures);
+    EXPECT_EQ(0, properties3.linearTilingFeatures);
+}
