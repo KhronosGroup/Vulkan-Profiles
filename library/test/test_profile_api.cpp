@@ -388,15 +388,15 @@ TEST(test_profile, get_device_features) {
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.shaderOutputLayer);
 }
 
-TEST(test_profile, enumerate_profile_extension_properties_full) {
+TEST(test_profile, get_profile_extension_properties_full) {
     const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
-    vpEnumerateProfileExtensionProperties(&profile, &propertyCount, nullptr);
+    vpGetProfileExtensionProperties(&profile, &propertyCount, nullptr);
     EXPECT_EQ(12, propertyCount);
 
     std::vector<VkExtensionProperties> properties(propertyCount);
-    vpEnumerateProfileExtensionProperties(&profile, &propertyCount, &properties[0]);
+    vpGetProfileExtensionProperties(&profile, &propertyCount, &properties[0]);
 
     EXPECT_STREQ(VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME, properties[0].extensionName);
     EXPECT_STREQ(VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, properties[1].extensionName);
@@ -412,17 +412,17 @@ TEST(test_profile, enumerate_profile_extension_properties_full) {
     EXPECT_STREQ(VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, properties[11].extensionName);
 }
 
-TEST(test_profile, enumerate_profile_extension_properties_partial) {
+TEST(test_profile, get_profile_extension_properties_partial) {
     const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
-    vpEnumerateProfileExtensionProperties(&profile, &propertyCount, nullptr);
+    vpGetProfileExtensionProperties(&profile, &propertyCount, nullptr);
     EXPECT_EQ(12, propertyCount);
 
     propertyCount = 5;
 
     std::vector<VkExtensionProperties> properties(propertyCount);
-    vpEnumerateProfileExtensionProperties(&profile, &propertyCount, &properties[0]);
+    vpGetProfileExtensionProperties(&profile, &propertyCount, &properties[0]);
     EXPECT_EQ(5, propertyCount);
 
     EXPECT_STREQ(VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME, properties[0].extensionName);
@@ -432,15 +432,15 @@ TEST(test_profile, enumerate_profile_extension_properties_partial) {
     EXPECT_STREQ(VK_EXT_PRIVATE_DATA_EXTENSION_NAME, properties[4].extensionName);
 }
 
-TEST(test_profile, enumerate_profile_features_structure_types_full) {
+TEST(test_profile, get_profile_features_structure_types_full) {
     const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
 
     uint32_t structureTypesCount = 0;
-    vpEnumerateProfileStructureTypes(&profile, VP_STRUCTURE_FEATURES, &structureTypesCount, nullptr);
+    vpGetProfileStructureTypes(&profile, VP_STRUCTURE_FEATURES, &structureTypesCount, nullptr);
     EXPECT_EQ(14, structureTypesCount);
 
     std::vector<VkStructureType> structureTypes(structureTypesCount);
-    vpEnumerateProfileStructureTypes(&profile, VP_STRUCTURE_FEATURES, &structureTypesCount, &structureTypes[0]);
+    vpGetProfileStructureTypes(&profile, VP_STRUCTURE_FEATURES, &structureTypesCount, &structureTypes[0]);
 
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, structureTypes[0]);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, structureTypes[1]);
@@ -458,17 +458,17 @@ TEST(test_profile, enumerate_profile_features_structure_types_full) {
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT, structureTypes[13]);
 }
 
-TEST(test_profile, enumerate_profile_features_structure_types_partial) {
+TEST(test_profile, get_profile_features_structure_types_partial) {
     const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
 
     uint32_t structureTypesCount = 0;
-    vpEnumerateProfileStructureTypes(&profile, VP_STRUCTURE_FEATURES, &structureTypesCount, nullptr);
+    vpGetProfileStructureTypes(&profile, VP_STRUCTURE_FEATURES, &structureTypesCount, nullptr);
     EXPECT_EQ(14, structureTypesCount);
 
     structureTypesCount = 5;
 
     std::vector<VkStructureType> structureTypes(structureTypesCount);
-    vpEnumerateProfileStructureTypes(&profile, VP_STRUCTURE_FEATURES, &structureTypesCount, &structureTypes[0]);
+    vpGetProfileStructureTypes(&profile, VP_STRUCTURE_FEATURES, &structureTypesCount, &structureTypes[0]);
     EXPECT_EQ(5, structureTypesCount);
 
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, structureTypes[0]);
@@ -478,32 +478,32 @@ TEST(test_profile, enumerate_profile_features_structure_types_partial) {
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR, structureTypes[4]);
 }
 
-TEST(test_profile, enumerate_profile_properties_structure_types_full) {
+TEST(test_profile, get_profile_properties_structure_types_full) {
     const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
 
     uint32_t structureTypesCount = 0;
-    vpEnumerateProfileStructureTypes(&profile, VP_STRUCTURE_PROPERTIES, &structureTypesCount, nullptr);
+    vpGetProfileStructureTypes(&profile, VP_STRUCTURE_PROPERTIES, &structureTypesCount, nullptr);
     EXPECT_EQ(3, structureTypesCount);
 
     std::vector<VkStructureType> structureTypes(structureTypesCount);
-    vpEnumerateProfileStructureTypes(&profile, VP_STRUCTURE_PROPERTIES, &structureTypesCount, &structureTypes[0]);
+    vpGetProfileStructureTypes(&profile, VP_STRUCTURE_PROPERTIES, &structureTypesCount, &structureTypes[0]);
 
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, structureTypes[0]);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, structureTypes[1]);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, structureTypes[2]);
 }
 
-TEST(test_profile, enumerate_profile_properties_structure_types_partial) {
+TEST(test_profile, get_profile_properties_structure_types_partial) {
     const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
 
     uint32_t structureTypesCount = 0;
-    vpEnumerateProfileStructureTypes(&profile, VP_STRUCTURE_PROPERTIES, &structureTypesCount, nullptr);
+    vpGetProfileStructureTypes(&profile, VP_STRUCTURE_PROPERTIES, &structureTypesCount, nullptr);
     EXPECT_EQ(3, structureTypesCount);
 
     structureTypesCount = 2;
 
     std::vector<VkStructureType> structureTypes(structureTypesCount);
-    vpEnumerateProfileStructureTypes(&profile, VP_STRUCTURE_PROPERTIES, &structureTypesCount, &structureTypes[0]);
+    vpGetProfileStructureTypes(&profile, VP_STRUCTURE_PROPERTIES, &structureTypesCount, &structureTypes[0]);
     EXPECT_EQ(2, structureTypesCount);
 
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, structureTypes[0]);

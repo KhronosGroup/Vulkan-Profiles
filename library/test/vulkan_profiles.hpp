@@ -54,12 +54,12 @@ VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const char *
 
 void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
 
-void vpEnumerateProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                            VkExtensionProperties *pProperties);
 
 typedef enum VpStructureArea { VP_STRUCTURE_FEATURES = 0, VP_STRUCTURE_PROPERTIES } VpStructureArea;
 
-void vpEnumerateProfileStructureTypes(const VpProfileProperties *pProfile, VpStructureArea structureArea,
+void vpGetProfileStructureTypes(const VpProfileProperties *pProfile, VpStructureArea structureArea,
                                       uint32_t *pStructureTypesCount, VkStructureType *pStructureTypes);
 
 // Implementation details:
@@ -2579,7 +2579,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
     return result;
 }
 
-inline void vpEnumerateProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+inline void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                                   VkExtensionProperties *pProperties) {
     if (pProperties == nullptr) {
         if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
@@ -2606,7 +2606,7 @@ inline void vpEnumerateProfileExtensionProperties(const VpProfileProperties *pPr
     }
 }
 
-inline void vpEnumerateProfileStructureTypes(const VpProfileProperties *pProfile, VpStructureArea structureArea,
+inline void vpGetProfileStructureTypes(const VpProfileProperties *pProfile, VpStructureArea structureArea,
                                              uint32_t *pStructureTypesCount, VkStructureType *pStructureTypes) {
     if (pStructureTypes == nullptr) {
         if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
@@ -2670,3 +2670,31 @@ inline void vpEnumerateProfileStructureTypes(const VpProfileProperties *pProfile
         }
     }
 }
+/*
+inline void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                               VkFormatProperties2 *pProperties) {
+    if (pProperties == nullptr) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
+            *pPropertyCount = 0;
+        } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+            *pPropertyCount = countof(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS);
+        } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+            *pPropertyCount = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS);
+        }
+        return;
+    }
+
+    if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
+    } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+        for (std::size_t i = 0, n = std::min<std::size_t>(countof(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS), *pPropertyCount); i < n;
+             ++i) {
+            pProperties[i] = VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i];
+        }
+    } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        for (std::size_t i = 0, n = std::min<std::size_t>(countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS), *pPropertyCount);
+             i < n; ++i) {
+            pProperties[i] = VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
+        }
+    }
+}
+*/
