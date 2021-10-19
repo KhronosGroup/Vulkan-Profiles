@@ -2069,238 +2069,268 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             device8BitStorageFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES;
             device8BitStorageFeatures.pNext = &deviceShaderFloat16Int8Features;
 
-            VkPhysicalDeviceShaderDrawParametersFeatures shaderDrawParametersFeatures = {};
-            shaderDrawParametersFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES;
-            shaderDrawParametersFeatures.pNext = &device8BitStorageFeatures;
+            VkPhysicalDeviceShaderDrawParametersFeatures deviceShaderDrawParametersFeatures = {};
+            deviceShaderDrawParametersFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES;
+            deviceShaderDrawParametersFeatures.pNext = &device8BitStorageFeatures;
 
-            VkPhysicalDeviceImagelessFramebufferFeatures imagelessFramebufferFeatures = {};
-            imagelessFramebufferFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES;
-            imagelessFramebufferFeatures.pNext = &shaderDrawParametersFeatures;
+            VkPhysicalDeviceImagelessFramebufferFeatures deviceImagelessFramebufferFeatures = {};
+            deviceImagelessFramebufferFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES;
+            deviceImagelessFramebufferFeatures.pNext = &deviceShaderDrawParametersFeatures;
 
-            VkPhysicalDevice16BitStorageFeatures storage16bit = {};
-            storage16bit.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES;
-            storage16bit.pNext = &imagelessFramebufferFeatures;
+            VkPhysicalDevice16BitStorageFeatures deviceStorage16bit = {};
+            deviceStorage16bit.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES;
+            deviceStorage16bit.pNext = &deviceImagelessFramebufferFeatures;
 
-            VkPhysicalDeviceMultiviewFeatures multiviewFeatures = {};
-            multiviewFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES;
-            multiviewFeatures.pNext = &storage16bit;
+            VkPhysicalDeviceMultiviewFeatures deviceMultiviewFeatures = {};
+            deviceMultiviewFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES;
+            deviceMultiviewFeatures.pNext = &deviceStorage16bit;
 
-            VkPhysicalDeviceDescriptorIndexingFeatures descriptorIndexingFeatures = {};
-            descriptorIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
-            descriptorIndexingFeatures.pNext = &multiviewFeatures;
+            VkPhysicalDeviceDescriptorIndexingFeatures deviceDescriptorIndexingFeatures = {};
+            deviceDescriptorIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+            deviceDescriptorIndexingFeatures.pNext = &deviceMultiviewFeatures;
 
-            VkPhysicalDeviceHostQueryResetFeatures queryResetFeatures = {};
-            queryResetFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES;
-            queryResetFeatures.pNext = &descriptorIndexingFeatures;
+            VkPhysicalDeviceHostQueryResetFeatures deviceQueryResetFeatures = {};
+            deviceQueryResetFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES;
+            deviceQueryResetFeatures.pNext = &deviceDescriptorIndexingFeatures;
 
-            VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures subgroupExtendedTypesFeatures = {};
-            subgroupExtendedTypesFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES;
-            subgroupExtendedTypesFeatures.pNext = &queryResetFeatures;
+            VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures deviceSubgroupExtendedTypesFeatures = {};
+            deviceSubgroupExtendedTypesFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES;
+            deviceSubgroupExtendedTypesFeatures.pNext = &deviceQueryResetFeatures;
 
-            VkPhysicalDeviceUniformBufferStandardLayoutFeatures uniformBufferStandardLayoutFeatures = {};
-            uniformBufferStandardLayoutFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES;
-            uniformBufferStandardLayoutFeatures.pNext = &subgroupExtendedTypesFeatures;
+            VkPhysicalDeviceUniformBufferStandardLayoutFeatures deviceUniformBufferStandardLayoutFeatures = {};
+            deviceUniformBufferStandardLayoutFeatures.sType =
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES;
+            deviceUniformBufferStandardLayoutFeatures.pNext = &deviceSubgroupExtendedTypesFeatures;
 
             VkPhysicalDeviceFeatures2 deviceFeatures = {};
             deviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-            deviceFeatures.pNext = &uniformBufferStandardLayoutFeatures;
+            deviceFeatures.pNext = &deviceUniformBufferStandardLayoutFeatures;
 
             vkGetPhysicalDeviceFeatures2(physicalDevice, &deviceFeatures);
 
-            if (deviceFeatures.features.robustBufferAccess != VK_TRUE) {
+#if defined(__APPLE__)
+            VkPhysicalDevicePortabilitySubsetFeaturesKHR profilePortabilitySubset = {};
+            profilePortabilitySubset.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR;
+            profilePortabilitySubset.pNext = pNext;
+            pNext = &profilePortabilitySubset;
+#endif
+
+            VkPhysicalDeviceSamplerYcbcrConversionFeatures profileSamplerYcbcrConversionFeatures = {};
+            profileSamplerYcbcrConversionFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES;
+            profileSamplerYcbcrConversionFeatures.pNext = pNext;
+
+            VkPhysicalDeviceShaderFloat16Int8Features profileShaderFloat16Int8Features = {};
+            profileShaderFloat16Int8Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES;
+            profileShaderFloat16Int8Features.pNext = &profileSamplerYcbcrConversionFeatures;
+
+            VkPhysicalDevice8BitStorageFeatures profile8BitStorageFeatures = {};
+            profile8BitStorageFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES;
+            profile8BitStorageFeatures.pNext = &profileShaderFloat16Int8Features;
+
+            VkPhysicalDeviceShaderDrawParametersFeatures profileShaderDrawParametersFeatures = {};
+            profileShaderDrawParametersFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES;
+            profileShaderDrawParametersFeatures.pNext = &profile8BitStorageFeatures;
+
+            VkPhysicalDeviceImagelessFramebufferFeatures profileImagelessFramebufferFeatures = {};
+            profileImagelessFramebufferFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES;
+            profileImagelessFramebufferFeatures.pNext = &profileShaderDrawParametersFeatures;
+
+            VkPhysicalDevice16BitStorageFeatures profileStorage16bit = {};
+            profileStorage16bit.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES;
+            profileStorage16bit.pNext = &profileImagelessFramebufferFeatures;
+
+            VkPhysicalDeviceMultiviewFeatures profileMultiviewFeatures = {};
+            profileMultiviewFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES;
+            profileMultiviewFeatures.pNext = &profileStorage16bit;
+
+            VkPhysicalDeviceDescriptorIndexingFeatures profileDescriptorIndexingFeatures = {};
+            profileDescriptorIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+            profileDescriptorIndexingFeatures.pNext = &profileMultiviewFeatures;
+
+            VkPhysicalDeviceHostQueryResetFeatures profileQueryResetFeatures = {};
+            profileQueryResetFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES;
+            profileQueryResetFeatures.pNext = &profileDescriptorIndexingFeatures;
+
+            VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures profileSubgroupExtendedTypesFeatures = {};
+            profileSubgroupExtendedTypesFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES;
+            profileSubgroupExtendedTypesFeatures.pNext = &profileQueryResetFeatures;
+
+            VkPhysicalDeviceUniformBufferStandardLayoutFeatures profileUniformBufferStandardLayoutFeatures = {};
+            profileUniformBufferStandardLayoutFeatures.sType =
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES;
+            profileUniformBufferStandardLayoutFeatures.pNext = &profileSubgroupExtendedTypesFeatures;
+
+            VkPhysicalDeviceFeatures2 profileFeatures = {};
+            profileFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+            profileFeatures.pNext = &profileUniformBufferStandardLayoutFeatures;
+
+            vpGetProfileFeatures(&supportedProfiles[i], &profileFeatures);
+
+            if (deviceFeatures.features.robustBufferAccess != profileFeatures.features.robustBufferAccess) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.fullDrawIndexUint32 != VK_TRUE) {
+            } else if (deviceFeatures.features.fullDrawIndexUint32 != profileFeatures.features.fullDrawIndexUint32) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.imageCubeArray != VK_TRUE) {
+            } else if (deviceFeatures.features.imageCubeArray != profileFeatures.features.imageCubeArray) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.independentBlend != VK_TRUE) {
+            } else if (deviceFeatures.features.independentBlend != profileFeatures.features.independentBlend) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.inheritedQueries != VK_TRUE) {
+            } else if (deviceFeatures.features.inheritedQueries != profileFeatures.features.inheritedQueries) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.tessellationShader != VK_TRUE) {
+            } else if (deviceFeatures.features.tessellationShader != profileFeatures.features.tessellationShader) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.sampleRateShading != VK_TRUE) {
+            } else if (deviceFeatures.features.sampleRateShading != profileFeatures.features.sampleRateShading) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.multiDrawIndirect != VK_TRUE) {
+            } else if (deviceFeatures.features.multiDrawIndirect != profileFeatures.features.multiDrawIndirect) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.drawIndirectFirstInstance != VK_TRUE) {
+            } else if (deviceFeatures.features.drawIndirectFirstInstance != profileFeatures.features.drawIndirectFirstInstance) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.depthClamp != VK_TRUE) {
+            } else if (deviceFeatures.features.depthClamp != profileFeatures.features.depthClamp) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.depthBiasClamp != VK_TRUE) {
+            } else if (deviceFeatures.features.depthBiasClamp != profileFeatures.features.depthBiasClamp) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.dualSrcBlend != VK_TRUE) {
+            } else if (deviceFeatures.features.dualSrcBlend != profileFeatures.features.dualSrcBlend) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.fillModeNonSolid != VK_TRUE) {
+            } else if (deviceFeatures.features.fillModeNonSolid != profileFeatures.features.fillModeNonSolid) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.largePoints != VK_TRUE) {
+            } else if (deviceFeatures.features.largePoints != profileFeatures.features.largePoints) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.multiViewport != VK_TRUE) {
+            } else if (deviceFeatures.features.multiViewport != profileFeatures.features.multiViewport) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.samplerAnisotropy != VK_TRUE) {
+            } else if (deviceFeatures.features.samplerAnisotropy != profileFeatures.features.samplerAnisotropy) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.sampleRateShading != VK_TRUE) {
+            } else if (deviceFeatures.features.sampleRateShading != profileFeatures.features.sampleRateShading) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.textureCompressionBC != VK_TRUE) {
+            } else if (deviceFeatures.features.textureCompressionBC != profileFeatures.features.textureCompressionBC) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.occlusionQueryPrecise != VK_TRUE) {
+            } else if (deviceFeatures.features.occlusionQueryPrecise != profileFeatures.features.occlusionQueryPrecise) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.vertexPipelineStoresAndAtomics != VK_TRUE) {
+            } else if (deviceFeatures.features.vertexPipelineStoresAndAtomics !=
+                       profileFeatures.features.vertexPipelineStoresAndAtomics) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.fragmentStoresAndAtomics != VK_TRUE) {
+            } else if (deviceFeatures.features.fragmentStoresAndAtomics != profileFeatures.features.fragmentStoresAndAtomics) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.shaderTessellationAndGeometryPointSize != VK_TRUE) {
+            } else if (deviceFeatures.features.shaderTessellationAndGeometryPointSize !=
+                       profileFeatures.features.shaderTessellationAndGeometryPointSize) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.shaderImageGatherExtended != VK_TRUE) {
+            } else if (deviceFeatures.features.shaderImageGatherExtended != profileFeatures.features.shaderImageGatherExtended) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.shaderSampledImageArrayDynamicIndexing != VK_TRUE) {
+            } else if (deviceFeatures.features.shaderSampledImageArrayDynamicIndexing !=
+                       profileFeatures.features.shaderSampledImageArrayDynamicIndexing) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.shaderStorageBufferArrayDynamicIndexing != VK_TRUE) {
+            } else if (deviceFeatures.features.shaderStorageBufferArrayDynamicIndexing !=
+                       profileFeatures.features.shaderStorageBufferArrayDynamicIndexing) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.shaderStorageImageArrayDynamicIndexing != VK_TRUE) {
+            } else if (deviceFeatures.features.shaderStorageImageArrayDynamicIndexing !=
+                       profileFeatures.features.shaderStorageImageArrayDynamicIndexing) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.shaderStorageImageExtendedFormats != VK_TRUE) {
+            } else if (deviceFeatures.features.shaderStorageImageExtendedFormats !=
+                       profileFeatures.features.shaderStorageImageExtendedFormats) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.shaderStorageImageWriteWithoutFormat != VK_TRUE) {
+            } else if (deviceFeatures.features.shaderStorageImageWriteWithoutFormat !=
+                       profileFeatures.features.shaderStorageImageWriteWithoutFormat) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.shaderUniformBufferArrayDynamicIndexing != VK_TRUE) {
+            } else if (deviceFeatures.features.shaderUniformBufferArrayDynamicIndexing !=
+                       profileFeatures.features.shaderUniformBufferArrayDynamicIndexing) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.shaderClipDistance != VK_TRUE) {
+            } else if (deviceFeatures.features.shaderClipDistance != profileFeatures.features.shaderClipDistance) {
                 supported = VK_FALSE;
-            }
-            if (deviceFeatures.features.tessellationShader != VK_TRUE) {
+            } else if (deviceFeatures.features.tessellationShader != profileFeatures.features.tessellationShader) {
                 supported = VK_FALSE;
             }
 
-            if (imagelessFramebufferFeatures.imagelessFramebuffer != VK_TRUE) {
+            if (deviceImagelessFramebufferFeatures.imagelessFramebuffer !=
+                profileImagelessFramebufferFeatures.imagelessFramebuffer) {
                 supported = VK_FALSE;
-            }
-            if (storage16bit.storageBuffer16BitAccess != VK_TRUE) {
+            } else if (deviceStorage16bit.storageBuffer16BitAccess != profileStorage16bit.storageBuffer16BitAccess) {
                 supported = VK_FALSE;
-            }
-            if (storage16bit.uniformAndStorageBuffer16BitAccess != VK_TRUE) {
+            } else if (deviceStorage16bit.uniformAndStorageBuffer16BitAccess !=
+                       profileStorage16bit.uniformAndStorageBuffer16BitAccess) {
                 supported = VK_FALSE;
-            }
-            if (multiviewFeatures.multiview != VK_TRUE) {
+            } else if (deviceMultiviewFeatures.multiview != profileMultiviewFeatures.multiview) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.shaderUniformTexelBufferArrayDynamicIndexing != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayDynamicIndexing !=
+                       profileDescriptorIndexingFeatures.shaderUniformTexelBufferArrayDynamicIndexing) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.shaderStorageTexelBufferArrayDynamicIndexing != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.shaderStorageTexelBufferArrayDynamicIndexing !=
+                       profileDescriptorIndexingFeatures.shaderStorageTexelBufferArrayDynamicIndexing) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing !=
+                       profileDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing !=
+                       profileDescriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.shaderUniformTexelBufferArrayNonUniformIndexing != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayNonUniformIndexing !=
+                       profileDescriptorIndexingFeatures.shaderUniformTexelBufferArrayNonUniformIndexing) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind !=
+                       profileDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.descriptorBindingStorageImageUpdateAfterBind != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.descriptorBindingStorageImageUpdateAfterBind !=
+                       profileDescriptorIndexingFeatures.descriptorBindingStorageImageUpdateAfterBind) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind !=
+                       profileDescriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.descriptorBindingUniformTexelBufferUpdateAfterBind != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.descriptorBindingUniformTexelBufferUpdateAfterBind !=
+                       profileDescriptorIndexingFeatures.descriptorBindingUniformTexelBufferUpdateAfterBind) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.descriptorBindingStorageTexelBufferUpdateAfterBind != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.descriptorBindingStorageTexelBufferUpdateAfterBind !=
+                       profileDescriptorIndexingFeatures.descriptorBindingStorageTexelBufferUpdateAfterBind) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending !=
+                       profileDescriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.descriptorBindingPartiallyBound != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound !=
+                       profileDescriptorIndexingFeatures.descriptorBindingPartiallyBound) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.descriptorBindingVariableDescriptorCount != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount !=
+                       profileDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount) {
                 supported = VK_FALSE;
-            }
-            if (descriptorIndexingFeatures.runtimeDescriptorArray != VK_TRUE) {
+            } else if (deviceDescriptorIndexingFeatures.runtimeDescriptorArray !=
+                       profileDescriptorIndexingFeatures.runtimeDescriptorArray) {
                 supported = VK_FALSE;
-            }
-            if (queryResetFeatures.hostQueryReset != VK_TRUE) {
+            } else if (deviceQueryResetFeatures.hostQueryReset != profileQueryResetFeatures.hostQueryReset) {
                 supported = VK_FALSE;
-            }
-            if (subgroupExtendedTypesFeatures.shaderSubgroupExtendedTypes != VK_TRUE) {
+            } else if (deviceSubgroupExtendedTypesFeatures.shaderSubgroupExtendedTypes !=
+                       profileSubgroupExtendedTypesFeatures.shaderSubgroupExtendedTypes) {
                 supported = VK_FALSE;
-            }
-            if (uniformBufferStandardLayoutFeatures.uniformBufferStandardLayout != VK_TRUE) {
+            } else if (deviceUniformBufferStandardLayoutFeatures.uniformBufferStandardLayout !=
+                       profileUniformBufferStandardLayoutFeatures.uniformBufferStandardLayout) {
                 supported = VK_FALSE;
             }
 
-            if (shaderDrawParametersFeatures.shaderDrawParameters != VK_TRUE) {
+            if (deviceShaderDrawParametersFeatures.shaderDrawParameters !=
+                profileShaderDrawParametersFeatures.shaderDrawParameters) {
                 supported = VK_FALSE;
-            }
-            if (device8BitStorageFeatures.storageBuffer8BitAccess != VK_TRUE) {
+            } else if (device8BitStorageFeatures.storageBuffer8BitAccess != profile8BitStorageFeatures.storageBuffer8BitAccess) {
                 supported = VK_FALSE;
-            }
-            if (device8BitStorageFeatures.storagePushConstant8 != VK_TRUE) {
+            } else if (device8BitStorageFeatures.storagePushConstant8 != profile8BitStorageFeatures.storagePushConstant8) {
                 supported = VK_FALSE;
-            }
-            if (device8BitStorageFeatures.uniformAndStorageBuffer8BitAccess != VK_TRUE) {
+            } else if (device8BitStorageFeatures.uniformAndStorageBuffer8BitAccess !=
+                       profile8BitStorageFeatures.uniformAndStorageBuffer8BitAccess) {
                 supported = VK_FALSE;
             }
 
 #if defined(__APPLE__)
-            if (devicePortabilitySubset.vertexAttributeAccessBeyondStride != VK_TRUE) {
+            if (devicePortabilitySubset.vertexAttributeAccessBeyondStride !=
+                profilePortabilitySubset.vertexAttributeAccessBeyondStride) {
                 supported = VK_FALSE;
-            }
-            if (devicePortabilitySubset.separateStencilMaskRef != VK_TRUE) {
+            } else if (devicePortabilitySubset.separateStencilMaskRef != profilePortabilitySubset.separateStencilMaskRef) {
                 supported = VK_FALSE;
-            }
-            if (devicePortabilitySubset.mutableComparisonSamplers != VK_TRUE) {
+            } else if (devicePortabilitySubset.mutableComparisonSamplers != profilePortabilitySubset.mutableComparisonSamplers) {
                 supported = VK_FALSE;
-            }
-            if (devicePortabilitySubset.multisampleArrayImage != VK_TRUE) {
+            } else if (devicePortabilitySubset.multisampleArrayImage != profilePortabilitySubset.multisampleArrayImage) {
                 supported = VK_FALSE;
-            }
-            if (devicePortabilitySubset.imageViewFormatSwizzle != VK_TRUE) {
+            } else if (devicePortabilitySubset.imageViewFormatSwizzle != profilePortabilitySubset.imageViewFormatSwizzle) {
                 supported = VK_FALSE;
-            }
-            if (devicePortabilitySubset.imageViewFormatReinterpretation != VK_TRUE) {
+            } else if (devicePortabilitySubset.imageViewFormatReinterpretation !=
+                       profilePortabilitySubset.imageViewFormatReinterpretation) {
                 supported = VK_FALSE;
-            }
-            if (devicePortabilitySubset.events != VK_TRUE) {
+            } else if (devicePortabilitySubset.events != profilePortabilitySubset.events) {
                 supported = VK_FALSE;
-            }
-            if (devicePortabilitySubset.constantAlphaColorBlendFactors != VK_TRUE) {
+            } else if (devicePortabilitySubset.constantAlphaColorBlendFactors !=
+                       profilePortabilitySubset.constantAlphaColorBlendFactors) {
                 supported = VK_FALSE;
             }
 #endif
