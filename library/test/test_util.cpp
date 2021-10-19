@@ -130,9 +130,9 @@ TEST(test_library_util, GetStructure) {
     pNext_9.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT;
     pNext_9.pNext = &pNext_8;
 
-    EXPECT_EQ(&pNext_9, vpGetStructure(&pNext_9, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT));
-    EXPECT_EQ(&pNext_2, vpGetStructure(&pNext_9, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES));
-    EXPECT_EQ(nullptr, vpGetStructure(&pNext_9, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT));
+    EXPECT_EQ(&pNext_9, _vpGetStructure(&pNext_9, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT));
+    EXPECT_EQ(&pNext_2, _vpGetStructure(&pNext_9, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES));
+    EXPECT_EQ(nullptr, _vpGetStructure(&pNext_9, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT));
 }
 
 TEST(test_library_util, CheckExtension) {
@@ -149,11 +149,11 @@ TEST(test_library_util, CheckExtension) {
                                                       VkExtensionProperties{"VK_KHR_shader_terminate_invocation", 1},
                                                       VkExtensionProperties{"VK_KHR_imageless_framebuffer", 1}};
 
-    EXPECT_TRUE(vpCheckExtension(test_data, countof(test_data), "VK_KHR_synchronization2"));
+    EXPECT_TRUE(_vpCheckExtension(test_data, countof(test_data), "VK_KHR_synchronization2"));
 
-    EXPECT_TRUE(!vpCheckExtension(test_data, countof(test_data), "VK_KHR_synchronization"));
-    EXPECT_TRUE(!vpCheckExtension(test_data, countof(test_data), "KHR_synchronization2"));
-    EXPECT_TRUE(!vpCheckExtension(test_data, countof(test_data), "VK_EXT_synchronization2"));
+    EXPECT_TRUE(!_vpCheckExtension(test_data, countof(test_data), "VK_KHR_synchronization"));
+    EXPECT_TRUE(!_vpCheckExtension(test_data, countof(test_data), "KHR_synchronization2"));
+    EXPECT_TRUE(!_vpCheckExtension(test_data, countof(test_data), "VK_EXT_synchronization2"));
 }
 
 TEST(test_library_util, CheckQueueFamilyProperty) {
@@ -167,26 +167,26 @@ TEST(test_library_util, CheckQueueFamilyProperty) {
     {
         static const VkQueueFamilyProperties test_data[] = {
             {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT, 1, 36, {1, 1, 1}}};
-        EXPECT_TRUE(vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
+        EXPECT_TRUE(_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
     }
 
     // Check unsupported flag
     {
         static const VkQueueFamilyProperties test_data[] = {
             {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | (1 << 29), 1, 36, {1, 1, 1}}};
-        EXPECT_TRUE(!vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
+        EXPECT_TRUE(!_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
     }
 
     // Check unsupported timestampValidBits
     {
         static const VkQueueFamilyProperties test_data[] = {{VK_QUEUE_GRAPHICS_BIT, 1, 4894042, {1, 1, 1}}};
-        EXPECT_TRUE(!vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
+        EXPECT_TRUE(!_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
     }
 
     // Check unsupported queue count
     {
         static const VkQueueFamilyProperties test_data[] = {{VK_QUEUE_GRAPHICS_BIT, 46848646, 32, {1, 1, 1}}};
-        EXPECT_TRUE(!vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
+        EXPECT_TRUE(!_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
     }
 }
 
@@ -196,11 +196,11 @@ TEST(test_library_util, CheckMemoryProperty) {
     VkPhysicalDeviceMemoryProperties memoryProperties;
     vkGetPhysicalDeviceMemoryProperties(scaffold.physicalDevice, &memoryProperties);
 
-    EXPECT_TRUE(vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
-    EXPECT_TRUE(vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+    EXPECT_TRUE(_vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
+    EXPECT_TRUE(_vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                             VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
 
-    EXPECT_TRUE(!vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | (1 << 29)));
+    EXPECT_TRUE(!_vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | (1 << 29)));
 }
 
 TEST(test_library_util, CheckFormatProperty) {
@@ -223,7 +223,7 @@ TEST(test_library_util, CheckFormatProperty) {
         deviceProps.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
         vkGetPhysicalDeviceFormatProperties2(scaffold.physicalDevice, VK_FORMAT_R8G8B8A8_UNORM, &deviceProps);
 
-        EXPECT_TRUE(vpCheckFormatProperty(&deviceProps, profileProps));
+        EXPECT_TRUE(_vpCheckFormatProperty(&deviceProps, profileProps));
     }
 
     {
@@ -232,7 +232,7 @@ TEST(test_library_util, CheckFormatProperty) {
         vkGetPhysicalDeviceFormatProperties2(scaffold.physicalDevice, VK_FORMAT_R8G8B8A8_UNORM, &deviceProps);
         deviceProps.formatProperties.linearTilingFeatures = 0;
 
-        EXPECT_TRUE(!vpCheckFormatProperty(&deviceProps, profileProps));
+        EXPECT_TRUE(!_vpCheckFormatProperty(&deviceProps, profileProps));
     }
 
     {
@@ -241,7 +241,7 @@ TEST(test_library_util, CheckFormatProperty) {
         vkGetPhysicalDeviceFormatProperties2(scaffold.physicalDevice, VK_FORMAT_R8G8B8A8_UNORM, &deviceProps);
         deviceProps.formatProperties.optimalTilingFeatures = 0;
 
-        EXPECT_TRUE(!vpCheckFormatProperty(&deviceProps, profileProps));
+        EXPECT_TRUE(!_vpCheckFormatProperty(&deviceProps, profileProps));
     }
 
     {
@@ -250,6 +250,6 @@ TEST(test_library_util, CheckFormatProperty) {
         vkGetPhysicalDeviceFormatProperties2(scaffold.physicalDevice, VK_FORMAT_R8G8B8A8_UNORM, &deviceProps);
         deviceProps.formatProperties.bufferFeatures = 0;
 
-        EXPECT_TRUE(!vpCheckFormatProperty(&deviceProps, profileProps));
+        EXPECT_TRUE(!_vpCheckFormatProperty(&deviceProps, profileProps));
     }
 }

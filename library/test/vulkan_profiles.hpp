@@ -66,7 +66,7 @@ void vpGetProfileStructureTypes(const VpProfileProperties *pProfile, VpStructure
 #include <cstring>
 #include <vector>
 
-static const VkExtensionProperties VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[] = {
+static const VkExtensionProperties _VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[] = {
     VkExtensionProperties{VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 2},
@@ -80,7 +80,7 @@ static const VkExtensionProperties VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[] = {
     VkExtensionProperties{VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, 1}};
 
-static const VkExtensionProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[] = {
+static const VkExtensionProperties _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[] = {
     // Vulkan 1.2 extensions
     VkExtensionProperties{VK_KHR_8BIT_STORAGE_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, 1},
@@ -113,7 +113,7 @@ static const VkExtensionProperties VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSION
     VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 1}};
 
-static const VkStructureType VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES[] = {
+static const VkStructureType _VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES[] = {
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
@@ -129,11 +129,11 @@ static const VkStructureType VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES[] =
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT};
 
-static const VkStructureType VP_KHR_1_2_ROADMAP_2022_PROPERTY_STRUCTURE_TYPES[] = {
+static const VkStructureType _VP_KHR_1_2_ROADMAP_2022_PROPERTY_STRUCTURE_TYPES[] = {
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
 
-static const VkStructureType VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FEATURE_STRUCTURE_TYPES[] = {
+static const VkStructureType _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FEATURE_STRUCTURE_TYPES[] = {
 #if defined(__APPLE__)
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR,
 #endif
@@ -150,7 +150,7 @@ static const VkStructureType VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FEATURE_STRUCTU
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
 
-static const VkStructureType VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES[] = {
+static const VkStructureType _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES[] = {
 #if defined(__APPLE__)
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR,
 #endif
@@ -168,7 +168,7 @@ struct VpFormatProperties {
     VkFormatFeatureFlags bufferFeatures;
 };
 
-inline bool vpCheckExtension(const VkExtensionProperties *supportedProperties, std::size_t supportedSize,
+inline bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, std::size_t supportedSize,
                              const char *requestedExtension) {
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
         if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) return true;
@@ -177,7 +177,7 @@ inline bool vpCheckExtension(const VkExtensionProperties *supportedProperties, s
     return false;
 }
 
-inline bool vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memoryProperties,
+inline bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memoryProperties,
                                   const VkMemoryPropertyFlags &memoryPropertyFlags) {
     assert(&memoryProperties != nullptr);
 
@@ -188,7 +188,7 @@ inline bool vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memory
     return false;
 }
 
-inline bool vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const VpFormatProperties &profileProps) {
+inline bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const VpFormatProperties &profileProps) {
     if ((deviceProps->formatProperties.linearTilingFeatures & profileProps.linearTilingFeatures) !=
         profileProps.linearTilingFeatures) {
         return false;
@@ -202,7 +202,7 @@ inline bool vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const 
     return true;
 }
 
-inline bool vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties, std::size_t queueFamilyPropertiesCount,
+inline bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties, std::size_t queueFamilyPropertiesCount,
                                        const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
     assert(queueFamilyProperties != nullptr);
 
@@ -231,7 +231,7 @@ inline bool vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamil
     return false;
 }
 
-inline void *vpGetStructure(void *pNext, VkStructureType type) {
+inline void *_vpGetStructure(void *pNext, VkStructureType type) {
     if (pNext == nullptr) {
         return nullptr;
     }
@@ -246,7 +246,7 @@ inline void *vpGetStructure(void *pNext, VkStructureType type) {
     if (p->sType == type) {
         return pNext;
     } else {
-        return vpGetStructure(p->pNext, type);
+        return _vpGetStructure(p->pNext, type);
     }
 }
 
@@ -490,12 +490,12 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         return vkCreateDevice(physicalDevice, pCreateInfo, pAllocator, pDevice);
     } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
         std::vector<const char *> extensions;
-        for (int i = 0, n = countof(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS); i < n; ++i) {
-            extensions.push_back(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i].extensionName);
+        for (int i = 0, n = countof(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS); i < n; ++i) {
+            extensions.push_back(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i].extensionName);
         }
 
         for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; ++i) {
-            if (vpCheckExtension(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS, countof(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS),
+            if (_vpCheckExtension(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS, countof(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS),
                                  pCreateInfo->ppEnabledExtensionNames[i])) {
                 continue;
             }
@@ -582,73 +582,73 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         if (pCreateInfo->pEnabledFeatures != nullptr) {
             deviceFeatures2.features = *pCreateInfo->pEnabledFeatures;
         }
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) == nullptr &&
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) == nullptr &&
             pCreateInfo->pEnabledFeatures == nullptr) {
             deviceFeatures2.pNext = pNext;
             pNext = &deviceFeatures2;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES) == nullptr) {
             deviceVulkan11Features.pNext = pNext;
             pNext = &deviceVulkan11Features;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES) == nullptr) {
             deviceVulkan12Features.pNext = pNext;
             pNext = &deviceVulkan12Features;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR) == nullptr) {
             deviceShaderTerminateFeatures.pNext = pNext;
             pNext = &deviceShaderTerminateFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR) == nullptr) {
             deviceSynchrization2Features.pNext = pNext;
             pNext = &deviceSynchrization2Features;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR) == nullptr) {
             deviceZeroInitFeatures.pNext = pNext;
             pNext = &deviceZeroInitFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT) == nullptr) {
             deviceImageRobustnessFeatures.pNext = pNext;
             pNext = &deviceImageRobustnessFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT) == nullptr) {
             deviceInlineBlockFeatures.pNext = pNext;
             pNext = &deviceInlineBlockFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT) == nullptr) {
             devicePipelineCreationFeatures.pNext = pNext;
             pNext = &devicePipelineCreationFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT) == nullptr) {
             devicePrivateDataFeatures.pNext = pNext;
             pNext = &devicePrivateDataFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT) == nullptr) {
             deviceShaderDemoteFeatures.pNext = pNext;
             pNext = &deviceShaderDemoteFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT) == nullptr) {
             deviceSubgroupSizeFeatures.pNext = pNext;
             pNext = &deviceSubgroupSizeFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT) == nullptr) {
             deviceTexelBufferFeatures.pNext = pNext;
             pNext = &deviceTexelBufferFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT) == nullptr) {
             deviceExtendedDynamicState2Features.pNext = pNext;
             pNext = &deviceExtendedDynamicState2Features;
         }
@@ -664,13 +664,13 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
     } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         std::vector<const char *> extensions;
-        for (int i = 0, n = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS); i < n; ++i) {
-            extensions.push_back(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i].extensionName);
+        for (int i = 0, n = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS); i < n; ++i) {
+            extensions.push_back(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i].extensionName);
         }
 
         for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; ++i) {
-            if (vpCheckExtension(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS,
-                                 countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+            if (_vpCheckExtension(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS,
+                                 countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
                                  pCreateInfo->ppEnabledExtensionNames[i])) {
                 continue;
             }
@@ -759,68 +759,68 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         if (pCreateInfo->pEnabledFeatures != nullptr) {
             deviceFeatures2.features = *pCreateInfo->pEnabledFeatures;
         }
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) == nullptr &&
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) == nullptr &&
             pCreateInfo->pEnabledFeatures == nullptr) {
             deviceFeatures2.pNext = pNext;
             pNext = &deviceFeatures2;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES) == nullptr) {
             deviceImagelessFeatures.pNext = pNext;
             pNext = &deviceImagelessFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES) == nullptr) {
             device16BitFeatures.pNext = pNext;
             pNext = &device16BitFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES) == nullptr) {
             deviceMultiviewFeatures.pNext = pNext;
             pNext = &deviceMultiviewFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES) == nullptr) {
             deviceDescriptorInxedingFeatures.pNext = pNext;
             pNext = &deviceDescriptorInxedingFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES) == nullptr) {
             deviceHostQueryResetFeatures.pNext = pNext;
             pNext = &deviceHostQueryResetFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES) == nullptr) {
             deviceShaderSubgroupFeatures.pNext = pNext;
             pNext = &deviceShaderSubgroupFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES) == nullptr) {
             deviceUniformBufferFeatures.pNext = pNext;
             pNext = &deviceUniformBufferFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES) == nullptr) {
             deviceShaderDrawFeatures.pNext = pNext;
             pNext = &deviceShaderDrawFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES) == nullptr) {
             device8BitFeatures.pNext = pNext;
             pNext = &device8BitFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES) == nullptr) {
             deviceShaderFloatFeatures.pNext = pNext;
             pNext = &deviceShaderFloatFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES) == nullptr) {
             deviceSamplerYcbcrFeatures.pNext = pNext;
             pNext = &deviceSamplerYcbcrFeatures;
         }
 
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES) == nullptr) {
+        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES) == nullptr) {
             deviceVariableFeatures.pNext = pNext;
             pNext = &deviceVariableFeatures;
         }
@@ -871,11 +871,11 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
 
         if (strcmp(supportedProfiles[i].profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
         } else if (strcmp(supportedProfiles[i].profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
-            for (std::size_t i = 0, n = countof(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS); i < n && supported; ++i) {
-                const bool supportedInstanceExt = vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(),
-                                                                   VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i].extensionName);
-                const bool supportedDeviceExt = vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(),
-                                                                 VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i].extensionName);
+            for (std::size_t i = 0, n = countof(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS); i < n && supported; ++i) {
+                const bool supportedInstanceExt = _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(),
+                                                                   _VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i].extensionName);
+                const bool supportedDeviceExt = _vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(),
+                                                                 _VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i].extensionName);
 
                 if (!supportedInstanceExt && !supportedDeviceExt) {
                     supported = VK_FALSE;
@@ -1169,13 +1169,13 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             }
 
         } else if (strcmp(supportedProfiles[i].profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
-            for (std::size_t i = 0, n = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS); i < n && supported; ++i) {
-                const VkExtensionProperties &extensionProperties = VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
+            for (std::size_t i = 0, n = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS); i < n && supported; ++i) {
+                const VkExtensionProperties &extensionProperties = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
 
                 const bool supportedInstanceExt =
-                    vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(), extensionProperties.extensionName);
+                    _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(), extensionProperties.extensionName);
                 const bool supportedDeviceExt =
-                    vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(), extensionProperties.extensionName);
+                    _vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(), extensionProperties.extensionName);
 
                 if (!supportedInstanceExt && !supportedDeviceExt) {
                     supported = VK_FALSE;
@@ -1839,7 +1839,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
                 deviceProps.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
                 vkGetPhysicalDeviceFormatProperties2(physicalDevice, requiredProps.format, &deviceProps);
 
-                if (!vpCheckFormatProperty(&deviceProps, requiredProps)) {
+                if (!_vpCheckFormatProperty(&deviceProps, requiredProps)) {
                     supported = VK_FALSE;
                     break;
                 }
@@ -1854,7 +1854,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             for (uint32_t i = 0, n = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES); i < n && supported; ++i) {
                 const VkMemoryPropertyFlags memoryPropertyFlags = VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[i];
 
-                if (!vpCheckMemoryProperty(memoryProperties, VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[i])) {
+                if (!_vpCheckMemoryProperty(memoryProperties, VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[i])) {
                     supported = VK_FALSE;
                     break;
                 }
@@ -1872,7 +1872,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamily.data());
             for (uint32_t i = 0, n = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES); i < n && supported;
                  ++i) {
-                if (!vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount,
+                if (!_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount,
                                                 VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES[i])) {
                     supported = VK_FALSE;
                     break;
@@ -2585,23 +2585,23 @@ inline void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile,
         if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
             *pPropertyCount = 0;
         } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
-            *pPropertyCount = countof(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS);
+            *pPropertyCount = countof(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS);
         } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
-            *pPropertyCount = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS);
+            *pPropertyCount = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS);
         }
         return;
     }
 
     if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
     } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
-        for (std::size_t i = 0, n = std::min<std::size_t>(countof(VP_KHR_1_2_ROADMAP_2022_EXTENSIONS), *pPropertyCount); i < n;
+        for (std::size_t i = 0, n = std::min<std::size_t>(countof(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS), *pPropertyCount); i < n;
              ++i) {
-            pProperties[i] = VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i];
+            pProperties[i] = _VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i];
         }
     } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
-        for (std::size_t i = 0, n = std::min<std::size_t>(countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS), *pPropertyCount);
+        for (std::size_t i = 0, n = std::min<std::size_t>(countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS), *pPropertyCount);
              i < n; ++i) {
-            pProperties[i] = VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
+            pProperties[i] = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
         }
     }
 }
@@ -2614,19 +2614,19 @@ inline void vpGetProfileStructureTypes(const VpProfileProperties *pProfile, VpSt
         } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
             switch (structureArea) {
                 case VP_STRUCTURE_FEATURES:
-                    *pStructureTypesCount = countof(VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES);
+                    *pStructureTypesCount = countof(_VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES);
                     break;
                 case VP_STRUCTURE_PROPERTIES:
-                    *pStructureTypesCount = countof(VP_KHR_1_2_ROADMAP_2022_PROPERTY_STRUCTURE_TYPES);
+                    *pStructureTypesCount = countof(_VP_KHR_1_2_ROADMAP_2022_PROPERTY_STRUCTURE_TYPES);
                     break;
             }
         } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             switch (structureArea) {
                 case VP_STRUCTURE_FEATURES:
-                    *pStructureTypesCount = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FEATURE_STRUCTURE_TYPES);
+                    *pStructureTypesCount = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FEATURE_STRUCTURE_TYPES);
                     break;
                 case VP_STRUCTURE_PROPERTIES:
-                    *pStructureTypesCount = countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES);
+                    *pStructureTypesCount = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES);
                     break;
             }
         }
@@ -2638,35 +2638,37 @@ inline void vpGetProfileStructureTypes(const VpProfileProperties *pProfile, VpSt
         switch (structureArea) {
             case VP_STRUCTURE_FEATURES: {
                 std::size_t n =
-                    std::min<std::size_t>(countof(VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES), *pStructureTypesCount);
+                    std::min<std::size_t>(countof(_VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES), *pStructureTypesCount);
                 for (std::size_t i = 0; i < n; ++i) {
-                    pStructureTypes[i] = VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES[i];
+                    pStructureTypes[i] = _VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES[i];
                 }
             } break;
             case VP_STRUCTURE_PROPERTIES: {
                 std::size_t n =
-                    std::min<std::size_t>(countof(VP_KHR_1_2_ROADMAP_2022_PROPERTY_STRUCTURE_TYPES), *pStructureTypesCount);
+                    std::min<std::size_t>(countof(_VP_KHR_1_2_ROADMAP_2022_PROPERTY_STRUCTURE_TYPES), *pStructureTypesCount);
                 for (std::size_t i = 0; i < n; ++i) {
-                    pStructureTypes[i] = VP_KHR_1_2_ROADMAP_2022_PROPERTY_STRUCTURE_TYPES[i];
+                    pStructureTypes[i] = _VP_KHR_1_2_ROADMAP_2022_PROPERTY_STRUCTURE_TYPES[i];
                 }
             } break;
         }
     } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         switch (structureArea) {
             case VP_STRUCTURE_FEATURES: {
-                std::size_t n = std::min<std::size_t>(countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FEATURE_STRUCTURE_TYPES),
+                std::size_t n = std::min<std::size_t>(countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FEATURE_STRUCTURE_TYPES),
                                                       *pStructureTypesCount);
                 for (std::size_t i = 0; i < n; ++i) {
-                    pStructureTypes[i] = VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES[i];
+                    pStructureTypes[i] = _VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES[i];
                 }
             } break;
             case VP_STRUCTURE_PROPERTIES: {
-                std::size_t n = std::min<std::size_t>(countof(VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES),
+                std::size_t n = std::min<std::size_t>(countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES),
                                                       *pStructureTypesCount);
                 for (std::size_t i = 0; i < n; ++i) {
-                    pStructureTypes[i] = VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES[i];
+                    pStructureTypes[i] = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES[i];
                 }
             } break;
         }
     }
 }
+
+
