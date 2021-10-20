@@ -52,12 +52,10 @@ VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileProperti
 VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const char *pLayerName, uint32_t *pPropertyCount,
                                    VpProfileProperties *pProperties);
 
-void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
-
-void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext);
-
 void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                      VkExtensionProperties *pProperties);
+
+void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext);
 
 typedef enum VpStructureArea { VP_STRUCTURE_FEATURES = 0, VP_STRUCTURE_PROPERTIES } VpStructureArea;
 
@@ -811,7 +809,7 @@ inline void *_vpGetStructure(void *pNext, VkStructureType type) {
     }
 }
 
-inline void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext) {
+inline void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext) {
     if (pProfile == nullptr || pNext == nullptr) return;
 
     struct VkStruct {
@@ -914,6 +912,46 @@ inline void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNex
                     VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *features =
                         (VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *)p;
                     features->extendedDynamicState2 = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
+                    VkPhysicalDeviceProperties2 *properties = (VkPhysicalDeviceProperties2 *)p;
+                    properties->properties.limits.maxImageDimension1D = 8192;
+                    properties->properties.limits.maxImageDimension2D = 8192;
+                    properties->properties.limits.maxImageDimensionCube = 8192;
+                    properties->properties.limits.maxImageArrayLayers = 2048;
+                    properties->properties.limits.maxUniformBufferRange = 65536;
+                    properties->properties.limits.bufferImageGranularity = 4096;
+                    properties->properties.limits.maxPerStageDescriptorSamplers = 64;
+                    properties->properties.limits.maxPerStageDescriptorUniformBuffers = 15;
+                    properties->properties.limits.maxPerStageDescriptorStorageBuffers = 30;
+                    properties->properties.limits.maxPerStageDescriptorSampledImages = 200;
+                    properties->properties.limits.maxPerStageDescriptorStorageImages = 16;
+                    properties->properties.limits.maxPerStageResources = 200;
+                    properties->properties.limits.maxDescriptorSetSamplers = 576;
+                    properties->properties.limits.maxDescriptorSetUniformBuffers = 90;
+                    properties->properties.limits.maxDescriptorSetStorageBuffers = 96;
+                    properties->properties.limits.maxDescriptorSetSampledImages = 1800;
+                    properties->properties.limits.maxDescriptorSetStorageImages = 144;
+                    properties->properties.limits.maxFragmentCombinedOutputResources = 16;
+                    properties->properties.limits.maxComputeWorkGroupInvocations = 256;
+                    properties->properties.limits.maxComputeWorkGroupSize[0] = 256;
+                    properties->properties.limits.maxComputeWorkGroupSize[1] = 256;
+                    properties->properties.limits.maxComputeWorkGroupSize[2] = 64;
+                    properties->properties.limits.subTexelPrecisionBits = 8;
+                    properties->properties.limits.mipmapPrecisionBits = 6;
+                    properties->properties.limits.maxSamplerLodBias = 14.0;
+                    properties->properties.limits.pointSizeGranularity = 0.125;
+                    properties->properties.limits.lineWidthGranularity = 0.5;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES: {
+                    VkPhysicalDeviceVulkan11Properties *properties = (VkPhysicalDeviceVulkan11Properties *)p;
+                    properties->subgroupSize = 4;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES: {
+                    VkPhysicalDeviceVulkan12Properties *properties = (VkPhysicalDeviceVulkan12Properties *)p;
+                    properties->shaderSignedZeroInfNanPreserveFloat16 = VK_TRUE;
+                    properties->shaderSignedZeroInfNanPreserveFloat32 = VK_TRUE;
+                    properties->maxPerStageDescriptorUpdateAfterBindInputAttachments = 7;
                 } break;
                 default:
                     break;
@@ -1034,79 +1072,6 @@ inline void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNex
                     features->events = VK_TRUE;
                     features->constantAlphaColorBlendFactors = VK_TRUE;
                 } break;
-#endif
-                default:
-                    break;
-            }
-            p = static_cast<VkStruct *>(p->pNext);
-        }
-    }
-}
-
-inline void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext) {
-    if (pProfile == nullptr || pNext == nullptr) return;
-
-    struct VkStruct {
-        VkStructureType sType;
-        void *pNext;
-    };
-
-    VkStruct *p = static_cast<VkStruct *>(pNext);
-
-    if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0)
-        return;
-    else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
-        while (p != nullptr) {
-            switch (p->sType) {
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
-                    VkPhysicalDeviceProperties2 *properties = (VkPhysicalDeviceProperties2 *)p;
-                    properties->properties.limits.maxImageDimension1D = 8192;
-                    properties->properties.limits.maxImageDimension2D = 8192;
-                    properties->properties.limits.maxImageDimensionCube = 8192;
-                    properties->properties.limits.maxImageArrayLayers = 2048;
-                    properties->properties.limits.maxUniformBufferRange = 65536;
-                    properties->properties.limits.bufferImageGranularity = 4096;
-                    properties->properties.limits.maxPerStageDescriptorSamplers = 64;
-                    properties->properties.limits.maxPerStageDescriptorUniformBuffers = 15;
-                    properties->properties.limits.maxPerStageDescriptorStorageBuffers = 30;
-                    properties->properties.limits.maxPerStageDescriptorSampledImages = 200;
-                    properties->properties.limits.maxPerStageDescriptorStorageImages = 16;
-                    properties->properties.limits.maxPerStageResources = 200;
-                    properties->properties.limits.maxDescriptorSetSamplers = 576;
-                    properties->properties.limits.maxDescriptorSetUniformBuffers = 90;
-                    properties->properties.limits.maxDescriptorSetStorageBuffers = 96;
-                    properties->properties.limits.maxDescriptorSetSampledImages = 1800;
-                    properties->properties.limits.maxDescriptorSetStorageImages = 144;
-                    properties->properties.limits.maxFragmentCombinedOutputResources = 16;
-                    properties->properties.limits.maxComputeWorkGroupInvocations = 256;
-                    properties->properties.limits.maxComputeWorkGroupSize[0] = 256;
-                    properties->properties.limits.maxComputeWorkGroupSize[1] = 256;
-                    properties->properties.limits.maxComputeWorkGroupSize[2] = 64;
-                    properties->properties.limits.subTexelPrecisionBits = 8;
-                    properties->properties.limits.mipmapPrecisionBits = 6;
-                    properties->properties.limits.maxSamplerLodBias = 14.0;
-                    properties->properties.limits.pointSizeGranularity = 0.125;
-                    properties->properties.limits.lineWidthGranularity = 0.5;
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES: {
-                    VkPhysicalDeviceVulkan11Properties *properties = (VkPhysicalDeviceVulkan11Properties *)p;
-                    properties->subgroupSize = 4;
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES: {
-                    VkPhysicalDeviceVulkan12Properties *properties = (VkPhysicalDeviceVulkan12Properties *)p;
-                    properties->shaderSignedZeroInfNanPreserveFloat16 = VK_TRUE;
-                    properties->shaderSignedZeroInfNanPreserveFloat32 = VK_TRUE;
-                    properties->maxPerStageDescriptorUpdateAfterBindInputAttachments = 7;
-                } break;
-                default:
-                    break;
-            }
-            p = static_cast<VkStruct *>(p->pNext);
-        }
-    } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
-        while (p != nullptr) {
-            switch (p->sType) {
-#if defined(__APPLE__)
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR: {
                     VkPhysicalDevicePortabilitySubsetPropertiesKHR *properties =
                         (VkPhysicalDevicePortabilitySubsetPropertiesKHR *)p;
@@ -1360,7 +1325,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         deviceExtendedDynamicState2Features.pNext = pProfileNext;
         pProfileNext = &deviceExtendedDynamicState2Features;
 
-        vpGetProfileFeatures(pProfile, pProfileNext);
+        vpGetProfileStructures(pProfile, pProfileNext);
 
         void *pRoot = const_cast<void *>(pCreateInfo->pNext);
         void *pNext = pRoot;
@@ -1537,7 +1502,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileP
         pProfileNext = &devicePortabilitySubset;
 #endif
 
-        vpGetProfileFeatures(pProfile, pProfileNext);
+        vpGetProfileStructures(pProfile, pProfileNext);
 
         void *pRoot = const_cast<void *>(pCreateInfo->pNext);
         void *pNext = pRoot;
@@ -1773,7 +1738,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             profileFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
             profileFeatures.pNext = &profileFeatures11;
 
-            vpGetProfileFeatures(&supportedProfiles[i], &profileFeatures);
+            vpGetProfileStructures(&supportedProfiles[i], &profileFeatures);
 
             if (deviceFeatures.features.robustBufferAccess != profileFeatures.features.robustBufferAccess) {
                 supported = VK_FALSE;
@@ -1900,7 +1865,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             profileProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
             profileProperties.pNext = &profilePropertiesVulkan11;
 
-            vpGetProfileProperties(&supportedProfiles[i], &profileProperties);
+            vpGetProfileStructures(&supportedProfiles[i], &profileProperties);
 
             if (deviceProperties.properties.limits.maxImageDimension1D < profileProperties.properties.limits.maxImageDimension1D) {
                 supported = VK_FALSE;
@@ -2164,7 +2129,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             profileFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
             profileFeatures.pNext = &profileUniformBufferStandardLayoutFeatures;
 
-            vpGetProfileFeatures(&supportedProfiles[i], &profileFeatures);
+            vpGetProfileStructures(&supportedProfiles[i], &profileFeatures);
 
             if (deviceFeatures.features.robustBufferAccess != profileFeatures.features.robustBufferAccess) {
                 supported = VK_FALSE;
@@ -2401,7 +2366,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             profileProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
             profileProperties.pNext = &profileDescriptorIndexingProperties;
 
-            vpGetProfileProperties(&supportedProfiles[i], &profileProperties);
+            vpGetProfileStructures(&supportedProfiles[i], &profileProperties);
 
             if (deviceProperties.properties.limits.maxImageDimension1D < profileProperties.properties.limits.maxImageDimension1D) {
                 supported = VK_FALSE;

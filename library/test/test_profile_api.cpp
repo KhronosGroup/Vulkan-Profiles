@@ -362,7 +362,7 @@ TEST(test_profile, get_device_properties2) {
 
     const VpProfileProperties Profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
 
-    vpGetProfileProperties(&Profile, &profileProperties2);
+    vpGetProfileStructures(&Profile, &profileProperties2);
 
     EXPECT_EQ(16384, profileProperties2.properties.limits.maxImageDimension1D);
     EXPECT_EQ(16384, profileProperties2.properties.limits.maxImageDimension2D);
@@ -379,7 +379,7 @@ TEST(test_profile, get_device_descriptor_indexing_properties) {
 
     const VpProfileProperties Profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
 
-    vpGetProfileProperties(&Profile, &properties);
+    vpGetProfileStructures(&Profile, &properties);
 
     EXPECT_EQ(1048576, properties.maxUpdateAfterBindDescriptorsInAllPools);
     EXPECT_EQ(16, properties.maxPerStageDescriptorUpdateAfterBindSamplers);
@@ -396,7 +396,7 @@ TEST(test_profile, get_device_properties_chain) {
 
     const VpProfileProperties Profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
 
-    vpGetProfileProperties(&Profile, &properties1);
+    vpGetProfileStructures(&Profile, &properties1);
 
     EXPECT_EQ(1048576, properties0.maxUpdateAfterBindDescriptorsInAllPools);
     EXPECT_EQ(16, properties0.maxPerStageDescriptorUpdateAfterBindSamplers);
@@ -410,7 +410,7 @@ TEST(test_profile, get_device_features) {
 
     const VpProfileProperties Profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
 
-    vpGetProfileFeatures(&Profile, &deviceVulkan12Features);
+    vpGetProfileStructures(&Profile, &deviceVulkan12Features);
 
     EXPECT_EQ(VK_TRUE, deviceVulkan12Features.samplerMirrorClampToEdge);
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.drawIndirectCount);
