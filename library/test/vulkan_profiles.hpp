@@ -59,18 +59,21 @@ void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext);
 
 typedef enum VpStructureArea { VP_STRUCTURE_FEATURES = 0, VP_STRUCTURE_PROPERTIES } VpStructureArea;
 
-void vpGetProfileStructureTypes(const VpProfileProperties *pProfile, VpStructureArea structureArea, uint32_t *pStructureTypesCount,
-                                VkStructureType *pStructureTypes);
+typedef struct VpStructureProperties {
+    VkStructureType type;
+    VpStructureArea area;
+} VpStructureProperties;
+
+void vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                     VpStructureProperties *pProperties);
 
 void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormat);
 
 void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
-void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryPropertyFlagsCount,
-                             VkMemoryPropertyFlags *pMemoryPropertyFlags);
+void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkMemoryPropertyFlags *pProperties);
 
-void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
-                               VkQueueFamilyProperties *pQueueFamilyProperties);
+void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
 
 // Implementation details:
 #include <cstring>
@@ -123,25 +126,26 @@ static const VkExtensionProperties _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIO
     VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 1}};
 
-static const VkStructureType _VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES[] = {
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT};
-
-static const VkStructureType _VP_KHR_1_2_ROADMAP_2022_PROPERTY_STRUCTURE_TYPES[] = {
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
+static const VpStructureProperties _VP_KHR_1_2_ROADMAP_2022_STRUCTURE_PROPERTIES[] = {
+    // Features:
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT, VP_STRUCTURE_FEATURES},
+    // Properties:
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, VP_STRUCTURE_PROPERTIES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, VP_STRUCTURE_PROPERTIES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, VP_STRUCTURE_PROPERTIES}};
 
 struct VpFormatProperties {
     VkFormat format;
@@ -691,33 +695,33 @@ static const VpFormatProperties _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[] =
          VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
      0}};
 
-static const VkStructureType _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FEATURE_STRUCTURE_TYPES[] = {
+static const VpStructureProperties _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_STRUCTURE_PROPERTIES[] = {
+// Features:
 #if defined(__APPLE__)
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR,
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR,
 #endif
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
-
-static const VkStructureType _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES[] = {
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES, VP_STRUCTURE_FEATURES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES, VP_STRUCTURE_FEATURES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES, VP_STRUCTURE_FEATURES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES, VP_STRUCTURE_FEATURES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES, VP_STRUCTURE_FEATURES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES, VP_STRUCTURE_FEATURES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES, VP_STRUCTURE_FEATURES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES, VP_STRUCTURE_FEATURES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES, VP_STRUCTURE_FEATURES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES, VP_STRUCTURE_FEATURES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES, VP_STRUCTURE_FEATURES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, VP_STRUCTURE_FEATURES},
+// Properties:
 #if defined(__APPLE__)
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR,
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR, VP_STRUCTURE_PROPERTIES},
 #endif
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES, VP_STRUCTURE_PROPERTIES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES, VP_STRUCTURE_PROPERTIES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT, VP_STRUCTURE_PROPERTIES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES, VP_STRUCTURE_PROPERTIES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES, VP_STRUCTURE_PROPERTIES},
+     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, VP_STRUCTURE_PROPERTIES}};
 
 static const VkMemoryPropertyFlags _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[] = {
     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -2830,67 +2834,28 @@ inline void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile,
     }
 }
 
-inline void vpGetProfileStructureTypes(const VpProfileProperties *pProfile, VpStructureArea structureArea,
-                                       uint32_t *pStructureTypesCount, VkStructureType *pStructureTypes) {
-    if (pStructureTypes == nullptr) {
+inline void vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                            VpStructureProperties *pProperties) {
+    if (pProperties == nullptr) {
         if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
-            *pStructureTypesCount = 0;
+            *pPropertyCount = 0;
         } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
-            switch (structureArea) {
-                case VP_STRUCTURE_FEATURES:
-                    *pStructureTypesCount = countof(_VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES);
-                    break;
-                case VP_STRUCTURE_PROPERTIES:
-                    *pStructureTypesCount = countof(_VP_KHR_1_2_ROADMAP_2022_PROPERTY_STRUCTURE_TYPES);
-                    break;
-            }
+            *pPropertyCount = countof(_VP_KHR_1_2_ROADMAP_2022_STRUCTURE_PROPERTIES);
         } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
-            switch (structureArea) {
-                case VP_STRUCTURE_FEATURES:
-                    *pStructureTypesCount = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FEATURE_STRUCTURE_TYPES);
-                    break;
-                case VP_STRUCTURE_PROPERTIES:
-                    *pStructureTypesCount = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES);
-                    break;
-            }
+            *pPropertyCount = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_STRUCTURE_PROPERTIES);
         }
         return;
     }
 
-    if (strcmp(pProfile->profileName, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME) == 0) {
-    } else if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
-        switch (structureArea) {
-            case VP_STRUCTURE_FEATURES: {
-                std::size_t n =
-                    std::min<std::size_t>(countof(_VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES), *pStructureTypesCount);
-                for (std::size_t i = 0; i < n; ++i) {
-                    pStructureTypes[i] = _VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES[i];
-                }
-            } break;
-            case VP_STRUCTURE_PROPERTIES: {
-                std::size_t n =
-                    std::min<std::size_t>(countof(_VP_KHR_1_2_ROADMAP_2022_PROPERTY_STRUCTURE_TYPES), *pStructureTypesCount);
-                for (std::size_t i = 0; i < n; ++i) {
-                    pStructureTypes[i] = _VP_KHR_1_2_ROADMAP_2022_PROPERTY_STRUCTURE_TYPES[i];
-                }
-            } break;
+    if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+        std::size_t n = std::min<std::size_t>(countof(_VP_KHR_1_2_ROADMAP_2022_STRUCTURE_PROPERTIES), *pPropertyCount);
+        for (std::size_t i = 0; i < n; ++i) {
+            pProperties[i] = _VP_KHR_1_2_ROADMAP_2022_STRUCTURE_PROPERTIES[i];
         }
     } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
-        switch (structureArea) {
-            case VP_STRUCTURE_FEATURES: {
-                std::size_t n = std::min<std::size_t>(countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FEATURE_STRUCTURE_TYPES),
-                                                      *pStructureTypesCount);
-                for (std::size_t i = 0; i < n; ++i) {
-                    pStructureTypes[i] = _VP_KHR_1_2_ROADMAP_2022_FEATURE_STRUCTURE_TYPES[i];
-                }
-            } break;
-            case VP_STRUCTURE_PROPERTIES: {
-                std::size_t n = std::min<std::size_t>(countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES),
-                                                      *pStructureTypesCount);
-                for (std::size_t i = 0; i < n; ++i) {
-                    pStructureTypes[i] = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_PROPERTY_STRUCTURE_TYPES[i];
-                }
-            } break;
+        std::size_t n = std::min<std::size_t>(countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_STRUCTURE_PROPERTIES), *pPropertyCount);
+        for (std::size_t i = 0; i < n; ++i) {
+            pProperties[i] = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_STRUCTURE_PROPERTIES[i];
         }
     }
 }
