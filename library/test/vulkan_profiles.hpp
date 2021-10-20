@@ -1773,7 +1773,7 @@ inline VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const
             profileFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
             profileFeatures.pNext = &profileFeatures11;
 
-            vpGetProfileFeatures(&supportedProfiles[i], &deviceFeatures);
+            vpGetProfileFeatures(&supportedProfiles[i], &profileFeatures);
 
             if (deviceFeatures.features.robustBufferAccess != profileFeatures.features.robustBufferAccess) {
                 supported = VK_FALSE;
