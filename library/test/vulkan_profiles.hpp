@@ -46,7 +46,20 @@ typedef struct VpProfileProperties {
     uint32_t specVersion;
 } VpProfileProperties;
 
-VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile, const VkDeviceCreateInfo *pCreateInfo,
+typedef enum VpDeviceCreateFlagBits {
+    VP_DEVICE_CREATE_OVERRIDE_PROFILE_EXTENSIONS_BIT = 0x00000001,
+    VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT = 0x00000002,
+    VP_DEVICE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VpDeviceCreateFlagBits;
+typedef VkFlags VpDeviceCreateFlags;
+
+typedef struct VpDeviceCreateInfo {
+    const VkDeviceCreateInfo *pCreateInfo;
+    const VpProfileProperties *pProfile;
+    VpDeviceCreateFlags flags;
+} VpDeviceCreateInfo;
+
+VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
                         const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
 
 VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const char *pLayerName, uint32_t *pPropertyCount,
