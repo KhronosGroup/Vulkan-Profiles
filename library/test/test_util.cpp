@@ -93,6 +93,58 @@ TEST(test_library_util, GetPropertiesDesktopPortability1_0) {
     EXPECT_TRUE(true);
 }
 
+TEST(test_library_util, GetStructure_add) {
+    VpProfileProperties profile{VP_KHR_1_2_ROADMAP_2022_NAME, VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION};
+
+    VkPhysicalDeviceVulkan12Features deviceVulkan12Features = {};
+    deviceVulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+    deviceVulkan12Features.pNext = nullptr;
+
+    VkPhysicalDeviceVulkan12Features *requestedVulkan12Features = (VkPhysicalDeviceVulkan12Features *)_vpGetStructure(
+        &profile, &deviceVulkan12Features, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES);
+
+    EXPECT_EQ(requestedVulkan12Features, &deviceVulkan12Features);
+
+    EXPECT_EQ(VK_TRUE, requestedVulkan12Features->samplerMirrorClampToEdge);
+    EXPECT_EQ(VK_TRUE, requestedVulkan12Features->shaderUniformTexelBufferArrayDynamicIndexing);
+    EXPECT_EQ(VK_TRUE, requestedVulkan12Features->imagelessFramebuffer);
+
+    EXPECT_EQ(VK_FALSE, requestedVulkan12Features->drawIndirectCount);
+    EXPECT_EQ(VK_FALSE, requestedVulkan12Features->descriptorIndexing);
+
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.samplerMirrorClampToEdge);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.shaderUniformTexelBufferArrayDynamicIndexing);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.imagelessFramebuffer);
+
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.drawIndirectCount);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.descriptorIndexing);
+}
+
+TEST(test_library_util, GetStructure_override) {
+    VkPhysicalDeviceVulkan12Features deviceVulkan12Features = {};
+    deviceVulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+    deviceVulkan12Features.pNext = nullptr;
+
+    VkPhysicalDeviceVulkan12Features *requestedVulkan12Features = (VkPhysicalDeviceVulkan12Features *)_vpGetStructure(
+        nullptr, &deviceVulkan12Features, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES);
+
+    EXPECT_EQ(requestedVulkan12Features, &deviceVulkan12Features);
+
+    EXPECT_EQ(VK_FALSE, requestedVulkan12Features->samplerMirrorClampToEdge);
+    EXPECT_EQ(VK_FALSE, requestedVulkan12Features->shaderUniformTexelBufferArrayDynamicIndexing);
+    EXPECT_EQ(VK_FALSE, requestedVulkan12Features->imagelessFramebuffer);
+
+    EXPECT_EQ(VK_FALSE, requestedVulkan12Features->drawIndirectCount);
+    EXPECT_EQ(VK_FALSE, requestedVulkan12Features->descriptorIndexing);
+
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.samplerMirrorClampToEdge);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.shaderUniformTexelBufferArrayDynamicIndexing);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.imagelessFramebuffer);
+
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.drawIndirectCount);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.descriptorIndexing);
+}
+
 TEST(test_library_util, GetStructure) {
     VkPhysicalDeviceVulkan11Features pNext_1 = {};
     pNext_1.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
