@@ -26,6 +26,41 @@
 #include <memory>
 #include <vector>
 
+VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const char* pLayerName, uint32_t* pPropertyCount,
+    VpProfileProperties* pProperties) {
+    assert(physicalDevice != VK_NULL_HANDLE);
+    assert(pPropertyCount != nullptr);
+
+    uint32_t availablePropertyCount = 0;
+    vpGetProfiles(&availablePropertyCount, nullptr);
+    EXPECT_EQ(2, availablePropertyCount);
+
+    std::vector<VpProfileProperties> availableProperties(availablePropertyCount);
+    vpGetProfiles(&availablePropertyCount, availableProperties.data());
+
+    *pPropertyCount = 0;
+    std::size_t outputIndex = 0;
+    for (uint32_t i = 0, n = availablePropertyCount; i < n; ++i) {
+        VkBool32 supported = VK_FALSE;
+        VkResult result = vpGetDeviceProfileSupport(physicalDevice, pLayerName, &availableProperties[i], &supported);
+        if (result != VK_SUCCESS) {
+            *pPropertyCount = 0;
+            return result;
+        }
+
+        if (supported == VK_TRUE) {
+            ++(*pPropertyCount);
+
+            if (pProperties != nullptr) {
+                pProperties[outputIndex] = availableProperties[i];
+                ++outputIndex;
+            }
+        }
+    }
+
+    return VK_SUCCESS;
+}
+
 bool IsFound(std::vector<VpProfileProperties>& profiles, const char* profileName) {
     for (std::size_t i = 0, n = profiles.size(); i < n; ++i) {
         if (strcmp(profiles[i].profileName, profileName) == 0) return true;
@@ -54,7 +89,6 @@ TEST(test_profile, enumerate) {
         std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
     }
 
-    EXPECT_TRUE(IsFound(profiles, VP_LUNARG_MINIMUM_REQUIREMENTS_NAME));
     EXPECT_TRUE(IsFound(profiles, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME));
 }
 
@@ -529,7 +563,7 @@ TEST(test_profile, get_profile_structure_properties_partial) {
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR, structureTypes[3].type);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR, structureTypes[4].type);
 }
-
+/*
 TEST(test_profile, get_profile_structure_properties_unspecified) {
     const VpProfileProperties profile = {VP_LUNARG_MINIMUM_REQUIREMENTS_NAME, 1};
 
@@ -537,7 +571,7 @@ TEST(test_profile, get_profile_structure_properties_unspecified) {
     vpGetProfileStructureProperties(&profile, &structureTypesCount, nullptr);
     EXPECT_EQ(0, structureTypesCount);
 }
-
+*/
 TEST(test_profile, get_profile_formats_full) {
     const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, 1};
 
