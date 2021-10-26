@@ -743,7 +743,9 @@ static const VkQueueFamilyProperties _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_
 inline bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, std::size_t supportedSize,
                               const char *requestedExtension) {
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
-        if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) return true;
+        if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) {
+            return true;
+        }
     }
 
     return false;
@@ -802,6 +804,26 @@ inline bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFami
     }
 
     return false;
+}
+
+inline void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t propertyCount,
+                             const VkExtensionProperties *pProperties, std::vector<const char *> &extensions) {
+    if (pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_EXTENSIONS_BIT) {
+        for (int i = 0, n = pCreateInfo->info.enabledExtensionCount; i < n; ++i) {
+            extensions.push_back(pCreateInfo->info.ppEnabledExtensionNames[i]);
+        }
+    } else {
+        for (int i = 0, n = propertyCount; i < n; ++i) {
+            extensions.push_back(pProperties[i].extensionName);
+        }
+
+        for (uint32_t i = 0; i < pCreateInfo->info.enabledExtensionCount; ++i) {
+            if (_vpCheckExtension(pProperties, propertyCount, pCreateInfo->info.ppEnabledExtensionNames[i])) {
+                continue;
+            }
+            extensions.push_back(pCreateInfo->info.ppEnabledExtensionNames[i]);
+        }
+    }
 }
 
 inline void *_vpGetStructure(void *pNext, VkStructureType type) {
@@ -1265,23 +1287,14 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
     assert(pCreateInfo != nullptr);
 
     if (physicalDevice == VK_NULL_HANDLE || pCreateInfo == nullptr || pDevice == nullptr) {
-        // Ensure the validation layer 
+        // Ensure the validation layer
         return vkCreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : &pCreateInfo->info, pAllocator, pDevice);
     } else if (strcmp(pCreateInfo->profile.profileName, "") == 0) {
         return vkCreateDevice(physicalDevice, &pCreateInfo->info, pAllocator, pDevice);
     } else if (strcmp(pCreateInfo->profile.profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
         std::vector<const char *> extensions;
-        for (int i = 0, n = countof(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS); i < n; ++i) {
-            extensions.push_back(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i].extensionName);
-        }
-
-        for (uint32_t i = 0; i < pCreateInfo->info.enabledExtensionCount; ++i) {
-            if (_vpCheckExtension(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS, countof(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS),
-                                  pCreateInfo->info.ppEnabledExtensionNames[i])) {
-                continue;
-            }
-            extensions.push_back(pCreateInfo->info.ppEnabledExtensionNames[i]);
-        }
+        _vpGetExtensions(pCreateInfo, countof(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS),
+                         &_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[0], extensions);
 
         void *pProfileNext = nullptr;
 
@@ -1445,31 +1458,8 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
     } else if (strcmp(pCreateInfo->profile.profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         std::vector<const char *> extensions;
-
-        if (pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_EXTENSIONS_BIT) {
-            if (pCreateInfo->info.enabledExtensionCount > 0) {
-                for (int i = 0, n = pCreateInfo->info.enabledExtensionCount; i < n; ++i) {
-                    extensions.push_back(pCreateInfo->info.ppEnabledExtensionNames[i]);
-                }   
-            } else {
-                for (int i = 0, n = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS); i < n; ++i) {
-                    extensions.push_back(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i].extensionName);
-                }          
-            }
-        } else {
-            for (int i = 0, n = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS); i < n; ++i) {
-                extensions.push_back(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i].extensionName);
-            }
-
-            for (uint32_t i = 0; i < pCreateInfo->info.enabledExtensionCount; ++i) {
-                if (_vpCheckExtension(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS,
-                                      countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
-                                      pCreateInfo->info.ppEnabledExtensionNames[i])) {
-                    continue;
-                }
-                extensions.push_back(pCreateInfo->info.ppEnabledExtensionNames[i]);
-            }
-        }
+        _vpGetExtensions(pCreateInfo, countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                         &_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
 
         void *pProfileNext = nullptr;
 
