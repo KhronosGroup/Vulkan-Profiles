@@ -1559,155 +1559,249 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
                          &_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
 
         void *pProfileNext = nullptr;
+        void *pRoot = const_cast<void *>(pCreateInfo->info.pNext);
+
+        VkPhysicalDeviceFeatures2 *requestedFeatures2 =
+            (VkPhysicalDeviceFeatures2 *)_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2);
+
+        VkPhysicalDeviceImagelessFramebufferFeatures *requestedImagelessFeatures =
+            (VkPhysicalDeviceImagelessFramebufferFeatures *)_vpGetStructure(
+                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES);
+
+        VkPhysicalDevice16BitStorageFeatures *requested16BitFeatures = (VkPhysicalDevice16BitStorageFeatures *)_vpGetStructure(
+            pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES);
+
+        VkPhysicalDeviceMultiviewFeatures *requestedMultiviewFeatures =
+            (VkPhysicalDeviceMultiviewFeatures *)_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES);
+
+        VkPhysicalDeviceDescriptorIndexingFeatures *requestedDescriptorInxedingFeatures =
+            (VkPhysicalDeviceDescriptorIndexingFeatures *)_vpGetStructure(
+            pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES);
+
+        VkPhysicalDeviceHostQueryResetFeatures *requestedHostQueryResetFeatures =
+            (VkPhysicalDeviceHostQueryResetFeatures *)_vpGetStructure(pRoot,
+                                                                      VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES);
+
+        VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures *requestedShaderSubgroupFeatures =
+            (VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures *)_vpGetStructure(
+                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES);
+
+        VkPhysicalDeviceUniformBufferStandardLayoutFeatures *requestedUniformBufferFeatures =
+            (VkPhysicalDeviceUniformBufferStandardLayoutFeatures *)_vpGetStructure(
+                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES);
+
+        VkPhysicalDeviceShaderDrawParametersFeatures *requestedShaderDrawFeatures =
+            (VkPhysicalDeviceShaderDrawParametersFeatures *)_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES);
+
+        VkPhysicalDevice8BitStorageFeatures *requested8BitStorageFeatures =
+            (VkPhysicalDevice8BitStorageFeatures *)_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES);
+
+        VkPhysicalDeviceShaderFloat16Int8Features *requestedShaderFloatFeatures =
+            (VkPhysicalDeviceShaderFloat16Int8Features *)_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES);
+
+        VkPhysicalDeviceSamplerYcbcrConversionFeatures *requestedSamplerYcbcrFeatures =
+            (VkPhysicalDeviceSamplerYcbcrConversionFeatures *)_vpGetStructure(
+            pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES);
+
+        VkPhysicalDeviceVariablePointersFeatures *requestedVariableFeatures =
+            (VkPhysicalDeviceVariablePointersFeatures *)_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES);
+
+#if defined(__APPLE__)
+        VkPhysicalDevicePortabilitySubsetFeaturesKHR *requestedPortabilitySubset =
+            (VkPhysicalDevicePortabilitySubsetFeaturesKHR *)_vpGetStructure(
+            pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR);
+#endif
 
         VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
         deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) && requestedFeatures2 != nullptr) {
+            deviceFeatures2 = *requestedFeatures2;
+        }
         deviceFeatures2.pNext = nullptr;
         pProfileNext = &deviceFeatures2;
 
         VkPhysicalDeviceImagelessFramebufferFeatures deviceImagelessFeatures = {};
         deviceImagelessFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) && requestedImagelessFeatures != nullptr) {
+            deviceImagelessFeatures = *requestedImagelessFeatures;
+        }
         deviceImagelessFeatures.pNext = pProfileNext;
         pProfileNext = &deviceImagelessFeatures;
 
         VkPhysicalDevice16BitStorageFeatures device16BitFeatures = {};
         device16BitFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) && requested16BitFeatures != nullptr) {
+            device16BitFeatures = *requested16BitFeatures;
+        }
         device16BitFeatures.pNext = pProfileNext;
         pProfileNext = &device16BitFeatures;
 
         VkPhysicalDeviceMultiviewFeatures deviceMultiviewFeatures = {};
         deviceMultiviewFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) && requestedMultiviewFeatures != nullptr) {
+            deviceMultiviewFeatures = *requestedMultiviewFeatures;
+        }
         deviceMultiviewFeatures.pNext = pProfileNext;
         pProfileNext = &deviceMultiviewFeatures;
 
         VkPhysicalDeviceDescriptorIndexingFeatures deviceDescriptorInxedingFeatures = {};
         deviceDescriptorInxedingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) &&
+            requestedDescriptorInxedingFeatures != nullptr) {
+            deviceDescriptorInxedingFeatures = *requestedDescriptorInxedingFeatures;
+        }
         deviceDescriptorInxedingFeatures.pNext = pProfileNext;
         pProfileNext = &deviceDescriptorInxedingFeatures;
 
         VkPhysicalDeviceHostQueryResetFeatures deviceHostQueryResetFeatures = {};
         deviceHostQueryResetFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) && requestedHostQueryResetFeatures != nullptr) {
+            deviceHostQueryResetFeatures = *requestedHostQueryResetFeatures;
+        }
         deviceHostQueryResetFeatures.pNext = pProfileNext;
         pProfileNext = &deviceHostQueryResetFeatures;
 
         VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures deviceShaderSubgroupFeatures = {};
         deviceShaderSubgroupFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) && requestedShaderSubgroupFeatures != nullptr) {
+            deviceShaderSubgroupFeatures = *requestedShaderSubgroupFeatures;
+        }
         deviceShaderSubgroupFeatures.pNext = pProfileNext;
         pProfileNext = &deviceShaderSubgroupFeatures;
 
         VkPhysicalDeviceUniformBufferStandardLayoutFeatures deviceUniformBufferFeatures = {};
         deviceUniformBufferFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) && requestedUniformBufferFeatures != nullptr) {
+            deviceUniformBufferFeatures = *requestedUniformBufferFeatures;
+        }
         deviceUniformBufferFeatures.pNext = pProfileNext;
         pProfileNext = &deviceUniformBufferFeatures;
 
         VkPhysicalDeviceShaderDrawParametersFeatures deviceShaderDrawFeatures = {};
         deviceShaderDrawFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) && requestedShaderDrawFeatures != nullptr) {
+            deviceShaderDrawFeatures = *requestedShaderDrawFeatures;
+        }
         deviceShaderDrawFeatures.pNext = pProfileNext;
         pProfileNext = &deviceShaderDrawFeatures;
 
         VkPhysicalDevice8BitStorageFeatures device8BitFeatures = {};
         device8BitFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) && requested8BitStorageFeatures != nullptr) {
+            device8BitFeatures = *requested8BitStorageFeatures;
+        }
         device8BitFeatures.pNext = pProfileNext;
         pProfileNext = &device8BitFeatures;
 
         VkPhysicalDeviceShaderFloat16Int8Features deviceShaderFloatFeatures = {};
         deviceShaderFloatFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) && requestedShaderFloatFeatures != nullptr) {
+            deviceShaderFloatFeatures = *requestedShaderFloatFeatures;
+        }
         deviceShaderFloatFeatures.pNext = pProfileNext;
         pProfileNext = &deviceShaderFloatFeatures;
 
         VkPhysicalDeviceSamplerYcbcrConversionFeatures deviceSamplerYcbcrFeatures = {};
         deviceSamplerYcbcrFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) && requestedSamplerYcbcrFeatures != nullptr) {
+            deviceSamplerYcbcrFeatures = *requestedSamplerYcbcrFeatures;
+        }
         deviceSamplerYcbcrFeatures.pNext = pProfileNext;
         pProfileNext = &deviceSamplerYcbcrFeatures;
 
         VkPhysicalDeviceVariablePointersFeatures deviceVariableFeatures = {};
         deviceVariableFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) && requestedVariableFeatures != nullptr) {
+            deviceVariableFeatures = *requestedVariableFeatures;
+        }
         deviceVariableFeatures.pNext = pProfileNext;
         pProfileNext = &deviceVariableFeatures;
 
 #if defined(__APPLE__)
         VkPhysicalDevicePortabilitySubsetFeaturesKHR devicePortabilitySubset = {};
         devicePortabilitySubset.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR;
+        if (!(pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_FEATURES_BIT) && requestedPortabilitySubset != nullptr) {
+            devicePortabilitySubset = *requestedPortabilitySubset;
+        }
         devicePortabilitySubset.pNext = pProfileNext;
         pProfileNext = &devicePortabilitySubset;
 #endif
 
         vpGetProfileStructures(&pCreateInfo->profile, pProfileNext);
 
-        void *pRoot = const_cast<void *>(pCreateInfo->info.pNext);
         void *pNext = pRoot;
 
         if (pCreateInfo->info.pEnabledFeatures != nullptr) {
             deviceFeatures2.features = *pCreateInfo->info.pEnabledFeatures;
         }
-        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) == nullptr &&
+        if (requestedFeatures2 == nullptr &&
             pCreateInfo->info.pEnabledFeatures == nullptr) {
             deviceFeatures2.pNext = pNext;
             pNext = &deviceFeatures2;
         }
 
-        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES) == nullptr) {
+        if (requestedImagelessFeatures == nullptr) {
             deviceImagelessFeatures.pNext = pNext;
             pNext = &deviceImagelessFeatures;
         }
 
-        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES) == nullptr) {
+        if (requested16BitFeatures == nullptr) {
             device16BitFeatures.pNext = pNext;
             pNext = &device16BitFeatures;
         }
 
-        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES) == nullptr) {
+        if (requestedMultiviewFeatures == nullptr) {
             deviceMultiviewFeatures.pNext = pNext;
             pNext = &deviceMultiviewFeatures;
         }
 
-        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES) == nullptr) {
+        if (requestedDescriptorInxedingFeatures == nullptr) {
             deviceDescriptorInxedingFeatures.pNext = pNext;
             pNext = &deviceDescriptorInxedingFeatures;
         }
 
-        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES) == nullptr) {
+        if (requestedHostQueryResetFeatures == nullptr) {
             deviceHostQueryResetFeatures.pNext = pNext;
             pNext = &deviceHostQueryResetFeatures;
         }
 
-        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES) == nullptr) {
+        if (requestedShaderSubgroupFeatures == nullptr) {
             deviceShaderSubgroupFeatures.pNext = pNext;
             pNext = &deviceShaderSubgroupFeatures;
         }
 
-        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES) == nullptr) {
+        if (requestedUniformBufferFeatures == nullptr) {
             deviceUniformBufferFeatures.pNext = pNext;
             pNext = &deviceUniformBufferFeatures;
         }
 
-        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES) == nullptr) {
+        if (requestedShaderDrawFeatures == nullptr) {
             deviceShaderDrawFeatures.pNext = pNext;
             pNext = &deviceShaderDrawFeatures;
         }
 
-        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES) == nullptr) {
+        if (requested8BitStorageFeatures == nullptr) {
             device8BitFeatures.pNext = pNext;
             pNext = &device8BitFeatures;
         }
 
-        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES) == nullptr) {
+        if (requestedShaderFloatFeatures == nullptr) {
             deviceShaderFloatFeatures.pNext = pNext;
             pNext = &deviceShaderFloatFeatures;
         }
 
-        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES) == nullptr) {
+        if (requestedSamplerYcbcrFeatures == nullptr) {
             deviceSamplerYcbcrFeatures.pNext = pNext;
             pNext = &deviceSamplerYcbcrFeatures;
         }
 
-        if (_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES) == nullptr) {
+        if (requestedVariableFeatures == nullptr) {
             deviceVariableFeatures.pNext = pNext;
             pNext = &deviceVariableFeatures;
         }
 
 #if defined(__APPLE__)
-        if (vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR) == nullptr) {
+        if (requestedPortabilitySubset == nullptr) {
             devicePortabilitySubset.pNext = pNext;
             pNext = &devicePortabilitySubset;
         }
