@@ -59,11 +59,13 @@ typedef struct VpDeviceCreateInfo {
     VpDeviceCreateFlags flags;
 } VpDeviceCreateInfo;
 
+void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+
+VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, VpProfileProperties *pProperties,
+                                   VkBool32 *pSupported);
+
 VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
                         const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
-
-VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const char *pLayerName, uint32_t *pPropertyCount,
-                                   VpProfileProperties *pProperties);
 
 void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                      VkExtensionProperties *pProperties);
@@ -823,6 +825,22 @@ inline void *_vpGetStructure(void *pNext, VkStructureType type) {
         return pNext;
     } else {
         return _vpGetStructure(p->pNext, type);
+    }
+}
+
+inline void vpGetProfiles(uint32_t* pPropertyCount, VpProfileProperties* pProperties) {
+    static const VpProfileProperties table[] = {
+        {VP_KHR_1_2_ROADMAP_2022_NAME, VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION}, 
+        {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION}
+    };
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = countof(table);
+        return;
+    }
+
+    for (std::size_t i = 0, n = std::min<std::size_t>(countof(table), *pPropertyCount); i < n; ++i) {
+        pProperties[i] = table[i];
     }
 }
 
