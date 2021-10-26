@@ -168,9 +168,6 @@ TEST(test_profile, create_extensions_supported) {
     for (const VpProfileProperties& profile : profiles) {
         std::printf("Creating a Vulkan device using profile %s, version %d: ", profile.profileName, profile.specVersion);
 
-        VkPhysicalDeviceFeatures enabledFeatures = {};
-        enabledFeatures.robustBufferAccess = VK_TRUE;
-
         VpDeviceCreateInfo info = {};
         info.info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         info.info.pNext = nullptr;
@@ -243,6 +240,86 @@ TEST(test_profile, create_extensions_unsupported) {
             ++error;
             vkDestroyDevice(device, nullptr);
             std::printf("UNEXPECTED SUCCESS\n");
+        }
+    }
+
+    EXPECT_EQ(0, error);
+}
+
+TEST(test_profile, create_extensions_flag) {
+    TestScaffold scaffold;
+
+    VpProfileProperties profile{VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+
+    VkBool32 supported = VK_FALSE;
+    vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
+    EXPECT_EQ(VK_TRUE, supported);
+
+    int error = 0;
+
+    std::printf("Creating a Vulkan device using profile %s, version %d: ", profile.profileName, profile.specVersion);
+
+    static const char* extensions[] = {VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME};
+
+    VpDeviceCreateInfo info = {};
+    info.info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.info.pNext = nullptr;
+    info.info.queueCreateInfoCount = 1;
+    info.info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.info.pEnabledFeatures = nullptr;
+    info.profile = profile;
+
+    // override profile extensions
+    {
+        info.info.enabledExtensionCount = countof(extensions);
+        info.info.ppEnabledExtensionNames = extensions;
+        info.flags = VP_DEVICE_CREATE_OVERRIDE_PROFILE_EXTENSIONS_BIT;
+
+        VkDevice device = VK_NULL_HANDLE;
+        VkResult res = vpCreateDevice(scaffold.physicalDevice, &info, nullptr, &device);
+        if (res != VK_SUCCESS) {
+            ++error;
+            EXPECT_TRUE(device == VK_NULL_HANDLE);
+            std::printf("FAILURE: %d\n", res);
+        } else {
+            vkDestroyDevice(device, nullptr);
+            std::printf("SUCCESS!\n");
+        }
+    }
+
+    // add extensions to the profile extension list
+    {
+        info.info.enabledExtensionCount = countof(extensions);
+        info.info.ppEnabledExtensionNames = extensions;
+        info.flags = 0;
+
+        VkDevice device = VK_NULL_HANDLE;
+        VkResult res = vpCreateDevice(scaffold.physicalDevice, &info, nullptr, &device);
+        if (res != VK_SUCCESS) {
+            ++error;
+            EXPECT_TRUE(device == VK_NULL_HANDLE);
+            std::printf("FAILURE: %d\n", res);
+        } else {
+            vkDestroyDevice(device, nullptr);
+            std::printf("SUCCESS!\n");
+        }
+    }
+
+    // add extensions to the profile extension list but the list is empty
+    {
+        info.info.enabledExtensionCount = 0;
+        info.info.ppEnabledExtensionNames = nullptr;
+        info.flags = 0;
+
+        VkDevice device = VK_NULL_HANDLE;
+        VkResult res = vpCreateDevice(scaffold.physicalDevice, &info, nullptr, &device);
+        if (res != VK_SUCCESS) {
+            ++error;
+            EXPECT_TRUE(device == VK_NULL_HANDLE);
+            std::printf("FAILURE: %d\n", res);
+        } else {
+            vkDestroyDevice(device, nullptr);
+            std::printf("SUCCESS!\n");
         }
     }
 

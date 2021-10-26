@@ -1445,17 +1445,30 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
     } else if (strcmp(pCreateInfo->profile.profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         std::vector<const char *> extensions;
-        for (int i = 0, n = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS); i < n; ++i) {
-            extensions.push_back(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i].extensionName);
-        }
 
-        for (uint32_t i = 0; i < pCreateInfo->info.enabledExtensionCount; ++i) {
-            if (_vpCheckExtension(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS,
-                                  countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
-                                  pCreateInfo->info.ppEnabledExtensionNames[i])) {
-                continue;
+        if (pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_PROFILE_EXTENSIONS_BIT) {
+            if (pCreateInfo->info.enabledExtensionCount > 0) {
+                for (int i = 0, n = pCreateInfo->info.enabledExtensionCount; i < n; ++i) {
+                    extensions.push_back(pCreateInfo->info.ppEnabledExtensionNames[i]);
+                }   
+            } else {
+                for (int i = 0, n = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS); i < n; ++i) {
+                    extensions.push_back(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i].extensionName);
+                }          
             }
-            extensions.push_back(pCreateInfo->info.ppEnabledExtensionNames[i]);
+        } else {
+            for (int i = 0, n = countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS); i < n; ++i) {
+                extensions.push_back(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i].extensionName);
+            }
+
+            for (uint32_t i = 0; i < pCreateInfo->info.enabledExtensionCount; ++i) {
+                if (_vpCheckExtension(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS,
+                                      countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                                      pCreateInfo->info.ppEnabledExtensionNames[i])) {
+                    continue;
+                }
+                extensions.push_back(pCreateInfo->info.ppEnabledExtensionNames[i]);
+            }
         }
 
         void *pProfileNext = nullptr;
