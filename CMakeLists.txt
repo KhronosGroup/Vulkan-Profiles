@@ -95,3 +95,4 @@ add_subdirectory(layer)
 
 add_subdirectory(vku)
 add_subdirectory(device_simulation)
+add_subdirectory(device_simulation_manual)
