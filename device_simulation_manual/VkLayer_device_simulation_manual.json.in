@@ -1,7 +1,7 @@
 {
     "file_format_version": "1.2.0",
     "layer": {
-        "name": "VK_LAYER_LUNARG_device_simulation",
+        "name": "VK_LAYER_LUNARG_device_simulation_manual",
         "type": "GLOBAL",
         "library_path": "@RELATIVE_LAYER_BINARY@",
         "api_version": "@VK_VERSION@",
@@ -36,7 +36,7 @@
                         },
                         {
                             "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation/portability_desktop_1_0.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation_manual/portability_desktop_1_0.json"
                         }
                     ]
                 },
@@ -56,7 +56,7 @@
                         },
                         {
                             "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation/portability_desktop_1_2.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation_manual/portability_desktop_1_2.json"
                         }
                     ]
                 },
@@ -72,7 +72,7 @@
                         },
                         {
                             "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation/macOS_gpu_family_1_portability.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation_manual/macOS_gpu_family_1_portability.json"
                         }
                     ]
                 },
@@ -88,7 +88,7 @@
                         },
                         {
                             "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation/iOS_gpu_family_3_portability.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation_manual/iOS_gpu_family_3_portability.json"
                         }
                     ]
                 },
@@ -104,7 +104,7 @@
                         },
                         {
                             "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation/iOS_gpu_family_5_portability.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation_manual/iOS_gpu_family_5_portability.json"
                         }
                     ]
                 },
@@ -120,7 +120,7 @@
                         },
                         {
                             "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation/spec_minimum_vulkan_1_2.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation_manual/spec_minimum_vulkan_1_2.json"
                         }
                     ]
                 },
@@ -136,7 +136,7 @@
                         },
                         {
                             "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation/spec_minimum_vulkan_1_1.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation_manual/spec_minimum_vulkan_1_1.json"
                         }
                     ]
                 },
@@ -152,7 +152,7 @@
                         },
                         {
                             "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation/spec_minimum_vulkan_1_0.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation_manual/spec_minimum_vulkan_1_0.json"
                         }
                     ]
                 },
@@ -172,7 +172,7 @@
                         },
                         {
                             "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation/portability_minimum_vulkan_1_2.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation_manual/portability_minimum_vulkan_1_2.json"
                         }
                     ]
                 },
@@ -192,7 +192,7 @@
                         },
                         {
                             "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation/portability_minimum_vulkan_1_1.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation_manual/portability_minimum_vulkan_1_1.json"
                         }
                     ]
                 },
@@ -212,7 +212,7 @@
                         },
                         {
                             "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation/portability_minimum_vulkan_1_0.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation_manual/portability_minimum_vulkan_1_0.json"
                         }
                     ]
                 }
@@ -225,7 +225,7 @@
                     "description": "Path of a devsim configuration file to load.",
                     "type": "LOAD_FILE",
                     "filter": "*.json",
-                    "default": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation/portability_desktop_1_0.json"
+                    "default": "${VULKAN_CONTENT}/VK_LAYER_LUNARG_device_simulation_manual/portability_desktop_1_0.json"
                 },
                 {
                     "key": "debug_enable",
