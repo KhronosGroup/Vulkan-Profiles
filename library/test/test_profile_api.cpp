@@ -127,8 +127,8 @@ TEST(test_profile, create_profile) {
         info.pEnabledFeatures = nullptr;     
         
         VpDeviceCreateInfo profileInfo = {};
-        profileInfo.info = &info;
-        profileInfo.profile = profile;
+        profileInfo.pCreateInfo = &info;
+        profileInfo.pProfile = &profile;
 
         VkDevice device = VK_NULL_HANDLE;
         VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
@@ -181,10 +181,8 @@ TEST(test_profile, create_extensions_supported) {
         info.pEnabledFeatures = nullptr;
 
         VpDeviceCreateInfo profileInfo = {};
-        profileInfo.info = &info;
-
-
-        profileInfo.profile = profile;
+        profileInfo.pCreateInfo = &info;
+        profileInfo.pProfile = &profile;
 
         VkDevice device = VK_NULL_HANDLE;
         VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
@@ -239,8 +237,8 @@ TEST(test_profile, create_extensions_unsupported) {
         info.pEnabledFeatures = nullptr;
 
         VpDeviceCreateInfo profileInfo = {};
-        profileInfo.info = &info;
-        profileInfo.profile = profile;
+        profileInfo.pCreateInfo = &info;
+        profileInfo.pProfile = &profile;
 
         VkDevice device = VK_NULL_HANDLE;
         VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
@@ -304,9 +302,11 @@ TEST(test_profile, get_extensions) {
     info.pNext = nullptr;
     info.pEnabledFeatures = nullptr;
 
+    const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+
     VpDeviceCreateInfo profileInfo = {};
-    profileInfo.info = &info;
-    profileInfo.profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+    profileInfo.pCreateInfo = &info;
+    profileInfo.pProfile = &profile;
 
     {
         info.enabledExtensionCount = 0;
@@ -376,8 +376,8 @@ TEST(test_profile, create_extensions_flag) {
     info.pEnabledFeatures = nullptr;
 
     VpDeviceCreateInfo profileInfo = {};
-    profileInfo.info = &info;
-    profileInfo.profile = profile;
+    profileInfo.pCreateInfo = &info;
+    profileInfo.pProfile = &profile;
 
     // override profile extensions
     {
@@ -474,8 +474,8 @@ TEST(test_profile, create_features) {
         info.pEnabledFeatures = &enabledFeatures;
 
         VpDeviceCreateInfo profileInfo = {};
-        profileInfo.info = &info;
-        profileInfo.profile = profile;
+        profileInfo.pCreateInfo = &info;
+        profileInfo.pProfile = &profile;
 
         VkDevice device = VK_NULL_HANDLE;
         VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
@@ -570,8 +570,8 @@ TEST(test_profile, create_pnext) {
         info.pEnabledFeatures = nullptr;
 
         VpDeviceCreateInfo profileInfo = {};
-        profileInfo.info = &info;
-        profileInfo.profile = profile;
+        profileInfo.pCreateInfo = &info;
+        profileInfo.pProfile = &profile;
 
         VkDevice device = VK_NULL_HANDLE;
         VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);

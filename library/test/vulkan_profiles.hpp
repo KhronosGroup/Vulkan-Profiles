@@ -47,8 +47,8 @@ typedef enum VpDeviceCreateFlagBits {
 typedef VkFlags VpDeviceCreateFlags;
 
 typedef struct VpDeviceCreateInfo {
-    const VkDeviceCreateInfo *info;
-    VpProfileProperties profile;
+    const VkDeviceCreateInfo *pCreateInfo;
+    const VpProfileProperties* pProfile;
     VpDeviceCreateFlags flags;
     uint32_t overriddenStructuresCount;
     const VkStructureType *pOverriddenStructures;
@@ -824,19 +824,19 @@ inline bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFami
 inline void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t propertyCount,
                              const VkExtensionProperties *pProperties, std::vector<const char *> &extensions) {
     if (pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_EXTENSIONS_BIT) {
-        for (int i = 0, n = pCreateInfo->info->enabledExtensionCount; i < n; ++i) {
-            extensions.push_back(pCreateInfo->info->ppEnabledExtensionNames[i]);
+        for (int i = 0, n = pCreateInfo->pCreateInfo->enabledExtensionCount; i < n; ++i) {
+            extensions.push_back(pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i]);
         }
     } else {
         for (int i = 0, n = propertyCount; i < n; ++i) {
             extensions.push_back(pProperties[i].extensionName);
         }
 
-        for (uint32_t i = 0; i < pCreateInfo->info->enabledExtensionCount; ++i) {
-            if (_vpCheckExtension(pProperties, propertyCount, pCreateInfo->info->ppEnabledExtensionNames[i])) {
+        for (uint32_t i = 0; i < pCreateInfo->pCreateInfo->enabledExtensionCount; ++i) {
+            if (_vpCheckExtension(pProperties, propertyCount, pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i])) {
                 continue;
             }
-            extensions.push_back(pCreateInfo->info->ppEnabledExtensionNames[i]);
+            extensions.push_back(pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i]);
         }
     }
 }
@@ -1308,19 +1308,19 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
 
     if (physicalDevice == VK_NULL_HANDLE || pCreateInfo == nullptr || pDevice == nullptr) {
         // Ensure the validation layer
-        return vkCreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : pCreateInfo->info, pAllocator, pDevice);
-    } else if (strcmp(pCreateInfo->profile.profileName, "") == 0) {
-        return vkCreateDevice(physicalDevice, pCreateInfo->info, pAllocator, pDevice);
-    } else if (strcmp(pCreateInfo->profile.profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+        return vkCreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : pCreateInfo->pCreateInfo, pAllocator, pDevice);
+    } else if (strcmp(pCreateInfo->pProfile->profileName, "") == 0) {
+        return vkCreateDevice(physicalDevice, pCreateInfo->pCreateInfo, pAllocator, pDevice);
+    } else if (strcmp(pCreateInfo->pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
         const VpProfileProperties *addFeatures =
-            pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT ? nullptr : &pCreateInfo->profile;
+            pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT ? nullptr : pCreateInfo->pProfile;
 
         std::vector<const char *> extensions;
         _vpGetExtensions(pCreateInfo, _vpCountOf(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS), &_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[0],
                          extensions);
 
         void *pProfileNext = nullptr;
-        void *pRoot = const_cast<void *>(pCreateInfo->info->pNext);
+        void *pRoot = const_cast<void *>(pCreateInfo->pCreateInfo->pNext);
 
         VkPhysicalDeviceFeatures2 *requestedFeatures2 =
             (VkPhysicalDeviceFeatures2 *)_vpGetStructure(addFeatures, pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2);
@@ -1455,15 +1455,15 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
         deviceExtendedDynamicState2Features.pNext = pProfileNext;
         pProfileNext = &deviceExtendedDynamicState2Features;
 
-        vpGetProfileStructures(&pCreateInfo->profile, pProfileNext);
+        vpGetProfileStructures(pCreateInfo->pProfile, pProfileNext);
 
         void *pNext = pRoot;
 
-        if (pCreateInfo->info->pEnabledFeatures != nullptr) {
-            deviceFeatures2.features = *pCreateInfo->info->pEnabledFeatures;
+        if (pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr) {
+            deviceFeatures2.features = *pCreateInfo->pCreateInfo->pEnabledFeatures;
         }
         if (requestedFeatures2 == nullptr &&
-            pCreateInfo->info->pEnabledFeatures == nullptr) {
+            pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {
             deviceFeatures2.pNext = pNext;
             pNext = &deviceFeatures2;
         }
@@ -1536,22 +1536,22 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
         VkDeviceCreateInfo deviceCreateInfo = {};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         deviceCreateInfo.pNext = pNext;
-        deviceCreateInfo.queueCreateInfoCount = pCreateInfo->info->queueCreateInfoCount;
-        deviceCreateInfo.pQueueCreateInfos = pCreateInfo->info->pQueueCreateInfos;
+        deviceCreateInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;
+        deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;
         deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         deviceCreateInfo.ppEnabledExtensionNames = static_cast<const char *const *>(extensions.data());
-        deviceCreateInfo.pEnabledFeatures = pCreateInfo->info->pEnabledFeatures != nullptr ? &deviceFeatures2.features : nullptr;
+        deviceCreateInfo.pEnabledFeatures = pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr ? &deviceFeatures2.features : nullptr;
         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
-    } else if (strcmp(pCreateInfo->profile.profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+    } else if (strcmp(pCreateInfo->pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         const VpProfileProperties *addFeatures =
-            pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT ? nullptr : &pCreateInfo->profile;
+            pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT ? nullptr : pCreateInfo->pProfile;
 
         std::vector<const char *> extensions;
         _vpGetExtensions(pCreateInfo, _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
                          &_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
 
         void *pProfileNext = nullptr;
-        void *pRoot = const_cast<void *>(pCreateInfo->info->pNext);
+        void *pRoot = const_cast<void *>(pCreateInfo->pCreateInfo->pNext);
 
         VkPhysicalDeviceFeatures2 *requestedFeatures2 =
             (VkPhysicalDeviceFeatures2 *)_vpGetStructure(addFeatures, pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2);
@@ -1680,15 +1680,15 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
         pProfileNext = &devicePortabilitySubset;
 #endif
 
-        vpGetProfileStructures(&pCreateInfo->profile, pProfileNext);
+        vpGetProfileStructures(pCreateInfo->pProfile, pProfileNext);
 
         void *pNext = pRoot;
 
-        if (pCreateInfo->info->pEnabledFeatures != nullptr) {
-            deviceFeatures2.features = *pCreateInfo->info->pEnabledFeatures;
+        if (pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr) {
+            deviceFeatures2.features = *pCreateInfo->pCreateInfo->pEnabledFeatures;
         }
         if (requestedFeatures2 == nullptr &&
-            pCreateInfo->info->pEnabledFeatures == nullptr) {
+            pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {
             deviceFeatures2.pNext = pNext;
             pNext = &deviceFeatures2;
         }
@@ -1763,11 +1763,11 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
         VkDeviceCreateInfo deviceCreateInfo = {};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         deviceCreateInfo.pNext = pNext;
-        deviceCreateInfo.queueCreateInfoCount = pCreateInfo->info->queueCreateInfoCount;
-        deviceCreateInfo.pQueueCreateInfos = pCreateInfo->info->pQueueCreateInfos;
+        deviceCreateInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;
+        deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;
         deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         deviceCreateInfo.ppEnabledExtensionNames = static_cast<const char *const *>(extensions.data());
-        deviceCreateInfo.pEnabledFeatures = pCreateInfo->info->pEnabledFeatures != nullptr ? &deviceFeatures2.features : nullptr;
+        deviceCreateInfo.pEnabledFeatures = pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr ? &deviceFeatures2.features : nullptr;
         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
     } else {
         return VK_ERROR_UNKNOWN;
