@@ -47,7 +47,7 @@ std::vector<std::string> GetFormatFeatures(int flags) {
 
     std::vector<std::string> results;
 
-    for (std::size_t i = 0, n = countof(format_features); i < n; ++i) {
+    for (std::size_t i = 0, n = _vpCountOf(format_features); i < n; ++i) {
         if (flags & format_features[i].flag) results.push_back(format_features[i].label);
     }
 
@@ -201,11 +201,11 @@ TEST(test_library_util, CheckExtension) {
                                                       VkExtensionProperties{"VK_KHR_shader_terminate_invocation", 1},
                                                       VkExtensionProperties{"VK_KHR_imageless_framebuffer", 1}};
 
-    EXPECT_TRUE(_vpCheckExtension(test_data, countof(test_data), "VK_KHR_synchronization2"));
+    EXPECT_TRUE(_vpCheckExtension(test_data, _vpCountOf(test_data), "VK_KHR_synchronization2"));
 
-    EXPECT_TRUE(!_vpCheckExtension(test_data, countof(test_data), "VK_KHR_synchronization"));
-    EXPECT_TRUE(!_vpCheckExtension(test_data, countof(test_data), "KHR_synchronization2"));
-    EXPECT_TRUE(!_vpCheckExtension(test_data, countof(test_data), "VK_EXT_synchronization2"));
+    EXPECT_TRUE(!_vpCheckExtension(test_data, _vpCountOf(test_data), "VK_KHR_synchronization"));
+    EXPECT_TRUE(!_vpCheckExtension(test_data, _vpCountOf(test_data), "KHR_synchronization2"));
+    EXPECT_TRUE(!_vpCheckExtension(test_data, _vpCountOf(test_data), "VK_EXT_synchronization2"));
 }
 
 TEST(test_library_util, CheckQueueFamilyProperty) {

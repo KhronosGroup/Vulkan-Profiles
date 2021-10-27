@@ -176,7 +176,7 @@ TEST(test_profile, create_extensions_supported) {
         info.pNext = nullptr;
         info.queueCreateInfoCount = 1;
         info.pQueueCreateInfos = &scaffold.queueCreateInfo;
-        info.enabledExtensionCount = countof(extensions);
+        info.enabledExtensionCount = _vpCountOf(extensions);
         info.ppEnabledExtensionNames = extensions;
         info.pEnabledFeatures = nullptr;
 
@@ -234,7 +234,7 @@ TEST(test_profile, create_extensions_unsupported) {
         info.pNext = nullptr;
         info.queueCreateInfoCount = 1;
         info.pQueueCreateInfos = &scaffold.queueCreateInfo;
-        info.enabledExtensionCount = countof(extensions);
+        info.enabledExtensionCount = _vpCountOf(extensions);
         info.ppEnabledExtensionNames = extensions;
         info.pEnabledFeatures = nullptr;
 
@@ -264,12 +264,13 @@ TEST(test_profile, check_extension_not_found) {
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     info.pNext = nullptr;
     info.pEnabledFeatures = nullptr;
-    info.enabledExtensionCount = countof(EXTENSIONS);
+    info.enabledExtensionCount = _vpCountOf(EXTENSIONS);
     info.ppEnabledExtensionNames = EXTENSIONS;
 
     for (std::size_t i = 0, n = info.enabledExtensionCount; i < n; ++i) {
         EXPECT_FALSE(_vpCheckExtension(&_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0],
-                                       countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS), info.ppEnabledExtensionNames[i]));
+                                       _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                                       info.ppEnabledExtensionNames[i]));
     }
 }
 
@@ -280,12 +281,13 @@ TEST(test_profile, check_extension_found) {
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     info.pNext = nullptr;
     info.pEnabledFeatures = nullptr;
-    info.enabledExtensionCount = countof(EXTENSIONS);
+    info.enabledExtensionCount = _vpCountOf(EXTENSIONS);
     info.ppEnabledExtensionNames = EXTENSIONS;
 
     for (std::size_t i = 0, n = info.enabledExtensionCount; i < n; ++i) {
         EXPECT_TRUE(_vpCheckExtension(&_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0],
-                                      countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS), info.ppEnabledExtensionNames[i]));
+                                      _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                                      info.ppEnabledExtensionNames[i]));
     }
 }
 
@@ -312,31 +314,31 @@ TEST(test_profile, get_extensions) {
         profileInfo.flags = 0;
 
         std::vector<const char*> extensions;
-        _vpGetExtensions(&profileInfo, countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
                          &_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
-        EXPECT_EQ(countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS), extensions.size());
+        EXPECT_EQ(_vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS), extensions.size());
     }
 
     {
-        info.enabledExtensionCount = countof(EXTENSIONS);
+        info.enabledExtensionCount = _vpCountOf(EXTENSIONS);
         info.ppEnabledExtensionNames = EXTENSIONS;
         profileInfo.flags = 0;
 
         std::vector<const char*> extensions;
-        _vpGetExtensions(&profileInfo, countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
                          &_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
-        EXPECT_EQ(countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS) + 2, extensions.size());
+        EXPECT_EQ(_vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS) + 2, extensions.size());
     }
 
     {
-        info.enabledExtensionCount = countof(EXTENSIONS);
+        info.enabledExtensionCount = _vpCountOf(EXTENSIONS);
         info.ppEnabledExtensionNames = EXTENSIONS;
         profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_ALL_EXTENSIONS_BIT;
 
         std::vector<const char*> extensions;
-        _vpGetExtensions(&profileInfo, countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
                          &_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
-        EXPECT_EQ(countof(EXTENSIONS), extensions.size());
+        EXPECT_EQ(_vpCountOf(EXTENSIONS), extensions.size());
     }
 
     {
@@ -345,7 +347,7 @@ TEST(test_profile, get_extensions) {
         profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_ALL_EXTENSIONS_BIT;
 
         std::vector<const char*> extensions;
-        _vpGetExtensions(&profileInfo, countof(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
                          &_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
         EXPECT_EQ(0, extensions.size());
     }
@@ -379,7 +381,7 @@ TEST(test_profile, create_extensions_flag) {
 
     // override profile extensions
     {
-        info.enabledExtensionCount = countof(extensions);
+        info.enabledExtensionCount = _vpCountOf(extensions);
         info.ppEnabledExtensionNames = extensions;
         profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_ALL_EXTENSIONS_BIT;
 
@@ -397,7 +399,7 @@ TEST(test_profile, create_extensions_flag) {
 
     // add extensions to the profile extension list
     {
-        info.enabledExtensionCount = countof(extensions);
+        info.enabledExtensionCount = _vpCountOf(extensions);
         info.ppEnabledExtensionNames = extensions;
         profileInfo.flags = 0;
 
