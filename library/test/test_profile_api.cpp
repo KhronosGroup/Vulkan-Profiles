@@ -1056,8 +1056,8 @@ TEST(test_profile, example_local_override_features) {
     profileInfo.pCreateInfo = &info;
     profileInfo.pProfile = &profile;
     profileInfo.flags = 0;
-    profileInfo.overriddenStructuresCount = _vpCountOf(overrideStructures);
-    profileInfo.pOverriddenStructures = overrideStructures;
+    profileInfo.overrideStructureCount = _vpCountOf(overrideStructures);
+    profileInfo.pOverrideStructures = overrideStructures;
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);

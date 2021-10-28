@@ -52,8 +52,8 @@ typedef struct VpDeviceCreateInfo {
     const VkDeviceCreateInfo *pCreateInfo;
     const VpProfileProperties* pProfile;
     VpDeviceCreateFlags flags;
-    uint32_t overriddenStructuresCount;
-    const VkStructureType *pOverriddenStructures;
+    uint32_t overrideStructureCount;
+    const VkStructureType *pOverrideStructures;
 } VpDeviceCreateInfo;
 
 // Query the list of available profiles in the library
