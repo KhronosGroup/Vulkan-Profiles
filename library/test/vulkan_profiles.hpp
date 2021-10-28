@@ -42,6 +42,8 @@ typedef struct VpProfileProperties {
 typedef enum VpDeviceCreateFlagBits {
     VP_DEVICE_CREATE_OVERRIDE_ALL_EXTENSIONS_BIT = 0x00000001,
     VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT = 0x00000002,
+    VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT = 0x00000004,
+    VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT = 0x00000008,
     VP_DEVICE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
 } VpDeviceCreateFlagBits;
 typedef VkFlags VpDeviceCreateFlags;
@@ -50,8 +52,8 @@ typedef struct VpDeviceCreateInfo {
     const VkDeviceCreateInfo *pCreateInfo;
     const VpProfileProperties* pProfile;
     VpDeviceCreateFlags flags;
-    uint32_t overriddenStructuresCount;
-    const VkStructureType *pOverriddenStructures;
+    uint32_t overrideStructureCount;
+    const VkStructureType *pOverrideStructures;
 } VpDeviceCreateInfo;
 
 // Query the list of available profiles in the library
@@ -1467,6 +1469,12 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
             deviceFeatures2.pNext = pNext;
             pNext = &deviceFeatures2;
         }
+        if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
+            deviceFeatures2.features.robustBufferAccess = VK_FALSE;
+            if (requestedFeatures2 != nullptr) {
+                requestedFeatures2->features.robustBufferAccess = VK_FALSE;
+            }
+        }
 
         if (requestedVulkan11Features == nullptr) {
             deviceVulkan11Features.pNext = pNext;
@@ -1496,6 +1504,12 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
         if (requestedImageRobustnessFeatures == nullptr) {
             deviceImageRobustnessFeatures.pNext = pNext;
             pNext = &deviceImageRobustnessFeatures;
+        }
+        if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT) {
+            deviceImageRobustnessFeatures.robustImageAccess = VK_FALSE;
+            if (requestedImageRobustnessFeatures != nullptr) {
+                requestedImageRobustnessFeatures->robustImageAccess = VK_FALSE;
+            }
         }
 
         if (requestedInlineBlockFeatures == nullptr) {
@@ -1691,6 +1705,12 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
             pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {
             deviceFeatures2.pNext = pNext;
             pNext = &deviceFeatures2;
+        }
+        if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
+            deviceFeatures2.features.robustBufferAccess = VK_FALSE;
+            if (requestedFeatures2 != nullptr) {
+                requestedFeatures2->features.robustBufferAccess = VK_FALSE;
+            }
         }
 
         if (requestedImagelessFeatures == nullptr) {
