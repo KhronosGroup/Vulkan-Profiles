@@ -124,8 +124,8 @@ TEST(test_profile, create_profile) {
         info.pQueueCreateInfos = &scaffold.queueCreateInfo;
         info.enabledExtensionCount = 0;
         info.ppEnabledExtensionNames = nullptr;
-        info.pEnabledFeatures = nullptr;     
-        
+        info.pEnabledFeatures = nullptr;
+
         VpDeviceCreateInfo profileInfo = {};
         profileInfo.pCreateInfo = &info;
         profileInfo.pProfile = &profile;
@@ -302,7 +302,8 @@ TEST(test_profile, get_extensions) {
     info.pNext = nullptr;
     info.pEnabledFeatures = nullptr;
 
-    const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+    const VpProfileProperties profile = {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME,
+                                         VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
@@ -961,4 +962,135 @@ TEST(test_profile, get_profiles_partial) {
 
     EXPECT_STREQ(VP_KHR_1_2_ROADMAP_2022_NAME, pProperties[0].profileName);
     EXPECT_EQ(VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION, pProperties[0].specVersion);
+}
+
+TEST(test_profile, example_add_features_add_extensions) {
+    TestScaffold scaffold;
+
+    VpProfileProperties profile{VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+
+    VkBool32 supported = VK_FALSE;
+    vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
+    EXPECT_EQ(VK_TRUE, supported);
+
+    static const char* extensions[] = {VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, VK_KHR_MAINTENANCE3_EXTENSION_NAME};
+
+    VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
+    deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    deviceFeatures2.features.depthBiasClamp = VK_TRUE;
+    deviceFeatures2.features.depthBounds = VK_TRUE;
+    deviceFeatures2.features.depthClamp = VK_TRUE;
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = &deviceFeatures2;
+    info.queueCreateInfoCount = 1;
+    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.pEnabledFeatures = nullptr;
+    info.enabledExtensionCount = _vpCountOf(extensions);
+    info.ppEnabledExtensionNames = extensions;
+
+    VpDeviceCreateInfo profileInfo = {};
+    profileInfo.pCreateInfo = &info;
+    profileInfo.pProfile = &profile;
+    profileInfo.flags = 0;
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    EXPECT_EQ(VK_SUCCESS, res);
+}
+
+TEST(test_profile, example_global_override_features) {
+    TestScaffold scaffold;
+
+    VpProfileProperties profile{VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+
+    VkBool32 supported = VK_FALSE;
+    vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
+    EXPECT_EQ(VK_TRUE, supported);
+
+    VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
+    deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    vpGetProfileStructures(&profile, &deviceFeatures2);
+    deviceFeatures2.features.robustBufferAccess = VK_FALSE;
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = &deviceFeatures2;
+    info.queueCreateInfoCount = 1;
+    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+
+    VpDeviceCreateInfo profileInfo = {};
+    profileInfo.pCreateInfo = &info;
+    profileInfo.pProfile = &profile;
+    profileInfo.flags = VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT;
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    EXPECT_EQ(VK_SUCCESS, res);
+}
+
+TEST(test_profile, example_local_override_features) {
+    TestScaffold scaffold;
+
+    VpProfileProperties profile{VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+
+    VkBool32 supported = VK_FALSE;
+    vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
+    EXPECT_EQ(VK_TRUE, supported);
+
+    VkStructureType overrideStructures[] = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
+
+    VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
+    deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    vpGetProfileStructures(&profile, &deviceFeatures2);
+    deviceFeatures2.features.robustBufferAccess = VK_FALSE;
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = &deviceFeatures2;
+    info.queueCreateInfoCount = 1;
+    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+
+    VpDeviceCreateInfo profileInfo = {};
+    profileInfo.pCreateInfo = &info;
+    profileInfo.pProfile = &profile;
+    profileInfo.flags = 0;
+    profileInfo.overriddenStructuresCount = _vpCountOf(overrideStructures);
+    profileInfo.pOverriddenStructures = overrideStructures;
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    EXPECT_EQ(VK_SUCCESS, res);
+}
+
+TEST(test_profile, example_flag_disable_robust_access) {
+    TestScaffold scaffold;
+
+    VpProfileProperties profile{VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+
+    VkBool32 supported = VK_FALSE;
+    vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
+    EXPECT_EQ(VK_TRUE, supported);
+
+    // Regardness of robustBufferAccess = VK_TRUE, because of VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT is set
+    // robustBufferAccess is effectively set to VK_FALSE when creating the VkDevice
+    VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
+    deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    deviceFeatures2.features.robustBufferAccess = VK_TRUE;
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = &deviceFeatures2;
+    info.queueCreateInfoCount = 1;
+    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+
+    VpDeviceCreateInfo profileInfo = {};
+    profileInfo.pCreateInfo = &info;
+    profileInfo.pProfile = &profile;
+    profileInfo.flags = VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT;
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    EXPECT_EQ(VK_SUCCESS, res);
 }
