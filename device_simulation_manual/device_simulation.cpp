@@ -1534,6 +1534,9 @@ class PhysicalDeviceData {
     // VK_KHR_device_group_creation structs
     VkPhysicalDeviceGroupPropertiesKHR physical_device_group_properites_;
 
+    // VK_KHR_driver_properties structs
+    VkPhysicalDeviceDriverPropertiesKHR physical_device_driver_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1653,6 +1656,9 @@ class PhysicalDeviceData {
 
         // VK_KHR_device_group_creation structs
         physical_device_group_properites_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GROUP_PROPERTIES};
+
+        // VK_KHR_driver_properties structs
+        physical_device_driver_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES};
     }
 
     const VkInstance instance_;
@@ -1747,6 +1753,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceAccelerationStructureFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceAccelerationStructurePropertiesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDriverPropertiesKHR *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -1834,6 +1841,19 @@ class JsonLoader {
             return;
         }
         const uint64_t new_value = value.asUInt64();
+        if (warn_func) {
+            warn_func(name, new_value, *dest);
+        }
+        *dest = new_value;
+    }
+
+    void GetValue(const Json::Value &parent, const char *name, uint8_t *dest,
+                  std::function<bool(const char *, uint8_t, uint8_t)> warn_func = nullptr) {
+        const Json::Value value = parent[name];
+        if (!value.isUInt()) {
+            return;
+        }
+        const uint8_t new_value = value.asUInt();
         if (warn_func) {
             warn_func(name, new_value, *dest);
         }
@@ -2195,6 +2215,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceAccelerationStructurePropertiesKHR", &pdd_.physical_device_acceleration_structure_properties_);
     GetValue(root, "VkPhysicalDeviceGroupProperties", &pdd_.physical_device_group_properites_);
     GetValue(root, "VkPhysicalDeviceGroupPropertiesKHR", &pdd_.physical_device_group_properites_);
+    GetValue(root, "VkPhysicalDeviceDriverProperties", &pdd_.physical_device_driver_properties_);
+    GetValue(root, "VkPhysicalDeviceDriverPropertiesKHR", &pdd_.physical_device_driver_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -3073,14 +3095,14 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_KHR_acceleration_structure is "
             "not supported by the device.\n");
     }
-    GET_VALUE(maxGeometryCount);
-    GET_VALUE(maxInstanceCount);
-    GET_VALUE(maxPrimitiveCount);
-    GET_VALUE(maxPerStageDescriptorAccelerationStructures);
-    GET_VALUE(maxPerStageDescriptorUpdateAfterBindAccelerationStructures);
-    GET_VALUE(maxDescriptorSetAccelerationStructures);
-    GET_VALUE(maxDescriptorSetUpdateAfterBindAccelerationStructures);
-    GET_VALUE(minAccelerationStructureScratchOffsetAlignment);
+    GET_VALUE_WARN(maxGeometryCount, WarnIfGreater);
+    GET_VALUE_WARN(maxInstanceCount, WarnIfGreater);
+    GET_VALUE_WARN(maxPrimitiveCount, WarnIfGreater);
+    GET_VALUE_WARN(maxPerStageDescriptorAccelerationStructures, WarnIfGreater);
+    GET_VALUE_WARN(maxPerStageDescriptorUpdateAfterBindAccelerationStructures, WarnIfGreater);
+    GET_VALUE_WARN(maxDescriptorSetAccelerationStructures, WarnIfGreater);
+    GET_VALUE_WARN(maxDescriptorSetUpdateAfterBindAccelerationStructures, WarnIfGreater);
+    GET_VALUE_WARN(minAccelerationStructureScratchOffsetAlignment, WarnIfGreater);
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
@@ -3095,9 +3117,30 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_KHR_device_group_creation is "
             "not supported by the device.\n");
     }
-    GET_VALUE(physicalDeviceCount);
+    GET_VALUE_WARN(physicalDeviceCount, WarnIfGreater);
     GetArray(value, "physicalDevices", &pdd_.arrayof_physical_devices_);
     GET_VALUE_WARN(subsetAllocation, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDriverPropertiesKHR *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDriverPropertiesKHR)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_KHR_driver_properties, but "
+            "VK_KHR_driver_properties is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE(driverID);
+    GET_ARRAY(driverName);  // size < VK_MAX_DRIVER_NAME_SIZE
+    GET_ARRAY(driverInfo);  // size < VK_MAX_DRIVER_INFO_SIZE
+    GET_VALUE_WARN(conformanceVersion.major, WarnIfGreater);
+    GET_VALUE_WARN(conformanceVersion.minor, WarnIfGreater);
+    GET_VALUE_WARN(conformanceVersion.subminor, WarnIfGreater);
+    GET_VALUE_WARN(conformanceVersion.patch, WarnIfGreater);
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
@@ -3530,6 +3573,18 @@ void JsonLoader::GetValueGPUinfoCore12(const Json::Value &parent) {
 
         GetValue(core12_properties, "framebufferIntegerColorSampleCounts",
                  &pdd_.physical_device_vulkan_1_2_properties_.framebufferIntegerColorSampleCounts);
+
+        GetValue(core12_properties, "driverID", &pdd_.physical_device_driver_properties_.driverID);
+        GetArray(core12_properties, "driverName", pdd_.physical_device_driver_properties_.driverName);
+        GetArray(core12_properties, "driverInfo", pdd_.physical_device_driver_properties_.driverInfo);
+        GetValue(core12_properties, "conformanceVersion.major", &pdd_.physical_device_driver_properties_.conformanceVersion.major,
+                 WarnIfGreater);
+        GetValue(core12_properties, "conformanceVersion.minor", &pdd_.physical_device_driver_properties_.conformanceVersion.minor,
+                 WarnIfGreater);
+        GetValue(core12_properties, "conformanceVersion.subminor",
+                 &pdd_.physical_device_driver_properties_.conformanceVersion.subminor, WarnIfGreater);
+        GetValue(core12_properties, "conformanceVersion.patch", &pdd_.physical_device_driver_properties_.conformanceVersion.patch,
+                 WarnIfGreater);
     }
 }
 
@@ -4052,6 +4107,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = gp->pNext;
             *gp = physicalDeviceData->physical_device_group_properites_;
             gp->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME)) {
+            VkPhysicalDeviceDriverPropertiesKHR *dp = (VkPhysicalDeviceDriverPropertiesKHR *)place;
+            void *pNext = dp->pNext;
+            *dp = physicalDeviceData->physical_device_driver_properties_;
+            dp->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -4792,6 +4853,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolPropertiesEXT(VkPhysicalDevi
 }
 
 #define TRANSFER_VALUE(name) dest->name = src->name
+#define TRANSFER_CHAR_ARRAY(name, size) strncpy(dest->name, src->name, size);
 
 // VK_VULKAN_1_1
 
@@ -4908,6 +4970,16 @@ void TransferValue(VkPhysicalDeviceVulkan12Properties *dest, VkPhysicalDeviceSam
 
 void TransferValue(VkPhysicalDeviceVulkan12Properties *dest, VkPhysicalDeviceTimelineSemaphorePropertiesKHR *src) {
     TRANSFER_VALUE(maxTimelineSemaphoreValueDifference);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan12Properties *dest, VkPhysicalDeviceDriverPropertiesKHR *src) {
+    TRANSFER_VALUE(driverID);
+    TRANSFER_CHAR_ARRAY(driverName, VK_MAX_DRIVER_NAME_SIZE);
+    TRANSFER_CHAR_ARRAY(driverInfo, VK_MAX_DRIVER_INFO_SIZE);
+    TRANSFER_VALUE(conformanceVersion.major);
+    TRANSFER_VALUE(conformanceVersion.minor);
+    TRANSFER_VALUE(conformanceVersion.subminor);
+    TRANSFER_VALUE(conformanceVersion.patch);
 }
 
 // Features
@@ -5229,6 +5301,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_group_properites_);
                 }
 
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME)) {
+                    pdd.physical_device_driver_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_driver_properties_);
+                }
+
                 if (api_version_above_1_1) {
                     pdd.physical_device_protected_memory_properties_.pNext = property_chain.pNext;
 
@@ -5300,6 +5378,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             TransferValue(&(pdd.physical_device_vulkan_1_2_properties_), &(pdd.physical_device_float_controls_properties_));
             TransferValue(&(pdd.physical_device_vulkan_1_2_properties_), &(pdd.physical_device_sampler_filter_minmax_properties_));
             TransferValue(&(pdd.physical_device_vulkan_1_2_properties_), &(pdd.physical_device_timeline_semaphore_properties_));
+            TransferValue(&(pdd.physical_device_vulkan_1_2_properties_), &(pdd.physical_device_driver_properties_));
 
             TransferValue(&(pdd.physical_device_vulkan_1_2_features_), &(pdd.physical_device_8bit_storage_features_));
             TransferValue(&(pdd.physical_device_vulkan_1_2_features_), &(pdd.physical_device_buffer_device_address_features_));
