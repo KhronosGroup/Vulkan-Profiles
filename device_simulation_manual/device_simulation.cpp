@@ -1522,6 +1522,9 @@ class PhysicalDeviceData {
     // VK_KHR_vulkan_memory_model structs
     VkPhysicalDeviceVulkanMemoryModelFeaturesKHR physical_device_vulkan_memory_model_features_;
 
+    // VK_KHR_zero_initialize_workgroup_memory structs
+    VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR physical_device_zero_initialize_workgroup_memory_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1629,6 +1632,10 @@ class PhysicalDeviceData {
 
         // VK_KHR_vulkan_memory_model structs
         physical_device_vulkan_memory_model_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR};
+
+        // VK_KHR_zero_initialize_workgroup_memory structs
+        physical_device_zero_initialize_workgroup_memory_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR};
     }
 
     const VkInstance instance_;
@@ -1719,6 +1726,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVariablePointersFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2144,6 +2152,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceVariablePointersFeaturesKHR", &pdd_.physical_device_variable_pointers_features_);
     GetValue(root, "VkPhysicalDeviceVulkanMemoryModelFeatures", &pdd_.physical_device_vulkan_memory_model_features_);
     GetValue(root, "VkPhysicalDeviceVulkanMemoryModelFeaturesKHR", &pdd_.physical_device_vulkan_memory_model_features_);
+    GetValue(root, "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR",
+             &pdd_.physical_device_zero_initialize_workgroup_memory_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -2973,6 +2983,22 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(vulkanMemoryModel, WarnIfGreater);
     GET_VALUE_WARN(vulkanMemoryModelDeviceScope, WarnIfGreater);
     GET_VALUE_WARN(vulkanMemoryModelAvailabilityVisibilityChains, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name,
+                          VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_KHR_zero_initialize_workgroup_memory, but "
+            "VK_KHR_zero_initialize_workgroup_memory is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(shaderZeroInitializeWorkgroupMemory, WarnIfGreater);
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
@@ -3891,6 +3917,13 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = vmmf->pNext;
             *vmmf = physicalDeviceData->physical_device_vulkan_memory_model_features_;
             vmmf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
+            VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *ziwmf =
+                (VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *)place;
+            void *pNext = ziwmf->pNext;
+            *ziwmf = physicalDeviceData->physical_device_zero_initialize_workgroup_memory_features_;
+            ziwmf->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -5044,6 +5077,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_vulkan_memory_model_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_vulkan_memory_model_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
+                    pdd.physical_device_zero_initialize_workgroup_memory_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_zero_initialize_workgroup_memory_features_);
                 }
 
                 if (api_version_above_1_1) {
