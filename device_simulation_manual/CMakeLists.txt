@@ -66,9 +66,9 @@ if (APPLE)
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_BINARY_DIR}
         ${jsoncpp_SOURCE_DIR}/include
-        ${Vulkan-Headers_SOURCE_DIR}/include
-        ${Vulkan-ValidationLayers_SOURCE_DIR}/layers
-        ${Vulkan-ValidationLayers_SOURCE_DIR}/layers/generated
+        ${vulkan-headers_SOURCE_DIR}/include
+        ${vulkan-validationlayers_SOURCE_DIR}/layers
+        ${vulkan-validationlayers_SOURCE_DIR}/layers/generated
     )
 else ()
     include_directories(
@@ -76,9 +76,9 @@ else ()
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_BINARY_DIR}
         ${jsoncpp_SOURCE_DIR}/include
-        ${Vulkan-Headers_SOURCE_DIR}/include
-        ${Vulkan-ValidationLayers_SOURCE_DIR}/layers
-        ${Vulkan-ValidationLayers_SOURCE_DIR}/layers/generated
+        ${vulkan-headers_SOURCE_DIR}/include
+        ${vulkan-validationlayers_SOURCE_DIR}/layers
+        ${vulkan-validationlayers_SOURCE_DIR}/layers/generated
     )
 endif()
 

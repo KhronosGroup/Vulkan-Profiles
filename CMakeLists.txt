@@ -17,37 +17,57 @@ find_package(PythonInterp 3 REQUIRED)
 # Third-party libraries
 include(FetchContent)
 
+# Declare all content before making available, to ensure that these
+# settings are used instead of any settings that may be encountered
+# inside these projects.
+#
+# Names should be lower-case, since FetchContent always sets 
+# <lowercaseName>_* variables.  Sometimes (only when using 
+# FetchContent_MakeAvailable) it will also set <givenName>_*
+# variables, but this isn't consistent and isn't guaranteed
+# by the documentation.
 FetchContent_Declare(
 	googletest
 	GIT_REPOSITORY https://github.com/google/googletest
 	GIT_TAG release-1.11.0
 )
-
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-
 FetchContent_Declare(
 	json
 	GIT_REPOSITORY https://github.com/nlohmann/json
 	GIT_TAG v3.10.0
 )
-
-FetchContent_MakeAvailable(json)
-
 FetchContent_Declare(
 	jsoncpp
 	GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp
 	GIT_TAG 1.9.4
 )
-
 set(JSONCPP_WITH_TESTS OFF CACHE BOOL "" FORCE)
 set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "" FORCE)
 set(JSONCPP_WITH_WARNING_AS_ERROR OFF CACHE BOOL "" FORCE)
 set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_OBJECT_LIBS OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(jsoncpp)
+FetchContent_Declare(
+	vulkan-headers
+	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers
+	GIT_TAG main
+)
+FetchContent_Declare(
+	vulkan-loader
+	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Loader
+	GIT_TAG master
+)
+FetchContent_Declare(
+	vulkan-validationlayers
+	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-ValidationLayers
+	GIT_TAG ${VULKAN_TAG}
+)
 
+# After all the content is declared, it can safely be made available.
+FetchContent_MakeAvailable(googletest)
+FetchContent_MakeAvailable(json)
+FetchContent_MakeAvailable(jsoncpp)
 execute_process(COMMAND python ${jsoncpp_SOURCE_DIR}/amalgamate.py WORKING_DIRECTORY ${jsoncpp_SOURCE_DIR})
 
 set(UPDATE_DEPS ON)
@@ -55,37 +75,25 @@ set(BUILD_TESTS OFF)
 set(_build_type ${CMAKE_BUILD_TYPE})
 set(VVL_CPP_STANDARD 11)
 set(_build_type ${CMAKE_BUILD_TYPE})
+FetchContent_MakeAvailable(vulkan-headers)
+FetchContent_MakeAvailable(vulkan-loader)
 
-FetchContent_Declare(
-	Vulkan-Headers
-	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers
-	GIT_TAG main
-)
-
-FetchContent_MakeAvailable(Vulkan-Headers)
-
-FetchContent_Declare(
-	Vulkan-Loader
-	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Loader
-	GIT_TAG master
-)
-
-FetchContent_MakeAvailable(Vulkan-Loader)
+# We want the code for Vulkan-ValidationLayers, to get source required
+# to build devsim, but we don't need its build and build dependencies;
+# we just need some source from its tree.  We avoid using
+# FetchContent_MakeAvailable() because it will add the dependency build
+# (and all of its dependencies, recursively) to our build; by calling 
+# FetchContent_Populate() directly, we avoid the troubles that can cause.
+FetchContent_GetProperties(vulkan-validationlayers)
+# We protect the FetchContent_Populate() call just in case this project
+# is a dependent project of a higher-level project.
+if(NOT vulkan-validationlayers_POPULATED)
+    FetchContent_Populate(vulkan-validationlayers)
+endif()
 
 set(API_NAME "Vulkan" CACHE STRING "API name to use when building")
 string(TOLOWER ${API_NAME} API_LOWERCASE)
 add_definitions(-DAPI_NAME="${API_NAME}")
-
-FetchContent_Declare(
-	Vulkan-ValidationLayers
-	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-ValidationLayers
-	GIT_TAG ${VULKAN_TAG}
-)
-
-set(UPDATE_DEPS ON)
-set(BUILD_TESTS OFF)
-set(VVL_CPP_STANDARD 11)
-FetchContent_MakeAvailable(Vulkan-ValidationLayers)
 
 # Library project
 add_subdirectory(library)

@@ -60,15 +60,20 @@ else()
     endmacro()
 endif()
 
+FetchContent_GetProperties(vulkan-validationlayers)
+if(NOT vulkan-validationlayers_POPULATED)
+    FetchContent_Populate(vulkan-validationlayers)
+endif()
+
 if (APPLE)
     include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_BINARY_DIR}
         ${jsoncpp_SOURCE_DIR}/include
-        ${Vulkan-Headers_SOURCE_DIR}/include
-        ${Vulkan-ValidationLayers_SOURCE_DIR}/layers
-        ${Vulkan-ValidationLayers_SOURCE_DIR}/layers/generated
+        ${vulkan-headers_SOURCE_DIR}/include
+        ${vulkan-validationlayers_SOURCE_DIR}/layers
+        ${vulkan-validationlayers_SOURCE_DIR}/layers/generated
     )
 else ()
     include_directories(
@@ -76,9 +81,9 @@ else ()
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_BINARY_DIR}
         ${jsoncpp_SOURCE_DIR}/include
-        ${Vulkan-Headers_SOURCE_DIR}/include
-        ${Vulkan-ValidationLayers_SOURCE_DIR}/layers
-        ${Vulkan-ValidationLayers_SOURCE_DIR}/layers/generated
+        ${vulkan-headers_SOURCE_DIR}/include
+        ${vulkan-validationlayers_SOURCE_DIR}/layers
+        ${vulkan-validationlayers_SOURCE_DIR}/layers/generated
     )
 endif()
 
