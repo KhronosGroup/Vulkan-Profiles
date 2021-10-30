@@ -1738,6 +1738,10 @@ class PhysicalDeviceData {
     // VK_EXT_ycbcr_image_arrays structs
     VkPhysicalDeviceYcbcrImageArraysFeaturesEXT physical_device_ycbcr_image_arrays_features_;
 
+    // VK_KHR_fragment_shading_rate structs
+    VkPhysicalDeviceFragmentShadingRateFeaturesKHR physical_device_fragment_shading_rate_features_;
+    VkPhysicalDeviceFragmentShadingRatePropertiesKHR physical_device_fragment_shading_rate_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2078,6 +2082,10 @@ class PhysicalDeviceData {
 
         // VK_EXT_ycbcr_image_arrays structs
         physical_device_ycbcr_image_arrays_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_IMAGE_ARRAYS_FEATURES_EXT};
+
+        // VK_KHR_fragment_shading_rate structs
+        physical_device_fragment_shading_rate_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_FEATURES_KHR};
+        physical_device_fragment_shading_rate_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR};
     }
 
     const VkInstance instance_;
@@ -2249,6 +2257,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2834,6 +2844,8 @@ bool JsonLoader::LoadFile(const char *filename) {
              &pdd_.physical_device_vertex_input_dynamic_state_features_);
     GetValue(root, "VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT", &pdd_.physical_device_ycbcr_2plane_444_formats_features_);
     GetValue(root, "VkPhysicalDeviceYcbcrImageArraysFeaturesEXT", &pdd_.physical_device_ycbcr_image_arrays_features_);
+    GetValue(root, "VkPhysicalDeviceFragmentShadingRateFeaturesKHR", &pdd_.physical_device_fragment_shading_rate_features_);
+    GetValue(root, "VkPhysicalDeviceFragmentShadingRatePropertiesKHR", &pdd_.physical_device_fragment_shading_rate_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -5017,6 +5029,54 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(ycbcrImageArrays, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateFeaturesKHR)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_KHR_fragment_shading_rate, but "
+            "VK_KHR_fragment_shading_rate is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(pipelineFragmentShadingRate, WarnIfGreater);
+    GET_VALUE_WARN(primitiveFragmentShadingRate, WarnIfGreater);
+    GET_VALUE_WARN(attachmentFragmentShadingRate, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRatePropertiesKHR)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_KHR_fragment_shading_rate, but "
+            "VK_KHR_fragment_shading_rate is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE(minFragmentShadingRateAttachmentTexelSize);
+    GET_VALUE(maxFragmentShadingRateAttachmentTexelSize);
+    GET_VALUE_WARN(maxFragmentShadingRateAttachmentTexelSizeAspectRatio, WarnIfGreater);
+    GET_VALUE_WARN(primitiveFragmentShadingRateWithMultipleViewports, WarnIfGreater);
+    GET_VALUE_WARN(layeredShadingRateAttachments, WarnIfGreater);
+    GET_VALUE_WARN(fragmentShadingRateNonTrivialCombinerOps, WarnIfGreater);
+    GET_VALUE(maxFragmentSize);
+    GET_VALUE_WARN(maxFragmentSizeAspectRatio, WarnIfGreater);
+    GET_VALUE_WARN(maxFragmentShadingRateCoverageSamples, WarnIfGreater);
+    GET_VALUE(maxFragmentShadingRateRasterizationSamples);
+    GET_VALUE_WARN(fragmentShadingRateWithShaderDepthStencilWrites, WarnIfGreater);
+    GET_VALUE_WARN(fragmentShadingRateWithSampleMask, WarnIfGreater);
+    GET_VALUE_WARN(fragmentShadingRateWithShaderSampleMask, WarnIfGreater);
+    GET_VALUE_WARN(fragmentShadingRateWithConservativeRasterization, WarnIfGreater);
+    GET_VALUE_WARN(fragmentShadingRateWithFragmentShaderInterlock, WarnIfGreater);
+    GET_VALUE_WARN(fragmentShadingRateWithCustomSampleLocations, WarnIfGreater);
+    GET_VALUE_WARN(fragmentShadingRateStrictMultiplyCombiner, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -6508,6 +6568,18 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = yiaf->pNext;
             *yiaf = physicalDeviceData->physical_device_ycbcr_image_arrays_features_;
             yiaf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_FEATURES_KHR &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+            VkPhysicalDeviceFragmentShadingRateFeaturesKHR *fsrf = (VkPhysicalDeviceFragmentShadingRateFeaturesKHR *)place;
+            void *pNext = fsrf->pNext;
+            *fsrf = physicalDeviceData->physical_device_fragment_shading_rate_features_;
+            fsrf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+            VkPhysicalDeviceFragmentShadingRatePropertiesKHR *fsrp = (VkPhysicalDeviceFragmentShadingRatePropertiesKHR *)place;
+            void *pNext = fsrp->pNext;
+            *fsrp = physicalDeviceData->physical_device_fragment_shading_rate_properties_;
+            fsrp->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -8135,6 +8207,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_ycbcr_image_arrays_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_ycbcr_image_arrays_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+                    pdd.physical_device_fragment_shading_rate_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_fragment_shading_rate_features_);
+
+                    pdd.physical_device_fragment_shading_rate_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_fragment_shading_rate_properties_);
                 }
 
                 if (api_version_above_1_1) {
