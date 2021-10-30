@@ -1588,6 +1588,10 @@ class PhysicalDeviceData {
     // VK_EXT_astc_decode_mode structs
     VkPhysicalDeviceASTCDecodeFeaturesEXT physical_device_astc_decode_features_;
 
+    // VK_EXT_blend_operation_advanced structs
+    VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT physical_device_blend_operation_advanced_features_;
+    VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT physical_device_blend_operation_advanced_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1766,6 +1770,10 @@ class PhysicalDeviceData {
 
         // VK_EXT_astc_decode_mode structs
         physical_device_astc_decode_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ASTC_DECODE_FEATURES_EXT};
+
+        // VK_EXT_blend_operation_advanced structs
+        physical_device_blend_operation_advanced_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_FEATURES_EXT};
+        physical_device_blend_operation_advanced_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_PROPERTIES_EXT};
     }
 
     const VkInstance instance_;
@@ -1880,6 +1888,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevice4444FormatsFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceASTCDecodeFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2369,6 +2379,9 @@ bool JsonLoader::LoadFile(const char *filename) {
              &pdd_.physical_device_workgroup_memory_explicit_layout_features_);
     GetValue(root, "VkPhysicalDevice4444FormatsFeaturesEXT", &pdd_.physical_device_4444_formats_features_);
     GetValue(root, "VkPhysicalDeviceASTCDecodeFeaturesEXT", &pdd_.physical_device_astc_decode_features_);
+    GetValue(root, "VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT", &pdd_.physical_device_blend_operation_advanced_features_);
+    GetValue(root, "VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT",
+             &pdd_.physical_device_blend_operation_advanced_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -3595,6 +3608,41 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(decodeModeSharedExponent, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_blend_operation_advanced, but "
+            "VK_EXT_blend_operation_advanced is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(advancedBlendCoherentOperations, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_blend_operation_advanced, but "
+            "VK_EXT_blend_operation_advanced is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(advancedBlendMaxColorAttachments, WarnIfGreater);
+    GET_VALUE_WARN(advancedBlendIndependentBlend, WarnIfGreater);
+    GET_VALUE_WARN(advancedBlendNonPremultipliedSrcColor, WarnIfGreater);
+    GET_VALUE_WARN(advancedBlendNonPremultipliedDstColor, WarnIfGreater);
+    GET_VALUE_WARN(advancedBlendCorrelatedOverlap, WarnIfGreater);
+    GET_VALUE_WARN(advancedBlendAllOperations, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -4728,6 +4776,19 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = astcdf->pNext;
             *astcdf = physicalDeviceData->physical_device_astc_decode_features_;
             astcdf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+            VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *boaf = (VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *)place;
+            void *pNext = boaf->pNext;
+            *boaf = physicalDeviceData->physical_device_blend_operation_advanced_features_;
+            boaf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_PROPERTIES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+            VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *boap =
+                (VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *)place;
+            void *pNext = boap->pNext;
+            *boap = physicalDeviceData->physical_device_blend_operation_advanced_properties_;
+            boap->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -6037,6 +6098,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_astc_decode_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_astc_decode_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+                    pdd.physical_device_blend_operation_advanced_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_blend_operation_advanced_features_);
+
+                    pdd.physical_device_blend_operation_advanced_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_blend_operation_advanced_properties_);
                 }
 
                 if (api_version_above_1_1) {
