@@ -1735,6 +1735,9 @@ class PhysicalDeviceData {
     // VK_EXT_ycbcr_2plane_444_formats structs
     VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT physical_device_ycbcr_2plane_444_formats_features_;
 
+    // VK_EXT_ycbcr_image_arrays structs
+    VkPhysicalDeviceYcbcrImageArraysFeaturesEXT physical_device_ycbcr_image_arrays_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2072,6 +2075,9 @@ class PhysicalDeviceData {
         // VK_EXT_ycbcr_2plane_444_formats structs
         physical_device_ycbcr_2plane_444_formats_features_ = {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_2_PLANE_444_FORMATS_FEATURES_EXT};
+
+        // VK_EXT_ycbcr_image_arrays structs
+        physical_device_ycbcr_image_arrays_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_IMAGE_ARRAYS_FEATURES_EXT};
     }
 
     const VkInstance instance_;
@@ -2242,6 +2248,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2826,6 +2833,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT",
              &pdd_.physical_device_vertex_input_dynamic_state_features_);
     GetValue(root, "VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT", &pdd_.physical_device_ycbcr_2plane_444_formats_features_);
+    GetValue(root, "VkPhysicalDeviceYcbcrImageArraysFeaturesEXT", &pdd_.physical_device_ycbcr_image_arrays_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4994,6 +5002,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(ycbcr2plane444Formats, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceYcbcrImageArraysFeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_ycbcr_image_arrays, but "
+            "VK_EXT_ycbcr_image_arrays is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(ycbcrImageArrays, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -6479,6 +6502,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = y2pff->pNext;
             *y2pff = physicalDeviceData->physical_device_ycbcr_2plane_444_formats_features_;
             y2pff->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_IMAGE_ARRAYS_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
+            VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *yiaf = (VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *)place;
+            void *pNext = yiaf->pNext;
+            *yiaf = physicalDeviceData->physical_device_ycbcr_image_arrays_features_;
+            yiaf->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -8100,6 +8129,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_ycbcr_2plane_444_formats_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_ycbcr_2plane_444_formats_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
+                    pdd.physical_device_ycbcr_image_arrays_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_ycbcr_image_arrays_features_);
                 }
 
                 if (api_version_above_1_1) {
