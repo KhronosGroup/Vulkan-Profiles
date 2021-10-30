@@ -1715,6 +1715,9 @@ class PhysicalDeviceData {
     VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT physical_device_texel_buffer_alignment_features_;
     VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT physical_device_texel_buffer_alignment_properties_;
 
+    // VK_EXT_texture_compression_astc_hdr structs
+    VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT physical_device_texture_compression_astc_hdr_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2027,6 +2030,10 @@ class PhysicalDeviceData {
         // VK_EXT_texel_buffer_alignment structs
         physical_device_texel_buffer_alignment_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT};
         physical_device_texel_buffer_alignment_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT};
+
+        // VK_EXT_texture_compression_astc_hdr structs
+        physical_device_texture_compression_astc_hdr_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXTURE_COMPRESSION_ASTC_HDR_FEATURES_EXT};
     }
 
     const VkInstance instance_;
@@ -2189,6 +2196,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2762,6 +2770,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT", &pdd_.physical_device_subgroup_size_control_properties_);
     GetValue(root, "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT", &pdd_.physical_device_texel_buffer_alignment_features_);
     GetValue(root, "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT", &pdd_.physical_device_texel_buffer_alignment_properties_);
+    GetValue(root, "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT",
+             &pdd_.physical_device_texture_compression_astc_hdr_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4795,6 +4805,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(uniformTexelBufferOffsetSingleTexelAlignment, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_texture_compression_astc_hdr, but "
+            "VK_EXT_texture_compression_astc_hdr is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(textureCompressionASTC_HDR, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -6230,6 +6255,13 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = tbap->pNext;
             *tbap = physicalDeviceData->physical_device_texel_buffer_alignment_properties_;
             tbap->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXTURE_COMPRESSION_ASTC_HDR_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
+            VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *tcastchdrf =
+                (VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *)place;
+            void *pNext = tcastchdrf->pNext;
+            *tcastchdrf = physicalDeviceData->physical_device_texture_compression_astc_hdr_features_;
+            tcastchdrf->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -7807,6 +7839,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_texel_buffer_alignment_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_texel_buffer_alignment_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
+                    pdd.physical_device_texture_compression_astc_hdr_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_texture_compression_astc_hdr_features_);
                 }
 
                 if (api_version_above_1_1) {
