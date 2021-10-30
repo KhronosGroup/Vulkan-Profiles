@@ -1630,6 +1630,9 @@ class PhysicalDeviceData {
     VkPhysicalDeviceFragmentDensityMapFeaturesEXT physical_device_fragment_density_map_features_;
     VkPhysicalDeviceFragmentDensityMapPropertiesEXT physical_device_fragment_density_map_properties_;
 
+    // VK_EXT_fragment_shader_interlock structs
+    VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT physical_device_fragment_shader_interlock_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1854,6 +1857,10 @@ class PhysicalDeviceData {
         physical_device_fragment_density_map_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_FEATURES_EXT};
         physical_device_fragment_density_map_properties_ = {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_PROPERTIES_EXT};
+
+        // VK_EXT_fragment_shader_interlock structs
+        physical_device_fragment_shader_interlock_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT};
     }
 
     const VkInstance instance_;
@@ -1984,6 +1991,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExternalMemoryHostPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentDensityMapFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentDensityMapPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2491,6 +2499,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceExternalMemoryHostPropertiesEXT", &pdd_.physical_device_external_memory_host_properties_);
     GetValue(root, "VkPhysicalDeviceFragmentDensityMapFeaturesEXT", &pdd_.physical_device_fragment_density_map_features_);
     GetValue(root, "VkPhysicalDeviceFragmentDensityMapPropertiesEXT", &pdd_.physical_device_fragment_density_map_properties_);
+    GetValue(root, "VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT", &pdd_.physical_device_fragment_shader_interlock_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -3980,6 +3989,23 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(fragmentDensityInvocations, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_fragment_shader_interlock, but "
+            "VK_EXT_fragment_shader_interlock is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(fragmentShaderSampleInterlock, WarnIfGreater);
+    GET_VALUE_WARN(fragmentShaderPixelInterlock, WarnIfGreater);
+    GET_VALUE_WARN(fragmentShaderShadingRateInterlock, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -5211,6 +5237,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = fdmp->pNext;
             *fdmp = physicalDeviceData->physical_device_fragment_density_map_properties_;
             fdmp->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
+            VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *fsif = (VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *)place;
+            void *pNext = fsif->pNext;
+            *fsif = physicalDeviceData->physical_device_fragment_shader_interlock_features_;
+            fsif->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -6610,6 +6642,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_fragment_density_map_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_fragment_density_map_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
+                    pdd.physical_device_fragment_shader_interlock_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_fragment_shader_interlock_features_);
                 }
 
                 if (api_version_above_1_1) {
