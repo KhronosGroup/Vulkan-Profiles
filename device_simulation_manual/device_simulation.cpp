@@ -1669,6 +1669,9 @@ class PhysicalDeviceData {
     // VK_EXT_pci_bus_info structs
     VkPhysicalDevicePCIBusInfoPropertiesEXT physical_device_pci_bus_info_properties_;
 
+    // VK_EXT_physical_device_drm structs
+    VkPhysicalDeviceDrmPropertiesEXT physical_device_drm_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1931,6 +1934,9 @@ class PhysicalDeviceData {
 
         // VK_EXT_pci_bus_info structs
         physical_device_pci_bus_info_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PCI_BUS_INFO_PROPERTIES_EXT};
+
+        // VK_EXT_physical_device_drm structs
+        physical_device_drm_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRM_PROPERTIES_EXT};
     }
 
     const VkInstance instance_;
@@ -2075,6 +2081,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiDrawPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePCIBusInfoPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDrmPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2163,6 +2170,19 @@ class JsonLoader {
             return;
         }
         const uint64_t new_value = value.asUInt64();
+        if (warn_func) {
+            warn_func(name, new_value, *dest);
+        }
+        *dest = new_value;
+    }
+
+    void GetValue(const Json::Value &parent, const char *name, int64_t *dest,
+                  std::function<bool(const char *, int64_t, int64_t)> warn_func = nullptr) {
+        const Json::Value value = parent[name];
+        if (!value.isInt64()) {
+            return;
+        }
+        const int64_t new_value = value.asInt64();
         if (warn_func) {
             warn_func(name, new_value, *dest);
         }
@@ -2614,6 +2634,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT",
              &pdd_.physical_device_pageable_device_local_memory_features_);
     GetValue(root, "VkPhysicalDevicePCIBusInfoPropertiesEXT", &pdd_.physical_device_pci_bus_info_properties_);
+    GetValue(root, "VkPhysicalDeviceDrmPropertiesEXT", &pdd_.physical_device_drm_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4329,6 +4350,26 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(pciFunction, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDrmPropertiesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDrmPropertiesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PHYSICAL_DEVICE_DRM_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_physical_device_drm, but "
+            "VK_EXT_physical_device_drm is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(hasPrimary, WarnIfGreater);
+    GET_VALUE_WARN(hasRender, WarnIfGreater);
+    GET_VALUE_WARN(primaryMajor, WarnIfGreater);
+    GET_VALUE_WARN(primaryMinor, WarnIfGreater);
+    GET_VALUE_WARN(renderMajor, WarnIfGreater);
+    GET_VALUE_WARN(renderMinor, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -5653,6 +5694,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = pcibip->pNext;
             *pcibip = physicalDeviceData->physical_device_pci_bus_info_properties_;
             pcibip->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRM_PROPERTIES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PHYSICAL_DEVICE_DRM_EXTENSION_NAME)) {
+            VkPhysicalDeviceDrmPropertiesEXT *drmp = (VkPhysicalDeviceDrmPropertiesEXT *)place;
+            void *pNext = drmp->pNext;
+            *drmp = physicalDeviceData->physical_device_drm_properties_;
+            drmp->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -7130,6 +7177,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_pci_bus_info_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_pci_bus_info_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_PHYSICAL_DEVICE_DRM_EXTENSION_NAME)) {
+                    pdd.physical_device_drm_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_drm_properties_);
                 }
 
                 if (api_version_above_1_1) {
