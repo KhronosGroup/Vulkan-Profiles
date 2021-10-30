@@ -1707,6 +1707,10 @@ class PhysicalDeviceData {
     // VK_EXT_shader_image_atomic_int64 structs
     VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT physical_device_shader_image_atomic_int64_features_;
 
+    // VK_EXT_subgroup_size_control structs
+    VkPhysicalDeviceSubgroupSizeControlFeaturesEXT physical_device_subgroup_size_control_features_;
+    VkPhysicalDeviceSubgroupSizeControlPropertiesEXT physical_device_subgroup_size_control_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2010,6 +2014,11 @@ class PhysicalDeviceData {
         // VK_EXT_shader_image_atomic_int64 structs
         physical_device_shader_image_atomic_int64_features_ = {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_IMAGE_ATOMIC_INT64_FEATURES_EXT};
+
+        // VK_EXT_subgroup_size_control structs
+        physical_device_subgroup_size_control_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT};
+        physical_device_subgroup_size_control_properties_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT};
     }
 
     const VkInstance instance_;
@@ -2168,6 +2177,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2737,6 +2748,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT",
              &pdd_.physical_device_shader_demote_to_helper_invocation_features_);
     GetValue(root, "VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT", &pdd_.physical_device_shader_image_atomic_int64_features_);
+    GetValue(root, "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT", &pdd_.physical_device_subgroup_size_control_features_);
+    GetValue(root, "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT", &pdd_.physical_device_subgroup_size_control_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4703,6 +4716,40 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(sparseImageInt64Atomics, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupSizeControlFeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_subgroup_size_control, but "
+            "VK_EXT_subgroup_size_control is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(subgroupSizeControl, WarnIfGreater);
+    GET_VALUE_WARN(computeFullSubgroups, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupSizeControlPropertiesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_subgroup_size_control, but "
+            "VK_EXT_subgroup_size_control is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(minSubgroupSize, WarnIfLesser);
+    GET_VALUE_WARN(maxSubgroupSize, WarnIfGreater);
+    GET_VALUE_WARN(maxComputeWorkgroupSubgroups, WarnIfGreater);
+    GET_VALUE_WARN(requiredSubgroupSizeStages, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -6114,6 +6161,18 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = siai64f->pNext;
             *siai64f = physicalDeviceData->physical_device_shader_image_atomic_int64_features_;
             siai64f->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+            VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *sscf = (VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *)place;
+            void *pNext = sscf->pNext;
+            *sscf = physicalDeviceData->physical_device_subgroup_size_control_features_;
+            sscf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+            VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *sscp = (VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *)place;
+            void *pNext = sscp->pNext;
+            *sscp = physicalDeviceData->physical_device_subgroup_size_control_properties_;
+            sscp->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -7671,6 +7730,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_shader_image_atomic_int64_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_image_atomic_int64_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+                    pdd.physical_device_subgroup_size_control_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_subgroup_size_control_features_);
+
+                    pdd.physical_device_subgroup_size_control_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_subgroup_size_control_properties_);
                 }
 
                 if (api_version_above_1_1) {
