@@ -1608,6 +1608,9 @@ class PhysicalDeviceData {
     VkPhysicalDeviceCustomBorderColorFeaturesEXT physical_device_custom_border_color_features_;
     VkPhysicalDeviceCustomBorderColorPropertiesEXT physical_device_custom_border_color_properties_;
 
+    // VK_EXT_depth_clip_enable structs
+    VkPhysicalDeviceDepthClipEnableFeaturesEXT physical_device_depth_clip_enable_features_ext_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1807,6 +1810,9 @@ class PhysicalDeviceData {
         // VK_EXT_custom_border_color structs
         physical_device_custom_border_color_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT};
         physical_device_custom_border_color_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_PROPERTIES_EXT};
+
+        // VK_EXT_depth_clip_enable structs
+        physical_device_depth_clip_enable_features_ext_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT};
     }
 
     const VkInstance instance_;
@@ -1929,6 +1935,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCustomBorderColorFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCustomBorderColorPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2428,6 +2435,7 @@ bool JsonLoader::LoadFile(const char *filename) {
              &pdd_.physical_device_conservative_rasterization_properties_);
     GetValue(root, "VkPhysicalDeviceCustomBorderColorFeaturesEXT", &pdd_.physical_device_custom_border_color_features_);
     GetValue(root, "VkPhysicalDeviceCustomBorderColorPropertiesEXT", &pdd_.physical_device_custom_border_color_properties_);
+    GetValue(root, "VkPhysicalDeviceDepthClipEnableFeaturesEXT", &pdd_.physical_device_depth_clip_enable_features_ext_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -3791,6 +3799,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(maxCustomBorderColorSamplers, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDepthClipEnableFeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_depth_clip_enable, but "
+            "VK_EXT_depth_clip_enable is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(depthClipEnable, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -4974,6 +4997,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = cbcp->pNext;
             *cbcp = physicalDeviceData->physical_device_custom_border_color_properties_;
             cbcp->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
+            VkPhysicalDeviceDepthClipEnableFeaturesEXT *dcef = (VkPhysicalDeviceDepthClipEnableFeaturesEXT *)place;
+            void *pNext = dcef->pNext;
+            *dcef = physicalDeviceData->physical_device_depth_clip_enable_features_ext_;
+            dcef->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -6327,6 +6356,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_custom_border_color_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_custom_border_color_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
+                    pdd.physical_device_depth_clip_enable_features_ext_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_depth_clip_enable_features_ext_);
                 }
 
                 if (api_version_above_1_1) {
