@@ -1681,6 +1681,10 @@ class PhysicalDeviceData {
     // VK_EXT_private_data structs
     VkPhysicalDevicePrivateDataFeaturesEXT physical_device_private_data_features_;
 
+    // VK_EXT_provoking_vertex structs
+    VkPhysicalDeviceProvokingVertexFeaturesEXT physical_device_provoking_vertex_features_;
+    VkPhysicalDeviceProvokingVertexPropertiesEXT physical_device_provoking_vertex_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1956,6 +1960,10 @@ class PhysicalDeviceData {
 
         // VK_EXT_private_data structs
         physical_device_private_data_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT};
+
+        // VK_EXT_provoking_vertex structs
+        physical_device_provoking_vertex_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROVOKING_VERTEX_FEATURES_EXT};
+        physical_device_provoking_vertex_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROVOKING_VERTEX_PROPERTIES_EXT};
     }
 
     const VkInstance instance_;
@@ -2104,6 +2112,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePrivateDataFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProvokingVertexFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProvokingVertexPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2662,6 +2672,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT",
              &pdd_.physical_device_primitive_topology_list_restart_features_);
     GetValue(root, "VkPhysicalDevicePrivateDataFeaturesEXT", &pdd_.physical_device_private_data_features_);
+    GetValue(root, "VkPhysicalDeviceProvokingVertexFeaturesEXT", &pdd_.physical_device_provoking_vertex_features_);
+    GetValue(root, "VkPhysicalDeviceProvokingVertexPropertiesEXT", &pdd_.physical_device_provoking_vertex_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4445,6 +4457,38 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(privateData, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProvokingVertexFeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProvokingVertexFeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_provoking_vertex, but "
+            "VK_EXT_provoking_vertex is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(provokingVertexLast, WarnIfGreater);
+    GET_VALUE_WARN(transformFeedbackPreservesProvokingVertex, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProvokingVertexPropertiesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProvokingVertexPropertiesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_provoking_vertex, but "
+            "VK_EXT_provoking_vertex is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(provokingVertexModePerPipeline, WarnIfGreater);
+    GET_VALUE_WARN(transformFeedbackPreservesTriangleFanProvokingVertex, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -5795,6 +5839,18 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = pdf->pNext;
             *pdf = physicalDeviceData->physical_device_private_data_features_;
             pdf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROVOKING_VERTEX_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+            VkPhysicalDeviceProvokingVertexFeaturesEXT *pvf = (VkPhysicalDeviceProvokingVertexFeaturesEXT *)place;
+            void *pNext = pvf->pNext;
+            *pvf = physicalDeviceData->physical_device_provoking_vertex_features_;
+            pvf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROVOKING_VERTEX_PROPERTIES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+            VkPhysicalDeviceProvokingVertexPropertiesEXT *pvp = (VkPhysicalDeviceProvokingVertexPropertiesEXT *)place;
+            void *pNext = pvp->pNext;
+            *pvp = physicalDeviceData->physical_device_provoking_vertex_properties_;
+            pvp->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -7296,6 +7352,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_private_data_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_private_data_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+                    pdd.physical_device_provoking_vertex_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_provoking_vertex_features_);
+
+                    pdd.physical_device_provoking_vertex_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_provoking_vertex_properties_);
                 }
 
                 if (api_version_above_1_1) {
