@@ -1563,6 +1563,9 @@ class PhysicalDeviceData {
     VkPhysicalDeviceRayTracingPipelineFeaturesKHR physical_device_ray_tracing_pipeline_features_;
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR physical_device_ray_tracing_pipeline_properties_;
 
+    // VK_KHR_shader_clock structs
+    VkPhysicalDeviceShaderClockFeaturesKHR physical_device_shader_clock_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1712,6 +1715,9 @@ class PhysicalDeviceData {
         // VK_KHR_ray_tracing_pipeline structs
         physical_device_ray_tracing_pipeline_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR};
         physical_device_ray_tracing_pipeline_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR};
+
+        // VK_KHR_shader_clock structs
+        physical_device_shader_clock_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR};
     }
 
     const VkInstance instance_;
@@ -1817,6 +1823,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayQueryFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPipelineFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPipelinePropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderClockFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2292,6 +2299,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceRayQueryFeaturesKHR", &pdd_.physical_device_ray_query_features_);
     GetValue(root, "VkPhysicalDeviceRayTracingPipelineFeaturesKHR", &pdd_.physical_device_ray_tracing_pipeline_features_);
     GetValue(root, "VkPhysicalDeviceRayTracingPipelinePropertiesKHR", &pdd_.physical_device_ray_tracing_pipeline_properties_);
+    GetValue(root, "VkPhysicalDeviceShaderClockFeaturesKHR", &pdd_.physical_device_shader_clock_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -3345,6 +3353,22 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(maxRayDispatchInvocationCount, WarnIfGreater);
     GET_VALUE_WARN(shaderGroupHandleAlignment, WarnIfGreater);
     GET_VALUE_WARN(maxRayHitAttributeSize, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderClockFeaturesKHR *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderClockFeaturesKHR)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_KHR_shader_clock, but "
+            "VK_KHR_shader_clock is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(shaderSubgroupClock, WarnIfGreater);
+    GET_VALUE_WARN(shaderDeviceClock, WarnIfGreater);
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
@@ -4421,6 +4445,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = rtpp->pNext;
             *rtpp = physicalDeviceData->physical_device_ray_tracing_pipeline_properties_;
             rtpp->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
+            VkPhysicalDeviceShaderClockFeaturesKHR *scf = (VkPhysicalDeviceShaderClockFeaturesKHR *)place;
+            void *pNext = scf->pNext;
+            *scf = physicalDeviceData->physical_device_shader_clock_features_;
+            scf->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -5678,6 +5708,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_ray_tracing_pipeline_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_ray_tracing_pipeline_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
+                    pdd.physical_device_shader_clock_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_shader_clock_features_);
                 }
 
                 if (api_version_above_1_1) {
