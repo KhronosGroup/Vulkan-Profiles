@@ -1678,6 +1678,9 @@ class PhysicalDeviceData {
     // VK_EXT_primitive_topology_list_restart structs
     VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT physical_device_primitive_topology_list_restart_features_;
 
+    // VK_EXT_private_data structs
+    VkPhysicalDevicePrivateDataFeaturesEXT physical_device_private_data_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1951,6 +1954,8 @@ class PhysicalDeviceData {
         physical_device_primitive_topology_list_restart_features_ = {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIMITIVE_TOPOLOGY_LIST_RESTART_FEATURES_EXT};
 
+        // VK_EXT_private_data structs
+        physical_device_private_data_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT};
     }
 
     const VkInstance instance_;
@@ -2098,6 +2103,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDrmPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePrivateDataFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2655,6 +2661,7 @@ bool JsonLoader::LoadFile(const char *filename) {
              &pdd_.physical_device_pipeline_creation_cache_control_features_);
     GetValue(root, "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT",
              &pdd_.physical_device_primitive_topology_list_restart_features_);
+    GetValue(root, "VkPhysicalDevicePrivateDataFeaturesEXT", &pdd_.physical_device_private_data_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4423,6 +4430,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(primitiveTopologyPatchListRestart, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePrivateDataFeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePrivateDataFeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_private_data, but "
+            "VK_EXT_private_data is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(privateData, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -5767,6 +5789,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = ptlrf->pNext;
             *ptlrf = physicalDeviceData->physical_device_primitive_topology_list_restart_features_;
             ptlrf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
+            VkPhysicalDevicePrivateDataFeaturesEXT *pdf = (VkPhysicalDevicePrivateDataFeaturesEXT *)place;
+            void *pNext = pdf->pNext;
+            *pdf = physicalDeviceData->physical_device_private_data_features_;
+            pdf->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -7262,6 +7290,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_primitive_topology_list_restart_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_primitive_topology_list_restart_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
+                    pdd.physical_device_private_data_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_private_data_features_);
                 }
 
                 if (api_version_above_1_1) {
