@@ -1617,6 +1617,9 @@ class PhysicalDeviceData {
     // VK_EXT_discard_rectangles structs
     VkPhysicalDeviceDiscardRectanglePropertiesEXT physical_device_discard_rectangle_properties_;
 
+    // VK_EXT_extended_dynamic_state structs
+    VkPhysicalDeviceExtendedDynamicStateFeaturesEXT physical_device_extended_dynamic_state_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1825,6 +1828,9 @@ class PhysicalDeviceData {
 
         // VK_EXT_discard_rectangles structs
         physical_device_discard_rectangle_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DISCARD_RECTANGLE_PROPERTIES_EXT};
+
+        // VK_EXT_extended_dynamic_state structs
+        physical_device_extended_dynamic_state_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT};
     }
 
     const VkInstance instance_;
@@ -1950,6 +1956,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2452,6 +2459,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceDepthClipEnableFeaturesEXT", &pdd_.physical_device_depth_clip_enable_features_ext_);
     GetValue(root, "VkPhysicalDeviceDeviceMemoryReportFeaturesEXT", &pdd_.physical_device_device_memory_report_features_);
     GetValue(root, "VkPhysicalDeviceDiscardRectanglePropertiesEXT", &pdd_.physical_device_discard_rectangle_properties_);
+    GetValue(root, "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT", &pdd_.physical_device_extended_dynamic_state_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -3860,6 +3868,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(maxDiscardRectangles, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExtendedDynamicStateFeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_extended_dynamic_state, but "
+            "VK_EXT_extended_dynamic_state is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(extendedDynamicState, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -5061,6 +5084,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = drp->pNext;
             *drp = physicalDeviceData->physical_device_discard_rectangle_properties_;
             drp->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
+            VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *edsf = (VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *)place;
+            void *pNext = edsf->pNext;
+            *edsf = physicalDeviceData->physical_device_extended_dynamic_state_features_;
+            edsf->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -6432,6 +6461,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_discard_rectangle_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_discard_rectangle_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
+                    pdd.physical_device_extended_dynamic_state_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_extended_dynamic_state_features_);
                 }
 
                 if (api_version_above_1_1) {
