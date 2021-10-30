@@ -1601,6 +1601,9 @@ class PhysicalDeviceData {
     // VK_EXT_conditional_rendering structs
     VkPhysicalDeviceConditionalRenderingFeaturesEXT physical_device_conditional_rendering_features_;
 
+    // VK_EXT_conservative_rasterization structs
+    VkPhysicalDeviceConservativeRasterizationPropertiesEXT physical_device_conservative_rasterization_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1792,6 +1795,10 @@ class PhysicalDeviceData {
 
         // VK_EXT_conditional_rendering structs
         physical_device_conditional_rendering_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONDITIONAL_RENDERING_FEATURES_EXT};
+
+        // VK_EXT_conservative_rasterization structs
+        physical_device_conservative_rasterization_properties_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONSERVATIVE_RASTERIZATION_PROPERTIES_EXT};
     }
 
     const VkInstance instance_;
@@ -1911,6 +1918,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2406,6 +2414,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceBorderColorSwizzleFeaturesEXT", &pdd_.physical_device_border_color_swizzle_features_);
     GetValue(root, "VkPhysicalDeviceColorWriteEnableFeaturesEXT", &pdd_.physical_device_color_write_enable_features_);
     GetValue(root, "VkPhysicalDeviceConditionalRenderingFeaturesEXT", &pdd_.physical_device_conditional_rendering_features_);
+    GetValue(root, "VkPhysicalDeviceConservativeRasterizationPropertiesEXT",
+             &pdd_.physical_device_conservative_rasterization_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -3714,6 +3724,30 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(inheritedConditionalRendering, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name,
+                          VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceConservativeRasterizationPropertiesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_conservative_rasterization, but "
+            "VK_EXT_conservative_rasterization is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(primitiveOverestimationSize, WarnIfGreater);
+    GET_VALUE_WARN(maxExtraPrimitiveOverestimationSize, WarnIfGreater);
+    GET_VALUE_WARN(extraPrimitiveOverestimationSizeGranularity, WarnIfGreater);
+    GET_VALUE_WARN(primitiveUnderestimation, WarnIfGreater);
+    GET_VALUE_WARN(conservativePointAndLineRasterization, WarnIfGreater);
+    GET_VALUE_WARN(degenerateTrianglesRasterized, WarnIfGreater);
+    GET_VALUE_WARN(degenerateLinesRasterized, WarnIfGreater);
+    GET_VALUE_WARN(fullyCoveredFragmentShaderInputVariable, WarnIfGreater);
+    GET_VALUE_WARN(conservativeRasterizationPostDepthCoverage, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -4878,6 +4912,13 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = crf->pNext;
             *crf = physicalDeviceData->physical_device_conditional_rendering_features_;
             crf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONSERVATIVE_RASTERIZATION_PROPERTIES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
+            VkPhysicalDeviceConservativeRasterizationPropertiesEXT *crp =
+                (VkPhysicalDeviceConservativeRasterizationPropertiesEXT *)place;
+            void *pNext = crp->pNext;
+            *crp = physicalDeviceData->physical_device_conservative_rasterization_properties_;
+            crp->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -6215,6 +6256,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_conditional_rendering_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_conditional_rendering_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
+                    pdd.physical_device_conservative_rasterization_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_conservative_rasterization_properties_);
                 }
 
                 if (api_version_above_1_1) {
