@@ -1598,6 +1598,9 @@ class PhysicalDeviceData {
     // VK_EXT_color_write_enable structs
     VkPhysicalDeviceColorWriteEnableFeaturesEXT physical_device_color_write_enable_features_;
 
+    // VK_EXT_conditional_rendering structs
+    VkPhysicalDeviceConditionalRenderingFeaturesEXT physical_device_conditional_rendering_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1786,6 +1789,9 @@ class PhysicalDeviceData {
 
         // VK_EXT_color_write_enable structs
         physical_device_color_write_enable_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COLOR_WRITE_ENABLE_FEATURES_EXT};
+
+        // VK_EXT_conditional_rendering structs
+        physical_device_conditional_rendering_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONDITIONAL_RENDERING_FEATURES_EXT};
     }
 
     const VkInstance instance_;
@@ -1904,6 +1910,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2398,6 +2405,7 @@ bool JsonLoader::LoadFile(const char *filename) {
              &pdd_.physical_device_blend_operation_advanced_properties_);
     GetValue(root, "VkPhysicalDeviceBorderColorSwizzleFeaturesEXT", &pdd_.physical_device_border_color_swizzle_features_);
     GetValue(root, "VkPhysicalDeviceColorWriteEnableFeaturesEXT", &pdd_.physical_device_color_write_enable_features_);
+    GetValue(root, "VkPhysicalDeviceConditionalRenderingFeaturesEXT", &pdd_.physical_device_conditional_rendering_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -3690,6 +3698,22 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(colorWriteEnable, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceConditionalRenderingFeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_conditional_rendering, but "
+            "VK_EXT_conditional_rendering is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(conditionalRendering, WarnIfGreater);
+    GET_VALUE_WARN(inheritedConditionalRendering, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -4848,6 +4872,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = cwef->pNext;
             *cwef = physicalDeviceData->physical_device_color_write_enable_features_;
             cwef->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONDITIONAL_RENDERING_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
+            VkPhysicalDeviceConditionalRenderingFeaturesEXT *crf = (VkPhysicalDeviceConditionalRenderingFeaturesEXT *)place;
+            void *pNext = crf->pNext;
+            *crf = physicalDeviceData->physical_device_conditional_rendering_features_;
+            crf->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -6179,6 +6209,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_color_write_enable_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_color_write_enable_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
+                    pdd.physical_device_conditional_rendering_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_conditional_rendering_features_);
                 }
 
                 if (api_version_above_1_1) {
