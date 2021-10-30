@@ -1659,6 +1659,10 @@ class PhysicalDeviceData {
     // VK_EXT_memory_priority structs
     VkPhysicalDeviceMemoryPriorityFeaturesEXT physical_device_memory_priority_features_;
 
+    // VK_EXT_multi_draw structs
+    VkPhysicalDeviceMultiDrawFeaturesEXT physical_device_multi_draw_features_;
+    VkPhysicalDeviceMultiDrawPropertiesEXT physical_device_multi_draw_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1911,6 +1915,10 @@ class PhysicalDeviceData {
 
         // VK_EXT_memory_priority structs
         physical_device_memory_priority_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PRIORITY_FEATURES_EXT};
+
+        // VK_EXT_multi_draw structs
+        physical_device_multi_draw_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_FEATURES_EXT};
+        physical_device_multi_draw_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_PROPERTIES_EXT};
     }
 
     const VkInstance instance_;
@@ -2051,6 +2059,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceLineRasterizationPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryBudgetPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryPriorityFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiDrawFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiDrawPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2585,6 +2595,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceLineRasterizationPropertiesEXT", &pdd_.physical_device_line_rasterization_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryBudgetPropertiesEXT", &pdd_.physical_device_memory_budget_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryPriorityFeaturesEXT", &pdd_.physical_device_memory_priority_features_);
+    GetValue(root, "VkPhysicalDeviceMultiDrawFeaturesEXT", &pdd_.physical_device_multi_draw_features_);
+    GetValue(root, "VkPhysicalDeviceMultiDrawPropertiesEXT", &pdd_.physical_device_multi_draw_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4237,6 +4249,36 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(memoryPriority, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiDrawFeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMultiDrawFeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_multi_draw, but "
+            "VK_EXT_multi_draw is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(multiDraw, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiDrawPropertiesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMultiDrawPropertiesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_multi_draw, but "
+            "VK_EXT_multi_draw is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(maxMultiDrawCount, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -5536,6 +5578,18 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = mpf->pNext;
             *mpf = physicalDeviceData->physical_device_memory_priority_features_;
             mpf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+            VkPhysicalDeviceMultiDrawFeaturesEXT *mdf = (VkPhysicalDeviceMultiDrawFeaturesEXT *)place;
+            void *pNext = mdf->pNext;
+            *mdf = physicalDeviceData->physical_device_multi_draw_features_;
+            mdf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_PROPERTIES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+            VkPhysicalDeviceMultiDrawPropertiesEXT *mdp = (VkPhysicalDeviceMultiDrawPropertiesEXT *)place;
+            void *pNext = mdp->pNext;
+            *mdp = physicalDeviceData->physical_device_multi_draw_properties_;
+            mdp->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -6991,6 +7045,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_memory_priority_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_memory_priority_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+                    pdd.physical_device_multi_draw_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_multi_draw_features_);
+
+                    pdd.physical_device_multi_draw_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_multi_draw_properties_);
                 }
 
                 if (api_version_above_1_1) {
