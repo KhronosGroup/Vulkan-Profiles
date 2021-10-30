@@ -1559,6 +1559,10 @@ class PhysicalDeviceData {
     // VK_KHR_ray_query structs
     VkPhysicalDeviceRayQueryFeaturesKHR physical_device_ray_query_features_;
 
+    // VK_KHR_ray_tracing_pipeline structs
+    VkPhysicalDeviceRayTracingPipelineFeaturesKHR physical_device_ray_tracing_pipeline_features_;
+    VkPhysicalDeviceRayTracingPipelinePropertiesKHR physical_device_ray_tracing_pipeline_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1704,6 +1708,10 @@ class PhysicalDeviceData {
 
         // VK_KHR_ray_query structs
         physical_device_ray_query_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR};
+
+        // VK_KHR_ray_tracing_pipeline structs
+        physical_device_ray_tracing_pipeline_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR};
+        physical_device_ray_tracing_pipeline_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR};
     }
 
     const VkInstance instance_;
@@ -1807,6 +1815,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePresentWaitFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePushDescriptorPropertiesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayQueryFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPipelineFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPipelinePropertiesKHR *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2280,6 +2290,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDevicePresentWaitFeaturesKHR", &pdd_.physical_device_present_wait_features_);
     GetValue(root, "VkPhysicalDevicePushDescriptorPropertiesKHR", &pdd_.physical_device_push_descriptor_properites_);
     GetValue(root, "VkPhysicalDeviceRayQueryFeaturesKHR", &pdd_.physical_device_ray_query_features_);
+    GetValue(root, "VkPhysicalDeviceRayTracingPipelineFeaturesKHR", &pdd_.physical_device_ray_tracing_pipeline_features_);
+    GetValue(root, "VkPhysicalDeviceRayTracingPipelinePropertiesKHR", &pdd_.physical_device_ray_tracing_pipeline_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -3292,6 +3304,47 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "not supported by the device.\n");
     }
     GET_VALUE_WARN(rayQuery, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPipelineFeaturesKHR *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPipelineFeaturesKHR)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_KHR_ray_tracing_pipeline, but "
+            "VK_KHR_ray_tracing_pipeline is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(rayTracingPipeline, WarnIfGreater);
+    GET_VALUE_WARN(rayTracingPipelineShaderGroupHandleCaptureReplay, WarnIfGreater);
+    GET_VALUE_WARN(rayTracingPipelineShaderGroupHandleCaptureReplayMixed, WarnIfGreater);
+    GET_VALUE_WARN(rayTracingPipelineTraceRaysIndirect, WarnIfGreater);
+    GET_VALUE_WARN(rayTraversalPrimitiveCulling, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPipelinePropertiesKHR *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPipelinePropertiesKHR)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_KHR_ray_tracing_pipeline, but "
+            "VK_KHR_ray_tracing_pipeline is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(shaderGroupHandleSize, WarnIfGreater);
+    GET_VALUE_WARN(maxRayRecursionDepth, WarnIfGreater);
+    GET_VALUE_WARN(maxShaderGroupStride, WarnIfGreater);
+    GET_VALUE_WARN(shaderGroupBaseAlignment, WarnIfGreater);
+    GET_VALUE_WARN(shaderGroupHandleCaptureReplaySize, WarnIfGreater);
+    GET_VALUE_WARN(maxRayDispatchInvocationCount, WarnIfGreater);
+    GET_VALUE_WARN(shaderGroupHandleAlignment, WarnIfGreater);
+    GET_VALUE_WARN(maxRayHitAttributeSize, WarnIfGreater);
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
@@ -4356,6 +4409,18 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = rqf->pNext;
             *rqf = physicalDeviceData->physical_device_ray_query_features_;
             rqf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+            VkPhysicalDeviceRayTracingPipelineFeaturesKHR *rtpf = (VkPhysicalDeviceRayTracingPipelineFeaturesKHR *)place;
+            void *pNext = rtpf->pNext;
+            *rtpf = physicalDeviceData->physical_device_ray_tracing_pipeline_features_;
+            rtpf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+            VkPhysicalDeviceRayTracingPipelinePropertiesKHR *rtpp = (VkPhysicalDeviceRayTracingPipelinePropertiesKHR *)place;
+            void *pNext = rtpp->pNext;
+            *rtpp = physicalDeviceData->physical_device_ray_tracing_pipeline_properties_;
+            rtpp->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -5603,6 +5668,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_ray_query_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_ray_query_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+                    pdd.physical_device_ray_tracing_pipeline_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_ray_tracing_pipeline_features_);
+
+                    pdd.physical_device_ray_tracing_pipeline_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_ray_tracing_pipeline_properties_);
                 }
 
                 if (api_version_above_1_1) {
