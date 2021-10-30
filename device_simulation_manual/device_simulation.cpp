@@ -1573,6 +1573,9 @@ class PhysicalDeviceData {
     // VK_KHR_shader_subgroup_uniform_control_flow structs
     VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR physical_device_shader_subgroup_uniform_control_flow_features_;
 
+    // VK_KHR_shader_terminate_invocation structs
+    VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR physical_device_shader_terminate_invocation_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1735,6 +1738,10 @@ class PhysicalDeviceData {
         // VK_KHR_shader_subgroup_uniform_control_flow structs
         physical_device_shader_subgroup_uniform_control_flow_features_ = {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_FEATURES_KHR};
+
+        // VK_KHR_shader_terminate_invocation structs
+        physical_device_shader_terminate_invocation_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR};
     }
 
     const VkInstance instance_;
@@ -1844,6 +1851,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2326,6 +2334,8 @@ bool JsonLoader::LoadFile(const char *filename) {
              &pdd_.physical_device_shader_integer_dot_products_properties_);
     GetValue(root, "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR",
              &pdd_.physical_device_shader_subgroup_uniform_control_flow_features_);
+    GetValue(root, "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR",
+             &pdd_.physical_device_shader_terminate_invocation_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -3472,6 +3482,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(shaderSubgroupUniformControlFlow, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_KHR_shader_terminate_invocation, but "
+            "VK_KHR_shader_terminate_invocation is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(shaderTerminateInvocation, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -4573,6 +4598,13 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = ssucff->pNext;
             *ssucff = physicalDeviceData->physical_device_shader_subgroup_uniform_control_flow_features_;
             ssucff->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
+            VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *stif =
+                (VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *)place;
+            void *pNext = stif->pNext;
+            *stif = physicalDeviceData->physical_device_shader_terminate_invocation_features_;
+            stif->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -5852,6 +5884,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_shader_subgroup_uniform_control_flow_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_subgroup_uniform_control_flow_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
+                    pdd.physical_device_shader_terminate_invocation_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_shader_terminate_invocation_features_);
                 }
 
                 if (api_version_above_1_1) {
