@@ -1663,6 +1663,9 @@ class PhysicalDeviceData {
     VkPhysicalDeviceMultiDrawFeaturesEXT physical_device_multi_draw_features_;
     VkPhysicalDeviceMultiDrawPropertiesEXT physical_device_multi_draw_properties_;
 
+    // VK_EXT_pageable_device_local_memory structs
+    VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT physical_device_pageable_device_local_memory_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1919,6 +1922,9 @@ class PhysicalDeviceData {
         // VK_EXT_multi_draw structs
         physical_device_multi_draw_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_FEATURES_EXT};
         physical_device_multi_draw_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_PROPERTIES_EXT};
+
+        // VK_EXT_pageable_device_local_memory structs
+        physical_device_pageable_device_local_memory_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PAGEABLE_DEVICE_LOCAL_MEMORY_FEATURES_EXT};
     }
 
     const VkInstance instance_;
@@ -2061,6 +2067,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryPriorityFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiDrawFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiDrawPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2597,6 +2604,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceMemoryPriorityFeaturesEXT", &pdd_.physical_device_memory_priority_features_);
     GetValue(root, "VkPhysicalDeviceMultiDrawFeaturesEXT", &pdd_.physical_device_multi_draw_features_);
     GetValue(root, "VkPhysicalDeviceMultiDrawPropertiesEXT", &pdd_.physical_device_multi_draw_properties_);
+    GetValue(root, "VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT",
+             &pdd_.physical_device_pageable_device_local_memory_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4279,6 +4288,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(maxMultiDrawCount, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_pageable_device_local_memory, but "
+            "VK_EXT_pageable_device_local_memory is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(pageableDeviceLocalMemory, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -5590,6 +5614,13 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = mdp->pNext;
             *mdp = physicalDeviceData->physical_device_multi_draw_properties_;
             mdp->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PAGEABLE_DEVICE_LOCAL_MEMORY_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
+            VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *pdlmf =
+                (VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *)place;
+            void *pNext = pdlmf->pNext;
+            *pdlmf = physicalDeviceData->physical_device_pageable_device_local_memory_features_;
+            pdlmf->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -7055,6 +7086,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_multi_draw_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_multi_draw_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
+                    pdd.physical_device_pageable_device_local_memory_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_pageable_device_local_memory_features_);
                 }
 
                 if (api_version_above_1_1) {
