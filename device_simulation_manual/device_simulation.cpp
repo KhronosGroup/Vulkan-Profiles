@@ -1281,6 +1281,7 @@ typedef std::vector<VkExtensionProperties> ArrayOfVkExtensionProperties;
 typedef std::vector<VkSurfaceFormatKHR> ArrayOfVkSurfaceFormats;
 typedef std::vector<VkPresentModeKHR> ArrayOfVkPresentModes;
 typedef std::vector<VkPhysicalDevice> ArrayOfVkPhysicalDevices;
+typedef std::vector<VkDeviceSize> ArrayOfVkDeviceSize;
 
 // FormatProperties utilities ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1435,6 +1436,8 @@ class PhysicalDeviceData {
     ArrayOfVkExtensionProperties arrayof_extension_properties_;
     ArrayOfVkSurfaceFormats arrayof_surface_formats_;
     ArrayOfVkPhysicalDevices arrayof_physical_devices_;
+    ArrayOfVkDeviceSize arrayof_heap_budgets_;
+    ArrayOfVkDeviceSize arrayof_heap_usages_;
 
     // Vulkan 1.2 structs for summarizing core extension properties and features
     VkPhysicalDeviceVulkan11Properties physical_device_vulkan_1_1_properties_;
@@ -1649,6 +1652,9 @@ class PhysicalDeviceData {
     // VK_EXT_line_rasterization structs
     VkPhysicalDeviceLineRasterizationFeaturesEXT physical_device_line_rasterization_features_;
     VkPhysicalDeviceLineRasterizationPropertiesEXT physical_device_line_rasterization_properties_;
+
+    // VK_EXT_memory_budget structs
+    VkPhysicalDeviceMemoryBudgetPropertiesEXT physical_device_memory_budget_properties_;
 
    private:
     PhysicalDeviceData() = delete;
@@ -1896,6 +1902,9 @@ class PhysicalDeviceData {
         // VK_EXT_line_rasterization structs
         physical_device_line_rasterization_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT};
         physical_device_line_rasterization_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT};
+
+        // VK_EXT_memory_budget structs
+        physical_device_memory_budget_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_BUDGET_PROPERTIES_EXT};
     }
 
     const VkInstance instance_;
@@ -2034,6 +2043,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceInlineUniformBlockPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceLineRasterizationFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceLineRasterizationPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryBudgetPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2047,6 +2057,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, int index, VkSurfaceFormatKHR *dest);
     void GetValue(const Json::Value &parent, int index, VkPresentModeKHR *dest);
     void GetValue(const Json::Value &parent, int index, VkPhysicalDevice *dest);
+    void GetValue(const Json::Value &parent, int index, VkDeviceSize *dest);
 
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVulkan12Properties *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVulkan12Features *dest);
@@ -2334,7 +2345,7 @@ class JsonLoader {
         return static_cast<int>(dest->size());
     }
 
-    int GetArray(const Json::Value& parent, const char* name, ArrayOfVkPhysicalDevices* dest) {
+    int GetArray(const Json::Value &parent, const char *name, ArrayOfVkPhysicalDevices *dest) {
         const Json::Value value = parent[name];
         if (value.type() != Json::arrayValue) {
             return -1;
@@ -2346,6 +2357,22 @@ class JsonLoader {
             VkPhysicalDevice physical_device = VK_NULL_HANDLE;
             GetValue(value, i, &physical_device);
             dest->push_back(physical_device);
+        }
+        return static_cast<int>(dest->size());
+    }
+
+    int GetArray(const Json::Value &parent, const char *name, ArrayOfVkDeviceSize *dest) {
+        const Json::Value value = parent[name];
+        if (value.type() != Json::arrayValue) {
+            return -1;
+        }
+        DebugPrintf("\t\tJsonLoader::GetArray(ArrayOfVkDeviceSize)\n");
+        dest->clear();
+        const int count = static_cast<int>(value.size());
+        for (int i = 0; i < count; ++i) {
+            VkDeviceSize device_size = {};
+            GetValue(value, i, &device_size);
+            dest->push_back(device_size);
         }
         return static_cast<int>(dest->size());
     }
@@ -2549,6 +2576,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceInlineUniformBlockPropertiesEXT", &pdd_.physical_device_inline_uniform_block_properties_);
     GetValue(root, "VkPhysicalDeviceLineRasterizationFeaturesEXT", &pdd_.physical_device_line_rasterization_features_);
     GetValue(root, "VkPhysicalDeviceLineRasterizationPropertiesEXT", &pdd_.physical_device_line_rasterization_properties_);
+    GetValue(root, "VkPhysicalDeviceMemoryBudgetPropertiesEXT", &pdd_.physical_device_memory_budget_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4170,6 +4198,22 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(lineSubPixelPrecisionBits, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryBudgetPropertiesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMemoryBudgetPropertiesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_memory_budget, but "
+            "VK_EXT_memory_budget is "
+            "not supported by the device.\n");
+    }
+    GetArray(value, "heapBudget", &pdd_.arrayof_heap_budgets_);
+    GetArray(value, "heapUsage", &pdd_.arrayof_heap_usages_);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -4347,6 +4391,14 @@ void JsonLoader::GetValue(const Json::Value &parent, int index, VkPhysicalDevice
         return;
     }
     *dest = reinterpret_cast<VkPhysicalDevice>(value.asUInt64());
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, int index, VkDeviceSize *dest) {
+    const Json::Value value = parent[index];
+    if (!value.isUInt64()) {
+        return;
+    }
+    *dest = static_cast<VkDeviceSize>(value.asUInt64());
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVulkan12Properties *dest) {
@@ -5449,6 +5501,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = lrp->pNext;
             *lrp = physicalDeviceData->physical_device_line_rasterization_properties_;
             lrp->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_BUDGET_PROPERTIES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME)) {
+            VkPhysicalDeviceMemoryBudgetPropertiesEXT *mbp = (VkPhysicalDeviceMemoryBudgetPropertiesEXT *)place;
+            void *pNext = mbp->pNext;
+            *mbp = physicalDeviceData->physical_device_memory_budget_properties_;
+            mbp->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -6892,6 +6950,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_line_rasterization_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_line_rasterization_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME)) {
+                    pdd.physical_device_memory_budget_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_memory_budget_properties_);
                 }
 
                 if (api_version_above_1_1) {
