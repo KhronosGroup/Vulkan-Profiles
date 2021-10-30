@@ -1556,6 +1556,9 @@ class PhysicalDeviceData {
     // VK_KHR_push_descriptor structs
     VkPhysicalDevicePushDescriptorPropertiesKHR physical_device_push_descriptor_properites_;
 
+    // VK_KHR_ray_query structs
+    VkPhysicalDeviceRayQueryFeaturesKHR physical_device_ray_query_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1698,6 +1701,9 @@ class PhysicalDeviceData {
 
         // VK_KHR_push_descriptor structs
         physical_device_push_descriptor_properites_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR};
+
+        // VK_KHR_ray_query structs
+        physical_device_ray_query_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR};
     }
 
     const VkInstance instance_;
@@ -1800,6 +1806,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePresentIdFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePresentWaitFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePushDescriptorPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayQueryFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2272,6 +2279,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDevicePresentIdFeaturesKHR", &pdd_.physical_device_present_id_features_);
     GetValue(root, "VkPhysicalDevicePresentWaitFeaturesKHR", &pdd_.physical_device_present_wait_features_);
     GetValue(root, "VkPhysicalDevicePushDescriptorPropertiesKHR", &pdd_.physical_device_push_descriptor_properites_);
+    GetValue(root, "VkPhysicalDeviceRayQueryFeaturesKHR", &pdd_.physical_device_ray_query_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -3269,6 +3277,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "not supported by the device.\n");
     }
     GET_VALUE_WARN(maxPushDescriptors, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayQueryFeaturesKHR *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayQueryFeaturesKHR)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_KHR_ray_query, but "
+            "VK_KHR_ray_query is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(rayQuery, WarnIfGreater);
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
@@ -4327,6 +4350,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = pdp->pNext;
             *pdp = physicalDeviceData->physical_device_push_descriptor_properites_;
             pdp->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
+            VkPhysicalDeviceRayQueryFeaturesKHR *rqf = (VkPhysicalDeviceRayQueryFeaturesKHR *)place;
+            void *pNext = rqf->pNext;
+            *rqf = physicalDeviceData->physical_device_ray_query_features_;
+            rqf->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -5563,10 +5592,17 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
 
                     feature_chain.pNext = &(pdd.physical_device_present_wait_features_);
                 }
+
                 if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
                     pdd.physical_device_push_descriptor_properites_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_push_descriptor_properites_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
+                    pdd.physical_device_ray_query_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_ray_query_features_);
                 }
 
                 if (api_version_above_1_1) {
