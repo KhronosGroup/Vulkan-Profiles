@@ -1688,6 +1688,10 @@ class PhysicalDeviceData {
     // VK_EXT_rgba10x6_formats structs
     VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT physical_device_rgba10x6_formats_features_;
 
+    // VK_EXT_robustness2 structs
+    VkPhysicalDeviceRobustness2FeaturesEXT physical_device_robustness_2_features_;
+    VkPhysicalDeviceRobustness2PropertiesEXT physical_device_robustness_2_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1970,6 +1974,10 @@ class PhysicalDeviceData {
 
         // VK_EXT_rgba10x6_formats structs
         physical_device_rgba10x6_formats_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RGBA10X6_FORMATS_FEATURES_EXT};
+
+        // VK_EXT_robustness2 structs
+        physical_device_robustness_2_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT};
+        physical_device_robustness_2_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT};
     }
 
     const VkInstance instance_;
@@ -2121,6 +2129,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProvokingVertexFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProvokingVertexPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRobustness2FeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRobustness2PropertiesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2682,6 +2692,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceProvokingVertexFeaturesEXT", &pdd_.physical_device_provoking_vertex_features_);
     GetValue(root, "VkPhysicalDeviceProvokingVertexPropertiesEXT", &pdd_.physical_device_provoking_vertex_properties_);
     GetValue(root, "VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT", &pdd_.physical_device_rgba10x6_formats_features_);
+    GetValue(root, "VkPhysicalDeviceRobustness2FeaturesEXT", &pdd_.physical_device_robustness_2_features_);
+    GetValue(root, "VkPhysicalDeviceRobustness2PropertiesEXT", &pdd_.physical_device_robustness_2_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4512,6 +4524,39 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(formatRgba10x6WithoutYCbCrSampler, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRobustness2FeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRobustness2FeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_robustness2, but "
+            "VK_EXT_robustness2 is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(robustBufferAccess2, WarnIfGreater);
+    GET_VALUE_WARN(robustImageAccess2, WarnIfGreater);
+    GET_VALUE_WARN(nullDescriptor, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRobustness2PropertiesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRobustness2PropertiesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_robustness2, but "
+            "VK_EXT_robustness2 is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(robustStorageBufferAccessSizeAlignment, WarnIfGreater);
+    GET_VALUE_WARN(robustUniformBufferAccessSizeAlignment, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -5880,6 +5925,18 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = rgba10x6ff->pNext;
             *rgba10x6ff = physicalDeviceData->physical_device_rgba10x6_formats_features_;
             rgba10x6ff->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+            VkPhysicalDeviceRobustness2FeaturesEXT *r2f = (VkPhysicalDeviceRobustness2FeaturesEXT *)place;
+            void *pNext = r2f->pNext;
+            *r2f = physicalDeviceData->physical_device_robustness_2_features_;
+            r2f->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+            VkPhysicalDeviceRobustness2PropertiesEXT *r2p = (VkPhysicalDeviceRobustness2PropertiesEXT *)place;
+            void *pNext = r2p->pNext;
+            *r2p = physicalDeviceData->physical_device_robustness_2_properties_;
+            r2p->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -7397,6 +7454,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_rgba10x6_formats_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_rgba10x6_formats_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+                    pdd.physical_device_robustness_2_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_robustness_2_features_);
+
+                    pdd.physical_device_robustness_2_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_robustness_2_properties_);
                 }
 
                 if (api_version_above_1_1) {
