@@ -1544,6 +1544,9 @@ class PhysicalDeviceData {
     VkPhysicalDevicePerformanceQueryFeaturesKHR physical_device_performance_query_features_;
     VkPhysicalDevicePerformanceQueryPropertiesKHR physical_device_performance_query_properties_;
 
+    // VK_KHR_pipeline_executable_properties structs
+    VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR physical_device_pipeline_executable_properties_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1673,6 +1676,10 @@ class PhysicalDeviceData {
         // VK_KHR_performance_query structs
         physical_device_performance_query_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PERFORMANCE_QUERY_FEATURES_KHR};
         physical_device_performance_query_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PERFORMANCE_QUERY_PROPERTIES_KHR};
+
+        // VK_KHR_pipeline_executable_properties structs
+        physical_device_pipeline_executable_properties_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR};
     }
 
     const VkInstance instance_;
@@ -1771,6 +1778,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceIDPropertiesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePerformanceQueryFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePerformanceQueryPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2238,6 +2246,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceIDPropertiesKHR", &pdd_.physical_device_id_properties_);
     GetValue(root, "VkPhysicalDevicePerformanceQueryFeaturesKHR", &pdd_.physical_device_performance_query_features_);
     GetValue(root, "VkPhysicalDevicePerformanceQueryPropertiesKHR", &pdd_.physical_device_performance_query_properties_);
+    GetValue(root, "VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR",
+             &pdd_.physical_device_pipeline_executable_properties_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -3174,6 +3184,22 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "not supported by the device.\n");
     }
     GET_VALUE_WARN(allowCommandBufferQueryCopies, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name,
+                          VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_KHR_pipeline_executable_properties, but "
+            "VK_KHR_pipeline_executable_properties is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(pipelineExecutableInfo, WarnIfGreater);
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
@@ -4207,6 +4233,13 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = pqp->pNext;
             *pqp = physicalDeviceData->physical_device_performance_query_properties_;
             pqp->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
+            VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *pepf =
+                (VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *)place;
+            void *pNext = pepf->pNext;
+            *pepf = physicalDeviceData->physical_device_pipeline_executable_properties_features_;
+            pepf->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -5424,6 +5457,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_performance_query_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_performance_query_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
+                    pdd.physical_device_pipeline_executable_properties_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_pipeline_executable_properties_features_);
                 }
 
                 if (api_version_above_1_1) {
