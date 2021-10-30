@@ -1698,6 +1698,9 @@ class PhysicalDeviceData {
     // VK_EXT_shader_atomic_float structs
     VkPhysicalDeviceShaderAtomicFloatFeaturesEXT physical_device_shader_atomic_float_features_;
 
+    // VK_EXT_shader_atomic_float2 structs
+    VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT physical_device_shader_atomic_float2_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1990,6 +1993,9 @@ class PhysicalDeviceData {
 
         // VK_EXT_shader_atomic_float structs
         physical_device_shader_atomic_float_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT_FEATURES_EXT};
+
+        // VK_EXT_shader_atomic_float2 structs
+        physical_device_shader_atomic_float2_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT_2_FEATURES_EXT};
     }
 
     const VkInstance instance_;
@@ -2145,6 +2151,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRobustness2PropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSampleLocationsPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2710,6 +2717,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceRobustness2PropertiesEXT", &pdd_.physical_device_robustness_2_properties_);
     GetValue(root, "VkPhysicalDeviceSampleLocationsPropertiesEXT", &pdd_.physical_device_sample_locations_properties_);
     GetValue(root, "VkPhysicalDeviceShaderAtomicFloatFeaturesEXT", &pdd_.physical_device_shader_atomic_float_features_);
+    GetValue(root, "VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT", &pdd_.physical_device_shader_atomic_float2_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4618,6 +4626,32 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(sparseImageFloat32AtomicAdd, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_shader_atomic_float2, but "
+            "VK_EXT_shader_atomic_float2 is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(shaderBufferFloat16Atomics, WarnIfGreater);
+    GET_VALUE_WARN(shaderBufferFloat16AtomicAdd, WarnIfGreater);
+    GET_VALUE_WARN(shaderBufferFloat16AtomicMinMax, WarnIfGreater);
+    GET_VALUE_WARN(shaderBufferFloat32AtomicMinMax, WarnIfGreater);
+    GET_VALUE_WARN(shaderBufferFloat64AtomicMinMax, WarnIfGreater);
+    GET_VALUE_WARN(shaderSharedFloat16Atomics, WarnIfGreater);
+    GET_VALUE_WARN(shaderSharedFloat16AtomicAdd, WarnIfGreater);
+    GET_VALUE_WARN(shaderSharedFloat16AtomicMinMax, WarnIfGreater);
+    GET_VALUE_WARN(shaderSharedFloat32AtomicMinMax, WarnIfGreater);
+    GET_VALUE_WARN(shaderSharedFloat64AtomicMinMax, WarnIfGreater);
+    GET_VALUE_WARN(shaderImageFloat32AtomicMinMax, WarnIfGreater);
+    GET_VALUE_WARN(sparseImageFloat32AtomicMinMax, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -6010,6 +6044,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = saff->pNext;
             *saff = physicalDeviceData->physical_device_shader_atomic_float_features_;
             saff->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT_2_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
+            VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *saf2f = (VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *)place;
+            void *pNext = saf2f->pNext;
+            *saf2f = physicalDeviceData->physical_device_shader_atomic_float2_features_;
+            saf2f->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -7549,6 +7589,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_shader_atomic_float_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_atomic_float_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
+                    pdd.physical_device_shader_atomic_float2_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_shader_atomic_float2_features_);
                 }
 
                 if (api_version_above_1_1) {
