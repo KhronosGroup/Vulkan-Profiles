@@ -1721,6 +1721,10 @@ class PhysicalDeviceData {
     // VK_EXT_tooling_info structs
     VkPhysicalDeviceToolPropertiesEXT physical_device_tool_properties_;
 
+    // VK_EXT_transform_feedback structs
+    VkPhysicalDeviceTransformFeedbackFeaturesEXT physical_device_transform_feedback_features_;
+    VkPhysicalDeviceTransformFeedbackPropertiesEXT physical_device_transform_feedback_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2040,6 +2044,10 @@ class PhysicalDeviceData {
 
         // VK_EXT_tooling_info structs
         physical_device_tool_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TOOL_PROPERTIES_EXT};
+
+        // VK_EXT_transform_feedback structs
+        physical_device_transform_feedback_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT};
+        physical_device_transform_feedback_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT};
     }
 
     const VkInstance instance_;
@@ -2204,6 +2212,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceToolPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTransformFeedbackFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTransformFeedbackPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2780,6 +2790,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT",
              &pdd_.physical_device_texture_compression_astc_hdr_features_);
     GetValue(root, "VkPhysicalDeviceToolPropertiesEXT", &pdd_.physical_device_tool_properties_);
+    GetValue(root, "VkPhysicalDeviceTransformFeedbackFeaturesEXT", &pdd_.physical_device_transform_feedback_features_);
+    GetValue(root, "VkPhysicalDeviceTransformFeedbackPropertiesEXT", &pdd_.physical_device_transform_feedback_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4847,6 +4859,46 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_ARRAY(layer);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTransformFeedbackFeaturesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTransformFeedbackFeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_transform_feedback, but "
+            "VK_EXT_transform_feedback is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(transformFeedback, WarnIfGreater);
+    GET_VALUE_WARN(geometryStreams, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTransformFeedbackPropertiesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTransformFeedbackPropertiesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_transform_feedback, but "
+            "VK_EXT_transform_feedback is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(maxTransformFeedbackStreams, WarnIfGreater);
+    GET_VALUE_WARN(maxTransformFeedbackBuffers, WarnIfGreater);
+    GET_VALUE_WARN(maxTransformFeedbackBufferSize, WarnIfGreater);
+    GET_VALUE_WARN(maxTransformFeedbackStreamDataSize, WarnIfGreater);
+    GET_VALUE_WARN(maxTransformFeedbackBufferDataSize, WarnIfGreater);
+    GET_VALUE_WARN(maxTransformFeedbackBufferDataStride, WarnIfGreater);
+    GET_VALUE_WARN(transformFeedbackQueries, WarnIfGreater);
+    GET_VALUE_WARN(transformFeedbackStreamsLinesTriangles, WarnIfGreater);
+    GET_VALUE_WARN(transformFeedbackRasterizationStreamSelect, WarnIfGreater);
+    GET_VALUE_WARN(transformFeedbackDraw, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -6295,6 +6347,18 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = tp->pNext;
             *tp = physicalDeviceData->physical_device_tool_properties_;
             tp->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+            VkPhysicalDeviceTransformFeedbackFeaturesEXT *tff = (VkPhysicalDeviceTransformFeedbackFeaturesEXT *)place;
+            void *pNext = tff->pNext;
+            *tff = physicalDeviceData->physical_device_transform_feedback_features_;
+            tff->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+            VkPhysicalDeviceTransformFeedbackPropertiesEXT *tfp = (VkPhysicalDeviceTransformFeedbackPropertiesEXT *)place;
+            void *pNext = tfp->pNext;
+            *tfp = physicalDeviceData->physical_device_transform_feedback_properties_;
+            tfp->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -7884,6 +7948,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_tool_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_tool_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+                    pdd.physical_device_transform_feedback_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_transform_feedback_features_);
+
+                    pdd.physical_device_transform_feedback_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_transform_feedback_properties_);
                 }
 
                 if (api_version_above_1_1) {
