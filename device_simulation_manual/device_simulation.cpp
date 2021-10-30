@@ -1482,6 +1482,10 @@ class PhysicalDeviceData {
     // VK_KHR_maintenance3 structs
     VkPhysicalDeviceMaintenance3PropertiesKHR physical_device_maintenance_3_properties_;
 
+    // VK_KHR_maintenance4 structs
+    VkPhysicalDeviceMaintenance4FeaturesKHR physical_device_maintenance_4_features_;
+    VkPhysicalDeviceMaintenance4PropertiesKHR physical_device_maintenance_4_properties_;
+
     // VK_KHR_multiview structs
     VkPhysicalDeviceMultiviewPropertiesKHR physical_device_multiview_properties_;
     VkPhysicalDeviceMultiviewFeaturesKHR physical_device_multiview_features_;
@@ -1799,6 +1803,10 @@ class PhysicalDeviceData {
 
         // VK_KHR_maintenance3 structs
         physical_device_maintenance_3_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR};
+
+        // VK_KHR_maintenance4 structs
+        physical_device_maintenance_4_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_FEATURES_KHR};
+        physical_device_maintenance_4_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_PROPERTIES_KHR};
 
         // VK_KHR_multiview structs
         physical_device_multiview_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR};
@@ -2146,6 +2154,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFloatControlsPropertiesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMaintenance3PropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMaintenance4FeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMaintenance4PropertiesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiviewPropertiesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePointClippingPropertiesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest);
@@ -2694,6 +2704,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceHostQueryResetFeaturesEXT", &pdd_.physical_device_host_query_reset_features_);
     GetValue(root, "VkPhysicalDeviceMaintenance3Properties", &pdd_.physical_device_maintenance_3_properties_);
     GetValue(root, "VkPhysicalDeviceMaintenance3PropertiesKHR", &pdd_.physical_device_maintenance_3_properties_);
+    GetValue(root, "VkPhysicalDeviceMaintenance4FeaturesKHR", &pdd_.physical_device_maintenance_4_features_);
+    GetValue(root, "VkPhysicalDeviceMaintenance4PropertiesKHR", &pdd_.physical_device_maintenance_4_properties_);
     GetValue(root, "VkPhysicalDeviceMultiviewProperties", &pdd_.physical_device_multiview_properties_);
     GetValue(root, "VkPhysicalDeviceMultiviewPropertiesKHR", &pdd_.physical_device_multiview_properties_);
     GetValue(root, "VkPhysicalDevicePointClippingProperties", &pdd_.physical_device_point_clipping_properties_);
@@ -3066,6 +3078,34 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     }
     GET_VALUE_WARN(maxPerSetDescriptors, WarnIfGreater);
     GET_VALUE_WARN(maxMemoryAllocationSize, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMaintenance4FeaturesKHR *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance4FeaturesKHR)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_KHR_maintenance4, but VK_KHR_maintenance4 is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(maintenance4, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMaintenance4PropertiesKHR *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance4PropertiesKHR)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_KHR_maintenance4, but VK_KHR_maintenance4 is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(maxBufferSize, WarnIfGreater);
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiviewPropertiesKHR *dest) {
@@ -5974,6 +6014,18 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = pcp->pNext;
             *pcp = physicalDeviceData->physical_device_maintenance_3_properties_;
             pcp->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_FEATURES_KHR &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+            VkPhysicalDeviceMaintenance4FeaturesKHR *m4f = (VkPhysicalDeviceMaintenance4FeaturesKHR *)place;
+            void *pNext = m4f->pNext;
+            *m4f = physicalDeviceData->physical_device_maintenance_4_features_;
+            m4f->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_PROPERTIES_KHR &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+            VkPhysicalDeviceMaintenance4PropertiesKHR *m4p = (VkPhysicalDeviceMaintenance4PropertiesKHR *)place;
+            void *pNext = m4p->pNext;
+            *m4p = physicalDeviceData->physical_device_maintenance_4_properties_;
+            m4p->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR &&
                    PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
             VkPhysicalDeviceMultiviewPropertiesKHR *mp = (VkPhysicalDeviceMultiviewPropertiesKHR *)place;
@@ -7667,6 +7719,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_maintenance_3_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_maintenance_3_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+                    pdd.physical_device_maintenance_4_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_maintenance_4_features_);
+
+                    pdd.physical_device_maintenance_4_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_maintenance_4_properties_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
