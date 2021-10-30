@@ -1614,6 +1614,9 @@ class PhysicalDeviceData {
     // VK_EXT_device_memory_report structs
     VkPhysicalDeviceDeviceMemoryReportFeaturesEXT physical_device_device_memory_report_features_;
 
+    // VK_EXT_discard_rectangles structs
+    VkPhysicalDeviceDiscardRectanglePropertiesEXT physical_device_discard_rectangle_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1819,6 +1822,9 @@ class PhysicalDeviceData {
 
         // VK_EXT_device_memory_report structs
         physical_device_device_memory_report_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_MEMORY_REPORT_FEATURES_EXT};
+
+        // VK_EXT_discard_rectangles structs
+        physical_device_discard_rectangle_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DISCARD_RECTANGLE_PROPERTIES_EXT};
     }
 
     const VkInstance instance_;
@@ -1943,6 +1949,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCustomBorderColorPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2444,6 +2451,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceCustomBorderColorPropertiesEXT", &pdd_.physical_device_custom_border_color_properties_);
     GetValue(root, "VkPhysicalDeviceDepthClipEnableFeaturesEXT", &pdd_.physical_device_depth_clip_enable_features_ext_);
     GetValue(root, "VkPhysicalDeviceDeviceMemoryReportFeaturesEXT", &pdd_.physical_device_device_memory_report_features_);
+    GetValue(root, "VkPhysicalDeviceDiscardRectanglePropertiesEXT", &pdd_.physical_device_discard_rectangle_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -3837,6 +3845,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(deviceMemoryReport, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDiscardRectanglePropertiesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_discard_rectangles, but "
+            "VK_EXT_discard_rectangles is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(maxDiscardRectangles, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGroupPropertiesKHR *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -5032,6 +5055,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = dmrf->pNext;
             *dmrf = physicalDeviceData->physical_device_device_memory_report_features_;
             dmrf->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DISCARD_RECTANGLE_PROPERTIES_EXT &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
+            VkPhysicalDeviceDiscardRectanglePropertiesEXT *drp = (VkPhysicalDeviceDiscardRectanglePropertiesEXT *)place;
+            void *pNext = drp->pNext;
+            *drp = physicalDeviceData->physical_device_discard_rectangle_properties_;
+            drp->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -6397,6 +6426,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_device_memory_report_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_device_memory_report_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
+                    pdd.physical_device_discard_rectangle_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_discard_rectangle_properties_);
                 }
 
                 if (api_version_above_1_1) {
