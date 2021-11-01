@@ -18,6 +18,7 @@
  */
 
 #include <vulkan/vulkan_core.h>
+#include <algorithm>
 #if defined(__APPLE__)
 #include <vulkan/vulkan_beta.h>
 #endif
