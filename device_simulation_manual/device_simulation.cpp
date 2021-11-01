@@ -1758,6 +1758,9 @@ class PhysicalDeviceData {
     // VK_NV_dedicated_allocation_image_aliasing structs
     VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV physical_device_dedicated_allocation_image_aliasing_features_;
 
+    // VK_NV_device_diagnostics_config structs
+    VkPhysicalDeviceDiagnosticsConfigFeaturesNV physical_device_diagnostics_config_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2123,6 +2126,9 @@ class PhysicalDeviceData {
         // VK_NV_dedicated_allocation_image_aliasing structs
         physical_device_dedicated_allocation_image_aliasing_features_ = {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEDICATED_ALLOCATION_IMAGE_ALIASING_FEATURES_NV};
+
+        // VK_NV_device_diagnostics_config structs
+        physical_device_diagnostics_config_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DIAGNOSTICS_CONFIG_FEATURES_NV};
     }
 
     const VkInstance instance_;
@@ -2304,6 +2310,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCornerSampledImageFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCoverageReductionModeFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2883,6 +2890,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceCoverageReductionModeFeaturesNV", &pdd_.physical_device_coverage_reduction_mode_features_);
     GetValue(root, "VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV",
              &pdd_.physical_device_dedicated_allocation_image_aliasing_features_);
+    GetValue(root, "VkPhysicalDeviceDiagnosticsConfigFeaturesNV", &pdd_.physical_device_diagnostics_config_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -5262,6 +5270,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(dedicatedAllocationImageAliasing, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDiagnosticsConfigFeaturesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_device_diagnostics_config, but "
+            "VK_NV_device_diagnostics_config is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(diagnosticsConfig, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -7020,6 +7043,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     daiaf->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DIAGNOSTICS_CONFIG_FEATURES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dcf = (VkPhysicalDeviceDiagnosticsConfigFeaturesNV *)place;
+                    void *pNext = dcf->pNext;
+                    *dcf = physicalDeviceData->physical_device_diagnostics_config_features_;
+                    dcf->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
                 if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
                     VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -8699,6 +8730,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_dedicated_allocation_image_aliasing_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_dedicated_allocation_image_aliasing_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
+                    pdd.physical_device_diagnostics_config_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_diagnostics_config_features_);
                 }
 
                 if (api_version_above_1_1) {
