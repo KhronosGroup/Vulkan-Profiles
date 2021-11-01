@@ -1778,6 +1778,10 @@ class PhysicalDeviceData {
     // VK_NV_inherited_viewport_scissor structs
     VkPhysicalDeviceInheritedViewportScissorFeaturesNV physical_device_inherited_viewport_scissor_features_;
 
+    // VK_NV_mesh_shader structs
+    VkPhysicalDeviceMeshShaderFeaturesNV physical_device_mesh_shader_features_;
+    VkPhysicalDeviceMeshShaderPropertiesNV physical_device_mesh_shader_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2169,6 +2173,10 @@ class PhysicalDeviceData {
         // VK_NV_inherited_viewport_scissor structs
         physical_device_inherited_viewport_scissor_features_ = {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INHERITED_VIEWPORT_SCISSOR_FEATURES_NV};
+
+        // VK_NV_mesh_shader structs
+        physical_device_mesh_shader_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_NV};
+        physical_device_mesh_shader_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_NV};
     }
 
     const VkInstance instance_;
@@ -2358,6 +2366,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceInheritedViewportScissorFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMeshShaderFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMeshShaderPropertiesNV *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2950,6 +2960,8 @@ bool JsonLoader::LoadFile(const char *filename) {
              &pdd_.physical_device_fragment_shading_rate_enums_properties_);
     GetValue(root, "VkPhysicalDeviceInheritedViewportScissorFeaturesNV",
              &pdd_.physical_device_inherited_viewport_scissor_features_);
+    GetValue(root, "VkPhysicalDeviceMeshShaderFeaturesNV", &pdd_.physical_device_mesh_shader_features_);
+    GetValue(root, "VkPhysicalDeviceMeshShaderPropertiesNV", &pdd_.physical_device_mesh_shader_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -5459,6 +5471,49 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(inheritedViewportScissor2D, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMeshShaderFeaturesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderFeaturesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_mesh_shader, but "
+            "VK_NV_mesh_shader is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(taskShader, WarnIfGreater);
+    GET_VALUE_WARN(meshShader, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMeshShaderPropertiesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderPropertiesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_mesh_shader, but "
+            "VK_NV_mesh_shader is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(maxDrawMeshTasksCount, WarnIfGreater);
+    GET_VALUE_WARN(maxTaskWorkGroupInvocations, WarnIfGreater);
+    GET_ARRAY(maxTaskWorkGroupSize);
+    GET_VALUE_WARN(maxTaskTotalMemorySize, WarnIfGreater);
+    GET_VALUE_WARN(maxTaskOutputCount, WarnIfGreater);
+    GET_VALUE_WARN(maxMeshWorkGroupInvocations, WarnIfGreater);
+    GET_ARRAY(maxMeshWorkGroupSize);
+    GET_VALUE_WARN(maxMeshTotalMemorySize, WarnIfGreater);
+    GET_VALUE_WARN(maxMeshOutputVertices, WarnIfGreater);
+    GET_VALUE_WARN(maxMeshOutputPrimitives, WarnIfGreater);
+    GET_VALUE_WARN(maxMeshMultiviewViewCount, WarnIfGreater);
+    GET_VALUE_WARN(meshOutputPerVertexGranularity, WarnIfGreater);
+    GET_VALUE_WARN(meshOutputPerPrimitiveGranularity, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -7287,6 +7342,22 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     ivsf->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMeshShaderFeaturesNV *msf = (VkPhysicalDeviceMeshShaderFeaturesNV *)place;
+                    void *pNext = msf->pNext;
+                    *msf = physicalDeviceData->physical_device_mesh_shader_features_;
+                    msf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMeshShaderPropertiesNV *msp = (VkPhysicalDeviceMeshShaderPropertiesNV *)place;
+                    void *pNext = msp->pNext;
+                    *msp = physicalDeviceData->physical_device_mesh_shader_properties_;
+                    msp->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
                 if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
                     VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -9010,6 +9081,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_inherited_viewport_scissor_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_inherited_viewport_scissor_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
+                    pdd.physical_device_mesh_shader_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_mesh_shader_features_);
+
+                    pdd.physical_device_mesh_shader_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_mesh_shader_properties_);
                 }
 
                 if (api_version_above_1_1) {
