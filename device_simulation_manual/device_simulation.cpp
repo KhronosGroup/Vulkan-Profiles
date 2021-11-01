@@ -1735,6 +1735,10 @@ class PhysicalDeviceData {
     // VK_HUAWEI_invocation_mask structs
     VkPhysicalDeviceInvocationMaskFeaturesHUAWEI physical_device_invocation_mask_features_;
 
+    // VK_HUAWEI_subpass_shading structs
+    VkPhysicalDeviceSubpassShadingFeaturesHUAWEI physical_device_subpass_shading_features_;
+    VkPhysicalDeviceSubpassShadingPropertiesHUAWEI physical_device_subpass_shading_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2074,6 +2078,10 @@ class PhysicalDeviceData {
 
         // VK_HUAWEI_invocation_mask structs
         physical_device_invocation_mask_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INVOCATION_MASK_FEATURES_HUAWEI};
+
+        // VK_HUAWEI_subpass_shading structs
+        physical_device_subpass_shading_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBPASS_SHADING_FEATURES_HUAWEI};
+        physical_device_subpass_shading_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBPASS_SHADING_PROPERTIES_HUAWEI};
     }
 
     const VkInstance instance_;
@@ -2246,6 +2254,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderCorePropertiesAMD *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderCoreProperties2AMD *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2813,6 +2823,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceShaderCorePropertiesAMD", &pdd_.physical_device_shader_core_properties_);
     GetValue(root, "VkPhysicalDeviceShaderCoreProperties2AMD", &pdd_.physical_device_shader_core_properties_2_);
     GetValue(root, "VkPhysicalDeviceInvocationMaskFeaturesHUAWEI", &pdd_.physical_device_invocation_mask_features_);
+    GetValue(root, "VkPhysicalDeviceSubpassShadingFeaturesHUAWEI", &pdd_.physical_device_subpass_shading_features_);
+    GetValue(root, "VkPhysicalDeviceSubpassShadingPropertiesHUAWEI", &pdd_.physical_device_subpass_shading_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -5054,6 +5066,36 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(invocationMask, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubpassShadingFeaturesHUAWEI)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_HUAWEI_subpass_shading, but "
+            "VK_HUAWEI_subpass_shading is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(subpassShading, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubpassShadingPropertiesHUAWEI)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_HUAWEI_subpass_shading, but "
+            "VK_HUAWEI_subpass_shading is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(maxSubpassShadingWorkgroupSizeAspectRatio, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -6735,6 +6777,22 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     imf->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBPASS_SHADING_FEATURES_HUAWEI:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
+                    VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *shf = (VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *)place;
+                    void *pNext = shf->pNext;
+                    *shf= physicalDeviceData->physical_device_subpass_shading_features_;
+                    shf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBPASS_SHADING_PROPERTIES_HUAWEI:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
+                    VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *shp = (VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *)place;
+                    void *pNext = shp->pNext;
+                    *shp = physicalDeviceData->physical_device_subpass_shading_properties_;
+                    shp->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
                 if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
                     VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -8364,6 +8422,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_invocation_mask_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_invocation_mask_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
+                    pdd.physical_device_subpass_shading_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_subpass_shading_features_);
+
+                    pdd.physical_device_subpass_shading_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_subpass_shading_properties_);
                 }
 
                 if (api_version_above_1_1) {
