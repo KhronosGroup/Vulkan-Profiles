@@ -1723,6 +1723,9 @@ class PhysicalDeviceData {
     VkPhysicalDeviceFragmentShadingRateFeaturesKHR physical_device_fragment_shading_rate_features_;
     VkPhysicalDeviceFragmentShadingRatePropertiesKHR physical_device_fragment_shading_rate_properties_;
 
+    // VK_AMD_device_coherent_memory structs
+    VkPhysicalDeviceCoherentMemoryFeaturesAMD physical_device_coherent_memory_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2050,6 +2053,9 @@ class PhysicalDeviceData {
         // VK_KHR_fragment_shading_rate structs
         physical_device_fragment_shading_rate_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_FEATURES_KHR};
         physical_device_fragment_shading_rate_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR};
+
+        // VK_AMD_device_coherent_memory structs
+        physical_device_coherent_memory_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD};
     }
 
     const VkInstance instance_;
@@ -2218,6 +2224,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCoherentMemoryFeaturesAMD *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2781,6 +2788,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceYcbcrImageArraysFeaturesEXT", &pdd_.physical_device_ycbcr_image_arrays_features_);
     GetValue(root, "VkPhysicalDeviceFragmentShadingRateFeaturesKHR", &pdd_.physical_device_fragment_shading_rate_features_);
     GetValue(root, "VkPhysicalDeviceFragmentShadingRatePropertiesKHR", &pdd_.physical_device_fragment_shading_rate_properties_);
+    GetValue(root, "VkPhysicalDeviceCoherentMemoryFeaturesAMD", &pdd_.physical_device_coherent_memory_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4948,6 +4956,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(fragmentShadingRateStrictMultiplyCombiner, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCoherentMemoryFeaturesAMD *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCoherentMemoryFeaturesAMD)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_AMD_device_coherent_memory, but "
+            "VK_AMD_device_coherent_memory is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(deviceCoherentMemory, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -6363,6 +6386,12 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = fsrp->pNext;
             *fsrp = physicalDeviceData->physical_device_fragment_shading_rate_properties_;
             fsrp->pNext = pNext;
+        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD &&
+                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
+            VkPhysicalDeviceCoherentMemoryFeaturesAMD *cmf = (VkPhysicalDeviceCoherentMemoryFeaturesAMD *)place;
+            void *pNext = cmf->pNext;
+            *cmf = physicalDeviceData->physical_device_coherent_memory_features_;
+            cmf->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
                    physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
             VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -7950,6 +7979,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_fragment_shading_rate_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_fragment_shading_rate_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
+                    pdd.physical_device_coherent_memory_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_coherent_memory_features_);
                 }
 
                 if (api_version_above_1_1) {
