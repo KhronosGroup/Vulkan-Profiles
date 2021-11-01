@@ -1749,6 +1749,9 @@ class PhysicalDeviceData {
     VkPhysicalDeviceCooperativeMatrixFeaturesNV physical_device_cooperative_matrix_features_;
     VkPhysicalDeviceCooperativeMatrixPropertiesNV physical_device_cooperative_matrix_properties_;
 
+    // VK_NV_corner_sampled_image structs
+    VkPhysicalDeviceCornerSampledImageFeaturesNV physical_device_corner_sampled_image_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2104,6 +2107,9 @@ class PhysicalDeviceData {
         // VK_NV_cooperative_matrix structs
         physical_device_cooperative_matrix_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_NV};
         physical_device_cooperative_matrix_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_PROPERTIES_NV};
+
+        // VK_NV_corner_sampled_image structs
+        physical_device_corner_sampled_image_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CORNER_SAMPLED_IMAGE_FEATURES_NV};
     }
 
     const VkInstance instance_;
@@ -2282,6 +2288,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCooperativeMatrixFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCooperativeMatrixPropertiesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCornerSampledImageFeaturesNV *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2857,6 +2864,7 @@ bool JsonLoader::LoadFile(const char *filename) {
              &pdd_.physical_device_compute_shader_derivatives_features_);
     GetValue(root, "VkPhysicalDeviceCooperativeMatrixFeaturesNV", &pdd_.physical_device_cooperative_matrix_features_);
     GetValue(root, "VkPhysicalDeviceCooperativeMatrixPropertiesNV", &pdd_.physical_device_cooperative_matrix_properties_);
+    GetValue(root, "VkPhysicalDeviceCornerSampledImageFeaturesNV", &pdd_.physical_device_corner_sampled_image_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -5190,6 +5198,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(cooperativeMatrixSupportedStages, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCornerSampledImageFeaturesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCornerSampledImageFeaturesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_corner_sampled_image, but "
+            "VK_NV_corner_sampled_image is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(cornerSampledImage, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -6921,6 +6944,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     cmp->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CORNER_SAMPLED_IMAGE_FEATURES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceCornerSampledImageFeaturesNV *csif = (VkPhysicalDeviceCornerSampledImageFeaturesNV *)place;
+                    void *pNext = csif->pNext;
+                    *csif = physicalDeviceData->physical_device_corner_sampled_image_features_;
+                    csif->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
                 if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
                     VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -8582,6 +8613,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_cooperative_matrix_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_cooperative_matrix_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
+                    pdd.physical_device_corner_sampled_image_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_corner_sampled_image_features_);
                 }
 
                 if (api_version_above_1_1) {
