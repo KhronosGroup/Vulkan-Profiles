@@ -1768,6 +1768,9 @@ class PhysicalDeviceData {
     // VK_NV_external_memory_rdma structs
     VkPhysicalDeviceExternalMemoryRDMAFeaturesNV physical_device_external_memory_rdma_features_;
 
+    // VK_NV_fragment_shader_barycentric structs
+    VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV physical_device_fragment_shader_barycentric_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2145,6 +2148,10 @@ class PhysicalDeviceData {
 
         // VK_NV_external_memory_rdma structs
         physical_device_external_memory_rdma_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_RDMA_FEATURES_NV};
+
+        // VK_NV_fragment_shader_barycentric structs
+        physical_device_fragment_shader_barycentric_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_BARYCENTRIC_FEATURES_NV};
     }
 
     const VkInstance instance_;
@@ -2330,6 +2337,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2914,6 +2922,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV",
              &pdd_.physical_device_device_generated_commands_properties_);
     GetValue(root, "VkPhysicalDeviceExternalMemoryRDMAFeaturesNV", &pdd_.physical_device_external_memory_rdma_features_);
+    GetValue(root, "VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV",
+             &pdd_.physical_device_fragment_shader_barycentric_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -5361,6 +5371,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(externalMemoryRDMA, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_fragment_shader_barycentric, but "
+            "VK_NV_fragment_shader_barycentric is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(fragmentShaderBarycentric, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -7153,6 +7178,15 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     emrf->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_BARYCENTRIC_FEATURES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
+                    VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *fsbf =
+                        (VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *)place;
+                    void *pNext = fsbf->pNext;
+                    *fsbf = physicalDeviceData->physical_device_fragment_shader_barycentric_features_;
+                    fsbf->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
                 if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
                     VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -8854,6 +8888,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_external_memory_rdma_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_external_memory_rdma_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
+                    pdd.physical_device_fragment_shader_barycentric_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_fragment_shader_barycentric_features_);
                 }
 
                 if (api_version_above_1_1) {
