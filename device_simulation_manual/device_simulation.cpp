@@ -1761,6 +1761,10 @@ class PhysicalDeviceData {
     // VK_NV_device_diagnostics_config structs
     VkPhysicalDeviceDiagnosticsConfigFeaturesNV physical_device_diagnostics_config_features_;
 
+    // VK_NV_device_generated_commands structs
+    VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV physical_device_device_generated_commands_features_;
+    VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV physical_device_device_generated_commands_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2129,6 +2133,12 @@ class PhysicalDeviceData {
 
         // VK_NV_device_diagnostics_config structs
         physical_device_diagnostics_config_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DIAGNOSTICS_CONFIG_FEATURES_NV};
+
+        // VK_NV_device_generated_commands structs
+        physical_device_device_generated_commands_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_FEATURES_NV};
+        physical_device_device_generated_commands_properties_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_PROPERTIES_NV};
     }
 
     const VkInstance instance_;
@@ -2311,6 +2321,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCoverageReductionModeFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2891,6 +2903,9 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV",
              &pdd_.physical_device_dedicated_allocation_image_aliasing_features_);
     GetValue(root, "VkPhysicalDeviceDiagnosticsConfigFeaturesNV", &pdd_.physical_device_diagnostics_config_features_);
+    GetValue(root, "VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV", &pdd_.physical_device_device_generated_commands_features_);
+    GetValue(root, "VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV",
+             &pdd_.physical_device_device_generated_commands_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -5285,6 +5300,44 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(diagnosticsConfig, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_device_generated_commands, but "
+            "VK_NV_device_generated_commands is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(deviceGeneratedCommands, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_device_generated_commands, but "
+            "VK_NV_device_generated_commands is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(maxGraphicsShaderGroupCount, WarnIfGreater);
+    GET_VALUE_WARN(maxIndirectSequenceCount, WarnIfGreater);
+    GET_VALUE_WARN(maxIndirectCommandsTokenCount, WarnIfGreater);
+    GET_VALUE_WARN(maxIndirectCommandsStreamCount, WarnIfGreater);
+    GET_VALUE_WARN(maxIndirectCommandsTokenOffset, WarnIfGreater);
+    GET_VALUE_WARN(maxIndirectCommandsStreamStride, WarnIfGreater);
+    GET_VALUE_WARN(minSequencesCountBufferOffsetAlignment, WarnIfGreater);
+    GET_VALUE_WARN(minSequencesIndexBufferOffsetAlignment, WarnIfGreater);
+    GET_VALUE_WARN(minIndirectCommandsBufferOffsetAlignment, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -7051,6 +7104,24 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     dcf->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_FEATURES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dgcf =
+                        (VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *)place;
+                    void *pNext = dgcf->pNext;
+                    *dgcf = physicalDeviceData->physical_device_device_generated_commands_features_;
+                    dgcf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_PROPERTIES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dgcp =
+                        (VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *)place;
+                    void *pNext = dgcp->pNext;
+                    *dgcp = physicalDeviceData->physical_device_device_generated_commands_properties_;
+                    dgcp->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
                 if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
                     VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -8736,6 +8807,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_diagnostics_config_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_diagnostics_config_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
+                    pdd.physical_device_device_generated_commands_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_device_generated_commands_features_);
+
+                    pdd.physical_device_device_generated_commands_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_device_generated_commands_properties_);
                 }
 
                 if (api_version_above_1_1) {
