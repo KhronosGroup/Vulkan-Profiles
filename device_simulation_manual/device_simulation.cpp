@@ -1742,6 +1742,9 @@ class PhysicalDeviceData {
     // VK_INTEL_shader_integer_functions2 structs
     VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL physical_device_shader_integer_functions_2_features_;
 
+    // VK_NV_compute_shader_derivatives structs
+    VkPhysicalDeviceComputeShaderDerivativesFeaturesNV physical_device_compute_shader_derivatives_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2089,6 +2092,10 @@ class PhysicalDeviceData {
         // VK_INTEL_shader_integer_functions2 structs
         physical_device_shader_integer_functions_2_features_ = {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_INTEGER_FUNCTIONS_2_FEATURES_INTEL};
+
+        // VK_NV_compute_shader_derivatives structs
+        physical_device_compute_shader_derivatives_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COMPUTE_SHADER_DERIVATIVES_FEATURES_NV};
     }
 
     const VkInstance instance_;
@@ -2264,6 +2271,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2835,6 +2843,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceSubpassShadingPropertiesHUAWEI", &pdd_.physical_device_subpass_shading_properties_);
     GetValue(root, "VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL",
              &pdd_.physical_device_shader_integer_functions_2_features_);
+    GetValue(root, "VkPhysicalDeviceComputeShaderDerivativesFeaturesNV",
+             &pdd_.physical_device_compute_shader_derivatives_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -5121,6 +5131,22 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(shaderIntegerFunctions2, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceComputeShaderDerivativesFeaturesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_compute_shader_derivatives, but "
+            "VK_NV_compute_shader_derivatives is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(computeDerivativeGroupQuads, WarnIfGreater);
+    GET_VALUE_WARN(computeDerivativeGroupLinear, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -6827,6 +6853,15 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     sif2f->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COMPUTE_SHADER_DERIVATIVES_FEATURES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
+                    VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *csdf =
+                        (VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *)place;
+                    void *pNext = csdf->pNext;
+                    *csdf = physicalDeviceData->physical_device_compute_shader_derivatives_features_;
+                    csdf->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
                 if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
                     VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -8472,6 +8507,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_shader_integer_functions_2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_integer_functions_2_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
+                    pdd.physical_device_compute_shader_derivatives_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_compute_shader_derivatives_features_);
                 }
 
                 if (api_version_above_1_1) {
