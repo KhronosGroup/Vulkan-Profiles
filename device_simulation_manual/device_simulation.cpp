@@ -1745,6 +1745,10 @@ class PhysicalDeviceData {
     // VK_NV_compute_shader_derivatives structs
     VkPhysicalDeviceComputeShaderDerivativesFeaturesNV physical_device_compute_shader_derivatives_features_;
 
+    // VK_NV_cooperative_matrix structs
+    VkPhysicalDeviceCooperativeMatrixFeaturesNV physical_device_cooperative_matrix_features_;
+    VkPhysicalDeviceCooperativeMatrixPropertiesNV physical_device_cooperative_matrix_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2096,6 +2100,10 @@ class PhysicalDeviceData {
         // VK_NV_compute_shader_derivatives structs
         physical_device_compute_shader_derivatives_features_ = {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COMPUTE_SHADER_DERIVATIVES_FEATURES_NV};
+
+        // VK_NV_cooperative_matrix structs
+        physical_device_cooperative_matrix_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_NV};
+        physical_device_cooperative_matrix_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_PROPERTIES_NV};
     }
 
     const VkInstance instance_;
@@ -2272,6 +2280,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCooperativeMatrixFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCooperativeMatrixPropertiesNV *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2845,6 +2855,8 @@ bool JsonLoader::LoadFile(const char *filename) {
              &pdd_.physical_device_shader_integer_functions_2_features_);
     GetValue(root, "VkPhysicalDeviceComputeShaderDerivativesFeaturesNV",
              &pdd_.physical_device_compute_shader_derivatives_features_);
+    GetValue(root, "VkPhysicalDeviceCooperativeMatrixFeaturesNV", &pdd_.physical_device_cooperative_matrix_features_);
+    GetValue(root, "VkPhysicalDeviceCooperativeMatrixPropertiesNV", &pdd_.physical_device_cooperative_matrix_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -5147,6 +5159,37 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(computeDerivativeGroupLinear, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCooperativeMatrixFeaturesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCooperativeMatrixFeaturesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_cooperative_matrix, but "
+            "VK_NV_cooperative_matrix is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(cooperativeMatrix, WarnIfGreater);
+    GET_VALUE_WARN(cooperativeMatrixRobustBufferAccess, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCooperativeMatrixPropertiesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCooperativeMatrixPropertiesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_cooperative_matrix, but "
+            "VK_NV_cooperative_matrix is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(cooperativeMatrixSupportedStages, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -6862,6 +6905,22 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     csdf->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
+                    VkPhysicalDeviceCooperativeMatrixFeaturesNV *cmf = (VkPhysicalDeviceCooperativeMatrixFeaturesNV *)place;
+                    void *pNext = cmf->pNext;
+                    *cmf = physicalDeviceData->physical_device_cooperative_matrix_features_;
+                    cmf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_PROPERTIES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
+                    VkPhysicalDeviceCooperativeMatrixPropertiesNV *cmp = (VkPhysicalDeviceCooperativeMatrixPropertiesNV *)place;
+                    void *pNext = cmp->pNext;
+                    *cmp = physicalDeviceData->physical_device_cooperative_matrix_properties_;
+                    cmp->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
                 if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
                     VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -8513,6 +8572,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_compute_shader_derivatives_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_compute_shader_derivatives_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
+                    pdd.physical_device_cooperative_matrix_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_cooperative_matrix_features_);
+
+                    pdd.physical_device_cooperative_matrix_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_cooperative_matrix_properties_);
                 }
 
                 if (api_version_above_1_1) {
