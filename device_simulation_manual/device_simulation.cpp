@@ -1726,6 +1726,9 @@ class PhysicalDeviceData {
     // VK_AMD_device_coherent_memory structs
     VkPhysicalDeviceCoherentMemoryFeaturesAMD physical_device_coherent_memory_features_;
 
+    // VK_AMD_shader_core_properties structs
+    VkPhysicalDeviceShaderCorePropertiesAMD physical_device_shader_core_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2056,6 +2059,9 @@ class PhysicalDeviceData {
 
         // VK_AMD_device_coherent_memory structs
         physical_device_coherent_memory_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD};
+
+        // VK_AMD_shader_core_properties structs
+        physical_device_shader_core_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_PROPERTIES_AMD};
     }
 
     const VkInstance instance_;
@@ -2225,6 +2231,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCoherentMemoryFeaturesAMD *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderCorePropertiesAMD *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2789,6 +2796,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceFragmentShadingRateFeaturesKHR", &pdd_.physical_device_fragment_shading_rate_features_);
     GetValue(root, "VkPhysicalDeviceFragmentShadingRatePropertiesKHR", &pdd_.physical_device_fragment_shading_rate_properties_);
     GetValue(root, "VkPhysicalDeviceCoherentMemoryFeaturesAMD", &pdd_.physical_device_coherent_memory_features_);
+    GetValue(root, "VkPhysicalDeviceShaderCorePropertiesAMD", &pdd_.physical_device_shader_core_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -4971,6 +4979,34 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(deviceCoherentMemory, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderCorePropertiesAMD *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderCorePropertiesAMD)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_AMD_shader_core_properties, but "
+            "VK_AMD_shader_core_properties is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(shaderEngineCount, WarnIfGreater);
+    GET_VALUE_WARN(shaderArraysPerEngineCount, WarnIfGreater);
+    GET_VALUE_WARN(computeUnitsPerShaderArray, WarnIfGreater);
+    GET_VALUE_WARN(simdPerComputeUnit, WarnIfGreater);
+    GET_VALUE_WARN(wavefrontsPerSimd, WarnIfGreater);
+    GET_VALUE_WARN(wavefrontSize, WarnIfGreater);
+    GET_VALUE_WARN(sgprsPerSimd, WarnIfGreater);
+    GET_VALUE_WARN(minSgprAllocation, WarnIfGreater);
+    GET_VALUE_WARN(maxSgprAllocation, WarnIfGreater);
+    GET_VALUE_WARN(sgprAllocationGranularity, WarnIfGreater);
+    GET_VALUE_WARN(vgprsPerSimd, WarnIfGreater);
+    GET_VALUE_WARN(minVgprAllocation, WarnIfGreater);
+    GET_VALUE_WARN(maxVgprAllocation, WarnIfGreater);
+    GET_VALUE_WARN(vgprAllocationGranularity, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -6628,6 +6664,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     cmf->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_PROPERTIES_AMD:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderCorePropertiesAMD *scp = (VkPhysicalDeviceShaderCorePropertiesAMD *)place;
+                    void *pNext = scp->pNext;
+                    *scp = physicalDeviceData->physical_device_shader_core_properties_;
+                    scp->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
                 if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
                     VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -8239,6 +8283,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_coherent_memory_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_coherent_memory_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
+                    pdd.physical_device_shader_core_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_shader_core_properties_);
                 }
 
                 if (api_version_above_1_1) {
