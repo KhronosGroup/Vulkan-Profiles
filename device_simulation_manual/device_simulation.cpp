@@ -1785,6 +1785,9 @@ class PhysicalDeviceData {
     // VK_NV_ray_tracing structs
     VkPhysicalDeviceRayTracingPropertiesNV physical_device_ray_tracing_properties_;
 
+    // VK_NV_ray_tracing_motion_blur structs
+    VkPhysicalDeviceRayTracingMotionBlurFeaturesNV physical_device_ray_tracing_motiuon_blur_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2183,6 +2186,10 @@ class PhysicalDeviceData {
 
         // VK_NV_ray_tracing structs
         physical_device_ray_tracing_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PROPERTIES_NV};
+
+        // VK_NV_ray_tracing_motion_blur structs
+        physical_device_ray_tracing_motiuon_blur_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_MOTION_BLUR_FEATURES_NV};
     }
 
     const VkInstance instance_;
@@ -2375,6 +2382,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMeshShaderFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMeshShaderPropertiesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPropertiesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2970,6 +2978,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceMeshShaderFeaturesNV", &pdd_.physical_device_mesh_shader_features_);
     GetValue(root, "VkPhysicalDeviceMeshShaderPropertiesNV", &pdd_.physical_device_mesh_shader_properties_);
     GetValue(root, "VkPhysicalDeviceRayTracingPropertiesNV", &pdd_.physical_device_ray_tracing_properties_);
+    GetValue(root, "VkPhysicalDeviceRayTracingMotionBlurFeaturesNV", &pdd_.physical_device_ray_tracing_motiuon_blur_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -5544,6 +5553,22 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(maxDescriptorSetAccelerationStructures, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingMotionBlurFeaturesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_ray_tracing_motion_blur, but "
+            "VK_NV_ray_tracing_motion_blur is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(rayTracingMotionBlur, WarnIfGreater);
+    GET_VALUE_WARN(rayTracingMotionBlurPipelineTraceRaysIndirect, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -7396,6 +7421,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     rtp->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_MOTION_BLUR_FEATURES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
+                    VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *rtmbf = (VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *)place;
+                    void *pNext = rtmbf->pNext;
+                    *rtmbf = physicalDeviceData->physical_device_ray_tracing_motiuon_blur_features_;
+                    rtmbf->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
                 if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
                     VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -9135,6 +9168,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_ray_tracing_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_ray_tracing_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
+                    pdd.physical_device_ray_tracing_motiuon_blur_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_ray_tracing_motiuon_blur_features_);
                 }
 
                 if (api_version_above_1_1) {
