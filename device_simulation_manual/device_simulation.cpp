@@ -5732,714 +5732,968 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
     while (place) {
         VkBaseOutStructure *structure = (VkBaseOutStructure *)place;
 
-        // These IF-ELSE statements check which struct is in the pNext chain and, if the physical device has the proper extension,
+        // These switch statements check which struct is in the pNext chain and, if the physical device has the proper extension,
         // fill the struct with any override data provided by the PhysicalDeviceData object.
 
-        // VK_KHR_portability_subset is a special case since it can also be emulated by the DevSim layer.
-        if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR &&
-            (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) ||
-             emulatePortability.num > 0)) {
-            VkPhysicalDevicePortabilitySubsetPropertiesKHR *psp = (VkPhysicalDevicePortabilitySubsetPropertiesKHR *)place;
-            void *pNext = psp->pNext;
-            *psp = physicalDeviceData->physical_device_portability_subset_properties_;
-            psp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR &&
-                   (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) ||
-                    emulatePortability.num > 0)) {
-            VkPhysicalDevicePortabilitySubsetFeaturesKHR *psf = (VkPhysicalDevicePortabilitySubsetFeaturesKHR *)place;
-            void *pNext = psf->pNext;
-            *psf = physicalDeviceData->physical_device_portability_subset_features_;
-            psf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_8BIT_STORAGE_EXTENSION_NAME)) {
-            VkPhysicalDevice8BitStorageFeaturesKHR *ebsf = (VkPhysicalDevice8BitStorageFeaturesKHR *)place;
-            void *pNext = ebsf->pNext;
-            *ebsf = physicalDeviceData->physical_device_8bit_storage_features_;
-            ebsf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_16BIT_STORAGE_EXTENSION_NAME)) {
-            VkPhysicalDevice16BitStorageFeaturesKHR *sbsf = (VkPhysicalDevice16BitStorageFeaturesKHR *)place;
-            void *pNext = sbsf->pNext;
-            *sbsf = physicalDeviceData->physical_device_16bit_storage_features_;
-            sbsf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
-            VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *bdaf = (VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *)place;
-            void *pNext = bdaf->pNext;
-            *bdaf = physicalDeviceData->physical_device_buffer_device_address_features_;
-            bdaf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)) {
-            VkPhysicalDeviceDepthStencilResolvePropertiesKHR *dsrp = (VkPhysicalDeviceDepthStencilResolvePropertiesKHR *)place;
-            void *pNext = dsrp->pNext;
-            *dsrp = physicalDeviceData->physical_device_depth_stencil_resolve_properties_;
-            dsrp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
-            VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dip = (VkPhysicalDeviceDescriptorIndexingPropertiesEXT *)place;
-            void *pNext = dip->pNext;
-            *dip = physicalDeviceData->physical_device_descriptor_indexing_properties_;
-            dip->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
-            VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dif = (VkPhysicalDeviceDescriptorIndexingFeaturesEXT *)place;
-            void *pNext = dif->pNext;
-            *dif = physicalDeviceData->physical_device_descriptor_indexing_features_;
-            dif->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME)) {
-            VkPhysicalDeviceHostQueryResetFeaturesEXT *hqrf = (VkPhysicalDeviceHostQueryResetFeaturesEXT *)place;
-            void *pNext = hqrf->pNext;
-            *hqrf = physicalDeviceData->physical_device_host_query_reset_features_;
-            hqrf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME)) {
-            VkPhysicalDeviceImagelessFramebufferFeaturesKHR *iff = (VkPhysicalDeviceImagelessFramebufferFeaturesKHR *)place;
-            void *pNext = iff->pNext;
-            *iff = physicalDeviceData->physical_device_imageless_framebuffer_features_;
-            iff->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE2_EXTENSION_NAME)) {
-            VkPhysicalDevicePointClippingPropertiesKHR *pcp = (VkPhysicalDevicePointClippingPropertiesKHR *)place;
-            void *pNext = pcp->pNext;
-            *pcp = physicalDeviceData->physical_device_point_clipping_properties_;
-            pcp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
-            VkPhysicalDeviceMaintenance3PropertiesKHR *pcp = (VkPhysicalDeviceMaintenance3PropertiesKHR *)place;
-            void *pNext = pcp->pNext;
-            *pcp = physicalDeviceData->physical_device_maintenance_3_properties_;
-            pcp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
-            VkPhysicalDeviceMaintenance4FeaturesKHR *m4f = (VkPhysicalDeviceMaintenance4FeaturesKHR *)place;
-            void *pNext = m4f->pNext;
-            *m4f = physicalDeviceData->physical_device_maintenance_4_features_;
-            m4f->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
-            VkPhysicalDeviceMaintenance4PropertiesKHR *m4p = (VkPhysicalDeviceMaintenance4PropertiesKHR *)place;
-            void *pNext = m4p->pNext;
-            *m4p = physicalDeviceData->physical_device_maintenance_4_properties_;
-            m4p->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
-            VkPhysicalDeviceMultiviewPropertiesKHR *mp = (VkPhysicalDeviceMultiviewPropertiesKHR *)place;
-            void *pNext = mp->pNext;
-            *mp = physicalDeviceData->physical_device_multiview_properties_;
-            mp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
-            VkPhysicalDeviceMultiviewFeaturesKHR *mf = (VkPhysicalDeviceMultiviewFeaturesKHR *)place;
-            void *pNext = mf->pNext;
-            *mf = physicalDeviceData->physical_device_multiview_features_;
-            mf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_FILTER_MINMAX_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME)) {
-            VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *sfmp = (VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *)place;
-            void *pNext = sfmp->pNext;
-            *sfmp = physicalDeviceData->physical_device_sampler_filter_minmax_properties_;
-            sfmp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME)) {
-            VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *sycf = (VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *)place;
-            void *pNext = sycf->pNext;
-            *sycf = physicalDeviceData->physical_device_sampler_ycbcr_conversion_features_;
-            sycf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
-            VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *sblf = (VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *)place;
-            void *pNext = sblf->pNext;
-            *sblf = physicalDeviceData->physical_device_scalar_block_layout_features_;
-            sblf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SEPARATE_DEPTH_STENCIL_LAYOUTS_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME)) {
-            VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *sdslf =
-                (VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *)place;
-            void *pNext = sdslf->pNext;
-            *sdslf = physicalDeviceData->physical_device_separate_depth_stencil_layouts_features_;
-            sdslf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_INT64_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME)) {
-            VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *saisf = (VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *)place;
-            void *pNext = saisf->pNext;
-            *saisf = physicalDeviceData->physical_device_shader_atomic_int64_features_;
-            saisf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
-            VkPhysicalDeviceFloatControlsPropertiesKHR *fcp = (VkPhysicalDeviceFloatControlsPropertiesKHR *)place;
-            void *pNext = fcp->pNext;
-            *fcp = physicalDeviceData->physical_device_float_controls_properties_;
-            fcp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)) {
-            VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *sfsief = (VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *)place;
-            void *pNext = sfsief->pNext;
-            *sfsief = physicalDeviceData->physical_device_shader_float16_int8_features_;
-            sfsief->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
-            VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *ssetf =
-                (VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *)place;
-            void *pNext = ssetf->pNext;
-            *ssetf = physicalDeviceData->physical_device_shader_subgroup_extended_types_features_;
-            ssetf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
-            VkPhysicalDeviceTimelineSemaphorePropertiesKHR *tsp = (VkPhysicalDeviceTimelineSemaphorePropertiesKHR *)place;
-            void *pNext = tsp->pNext;
-            *tsp = physicalDeviceData->physical_device_timeline_semaphore_properties_;
-            tsp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
-            VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *tsf = (VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *)place;
-            void *pNext = tsf->pNext;
-            *tsf = physicalDeviceData->physical_device_timeline_semaphore_features_;
-            tsf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME)) {
-            VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *ubslf =
-                (VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *)place;
-            void *pNext = ubslf->pNext;
-            *ubslf = physicalDeviceData->physical_device_uniform_buffer_standard_layout_features_;
-            ubslf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
-            VkPhysicalDeviceVariablePointersFeaturesKHR *vpf = (VkPhysicalDeviceVariablePointersFeaturesKHR *)place;
-            void *pNext = vpf->pNext;
-            *vpf = physicalDeviceData->physical_device_variable_pointers_features_;
-            vpf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME)) {
-            VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *vmmf = (VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *)place;
-            void *pNext = vmmf->pNext;
-            *vmmf = physicalDeviceData->physical_device_vulkan_memory_model_features_;
-            vmmf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
-            VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *ziwmf =
-                (VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *)place;
-            void *pNext = ziwmf->pNext;
-            *ziwmf = physicalDeviceData->physical_device_zero_initialize_workgroup_memory_features_;
-            ziwmf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
-            VkPhysicalDeviceAccelerationStructureFeaturesKHR *asf = (VkPhysicalDeviceAccelerationStructureFeaturesKHR *)place;
-            void *pNext = asf->pNext;
-            *asf = physicalDeviceData->physical_device_acceleration_structure_features_;
-            asf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
-            VkPhysicalDeviceAccelerationStructurePropertiesKHR *asp = (VkPhysicalDeviceAccelerationStructurePropertiesKHR *)place;
-            void *pNext = asp->pNext;
-            *asp = physicalDeviceData->physical_device_acceleration_structure_properties_;
-            asp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PERFORMANCE_QUERY_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
-            VkPhysicalDevicePerformanceQueryFeaturesKHR *pqf = (VkPhysicalDevicePerformanceQueryFeaturesKHR *)place;
-            void *pNext = pqf->pNext;
-            *pqf = physicalDeviceData->physical_device_performance_query_features_;
-            pqf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PERFORMANCE_QUERY_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
-            VkPhysicalDevicePerformanceQueryPropertiesKHR *pqp = (VkPhysicalDevicePerformanceQueryPropertiesKHR *)place;
-            void *pNext = pqp->pNext;
-            *pqp = physicalDeviceData->physical_device_performance_query_properties_;
-            pqp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
-            VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *pepf =
-                (VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *)place;
-            void *pNext = pepf->pNext;
-            *pepf = physicalDeviceData->physical_device_pipeline_executable_properties_features_;
-            pepf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_ID_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PRESENT_ID_EXTENSION_NAME)) {
-            VkPhysicalDevicePresentIdFeaturesKHR *pidf = (VkPhysicalDevicePresentIdFeaturesKHR *)place;
-            void *pNext = pidf->pNext;
-            *pidf = physicalDeviceData->physical_device_present_id_features_;
-            pidf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_WAIT_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
-            VkPhysicalDevicePresentWaitFeaturesKHR *pwf = (VkPhysicalDevicePresentWaitFeaturesKHR *)place;
-            void *pNext = pwf->pNext;
-            *pwf = physicalDeviceData->physical_device_present_wait_features_;
-            pwf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
-            VkPhysicalDevicePushDescriptorPropertiesKHR *pdp = (VkPhysicalDevicePushDescriptorPropertiesKHR *)place;
-            void *pNext = pdp->pNext;
-            *pdp = physicalDeviceData->physical_device_push_descriptor_properites_;
-            pdp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
-            VkPhysicalDeviceRayQueryFeaturesKHR *rqf = (VkPhysicalDeviceRayQueryFeaturesKHR *)place;
-            void *pNext = rqf->pNext;
-            *rqf = physicalDeviceData->physical_device_ray_query_features_;
-            rqf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
-            VkPhysicalDeviceRayTracingPipelineFeaturesKHR *rtpf = (VkPhysicalDeviceRayTracingPipelineFeaturesKHR *)place;
-            void *pNext = rtpf->pNext;
-            *rtpf = physicalDeviceData->physical_device_ray_tracing_pipeline_features_;
-            rtpf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
-            VkPhysicalDeviceRayTracingPipelinePropertiesKHR *rtpp = (VkPhysicalDeviceRayTracingPipelinePropertiesKHR *)place;
-            void *pNext = rtpp->pNext;
-            *rtpp = physicalDeviceData->physical_device_ray_tracing_pipeline_properties_;
-            rtpp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
-            VkPhysicalDeviceShaderClockFeaturesKHR *scf = (VkPhysicalDeviceShaderClockFeaturesKHR *)place;
-            void *pNext = scf->pNext;
-            *scf = physicalDeviceData->physical_device_shader_clock_features_;
-            scf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_INTEGER_DOT_PRODUCT_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
-            VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *sidpf = (VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *)place;
-            void *pNext = sidpf->pNext;
-            *sidpf = physicalDeviceData->physical_device_shader_integer_dot_product_features_;
-            sidpf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_INTEGER_DOT_PRODUCT_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
-            VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *sidpp =
-                (VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *)place;
-            void *pNext = sidpp->pNext;
-            *sidpp = physicalDeviceData->physical_device_shader_integer_dot_products_properties_;
-            sidpp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData,
-                                                    VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
-            VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *ssucff =
-                (VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *)place;
-            void *pNext = ssucff->pNext;
-            *ssucff = physicalDeviceData->physical_device_shader_subgroup_uniform_control_flow_features_;
-            ssucff->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
-            VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *stif =
-                (VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *)place;
-            void *pNext = stif->pNext;
-            *stif = physicalDeviceData->physical_device_shader_terminate_invocation_features_;
-            stif->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
-            VkPhysicalDeviceSynchronization2FeaturesKHR *s2f = (VkPhysicalDeviceSynchronization2FeaturesKHR *)place;
-            void *pNext = s2f->pNext;
-            *s2f = physicalDeviceData->physical_device_synchronization2_features_;
-            s2f->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME)) {
-            VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *wmelf =
-                (VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *)place;
-            void *pNext = wmelf->pNext;
-            *wmelf = physicalDeviceData->physical_device_workgroup_memory_explicit_layout_features_;
-            wmelf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_4444_FORMATS_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
-            VkPhysicalDevice4444FormatsFeaturesEXT *ff = (VkPhysicalDevice4444FormatsFeaturesEXT *)place;
-            void *pNext = ff->pNext;
-            *ff = physicalDeviceData->physical_device_4444_formats_features_;
-            ff->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ASTC_DECODE_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME)) {
-            VkPhysicalDeviceASTCDecodeFeaturesEXT *astcdf = (VkPhysicalDeviceASTCDecodeFeaturesEXT *)place;
-            void *pNext = astcdf->pNext;
-            *astcdf = physicalDeviceData->physical_device_astc_decode_features_;
-            astcdf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
-            VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *boaf = (VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *)place;
-            void *pNext = boaf->pNext;
-            *boaf = physicalDeviceData->physical_device_blend_operation_advanced_features_;
-            boaf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
-            VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *boap =
-                (VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *)place;
-            void *pNext = boap->pNext;
-            *boap = physicalDeviceData->physical_device_blend_operation_advanced_properties_;
-            boap->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BORDER_COLOR_SWIZZLE_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
-            VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *bcsf = (VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *)place;
-            void *pNext = bcsf->pNext;
-            *bcsf = physicalDeviceData->physical_device_border_color_swizzle_features_;
-            bcsf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COLOR_WRITE_ENABLE_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME)) {
-            VkPhysicalDeviceColorWriteEnableFeaturesEXT *cwef = (VkPhysicalDeviceColorWriteEnableFeaturesEXT *)place;
-            void *pNext = cwef->pNext;
-            *cwef = physicalDeviceData->physical_device_color_write_enable_features_;
-            cwef->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONDITIONAL_RENDERING_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
-            VkPhysicalDeviceConditionalRenderingFeaturesEXT *crf = (VkPhysicalDeviceConditionalRenderingFeaturesEXT *)place;
-            void *pNext = crf->pNext;
-            *crf = physicalDeviceData->physical_device_conditional_rendering_features_;
-            crf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONSERVATIVE_RASTERIZATION_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
-            VkPhysicalDeviceConservativeRasterizationPropertiesEXT *crp =
-                (VkPhysicalDeviceConservativeRasterizationPropertiesEXT *)place;
-            void *pNext = crp->pNext;
-            *crp = physicalDeviceData->physical_device_conservative_rasterization_properties_;
-            crp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
-            VkPhysicalDeviceCustomBorderColorFeaturesEXT *cbcf = (VkPhysicalDeviceCustomBorderColorFeaturesEXT *)place;
-            void *pNext = cbcf->pNext;
-            *cbcf = physicalDeviceData->physical_device_custom_border_color_features_;
-            cbcf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
-            VkPhysicalDeviceCustomBorderColorPropertiesEXT *cbcp = (VkPhysicalDeviceCustomBorderColorPropertiesEXT *)place;
-            void *pNext = cbcp->pNext;
-            *cbcp = physicalDeviceData->physical_device_custom_border_color_properties_;
-            cbcp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
-            VkPhysicalDeviceDepthClipEnableFeaturesEXT *dcef = (VkPhysicalDeviceDepthClipEnableFeaturesEXT *)place;
-            void *pNext = dcef->pNext;
-            *dcef = physicalDeviceData->physical_device_depth_clip_enable_features_ext_;
-            dcef->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_MEMORY_REPORT_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME)) {
-            VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dmrf = (VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *)place;
-            void *pNext = dmrf->pNext;
-            *dmrf = physicalDeviceData->physical_device_device_memory_report_features_;
-            dmrf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DISCARD_RECTANGLE_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
-            VkPhysicalDeviceDiscardRectanglePropertiesEXT *drp = (VkPhysicalDeviceDiscardRectanglePropertiesEXT *)place;
-            void *pNext = drp->pNext;
-            *drp = physicalDeviceData->physical_device_discard_rectangle_properties_;
-            drp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
-            VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *edsf = (VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *)place;
-            void *pNext = edsf->pNext;
-            *edsf = physicalDeviceData->physical_device_extended_dynamic_state_features_;
-            edsf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
-            VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *eds2f = (VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *)place;
-            void *pNext = eds2f->pNext;
-            *eds2f = physicalDeviceData->physical_device_extended_dynamic_state2_features_;
-            eds2f->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME)) {
-            VkPhysicalDeviceExternalMemoryHostPropertiesEXT *emhp = (VkPhysicalDeviceExternalMemoryHostPropertiesEXT *)place;
-            void *pNext = emhp->pNext;
-            *emhp = physicalDeviceData->physical_device_external_memory_host_properties_;
-            emhp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
-            VkPhysicalDeviceFragmentDensityMapFeaturesEXT *fdmf = (VkPhysicalDeviceFragmentDensityMapFeaturesEXT *)place;
-            void *pNext = fdmf->pNext;
-            *fdmf = physicalDeviceData->physical_device_fragment_density_map_features_;
-            fdmf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
-            VkPhysicalDeviceFragmentDensityMapPropertiesEXT *fdmp = (VkPhysicalDeviceFragmentDensityMapPropertiesEXT *)place;
-            void *pNext = fdmp->pNext;
-            *fdmp = physicalDeviceData->physical_device_fragment_density_map_properties_;
-            fdmp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
-            VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *fsif = (VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *)place;
-            void *pNext = fsif->pNext;
-            *fsif = physicalDeviceData->physical_device_fragment_shader_interlock_features_;
-            fsif->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
-            VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *gpqf = (VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *)place;
-            void *pNext = gpqf->pNext;
-            *gpqf = physicalDeviceData->physical_device_global_priority_query_features_;
-            gpqf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
-            VkPhysicalDeviceImageRobustnessFeaturesEXT *irf = (VkPhysicalDeviceImageRobustnessFeaturesEXT *)place;
-            void *pNext = irf->pNext;
-            *irf = physicalDeviceData->physical_device_image_robustness_features_;
-            irf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INDEX_TYPE_UINT8_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME)) {
-            VkPhysicalDeviceIndexTypeUint8FeaturesEXT *itu8f = (VkPhysicalDeviceIndexTypeUint8FeaturesEXT *)place;
-            void *pNext = itu8f->pNext;
-            *itu8f = physicalDeviceData->physical_device_index_type_uint8_features_;
-            itu8f->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
-            VkPhysicalDeviceInlineUniformBlockFeaturesEXT *iubf = (VkPhysicalDeviceInlineUniformBlockFeaturesEXT *)place;
-            void *pNext = iubf->pNext;
-            *iubf = physicalDeviceData->physical_device_inline_uniform_block_features_;
-            iubf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
-            VkPhysicalDeviceInlineUniformBlockPropertiesEXT *iubp = (VkPhysicalDeviceInlineUniformBlockPropertiesEXT *)place;
-            void *pNext = iubp->pNext;
-            *iubp = physicalDeviceData->physical_device_inline_uniform_block_properties_;
-            iubp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
-            VkPhysicalDeviceLineRasterizationFeaturesEXT *lrf = (VkPhysicalDeviceLineRasterizationFeaturesEXT *)place;
-            void *pNext = lrf->pNext;
-            *lrf = physicalDeviceData->physical_device_line_rasterization_features_;
-            lrf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
-            VkPhysicalDeviceLineRasterizationPropertiesEXT *lrp = (VkPhysicalDeviceLineRasterizationPropertiesEXT *)place;
-            void *pNext = lrp->pNext;
-            *lrp = physicalDeviceData->physical_device_line_rasterization_properties_;
-            lrp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PRIORITY_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME)) {
-            VkPhysicalDeviceMemoryPriorityFeaturesEXT *mpf = (VkPhysicalDeviceMemoryPriorityFeaturesEXT *)place;
-            void *pNext = mpf->pNext;
-            *mpf = physicalDeviceData->physical_device_memory_priority_features_;
-            mpf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
-            VkPhysicalDeviceMultiDrawFeaturesEXT *mdf = (VkPhysicalDeviceMultiDrawFeaturesEXT *)place;
-            void *pNext = mdf->pNext;
-            *mdf = physicalDeviceData->physical_device_multi_draw_features_;
-            mdf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
-            VkPhysicalDeviceMultiDrawPropertiesEXT *mdp = (VkPhysicalDeviceMultiDrawPropertiesEXT *)place;
-            void *pNext = mdp->pNext;
-            *mdp = physicalDeviceData->physical_device_multi_draw_properties_;
-            mdp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PAGEABLE_DEVICE_LOCAL_MEMORY_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
-            VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *pdlmf =
-                (VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *)place;
-            void *pNext = pdlmf->pNext;
-            *pdlmf = physicalDeviceData->physical_device_pageable_device_local_memory_features_;
-            pdlmf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
-            VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *pcccf =
-                (VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *)place;
-            void *pNext = pcccf->pNext;
-            *pcccf = physicalDeviceData->physical_device_pipeline_creation_cache_control_features_;
-            pcccf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIMITIVE_TOPOLOGY_LIST_RESTART_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME)) {
-            VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *ptlrf =
-                (VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *)place;
-            void *pNext = ptlrf->pNext;
-            *ptlrf = physicalDeviceData->physical_device_primitive_topology_list_restart_features_;
-            ptlrf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
-            VkPhysicalDevicePrivateDataFeaturesEXT *pdf = (VkPhysicalDevicePrivateDataFeaturesEXT *)place;
-            void *pNext = pdf->pNext;
-            *pdf = physicalDeviceData->physical_device_private_data_features_;
-            pdf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROVOKING_VERTEX_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
-            VkPhysicalDeviceProvokingVertexFeaturesEXT *pvf = (VkPhysicalDeviceProvokingVertexFeaturesEXT *)place;
-            void *pNext = pvf->pNext;
-            *pvf = physicalDeviceData->physical_device_provoking_vertex_features_;
-            pvf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROVOKING_VERTEX_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
-            VkPhysicalDeviceProvokingVertexPropertiesEXT *pvp = (VkPhysicalDeviceProvokingVertexPropertiesEXT *)place;
-            void *pNext = pvp->pNext;
-            *pvp = physicalDeviceData->physical_device_provoking_vertex_properties_;
-            pvp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RGBA10X6_FORMATS_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME)) {
-            VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *rgba10x6ff = (VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *)place;
-            void *pNext = rgba10x6ff->pNext;
-            *rgba10x6ff = physicalDeviceData->physical_device_rgba10x6_formats_features_;
-            rgba10x6ff->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
-            VkPhysicalDeviceRobustness2FeaturesEXT *r2f = (VkPhysicalDeviceRobustness2FeaturesEXT *)place;
-            void *pNext = r2f->pNext;
-            *r2f = physicalDeviceData->physical_device_robustness_2_features_;
-            r2f->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
-            VkPhysicalDeviceRobustness2PropertiesEXT *r2p = (VkPhysicalDeviceRobustness2PropertiesEXT *)place;
-            void *pNext = r2p->pNext;
-            *r2p = physicalDeviceData->physical_device_robustness_2_properties_;
-            r2p->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLE_LOCATIONS_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME)) {
-            VkPhysicalDeviceSampleLocationsPropertiesEXT *slp = (VkPhysicalDeviceSampleLocationsPropertiesEXT *)place;
-            void *pNext = slp->pNext;
-            *slp = physicalDeviceData->physical_device_sample_locations_properties_;
-            slp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME)) {
-            VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *saff = (VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *)place;
-            void *pNext = saff->pNext;
-            *saff = physicalDeviceData->physical_device_shader_atomic_float_features_;
-            saff->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT_2_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
-            VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *saf2f = (VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *)place;
-            void *pNext = saf2f->pNext;
-            *saf2f = physicalDeviceData->physical_device_shader_atomic_float2_features_;
-            saf2f->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME)) {
-            VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *sdthif =
-                (VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *)place;
-            void *pNext = sdthif->pNext;
-            *sdthif = physicalDeviceData->physical_device_shader_demote_to_helper_invocation_features_;
-            sdthif->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_IMAGE_ATOMIC_INT64_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME)) {
-            VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *siai64f = (VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *)place;
-            void *pNext = siai64f->pNext;
-            *siai64f = physicalDeviceData->physical_device_shader_image_atomic_int64_features_;
-            siai64f->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
-            VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *sscf = (VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *)place;
-            void *pNext = sscf->pNext;
-            *sscf = physicalDeviceData->physical_device_subgroup_size_control_features_;
-            sscf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
-            VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *sscp = (VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *)place;
-            void *pNext = sscp->pNext;
-            *sscp = physicalDeviceData->physical_device_subgroup_size_control_properties_;
-            sscp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
-            VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *tbaf = (VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *)place;
-            void *pNext = tbaf->pNext;
-            *tbaf = physicalDeviceData->physical_device_texel_buffer_alignment_features_;
-            tbaf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
-            VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *tbap = (VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *)place;
-            void *pNext = tbap->pNext;
-            *tbap = physicalDeviceData->physical_device_texel_buffer_alignment_properties_;
-            tbap->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXTURE_COMPRESSION_ASTC_HDR_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
-            VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *tcastchdrf =
-                (VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *)place;
-            void *pNext = tcastchdrf->pNext;
-            *tcastchdrf = physicalDeviceData->physical_device_texture_compression_astc_hdr_features_;
-            tcastchdrf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
-            VkPhysicalDeviceTransformFeedbackFeaturesEXT *tff = (VkPhysicalDeviceTransformFeedbackFeaturesEXT *)place;
-            void *pNext = tff->pNext;
-            *tff = physicalDeviceData->physical_device_transform_feedback_features_;
-            tff->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
-            VkPhysicalDeviceTransformFeedbackPropertiesEXT *tfp = (VkPhysicalDeviceTransformFeedbackPropertiesEXT *)place;
-            void *pNext = tfp->pNext;
-            *tfp = physicalDeviceData->physical_device_transform_feedback_properties_;
-            tfp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
-            VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *vadf = (VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *)place;
-            void *pNext = vadf->pNext;
-            *vadf = physicalDeviceData->physical_device_vertex_attribute_divisor_features_;
-            vadf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
-            VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *vadp =
-                (VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *)place;
-            void *pNext = vadp->pNext;
-            *vadp = physicalDeviceData->physical_device_vertex_attirbute_divisor_properties_;
-            vadp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_INPUT_DYNAMIC_STATE_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME)) {
-            VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *vidsf = (VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *)place;
-            void *pNext = vidsf->pNext;
-            *vidsf = physicalDeviceData->physical_device_vertex_input_dynamic_state_features_;
-            vidsf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_2_PLANE_444_FORMATS_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
-            VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *y2pff = (VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *)place;
-            void *pNext = y2pff->pNext;
-            *y2pff = physicalDeviceData->physical_device_ycbcr_2plane_444_formats_features_;
-            y2pff->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_IMAGE_ARRAYS_FEATURES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
-            VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *yiaf = (VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *)place;
-            void *pNext = yiaf->pNext;
-            *yiaf = physicalDeviceData->physical_device_ycbcr_image_arrays_features_;
-            yiaf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_FEATURES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
-            VkPhysicalDeviceFragmentShadingRateFeaturesKHR *fsrf = (VkPhysicalDeviceFragmentShadingRateFeaturesKHR *)place;
-            void *pNext = fsrf->pNext;
-            *fsrf = physicalDeviceData->physical_device_fragment_shading_rate_features_;
-            fsrf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
-            VkPhysicalDeviceFragmentShadingRatePropertiesKHR *fsrp = (VkPhysicalDeviceFragmentShadingRatePropertiesKHR *)place;
-            void *pNext = fsrp->pNext;
-            *fsrp = physicalDeviceData->physical_device_fragment_shading_rate_properties_;
-            fsrp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
-            VkPhysicalDeviceCoherentMemoryFeaturesAMD *cmf = (VkPhysicalDeviceCoherentMemoryFeaturesAMD *)place;
-            void *pNext = cmf->pNext;
-            *cmf = physicalDeviceData->physical_device_coherent_memory_features_;
-            cmf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES &&
-                   physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
-            VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
-            void *pNext = pmp->pNext;
-            *pmp = physicalDeviceData->physical_device_protected_memory_properties_;
-            pmp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_FEATURES &&
-                   physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
-            VkPhysicalDeviceProtectedMemoryFeatures *pmf = (VkPhysicalDeviceProtectedMemoryFeatures *)place;
-            void *pNext = pmf->pNext;
-            *pmf = physicalDeviceData->physical_device_protected_memory_features_;
-            pmf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES &&
-                   physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
-            VkPhysicalDeviceShaderDrawParametersFeatures *sdpf = (VkPhysicalDeviceShaderDrawParametersFeatures *)place;
-            void *pNext = sdpf->pNext;
-            *sdpf = physicalDeviceData->physical_device_shader_draw_parameters_features_;
-            sdpf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES &&
-                   physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
-            VkPhysicalDeviceSubgroupProperties *sp = (VkPhysicalDeviceSubgroupProperties *)place;
-            void *pNext = sp->pNext;
-            *sp = physicalDeviceData->physical_device_subgroup_properties_;
-            sp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES &&
-                   physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_2) {
-            VkPhysicalDeviceVulkan11Properties *v11p = (VkPhysicalDeviceVulkan11Properties *)place;
-            void *pNext = v11p->pNext;
-            *v11p = physicalDeviceData->physical_device_vulkan_1_1_properties_;
-            v11p->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES &&
-                   physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_2) {
-            VkPhysicalDeviceVulkan11Features *v11f = (VkPhysicalDeviceVulkan11Features *)place;
-            void *pNext = v11f->pNext;
-            *v11f = physicalDeviceData->physical_device_vulkan_1_1_features_;
-            v11f->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES &&
-                   physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_2) {
-            VkPhysicalDeviceVulkan12Properties *v12p = (VkPhysicalDeviceVulkan12Properties *)place;
-            void *pNext = v12p->pNext;
-            *v12p = physicalDeviceData->physical_device_vulkan_1_2_properties_;
-            v12p->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES &&
-                   physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_2) {
-            VkPhysicalDeviceVulkan12Features *v12f = (VkPhysicalDeviceVulkan12Features *)place;
-            void *pNext = v12f->pNext;
-            *v12f = physicalDeviceData->physical_device_vulkan_1_2_features_;
-            v12f->pNext = pNext;
+        switch (structure->sType) {
+            // VK_KHR_portability_subset is a special case since it can also be emulated by the DevSim layer.
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) ||
+                    emulatePortability.num > 0) {
+                    VkPhysicalDevicePortabilitySubsetPropertiesKHR *psp = (VkPhysicalDevicePortabilitySubsetPropertiesKHR *)place;
+                    void *pNext = psp->pNext;
+                    *psp = physicalDeviceData->physical_device_portability_subset_properties_;
+                    psp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR:
+                if ((PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) ||
+                     emulatePortability.num > 0)) {
+                    VkPhysicalDevicePortabilitySubsetFeaturesKHR *psf = (VkPhysicalDevicePortabilitySubsetFeaturesKHR *)place;
+                    void *pNext = psf->pNext;
+                    *psf = physicalDeviceData->physical_device_portability_subset_features_;
+                    psf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_8BIT_STORAGE_EXTENSION_NAME)) {
+                    VkPhysicalDevice8BitStorageFeaturesKHR *ebsf = (VkPhysicalDevice8BitStorageFeaturesKHR *)place;
+                    void *pNext = ebsf->pNext;
+                    *ebsf = physicalDeviceData->physical_device_8bit_storage_features_;
+                    ebsf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_16BIT_STORAGE_EXTENSION_NAME)) {
+                    VkPhysicalDevice16BitStorageFeaturesKHR *sbsf = (VkPhysicalDevice16BitStorageFeaturesKHR *)place;
+                    void *pNext = sbsf->pNext;
+                    *sbsf = physicalDeviceData->physical_device_16bit_storage_features_;
+                    sbsf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *bdaf = (VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *)place;
+                    void *pNext = bdaf->pNext;
+                    *bdaf = physicalDeviceData->physical_device_buffer_device_address_features_;
+                    bdaf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDepthStencilResolvePropertiesKHR *dsrp =
+                        (VkPhysicalDeviceDepthStencilResolvePropertiesKHR *)place;
+                    void *pNext = dsrp->pNext;
+                    *dsrp = physicalDeviceData->physical_device_depth_stencil_resolve_properties_;
+                    dsrp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dip = (VkPhysicalDeviceDescriptorIndexingPropertiesEXT *)place;
+                    void *pNext = dip->pNext;
+                    *dip = physicalDeviceData->physical_device_descriptor_indexing_properties_;
+                    dip->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dif = (VkPhysicalDeviceDescriptorIndexingFeaturesEXT *)place;
+                    void *pNext = dif->pNext;
+                    *dif = physicalDeviceData->physical_device_descriptor_indexing_features_;
+                    dif->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME)) {
+                    VkPhysicalDeviceHostQueryResetFeaturesEXT *hqrf = (VkPhysicalDeviceHostQueryResetFeaturesEXT *)place;
+                    void *pNext = hqrf->pNext;
+                    *hqrf = physicalDeviceData->physical_device_host_query_reset_features_;
+                    hqrf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME)) {
+                    VkPhysicalDeviceImagelessFramebufferFeaturesKHR *iff = (VkPhysicalDeviceImagelessFramebufferFeaturesKHR *)place;
+                    void *pNext = iff->pNext;
+                    *iff = physicalDeviceData->physical_device_imageless_framebuffer_features_;
+                    iff->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE2_EXTENSION_NAME)) {
+                    VkPhysicalDevicePointClippingPropertiesKHR *pcp = (VkPhysicalDevicePointClippingPropertiesKHR *)place;
+                    void *pNext = pcp->pNext;
+                    *pcp = physicalDeviceData->physical_device_point_clipping_properties_;
+                    pcp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMaintenance3PropertiesKHR *pcp = (VkPhysicalDeviceMaintenance3PropertiesKHR *)place;
+                    void *pNext = pcp->pNext;
+                    *pcp = physicalDeviceData->physical_device_maintenance_3_properties_;
+                    pcp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMaintenance4FeaturesKHR *m4f = (VkPhysicalDeviceMaintenance4FeaturesKHR *)place;
+                    void *pNext = m4f->pNext;
+                    *m4f = physicalDeviceData->physical_device_maintenance_4_features_;
+                    m4f->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMaintenance4PropertiesKHR *m4p = (VkPhysicalDeviceMaintenance4PropertiesKHR *)place;
+                    void *pNext = m4p->pNext;
+                    *m4p = physicalDeviceData->physical_device_maintenance_4_properties_;
+                    m4p->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMultiviewPropertiesKHR *mp = (VkPhysicalDeviceMultiviewPropertiesKHR *)place;
+                    void *pNext = mp->pNext;
+                    *mp = physicalDeviceData->physical_device_multiview_properties_;
+                    mp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMultiviewFeaturesKHR *mf = (VkPhysicalDeviceMultiviewFeaturesKHR *)place;
+                    void *pNext = mf->pNext;
+                    *mf = physicalDeviceData->physical_device_multiview_features_;
+                    mf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_FILTER_MINMAX_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME)) {
+                    VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *sfmp =
+                        (VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *)place;
+                    void *pNext = sfmp->pNext;
+                    *sfmp = physicalDeviceData->physical_device_sampler_filter_minmax_properties_;
+                    sfmp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME)) {
+                    VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *sycf =
+                        (VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *)place;
+                    void *pNext = sycf->pNext;
+                    *sycf = physicalDeviceData->physical_device_sampler_ycbcr_conversion_features_;
+                    sycf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
+                    VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *sblf = (VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *)place;
+                    void *pNext = sblf->pNext;
+                    *sblf = physicalDeviceData->physical_device_scalar_block_layout_features_;
+                    sblf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SEPARATE_DEPTH_STENCIL_LAYOUTS_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *sdslf =
+                        (VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *)place;
+                    void *pNext = sdslf->pNext;
+                    *sdslf = physicalDeviceData->physical_device_separate_depth_stencil_layouts_features_;
+                    sdslf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_INT64_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *saisf = (VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *)place;
+                    void *pNext = saisf->pNext;
+                    *saisf = physicalDeviceData->physical_device_shader_atomic_int64_features_;
+                    saisf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceFloatControlsPropertiesKHR *fcp = (VkPhysicalDeviceFloatControlsPropertiesKHR *)place;
+                    void *pNext = fcp->pNext;
+                    *fcp = physicalDeviceData->physical_device_float_controls_properties_;
+                    fcp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *sfsief = (VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *)place;
+                    void *pNext = sfsief->pNext;
+                    *sfsief = physicalDeviceData->physical_device_shader_float16_int8_features_;
+                    sfsief->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *ssetf =
+                        (VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *)place;
+                    void *pNext = ssetf->pNext;
+                    *ssetf = physicalDeviceData->physical_device_shader_subgroup_extended_types_features_;
+                    ssetf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceTimelineSemaphorePropertiesKHR *tsp = (VkPhysicalDeviceTimelineSemaphorePropertiesKHR *)place;
+                    void *pNext = tsp->pNext;
+                    *tsp = physicalDeviceData->physical_device_timeline_semaphore_properties_;
+                    tsp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *tsf = (VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *)place;
+                    void *pNext = tsf->pNext;
+                    *tsf = physicalDeviceData->physical_device_timeline_semaphore_features_;
+                    tsf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME)) {
+                    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *ubslf =
+                        (VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *)place;
+                    void *pNext = ubslf->pNext;
+                    *ubslf = physicalDeviceData->physical_device_uniform_buffer_standard_layout_features_;
+                    ubslf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceVariablePointersFeaturesKHR *vpf = (VkPhysicalDeviceVariablePointersFeaturesKHR *)place;
+                    void *pNext = vpf->pNext;
+                    *vpf = physicalDeviceData->physical_device_variable_pointers_features_;
+                    vpf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME)) {
+                    VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *vmmf = (VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *)place;
+                    void *pNext = vmmf->pNext;
+                    *vmmf = physicalDeviceData->physical_device_vulkan_memory_model_features_;
+                    vmmf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
+                    VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *ziwmf =
+                        (VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *)place;
+                    void *pNext = ziwmf->pNext;
+                    *ziwmf = physicalDeviceData->physical_device_zero_initialize_workgroup_memory_features_;
+                    ziwmf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceAccelerationStructureFeaturesKHR *asf =
+                        (VkPhysicalDeviceAccelerationStructureFeaturesKHR *)place;
+                    void *pNext = asf->pNext;
+                    *asf = physicalDeviceData->physical_device_acceleration_structure_features_;
+                    asf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceAccelerationStructurePropertiesKHR *asp =
+                        (VkPhysicalDeviceAccelerationStructurePropertiesKHR *)place;
+                    void *pNext = asp->pNext;
+                    *asp = physicalDeviceData->physical_device_acceleration_structure_properties_;
+                    asp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PERFORMANCE_QUERY_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
+                    VkPhysicalDevicePerformanceQueryFeaturesKHR *pqf = (VkPhysicalDevicePerformanceQueryFeaturesKHR *)place;
+                    void *pNext = pqf->pNext;
+                    *pqf = physicalDeviceData->physical_device_performance_query_features_;
+                    pqf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PERFORMANCE_QUERY_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
+                    VkPhysicalDevicePerformanceQueryPropertiesKHR *pqp = (VkPhysicalDevicePerformanceQueryPropertiesKHR *)place;
+                    void *pNext = pqp->pNext;
+                    *pqp = physicalDeviceData->physical_device_performance_query_properties_;
+                    pqp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
+                    VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *pepf =
+                        (VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *)place;
+                    void *pNext = pepf->pNext;
+                    *pepf = physicalDeviceData->physical_device_pipeline_executable_properties_features_;
+                    pepf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_ID_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PRESENT_ID_EXTENSION_NAME)) {
+                    VkPhysicalDevicePresentIdFeaturesKHR *pidf = (VkPhysicalDevicePresentIdFeaturesKHR *)place;
+                    void *pNext = pidf->pNext;
+                    *pidf = physicalDeviceData->physical_device_present_id_features_;
+                    pidf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_WAIT_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
+                    VkPhysicalDevicePresentWaitFeaturesKHR *pwf = (VkPhysicalDevicePresentWaitFeaturesKHR *)place;
+                    void *pNext = pwf->pNext;
+                    *pwf = physicalDeviceData->physical_device_present_wait_features_;
+                    pwf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
+                    VkPhysicalDevicePushDescriptorPropertiesKHR *pdp = (VkPhysicalDevicePushDescriptorPropertiesKHR *)place;
+                    void *pNext = pdp->pNext;
+                    *pdp = physicalDeviceData->physical_device_push_descriptor_properites_;
+                    pdp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
+                    VkPhysicalDeviceRayQueryFeaturesKHR *rqf = (VkPhysicalDeviceRayQueryFeaturesKHR *)place;
+                    void *pNext = rqf->pNext;
+                    *rqf = physicalDeviceData->physical_device_ray_query_features_;
+                    rqf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceRayTracingPipelineFeaturesKHR *rtpf = (VkPhysicalDeviceRayTracingPipelineFeaturesKHR *)place;
+                    void *pNext = rtpf->pNext;
+                    *rtpf = physicalDeviceData->physical_device_ray_tracing_pipeline_features_;
+                    rtpf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceRayTracingPipelinePropertiesKHR *rtpp =
+                        (VkPhysicalDeviceRayTracingPipelinePropertiesKHR *)place;
+                    void *pNext = rtpp->pNext;
+                    *rtpp = physicalDeviceData->physical_device_ray_tracing_pipeline_properties_;
+                    rtpp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderClockFeaturesKHR *scf = (VkPhysicalDeviceShaderClockFeaturesKHR *)place;
+                    void *pNext = scf->pNext;
+                    *scf = physicalDeviceData->physical_device_shader_clock_features_;
+                    scf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_INTEGER_DOT_PRODUCT_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *sidpf =
+                        (VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *)place;
+                    void *pNext = sidpf->pNext;
+                    *sidpf = physicalDeviceData->physical_device_shader_integer_dot_product_features_;
+                    sidpf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_INTEGER_DOT_PRODUCT_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *sidpp =
+                        (VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *)place;
+                    void *pNext = sidpp->pNext;
+                    *sidpp = physicalDeviceData->physical_device_shader_integer_dot_products_properties_;
+                    sidpp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData,
+                                                     VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *ssucff =
+                        (VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *)place;
+                    void *pNext = ssucff->pNext;
+                    *ssucff = physicalDeviceData->physical_device_shader_subgroup_uniform_control_flow_features_;
+                    ssucff->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *stif =
+                        (VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *)place;
+                    void *pNext = stif->pNext;
+                    *stif = physicalDeviceData->physical_device_shader_terminate_invocation_features_;
+                    stif->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
+                    VkPhysicalDeviceSynchronization2FeaturesKHR *s2f = (VkPhysicalDeviceSynchronization2FeaturesKHR *)place;
+                    void *pNext = s2f->pNext;
+                    *s2f = physicalDeviceData->physical_device_synchronization2_features_;
+                    s2f->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME)) {
+                    VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *wmelf =
+                        (VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *)place;
+                    void *pNext = wmelf->pNext;
+                    *wmelf = physicalDeviceData->physical_device_workgroup_memory_explicit_layout_features_;
+                    wmelf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_4444_FORMATS_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
+                    VkPhysicalDevice4444FormatsFeaturesEXT *ff = (VkPhysicalDevice4444FormatsFeaturesEXT *)place;
+                    void *pNext = ff->pNext;
+                    *ff = physicalDeviceData->physical_device_4444_formats_features_;
+                    ff->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ASTC_DECODE_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceASTCDecodeFeaturesEXT *astcdf = (VkPhysicalDeviceASTCDecodeFeaturesEXT *)place;
+                    void *pNext = astcdf->pNext;
+                    *astcdf = physicalDeviceData->physical_device_astc_decode_features_;
+                    astcdf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+                    VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *boaf =
+                        (VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *)place;
+                    void *pNext = boaf->pNext;
+                    *boaf = physicalDeviceData->physical_device_blend_operation_advanced_features_;
+                    boaf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+                    VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *boap =
+                        (VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *)place;
+                    void *pNext = boap->pNext;
+                    *boap = physicalDeviceData->physical_device_blend_operation_advanced_properties_;
+                    boap->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BORDER_COLOR_SWIZZLE_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *bcsf = (VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *)place;
+                    void *pNext = bcsf->pNext;
+                    *bcsf = physicalDeviceData->physical_device_border_color_swizzle_features_;
+                    bcsf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COLOR_WRITE_ENABLE_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceColorWriteEnableFeaturesEXT *cwef = (VkPhysicalDeviceColorWriteEnableFeaturesEXT *)place;
+                    void *pNext = cwef->pNext;
+                    *cwef = physicalDeviceData->physical_device_color_write_enable_features_;
+                    cwef->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONDITIONAL_RENDERING_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
+                    VkPhysicalDeviceConditionalRenderingFeaturesEXT *crf = (VkPhysicalDeviceConditionalRenderingFeaturesEXT *)place;
+                    void *pNext = crf->pNext;
+                    *crf = physicalDeviceData->physical_device_conditional_rendering_features_;
+                    crf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONSERVATIVE_RASTERIZATION_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
+                    VkPhysicalDeviceConservativeRasterizationPropertiesEXT *crp =
+                        (VkPhysicalDeviceConservativeRasterizationPropertiesEXT *)place;
+                    void *pNext = crp->pNext;
+                    *crp = physicalDeviceData->physical_device_conservative_rasterization_properties_;
+                    crp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
+                    VkPhysicalDeviceCustomBorderColorFeaturesEXT *cbcf = (VkPhysicalDeviceCustomBorderColorFeaturesEXT *)place;
+                    void *pNext = cbcf->pNext;
+                    *cbcf = physicalDeviceData->physical_device_custom_border_color_features_;
+                    cbcf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
+                    VkPhysicalDeviceCustomBorderColorPropertiesEXT *cbcp = (VkPhysicalDeviceCustomBorderColorPropertiesEXT *)place;
+                    void *pNext = cbcp->pNext;
+                    *cbcp = physicalDeviceData->physical_device_custom_border_color_properties_;
+                    cbcp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDepthClipEnableFeaturesEXT *dcef = (VkPhysicalDeviceDepthClipEnableFeaturesEXT *)place;
+                    void *pNext = dcef->pNext;
+                    *dcef = physicalDeviceData->physical_device_depth_clip_enable_features_ext_;
+                    dcef->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_MEMORY_REPORT_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dmrf = (VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *)place;
+                    void *pNext = dmrf->pNext;
+                    *dmrf = physicalDeviceData->physical_device_device_memory_report_features_;
+                    dmrf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DISCARD_RECTANGLE_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDiscardRectanglePropertiesEXT *drp = (VkPhysicalDeviceDiscardRectanglePropertiesEXT *)place;
+                    void *pNext = drp->pNext;
+                    *drp = physicalDeviceData->physical_device_discard_rectangle_properties_;
+                    drp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *edsf =
+                        (VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *)place;
+                    void *pNext = edsf->pNext;
+                    *edsf = physicalDeviceData->physical_device_extended_dynamic_state_features_;
+                    edsf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
+                    VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *eds2f =
+                        (VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *)place;
+                    void *pNext = eds2f->pNext;
+                    *eds2f = physicalDeviceData->physical_device_extended_dynamic_state2_features_;
+                    eds2f->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME)) {
+                    VkPhysicalDeviceExternalMemoryHostPropertiesEXT *emhp =
+                        (VkPhysicalDeviceExternalMemoryHostPropertiesEXT *)place;
+                    void *pNext = emhp->pNext;
+                    *emhp = physicalDeviceData->physical_device_external_memory_host_properties_;
+                    emhp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
+                    VkPhysicalDeviceFragmentDensityMapFeaturesEXT *fdmf = (VkPhysicalDeviceFragmentDensityMapFeaturesEXT *)place;
+                    void *pNext = fdmf->pNext;
+                    *fdmf = physicalDeviceData->physical_device_fragment_density_map_features_;
+                    fdmf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
+                    VkPhysicalDeviceFragmentDensityMapPropertiesEXT *fdmp =
+                        (VkPhysicalDeviceFragmentDensityMapPropertiesEXT *)place;
+                    void *pNext = fdmp->pNext;
+                    *fdmp = physicalDeviceData->physical_device_fragment_density_map_properties_;
+                    fdmp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
+                    VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *fsif =
+                        (VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *)place;
+                    void *pNext = fsif->pNext;
+                    *fsif = physicalDeviceData->physical_device_fragment_shader_interlock_features_;
+                    fsif->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
+                    VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *gpqf = (VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *)place;
+                    void *pNext = gpqf->pNext;
+                    *gpqf = physicalDeviceData->physical_device_global_priority_query_features_;
+                    gpqf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceImageRobustnessFeaturesEXT *irf = (VkPhysicalDeviceImageRobustnessFeaturesEXT *)place;
+                    void *pNext = irf->pNext;
+                    *irf = physicalDeviceData->physical_device_image_robustness_features_;
+                    irf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INDEX_TYPE_UINT8_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME)) {
+                    VkPhysicalDeviceIndexTypeUint8FeaturesEXT *itu8f = (VkPhysicalDeviceIndexTypeUint8FeaturesEXT *)place;
+                    void *pNext = itu8f->pNext;
+                    *itu8f = physicalDeviceData->physical_device_index_type_uint8_features_;
+                    itu8f->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
+                    VkPhysicalDeviceInlineUniformBlockFeaturesEXT *iubf = (VkPhysicalDeviceInlineUniformBlockFeaturesEXT *)place;
+                    void *pNext = iubf->pNext;
+                    *iubf = physicalDeviceData->physical_device_inline_uniform_block_features_;
+                    iubf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
+                    VkPhysicalDeviceInlineUniformBlockPropertiesEXT *iubp =
+                        (VkPhysicalDeviceInlineUniformBlockPropertiesEXT *)place;
+                    void *pNext = iubp->pNext;
+                    *iubp = physicalDeviceData->physical_device_inline_uniform_block_properties_;
+                    iubp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
+                    VkPhysicalDeviceLineRasterizationFeaturesEXT *lrf = (VkPhysicalDeviceLineRasterizationFeaturesEXT *)place;
+                    void *pNext = lrf->pNext;
+                    *lrf = physicalDeviceData->physical_device_line_rasterization_features_;
+                    lrf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
+                    VkPhysicalDeviceLineRasterizationPropertiesEXT *lrp = (VkPhysicalDeviceLineRasterizationPropertiesEXT *)place;
+                    void *pNext = lrp->pNext;
+                    *lrp = physicalDeviceData->physical_device_line_rasterization_properties_;
+                    lrp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PRIORITY_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMemoryPriorityFeaturesEXT *mpf = (VkPhysicalDeviceMemoryPriorityFeaturesEXT *)place;
+                    void *pNext = mpf->pNext;
+                    *mpf = physicalDeviceData->physical_device_memory_priority_features_;
+                    mpf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMultiDrawFeaturesEXT *mdf = (VkPhysicalDeviceMultiDrawFeaturesEXT *)place;
+                    void *pNext = mdf->pNext;
+                    *mdf = physicalDeviceData->physical_device_multi_draw_features_;
+                    mdf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMultiDrawPropertiesEXT *mdp = (VkPhysicalDeviceMultiDrawPropertiesEXT *)place;
+                    void *pNext = mdp->pNext;
+                    *mdp = physicalDeviceData->physical_device_multi_draw_properties_;
+                    mdp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PAGEABLE_DEVICE_LOCAL_MEMORY_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
+                    VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *pdlmf =
+                        (VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *)place;
+                    void *pNext = pdlmf->pNext;
+                    *pdlmf = physicalDeviceData->physical_device_pageable_device_local_memory_features_;
+                    pdlmf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
+                    VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *pcccf =
+                        (VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *)place;
+                    void *pNext = pcccf->pNext;
+                    *pcccf = physicalDeviceData->physical_device_pipeline_creation_cache_control_features_;
+                    pcccf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIMITIVE_TOPOLOGY_LIST_RESTART_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME)) {
+                    VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *ptlrf =
+                        (VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *)place;
+                    void *pNext = ptlrf->pNext;
+                    *ptlrf = physicalDeviceData->physical_device_primitive_topology_list_restart_features_;
+                    ptlrf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
+                    VkPhysicalDevicePrivateDataFeaturesEXT *pdf = (VkPhysicalDevicePrivateDataFeaturesEXT *)place;
+                    void *pNext = pdf->pNext;
+                    *pdf = physicalDeviceData->physical_device_private_data_features_;
+                    pdf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROVOKING_VERTEX_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+                    VkPhysicalDeviceProvokingVertexFeaturesEXT *pvf = (VkPhysicalDeviceProvokingVertexFeaturesEXT *)place;
+                    void *pNext = pvf->pNext;
+                    *pvf = physicalDeviceData->physical_device_provoking_vertex_features_;
+                    pvf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROVOKING_VERTEX_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+                    VkPhysicalDeviceProvokingVertexPropertiesEXT *pvp = (VkPhysicalDeviceProvokingVertexPropertiesEXT *)place;
+                    void *pNext = pvp->pNext;
+                    *pvp = physicalDeviceData->physical_device_provoking_vertex_properties_;
+                    pvp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RGBA10X6_FORMATS_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *rgba10x6ff = (VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *)place;
+                    void *pNext = rgba10x6ff->pNext;
+                    *rgba10x6ff = physicalDeviceData->physical_device_rgba10x6_formats_features_;
+                    rgba10x6ff->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+                    VkPhysicalDeviceRobustness2FeaturesEXT *r2f = (VkPhysicalDeviceRobustness2FeaturesEXT *)place;
+                    void *pNext = r2f->pNext;
+                    *r2f = physicalDeviceData->physical_device_robustness_2_features_;
+                    r2f->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+                    VkPhysicalDeviceRobustness2PropertiesEXT *r2p = (VkPhysicalDeviceRobustness2PropertiesEXT *)place;
+                    void *pNext = r2p->pNext;
+                    *r2p = physicalDeviceData->physical_device_robustness_2_properties_;
+                    r2p->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLE_LOCATIONS_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceSampleLocationsPropertiesEXT *slp = (VkPhysicalDeviceSampleLocationsPropertiesEXT *)place;
+                    void *pNext = slp->pNext;
+                    *slp = physicalDeviceData->physical_device_sample_locations_properties_;
+                    slp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *saff = (VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *)place;
+                    void *pNext = saff->pNext;
+                    *saff = physicalDeviceData->physical_device_shader_atomic_float_features_;
+                    saff->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT_2_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *saf2f = (VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *)place;
+                    void *pNext = saf2f->pNext;
+                    *saf2f = physicalDeviceData->physical_device_shader_atomic_float2_features_;
+                    saf2f->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData,
+                                                     VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *sdthif =
+                        (VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *)place;
+                    void *pNext = sdthif->pNext;
+                    *sdthif = physicalDeviceData->physical_device_shader_demote_to_helper_invocation_features_;
+                    sdthif->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_IMAGE_ATOMIC_INT64_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *siai64f =
+                        (VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *)place;
+                    void *pNext = siai64f->pNext;
+                    *siai64f = physicalDeviceData->physical_device_shader_image_atomic_int64_features_;
+                    siai64f->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+                    VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *sscf = (VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *)place;
+                    void *pNext = sscf->pNext;
+                    *sscf = physicalDeviceData->physical_device_subgroup_size_control_features_;
+                    sscf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+                    VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *sscp =
+                        (VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *)place;
+                    void *pNext = sscp->pNext;
+                    *sscp = physicalDeviceData->physical_device_subgroup_size_control_properties_;
+                    sscp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
+                    VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *tbaf =
+                        (VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *)place;
+                    void *pNext = tbaf->pNext;
+                    *tbaf = physicalDeviceData->physical_device_texel_buffer_alignment_features_;
+                    tbaf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
+                    VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *tbap =
+                        (VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *)place;
+                    void *pNext = tbap->pNext;
+                    *tbap = physicalDeviceData->physical_device_texel_buffer_alignment_properties_;
+                    tbap->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXTURE_COMPRESSION_ASTC_HDR_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
+                    VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *tcastchdrf =
+                        (VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *)place;
+                    void *pNext = tcastchdrf->pNext;
+                    *tcastchdrf = physicalDeviceData->physical_device_texture_compression_astc_hdr_features_;
+                    tcastchdrf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+                    VkPhysicalDeviceTransformFeedbackFeaturesEXT *tff = (VkPhysicalDeviceTransformFeedbackFeaturesEXT *)place;
+                    void *pNext = tff->pNext;
+                    *tff = physicalDeviceData->physical_device_transform_feedback_features_;
+                    tff->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+                    VkPhysicalDeviceTransformFeedbackPropertiesEXT *tfp = (VkPhysicalDeviceTransformFeedbackPropertiesEXT *)place;
+                    void *pNext = tfp->pNext;
+                    *tfp = physicalDeviceData->physical_device_transform_feedback_properties_;
+                    tfp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
+                    VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *vadf =
+                        (VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *)place;
+                    void *pNext = vadf->pNext;
+                    *vadf = physicalDeviceData->physical_device_vertex_attribute_divisor_features_;
+                    vadf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
+                    VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *vadp =
+                        (VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *)place;
+                    void *pNext = vadp->pNext;
+                    *vadp = physicalDeviceData->physical_device_vertex_attirbute_divisor_properties_;
+                    vadp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_INPUT_DYNAMIC_STATE_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *vidsf =
+                        (VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *)place;
+                    void *pNext = vidsf->pNext;
+                    *vidsf = physicalDeviceData->physical_device_vertex_input_dynamic_state_features_;
+                    vidsf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_2_PLANE_444_FORMATS_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *y2pff =
+                        (VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *)place;
+                    void *pNext = y2pff->pNext;
+                    *y2pff = physicalDeviceData->physical_device_ycbcr_2plane_444_formats_features_;
+                    y2pff->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_IMAGE_ARRAYS_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *yiaf = (VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *)place;
+                    void *pNext = yiaf->pNext;
+                    *yiaf = physicalDeviceData->physical_device_ycbcr_image_arrays_features_;
+                    yiaf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceFragmentShadingRateFeaturesKHR *fsrf = (VkPhysicalDeviceFragmentShadingRateFeaturesKHR *)place;
+                    void *pNext = fsrf->pNext;
+                    *fsrf = physicalDeviceData->physical_device_fragment_shading_rate_features_;
+                    fsrf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceFragmentShadingRatePropertiesKHR *fsrp =
+                        (VkPhysicalDeviceFragmentShadingRatePropertiesKHR *)place;
+                    void *pNext = fsrp->pNext;
+                    *fsrp = physicalDeviceData->physical_device_fragment_shading_rate_properties_;
+                    fsrp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
+                    VkPhysicalDeviceCoherentMemoryFeaturesAMD *cmf = (VkPhysicalDeviceCoherentMemoryFeaturesAMD *)place;
+                    void *pNext = cmf->pNext;
+                    *cmf = physicalDeviceData->physical_device_coherent_memory_features_;
+                    cmf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
+                if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
+                    VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
+                    void *pNext = pmp->pNext;
+                    *pmp = physicalDeviceData->physical_device_protected_memory_properties_;
+                    pmp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_FEATURES:
+                if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
+                    VkPhysicalDeviceProtectedMemoryFeatures *pmf = (VkPhysicalDeviceProtectedMemoryFeatures *)place;
+                    void *pNext = pmf->pNext;
+                    *pmf = physicalDeviceData->physical_device_protected_memory_features_;
+                    pmf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES:
+                if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
+                    VkPhysicalDeviceShaderDrawParametersFeatures *sdpf = (VkPhysicalDeviceShaderDrawParametersFeatures *)place;
+                    void *pNext = sdpf->pNext;
+                    *sdpf = physicalDeviceData->physical_device_shader_draw_parameters_features_;
+                    sdpf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES:
+                if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
+                    VkPhysicalDeviceSubgroupProperties *sp = (VkPhysicalDeviceSubgroupProperties *)place;
+                    void *pNext = sp->pNext;
+                    *sp = physicalDeviceData->physical_device_subgroup_properties_;
+                    sp->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES:
+                if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_2) {
+                    VkPhysicalDeviceVulkan11Properties *v11p = (VkPhysicalDeviceVulkan11Properties *)place;
+                    void *pNext = v11p->pNext;
+                    *v11p = physicalDeviceData->physical_device_vulkan_1_1_properties_;
+                    v11p->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES:
+                if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_2) {
+                    VkPhysicalDeviceVulkan11Features *v11f = (VkPhysicalDeviceVulkan11Features *)place;
+                    void *pNext = v11f->pNext;
+                    *v11f = physicalDeviceData->physical_device_vulkan_1_1_features_;
+                    v11f->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES:
+                if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_2) {
+                    VkPhysicalDeviceVulkan12Properties *v12p = (VkPhysicalDeviceVulkan12Properties *)place;
+                    void *pNext = v12p->pNext;
+                    *v12p = physicalDeviceData->physical_device_vulkan_1_2_properties_;
+                    v12p->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES:
+                if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_2) {
+                    VkPhysicalDeviceVulkan12Features *v12f = (VkPhysicalDeviceVulkan12Features *)place;
+                    void *pNext = v12f->pNext;
+                    *v12f = physicalDeviceData->physical_device_vulkan_1_2_features_;
+                    v12f->pNext = pNext;
+                }
+                break;
+            default:
+                break;
         }
 
         place = structure->pNext;
