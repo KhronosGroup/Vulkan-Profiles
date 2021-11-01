@@ -1801,6 +1801,10 @@ class PhysicalDeviceData {
     VkPhysicalDeviceShaderSMBuiltinsFeaturesNV physical_device_shader_sm_builtins_features_;
     VkPhysicalDeviceShaderSMBuiltinsPropertiesNV physical_device_shader_sm_builtins_properties_;
 
+    // VK_NV_shading_rate_image structs
+    VkPhysicalDeviceShadingRateImageFeaturesNV physical_device_shading_rate_image_features_;
+    VkPhysicalDeviceShadingRateImagePropertiesNV physical_device_shading_rate_image_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2217,6 +2221,10 @@ class PhysicalDeviceData {
         // VK_NV_shader_sm_builtins structs
         physical_device_shader_sm_builtins_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SM_BUILTINS_FEATURES_NV};
         physical_device_shader_sm_builtins_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SM_BUILTINS_PROPERTIES_NV};
+
+        // VK_NV_shading_rate_image structs
+        physical_device_shading_rate_image_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_FEATURES_NV};
+        physical_device_shading_rate_image_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_PROPERTIES_NV};
     }
 
     const VkInstance instance_;
@@ -2415,6 +2423,8 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderImageFootprintFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderSMBuiltinsFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderSMBuiltinsPropertiesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShadingRateImageFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShadingRateImagePropertiesNV *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -3017,6 +3027,8 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceShaderImageFootprintFeaturesNV", &pdd_.physical_device_shader_image_footprint_features_);
     GetValue(root, "VkPhysicalDeviceShaderSMBuiltinsFeaturesNV", &pdd_.physical_device_shader_sm_builtins_features_);
     GetValue(root, "VkPhysicalDeviceShaderSMBuiltinsPropertiesNV", &pdd_.physical_device_shader_sm_builtins_properties_);
+    GetValue(root, "VkPhysicalDeviceShadingRateImageFeaturesNV", &pdd_.physical_device_shading_rate_image_features_);
+    GetValue(root, "VkPhysicalDeviceShadingRateImagePropertiesNV", &pdd_.physical_device_shading_rate_image_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -5683,6 +5695,39 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(shaderWarpsPerSM, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShadingRateImageFeaturesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShadingRateImageFeaturesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_shading_rate_image, but "
+            "VK_NV_shading_rate_image is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(shadingRateImage, WarnIfGreater);
+    GET_VALUE_WARN(shadingRateCoarseSampleOrder, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShadingRateImagePropertiesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShadingRateImagePropertiesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_shading_rate_image, but "
+            "VK_NV_shading_rate_image is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE(shadingRateTexelSize);
+    GET_VALUE_WARN(shadingRatePaletteSize, WarnIfGreater);
+    GET_VALUE_WARN(shadingRateMaxCoarseSamples, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -7584,6 +7629,22 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     ssmbp->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_FEATURES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShadingRateImageFeaturesNV *srif = (VkPhysicalDeviceShadingRateImageFeaturesNV *)place;
+                    void *pNext = srif->pNext;
+                    *srif = physicalDeviceData->physical_device_shading_rate_image_features_;
+                    srif->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_PROPERTIES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShadingRateImagePropertiesNV *srip = (VkPhysicalDeviceShadingRateImagePropertiesNV *)place;
+                    void *pNext = srip->pNext;
+                    *srip = physicalDeviceData->physical_device_shading_rate_image_properties_;
+                    srip->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
                 if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
                     VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -9357,6 +9418,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_shader_sm_builtins_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_shader_sm_builtins_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+                    pdd.physical_device_shading_rate_image_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_shading_rate_image_features_);
+
+                    pdd.physical_device_shading_rate_image_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_shading_rate_image_properties_);
                 }
 
                 if (api_version_above_1_1) {
