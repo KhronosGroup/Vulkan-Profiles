@@ -1782,6 +1782,9 @@ class PhysicalDeviceData {
     VkPhysicalDeviceMeshShaderFeaturesNV physical_device_mesh_shader_features_;
     VkPhysicalDeviceMeshShaderPropertiesNV physical_device_mesh_shader_properties_;
 
+    // VK_NV_ray_tracing structs
+    VkPhysicalDeviceRayTracingPropertiesNV physical_device_ray_tracing_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2177,6 +2180,9 @@ class PhysicalDeviceData {
         // VK_NV_mesh_shader structs
         physical_device_mesh_shader_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_NV};
         physical_device_mesh_shader_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_NV};
+
+        // VK_NV_ray_tracing structs
+        physical_device_ray_tracing_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PROPERTIES_NV};
     }
 
     const VkInstance instance_;
@@ -2368,6 +2374,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceInheritedViewportScissorFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMeshShaderFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMeshShaderPropertiesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPropertiesNV *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2962,6 +2969,7 @@ bool JsonLoader::LoadFile(const char *filename) {
              &pdd_.physical_device_inherited_viewport_scissor_features_);
     GetValue(root, "VkPhysicalDeviceMeshShaderFeaturesNV", &pdd_.physical_device_mesh_shader_features_);
     GetValue(root, "VkPhysicalDeviceMeshShaderPropertiesNV", &pdd_.physical_device_mesh_shader_properties_);
+    GetValue(root, "VkPhysicalDeviceRayTracingPropertiesNV", &pdd_.physical_device_ray_tracing_properties_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -5514,6 +5522,28 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(meshOutputPerPrimitiveGranularity, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPropertiesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPropertiesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_RAY_TRACING_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_ray_tracing, but "
+            "VK_NV_ray_tracing is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(shaderGroupHandleSize, WarnIfGreater);
+    GET_VALUE_WARN(maxRecursionDepth, WarnIfGreater);
+    GET_VALUE_WARN(maxShaderGroupStride, WarnIfGreater);
+    GET_VALUE_WARN(shaderGroupBaseAlignment, WarnIfGreater);
+    GET_VALUE_WARN(maxGeometryCount, WarnIfGreater);
+    GET_VALUE_WARN(maxInstanceCount, WarnIfGreater);
+    GET_VALUE_WARN(maxTriangleCount, WarnIfGreater);
+    GET_VALUE_WARN(maxDescriptorSetAccelerationStructures, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -7358,6 +7388,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     msp->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PROPERTIES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_RAY_TRACING_EXTENSION_NAME)) {
+                    VkPhysicalDeviceRayTracingPropertiesNV *rtp = (VkPhysicalDeviceRayTracingPropertiesNV *)place;
+                    void *pNext = rtp->pNext;
+                    *rtp = physicalDeviceData->physical_device_ray_tracing_properties_;
+                    rtp->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
                 if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
                     VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -9091,6 +9129,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_mesh_shader_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_mesh_shader_properties_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_RAY_TRACING_EXTENSION_NAME)) {
+                    pdd.physical_device_ray_tracing_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_ray_tracing_properties_);
                 }
 
                 if (api_version_above_1_1) {
