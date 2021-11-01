@@ -1794,6 +1794,9 @@ class PhysicalDeviceData {
     // VK_NV_scissor_exclusive structs
     VkPhysicalDeviceExclusiveScissorFeaturesNV physical_device_exclusive_scissor_features_;
 
+    // VK_NV_shader_image_footprint structs
+    VkPhysicalDeviceShaderImageFootprintFeaturesNV physical_device_shader_image_footprint_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2203,6 +2206,9 @@ class PhysicalDeviceData {
 
         // VK_NV_scissor_exclusive structs
         physical_device_exclusive_scissor_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXCLUSIVE_SCISSOR_FEATURES_NV};
+
+        // VK_NV_shader_image_footprint structs
+        physical_device_shader_image_footprint_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_IMAGE_FOOTPRINT_FEATURES_NV};
     }
 
     const VkInstance instance_;
@@ -2398,6 +2404,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExclusiveScissorFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderImageFootprintFeaturesNV *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
@@ -2997,6 +3004,7 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV",
              &pdd_.physical_device_representative_fragment_test_features_);
     GetValue(root, "VkPhysicalDeviceExclusiveScissorFeaturesNV", &pdd_.physical_device_exclusive_scissor_features_);
+    GetValue(root, "VkPhysicalDeviceShaderImageFootprintFeaturesNV", &pdd_.physical_device_shader_image_footprint_features_);
     GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
     GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
     GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
@@ -5617,6 +5625,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(exclusiveScissor, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderImageFootprintFeaturesNV *dest) {
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderImageFootprintFeaturesNV)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_NV_shader_image_footprint, but "
+            "VK_NV_shader_image_footprint is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(imageFootprint, WarnIfGreater);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -7494,6 +7517,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     esf->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_IMAGE_FOOTPRINT_FEATURES_NV:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderImageFootprintFeaturesNV *siff = (VkPhysicalDeviceShaderImageFootprintFeaturesNV *)place;
+                    void *pNext = siff->pNext;
+                    *siff = physicalDeviceData->physical_device_shader_image_footprint_features_;
+                    siff->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
                 if (physicalDeviceData->physical_device_properties_.apiVersion >= VK_API_VERSION_1_1) {
                     VkPhysicalDeviceProtectedMemoryProperties *pmp = (VkPhysicalDeviceProtectedMemoryProperties *)place;
@@ -9251,6 +9282,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_exclusive_scissor_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_exclusive_scissor_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
+                    pdd.physical_device_shader_image_footprint_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_shader_image_footprint_features_);
                 }
 
                 if (api_version_above_1_1) {
