@@ -7,7 +7,7 @@
     "required": [
         "name",
         "comments",
-        "requiredVersion"
+        "version"
     ],
     "definitions": {
         "uint8_t": {
@@ -708,7 +708,7 @@
                 }
             }
         },
-        "requiredVersion": {
+        "version": {
             "description": "TODO",
             "type": "string",
             "pattern": "^[0-9]+.[0-9]+$"

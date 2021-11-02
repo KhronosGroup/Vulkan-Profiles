@@ -64,13 +64,6 @@ static Json::Value ParseJsonFile(const char *filename) {
     file.open(filename);
     assert(file.is_open());
 
-    std::string data;
-    while (file) {
-        std::string line;
-        std::getline(file, line);
-        data += line + "\n";
-    }
-
     Json::Reader reader;
     Json::Value root = Json::nullValue;
     bool success = reader.parse(file, root, false);
@@ -136,10 +129,10 @@ struct JsonValidator {
 TEST(test_validate, adapter) {
     JsonValidator validator;
 
-    return;
-
     const Json::Value json_document1 = ParseJsonFile("VP_KHR_minimum_requirements.json");
     EXPECT_TRUE(validator.Check(json_document1));
+
+    return;
 
     const Json::Value json_document2 = ParseJsonFile("VP_LUNARG_1_1_desktop_portability_2022.json");
     EXPECT_TRUE(validator.Check(json_document2));
