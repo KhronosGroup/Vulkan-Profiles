@@ -88,7 +88,7 @@ struct JsonValidator {
         assert(!json_document.empty());
 
         if (!schema) {
-            const Json::Value schema_document = ParseJsonFile("../schema/profile.json");
+            const Json::Value schema_document = ParseJsonFile("profile.json");
 
             schema.reset(new Schema);
 
@@ -134,9 +134,9 @@ struct JsonValidator {
 };
 
 TEST(test_validate, adapter) {
-    return;
-
     JsonValidator validator;
+
+    return;
 
     const Json::Value json_document1 = ParseJsonFile("VP_KHR_minimum_requirements.json");
     EXPECT_TRUE(validator.Check(json_document1));
