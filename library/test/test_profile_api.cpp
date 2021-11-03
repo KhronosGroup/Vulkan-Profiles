@@ -312,7 +312,7 @@ TEST(test_profile, get_extensions) {
     {
         info.enabledExtensionCount = 0;
         info.ppEnabledExtensionNames = nullptr;
-        profileInfo.flags = 0;
+        profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
 
         std::vector<const char*> extensions;
         _vpGetExtensions(&profileInfo, _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
@@ -323,7 +323,7 @@ TEST(test_profile, get_extensions) {
     {
         info.enabledExtensionCount = _vpCountOf(EXTENSIONS);
         info.ppEnabledExtensionNames = EXTENSIONS;
-        profileInfo.flags = 0;
+        profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
 
         std::vector<const char*> extensions;
         _vpGetExtensions(&profileInfo, _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
@@ -334,7 +334,7 @@ TEST(test_profile, get_extensions) {
     {
         info.enabledExtensionCount = _vpCountOf(EXTENSIONS);
         info.ppEnabledExtensionNames = EXTENSIONS;
-        profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_ALL_EXTENSIONS_BIT;
+        profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
         std::vector<const char*> extensions;
         _vpGetExtensions(&profileInfo, _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
@@ -345,7 +345,7 @@ TEST(test_profile, get_extensions) {
     {
         info.enabledExtensionCount = 0;
         info.ppEnabledExtensionNames = nullptr;
-        profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_ALL_EXTENSIONS_BIT;
+        profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
         std::vector<const char*> extensions;
         _vpGetExtensions(&profileInfo, _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
@@ -384,7 +384,7 @@ TEST(test_profile, create_extensions_flag) {
     {
         info.enabledExtensionCount = _vpCountOf(extensions);
         info.ppEnabledExtensionNames = extensions;
-        profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_ALL_EXTENSIONS_BIT;
+        profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
         VkDevice device = VK_NULL_HANDLE;
         VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
@@ -1000,8 +1000,8 @@ TEST(test_profile, example_add_features_add_extensions) {
     EXPECT_EQ(VK_SUCCESS, res);
 }
 
-// In this example, using VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT so that all structures override the profile definision
-TEST(test_profile, example_global_override_features) {
+// In this example, we are using vpGetProfileStructures to initialize each application structure individually
+TEST(test_profile, example_individual_override_features) {
     TestScaffold scaffold;
 
     VpProfileProperties profile{VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
@@ -1010,14 +1010,17 @@ TEST(test_profile, example_global_override_features) {
     vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
+    // This structure is not part of the profile, so it will remains unchanged.
     VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceSubgroupFeatures = {};
     deviceSubgroupFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
-    vpGetProfileStructures(&profile, &deviceSubgroupFeatures); // The structure is not part of the profile, so it remains unchanged.
+    vpGetProfileStructures(&profile, &deviceSubgroupFeatures);
     deviceSubgroupFeatures.subgroupSizeControl = VK_TRUE;
 
+    // This structure is not part of the profile, so it will be updated.
     VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
     deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-    vpGetProfileStructures(&profile, &deviceFeatures2); // Load the profile definition 
+    vpGetProfileStructures(&profile, &deviceFeatures2);
+    deviceFeatures2.pNext = &deviceSubgroupFeatures;
     deviceFeatures2.features.robustBufferAccess = VK_FALSE;
 
     VkDeviceCreateInfo info = {};
@@ -1029,15 +1032,14 @@ TEST(test_profile, example_global_override_features) {
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
     profileInfo.pProfile = &profile;
-    profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT; // Configure the vpCreateDevice implement so that all structures override the profile definision. 
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_EQ(VK_SUCCESS, res);
 }
 
-// In this example, we are using vpGetProfileStructures and pOverrideStructures to disable robustBufferAccess
-TEST(test_profile, example_local_override_features) {
+// In this example, we are using vpGetProfileStructures to initial the entire application structure chain
+TEST(test_profile, example_collective_override_features) {
     TestScaffold scaffold;
 
     VpProfileProperties profile{VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
@@ -1046,11 +1048,19 @@ TEST(test_profile, example_local_override_features) {
     vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
-    VkStructureType overrideStructures[] = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
+    // This structure is not part of the profile, so it will remains unchanged.
+    VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceSubgroupFeatures = {};
+    deviceSubgroupFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
 
+    // This structure is not part of the profile, so it will be updated.
     VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
     deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-    vpGetProfileStructures(&profile, &deviceFeatures2); // Load the profile structure definision 
+    deviceFeatures2.pNext = &deviceSubgroupFeatures;
+
+    // Load the profile definition
+    vpGetProfileStructures(&profile, &deviceFeatures2);
+
+    deviceSubgroupFeatures.subgroupSizeControl = VK_TRUE;
     deviceFeatures2.features.robustBufferAccess = VK_FALSE;
 
     VkDeviceCreateInfo info = {};
@@ -1062,9 +1072,6 @@ TEST(test_profile, example_local_override_features) {
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
     profileInfo.pProfile = &profile;
-    profileInfo.flags = 0;
-    profileInfo.overrideStructureCount = _vpCountOf(overrideStructures);
-    profileInfo.pOverrideStructures = overrideStructures;
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
