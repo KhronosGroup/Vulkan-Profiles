@@ -1010,13 +1010,13 @@ TEST(test_profile, example_individual_override_features) {
     vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
-    // This structure is not part of the profile, so it will remains unchanged.
+    // This structure is not part of the profile, so it will remains unchanged by vpGetProfileStructures
     VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceSubgroupFeatures = {};
     deviceSubgroupFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
     vpGetProfileStructures(&profile, &deviceSubgroupFeatures);
     deviceSubgroupFeatures.subgroupSizeControl = VK_TRUE;
 
-    // This structure is not part of the profile, so it will be updated.
+    // This structure is not part of the profile, so it will be updated by vpGetProfileStructures
     VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
     deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     vpGetProfileStructures(&profile, &deviceFeatures2);
@@ -1048,11 +1048,11 @@ TEST(test_profile, example_collective_override_features) {
     vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
-    // This structure is not part of the profile, so it will remains unchanged.
+    // This structure is not part of the profile, so it will remains unchanged by vpGetProfileStructures
     VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceSubgroupFeatures = {};
     deviceSubgroupFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
 
-    // This structure is not part of the profile, so it will be updated.
+    // This structure is not part of the profile, so it will be updated by vpGetProfileStructures
     VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
     deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     deviceFeatures2.pNext = &deviceSubgroupFeatures;
