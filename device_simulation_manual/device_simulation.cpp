@@ -1536,9 +1536,6 @@ class PhysicalDeviceData {
     VkPhysicalDeviceAccelerationStructureFeaturesKHR physical_device_acceleration_structure_features_;
     VkPhysicalDeviceAccelerationStructurePropertiesKHR physical_device_acceleration_structure_properties_;
 
-    // VK_KHR_driver_properties structs
-    VkPhysicalDeviceDriverPropertiesKHR physical_device_driver_properties_;
-
     // VK_KHR_external_fence_capabilities structs
     VkPhysicalDeviceIDPropertiesKHR physical_device_id_properties_;
 
@@ -1862,9 +1859,6 @@ class PhysicalDeviceData {
         physical_device_acceleration_structure_properties_ = {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR};
 
-        // VK_KHR_driver_properties structs
-        physical_device_driver_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR};
-
         // VK_KHR_external_fence_capabilities structs
         physical_device_id_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES_KHR};
 
@@ -2181,7 +2175,6 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceAccelerationStructureFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceAccelerationStructurePropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDriverPropertiesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceIDPropertiesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePerformanceQueryFeaturesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePerformanceQueryPropertiesKHR *dest);
@@ -2735,8 +2728,6 @@ bool JsonLoader::LoadFile(const char *filename) {
              &pdd_.physical_device_zero_initialize_workgroup_memory_features_);
     GetValue(root, "VkPhysicalDeviceAccelerationStructureFeaturesKHR", &pdd_.physical_device_acceleration_structure_features_);
     GetValue(root, "VkPhysicalDeviceAccelerationStructurePropertiesKHR", &pdd_.physical_device_acceleration_structure_properties_);
-    GetValue(root, "VkPhysicalDeviceDriverProperties", &pdd_.physical_device_driver_properties_);
-    GetValue(root, "VkPhysicalDeviceDriverPropertiesKHR", &pdd_.physical_device_driver_properties_);
     GetValue(root, "VkPhysicalDeviceIDProperties", &pdd_.physical_device_id_properties_);
     GetValue(root, "VkPhysicalDeviceIDPropertiesKHR", &pdd_.physical_device_id_properties_);
     GetValue(root, "VkPhysicalDevicePerformanceQueryFeaturesKHR", &pdd_.physical_device_performance_query_features_);
@@ -5090,27 +5081,6 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(fragmentShadingRateStrictMultiplyCombiner, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDriverPropertiesKHR *dest) {
-    const Json::Value value = parent[name];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
-    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDriverPropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_driver_properties, but "
-            "VK_KHR_driver_properties is "
-            "not supported by the device.\n");
-    }
-    GET_VALUE(driverID);
-    GET_ARRAY(driverName);  // size < VK_MAX_DRIVER_NAME_SIZE
-    GET_ARRAY(driverInfo);  // size < VK_MAX_DRIVER_INFO_SIZE
-    GET_VALUE_WARN(conformanceVersion.major, WarnIfGreater);
-    GET_VALUE_WARN(conformanceVersion.minor, WarnIfGreater);
-    GET_VALUE_WARN(conformanceVersion.subminor, WarnIfGreater);
-    GET_VALUE_WARN(conformanceVersion.patch, WarnIfGreater);
-}
-
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -5551,18 +5521,6 @@ void JsonLoader::GetValueGPUinfoCore12(const Json::Value &parent) {
 
         GetValue(core12_properties, "framebufferIntegerColorSampleCounts",
                  &pdd_.physical_device_vulkan_1_2_properties_.framebufferIntegerColorSampleCounts);
-
-        GetValue(core12_properties, "driverID", &pdd_.physical_device_driver_properties_.driverID);
-        GetArray(core12_properties, "driverName", pdd_.physical_device_driver_properties_.driverName);
-        GetArray(core12_properties, "driverInfo", pdd_.physical_device_driver_properties_.driverInfo);
-        GetValue(core12_properties, "conformanceVersion.major", &pdd_.physical_device_driver_properties_.conformanceVersion.major,
-                 WarnIfGreater);
-        GetValue(core12_properties, "conformanceVersion.minor", &pdd_.physical_device_driver_properties_.conformanceVersion.minor,
-                 WarnIfGreater);
-        GetValue(core12_properties, "conformanceVersion.subminor",
-                 &pdd_.physical_device_driver_properties_.conformanceVersion.subminor, WarnIfGreater);
-        GetValue(core12_properties, "conformanceVersion.patch", &pdd_.physical_device_driver_properties_.conformanceVersion.patch,
-                 WarnIfGreater);
     }
 }
 
@@ -6091,12 +6049,6 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = asp->pNext;
             *asp = physicalDeviceData->physical_device_acceleration_structure_properties_;
             asp->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME)) {
-            VkPhysicalDeviceDriverPropertiesKHR *dp = (VkPhysicalDeviceDriverPropertiesKHR *)place;
-            void *pNext = dp->pNext;
-            *dp = physicalDeviceData->physical_device_driver_properties_;
-            dp->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES_KHR &&
                    PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME)) {
             VkPhysicalDeviceIDPropertiesKHR *idp = (VkPhysicalDeviceIDPropertiesKHR *)place;
@@ -7447,16 +7399,6 @@ void TransferValue(VkPhysicalDeviceVulkan12Properties *dest, VkPhysicalDeviceTim
     TRANSFER_VALUE(maxTimelineSemaphoreValueDifference);
 }
 
-void TransferValue(VkPhysicalDeviceVulkan12Properties *dest, VkPhysicalDeviceDriverPropertiesKHR *src) {
-    TRANSFER_VALUE(driverID);
-    TRANSFER_CHAR_ARRAY(driverName, VK_MAX_DRIVER_NAME_SIZE);
-    TRANSFER_CHAR_ARRAY(driverInfo, VK_MAX_DRIVER_INFO_SIZE);
-    TRANSFER_VALUE(conformanceVersion.major);
-    TRANSFER_VALUE(conformanceVersion.minor);
-    TRANSFER_VALUE(conformanceVersion.subminor);
-    TRANSFER_VALUE(conformanceVersion.patch);
-}
-
 // Features
 void TransferValue(VkPhysicalDeviceVulkan12Features *dest, VkPhysicalDevice8BitStorageFeaturesKHR *src) {
     TRANSFER_VALUE(storageBuffer8BitAccess);
@@ -7778,12 +7720,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_acceleration_structure_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_acceleration_structure_properties_);
-                }
-
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME)) {
-                    pdd.physical_device_driver_properties_.pNext = property_chain.pNext;
-
-                    property_chain.pNext = &(pdd.physical_device_driver_properties_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME)) {
@@ -8294,7 +8230,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             TransferValue(&(pdd.physical_device_vulkan_1_2_properties_), &(pdd.physical_device_float_controls_properties_));
             TransferValue(&(pdd.physical_device_vulkan_1_2_properties_), &(pdd.physical_device_sampler_filter_minmax_properties_));
             TransferValue(&(pdd.physical_device_vulkan_1_2_properties_), &(pdd.physical_device_timeline_semaphore_properties_));
-            TransferValue(&(pdd.physical_device_vulkan_1_2_properties_), &(pdd.physical_device_driver_properties_));
 
             TransferValue(&(pdd.physical_device_vulkan_1_2_features_), &(pdd.physical_device_8bit_storage_features_));
             TransferValue(&(pdd.physical_device_vulkan_1_2_features_), &(pdd.physical_device_buffer_device_address_features_));
