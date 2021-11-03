@@ -409,7 +409,8 @@
                 },
                 {
                     "name": "maxComputeWorkGroupCount",
-                    "type": "UINT3",
+                    "type": "uint32_t",
+                    "dimensions": 3,
                     "limit": "MIN",
                     "value": [ 65536, 65536, 65536 ]
                 },
@@ -421,7 +422,8 @@
                 },
                 {
                     "name": "maxComputeWorkGroupSize",
-                    "type": "UINT3",
+                    "type": "uint32_t",
+                    "dimensions": 3,
                     "limit": "MIN",
                     "value": [ 128, 128, 128 ]
                 },
@@ -475,13 +477,15 @@
                 },
                 {
                     "name": "maxViewportDimensions",
-                    "type": "INT2",
+                    "type": "int32_t",
+                    "dimensions": 2,
                     "limit": "MIN",
                     "value": [ 8192, 8192 ]
                 },
                 {
                     "name": "viewportBoundsRange",
-                    "type": "FLOAT2",
+                    "type": "float",
+                    "dimensions": 2,
                     "limit": "RANGE",
                     "value": [ -32768, 32767 ]
                 },
@@ -678,13 +682,15 @@
                 },
                 {
                     "name": "pointSizeRange",
-                    "type": "FLOAT2",
+                    "type": "float",
+                    "dimensions": 2,
                     "limit": "RANGE",
                     "value": [ 1.0, 1024.0 ]
                 },
                 {
                     "name": "lineWidthRange",
-                    "type": "FLOAT2",
+                    "type": "float",
+                    "dimensions": 2,
                     "limit": "RANGE",
                     "value": [ 1.0, 1.0 ]
                 },

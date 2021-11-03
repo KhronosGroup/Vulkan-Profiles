@@ -292,7 +292,8 @@
                 },
                 {
                     "name": "maxComputeWorkGroupSize",
-                    "type": "UINT3",
+                    "type": "uint32_t",
+                    "dimensions": 3,
                     "limit": "MIN",
                     "value": [ 1024, 1024, 64 ]
                 },

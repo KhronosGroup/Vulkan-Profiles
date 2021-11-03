@@ -25,6 +25,46 @@
             "minimum": 0,
             "maximum": 4294967295
         },
+        "float2": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            },
+            "uniqueItems": false,
+            "minItems": 2,
+            "maxItems": 2
+        },
+        "int32_t2": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            },
+            "uniqueItems": false,
+            "minItems": 2,
+            "maxItems": 2
+        },
+        "uint32_t2": {
+            "type": "array",
+            "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+            },
+            "uniqueItems": false,
+            "minItems": 2,
+            "maxItems": 2
+        },
+        "uint32_t3": {
+            "type": "array",
+            "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+            },
+            "uniqueItems": false,
+            "minItems": 3,
+            "maxItems": 3
+        },
         "uint64_t": {
             "oneOf": [
                 { "enum": [ "" ] },
@@ -408,6 +448,10 @@
                                 "type": "string",
                                 "enum": [ "uint32_t" ]
                             },
+                            "dimensions": {
+                                "type": "integer",
+                                "minimum": 0
+                            },
                             "value": {
                                 "$ref": "#/definitions/uint32_t"
                             },
@@ -439,15 +483,15 @@
                             },
                             "type": {
                                 "type": "string",
-                                "enum": [ "INT2" ]
+                                "enum": [ "uint32_t" ]
+                            },
+                            "dimensions": {
+                                "type": "integer",
+                                "minimum": 2,
+                                "maximum": 2
                             },
                             "value": {
-                                "type": "array",
-                                "items": {
-                                    "type": "integer"
-                                },
-                                "minItems": 2,
-                                "maxItems": 2
+                                "$ref": "#/definitions/uint32_t2"
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
@@ -477,16 +521,15 @@
                             },
                             "type": {
                                 "type": "string",
-                                "enum": [ "UINT2" ]
+                                "enum": [ "int32_t" ]
+                            },
+                            "dimensions": {
+                                "type": "integer",
+                                "minimum": 2,
+                                "maximum": 2
                             },
                             "value": {
-                                "type": "array",
-                                "items": {
-                                    "type": "integer",
-                                    "minimum": 0
-                                },
-                                "minItems": 2,
-                                "maxItems": 2
+                                "$ref": "#/definitions/int32_t2"
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
@@ -516,54 +559,15 @@
                             },
                             "type": {
                                 "type": "string",
-                                "enum": [ "INT3" ]
+                                "enum": [ "uint32_t" ]
+                            },
+                            "dimensions": {
+                                "type": "integer",
+                                "minimum": 3,
+                                "maximum": 3
                             },
                             "value": {
-                                "type": "array",
-                                "items": {
-                                    "type": "integer"
-                                },
-                                "minItems": 3,
-                                "maxItems": 3
-                            },
-                            "limit": {
-                                "$ref": "#/definitions/limit"
-                            },
-                            "platforms": {
-                                "$ref": "#/definitions/platforms"
-                            },
-                            "support": {
-                                "$ref": "#/definitions/support"
-                            }
-                        }
-                    },
-                    {
-                        "description": "TODO",
-                        "type": "object",
-                        "additionalProperties": false,
-                        "required": [
-                            "name",
-                            "type",
-                            "limit",
-                            "value"
-                        ],
-                        "properties": {
-                            "name": {
-                                "description": "The unique identifier of a setting",
-                                "type": "string"
-                            },
-                            "type": {
-                                "type": "string",
-                                "enum": [ "UINT3" ]
-                            },
-                            "value": {
-                                "type": "array",
-                                "items": {
-                                    "type": "integer",
-                                    "minimum": 0
-                                },
-                                "minItems": 3,
-                                "maxItems": 3
+                                "$ref": "#/definitions/uint32_t3"
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
@@ -626,15 +630,15 @@
                             },
                             "type": {
                                 "type": "string",
-                                "enum": [ "FLOAT2" ]
+                                "enum": [ "float" ]
+                            },
+                            "dimensions": {
+                                "type": "integer",
+                                "minimum": 2,
+                                "maximum": 2
                             },
                             "value": {
-                                "type": "array",
-                                "items": {
-                                    "type": "number"
-                                },
-                                "minItems": 2,
-                                "maxItems": 2
+                                "$ref": "#/definitions/float2"
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
