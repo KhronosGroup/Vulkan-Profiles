@@ -126,19 +126,29 @@ struct JsonValidator {
     std::string message;
 };
 
-TEST(test_validate, adapter) {
+TEST(test_validate, VP_KHR_minimum_requirements) {
     JsonValidator validator;
 
     const Json::Value json_document1 = ParseJsonFile("VP_KHR_minimum_requirements.json");
     EXPECT_TRUE(validator.Check(json_document1));
+}
 
-    return;
+TEST(test_validate, VP_LUNARG_1_1_desktop_portability_2022) {
+    JsonValidator validator;
 
     const Json::Value json_document2 = ParseJsonFile("VP_LUNARG_1_1_desktop_portability_2022.json");
     EXPECT_TRUE(validator.Check(json_document2));
+}
+
+TEST(test_validate, VP_KHR_1_2_roadmap_2022) {
+    JsonValidator validator;
 
     const Json::Value json_document3 = ParseJsonFile("VP_KHR_1_2_roadmap_2022.json");
     EXPECT_TRUE(validator.Check(json_document3));
+}
+
+TEST(test_validate, VP_KHR_1_3_roadmap_2022) {
+    JsonValidator validator;
 
     const Json::Value json_document4 = ParseJsonFile("VP_KHR_1_3_roadmap_2022.json");
     EXPECT_TRUE(validator.Check(json_document4));
