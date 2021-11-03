@@ -153,3 +153,17 @@ TEST(test_validate, VP_KHR_1_3_roadmap_2022) {
     const Json::Value json_document4 = ParseJsonFile("VP_KHR_1_3_roadmap_2022.json");
     EXPECT_TRUE(validator.Check(json_document4));
 }
+
+TEST(test_validate, VP_ANDROID_1_0_baseline_2022) {
+    JsonValidator validator;
+
+    const Json::Value json_document3 = ParseJsonFile("VP_ANDROID_1_0_baseline_2022.json");
+    EXPECT_TRUE(validator.Check(json_document3));
+}
+
+TEST(test_validate, VP_ANDROID_angle_es31) {
+    JsonValidator validator;
+
+    const Json::Value json_document4 = ParseJsonFile("VP_ANDROID_angle_es31.json");
+    EXPECT_TRUE(validator.Check(json_document4));
+}
