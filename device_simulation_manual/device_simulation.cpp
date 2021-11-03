@@ -1656,12 +1656,6 @@ class PhysicalDeviceData {
     // VK_EXT_pageable_device_local_memory structs
     VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT physical_device_pageable_device_local_memory_features_;
 
-    // VK_EXT_pci_bus_info structs
-    VkPhysicalDevicePCIBusInfoPropertiesEXT physical_device_pci_bus_info_properties_;
-
-    // VK_EXT_physical_device_drm structs
-    VkPhysicalDeviceDrmPropertiesEXT physical_device_drm_properties_;
-
     // VK_EXT_pipeline_creation_cache_control structs
     VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT physical_device_pipeline_creation_cache_control_features_;
 
@@ -1984,12 +1978,6 @@ class PhysicalDeviceData {
         // VK_EXT_pageable_device_local_memory structs
         physical_device_pageable_device_local_memory_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PAGEABLE_DEVICE_LOCAL_MEMORY_FEATURES_EXT};
 
-        // VK_EXT_pci_bus_info structs
-        physical_device_pci_bus_info_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PCI_BUS_INFO_PROPERTIES_EXT};
-
-        // VK_EXT_physical_device_drm structs
-        physical_device_drm_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRM_PROPERTIES_EXT};
-
         // VK_EXT_pipeline_creation_cache_control structs
         physical_device_pipeline_creation_cache_control_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT};
 
@@ -2209,8 +2197,6 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiDrawFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiDrawPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePCIBusInfoPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDrmPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest);
     void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePrivateDataFeaturesEXT *dest);
@@ -2769,8 +2755,6 @@ bool JsonLoader::LoadFile(const char *filename) {
     GetValue(root, "VkPhysicalDeviceMultiDrawPropertiesEXT", &pdd_.physical_device_multi_draw_properties_);
     GetValue(root, "VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT",
              &pdd_.physical_device_pageable_device_local_memory_features_);
-    GetValue(root, "VkPhysicalDevicePCIBusInfoPropertiesEXT", &pdd_.physical_device_pci_bus_info_properties_);
-    GetValue(root, "VkPhysicalDeviceDrmPropertiesEXT", &pdd_.physical_device_drm_properties_);
     GetValue(root, "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT",
              &pdd_.physical_device_pipeline_creation_cache_control_features_);
     GetValue(root, "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT",
@@ -4493,44 +4477,6 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "not supported by the device.\n");
     }
     GET_VALUE_WARN(pageableDeviceLocalMemory, WarnIfGreater);
-}
-
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePCIBusInfoPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
-    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePCIBusInfoPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PCI_BUS_INFO_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_pci_bus_info, but "
-            "VK_EXT_pci_bus_info is "
-            "not supported by the device.\n");
-    }
-    GET_VALUE_WARN(pciDomain, WarnIfGreater);
-    GET_VALUE_WARN(pciBus, WarnIfGreater);
-    GET_VALUE_WARN(pciDevice, WarnIfGreater);
-    GET_VALUE_WARN(pciFunction, WarnIfGreater);
-}
-
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDrmPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
-    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDrmPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PHYSICAL_DEVICE_DRM_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_physical_device_drm, but "
-            "VK_EXT_physical_device_drm is "
-            "not supported by the device.\n");
-    }
-    GET_VALUE_WARN(hasPrimary, WarnIfGreater);
-    GET_VALUE_WARN(hasRender, WarnIfGreater);
-    GET_VALUE_WARN(primaryMajor, WarnIfGreater);
-    GET_VALUE_WARN(primaryMinor, WarnIfGreater);
-    GET_VALUE_WARN(renderMajor, WarnIfGreater);
-    GET_VALUE_WARN(renderMinor, WarnIfGreater);
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, const char *name,
@@ -6277,18 +6223,6 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             void *pNext = pdlmf->pNext;
             *pdlmf = physicalDeviceData->physical_device_pageable_device_local_memory_features_;
             pdlmf->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PCI_BUS_INFO_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PCI_BUS_INFO_EXTENSION_NAME)) {
-            VkPhysicalDevicePCIBusInfoPropertiesEXT *pcibip = (VkPhysicalDevicePCIBusInfoPropertiesEXT *)place;
-            void *pNext = pcibip->pNext;
-            *pcibip = physicalDeviceData->physical_device_pci_bus_info_properties_;
-            pcibip->pNext = pNext;
-        } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRM_PROPERTIES_EXT &&
-                   PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PHYSICAL_DEVICE_DRM_EXTENSION_NAME)) {
-            VkPhysicalDeviceDrmPropertiesEXT *drmp = (VkPhysicalDeviceDrmPropertiesEXT *)place;
-            void *pNext = drmp->pNext;
-            *drmp = physicalDeviceData->physical_device_drm_properties_;
-            drmp->pNext = pNext;
         } else if (structure->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT &&
                    PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
             VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *pcccf =
@@ -7901,18 +7835,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_pageable_device_local_memory_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_pageable_device_local_memory_features_);
-                }
-
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_PCI_BUS_INFO_EXTENSION_NAME)) {
-                    pdd.physical_device_pci_bus_info_properties_.pNext = property_chain.pNext;
-
-                    property_chain.pNext = &(pdd.physical_device_pci_bus_info_properties_);
-                }
-
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_PHYSICAL_DEVICE_DRM_EXTENSION_NAME)) {
-                    pdd.physical_device_drm_properties_.pNext = property_chain.pNext;
-
-                    property_chain.pNext = &(pdd.physical_device_drm_properties_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
