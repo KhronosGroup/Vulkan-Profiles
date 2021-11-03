@@ -5,6 +5,7 @@
         "info": "Empty profile",
         "desc": "Profile for debugging the trivial case of device creation."
     },
+    "version": "1.2",
     "VkPhysicalDeviceProperties": {
     },
     "VkPhysicalDeviceFeatures": {

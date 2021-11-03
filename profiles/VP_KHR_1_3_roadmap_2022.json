@@ -5,7 +5,7 @@
         "info": "Khronos Vulkan 1.3 roadmap 2022 profile",
         "desc": "Collection on nonsensical features to test completeness"
     },
-    "required-version": "1.3",
+    "version": "1.3",
     "features": [
         {
             "struct": "VkPhysicalDeviceFeatures",
@@ -77,115 +77,115 @@
             "members": [
                 {
                     "name": "maxImageDimension1D",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 8192
                 },
                 {
                     "name": "maxImageDimension2D",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 8192
                 },
                 {
                     "name": "maxImageDimensionCube",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 8192
                 },
                 {
                     "name": "maxImageArrayLayers",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 2048
                 },
                 {
                     "name": "maxUniformBufferRange",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 65536
                 },
                 {
                     "name": "bufferImageGranularity",
-                    "type": "INT",
+                    "type": "VkDeviceSize",
                     "limit": "MAX",
                     "value": 4096
                 },
                 {
                     "name": "maxPerStageDescriptorSamplers",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 64
                 },
                 {
                     "name": "maxPerStageDescriptorUniformBuffers",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 15
                 },
                 {
                     "name": "maxPerStageDescriptorStorageBuffers",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 30
                 },
                 {
                     "name": "maxPerStageDescriptorSampledImages",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 200
                 },
                 {
                     "name": "maxPerStageDescriptorStorageImages",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 16
                 },
                 {
                     "name": "maxPerStageResources",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 200
                 },
                 {
                     "name": "maxDescriptorSetSamplers",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 576
                 },
                 {
                     "name": "maxDescriptorSetUniformBuffers",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 90
                 },
                 {
                     "name": "maxDescriptorSetStorageBuffers",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 96
                 },
                 {
                     "name": "maxDescriptorSetSampledImages",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 1800
                 },
                 {
                     "name": "maxDescriptorSetStorageImages",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 144
                 },
                 {
                     "name": "maxFragmentCombinedOutputResources",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 16
                 },
                 {
                     "name": "maxComputeWorkGroupInvocations",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 256
                 },
@@ -197,31 +197,31 @@
                 },
                 {
                     "name": "subTexelPrecisionBits",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 8
                 },
                 {
                     "name": "mipmapPrecisionBits",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 6
                 },
                 {
                     "name": "maxSamplerLodBias",
-                    "type": "FLOAT",
+                    "type": "float",
                     "limit": "MIN",
                     "value": 14
                 },
                 {
                     "name": "pointSizeGranularity",
-                    "type": "FLOAT",
+                    "type": "float",
                     "limit": "MAX",
                     "value": 0.125
                 },
                 {
                     "name": "lineWidthGranularity",
-                    "type": "FLOAT",
+                    "type": "float",
                     "limit": "MAX",
                     "value": 0.5
                 }
@@ -232,7 +232,7 @@
             "members": [
                 {
                     "name": "subgroupSize",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 4
                 }
@@ -243,17 +243,17 @@
             "members": [
                 {
                     "name": "shaderSignedZeroInfNanPreserveFloat16",
-                    "type": "BOOL",
+                    "type": "VkBool32",
                     "value": true
                 },
                 {
                     "name": "shaderSignedZeroInfNanPreserveFloat32",
-                    "type": "BOOL",
+                    "type": "VkBool32",
                     "value": true
                 },
                 {
                     "name": "maxPerStageDescriptorUpdateAfterBindInputAttachments",
-                    "type": "INT",
+                    "type": "uint32_t",
                     "limit": "MIN",
                     "value": 7
                 }
