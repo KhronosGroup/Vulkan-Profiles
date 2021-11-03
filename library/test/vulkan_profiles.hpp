@@ -847,7 +847,7 @@ inline void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t pro
     }
 }
 
-inline void *_vpGetStructure(void *pNext, VkStructureType type) {
+inline const void *_vpGetStructure(const void *pNext, VkStructureType type) {
     if (pNext == nullptr) {
         return nullptr;
     }
@@ -857,7 +857,7 @@ inline void *_vpGetStructure(void *pNext, VkStructureType type) {
         void *pNext;
     };
 
-    VkStruct *p = static_cast<VkStruct *>(pNext);
+    const VkStruct *p = static_cast<const VkStruct *>(pNext);
 
     if (p->sType == type) {
         return pNext;
