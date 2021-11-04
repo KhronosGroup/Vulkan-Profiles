@@ -5,15 +5,14 @@
 		"info": "LunarG Vulkan 1.1 Desktop Portability Profile",
 		"desc": "Common desktop platforms with drivers supporting Vulkan 1.0 on Windows, Linux and macOS."
 	},
+	"version": "1.1",
 	"capabilities": [
 		{
 			"name": "baseline",
-			"version": "1.1",
 			"extensions": [
 				{
 					"extensionName": "VK_KHR_8bit_storage",
-					"specVersion": 1,
-					"support": "REQUIRED"
+					"specVersion": 1
 				},
 				{
 					"extensionName": "VK_KHR_create_renderpass2",
@@ -240,15 +239,13 @@
 							"name": "maxImageDimension1D",
 							"type": "uint32_t",
 							"limit": "MIN",
-							"value": 16384,
-							"support": "REQUIRED"
+							"value": 16384
 						},
 						{
 							"name": "maxImageDimension2D",
 							"type": "uint32_t",
 							"limit": "MIN",
-							"value": 16384,
-							"support": "REQUIRED"
+							"value": 16384
 						},
 						{
 							"name": "maxImageDimension3D",
@@ -832,8 +829,7 @@
 							"limit": "MAX",
 							"value": 0.5
 						}
-					],
-					"support": "REQUIRED"
+					]
 				},
 				{
 					"struct": "VkPhysicalDeviceDescriptorIndexingProperties",
@@ -943,15 +939,13 @@
 							"name": "maxMultiviewViewCount",
 							"type": "uint32_t",
 							"limit": "MIN",
-							"value": 6,
-							"support": "REQUIRED"
+							"value": 6
 						},
 						{
 							"name": "maxMultiviewInstanceIndex",
 							"type": "uint32_t",
 							"limit": "MIN",
-							"value": 134217727,
-							"support": "REQUIRED"
+							"value": 134217727
 						}
 					]
 				},
