@@ -1,11 +1,11 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
     "name": "VP_ANDROID_angle_es31",
+    "version": 1,
     "comments": {
         "info": "Android Vulkan 1.1 ANGLE 2022 Profile",
         "desc": "ANGLE Layer Support for GLES 3.1"
     },
-    "version": "1.1",
     "capabilities": [
         {
             "name": "baseline",
@@ -176,6 +176,7 @@
     "variants": [
         {
             "name": "Android",
+            "api-version": "1.1.131",
             "requirements": [
                 "baseline"
             ]

@@ -1,11 +1,11 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
     "name": "VP_ANDROID_1_0_baseline_2022",
+    "version": 1,
     "comments": {
         "info": "Android Vulkan 1.0 baseline 2022 Profile",
         "desc": "Collection on features supported in the majority of devices"
     },
-    "version": "1.0",
     "capabilities": [
         {
             "name": "baseline",
@@ -1985,6 +1985,7 @@
     "variants": [
         {
             "name": "Android 1.0 Baseline 2020",
+            "api-version": "1.0.30",
             "requirements": [
                 "baseline"
             ]
