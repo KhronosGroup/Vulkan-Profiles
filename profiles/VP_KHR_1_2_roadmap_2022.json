@@ -5,10 +5,10 @@
         "info": "Khronos Vulkan 1.2 roadmap 2022 Profile",
         "desc": "Collection on nonsensical features to test completeness"
     },
+    "version": "1.2",
     "capabilities": [
         {
             "name": "baseline",
-            "version": "1.2",
             "extensions": [
                 {
                     "extensionName": "VK_KHR_shader_terminate_invocation",

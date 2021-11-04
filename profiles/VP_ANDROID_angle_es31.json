@@ -5,10 +5,10 @@
         "info": "Android Vulkan 1.1 ANGLE 2022 Profile",
         "desc": "ANGLE Layer Support for GLES 3.1"
     },
+    "version": "1.1",
     "capabilities": [
         {
             "name": "baseline",
-            "version": "1.1",
             "extensions": [
                 {
                     "extensionName": "VK_EXT_line_rasterization",

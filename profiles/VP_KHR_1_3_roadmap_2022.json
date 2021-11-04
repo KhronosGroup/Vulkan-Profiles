@@ -5,10 +5,10 @@
         "info": "Khronos Vulkan 1.3 roadmap 2022 profile",
         "desc": "Collection on nonsensical features to test completeness"
     },
+    "version": "1.3",
     "capabilities": [
         {
             "name": "baseline",
-            "version": "1.3",
             "features": [
                 {
                     "struct": "VkPhysicalDeviceFeatures",

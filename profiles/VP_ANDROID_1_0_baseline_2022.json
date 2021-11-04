@@ -5,10 +5,10 @@
         "info": "Android Vulkan 1.0 baseline 2022 Profile",
         "desc": "Collection on features supported in the majority of devices"
     },
+    "version": "1.0",
     "capabilities": [
         {
             "name": "baseline",
-            "version": "1.0",
             "extensions": [
                 {
                     "extensionName": "VK_KHR_surface",

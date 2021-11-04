@@ -7,7 +7,8 @@
     "required": [
         "name",
         "comments",
-        "version"
+        "capabilities",
+        "variants"
     ],
     "definitions": {
         "uint8_t": {
@@ -251,12 +252,6 @@
             "properties": {
                 "memoryType": {
                     "$ref": "#/definitions/VkMemoryPropertyFlagBits"
-                },
-                "platforms": {
-                    "$ref": "#/definitions/platforms"
-                },
-                "support": {
-                    "$ref": "#/definitions/support"
                 }
             }
         },
@@ -354,12 +349,6 @@
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
-                            },
-                            "platforms": {
-                                "$ref": "#/definitions/platforms"
-                            },
-                            "support": {
-                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -387,12 +376,6 @@
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
-                            },
-                            "platforms": {
-                                "$ref": "#/definitions/platforms"
-                            },
-                            "support": {
-                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -420,12 +403,6 @@
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
-                            },
-                            "platforms": {
-                                "$ref": "#/definitions/platforms"
-                            },
-                            "support": {
-                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -457,12 +434,6 @@
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
-                            },
-                            "platforms": {
-                                "$ref": "#/definitions/platforms"
-                            },
-                            "support": {
-                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -495,12 +466,6 @@
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
-                            },
-                            "platforms": {
-                                "$ref": "#/definitions/platforms"
-                            },
-                            "support": {
-                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -533,12 +498,6 @@
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
-                            },
-                            "platforms": {
-                                "$ref": "#/definitions/platforms"
-                            },
-                            "support": {
-                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -571,12 +530,6 @@
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
-                            },
-                            "platforms": {
-                                "$ref": "#/definitions/platforms"
-                            },
-                            "support": {
-                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -604,12 +557,6 @@
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
-                            },
-                            "platforms": {
-                                "$ref": "#/definitions/platforms"
-                            },
-                            "support": {
-                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -642,12 +589,6 @@
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
-                            },
-                            "platforms": {
-                                "$ref": "#/definitions/platforms"
-                            },
-                            "support": {
-                                "$ref": "#/definitions/support"
                             }
                         }
                     },
@@ -674,12 +615,6 @@
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
-                            },
-                            "platforms": {
-                                "$ref": "#/definitions/platforms"
-                            },
-                            "support": {
-                                "$ref": "#/definitions/support"
                             }
                         }
                     }
@@ -717,104 +652,42 @@
             "type": "string",
             "pattern": "^[0-9]+.[0-9]+$"
         },
-        "extensions": {
+        "capabilities": {
             "description": "TODO",
             "type": "array",
             "items": {
                 "additionalProperties": false,
                 "required": [
-                    "extensionName",
-                    "specVersion"
+                    "name"
                 ],
                 "properties": {
-                    "extensionName": {
+                    "name": {
                         "description": "TODO",
                         "type": "string"
                     },
-                    "specVersion": {
+                    "extensions": {
                         "description": "TODO",
-                        "type": "integer"
+                        "type": "array",
+                        "items": {
+                            "additionalProperties": false,
+                            "required": [
+                                "extensionName",
+                                "specVersion"
+                            ],
+                            "properties": {
+                                "extensionName": {
+                                    "description": "TODO",
+                                    "type": "string"
+                                },
+                                "specVersion": {
+                                    "description": "TODO",
+                                    "type": "integer"
+                                }
+                            }
+                        }
                     },
-                    "platforms": {
-                        "$ref": "#/definitions/platforms"
-                    },
-                    "support": {
-                        "$ref": "#/definitions/support"
-                    }
-                }
-            }
-        },
-        "features": {
-            "description": "TODO",
-            "type": "array",
-            "items": {
-                "additionalProperties": false,
-                "required": [
-                    "struct",
-                    "members"
-                ],
-                "properties": {
-                    "struct": {
+                    "features": {
                         "description": "TODO",
-                        "type": "string",
-                        "pattern": "Vk[A-Za-z0-9_]+"
-                    },
-                    "members": {
-                        "description": "TODO",
-                        "type": "object"
-                    },
-                    "platforms": {
-                        "$ref": "#/definitions/platforms"
-                    },
-                    "support": {
-                        "$ref": "#/definitions/support"
-                    }
-                }
-            }
-        },
-        "properties": {
-            "description": "TODO",
-            "type": "array",
-            "items": {
-                "additionalProperties": false,
-                "required": [
-                    "struct",
-                    "members"
-                ],
-                "properties": {
-                    "struct": {
-                        "description": "TODO",
-                        "type": "string",
-                        "pattern": "Vk[A-Za-z0-9_]+"
-                    },
-                    "members": {
-                        "$ref": "#/definitions/members"
-                    },
-                    "platforms": {
-                        "$ref": "#/definitions/platforms"
-                    },
-                    "support": {
-                        "$ref": "#/definitions/support"
-                    }
-                }
-            }
-        },
-        "formats": {
-            "description": "TODO",
-            "type": "array",
-            "items": {
-                "additionalProperties": false,
-                "required": [
-                    "value",
-                    "properties"
-                ],
-                "properties": {
-                    "value": {
-                        "description": "TODO",
-                        "type": "string",
-                        "pattern": "VK_[A-Z0-9_]+"
-                    },
-                    "properties": {
                         "type": "array",
                         "items": {
                             "additionalProperties": false,
@@ -829,80 +702,152 @@
                                     "pattern": "Vk[A-Za-z0-9_]+"
                                 },
                                 "members": {
-                                    "$ref": "#/definitions/VkFormatProperties",
                                     "description": "TODO",
-                                    "type": "object",
-                                    "additionalProperties": false,
-                                    "required": [
-                                        "linearTilingFeatures",
-                                        "optimalTilingFeatures",
-                                        "bufferFeatures"
-                                    ],
-                                    "properties": {
-                                        "linearTilingFeatures": {
-                                            "$ref": "#/definitions/VkFormatFeatureFlagBits"
-                                        },
-                                        "optimalTilingFeatures": {
-                                            "$ref": "#/definitions/VkFormatFeatureFlagBits"
-                                        },
-                                        "bufferFeatures": {
-                                            "$ref": "#/definitions/VkFormatFeatureFlagBits"
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "properties": {
+                        "description": "TODO",
+                        "type": "array",
+                        "items": {
+                            "additionalProperties": false,
+                            "required": [
+                                "struct",
+                                "members"
+                            ],
+                            "properties": {
+                                "struct": {
+                                    "description": "TODO",
+                                    "type": "string",
+                                    "pattern": "Vk[A-Za-z0-9_]+"
+                                },
+                                "members": {
+                                    "$ref": "#/definitions/members"
+                                }
+                            }
+                        }
+                    },
+                    "formats": {
+                        "description": "TODO",
+                        "type": "array",
+                        "items": {
+                            "additionalProperties": false,
+                            "required": [
+                                "value",
+                                "properties"
+                            ],
+                            "properties": {
+                                "value": {
+                                    "description": "TODO",
+                                    "type": "string",
+                                    "pattern": "VK_[A-Z0-9_]+"
+                                },
+                                "properties": {
+                                    "type": "array",
+                                    "items": {
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "struct",
+                                            "members"
+                                        ],
+                                        "properties": {
+                                            "struct": {
+                                                "description": "TODO",
+                                                "type": "string",
+                                                "pattern": "Vk[A-Za-z0-9_]+"
+                                            },
+                                            "members": {
+                                                "$ref": "#/definitions/VkFormatProperties",
+                                                "description": "TODO",
+                                                "type": "object",
+                                                "additionalProperties": false,
+                                                "required": [
+                                                    "linearTilingFeatures",
+                                                    "optimalTilingFeatures",
+                                                    "bufferFeatures"
+                                                ],
+                                                "properties": {
+                                                    "linearTilingFeatures": {
+                                                        "$ref": "#/definitions/VkFormatFeatureFlagBits"
+                                                    },
+                                                    "optimalTilingFeatures": {
+                                                        "$ref": "#/definitions/VkFormatFeatureFlagBits"
+                                                    },
+                                                    "bufferFeatures": {
+                                                        "$ref": "#/definitions/VkFormatFeatureFlagBits"
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     },
-                    "platforms": {
-                        "$ref": "#/definitions/platforms"
+                    "queueFamilies": {
+                        "description": "TODO",
+                        "type": "array",
+                        "items": {
+                            "description": "TODO",
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                                "queueFlags",
+                                "queueCount",
+                                "timestampValidBits",
+                                "minImageTransferGranularity"
+                            ],
+                            "properties": {
+                                "queueFlags": {
+                                    "$ref": "#/definitions/VkQueueFlags"
+                                },
+                                "queueCount": {
+                                    "$ref": "#/definitions/uint32_t"
+                                },
+                                "timestampValidBits": {
+                                    "$ref": "#/definitions/uint32_t"
+                                },
+                                "minImageTransferGranularity": {
+                                    "$ref": "#/definitions/VkExtent3D"
+                                }
+                            }
+                        }
                     },
-                    "support": {
-                        "$ref": "#/definitions/support"
+                    "memoryTypes": {
+                        "description": "TODO VkMemoryPropertyFlagBits",
+                        "type": "array",
+                        "additionalProperties": false,
+                        "items": {
+                            "$ref": "#/definitions/memoryType"
+                        }
                     }
                 }
             }
         },
-        "queueFamilies": {
+        "variants": {
             "description": "TODO",
             "type": "array",
             "items": {
-                "description": "TODO",
-                "type": "object",
                 "additionalProperties": false,
                 "required": [
-                    "queueFlags",
-                    "queueCount",
-                    "timestampValidBits",
-                    "minImageTransferGranularity"
+                    "name",
+                    "requirements"
                 ],
                 "properties": {
-                    "queueFlags": {
-                        "$ref": "#/definitions/VkQueueFlags"
+                    "name": {
+                        "description": "TODO",
+                        "type": "string"
                     },
-                    "queueCount": {
-                        "$ref": "#/definitions/uint32_t"
-                    },
-                    "timestampValidBits": {
-                        "$ref": "#/definitions/uint32_t"
-                    },
-                    "minImageTransferGranularity": {
-                        "$ref": "#/definitions/VkExtent3D"
-                    },
-                    "platforms": {
-                        "$ref": "#/definitions/platforms"
-                    },
-                    "support": {
-                        "$ref": "#/definitions/support"
+                    "requirements": {
+                        "description": "TODO",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 }
-            }
-        },
-        "memoryTypes": {
-            "description": "TODO VkMemoryPropertyFlagBits",
-            "type": "array",
-            "additionalProperties": false,
-            "items": {
-                "$ref": "#/definitions/memoryType"
             }
         }
     }
