@@ -5,1975 +5,1988 @@
         "info": "Android Vulkan 1.0 baseline 2022 Profile",
         "desc": "Collection on features supported in the majority of devices"
     },
-    "version": "1.0",
-    "extensions": [
+    "capabilities": [
         {
-            "extensionName": "VK_KHR_surface",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_android_surface",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_swapchain",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_get_physical_device_properties2",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_maintenance1",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_EXT_swapchain_colorspace",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_get_surface_capabilities2",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_incremental_present",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_GOOGLE_display_timing",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_shader_draw_parameters",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_descriptor_update_template",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_get_memory_requirements",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_dedicated_allocation",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_storage_buffer_storage_class",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_external_semaphore_capabilities",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_external_semaphore",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_external_memory_capbilities",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_external_memory",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_external_fence_capabilities",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_external_semaphore_fd",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_external_fence",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_external_fence_fd",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_variable_pointers",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_maintenance2",
-            "specVersion": 1
-        }
-    ],
-    "features": [
-        {
-            "struct": "VkPhysicalDeviceFeatures",
-            "members": {
-                "depthBiasClamp": true,
-                "fragmentStoresAndAtomics": true,
-                "fullDrawIndexUint32": true,
-                "imageCubeArray": true,
-                "independentBlend": true,
-                "largePoints": true,
-                "robustBufferAccess": true,
-                "shaderImageGatherExtended": true,
-                "shaderInt16": true,
-                "shaderSampledImageArrayDynamicIndexing": true,
-                "shaderStorageBufferArrayDynamicIndexing": true,
-                "shaderStorageImageArrayDynamicIndexing": true,
-                "shaderStorageImageWriteWithoutFormat": true,
-                "shaderUniformBufferArrayDynamicIndexing": true,
-                "textureCompressionASTC_LDR": true,
-                "textureCompressionETC2": true
-            }
-        }
-    ],
-    "properties": [
-        {
-            "struct": "VkPhysicalDeviceLimits",
-            "members": [
+            "name": "baseline",
+            "version": "1.0",
+            "extensions": [
                 {
-                    "name": "maxImageDimension1D",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 16384
+                    "extensionName": "VK_KHR_surface",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxImageDimension2D",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 8192
+                    "extensionName": "VK_KHR_android_surface",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxImageDimension3D",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 4096
+                    "extensionName": "VK_KHR_swapchain",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxImageDimensionCube",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 8192
+                    "extensionName": "VK_KHR_get_physical_device_properties2",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxImageArrayLayers",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 256
+                    "extensionName": "VK_KHR_maintenance1",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxTexelBufferElements",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 65536
+                    "extensionName": "VK_EXT_swapchain_colorspace",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxUniformBufferRange",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 65536
+                    "extensionName": "VK_KHR_get_surface_capabilities2",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxStorageBufferRange",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 268435456
+                    "extensionName": "VK_KHR_incremental_present",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxPushConstantsSize",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 128
+                    "extensionName": "VK_GOOGLE_display_timing",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxMemoryAllocationCount",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 4294967295
+                    "extensionName": "VK_KHR_shader_draw_parameters",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxSamplerAllocationCount",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 16384
+                    "extensionName": "VK_KHR_descriptor_update_template",
+                    "specVersion": 1
                 },
                 {
-                    "name": "bufferImageGranularity",
-                    "type": "VkDeviceSize",
-                    "limit": "MAX",
-                    "value": 4096
+                    "extensionName": "VK_KHR_get_memory_requirements",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxBoundDescriptorSets",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 4
+                    "extensionName": "VK_KHR_dedicated_allocation",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxPerStageDescriptorSamplers",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 128
+                    "extensionName": "VK_KHR_storage_buffer_storage_class",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxPerStageDescriptorUniformBuffers",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 12
+                    "extensionName": "VK_KHR_external_semaphore_capabilities",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxPerStageDescriptorStorageBuffers",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 35
+                    "extensionName": "VK_KHR_external_semaphore",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxPerStageDescriptorSampledImages",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 16
+                    "extensionName": "VK_KHR_external_memory_capbilities",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxPerStageDescriptorStorageImages",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 8
+                    "extensionName": "VK_KHR_external_memory",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxPerStageDescriptorInputAttachments",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 4
+                    "extensionName": "VK_KHR_external_fence_capabilities",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxPerStageResources",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 79
+                    "extensionName": "VK_KHR_external_semaphore_fd",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxDescriptorSetSamplers",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 768
+                    "extensionName": "VK_KHR_external_fence",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxDescriptorSetUniformBuffers",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 72
+                    "extensionName": "VK_KHR_external_fence_fd",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxDescriptorSetUniformBuffersDynamic",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 8
+                    "extensionName": "VK_KHR_variable_pointers",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxDescriptorSetStorageBuffers",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 72
-                },
-                {
-                    "name": "maxDescriptorSetStorageBuffersDynamic",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 4
-                },
-                {
-                    "name": "maxDescriptorSetSampledImages",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 96
-                },
-                {
-                    "name": "maxDescriptorSetStorageImages",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 48
-                },
-                {
-                    "name": "maxDescriptorSetInputAttachments",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 4
-                },
-                {
-                    "name": "maxVertexInputAttributes",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 16
-                },
-                {
-                    "name": "maxVertexInputBindings",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 16
-                },
-                {
-                    "name": "maxVertexInputAttributeOffset",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 2047
-                },
-                {
-                    "name": "maxVertexInputBindingStride",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 2048
-                },
-                {
-                    "name": "maxVertexOutputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 128
-                },
-                {
-                    "name": "maxTessellationGenerationLevel",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 64
-                },
-                {
-                    "name": "maxTessellationPatchSize",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 32
-                },
-                {
-                    "name": "maxTessellationControlPerVertexInputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 128
-                },
-                {
-                    "name": "maxTessellationControlPerVertexOutputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 128
-                },
-                {
-                    "name": "maxTessellationControlPerPatchOutputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 120
-                },
-                {
-                    "name": "maxTessellationControlTotalOutputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 4096
-                },
-                {
-                    "name": "maxTessellationEvaluationInputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 128
-                },
-                {
-                    "name": "maxTessellationEvaluationOutputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 128
-                },
-                {
-                    "name": "maxFragmentInputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 128
-                },
-                {
-                    "name": "maxFragmentOutputAttachments",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 4
-                },
-                {
-                    "name": "maxFragmentDualSrcAttachments",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 0
-                },
-                {
-                    "name": "maxFragmentCombinedOutputResources",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 47
-                },
-                {
-                    "name": "maxComputeSharedMemorySize",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 32768
-                },
-                {
-                    "name": "maxComputeWorkGroupCount",
-                    "type": "uint32_t",
-                    "dimensions": 3,
-                    "limit": "MIN",
-                    "value": [ 65536, 65536, 65536 ]
-                },
-                {
-                    "name": "maxComputeWorkGroupInvocations",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 128
-                },
-                {
-                    "name": "maxComputeWorkGroupSize",
-                    "type": "uint32_t",
-                    "dimensions": 3,
-                    "limit": "MIN",
-                    "value": [ 128, 128, 128 ]
-                },
-                {
-                    "name": "subPixelPrecisionBits",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 8
-                },
-                {
-                    "name": "subTexelPrecisionBits",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 8
-                },
-                {
-                    "name": "mipmapPrecisionBits",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 8
-                },
-                {
-                    "name": "maxDrawIndexedIndexValue",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 4294967295
-                },
-                {
-                    "name": "maxDrawIndirectCount",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 1
-                },
-                {
-                    "name": "maxSamplerLodBias",
-                    "type": "float",
-                    "limit": "MIN",
-                    "value": 15.9961
-                },
-                {
-                    "name": "maxSamplerAnisotropy",
-                    "type": "float",
-                    "limit": "MIN",
-                    "value": 1.0
-                },
-                {
-                    "name": "maxViewports",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 1
-                },
-                {
-                    "name": "maxViewportDimensions",
-                    "type": "int32_t",
-                    "dimensions": 2,
-                    "limit": "MIN",
-                    "value": [ 8192, 8192 ]
-                },
-                {
-                    "name": "viewportBoundsRange",
-                    "type": "float",
-                    "dimensions": 2,
-                    "limit": "RANGE",
-                    "value": [ -32768, 32767 ]
-                },
-                {
-                    "name": "viewportSubPixelBits",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 0
-                },
-                {
-                    "name": "minMemoryMapAlignment",
-                    "type": "uint32_t",
-                    "limit": "MAX",
-                    "value": 64
-                },
-                {
-                    "name": "minTexelBufferOffsetAlignment",
-                    "type": "VkDeviceSize",
-                    "limit": "MAX",
-                    "value": 256
-                },
-                {
-                    "name": "minUniformBufferOffsetAlignment",
-                    "type": "VkDeviceSize",
-                    "limit": "MAX",
-                    "value": 64
-                },
-                {
-                    "name": "minStorageBufferOffsetAlignment",
-                    "type": "VkDeviceSize",
-                    "limit": "MAX",
-                    "value": 256
-                },
-                {
-                    "name": "minTexelOffset",
-                    "type": "int32_t",
-                    "limit": "MAX",
-                    "value": -8
-                },
-                {
-                    "name": "maxTexelOffset",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 7
-                },
-                {
-                    "name": "minTexelGatherOffset",
-                    "type": "int32_t",
-                    "limit": "MAX",
-                    "value": -8
-                },
-                {
-                    "name": "maxTexelGatherOffset",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 7
-                },
-                {
-                    "name": "minInterpolationOffset",
-                    "type": "float",
-                    "limit": "MAX",
-                    "value": -0.5
-                },
-                {
-                    "name": "maxInterpolationOffset",
-                    "type": "float",
-                    "limit": "MIN",
-                    "value": 0.5
-                },
-                {
-                    "name": "subPixelInterpolationOffsetBits",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 4
-                },
-                {
-                    "name": "maxFramebufferWidth",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 8192
-                },
-                {
-                    "name": "maxFramebufferHeight",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 8192
-                },
-                {
-                    "name": "maxFramebufferLayers",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 256
-                },
-                {
-                    "name": "framebufferColorSampleCounts",
-                    "type": "VkSampleCountFlags",
-                    "limit": "ALL",
-                    "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                },
-                {
-                    "name": "framebufferDepthSampleCounts",
-                    "type": "VkSampleCountFlags",
-                    "limit": "ALL",
-                    "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                },
-                {
-                    "name": "framebufferStencilSampleCounts",
-                    "type": "VkSampleCountFlags",
-                    "limit": "ALL",
-                    "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                },
-                {
-                    "name": "framebufferNoAttachmentsSampleCounts",
-                    "type": "VkSampleCountFlags",
-                    "limit": "ALL",
-                    "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                },
-                {
-                    "name": "maxColorAttachments",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 4
-                },
-                {
-                    "name": "sampledImageColorSampleCounts",
-                    "type": "VkSampleCountFlags",
-                    "limit": "ALL",
-                    "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                },
-                {
-                    "name": "sampledImageIntegerSampleCounts",
-                    "type": "VkSampleCountFlags",
-                    "limit": "ALL",
-                    "value": [ "VK_SAMPLE_COUNT_1_BIT" ]
-                },
-                {
-                    "name": "sampledImageDepthSampleCounts",
-                    "type": "VkSampleCountFlags",
-                    "limit": "ALL",
-                    "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                },
-                {
-                    "name": "sampledImageStencilSampleCounts",
-                    "type": "VkSampleCountFlags",
-                    "limit": "ALL",
-                    "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                },
-                {
-                    "name": "storageImageSampleCounts",
-                    "type": "VkSampleCountFlags",
-                    "limit": "ALL",
-                    "value": [ "VK_SAMPLE_COUNT_1_BIT" ]
-                },
-                {
-                    "name": "maxSampleMaskWords",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 1
-                },
-                {
-                    "name": "timestampComputeAndGraphics",
-                    "type": "VkBool32",
-                    "value": true
-                },
-                {
-                    "name": "timestampPeriod",
-                    "type": "float",
-                    "limit": "MIN",
-                    "value": 38.4615
-                },
-                {
-                    "name": "maxClipDistances",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 0
-                },
-                {
-                    "name": "maxCullDistances",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 0
-                },
-                {
-                    "name": "maxCombinedClipAndCullDistances",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 0
-                },
-                {
-                    "name": "discreteQueuePriorities",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 2
-                },
-                {
-                    "name": "pointSizeRange",
-                    "type": "float",
-                    "dimensions": 2,
-                    "limit": "RANGE",
-                    "value": [ 1.0, 1024.0 ]
-                },
-                {
-                    "name": "lineWidthRange",
-                    "type": "float",
-                    "dimensions": 2,
-                    "limit": "RANGE",
-                    "value": [ 1.0, 1.0 ]
-                },
-                {
-                    "name": "pointSizeGranularity",
-                    "type": "float",
-                    "limit": "MAX",
-                    "value": 0.0625
-                },
-                {
-                    "name": "strictLines",
-                    "type": "VkBool32",
-                    "value": true
-                },
-                {
-                    "name": "nonCoherentAtomSize",
-                    "type": "uint32_t",
-                    "limit": "MAX",
-                    "value": 64
+                    "extensionName": "VK_KHR_maintenance2",
+                    "specVersion": 1
+                }
+            ],
+            "features": [
+                {
+                    "struct": "VkPhysicalDeviceFeatures",
+                    "members": {
+                        "depthBiasClamp": true,
+                        "fragmentStoresAndAtomics": true,
+                        "fullDrawIndexUint32": true,
+                        "imageCubeArray": true,
+                        "independentBlend": true,
+                        "largePoints": true,
+                        "robustBufferAccess": true,
+                        "shaderImageGatherExtended": true,
+                        "shaderInt16": true,
+                        "shaderSampledImageArrayDynamicIndexing": true,
+                        "shaderStorageBufferArrayDynamicIndexing": true,
+                        "shaderStorageImageArrayDynamicIndexing": true,
+                        "shaderStorageImageWriteWithoutFormat": true,
+                        "shaderUniformBufferArrayDynamicIndexing": true,
+                        "textureCompressionASTC_LDR": true,
+                        "textureCompressionETC2": true
+                    }
+                }
+            ],
+            "properties": [
+                {
+                    "struct": "VkPhysicalDeviceLimits",
+                    "members": [
+                        {
+                            "name": "maxImageDimension1D",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 16384
+                        },
+                        {
+                            "name": "maxImageDimension2D",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 8192
+                        },
+                        {
+                            "name": "maxImageDimension3D",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 4096
+                        },
+                        {
+                            "name": "maxImageDimensionCube",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 8192
+                        },
+                        {
+                            "name": "maxImageArrayLayers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 256
+                        },
+                        {
+                            "name": "maxTexelBufferElements",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 65536
+                        },
+                        {
+                            "name": "maxUniformBufferRange",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 65536
+                        },
+                        {
+                            "name": "maxStorageBufferRange",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 268435456
+                        },
+                        {
+                            "name": "maxPushConstantsSize",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 128
+                        },
+                        {
+                            "name": "maxMemoryAllocationCount",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 4294967295
+                        },
+                        {
+                            "name": "maxSamplerAllocationCount",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 16384
+                        },
+                        {
+                            "name": "bufferImageGranularity",
+                            "type": "VkDeviceSize",
+                            "limit": "MAX",
+                            "value": 4096
+                        },
+                        {
+                            "name": "maxBoundDescriptorSets",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 4
+                        },
+                        {
+                            "name": "maxPerStageDescriptorSamplers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 128
+                        },
+                        {
+                            "name": "maxPerStageDescriptorUniformBuffers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 12
+                        },
+                        {
+                            "name": "maxPerStageDescriptorStorageBuffers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 35
+                        },
+                        {
+                            "name": "maxPerStageDescriptorSampledImages",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 16
+                        },
+                        {
+                            "name": "maxPerStageDescriptorStorageImages",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 8
+                        },
+                        {
+                            "name": "maxPerStageDescriptorInputAttachments",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 4
+                        },
+                        {
+                            "name": "maxPerStageResources",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 79
+                        },
+                        {
+                            "name": "maxDescriptorSetSamplers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 768
+                        },
+                        {
+                            "name": "maxDescriptorSetUniformBuffers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 72
+                        },
+                        {
+                            "name": "maxDescriptorSetUniformBuffersDynamic",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 8
+                        },
+                        {
+                            "name": "maxDescriptorSetStorageBuffers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 72
+                        },
+                        {
+                            "name": "maxDescriptorSetStorageBuffersDynamic",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 4
+                        },
+                        {
+                            "name": "maxDescriptorSetSampledImages",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 96
+                        },
+                        {
+                            "name": "maxDescriptorSetStorageImages",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 48
+                        },
+                        {
+                            "name": "maxDescriptorSetInputAttachments",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 4
+                        },
+                        {
+                            "name": "maxVertexInputAttributes",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 16
+                        },
+                        {
+                            "name": "maxVertexInputBindings",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 16
+                        },
+                        {
+                            "name": "maxVertexInputAttributeOffset",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 2047
+                        },
+                        {
+                            "name": "maxVertexInputBindingStride",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 2048
+                        },
+                        {
+                            "name": "maxVertexOutputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 128
+                        },
+                        {
+                            "name": "maxTessellationGenerationLevel",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 64
+                        },
+                        {
+                            "name": "maxTessellationPatchSize",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 32
+                        },
+                        {
+                            "name": "maxTessellationControlPerVertexInputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 128
+                        },
+                        {
+                            "name": "maxTessellationControlPerVertexOutputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 128
+                        },
+                        {
+                            "name": "maxTessellationControlPerPatchOutputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 120
+                        },
+                        {
+                            "name": "maxTessellationControlTotalOutputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 4096
+                        },
+                        {
+                            "name": "maxTessellationEvaluationInputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 128
+                        },
+                        {
+                            "name": "maxTessellationEvaluationOutputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 128
+                        },
+                        {
+                            "name": "maxFragmentInputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 128
+                        },
+                        {
+                            "name": "maxFragmentOutputAttachments",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 4
+                        },
+                        {
+                            "name": "maxFragmentDualSrcAttachments",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 0
+                        },
+                        {
+                            "name": "maxFragmentCombinedOutputResources",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 47
+                        },
+                        {
+                            "name": "maxComputeSharedMemorySize",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 32768
+                        },
+                        {
+                            "name": "maxComputeWorkGroupCount",
+                            "type": "uint32_t",
+                            "dimensions": 3,
+                            "limit": "MIN",
+                            "value": [ 65536, 65536, 65536 ]
+                        },
+                        {
+                            "name": "maxComputeWorkGroupInvocations",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 128
+                        },
+                        {
+                            "name": "maxComputeWorkGroupSize",
+                            "type": "uint32_t",
+                            "dimensions": 3,
+                            "limit": "MIN",
+                            "value": [ 128, 128, 128 ]
+                        },
+                        {
+                            "name": "subPixelPrecisionBits",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 8
+                        },
+                        {
+                            "name": "subTexelPrecisionBits",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 8
+                        },
+                        {
+                            "name": "mipmapPrecisionBits",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 8
+                        },
+                        {
+                            "name": "maxDrawIndexedIndexValue",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 4294967295
+                        },
+                        {
+                            "name": "maxDrawIndirectCount",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 1
+                        },
+                        {
+                            "name": "maxSamplerLodBias",
+                            "type": "float",
+                            "limit": "MIN",
+                            "value": 15.9961
+                        },
+                        {
+                            "name": "maxSamplerAnisotropy",
+                            "type": "float",
+                            "limit": "MIN",
+                            "value": 1.0
+                        },
+                        {
+                            "name": "maxViewports",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 1
+                        },
+                        {
+                            "name": "maxViewportDimensions",
+                            "type": "int32_t",
+                            "dimensions": 2,
+                            "limit": "MIN",
+                            "value": [ 8192, 8192 ]
+                        },
+                        {
+                            "name": "viewportBoundsRange",
+                            "type": "float",
+                            "dimensions": 2,
+                            "limit": "RANGE",
+                            "value": [ -32768, 32767 ]
+                        },
+                        {
+                            "name": "viewportSubPixelBits",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 0
+                        },
+                        {
+                            "name": "minMemoryMapAlignment",
+                            "type": "uint32_t",
+                            "limit": "MAX",
+                            "value": 64
+                        },
+                        {
+                            "name": "minTexelBufferOffsetAlignment",
+                            "type": "VkDeviceSize",
+                            "limit": "MAX",
+                            "value": 256
+                        },
+                        {
+                            "name": "minUniformBufferOffsetAlignment",
+                            "type": "VkDeviceSize",
+                            "limit": "MAX",
+                            "value": 64
+                        },
+                        {
+                            "name": "minStorageBufferOffsetAlignment",
+                            "type": "VkDeviceSize",
+                            "limit": "MAX",
+                            "value": 256
+                        },
+                        {
+                            "name": "minTexelOffset",
+                            "type": "int32_t",
+                            "limit": "MAX",
+                            "value": -8
+                        },
+                        {
+                            "name": "maxTexelOffset",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 7
+                        },
+                        {
+                            "name": "minTexelGatherOffset",
+                            "type": "int32_t",
+                            "limit": "MAX",
+                            "value": -8
+                        },
+                        {
+                            "name": "maxTexelGatherOffset",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 7
+                        },
+                        {
+                            "name": "minInterpolationOffset",
+                            "type": "float",
+                            "limit": "MAX",
+                            "value": -0.5
+                        },
+                        {
+                            "name": "maxInterpolationOffset",
+                            "type": "float",
+                            "limit": "MIN",
+                            "value": 0.5
+                        },
+                        {
+                            "name": "subPixelInterpolationOffsetBits",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 4
+                        },
+                        {
+                            "name": "maxFramebufferWidth",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 8192
+                        },
+                        {
+                            "name": "maxFramebufferHeight",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 8192
+                        },
+                        {
+                            "name": "maxFramebufferLayers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 256
+                        },
+                        {
+                            "name": "framebufferColorSampleCounts",
+                            "type": "VkSampleCountFlags",
+                            "limit": "ALL",
+                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
+                        },
+                        {
+                            "name": "framebufferDepthSampleCounts",
+                            "type": "VkSampleCountFlags",
+                            "limit": "ALL",
+                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
+                        },
+                        {
+                            "name": "framebufferStencilSampleCounts",
+                            "type": "VkSampleCountFlags",
+                            "limit": "ALL",
+                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
+                        },
+                        {
+                            "name": "framebufferNoAttachmentsSampleCounts",
+                            "type": "VkSampleCountFlags",
+                            "limit": "ALL",
+                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
+                        },
+                        {
+                            "name": "maxColorAttachments",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 4
+                        },
+                        {
+                            "name": "sampledImageColorSampleCounts",
+                            "type": "VkSampleCountFlags",
+                            "limit": "ALL",
+                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
+                        },
+                        {
+                            "name": "sampledImageIntegerSampleCounts",
+                            "type": "VkSampleCountFlags",
+                            "limit": "ALL",
+                            "value": [ "VK_SAMPLE_COUNT_1_BIT" ]
+                        },
+                        {
+                            "name": "sampledImageDepthSampleCounts",
+                            "type": "VkSampleCountFlags",
+                            "limit": "ALL",
+                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
+                        },
+                        {
+                            "name": "sampledImageStencilSampleCounts",
+                            "type": "VkSampleCountFlags",
+                            "limit": "ALL",
+                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
+                        },
+                        {
+                            "name": "storageImageSampleCounts",
+                            "type": "VkSampleCountFlags",
+                            "limit": "ALL",
+                            "value": [ "VK_SAMPLE_COUNT_1_BIT" ]
+                        },
+                        {
+                            "name": "maxSampleMaskWords",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 1
+                        },
+                        {
+                            "name": "timestampComputeAndGraphics",
+                            "type": "VkBool32",
+                            "value": true
+                        },
+                        {
+                            "name": "timestampPeriod",
+                            "type": "float",
+                            "limit": "MIN",
+                            "value": 38.4615
+                        },
+                        {
+                            "name": "maxClipDistances",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 0
+                        },
+                        {
+                            "name": "maxCullDistances",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 0
+                        },
+                        {
+                            "name": "maxCombinedClipAndCullDistances",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 0
+                        },
+                        {
+                            "name": "discreteQueuePriorities",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 2
+                        },
+                        {
+                            "name": "pointSizeRange",
+                            "type": "float",
+                            "dimensions": 2,
+                            "limit": "RANGE",
+                            "value": [ 1.0, 1024.0 ]
+                        },
+                        {
+                            "name": "lineWidthRange",
+                            "type": "float",
+                            "dimensions": 2,
+                            "limit": "RANGE",
+                            "value": [ 1.0, 1.0 ]
+                        },
+                        {
+                            "name": "pointSizeGranularity",
+                            "type": "float",
+                            "limit": "MAX",
+                            "value": 0.0625
+                        },
+                        {
+                            "name": "strictLines",
+                            "type": "VkBool32",
+                            "value": true
+                        },
+                        {
+                            "name": "nonCoherentAtomSize",
+                            "type": "uint32_t",
+                            "limit": "MAX",
+                            "value": 64
+                        }
+                    ]
+                }
+            ],
+            "formats": [
+                {
+                    "value": "VK_FORMAT_R8G8B8_UNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_X8_D24_UNORM_PACK32",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_4x4_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_4x4_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_5x4_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_5x4_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_5x5_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_5x5_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_6x5_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_6x5_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_6x6_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_6x6_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_8x5_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_8x5_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_8x6_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_8x6_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_8x8_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_8x8_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_10x5_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_10x5_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_10x6_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_10x6_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_10x8_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_10x8_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_10x10_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_10x10_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_12x10_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_12x10_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_12x12_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ASTC_12x12_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_D24_UNORM_S8_UINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_B4G4R4A4_UNORM_PACK16",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R5G6B5_UNORM_PACK16",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_A1R5G5B5_UNORM_PACK16",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R8_UNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R8_SNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R8_UINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R8_SINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R8G8_UNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R8G8_SNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R8G8_UINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R8G8_SINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R8G8B8A8_UNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R8G8B8A8_SNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R8G8B8A8_UINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R8G8B8A8_SINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R8G8B8A8_SRGB",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_B8G8R8A8_UNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_B8G8R8A8_SRGB",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_A8B8G8R8_UNORM_PACK32",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_A8B8G8R8_SNORM_PACK32",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_A8B8G8R8_UINT_PACK32",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_A8B8G8R8_SINT_PACK32",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_A8B8G8R8_SRGB_PACK32",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_A2B10G10R10_UNORM_PACK32",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_A2B10G10R10_UINT_PACK32",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16_UNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16_SNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16_UINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16_SINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16_SFLOAT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16G16_UNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16G16_SNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16G16_UINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16G16_SINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16G16_SFLOAT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16G16B16A16_UNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16G16B16A16_SNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16G16B16A16_UINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16G16B16A16_SINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R16G16B16A16_SFLOAT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R32_UINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R32_SINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R32_SFLOAT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R32G32_UINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R32G32_SINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R32G32_SFLOAT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R32G32B32_UINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R32G32B32_SINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R32G32B32_SFLOAT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R32G32B32A32_UINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R32G32B32A32_SINT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_R32G32B32A32_SFLOAT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_B10G11R11_UFLOAT_PACK32",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_E5B9G9R9_UFLOAT_PACK32",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_D16_UNORM",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_D32_SFLOAT",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_EAC_R11_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_EAC_R11_SNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_EAC_R11G11_UNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "value": "VK_FORMAT_EAC_R11G11_SNORM_BLOCK",
+                    "properties": [
+                        {
+                            "struct": "VkFormatProperties2",
+                            "members": {
+                                "linearTilingFeatures": [],
+                                "optimalTilingFeatures": [],
+                                "bufferFeatures": []
+                            }
+                        }
+                    ]
                 }
             ]
         }
     ],
-    "formats": [
-        {
-            "value": "VK_FORMAT_R8G8B8_UNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_X8_D24_UNORM_PACK32",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_4x4_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_4x4_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_5x4_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_5x4_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_5x5_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_5x5_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_6x5_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_6x5_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_6x6_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_6x6_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_8x5_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_8x5_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_8x6_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_8x6_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_8x8_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_8x8_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_10x5_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_10x5_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_10x6_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_10x6_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_10x8_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_10x8_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_10x10_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_10x10_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_12x10_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_12x10_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_12x12_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ASTC_12x12_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_D24_UNORM_S8_UINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_B4G4R4A4_UNORM_PACK16",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R5G6B5_UNORM_PACK16",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_A1R5G5B5_UNORM_PACK16",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R8_UNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R8_SNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R8_UINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R8_SINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R8G8_UNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R8G8_SNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R8G8_UINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R8G8_SINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R8G8B8A8_UNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R8G8B8A8_SNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R8G8B8A8_UINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R8G8B8A8_SINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R8G8B8A8_SRGB",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_B8G8R8A8_UNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_B8G8R8A8_SRGB",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_A8B8G8R8_UNORM_PACK32",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_A8B8G8R8_SNORM_PACK32",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_A8B8G8R8_UINT_PACK32",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_A8B8G8R8_SINT_PACK32",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_A8B8G8R8_SRGB_PACK32",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_A2B10G10R10_UNORM_PACK32",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_A2B10G10R10_UINT_PACK32",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16_UNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16_SNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16_UINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16_SINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16_SFLOAT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16G16_UNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16G16_SNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16G16_UINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16G16_SINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16G16_SFLOAT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16G16B16A16_UNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16G16B16A16_SNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16G16B16A16_UINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16G16B16A16_SINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R16G16B16A16_SFLOAT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R32_UINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R32_SINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R32_SFLOAT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R32G32_UINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R32G32_SINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R32G32_SFLOAT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R32G32B32_UINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R32G32B32_SINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R32G32B32_SFLOAT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R32G32B32A32_UINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R32G32B32A32_SINT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_R32G32B32A32_SFLOAT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_B10G11R11_UFLOAT_PACK32",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_E5B9G9R9_UFLOAT_PACK32",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_D16_UNORM",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_D32_SFLOAT",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_EAC_R11_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_EAC_R11_SNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_EAC_R11G11_UNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
-            ]
-        },
-        {
-            "value": "VK_FORMAT_EAC_R11G11_SNORM_BLOCK",
-            "properties": [
-                {
-                    "struct": "VkFormatProperties2",
-                    "members": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
-                        "bufferFeatures": []
-                    }
-                }
+    "variants": [
+        {
+            "name": "Android 1.0 Baseline 2020",
+            "requirements": [
+                "baseline"
             ]
         }
     ]
