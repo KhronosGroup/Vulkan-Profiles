@@ -1,170 +1,184 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
     "name": "VP_ANDROID_angle_es31",
+    "version": 1,
     "comments": {
         "info": "Android Vulkan 1.1 ANGLE 2022 Profile",
         "desc": "ANGLE Layer Support for GLES 3.1"
     },
-    "version": "1.1",
-    "extensions": [
+    "capabilities": [
         {
-            "extensionName": "VK_EXT_line_rasterization",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_shader_terminate_invocation",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_EXT_provoking_vertex",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_EXT_transform_feedback",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_EXT_primitive_topology_list_restart",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_EXT_load_store_op_none",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_EXT_swapchain_colorspace",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_EXT_image_robustness",
-            "specVersion": 1
-        },
-        {
-            "extensionName": "VK_KHR_incremental_present",
-            "specVersion": 1
-        }
-    ],
-    "features": [
-        {
-            "struct": "VkPhysicalDeviceFeatures",
-            "members": {
-                "independentBlend": true,
-                "robustBufferAccess": true,
-                "vertexPipelineStoresAndAtomics": true
-            }
-        },
-        {
-            "struct": "VkPhysicalDeviceLineRasterizationFeaturesEXT",
-            "members": {
-                "bresenhamLines": true
-            }
-        },
-        {
-            "struct": "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR",
-            "members": {
-                "shaderTerminateInvocation": true
-            }
-        },
-        {
-            "struct": "VkPhysicalDeviceProvokingVertexFeaturesEXT",
-            "members": {
-                "provokingVertexLast": true
-            }
-        },
-        {
-            "struct": "VkPhysicalDeviceTransformFeedbackFeaturesEXT",
-            "members": {
-                "transformFeedback": true
-            }
-        },
-        {
-            "struct": "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT",
-            "members": {
-                "primitiveTopologyListRestart": true
-            }
-        },
-        {
-            "struct": "VkPhysicalDeviceImageRobustnessFeaturesEXT",
-            "members": {
-                "robustImageAccess": true
-            }
-        }
-    ],
-    "properties": [
-        {
-            "struct": "VkPhysicalDeviceLimits",
-            "members": [
+            "name": "baseline",
+            "extensions": [
                 {
-                    "name": "standardSampleLocations",
-                    "type": "VkBool32",
-                    "value": true
+                    "extensionName": "VK_EXT_line_rasterization",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxVertexOutputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 64
+                    "extensionName": "VK_KHR_shader_terminate_invocation",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxTessellationControlPerVertexOutputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 64
+                    "extensionName": "VK_EXT_provoking_vertex",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxTessellationControlPerPatchOutputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 64
+                    "extensionName": "VK_EXT_transform_feedback",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxTessellationControlTotalOutputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 64
+                    "extensionName": "VK_EXT_primitive_topology_list_restart",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxTessellationEvaluationOutputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 64
+                    "extensionName": "VK_EXT_load_store_op_none",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxGeometryOutputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 64
+                    "extensionName": "VK_EXT_swapchain_colorspace",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxGeometryTotalOutputComponents",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 64
+                    "extensionName": "VK_EXT_image_robustness",
+                    "specVersion": 1
                 },
                 {
-                    "name": "maxPerStageDescriptorUniformBuffers",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 12
-                },
-                {
-                    "name": "maxPerStageDescriptorStorageBuffers",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 12
-                },
-                {
-                    "name": "maxVertexInputAttributeOffset",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 2048
-                },
-                {
-                    "name": "subPixelPrecisionBits",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 8
+                    "extensionName": "VK_KHR_incremental_present",
+                    "specVersion": 1
                 }
+            ],
+            "features": [
+                {
+                    "struct": "VkPhysicalDeviceFeatures",
+                    "members": {
+                        "independentBlend": true,
+                        "robustBufferAccess": true,
+                        "vertexPipelineStoresAndAtomics": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDeviceLineRasterizationFeaturesEXT",
+                    "members": {
+                        "bresenhamLines": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR",
+                    "members": {
+                        "shaderTerminateInvocation": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDeviceProvokingVertexFeaturesEXT",
+                    "members": {
+                        "provokingVertexLast": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDeviceTransformFeedbackFeaturesEXT",
+                    "members": {
+                        "transformFeedback": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT",
+                    "members": {
+                        "primitiveTopologyListRestart": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDeviceImageRobustnessFeaturesEXT",
+                    "members": {
+                        "robustImageAccess": true
+                    }
+                }
+            ],
+            "properties": [
+                {
+                    "struct": "VkPhysicalDeviceLimits",
+                    "members": [
+                        {
+                            "name": "standardSampleLocations",
+                            "type": "VkBool32",
+                            "value": true
+                        },
+                        {
+                            "name": "maxVertexOutputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 64
+                        },
+                        {
+                            "name": "maxTessellationControlPerVertexOutputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 64
+                        },
+                        {
+                            "name": "maxTessellationControlPerPatchOutputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 64
+                        },
+                        {
+                            "name": "maxTessellationControlTotalOutputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 64
+                        },
+                        {
+                            "name": "maxTessellationEvaluationOutputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 64
+                        },
+                        {
+                            "name": "maxGeometryOutputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 64
+                        },
+                        {
+                            "name": "maxGeometryTotalOutputComponents",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 64
+                        },
+                        {
+                            "name": "maxPerStageDescriptorUniformBuffers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 12
+                        },
+                        {
+                            "name": "maxPerStageDescriptorStorageBuffers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 12
+                        },
+                        {
+                            "name": "maxVertexInputAttributeOffset",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 2048
+                        },
+                        {
+                            "name": "subPixelPrecisionBits",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 8
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "variants": [
+        {
+            "name": "Android",
+            "api-version": "1.1.131",
+            "requirements": [
+                "baseline"
             ]
         }
     ]
