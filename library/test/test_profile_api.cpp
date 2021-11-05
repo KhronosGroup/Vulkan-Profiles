@@ -888,36 +888,3 @@ TEST(test_profile, get_profile_queue_families_unspecified) {
     EXPECT_EQ(0, count);
 }
 
-TEST(test_profile, get_profiles_full) {
-    uint32_t pPropertyCount = 0;
-    vpGetProfiles(&pPropertyCount, nullptr);
-    EXPECT_EQ(3, pPropertyCount);
-
-    std::vector<VpProfileProperties> pProperties(pPropertyCount);
-    vpGetProfiles(&pPropertyCount, &pProperties[0]);
-    EXPECT_EQ(3, pPropertyCount);
-
-    EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, pProperties[0].profileName);
-    EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, pProperties[0].specVersion);
-
-    EXPECT_STREQ(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME, pProperties[1].profileName);
-    EXPECT_EQ(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION, pProperties[1].specVersion);
-
-    EXPECT_STREQ(VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, pProperties[2].profileName);
-    EXPECT_EQ(VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION, pProperties[2].specVersion);
-}
-
-TEST(test_profile, get_profiles_partial) {
-    uint32_t pPropertyCount = 0;
-    vpGetProfiles(&pPropertyCount, nullptr);
-    EXPECT_EQ(3, pPropertyCount);
-
-    pPropertyCount = 1;
-
-    std::vector<VpProfileProperties> pProperties(pPropertyCount);
-    vpGetProfiles(&pPropertyCount, &pProperties[0]);
-    EXPECT_EQ(1, pPropertyCount);
-
-    EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, pProperties[0].profileName);
-    EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, pProperties[0].specVersion);
-}

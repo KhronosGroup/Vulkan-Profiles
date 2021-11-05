@@ -18,33 +18,34 @@
  * - Christophe Riccio <christophe@lunarg.com>
  */
 
-#include "test.hpp"
+#define VK_ENABLE_BETA_EXTENSIONS
 
-//#define VK_ENABLE_BETA_EXTENSIONS <= checking the library build and report the right number of profiles when it's not defined
+#include "test.hpp"
 #include "vulkan_profiles.hpp"
 
-TEST(test_get_profiles, full) {
+TEST(api_get_profiles_beta, full) {
     uint32_t pPropertyCount = 0;
     vpGetProfiles(&pPropertyCount, nullptr);
-
-    EXPECT_EQ(2, pPropertyCount);
+    EXPECT_EQ(3, pPropertyCount);
 
     std::vector<VpProfileProperties> pProperties(pPropertyCount);
     vpGetProfiles(&pPropertyCount, &pProperties[0]);
-    EXPECT_EQ(2, pPropertyCount);
+    EXPECT_EQ(3, pPropertyCount);
 
     EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, pProperties[0].profileName);
     EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, pProperties[0].specVersion);
 
-    EXPECT_STREQ(VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, pProperties[1].profileName);
-    EXPECT_EQ(VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION, pProperties[1].specVersion);
+    EXPECT_STREQ(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME, pProperties[1].profileName);
+    EXPECT_EQ(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION, pProperties[1].specVersion);
+
+    EXPECT_STREQ(VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, pProperties[2].profileName);
+    EXPECT_EQ(VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION, pProperties[2].specVersion);
 }
 
-TEST(test_get_profiles, partial) {
+TEST(api_get_profiles_beta, partial) {
     uint32_t pPropertyCount = 0;
     vpGetProfiles(&pPropertyCount, nullptr);
-
-    EXPECT_EQ(2, pPropertyCount);
+    EXPECT_EQ(3, pPropertyCount);
 
     pPropertyCount = 1;
 
