@@ -98,9 +98,6 @@ add_definitions(-DAPI_NAME="${API_NAME}")
 # Library project
 add_subdirectory(library)
 
-# Layer project
-add_subdirectory(layer)
-
 add_subdirectory(vku)
 add_subdirectory(device_simulation)
 add_subdirectory(device_simulation_manual)
