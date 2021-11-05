@@ -26,10 +26,10 @@
 #define VP_MAX_PROFILE_NAME_SIZE 256U
 #define VP_MAX_VARIANT_NAME_SIZE 256U
 
-#define VP_KHR_1_2_roadmap_2022 1
-#define VP_KHR_1_2_ROADMAP_2022_NAME "VP_KHR_1_2_roadmap_2022"
-#define VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION 1
-#define VP_KHR_1_2_ROADMAP_2022_MIN_VERSION VK_MAKE_VERSION(1, 2, 189)
+#define VK_KHR_roadmap_2022 1
+#define VP_KHR_ROADMAP_2022_NAME "VP_KHR_roadmap_2022"
+#define VP_KHR_ROADMAP_2022_SPEC_VERSION 1
+#define VP_KHR_ROADMAP_2022_MIN_VERSION VK_MAKE_VERSION(1, 3, 200)
 
 #define VP_LUNARG_1_1_desktop_portability_2022 1
 #define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME "VP_LUNARG_1_1_desktop_portability_2022"
@@ -902,7 +902,7 @@ inline const void *_vpGetStructure(const void *pNext, VkStructureType type) {
 
 inline void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
     static const VpProfileProperties table[] = {
-        {VP_KHR_1_2_ROADMAP_2022_NAME, VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION},
+        {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION},
         {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION},
         {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION}};
 
@@ -948,7 +948,7 @@ inline void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pN
 
     VkStruct *p = static_cast<VkStruct *>(pNext);
 
-    if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+    if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
         while (p != nullptr) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {
@@ -1373,7 +1373,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
         return vkCreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : pCreateInfo->pCreateInfo, pAllocator, pDevice);
     } else if (strcmp(pCreateInfo->pProfile->profileName, "") == 0) {
         return vkCreateDevice(physicalDevice, pCreateInfo->pCreateInfo, pAllocator, pDevice);
-    } else if (strcmp(pCreateInfo->pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+    } else if (strcmp(pCreateInfo->pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
         std::vector<const char *> extensions;
         _vpGetExtensions(pCreateInfo, _vpCountOf(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS), &_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[0],
                          extensions);
@@ -1853,10 +1853,10 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
 
     *pSupported = VK_FALSE;
 
-    if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+    if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-        if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_KHR_1_2_ROADMAP_2022_MIN_VERSION)) return result;
+        if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_KHR_ROADMAP_2022_MIN_VERSION)) return result;
 
         VkBool32 extensionSupported = VK_TRUE;
         for (std::size_t i = 0, n = _vpCountOf(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS); i < n && extensionSupported; ++i) {
@@ -3049,7 +3049,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
 inline void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                             VkExtensionProperties *pProperties) {
     if (pProperties == nullptr) {
-        if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS);
         } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS);
@@ -3057,7 +3057,7 @@ inline void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile,
         return;
     }
 
-    if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+    if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
         for (std::size_t i = 0, n = std::min<std::size_t>(_vpCountOf(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS), *pPropertyCount); i < n;
              ++i) {
             pProperties[i] = _VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i];
@@ -3074,7 +3074,7 @@ inline void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile,
 inline void vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                             VpStructureProperties *pProperties) {
     if (pProperties == nullptr) {
-        if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_KHR_1_2_ROADMAP_2022_STRUCTURE_PROPERTIES);
         } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_STRUCTURE_PROPERTIES);
@@ -3082,7 +3082,7 @@ inline void vpGetProfileStructureProperties(const VpProfileProperties *pProfile,
         return;
     }
 
-    if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
+    if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
         std::size_t n = std::min<std::size_t>(_vpCountOf(_VP_KHR_1_2_ROADMAP_2022_STRUCTURE_PROPERTIES), *pPropertyCount);
         for (std::size_t i = 0; i < n; ++i) {
             pProperties[i] = _VP_KHR_1_2_ROADMAP_2022_STRUCTURE_PROPERTIES[i];

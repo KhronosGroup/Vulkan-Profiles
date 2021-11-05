@@ -1,12 +1,12 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.200.json#",
     "comments": {
-        "info": "Khronos Vulkan 1.3 roadmap 2022 profile",
+        "info": "Khronos Vulkan roadmap 2022 profile",
         "desc": "Collection on nonsensical features to test completeness"
     },
     "capabilities": [
         {
-            "name": "baseline",
+            "name": "common",
             "features": [
                 {
                     "struct": "VkPhysicalDeviceFeatures",
@@ -50,25 +50,6 @@
                         "vulkanMemoryModelAvailabilityVisibilityChains": true,
                         "subgroupBroadcastDynamicId": true,
                         "imagelessFramebuffer": true
-                    }
-                },
-                {
-                    "struct": "VkPhysicalDeviceVulkan13Features",
-                    "members": {
-                        "shaderTerminateInvocation": true,
-                        "synchronization2": true,
-                        "shaderZeroInitializeWorkgroupMem": true,
-                        "robustImageAccess": true,
-                        "inlineUniformBlock": true,
-                        "pipelineCreationCacheControl": true,
-                        "privateData": true,
-                        "shaderDemoteToHelperInvocation": true,
-                        "subgroupSizeControl": true,
-                        "computeFullSubgroups": true,
-                        "texelBufferAlignment": true,
-                        "formatA4R4G4B4": true,
-                        "formatA4B4G4R4": true,
-                        "extendedDynamicState2": true
                     }
                 }
             ],
@@ -262,14 +243,173 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "vulkan12",
+            "extensions": [
+                {
+                    "extensionName": "VK_KHR_shader_terminate_invocation",
+                    "specVersion": 1
+                },
+                {
+                    "extensionName": "VK_KHR_synchronization2",
+                    "specVersion": 1
+                },
+                {
+                    "extensionName": "VK_KHR_zero_initialize_workgroup_memory",
+                    "specVersion": 1
+                },
+                {
+                    "extensionName": "VK_EXT_image_robustness",
+                    "specVersion": 1
+                },
+                {
+                    "extensionName": "VK_EXT_inline_uniform_block",
+                    "specVersion": 1
+                },
+                {
+                    "extensionName": "VK_EXT_pipeline_creation_cache_control",
+                    "specVersion": 1
+                },
+                {
+                    "extensionName": "VK_EXT_private_data",
+                    "specVersion": 1
+                },
+                {
+                    "extensionName": "VK_EXT_shader_demote_to_helper_invocation",
+                    "specVersion": 1
+                },
+                {
+                    "extensionName": "VK_EXT_subgroup_size_control",
+                    "specVersion": 1
+                },
+                {
+                    "extensionName": "VK_EXT_texel_buffer_alignment",
+                    "specVersion": 1
+                },
+                {
+                    "extensionName": "VK_EXT_extended_dynamic_state2",
+                    "specVersion": 1
+                }
+            ],
+            "features": [
+                {
+                    "struct": "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR",
+                    "members": {
+                        "shaderTerminateInvocation": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDeviceSynchronization2FeaturesKHR",
+                    "members": {
+                        "shaderTerminateInvocation": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR",
+                    "members": {
+                        "shaderZeroInitializeWorkgroupMemory": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDeviceImageRobustnessFeaturesEXT",
+                    "members": {
+                        "robustImageAccess": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDeviceInlineUniformBlockFeaturesEXT",
+                    "members": {
+                        "inlineUniformBlock": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT",
+                    "members": {
+                        "pipelineCreationCacheControl": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDevicePrivateDataFeaturesEXT",
+                    "members": {
+                        "privateData": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT",
+                    "members": {
+                        "shaderDemoteToHelperInvocation": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT",
+                    "members": {
+                        "subgroupSizeControl": true,
+                        "computeFullSubgroups": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT",
+                    "members": {
+                        "texelBufferAlignment": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDeviceExtendedDynamicState2FeaturesEXT",
+                    "members": {
+                        "extendedDynamicState2": true
+                    }
+                },
+                {
+                    "struct": "VkPhysicalDevice4444FormatsFeaturesEXT",
+                    "members": {
+                        "formatA4R4G4B4": true,
+                        "formatA4B4G4R4": true
+                    }
+                }
+            ]
+        },
+        {
+            "name": "vulkan13",
+            "features": [
+                {
+                    "struct": "VkPhysicalDeviceVulkan13Features",
+                    "members": {
+                        "shaderTerminateInvocation": true,
+                        "synchronization2": true,
+                        "shaderZeroInitializeWorkgroupMem": true,
+                        "robustImageAccess": true,
+                        "inlineUniformBlock": true,
+                        "pipelineCreationCacheControl": true,
+                        "privateData": true,
+                        "shaderDemoteToHelperInvocation": true,
+                        "subgroupSizeControl": true,
+                        "computeFullSubgroups": true,
+                        "texelBufferAlignment": true,
+                        "formatA4R4G4B4": true,
+                        "formatA4B4G4R4": true,
+                        "extendedDynamicState2": true
+                    }
+                }
+            ]
         }
     ],
     "profiles": [
         {
-            "name": "VP_KHR_1_3_roadmap_2022",
+            "name": "VP_KHR_roadmap_2022",
             "api-version": "1.3.200",
             "capabilities": [
-                "baseline"
+                "common",
+                "vulkan13"
+            ],
+            "fallback": "VP_LUNARG_roadmap_2022_1_2"
+        },
+        {
+            "name": "VP_LUNARG_roadmap_2022_1_2",
+            "api-version": "1.2.189",
+            "capabilities": [
+                "common",
+                "vulkan12"
             ]
         }
     ]

@@ -604,7 +604,7 @@ TEST(test_profile, get_device_features) {
     deviceVulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
     deviceVulkan12Features.pNext = nullptr;
 
-    const VpProfileProperties Profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties Profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     vpGetProfileStructures(&Profile, &deviceVulkan12Features);
 
@@ -633,7 +633,7 @@ TEST(test_profile, get_device_features) {
 }
 
 TEST(test_profile, get_profile_extension_properties_full) {
-    const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
     vpGetProfileExtensionProperties(&profile, &propertyCount, nullptr);
@@ -657,7 +657,7 @@ TEST(test_profile, get_profile_extension_properties_full) {
 }
 
 TEST(test_profile, get_profile_extension_properties_partial) {
-    const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
     vpGetProfileExtensionProperties(&profile, &propertyCount, nullptr);
@@ -677,7 +677,7 @@ TEST(test_profile, get_profile_extension_properties_partial) {
 }
 
 TEST(test_profile, get_profile_structure_properties_full) {
-    const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
     vpGetProfileStructureProperties(&profile, &propertyCount, nullptr);
@@ -707,7 +707,7 @@ TEST(test_profile, get_profile_structure_properties_full) {
 }
 
 TEST(test_profile, get_profile_structure_properties_partial) {
-    const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t structureTypesCount = 0;
     vpGetProfileStructureProperties(&profile, &structureTypesCount, nullptr);
@@ -761,7 +761,7 @@ TEST(test_profile, get_profile_formats_partial) {
 }
 
 TEST(test_profile, get_profile_formats_unspecified) {
-    const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t formatCount = 0;
     vpGetProfileFormats(&profile, &formatCount, nullptr);
@@ -853,7 +853,7 @@ TEST(test_profile, get_profile_memory_types_partial) {
 }
 
 TEST(test_profile, get_profile_memory_types_unspecified) {
-    const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t memoryPropertyFlagsCount = 0;
     vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, nullptr);
@@ -881,7 +881,7 @@ TEST(test_profile, get_profile_queue_families_full) {
 }
 
 TEST(test_profile, get_profile_queue_families_unspecified) {
-    const VpProfileProperties profile = {VP_KHR_1_2_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t count = 0;
     vpGetProfileQueueFamilies(&profile, &count, nullptr);
@@ -897,8 +897,8 @@ TEST(test_profile, get_profiles_full) {
     vpGetProfiles(&pPropertyCount, &pProperties[0]);
     EXPECT_EQ(3, pPropertyCount);
 
-    EXPECT_STREQ(VP_KHR_1_2_ROADMAP_2022_NAME, pProperties[0].profileName);
-    EXPECT_EQ(VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION, pProperties[0].specVersion);
+    EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, pProperties[0].profileName);
+    EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, pProperties[0].specVersion);
 
     EXPECT_STREQ(VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, pProperties[1].profileName);
     EXPECT_EQ(VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION, pProperties[1].specVersion);
@@ -918,6 +918,6 @@ TEST(test_profile, get_profiles_partial) {
     vpGetProfiles(&pPropertyCount, &pProperties[0]);
     EXPECT_EQ(1, pPropertyCount);
 
-    EXPECT_STREQ(VP_KHR_1_2_ROADMAP_2022_NAME, pProperties[0].profileName);
-    EXPECT_EQ(VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION, pProperties[0].specVersion);
+    EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, pProperties[0].profileName);
+    EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, pProperties[0].specVersion);
 }
