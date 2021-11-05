@@ -1902,6 +1902,7 @@
 		{
 			"name": "VP_LUNARG_1_1_desktop_portability_2022_subset",
 			"version": 1,
+			"status": "BETA",
 			"api-version": "1.1.142",
 			"requirements": [
 				"baseline",

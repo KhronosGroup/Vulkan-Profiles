@@ -7,9 +7,14 @@
     "required": [
         "comments",
         "capabilities",
-        "variants"
+        "profiles"
     ],
     "definitions": {
+        "status": {
+            "description": "The development status of the setting. When missing, this property is inherited from parent nodes. If no parent node defines it, the default value is 'STABLE'.",
+            "type": "string",
+            "enum": [ "ALPHA", "BETA", "STABLE", "DEPRECATED" ]
+        },
         "uint8_t": {
             "type": "integer",
             "minimum": 0,
@@ -815,7 +820,7 @@
                 }
             }
         },
-        "variants": {
+        "profiles": {
             "description": "TODO",
             "type": "array",
             "items": {
@@ -834,6 +839,9 @@
                     "version": {
                         "description": "TODO",
                         "type": "integer"
+                    },
+                    "status": {
+                        "$ref": "#/definitions/status"
                     },
                     "api-version": {
                         "description": "TODO",
