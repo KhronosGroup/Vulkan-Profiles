@@ -5,13 +5,16 @@
     "description": "TODO",
     "additionalProperties": true,
     "required": [
-        "name",
-        "version",
         "comments",
         "capabilities",
-        "variants"
+        "profiles"
     ],
     "definitions": {
+        "status": {
+            "description": "The development status of the setting. When missing, this property is inherited from parent nodes. If no parent node defines it, the default value is 'STABLE'.",
+            "type": "string",
+            "enum": [ "ALPHA", "BETA", "STABLE", "DEPRECATED" ]
+        },
         "uint8_t": {
             "type": "integer",
             "minimum": 0,
@@ -624,15 +627,6 @@
         }
     },
     "properties": {
-        "name": {
-            "description": "The string used to uniquely identify this layer to applications.",
-            "type": "string",
-            "pattern": "^VP_[A-Z0-9]+_[A-Za-z0-9_]+"
-        },
-        "version": {
-            "description": "TODO",
-            "type": "integer"
-        },
         "comments": {
             "description": "TODO",
             "type": "object",
@@ -826,7 +820,7 @@
                 }
             }
         },
-        "variants": {
+        "profiles": {
             "description": "TODO",
             "type": "array",
             "items": {
@@ -834,19 +828,27 @@
                 "required": [
                     "name",
                     "api-version",
-                    "requirements"
+                    "capabilities"
                 ],
                 "properties": {
                     "name": {
                         "description": "TODO",
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^VP_[A-Z0-9]+_[A-Za-z0-9_]+"
+                    },
+                    "version": {
+                        "description": "TODO",
+                        "type": "integer"
+                    },
+                    "status": {
+                        "$ref": "#/definitions/status"
                     },
                     "api-version": {
                         "description": "TODO",
                         "type": "string",
                         "pattern": "^[0-9]+.[0-9]+.[0-9]+$"
                     },
-                    "requirements": {
+                    "capabilities": {
                         "description": "TODO",
                         "type": "array",
                         "items": {

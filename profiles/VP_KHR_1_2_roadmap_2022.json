@@ -1,7 +1,5 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
-    "name": "VP_KHR_1_2_roadmap_2022",
-    "version": 1,
     "comments": {
         "info": "Khronos Vulkan 1.2 roadmap 2022 Profile",
         "desc": "Collection on nonsensical features to test completeness"
@@ -367,11 +365,12 @@
             ]
         }
     ],
-    "variants": [
+    "profiles": [
         {
             "name": "VP_KHR_1_2_roadmap_2022",
-            "api-version": "1.3.200",
-            "requirements": [
+            "version": 1,
+            "api-version": "1.2.189",
+            "capabilities": [
                 "baseline"
             ]
         }
