@@ -31,15 +31,15 @@
 #define VP_KHR_ROADMAP_2022_SPEC_VERSION 1
 #define VP_KHR_ROADMAP_2022_MIN_VERSION VK_MAKE_VERSION(1, 3, 200)
 
-#define VP_LUNARG_1_1_desktop_portability_2022 1
-#define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME "VP_LUNARG_1_1_desktop_portability_2022"
-#define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION 1
-#define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
+#define VP_LUNARG_desktop_portability_2022 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME "VP_LUNARG_desktop_portability_2022"
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
 
-#define VP_LUNARG_1_1_desktop_portability_2022_subset 1
-#define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME "VP_LUNARG_1_1_desktop_portability_2022_subset"
-#define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION 1
-#define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
+#define VP_LUNARG_desktop_portability_2022_subset 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME "VP_LUNARG_desktop_portability_2022_subset"
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
 
 typedef struct VpProfileProperties {
     char profileName[VP_MAX_PROFILE_NAME_SIZE];
@@ -903,8 +903,8 @@ inline const void *_vpGetStructure(const void *pNext, VkStructureType type) {
 inline void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
     static const VpProfileProperties table[] = {
         {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION},
-        {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION},
-        {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION}};
+        {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION},
+        {VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION}};
 
     if (pProperties == nullptr) {
         *pPropertyCount = _vpCountOf(table);
@@ -918,10 +918,10 @@ inline void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProper
 
 inline void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
     static const VpProfileProperties VP_LUNARG_1_1_desktop_portability_2022_subset_fallbacks[] = {
-        {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION}};
+        {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION}};
 
     if (pProperties == nullptr) {
-        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
             *pPropertyCount = _vpCountOf(VP_LUNARG_1_1_desktop_portability_2022_subset_fallbacks);
         } else {
             *pPropertyCount = 0;
@@ -929,7 +929,7 @@ inline void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t 
         return;
     }
 
-    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
         for (std::size_t i = 0, n = std::min<std::size_t>(_vpCountOf(VP_LUNARG_1_1_desktop_portability_2022_subset_fallbacks),
                                                           *pPropertyCount);
              i < n; ++i) {
@@ -1085,8 +1085,8 @@ inline void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pN
             }
             p = static_cast<VkStruct *>(p->pNext);
         }
-    } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0 ||
-               strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+    } else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0 ||
+               strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
         while (p != nullptr) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {
@@ -1190,7 +1190,7 @@ inline void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pN
                 } break;
 #ifdef VK_ENABLE_BETA_EXTENSIONS
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR: {
-                    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+                    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
                         VkPhysicalDevicePortabilitySubsetFeaturesKHR *features = (VkPhysicalDevicePortabilitySubsetFeaturesKHR *)p;
                         features->vertexAttributeAccessBeyondStride = VK_TRUE;
                         features->separateStencilMaskRef = VK_TRUE;
@@ -1203,7 +1203,7 @@ inline void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pN
                     }
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR: {
-                    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+                    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
                         VkPhysicalDevicePortabilitySubsetPropertiesKHR *properties =
                             (VkPhysicalDevicePortabilitySubsetPropertiesKHR *)p;
                         properties->minVertexInputBindingStrideAlignment = 4;
@@ -1597,7 +1597,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
         deviceCreateInfo.pEnabledFeatures =
             pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr ? &deviceFeatures2.features : nullptr;
         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
-    } else if (strcmp(pCreateInfo->pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+    } else if (strcmp(pCreateInfo->pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         std::vector<const char *> extensions;
         _vpGetExtensions(pCreateInfo, _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
                          &_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
@@ -2202,15 +2202,15 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
             return result;
         }
 
-    } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0 ||
-               strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+    } else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0 ||
+               strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-        if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_MIN_API_VERSION))
+        if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION))
             return result;
 
         VkBool32 extensionSupported = VK_TRUE;
-        if (strcmp(VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, pProfile->profileName) == 0) {
+        if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, pProfile->profileName) == 0) {
             for (std::size_t i = 0, n = _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS); i < n && extensionSupported;
                  ++i) {
                 const VkExtensionProperties &extensionProperties = _VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
@@ -2224,7 +2224,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
                     extensionSupported = VK_FALSE;
                 }
             }
-        } else if (strcmp(VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME, pProfile->profileName) == 0) {
+        } else if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME, pProfile->profileName) == 0) {
             for (std::size_t i = 0, n = _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_EXTENSIONS); i < n && extensionSupported;
                  ++i) {
                 const VkExtensionProperties &extensionProperties = _VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_EXTENSIONS[i];
@@ -2300,7 +2300,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         VkPhysicalDevicePortabilitySubsetFeaturesKHR devicePortabilitySubset = {};
         devicePortabilitySubset.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR;
-        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
             devicePortabilitySubset.pNext = pNext;
             pNext = &devicePortabilitySubset;
         }
@@ -2359,7 +2359,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         VkPhysicalDevicePortabilitySubsetFeaturesKHR profilePortabilitySubset = {};
         profilePortabilitySubset.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR;
-        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
             profilePortabilitySubset.pNext = pNext;
             pNext = &profilePortabilitySubset;
         }
@@ -2561,7 +2561,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
         }
 
 #ifdef VK_ENABLE_BETA_EXTENSIONS
-        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
             if (devicePortabilitySubset.vertexAttributeAccessBeyondStride !=
                 profilePortabilitySubset.vertexAttributeAccessBeyondStride) {
                 return result;
@@ -2590,7 +2590,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         VkPhysicalDevicePortabilitySubsetPropertiesKHR devicePortabilitySubsetProperties = {};
         devicePortabilitySubsetProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR;
-        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
             devicePortabilitySubsetProperties.pNext = pNext;
             pNext = &devicePortabilitySubsetProperties;
         }
@@ -2625,7 +2625,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         VkPhysicalDevicePortabilitySubsetPropertiesKHR profilePortabilitySubsetProperties = {};
         profilePortabilitySubsetProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR;
-        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
             profilePortabilitySubsetProperties.pNext = pNext;
             pNext = &profilePortabilitySubsetProperties;
         }
@@ -3032,7 +3032,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
             return result;
         }
 #ifdef VK_ENABLE_BETA_EXTENSIONS
-        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
             if (devicePortabilitySubsetProperties.minVertexInputBindingStrideAlignment <
                 profilePortabilitySubsetProperties.minVertexInputBindingStrideAlignment) {
                 return result;
@@ -3051,7 +3051,7 @@ inline void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile,
     if (pProperties == nullptr) {
         if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS);
-        } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        } else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS);
         }
         return;
@@ -3062,7 +3062,7 @@ inline void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile,
              ++i) {
             pProperties[i] = _VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[i];
         }
-    } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+    } else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         for (std::size_t i = 0,
                          n = std::min<std::size_t>(_vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS), *pPropertyCount);
              i < n; ++i) {
@@ -3076,7 +3076,7 @@ inline void vpGetProfileStructureProperties(const VpProfileProperties *pProfile,
     if (pProperties == nullptr) {
         if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_KHR_1_2_ROADMAP_2022_STRUCTURE_PROPERTIES);
-        } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        } else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_STRUCTURE_PROPERTIES);
         }
         return;
@@ -3087,7 +3087,7 @@ inline void vpGetProfileStructureProperties(const VpProfileProperties *pProfile,
         for (std::size_t i = 0; i < n; ++i) {
             pProperties[i] = _VP_KHR_1_2_ROADMAP_2022_STRUCTURE_PROPERTIES[i];
         }
-    } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+    } else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         std::size_t n =
             std::min<std::size_t>(_vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_STRUCTURE_PROPERTIES), *pPropertyCount);
         for (std::size_t i = 0; i < n; ++i) {
@@ -3098,7 +3098,7 @@ inline void vpGetProfileStructureProperties(const VpProfileProperties *pProfile,
 
 inline void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormat) {
     if (pFormat == nullptr) {
-        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             *pFormatCount = _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS);
         } else {
             *pFormatCount = 0;
@@ -3106,7 +3106,7 @@ inline void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *p
         return;
     }
 
-    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         std::size_t n = std::min<std::size_t>(_vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS), *pFormatCount);
         for (std::size_t i = 0; i < n; ++i) {
             pFormat[i] = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[i].format;
@@ -3126,7 +3126,7 @@ inline void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, Vk
 
     VkStruct *p = static_cast<VkStruct *>(pNext);
 
-    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         for (std::size_t i = 0, n = _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS); i < n; ++i) {
             const VpFormatProperties &props = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_FORMATS[i];
             if (props.format != format) continue;
@@ -3157,7 +3157,7 @@ inline void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, Vk
 inline void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryPropertyFlagsCount,
                                     VkMemoryPropertyFlags *pMemoryPropertyFlags) {
     if (pMemoryPropertyFlags == nullptr) {
-        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             *pMemoryPropertyFlagsCount = _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES);
         } else {
             *pMemoryPropertyFlagsCount = 0;
@@ -3165,7 +3165,7 @@ inline void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_
         return;
     }
 
-    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         std::size_t n =
             std::min<std::size_t>(_vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_MEMORY_TYPES), *pMemoryPropertyFlagsCount);
         for (std::size_t i = 0; i < n; ++i) {
@@ -3177,7 +3177,7 @@ inline void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_
 inline void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
                                       VkQueueFamilyProperties *pQueueFamilyProperties) {
     if (pQueueFamilyProperties == nullptr) {
-        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             *pQueueFamilyPropertiesCount = _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES);
         } else {
             *pQueueFamilyPropertiesCount = 0;
@@ -3185,7 +3185,7 @@ inline void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint3
         return;
     }
 
-    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         std::size_t n = std::min<std::size_t>(_vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES),
                                               *pQueueFamilyPropertiesCount);
         for (std::size_t i = 0; i < n; ++i) {
