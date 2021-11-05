@@ -1866,7 +1866,11 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
 
     *pSupported = VK_FALSE;
 
-    if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
+    if (strcmp(VP_KHR_ROADMAP_2022_NAME, pProfile->profileName) == 0) {
+        if (VP_KHR_ROADMAP_2022_SPEC_VERSION < pProfile->specVersion) {
+            return result;
+        }
+
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(physicalDevice, &properties);
         if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_KHR_ROADMAP_2022_MIN_VERSION)) return result;
@@ -2215,15 +2219,39 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
             return result;
         }
 
-    } else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0
+    } else if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, pProfile->profileName) == 0
 #ifdef VK_ENABLE_BETA_EXTENSIONS
-               || strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0
+               || strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME, pProfile->profileName) == 0
 #endif
     ) {
+        if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, pProfile->profileName) == 0) {
+            if (VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION < pProfile->specVersion) {
+                return result;
+            }
+        } 
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        else if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME, pProfile->profileName) == 0) {
+            if (VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION < pProfile->specVersion) {
+                return result;
+            }
+        }
+#endif
+
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-        if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION))
-            return result;
+        if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, pProfile->profileName) == 0) {
+            if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION)) {
+                return result;
+            }
+        } 
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        else if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME, pProfile->profileName) == 0) {
+            if (VK_VERSION_PATCH(properties.apiVersion) <
+                VK_VERSION_PATCH(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_MIN_API_VERSION)) {
+                return result;
+            }
+        }
+#endif
 
         VkBool32 extensionSupported = VK_TRUE;
         if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, pProfile->profileName) == 0) {
@@ -3059,6 +3087,8 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
             }
         }
 #endif
+    } else {
+        return result;
     }
 
     *pSupported = VK_TRUE;
