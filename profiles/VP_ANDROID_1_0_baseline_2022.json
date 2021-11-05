@@ -1982,7 +1982,7 @@
             ]
         }
     ],
-    "variants": [
+    "profiles": [
         {
             "name": "VP_ANDROID_1_0_baseline_2022",
             "api-version": "1.0.30",

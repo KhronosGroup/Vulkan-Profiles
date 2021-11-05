@@ -365,7 +365,7 @@
             ]
         }
     ],
-    "variants": [
+    "profiles": [
         {
             "name": "VP_KHR_1_2_roadmap_2022",
             "version": 1,
