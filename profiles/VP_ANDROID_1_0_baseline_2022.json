@@ -1984,7 +1984,7 @@
     ],
     "variants": [
         {
-            "name": "Android 1.0 Baseline 2020",
+            "name": "VP_ANDROID_1_0_baseline_2022",
             "api-version": "1.0.30",
             "requirements": [
                 "baseline"

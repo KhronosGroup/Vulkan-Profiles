@@ -19,21 +19,27 @@
 
 #include <vulkan/vulkan_core.h>
 #include <algorithm>
-#if defined(__APPLE__)
+#ifdef VK_ENABLE_BETA_EXTENSIONS
 #include <vulkan/vulkan_beta.h>
 #endif
 
 #define VP_MAX_PROFILE_NAME_SIZE 256U
+#define VP_MAX_VARIANT_NAME_SIZE 256U
 
 #define VP_KHR_1_2_roadmap_2022 1
-#define VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION 1
 #define VP_KHR_1_2_ROADMAP_2022_NAME "VP_KHR_1_2_roadmap_2022"
+#define VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION 1
 #define VP_KHR_1_2_ROADMAP_2022_MIN_VERSION VK_MAKE_VERSION(1, 2, 189)
 
 #define VP_LUNARG_1_1_desktop_portability_2022 1
-#define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION 1
 #define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME "VP_LUNARG_1_1_desktop_portability_2022"
+#define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION 1
 #define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
+
+#define VP_LUNARG_1_1_desktop_portability_2022_subset 1
+#define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME "VP_LUNARG_1_1_desktop_portability_2022_subset"
+#define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION 1
+#define VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
 
 typedef struct VpProfileProperties {
     char profileName[VP_MAX_PROFILE_NAME_SIZE];
@@ -62,6 +68,9 @@ typedef struct VpDeviceCreateInfo {
 
 // Query the list of available profiles in the library
 void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+
+// List the recommand fallback profiles of a profile
+void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // Check whether a profile is supported by the physical device
 VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
@@ -124,7 +133,7 @@ static const VkExtensionProperties _VP_KHR_1_2_ROADMAP_2022_EXTENSIONS[] = {
     VkExtensionProperties{VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, 1}};
 
-static const VkExtensionProperties _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[] = {
+static const VkExtensionProperties _VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[] = {
     // Vulkan 1.2 extensions
     VkExtensionProperties{VK_KHR_8BIT_STORAGE_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, 1},
@@ -143,12 +152,37 @@ static const VkExtensionProperties _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIO
     VkExtensionProperties{VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, 1},
 
-// Additional Vulkan extensions
-// VkExtensionProperties{VK_KHR_SWAPCHAIN_EXTENSION_NAME, 70}, VkExtensionProperties{VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME,
-// 1},
-#if defined(__APPLE__)
-    VkExtensionProperties{VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, 1},  // MacOS only
+    VkExtensionProperties{VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
+                          1},  // Not supported by Intel 520 https://vulkan.gpuinfo.org/displayreport.php?id=12491#extensions
+    VkExtensionProperties{VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 1}};
+
+static const VkExtensionProperties _VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_EXTENSIONS[] = {
+    // Vulkan 1.2 extensions
+    VkExtensionProperties{VK_KHR_8BIT_STORAGE_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME,
+                          1},  // Not supported by Intel 6000 https://vulkan.gpuinfo.org/displayreport.php?id=11332#extensions
+    VkExtensionProperties{VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME,
+                          1},  // Not supported by Intel 6000 https://vulkan.gpuinfo.org/displayreport.php?id=11332#extensions
+    VkExtensionProperties{VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, 1},
+
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+    VkExtensionProperties{VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, 1}, 
 #endif
+
     VkExtensionProperties{VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
                           1},  // Not supported by Intel 520 https://vulkan.gpuinfo.org/displayreport.php?id=12491#extensions
     VkExtensionProperties{VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, 1},
@@ -869,7 +903,8 @@ inline const void *_vpGetStructure(const void *pNext, VkStructureType type) {
 inline void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
     static const VpProfileProperties table[] = {
         {VP_KHR_1_2_ROADMAP_2022_NAME, VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION},
-        {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION}};
+        {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION},
+        {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION}};
 
     if (pProperties == nullptr) {
         *pPropertyCount = _vpCountOf(table);
@@ -878,6 +913,28 @@ inline void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProper
 
     for (std::size_t i = 0, n = std::min<std::size_t>(_vpCountOf(table), *pPropertyCount); i < n; ++i) {
         pProperties[i] = table[i];
+    }
+}
+
+inline void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
+    static const VpProfileProperties VP_LUNARG_1_1_desktop_portability_2022_subset_fallbacks[] = {
+        {VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION}};
+
+    if (pProperties == nullptr) {
+        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+            *pPropertyCount = _vpCountOf(VP_LUNARG_1_1_desktop_portability_2022_subset_fallbacks);
+        } else {
+            *pPropertyCount = 0;
+        }
+        return;
+    }
+
+    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+        for (std::size_t i = 0, n = std::min<std::size_t>(_vpCountOf(VP_LUNARG_1_1_desktop_portability_2022_subset_fallbacks),
+                                                          *pPropertyCount);
+             i < n; ++i) {
+            pProperties[i] = VP_LUNARG_1_1_desktop_portability_2022_subset_fallbacks[i];
+        }
     }
 }
 
@@ -1028,7 +1085,8 @@ inline void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pN
             }
             p = static_cast<VkStruct *>(p->pNext);
         }
-    } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+    } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0 ||
+               strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
         while (p != nullptr) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {
@@ -1130,23 +1188,26 @@ inline void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pN
                     features->variablePointersStorageBuffer = VK_TRUE;
                     features->variablePointers = VK_TRUE;
                 } break;
-#if defined(__APPLE__)
+#ifdef VK_ENABLE_BETA_EXTENSIONS
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR: {
-                    VkPhysicalDevicePortabilitySubsetFeaturesKHR *features = (VkPhysicalDevicePortabilitySubsetFeaturesKHR *)p;
-                    features->vertexAttributeAccessBeyondStride = VK_TRUE;
-                    features->separateStencilMaskRef = VK_TRUE;
-                    features->mutableComparisonSamplers = VK_TRUE;
-                    features->multisampleArrayImage = VK_TRUE;
-                    features->imageViewFormatSwizzle = VK_TRUE;
-                    features->imageViewFormatReinterpretation = VK_TRUE;
-                    features->events = VK_TRUE;
-                    features->constantAlphaColorBlendFactors = VK_TRUE;
+                    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+                        VkPhysicalDevicePortabilitySubsetFeaturesKHR *features = (VkPhysicalDevicePortabilitySubsetFeaturesKHR *)p;
+                        features->vertexAttributeAccessBeyondStride = VK_TRUE;
+                        features->separateStencilMaskRef = VK_TRUE;
+                        features->mutableComparisonSamplers = VK_TRUE;
+                        features->multisampleArrayImage = VK_TRUE;
+                        features->imageViewFormatSwizzle = VK_TRUE;
+                        features->imageViewFormatReinterpretation = VK_TRUE;
+                        features->events = VK_TRUE;
+                        features->constantAlphaColorBlendFactors = VK_TRUE;
+                    }
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR: {
-                    VkPhysicalDevicePortabilitySubsetPropertiesKHR *properties =
-                        (VkPhysicalDevicePortabilitySubsetPropertiesKHR *)p;
-                    properties->minVertexInputBindingStrideAlignment = 4;
-
+                    if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+                        VkPhysicalDevicePortabilitySubsetPropertiesKHR *properties =
+                            (VkPhysicalDevicePortabilitySubsetPropertiesKHR *)p;
+                        properties->minVertexInputBindingStrideAlignment = 4;
+                    }
                 } break;
 #endif
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES: {
@@ -1538,8 +1599,8 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
     } else if (strcmp(pCreateInfo->pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         std::vector<const char *> extensions;
-        _vpGetExtensions(pCreateInfo, _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
-                         &_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
+        _vpGetExtensions(pCreateInfo, _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                         &_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
 
         void *pProfileNext = nullptr;
         void *pRoot = const_cast<void *>(pCreateInfo->pCreateInfo->pNext);
@@ -2141,23 +2202,41 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
             return result;
         }
 
-    } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+    } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0 ||
+               strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(physicalDevice, &properties);
         if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_MIN_API_VERSION))
             return result;
 
         VkBool32 extensionSupported = VK_TRUE;
-        for (std::size_t i = 0, n = _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS); i < n && extensionSupported; ++i) {
-            const VkExtensionProperties &extensionProperties = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
+        if (strcmp(VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME, pProfile->profileName) == 0) {
+            for (std::size_t i = 0, n = _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS); i < n && extensionSupported;
+                 ++i) {
+                const VkExtensionProperties &extensionProperties = _VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
 
-            const bool supportedInstanceExt =
-                _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(), extensionProperties.extensionName);
-            const bool supportedDeviceExt =
-                _vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(), extensionProperties.extensionName);
+                const bool supportedInstanceExt =
+                    _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(), extensionProperties.extensionName);
+                const bool supportedDeviceExt =
+                    _vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(), extensionProperties.extensionName);
 
-            if (!supportedInstanceExt && !supportedDeviceExt) {
-                extensionSupported = VK_FALSE;
+                if (!supportedInstanceExt && !supportedDeviceExt) {
+                    extensionSupported = VK_FALSE;
+                }
+            }
+        } else if (strcmp(VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME, pProfile->profileName) == 0) {
+            for (std::size_t i = 0, n = _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_EXTENSIONS); i < n && extensionSupported;
+                 ++i) {
+                const VkExtensionProperties &extensionProperties = _VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_EXTENSIONS[i];
+
+                const bool supportedInstanceExt =
+                    _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(), extensionProperties.extensionName);
+                const bool supportedDeviceExt =
+                    _vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(), extensionProperties.extensionName);
+
+                if (!supportedInstanceExt && !supportedDeviceExt) {
+                    extensionSupported = VK_FALSE;
+                }
             }
         }
 
@@ -2218,11 +2297,13 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
 
         void *pNext = nullptr;
 
-#if defined(__APPLE__)
+#ifdef VK_ENABLE_BETA_EXTENSIONS
         VkPhysicalDevicePortabilitySubsetFeaturesKHR devicePortabilitySubset = {};
         devicePortabilitySubset.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR;
-        devicePortabilitySubset.pNext = pNext;
-        pNext = &devicePortabilitySubset;
+        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+            devicePortabilitySubset.pNext = pNext;
+            pNext = &devicePortabilitySubset;
+        }
 #endif
 
         VkPhysicalDeviceSamplerYcbcrConversionFeatures deviceSamplerYcbcrConversionFeatures = {};
@@ -2275,11 +2356,13 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
 
         vkGetPhysicalDeviceFeatures2(physicalDevice, &deviceFeatures);
 
-#if defined(__APPLE__)
+#ifdef VK_ENABLE_BETA_EXTENSIONS
         VkPhysicalDevicePortabilitySubsetFeaturesKHR profilePortabilitySubset = {};
         profilePortabilitySubset.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR;
-        profilePortabilitySubset.pNext = pNext;
-        pNext = &profilePortabilitySubset;
+        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+            profilePortabilitySubset.pNext = pNext;
+            pNext = &profilePortabilitySubset;
+        }
 #endif
 
         VkPhysicalDeviceSamplerYcbcrConversionFeatures profileSamplerYcbcrConversionFeatures = {};
@@ -2477,36 +2560,40 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
             return result;
         }
 
-#if defined(__APPLE__)
-        if (devicePortabilitySubset.vertexAttributeAccessBeyondStride !=
-            profilePortabilitySubset.vertexAttributeAccessBeyondStride) {
-            return result;
-        } else if (devicePortabilitySubset.separateStencilMaskRef != profilePortabilitySubset.separateStencilMaskRef) {
-            return result;
-        } else if (devicePortabilitySubset.mutableComparisonSamplers != profilePortabilitySubset.mutableComparisonSamplers) {
-            return result;
-        } else if (devicePortabilitySubset.multisampleArrayImage != profilePortabilitySubset.multisampleArrayImage) {
-            return result;
-        } else if (devicePortabilitySubset.imageViewFormatSwizzle != profilePortabilitySubset.imageViewFormatSwizzle) {
-            return result;
-        } else if (devicePortabilitySubset.imageViewFormatReinterpretation !=
-                   profilePortabilitySubset.imageViewFormatReinterpretation) {
-            return result;
-        } else if (devicePortabilitySubset.events != profilePortabilitySubset.events) {
-            return result;
-        } else if (devicePortabilitySubset.constantAlphaColorBlendFactors !=
-                   profilePortabilitySubset.constantAlphaColorBlendFactors) {
-            return result;
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+            if (devicePortabilitySubset.vertexAttributeAccessBeyondStride !=
+                profilePortabilitySubset.vertexAttributeAccessBeyondStride) {
+                return result;
+            } else if (devicePortabilitySubset.separateStencilMaskRef != profilePortabilitySubset.separateStencilMaskRef) {
+                return result;
+            } else if (devicePortabilitySubset.mutableComparisonSamplers != profilePortabilitySubset.mutableComparisonSamplers) {
+                return result;
+            } else if (devicePortabilitySubset.multisampleArrayImage != profilePortabilitySubset.multisampleArrayImage) {
+                return result;
+            } else if (devicePortabilitySubset.imageViewFormatSwizzle != profilePortabilitySubset.imageViewFormatSwizzle) {
+                return result;
+            } else if (devicePortabilitySubset.imageViewFormatReinterpretation !=
+                       profilePortabilitySubset.imageViewFormatReinterpretation) {
+                return result;
+            } else if (devicePortabilitySubset.events != profilePortabilitySubset.events) {
+                return result;
+            } else if (devicePortabilitySubset.constantAlphaColorBlendFactors !=
+                       profilePortabilitySubset.constantAlphaColorBlendFactors) {
+                return result;
+            }
         }
 #endif
 
         pNext = nullptr;
 
-#if defined(__APPLE__)
+#ifdef VK_ENABLE_BETA_EXTENSIONS
         VkPhysicalDevicePortabilitySubsetPropertiesKHR devicePortabilitySubsetProperties = {};
         devicePortabilitySubsetProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR;
-        devicePortabilitySubsetProperties.pNext = pNext;
-        pNext = &devicePortabilitySubsetProperties;
+        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+            devicePortabilitySubsetProperties.pNext = pNext;
+            pNext = &devicePortabilitySubsetProperties;
+        }
 #endif
 
         VkPhysicalDeviceMaintenance3Properties deviceMaintenance3Properties = {};
@@ -2535,11 +2622,13 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
 
         vkGetPhysicalDeviceProperties2(physicalDevice, &deviceProperties);
 
-#if defined(__APPLE__)
+#ifdef VK_ENABLE_BETA_EXTENSIONS
         VkPhysicalDevicePortabilitySubsetPropertiesKHR profilePortabilitySubsetProperties = {};
         profilePortabilitySubsetProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR;
-        profilePortabilitySubsetProperties.pNext = pNext;
-        pNext = &profilePortabilitySubsetProperties;
+        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+            profilePortabilitySubsetProperties.pNext = pNext;
+            pNext = &profilePortabilitySubsetProperties;
+        }
 #endif
 
         VkPhysicalDeviceMaintenance3Properties profileMaintenance3Properties = {};
@@ -2942,10 +3031,12 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
         } else if (deviceMaintenance3Properties.maxMemoryAllocationSize < profileMaintenance3Properties.maxMemoryAllocationSize) {
             return result;
         }
-#if defined(__APPLE__)
-        else if (devicePortabilitySubsetProperties.minVertexInputBindingStrideAlignment <
-                 profilePortabilitySubsetProperties.minVertexInputBindingStrideAlignment) {
-            return result;
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+            if (devicePortabilitySubsetProperties.minVertexInputBindingStrideAlignment <
+                profilePortabilitySubsetProperties.minVertexInputBindingStrideAlignment) {
+                return result;
+            }
         }
 #endif
     }
@@ -2961,7 +3052,7 @@ inline void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile,
         if (strcmp(pProfile->profileName, VP_KHR_1_2_ROADMAP_2022_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_KHR_1_2_ROADMAP_2022_EXTENSIONS);
         } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
-            *pPropertyCount = _vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS);
+            *pPropertyCount = _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS);
         }
         return;
     }
@@ -2973,9 +3064,9 @@ inline void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile,
         }
     } else if (strcmp(pProfile->profileName, VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME) == 0) {
         for (std::size_t i = 0,
-                         n = std::min<std::size_t>(_vpCountOf(_VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS), *pPropertyCount);
+                         n = std::min<std::size_t>(_vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS), *pPropertyCount);
              i < n; ++i) {
-            pProperties[i] = _VP_KHR_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
+            pProperties[i] = _VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
         }
     }
 }

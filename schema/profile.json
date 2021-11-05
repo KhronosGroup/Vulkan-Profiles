@@ -5,8 +5,6 @@
     "description": "TODO",
     "additionalProperties": true,
     "required": [
-        "name",
-        "version",
         "comments",
         "capabilities",
         "variants"
@@ -624,15 +622,6 @@
         }
     },
     "properties": {
-        "name": {
-            "description": "The string used to uniquely identify this layer to applications.",
-            "type": "string",
-            "pattern": "^VP_[A-Z0-9]+_[A-Za-z0-9_]+"
-        },
-        "version": {
-            "description": "TODO",
-            "type": "integer"
-        },
         "comments": {
             "description": "TODO",
             "type": "object",
@@ -839,7 +828,12 @@
                 "properties": {
                     "name": {
                         "description": "TODO",
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^VP_[A-Z0-9]+_[A-Za-z0-9_]+"
+                    },
+                    "version": {
+                        "description": "TODO",
+                        "type": "integer"
                     },
                     "api-version": {
                         "description": "TODO",
