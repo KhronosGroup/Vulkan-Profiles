@@ -343,3 +343,36 @@ TEST(test_library_util, _vpGetExtensions) {
         EXPECT_EQ(0, extensions.size());
     }
 }
+
+TEST(test_library_util, check_extension_not_found) {
+    static const char *EXTENSIONS[] = {VK_KHR_MAINTENANCE_3_EXTENSION_NAME, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME};
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = nullptr;
+    info.pEnabledFeatures = nullptr;
+    info.enabledExtensionCount = _vpCountOf(EXTENSIONS);
+    info.ppEnabledExtensionNames = EXTENSIONS;
+
+    for (std::size_t i = 0, n = info.enabledExtensionCount; i < n; ++i) {
+        EXPECT_FALSE(_vpCheckExtension(&_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0],
+                                       _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                                       info.ppEnabledExtensionNames[i]));
+    }
+}
+
+TEST(test_library_util, check_extension_found) {
+    static const char *EXTENSIONS[] = {VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME};
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = nullptr;
+    info.pEnabledFeatures = nullptr;
+    info.enabledExtensionCount = _vpCountOf(EXTENSIONS);
+    info.ppEnabledExtensionNames = EXTENSIONS;
+
+    for (std::size_t i = 0, n = info.enabledExtensionCount; i < n; ++i) {
+        EXPECT_TRUE(_vpCheckExtension(&_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0],
+                                      _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS), info.ppEnabledExtensionNames[i]));
+    }
+}
