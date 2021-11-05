@@ -26,7 +26,7 @@
 TEST(test_profile, VP_KHR_1_2_roadmap_2022_support) { 
     TestScaffold scaffold; 
 
-    const VpProfileProperties profile{VP_KHR_1_2_ROADMAP_2022_NAME, VP_KHR_1_2_ROADMAP_2022_SPEC_VERSION};
+    const VpProfileProperties profile{VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     VkResult result = vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
@@ -42,8 +42,8 @@ TEST(test_profile, VP_KHR_1_2_roadmap_2022_support) {
 TEST(test_profile, VP_LUNARG_1_1_desktop_portability_2022_support) {
     TestScaffold scaffold;
 
-    const VpProfileProperties profile{VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME,
-                                      VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+    const VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME,
+                                      VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     VkResult result = vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
@@ -59,8 +59,8 @@ TEST(test_profile, VP_LUNARG_1_1_desktop_portability_2022_support) {
 TEST(test_profile, VP_LUNARG_1_1_desktop_portability_2022_subset_support) {
     TestScaffold scaffold;
 
-    const VpProfileProperties profile{VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_NAME,
-                                VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION};
+    const VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME,
+                                VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     VkResult result = vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
