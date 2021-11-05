@@ -27,6 +27,84 @@
 #include <memory>
 #include <vector>
 
+TEST(api_create_device_profile, with_profile_only) {
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+
+    TestScaffold scaffold;
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = nullptr;
+    info.queueCreateInfoCount = 1;
+    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.enabledExtensionCount = 0;
+    info.ppEnabledExtensionNames = nullptr;
+    info.pEnabledFeatures = nullptr;
+
+    VpDeviceCreateInfo profileInfo = {};
+    profileInfo.pCreateInfo = &info;
+    profileInfo.pProfile = &profile;
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    EXPECT_TRUE(res == VK_SUCCESS);
+    EXPECT_TRUE(device != VK_NULL_HANDLE);
+}
+
+TEST(api_create_device_profile, with_supported_extensions) {
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+
+    TestScaffold scaffold;
+
+    static const char* extensions[] = {"VK_KHR_image_format_list", "VK_KHR_maintenance3", "VK_KHR_imageless_framebuffer"};
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = nullptr;
+    info.queueCreateInfoCount = 1;
+    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.enabledExtensionCount = _vpCountOf(extensions);
+    info.ppEnabledExtensionNames = extensions;
+    info.pEnabledFeatures = nullptr;
+
+    VpDeviceCreateInfo profileInfo = {};
+    profileInfo.pCreateInfo = &info;
+    profileInfo.pProfile = &profile;
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    EXPECT_TRUE(res == VK_SUCCESS);
+    EXPECT_TRUE(device != VK_NULL_HANDLE);
+}
+
+TEST(api_create_device_profile, with_unsupported_extensions) {
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+
+    TestScaffold scaffold;
+
+    static const char* extensions[] = {"VK_LUNARG_doesnot_exist", "VK_GTRUC_automagic_rendering",
+                                       "VK_GTRUC_portability_everywhere"};
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = nullptr;
+    info.queueCreateInfoCount = 1;
+    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.enabledExtensionCount = _vpCountOf(extensions);
+    info.ppEnabledExtensionNames = extensions;
+    info.pEnabledFeatures = nullptr;
+
+    VpDeviceCreateInfo profileInfo = {};
+    profileInfo.pCreateInfo = &info;
+    profileInfo.pProfile = &profile;
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    EXPECT_TRUE(res != VK_SUCCESS);
+    EXPECT_TRUE(device == VK_NULL_HANDLE);
+}
+
+
 VkResult vpEnumerateDeviceProfiles(VkPhysicalDevice physicalDevice, const char* pLayerName, uint32_t* pPropertyCount,
                                    VpProfileProperties* pProperties) {
     assert(physicalDevice != VK_NULL_HANDLE);
@@ -69,7 +147,7 @@ bool IsFound(std::vector<VpProfileProperties>& profiles, const char* profileName
     return false;
 }
 
-TEST(test_profile, enumerate) {
+TEST(api_create_device_profile, enumerate) {
     TestScaffold scaffold;
 
     uint32_t profileCount = 0;
@@ -95,170 +173,7 @@ TEST(test_profile, enumerate) {
 #endif
 }
 
-TEST(test_profile, create_profile) {
-    TestScaffold scaffold;
-
-    uint32_t profileCount = 0;
-
-    VkResult result_count = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
-    EXPECT_TRUE(result_count == VK_SUCCESS);
-    EXPECT_TRUE(profileCount > 0);
-
-    std::vector<VpProfileProperties> profiles;
-    if (profileCount > 0) {
-        profiles.resize(profileCount);
-        VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
-        EXPECT_TRUE(result_profile == VK_SUCCESS);
-    }
-
-    for (const VpProfileProperties& profile : profiles) {
-        std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
-    }
-
-    int error = 0;
-
-    for (const VpProfileProperties& profile : profiles) {
-        std::printf("Creating a Vulkan device using profile %s, version %d: ", profile.profileName, profile.specVersion);
-
-        VkDeviceCreateInfo info = {};
-        info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        info.pNext = nullptr;
-        info.queueCreateInfoCount = 1;
-        info.pQueueCreateInfos = &scaffold.queueCreateInfo;
-        info.enabledExtensionCount = 0;
-        info.ppEnabledExtensionNames = nullptr;
-        info.pEnabledFeatures = nullptr;
-
-        VpDeviceCreateInfo profileInfo = {};
-        profileInfo.pCreateInfo = &info;
-        profileInfo.pProfile = &profile;
-
-        VkDevice device = VK_NULL_HANDLE;
-        VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
-        if (res != VK_SUCCESS) {
-            ++error;
-            EXPECT_TRUE(device == VK_NULL_HANDLE);
-            std::printf("FAILURE: %d\n", res);
-        } else {
-            std::printf("SUCCESS!\n");
-        }
-    }
-
-    EXPECT_EQ(0, error);
-}
-
-TEST(test_profile, create_extensions_supported) {
-    TestScaffold scaffold;
-
-    uint32_t profileCount = 0;
-
-    VkResult result_count = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
-    EXPECT_TRUE(result_count == VK_SUCCESS);
-    EXPECT_TRUE(profileCount > 0);
-
-    std::vector<VpProfileProperties> profiles;
-    if (profileCount > 0) {
-        profiles.resize(profileCount);
-        VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
-        EXPECT_TRUE(result_profile == VK_SUCCESS);
-    }
-
-    for (const VpProfileProperties& profile : profiles) {
-        std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
-    }
-
-    int error = 0;
-
-    static const char* extensions[] = {"VK_KHR_image_format_list", "VK_KHR_maintenance3", "VK_KHR_imageless_framebuffer"};
-
-    for (const VpProfileProperties& profile : profiles) {
-        std::printf("Creating a Vulkan device using profile %s, version %d: ", profile.profileName, profile.specVersion);
-
-        VkDeviceCreateInfo info = {};
-        info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        info.pNext = nullptr;
-        info.queueCreateInfoCount = 1;
-        info.pQueueCreateInfos = &scaffold.queueCreateInfo;
-        info.enabledExtensionCount = _vpCountOf(extensions);
-        info.ppEnabledExtensionNames = extensions;
-        info.pEnabledFeatures = nullptr;
-
-        VpDeviceCreateInfo profileInfo = {};
-        profileInfo.pCreateInfo = &info;
-        profileInfo.pProfile = &profile;
-
-        VkDevice device = VK_NULL_HANDLE;
-        VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
-        if (res != VK_SUCCESS) {
-            ++error;
-            EXPECT_TRUE(device == VK_NULL_HANDLE);
-            std::printf("FAILURE: %d\n", res);
-        } else {
-            vkDestroyDevice(device, nullptr);
-            std::printf("SUCCESS!\n");
-        }
-    }
-
-    EXPECT_EQ(0, error);
-}
-
-TEST(test_profile, create_extensions_unsupported) {
-    TestScaffold scaffold;
-
-    uint32_t profileCount = 0;
-
-    VkResult result_count = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, nullptr);
-    EXPECT_TRUE(result_count == VK_SUCCESS);
-    EXPECT_TRUE(profileCount > 0);
-
-    std::vector<VpProfileProperties> profiles;
-    if (profileCount > 0) {
-        profiles.resize(profileCount);
-        VkResult result_profile = vpEnumerateDeviceProfiles(scaffold.physicalDevice, nullptr, &profileCount, &profiles[0]);
-        EXPECT_TRUE(result_profile == VK_SUCCESS);
-    }
-
-    for (const VpProfileProperties& profile : profiles) {
-        std::printf("Profile supported: %s, version %d\n", profile.profileName, profile.specVersion);
-    }
-
-    int error = 0;
-
-    static const char* extensions[] = {"VK_LUNARG_doesnot_exist", "VK_GTRUC_automagic_rendering",
-                                       "VK_GTRUC_portability_everywhere"};
-
-    for (const VpProfileProperties& profile : profiles) {
-        std::printf("Creating a Vulkan device using profile %s, version %d: ", profile.profileName, profile.specVersion);
-
-        VkDeviceCreateInfo info = {};
-        info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        info.pNext = nullptr;
-        info.queueCreateInfoCount = 1;
-        info.pQueueCreateInfos = &scaffold.queueCreateInfo;
-        info.enabledExtensionCount = _vpCountOf(extensions);
-        info.ppEnabledExtensionNames = extensions;
-        info.pEnabledFeatures = nullptr;
-
-        VpDeviceCreateInfo profileInfo = {};
-        profileInfo.pCreateInfo = &info;
-        profileInfo.pProfile = &profile;
-
-        VkDevice device = VK_NULL_HANDLE;
-        VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
-        if (res != VK_SUCCESS) {
-            EXPECT_TRUE(device == VK_NULL_HANDLE);
-            std::printf("EXPECTED FAILURE: %d\n", res);
-        } else {
-            ++error;
-            vkDestroyDevice(device, nullptr);
-            std::printf("UNEXPECTED SUCCESS\n");
-        }
-    }
-
-    EXPECT_EQ(0, error);
-}
-
-TEST(test_profile, create_extensions_flag) {
+TEST(api_create_device_profile, create_extensions_flag) {
     TestScaffold scaffold;
 
     VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
@@ -341,7 +256,7 @@ TEST(test_profile, create_extensions_flag) {
     EXPECT_EQ(0, error);
 }
 
-TEST(test_profile, create_features) {
+TEST(api_create_device_profile, create_features) {
     TestScaffold scaffold;
 
     uint32_t profileCount = 0;
@@ -396,7 +311,7 @@ TEST(test_profile, create_features) {
     EXPECT_EQ(0, error);
 }
 
-TEST(test_profile, create_pnext) {
+TEST(api_create_device_profile, create_pnext) {
     TestScaffold scaffold;
 
     uint32_t profileCount = 0;
