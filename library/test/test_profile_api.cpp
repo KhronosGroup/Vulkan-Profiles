@@ -267,8 +267,8 @@ TEST(test_profile, check_extension_not_found) {
     info.ppEnabledExtensionNames = EXTENSIONS;
 
     for (std::size_t i = 0, n = info.enabledExtensionCount; i < n; ++i) {
-        EXPECT_FALSE(_vpCheckExtension(&_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0],
-                                       _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+        EXPECT_FALSE(_vpCheckExtension(&_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0],
+                                       _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS),
                                        info.ppEnabledExtensionNames[i]));
     }
 }
@@ -284,8 +284,8 @@ TEST(test_profile, check_extension_found) {
     info.ppEnabledExtensionNames = EXTENSIONS;
 
     for (std::size_t i = 0, n = info.enabledExtensionCount; i < n; ++i) {
-        EXPECT_TRUE(_vpCheckExtension(&_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0],
-                                      _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+        EXPECT_TRUE(_vpCheckExtension(&_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0],
+                                      _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS),
                                       info.ppEnabledExtensionNames[i]));
     }
 }
@@ -316,9 +316,9 @@ TEST(test_profile, get_extensions) {
         profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
 
         std::vector<const char*> extensions;
-        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
-                         &_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
-        EXPECT_EQ(_vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS), extensions.size());
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
+        EXPECT_EQ(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS), extensions.size());
     }
 
     {
@@ -327,9 +327,9 @@ TEST(test_profile, get_extensions) {
         profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
 
         std::vector<const char*> extensions;
-        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
-                         &_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
-        EXPECT_EQ(_vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS) + 2, extensions.size());
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
+        EXPECT_EQ(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS) + 2, extensions.size());
     }
 
     {
@@ -338,8 +338,8 @@ TEST(test_profile, get_extensions) {
         profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
         std::vector<const char*> extensions;
-        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
-                         &_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
         EXPECT_EQ(_vpCountOf(EXTENSIONS), extensions.size());
     }
 
@@ -349,8 +349,8 @@ TEST(test_profile, get_extensions) {
         profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
         std::vector<const char*> extensions;
-        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS),
-                         &_VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
         EXPECT_EQ(0, extensions.size());
     }
 }
