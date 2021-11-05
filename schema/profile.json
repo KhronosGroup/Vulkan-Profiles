@@ -852,6 +852,10 @@
                         "items": {
                             "type": "string"
                         }
+                    },
+                    "fallback": {
+                        "description": "TODO",
+                        "type": "string"
                     }
                 }
             }
