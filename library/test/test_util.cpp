@@ -18,8 +18,9 @@
  * - Christophe Riccio <christophe@lunarg.com>
  */
 
-#include "test.hpp"
+#define VK_ENABLE_BETA_EXTENSIONS 1
 
+#include "test.hpp"
 #include "vulkan_profiles.hpp"
 
 struct FormatFeatureFlagBits {
@@ -276,5 +277,69 @@ TEST(test_library_util, CheckFormatProperty) {
         deviceProps.formatProperties.bufferFeatures = 0;
 
         EXPECT_TRUE(!_vpCheckFormatProperty(&deviceProps, profileProps));
+    }
+}
+
+TEST(test_library_util, _vpGetExtensions) {
+    static const char *EXTENSIONS[] = {
+        VK_KHR_MAINTENANCE_3_EXTENSION_NAME,                    // Not in VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME
+        VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME,  // Not in VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME
+        VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,              // In VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME
+        VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME                 // In VP_LUNARG_1_1_DESKTOP_PORTABILITY_2022_NAME
+    };
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = nullptr;
+    info.pEnabledFeatures = nullptr;
+
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+
+    VpDeviceCreateInfo profileInfo = {};
+    profileInfo.pCreateInfo = &info;
+    profileInfo.pProfile = &profile;
+
+    {
+        info.enabledExtensionCount = 0;
+        info.ppEnabledExtensionNames = nullptr;
+        profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
+
+        std::vector<const char *> extensions;
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
+        EXPECT_EQ(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS), extensions.size());
+    }
+
+    {
+        info.enabledExtensionCount = _vpCountOf(EXTENSIONS);
+        info.ppEnabledExtensionNames = EXTENSIONS;
+        profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
+
+        std::vector<const char *> extensions;
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
+        EXPECT_EQ(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS) + 2, extensions.size());
+    }
+
+    {
+        info.enabledExtensionCount = _vpCountOf(EXTENSIONS);
+        info.ppEnabledExtensionNames = EXTENSIONS;
+        profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
+
+        std::vector<const char *> extensions;
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
+        EXPECT_EQ(_vpCountOf(EXTENSIONS), extensions.size());
+    }
+
+    {
+        info.enabledExtensionCount = 0;
+        info.ppEnabledExtensionNames = nullptr;
+        profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
+
+        std::vector<const char *> extensions;
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
+        EXPECT_EQ(0, extensions.size());
     }
 }
