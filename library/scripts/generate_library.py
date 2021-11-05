@@ -507,6 +507,6 @@ if __name__ == "__main__":
     profiles = os.path.join(dirname, '../../profiles')
     output = os.path.join(dirname, '../include/vulkan')
 
-    builder = ProfileLibraryBuilder(database, profiles, output)
-    builder.genProfilesHeaderFile()
+    #builder = ProfileLibraryBuilder(database, profiles, output)
+    #builder.genProfilesHeaderFile()
 
