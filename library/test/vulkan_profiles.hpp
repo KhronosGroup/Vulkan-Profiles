@@ -1846,6 +1846,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
                                           const VpProfileProperties *pProfile, VkBool32 *pSupported) {
     assert(pProfile != nullptr);
     assert(pSupported != nullptr);
+    assert(physicalDevice != VK_NULL_HANDLE);
 
     VkResult result = VK_SUCCESS;
 
