@@ -17,6 +17,9 @@
  * - Christophe Riccio <christophe@lunarg.com>
  */
 
+#ifndef VULKAN_PROFILES_HPP_
+#define VULKAN_PROFILES_HPP_ 1
+
 #include <vulkan/vulkan_core.h>
 #include <algorithm>
 #ifdef VK_ENABLE_BETA_EXTENSIONS
@@ -2235,7 +2238,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
             if (VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION < pProfile->specVersion) {
                 return result;
             }
-        } 
+        }
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         else if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME, pProfile->profileName) == 0) {
             if (VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION < pProfile->specVersion) {
@@ -2250,7 +2253,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
             if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION)) {
                 return result;
             }
-        } 
+        }
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         else if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME, pProfile->profileName) == 0) {
             if (VK_VERSION_PATCH(properties.apiVersion) <
@@ -3250,3 +3253,5 @@ inline void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint3
         }
     }
 }
+
+#endif  // VULKAN_PROFILES_HPP_
