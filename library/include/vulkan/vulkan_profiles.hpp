@@ -23,8 +23,6 @@
 #include <vulkan/vulkan_beta.h>
 #endif
 
-#define VP_MAX_PROFILE_NAME_SIZE 256U
-
 #define VK_KHR_roadmap_2022 1
 #define VP_KHR_ROADMAP_2022_NAME "VP_KHR_roadmap_2022"
 #define VP_KHR_ROADMAP_2022_SPEC_VERSION 1
@@ -41,6 +39,8 @@
 #define VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION 1
 #define VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
 #endif
+
+#define VP_MAX_PROFILE_NAME_SIZE 256U
 
 typedef struct VpProfileProperties {
     char profileName[VP_MAX_PROFILE_NAME_SIZE];
