@@ -1908,7 +1908,7 @@
 				"baseline",
 				"macos-specific"
 			],
-			"fallback": "VP_LUNARG_desktop_portability_2022"
+			"fallback": [ "VP_LUNARG_desktop_portability_2022" ]
 		},
 		{
 			"name": "VP_LUNARG_desktop_portability_2022",

@@ -402,10 +402,10 @@
                 "common",
                 "vulkan13"
             ],
-            "fallback": "VP_LUNARG_roadmap_2022_1_2"
+            "fallback": [ "VP_LUNARG_roadmap_2022" ]
         },
         {
-            "name": "VP_LUNARG_roadmap_2022_1_2",
+            "name": "VP_LUNARG_roadmap_2022",
             "api-version": "1.2.189",
             "capabilities": [
                 "common",
