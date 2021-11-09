@@ -12,5 +12,5 @@ add_custom_command(TARGET ${TEST_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E co
 add_custom_command(TARGET ${TEST_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different  ${CMAKE_CURRENT_SOURCE_DIR}/../../schema/profile.json ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(${TEST_NAME} PRIVATE gtest gtest_main)
-add_dependencies(${TEST_NAME} vulkan_profiles)
+add_dependencies(${TEST_NAME} library_profiles)
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} --gtest_catch_exceptions=0)
