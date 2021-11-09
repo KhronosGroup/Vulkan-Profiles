@@ -95,7 +95,6 @@ set(API_NAME "Vulkan" CACHE STRING "API name to use when building")
 string(TOLOWER ${API_NAME} API_LOWERCASE)
 add_definitions(-DAPI_NAME="${API_NAME}")
 
-# Library project
 add_subdirectory(library)
 
 add_subdirectory(vku)

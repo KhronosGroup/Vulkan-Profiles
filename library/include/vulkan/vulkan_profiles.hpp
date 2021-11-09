@@ -17,6 +17,9 @@
  * - Christophe Riccio <christophe@lunarg.com>
  */
 
+#ifndef VULKAN_PROFILES_HPP_
+#define VULKAN_PROFILES_HPP_ 1
+
 #include <vulkan/vulkan_core.h>
 #include <algorithm>
 #ifdef VK_ENABLE_BETA_EXTENSIONS
@@ -27,6 +30,21 @@
 #define VP_KHR_ROADMAP_2022_NAME "VP_KHR_roadmap_2022"
 #define VP_KHR_ROADMAP_2022_SPEC_VERSION 1
 #define VP_KHR_ROADMAP_2022_MIN_VERSION VK_MAKE_VERSION(1, 3, 200)
+
+#define VK_LUNARG_roadmap_2022 1
+#define VP_LUNARG_ROADMAP_2022_NAME "VP_LUNARG_roadmap_2022"
+#define VP_LUNARG_ROADMAP_2022_SPEC_VERSION 1
+#define VP_LUNARG_ROADMAP_2022_MIN_VERSION VK_MAKE_VERSION(1, 3, 200)
+
+#define VP_ANDROID_baseline_2022 1
+#define VP_ANDROID_BASELINE_2022_NAME "VP_ANDROID_baseline_2022"
+#define VP_ANDROID_BASELINE_2022_SPEC_VERSION 1
+#define VP_ANDROID_BASELINE_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 0, 68)
+
+#define VP_ANDROID_angle_es31 1
+#define VP_ANDROID_ANGLE_ES31_2022_NAME "VP_ANDROID_angle_es31"
+#define VP_ANDROID_ANGLE_ES31_2022_SPEC_VERSION 1
+#define VP_ANDROID_ANGLE_ES31_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 131)
 
 #define VP_LUNARG_desktop_portability_2022 1
 #define VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME "VP_LUNARG_desktop_portability_2022"
@@ -63,8 +81,6 @@ typedef struct VpDeviceCreateInfo {
     const VkDeviceCreateInfo *pCreateInfo;
     const VpProfileProperties *pProfile;
     VpDeviceCreateFlags flags;
-    uint32_t overrideStructureCount;
-    const VkStructureType *pOverrideStructures;
 } VpDeviceCreateInfo;
 
 // Query the list of available profiles in the library
@@ -2227,7 +2243,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
             if (VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION < pProfile->specVersion) {
                 return result;
             }
-        } 
+        }
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         else if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME, pProfile->profileName) == 0) {
             if (VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_SPEC_VERSION < pProfile->specVersion) {
@@ -2242,7 +2258,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
             if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION)) {
                 return result;
             }
-        } 
+        }
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         else if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME, pProfile->profileName) == 0) {
             if (VK_VERSION_PATCH(properties.apiVersion) <
@@ -3242,3 +3258,5 @@ inline void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint3
         }
     }
 }
+
+#endif  // VULKAN_PROFILES_HPP_
