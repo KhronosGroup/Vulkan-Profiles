@@ -24,7 +24,6 @@
 #endif
 
 #define VP_MAX_PROFILE_NAME_SIZE 256U
-#define VP_MAX_VARIANT_NAME_SIZE 256U
 
 #define VK_KHR_roadmap_2022 1
 #define VP_KHR_ROADMAP_2022_NAME "VP_KHR_roadmap_2022"
