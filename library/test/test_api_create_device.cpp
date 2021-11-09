@@ -19,9 +19,9 @@
  */
 
 #define VK_ENABLE_BETA_EXTENSIONS 1
-#include "test.hpp"
 
-#include "vulkan_profiles.hpp"
+#include "test.hpp"
+#include <vulkan/vulkan_profiles.hpp>
 
 #include <cstdio>
 #include <memory>

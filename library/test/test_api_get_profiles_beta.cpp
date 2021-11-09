@@ -21,7 +21,7 @@
 #define VK_ENABLE_BETA_EXTENSIONS
 
 #include "test.hpp"
-#include "vulkan_profiles.hpp"
+#include <vulkan/vulkan_profiles.hpp>
 
 TEST(api_get_profiles_beta, full) {
     uint32_t pPropertyCount = 0;

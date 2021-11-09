@@ -21,7 +21,7 @@
 #define VK_ENABLE_BETA_EXTENSIONS 1
 
 #include "test.hpp"
-#include "vulkan_profiles.hpp"
+#include <vulkan/vulkan_profiles.hpp>
 
 TEST(api_get_profile_extension_properties, full) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
