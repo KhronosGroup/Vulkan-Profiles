@@ -1,3 +1,4 @@
+add_subdirectory(generator)
 add_subdirectory(test)
 
 add_library(VulkanProfiles INTERFACE)
