@@ -21,7 +21,7 @@
 //#define VK_ENABLE_BETA_EXTENSIONS <= checking the library build and report the right number of profiles when it's not defined
 
 #include "test.hpp"
-#include "vulkan_profiles.hpp"
+#include <vulkan/vulkan_profiles.hpp>
 
 TEST(api_get_profiles_core, full) {
     uint32_t pPropertyCount = 0;

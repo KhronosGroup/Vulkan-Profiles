@@ -19,9 +19,9 @@
  */
 
 #define VK_ENABLE_BETA_EXTENSIONS 1
-#include "test.hpp"
 
-#include "vulkan_profiles.hpp"
+#include "test.hpp"
+#include <vulkan/vulkan_profiles.hpp>
 
 // In this example, a typical usage of profiles with additional features and extensions
 TEST(test_profile, example_add_features_add_extensions) {

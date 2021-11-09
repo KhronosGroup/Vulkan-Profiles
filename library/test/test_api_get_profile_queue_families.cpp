@@ -19,8 +19,9 @@
  */
 
 #define VK_ENABLE_BETA_EXTENSIONS 1
+
 #include "test.hpp"
-#include "vulkan_profiles.hpp"
+#include <vulkan/vulkan_profiles.hpp>
 
 TEST(api_get_profile_queue_families, full) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, 1};
