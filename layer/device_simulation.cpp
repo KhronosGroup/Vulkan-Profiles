@@ -1299,6 +1299,123 @@ bool IsFormatSupported(const VkFormatProperties &props) {
     return !(!props.linearTilingFeatures && !props.optimalTilingFeatures && !props.bufferFeatures);
 }
 
+enum Limit {
+    MIN,
+    MAX,
+    RANGE,
+    EQUAL,
+    NEQUAL,
+    ALL,
+    ANY,
+};
+
+enum Type {
+    INT32,
+    UINT32,
+    FLOAT,
+};
+
+struct Value {
+    union {
+        int32_t int_value;
+        uint32_t uint_value;
+        float float_value;
+    };
+};
+
+struct Property {
+    const char *name = "";
+    Limit limit = Limit::MIN;
+    uint32_t dimensions = 1;
+    Type type;
+    Value *values = nullptr;
+
+    Property(const Json::Value &value) {
+        ReadName(value);
+        ReadLimit(value);
+        ReadDimensions(value);
+        values = new Value[dimensions];
+        ReadType(value);
+        ReadValues(value);
+    }
+    ~Property() {
+        if (values) {
+            delete[] values;
+        }
+    }
+
+    void ReadName(const Json::Value &value) {
+        if (value.isMember("name")) {
+            name = value["name"].asCString();
+        }
+    }
+
+    void ReadLimit(const Json::Value &value) {
+        if (value.isMember("limit")) {
+            const auto limitString = value["limit"].asString();
+            if (limitString == "MIN") {
+                limit = Limit::MIN;
+            } else if (limitString == "MAX") {
+                limit = Limit::MAX;
+            } else if (limitString == "RANGE") {
+                limit = Limit::RANGE;
+            } else if (limitString == "EQUAL") {
+                limit = Limit::EQUAL;
+            } else if (limitString == "NEQUAL") {
+                limit = Limit::NEQUAL;
+            } else if (limitString == "ALL") {
+                limit = Limit::ALL;
+            } else if (limitString == "ANY") {
+                limit = Limit::ANY;
+            }
+        }
+    }
+
+    void ReadDimensions(const Json::Value &value) {
+        if (value.isMember("dimensions")) {
+            dimensions = value["dimensions"].asInt();
+        }
+    }
+
+    void ReadType(const Json::Value &value) {
+        if (value.isMember("type")) {
+            if (value["type"].asString() == "int32_t") {
+                type = Type::INT32;
+            } else if (value["type"].asString() == "uint32_t") {
+                type = Type::UINT32;
+            } else if (value["type"].asString() == "float") {
+                type = Type::FLOAT;
+            }
+        }
+    }
+
+    void ReadValues(const Json::Value &value) {
+        if (value.isMember("value")) {
+            if (value["value"].isArray()) {
+                uint32_t i = 0;
+                for (const auto el : value["value"]) {
+                    if (type == Type::INT32) {
+                        values[i].int_value = el.asInt();
+                    } else if (type == Type::UINT32) {
+                        values[i].uint_value = el.asUInt();
+                    } else {
+                        values[i].float_value = el.asFloat();
+                    }
+                    ++i;
+                }
+            } else {
+                if (type == Type::INT32) {
+                    values[0].int_value = value["value"].asInt();
+                } else if (type == Type::UINT32) {
+                    values[0].uint_value = value["value"].asUInt();
+                } else {
+                    values[0].float_value = value["value"].asFloat();
+                }
+            }
+        }
+    }
+};
+
 // PhysicalDeviceData : creates and manages the simulated device configurations //////////////////////////////////////////////////
 
 class PhysicalDeviceData {
@@ -1307,7 +1424,7 @@ class PhysicalDeviceData {
     static PhysicalDeviceData &Create(VkPhysicalDevice pd, VkInstance instance) {
         assert(pd != VK_NULL_HANDLE);
         assert(instance != VK_NULL_HANDLE);
-        assert(!Find(pd));                        // Verify this instance does not already exist.
+        assert(!Find(pd));  // Verify this instance does not already exist.
         const auto result = map_.emplace(pd, PhysicalDeviceData(instance));
         assert(result.second);  // true=insertion, false=replacement
         auto iter = result.first;
@@ -1974,7 +2091,8 @@ class PhysicalDeviceData {
         physical_device_synchronization2_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR};
 
         // VK_KHR_workgroup_memory_explicit_layout structs
-        physical_device_workgroup_memory_explicit_layout_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_FEATURES_KHR};
+        physical_device_workgroup_memory_explicit_layout_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_FEATURES_KHR};
 
         // VK_EXT_4444_formats structs
         physical_device_4444_formats_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_4444_FORMATS_FEATURES_EXT};
@@ -1983,8 +2101,10 @@ class PhysicalDeviceData {
         physical_device_astc_decode_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ASTC_DECODE_FEATURES_EXT};
 
         // VK_EXT_blend_operation_advanced structs
-        physical_device_blend_operation_advanced_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_FEATURES_EXT};
-        physical_device_blend_operation_advanced_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_PROPERTIES_EXT};
+        physical_device_blend_operation_advanced_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_FEATURES_EXT};
+        physical_device_blend_operation_advanced_properties_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_PROPERTIES_EXT};
 
         // VK_EXT_border_color_swizzle structs
         physical_device_border_color_swizzle_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BORDER_COLOR_SWIZZLE_FEATURES_EXT};
@@ -2020,8 +2140,7 @@ class PhysicalDeviceData {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT};
 
         // VK_EXT_external_memory_host structs
-        physical_device_external_memory_host_properties_ = {
-            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT};
+        physical_device_external_memory_host_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT};
 
         // VK_EXT_fragment_density_map structs
         physical_device_fragment_density_map_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_FEATURES_EXT};
@@ -2033,8 +2152,7 @@ class PhysicalDeviceData {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT};
 
         // VK_EXT_global_priority_query structs
-        physical_device_global_priority_query_features_ = {
-            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES_EXT};
+        physical_device_global_priority_query_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES_EXT};
 
         // VK_EXT_image_robustness structs
         physical_device_image_robustness_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT};
@@ -2058,10 +2176,12 @@ class PhysicalDeviceData {
         physical_device_multi_draw_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_PROPERTIES_EXT};
 
         // VK_EXT_pageable_device_local_memory structs
-        physical_device_pageable_device_local_memory_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PAGEABLE_DEVICE_LOCAL_MEMORY_FEATURES_EXT};
+        physical_device_pageable_device_local_memory_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PAGEABLE_DEVICE_LOCAL_MEMORY_FEATURES_EXT};
 
         // VK_EXT_pipeline_creation_cache_control structs
-        physical_device_pipeline_creation_cache_control_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT};
+        physical_device_pipeline_creation_cache_control_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT};
 
         // VK_EXT_primitive_topology_list_restart structs
         physical_device_primitive_topology_list_restart_features_ = {
@@ -2105,7 +2225,8 @@ class PhysicalDeviceData {
 
         // VK_EXT_texel_buffer_alignment structs
         physical_device_texel_buffer_alignment_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT};
-        physical_device_texel_buffer_alignment_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT};
+        physical_device_texel_buffer_alignment_properties_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT};
 
         // VK_EXT_texture_compression_astc_hdr structs
         physical_device_texture_compression_astc_hdr_features_ = {
@@ -2134,7 +2255,8 @@ class PhysicalDeviceData {
 
         // VK_KHR_fragment_shading_rate structs
         physical_device_fragment_shading_rate_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_FEATURES_KHR};
-        physical_device_fragment_shading_rate_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR};
+        physical_device_fragment_shading_rate_properties_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR};
 
         // VK_AMD_device_coherent_memory structs
         physical_device_coherent_memory_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD};
@@ -2283,160 +2405,172 @@ class JsonLoader {
         kDevsimTimelineSemaphoreKHR,
         kDevsimUniformBufferStandardLayoutKHR,
         kDevsimVariablePointersKHR,
-        kDevsimVulkanMemoryModelKHR
+        kDevsimVulkanMemoryModelKHR,
+        kDevsimProfiles130
     };
 
+    struct Extension {
+        std::string name;
+        int specVersion;
+    };
+
+    std::string profile_name;
+    std::vector<Extension> profile_extensions;
+
     SchemaId IdentifySchema(const Json::Value &value);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProperties *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDepthStencilResolveProperties *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFloatControlsPropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMaintenance3PropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMaintenance4FeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMaintenance4PropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiviewPropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePointClippingPropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProtectedMemoryProperties *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTimelineSemaphorePropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceLimits *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSparseProperties *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubgroupProperties *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFeatures *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevice8BitStorageFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevice16BitStorageFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceHostQueryResetFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceImagelessFramebufferFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiviewFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProtectedMemoryFeatures *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderDrawParametersFeatures *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVariablePointersFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceAccelerationStructureFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceAccelerationStructurePropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePerformanceQueryFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePerformanceQueryPropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePresentIdFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePresentWaitFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePushDescriptorPropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayQueryFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPipelineFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPipelinePropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderClockFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSynchronization2FeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevice4444FormatsFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceASTCDecodeFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCustomBorderColorFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCustomBorderColorPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExternalMemoryHostPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentDensityMapFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentDensityMapPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceImageRobustnessFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceIndexTypeUint8FeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceInlineUniformBlockFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceInlineUniformBlockPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceLineRasterizationFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceLineRasterizationPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryPriorityFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiDrawFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiDrawPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePrivateDataFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProvokingVertexFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProvokingVertexPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRobustness2FeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRobustness2PropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSampleLocationsPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTransformFeedbackFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTransformFeedbackPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCoherentMemoryFeaturesAMD *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderCorePropertiesAMD *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderCoreProperties2AMD *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCooperativeMatrixFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCooperativeMatrixPropertiesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCornerSampledImageFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCoverageReductionModeFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceInheritedViewportScissorFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMeshShaderFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMeshShaderPropertiesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPropertiesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExclusiveScissorFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderImageFootprintFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderSMBuiltinsFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderSMBuiltinsPropertiesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShadingRateImageFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShadingRateImagePropertiesNV *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *dest);
+    void GetFeature(const Json::Value &feature);
+    void GetProperty(const Json::Value &prop);
+    void GetFormat(const Json::Value &value, ArrayOfVkFormatProperties *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStencilResolveProperties *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceFloatControlsPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance3PropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4FeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4PropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePointClippingPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryProperties *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphorePropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceSparseProperties *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupProperties *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorageFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorageFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryResetFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFramebufferFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryFeatures *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawParametersFeatures *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePointersFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructureFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructurePropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePresentWaitFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePushDescriptorPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelineFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelinePropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClockFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceSynchronization2FeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevice4444FormatsFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryHostPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobustnessFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUint8FeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPriorityFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePrivateDataFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2FeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2PropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocationsPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMemoryFeaturesAMD *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCorePropertiesAMD *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreProperties2AMD *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixPropertiesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampledImageFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageReductionModeFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedViewportScissorFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderPropertiesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPropertiesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveScissorFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageFootprintFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsPropertiesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImageFeaturesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImagePropertiesNV *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkSurfaceCapabilitiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryProperties *dest);
+    void GetValue(const Json::Value &parent, VkSurfaceCapabilitiesKHR *dest);
     void GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest);
     void GetValue(const Json::Value &parent, const char *name, VkExtent3D *dest);
     void GetValue(const Json::Value &parent, int index, VkQueueFamilyProperties *dest);
@@ -2448,15 +2582,14 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, int index, VkPhysicalDevice *dest);
     void GetValue(const Json::Value &parent, int index, VkDeviceSize *dest);
 
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVulkan12Properties *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVulkan12Features *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Properties *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Features *dest);
 
     // GPUinfo config file format
     void GetValueGPUinfoCore11(const Json::Value &parent);
     void GetValueGPUinfoCore12(const Json::Value &parent);
     void GetValueGPUinfoSurfaceCapabilities(const Json::Value &parent);
 
-    // For use as warn_func in GET_VALUE_WARN().  Return true if warning occurred.
     static bool WarnIfGreater(const char *name, const uint64_t new_value, const uint64_t old_value) {
         if (new_value > old_value) {
             DebugPrintf("WARN \"%s\" JSON value (%" PRIu64 ") is greater than existing value (%" PRIu64 ")\n", name, new_value,
@@ -2474,6 +2607,224 @@ class JsonLoader {
         }
         return false;
     }
+
+    // For use as warn_func in GET_VALUE_WARN().  Return true if warning occurred.
+    template <typename T>
+    static bool PropertyWarnIfGreater(const char *name, const Property &new_value, const T old_value, const uint32_t i = 0) {
+        if (new_value.type == Type::UINT32) {
+            if (new_value.values[i].uint_value > static_cast<uint32_t>(old_value)) {
+                DebugPrintf("WARN \"%s\" JSON value (%" PRIu32 ") is greater than existing value (%" PRIu32 ")\n", name,
+                            new_value.values[i].uint_value, old_value);
+                return true;
+            }
+        } else if (new_value.type == Type::INT32) {
+            if (new_value.values[i].int_value > static_cast<int>(old_value)) {
+                DebugPrintf("WARN \"%s\" JSON value (%" PRIi32 ") is greater than existing value (%" PRIi32 ")\n", name,
+                            new_value.values[i].int_value, old_value);
+                return true;
+            }
+        } else if (new_value.type == Type::FLOAT) {
+            if (new_value.values[i].float_value > old_value) {
+                DebugPrintf("WARN \"%s\" JSON value (%f) is greater than existing value (%f)\n", name,
+                            new_value.values[i].float_value, old_value);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static bool PropertyWarnIfGreater(const char *name, const Property &new_value, const VkExtent2D old_value) {
+        bool r = false;
+        if (new_value.dimensions == 2) {
+            r |= PropertyWarnIfGreater(name, new_value, old_value.width, 0);
+            r |= PropertyWarnIfGreater(name, new_value, old_value.height, 1);
+        }
+        return r;
+    }
+
+    static bool PropertyWarnIfGreater(const char *name, const Property &new_value, const VkExtent3D old_value) {
+        bool r = false;
+        if (new_value.dimensions == 3) {
+            r |= PropertyWarnIfGreater(name, new_value, old_value.width, 0);
+            r |= PropertyWarnIfGreater(name, new_value, old_value.height, 1);
+            r |= PropertyWarnIfGreater(name, new_value, old_value.depth, 2);
+        }
+        return r;
+    }
+
+    template <typename T>
+    static bool PropertyWarnIfLesser(const char *name, const Property &new_value, const T old_value, const uint32_t i = 0) {
+        if (new_value.type == Type::UINT32) {
+            if (new_value.values[i].uint_value < static_cast<uint32_t>(old_value)) {
+                DebugPrintf("WARN \"%s\" JSON value (%" PRIu32 ") is lesser than existing value (%" PRIu32 ")\n", name,
+                            new_value.values[i].uint_value, old_value);
+                return true;
+            }
+        } else if (new_value.type == Type::INT32) {
+            if (new_value.values[i].int_value < static_cast<int>(old_value)) {
+                DebugPrintf("WARN \"%s\" JSON value (%" PRIi32 ") is lesser than existing value (%" PRIi32 ")\n", name,
+                            new_value.values[i].int_value, old_value);
+                return true;
+            }
+        } else if (new_value.type == Type::FLOAT) {
+            if (new_value.values[i].float_value < old_value) {
+                DebugPrintf("WARN \"%s\" JSON value (%f) is lesser than existing value (%f)\n", name,
+                            new_value.values[i].float_value, old_value);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static bool PropertyWarnIfLesser(const char *name, const Property &new_value, const VkExtent2D old_value) {
+        bool r = false;
+        if (new_value.dimensions == 2) {
+            r |= PropertyWarnIfLesser(name, new_value, old_value.width, 0);
+            r |= PropertyWarnIfLesser(name, new_value, old_value.height, 1);
+        }
+        return r;
+    }
+
+    static bool PropertyWarnIfLesser(const char *name, const Property &new_value, const VkExtent3D old_value) {
+        bool r = false;
+        if (new_value.dimensions == 3) {
+            r |= PropertyWarnIfLesser(name, new_value, old_value.width, 0);
+            r |= PropertyWarnIfLesser(name, new_value, old_value.height, 1);
+            r |= PropertyWarnIfLesser(name, new_value, old_value.depth, 2);
+        }
+        return r;
+    }
+
+    template <typename T>
+    static bool PropertyWarnIfEqual(const char *name, const Property &new_value, const T old_value, const uint32_t i = 0) {
+        if (new_value.type == Type::UINT32) {
+            if (new_value.values[i].uint_value == old_value) {
+                DebugPrintf("WARN \"%s\" JSON value (%" PRIu32 ") is equal to existing value (%" PRIu32 ")\n", name,
+                            new_value.values[i].uint_value, old_value);
+                return true;
+            }
+        } else if (new_value.type == Type::INT32) {
+            if (new_value.values[i].int_value == old_value) {
+                DebugPrintf("WARN \"%s\" JSON value (%" PRIi32 ") is equal to existing value (%" PRIi32 ")\n", name,
+                            new_value.values[i].int_value, old_value);
+                return true;
+            }
+        } else if (new_value.type == Type::FLOAT) {
+            if (new_value.values[i].float_value == old_value) {
+                DebugPrintf("WARN \"%s\" JSON value (%f) is equal to existing value (%f)\n", name, new_value.values[i].float_value,
+                            old_value);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static bool PropertyWarnIfEqual(const char *name, const Property &new_value, const VkExtent2D old_value) {
+        bool r = false;
+        if (new_value.dimensions == 2) {
+            r |= PropertyWarnIfEqual(name, new_value, old_value.width, 0);
+            r |= PropertyWarnIfEqual(name, new_value, old_value.height, 1);
+        }
+        return r;
+    }
+
+    static bool PropertyWarnIfEqual(const char *name, const Property &new_value, const VkExtent3D old_value) {
+        bool r = false;
+        if (new_value.dimensions == 3) {
+            r |= PropertyWarnIfEqual(name, new_value, old_value.width, 0);
+            r |= PropertyWarnIfEqual(name, new_value, old_value.height, 1);
+            r |= PropertyWarnIfEqual(name, new_value, old_value.depth, 2);
+        }
+        return r;
+    }
+
+    template <typename T>
+    static bool PropertyWarnIfNEqual(const char *name, const Property &new_value, const T old_value, const uint32_t i = 0) {
+        if (new_value.type != Type::UINT32) {
+            if (new_value.values[i].uint_value == old_value) {
+                DebugPrintf("WARN \"%s\" JSON value (%" PRIu32 ") is not equal to existing value (%" PRIu32 ")\n", name,
+                            new_value.values[i].uint_value, old_value);
+                return true;
+            }
+        } else if (new_value.type != Type::INT32) {
+            if (new_value.values[i].int_value == old_value) {
+                DebugPrintf("WARN \"%s\" JSON value (%" PRIi32 ") is not equal to existing value (%" PRIi32 ")\n", name,
+                            new_value.values[i].int_value, old_value);
+                return true;
+            }
+        } else if (new_value.type != Type::FLOAT) {
+            if (new_value.values[i].float_value == old_value) {
+                DebugPrintf("WARN \"%s\" JSON value (%f) is not equal to existing value (%f)\n", name,
+                            new_value.values[i].float_value, old_value);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static bool PropertyWarnIfNEqual(const char *name, const Property &new_value, const VkExtent2D old_value) {
+        bool r = false;
+        if (new_value.dimensions == 2) {
+            r |= PropertyWarnIfNEqual(name, new_value, old_value.width, 0);
+            r |= PropertyWarnIfNEqual(name, new_value, old_value.height, 1);
+        }
+        return r;
+    }
+
+    static bool PropertyWarnIfNEqual(const char *name, const Property &new_value, const VkExtent3D old_value) {
+        bool r = false;
+        if (new_value.dimensions == 3) {
+            r |= PropertyWarnIfNEqual(name, new_value, old_value.width, 0);
+            r |= PropertyWarnIfNEqual(name, new_value, old_value.height, 1);
+            r |= PropertyWarnIfNEqual(name, new_value, old_value.depth, 2);
+        }
+        return r;
+    }
+
+    template <typename T>
+    static void WriteValue(T *dest, const Property &value, const uint32_t i = 0) {
+        if (value.type == Type::INT32) {
+            *dest = static_cast<T>(value.values[i].int_value);
+        } else if (value.type == Type::UINT32) {
+            *dest = static_cast<T>(value.values[i].uint_value);
+        } else if (value.type == Type::FLOAT) {
+            *dest = static_cast<T>(value.values[i].float_value);
+        }
+    }
+
+    template <typename T>
+    static void WriteValueInt(T *dest, const Property &value, const uint32_t i = 0) {
+        if (value.type == Type::INT32) {
+            *dest = static_cast<T>(value.values[i].int_value);
+        } else if (value.type == Type::UINT32) {
+            *dest = static_cast<T>(value.values[i].uint_value);
+        }
+    }
+
+    static void WriteValue(VkExtent2D *dest, const Property &value) {
+        if (value.dimensions == 2) {
+            WriteValue(&dest->width, value, 0);
+            WriteValue(&dest->height, value, 1);
+        }
+    }
+
+    static void WriteValue(VkExtent3D *dest, const Property &value) {
+        if (value.dimensions == 3) {
+            WriteValue(&dest->width, value, 0);
+            WriteValue(&dest->height, value, 1);
+            WriteValue(&dest->depth, value, 2);
+        }
+    }
+
+    static void WriteValue(VkPhysicalDeviceType *dest, const Property &value) { WriteValueInt(dest, value); }
+
+    static void WriteValue(VkShaderFloatControlsIndependence *dest, const Property &value) { WriteValueInt(dest, value); }
+
+    static void WriteValue(VkSampleCountFlagBits *dest, const Property &value) { WriteValueInt(dest, value); }
 
     void GetValue(const Json::Value &parent, const char *name, float *dest,
                   std::function<bool(const char *, float, float)> warn_func = nullptr) {
@@ -2504,7 +2855,13 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, const char *name, uint32_t *dest,
                   std::function<bool(const char *, uint32_t, uint32_t)> warn_func = nullptr) {
         const Json::Value value = parent[name];
-        if (!value.isUInt()) {
+        if (value.isBool()) {
+            const bool new_value = value.asBool();
+            if (warn_func) {
+                warn_func(name, new_value, *dest);
+            }
+            *dest = static_cast<uint32_t>(new_value);
+        } else if (!value.isUInt()) {
             return;
         }
         const uint32_t new_value = value.asUInt();
@@ -2658,31 +3015,6 @@ class JsonLoader {
         return static_cast<int>(dest->size());
     }
 
-    int GetArray(const Json::Value &parent, const char *name, ArrayOfVkFormatProperties *dest) {
-        const Json::Value value = parent[name];
-        if (value.type() != Json::arrayValue) {
-            return -1;
-        }
-        DebugPrintf("\t\tJsonLoader::GetArray(ArrayOfVkFormatProperties)\n");
-        dest->clear();
-        const int count = static_cast<int>(value.size());
-        for (int i = 0; i < count; ++i) {
-            // Get a format structure from JSON.
-            DevsimFormatProperties devsim_format_properties = {};
-            GetValue(value, i, &devsim_format_properties);
-            // Split the JSON-acquired data into VkFormat and VkFormatProperties.
-            const VkFormat format = devsim_format_properties.formatID;
-            VkFormatProperties vk_format_properties = {};
-            vk_format_properties.linearTilingFeatures = devsim_format_properties.linearTilingFeatures;
-            vk_format_properties.optimalTilingFeatures = devsim_format_properties.optimalTilingFeatures;
-            vk_format_properties.bufferFeatures = devsim_format_properties.bufferFeatures;
-            if (IsFormatSupported(vk_format_properties)) {
-                dest->insert({format, vk_format_properties});
-            }
-        }
-        return static_cast<int>(dest->size());
-    }
-
     int GetArray(const Json::Value &parent, const char *name, ArrayOfVkLayerProperties *dest) {
         const Json::Value value = parent[name];
         if (value.type() != Json::arrayValue) {
@@ -2773,6 +3105,359 @@ class JsonLoader {
     PhysicalDeviceData &pdd_;
 };
 
+static inline VkFormat StringToFormat(const std::string& input_value) {
+    static const std::unordered_map<std::string, VkFormat> map = {
+        {"VK_FORMAT_UNDEFINED", VK_FORMAT_UNDEFINED},
+        {"VK_FORMAT_R4G4_UNORM_PACK8", VK_FORMAT_R4G4_UNORM_PACK8},
+        {"VK_FORMAT_R4G4B4A4_UNORM_PACK16", VK_FORMAT_R4G4B4A4_UNORM_PACK16},
+        {"VK_FORMAT_B4G4R4A4_UNORM_PACK16", VK_FORMAT_B4G4R4A4_UNORM_PACK16},
+        {"VK_FORMAT_R5G6B5_UNORM_PACK16", VK_FORMAT_R5G6B5_UNORM_PACK16},
+        {"VK_FORMAT_B5G6R5_UNORM_PACK16", VK_FORMAT_B5G6R5_UNORM_PACK16},
+        {"VK_FORMAT_R5G5B5A1_UNORM_PACK16", VK_FORMAT_R5G5B5A1_UNORM_PACK16},
+        {"VK_FORMAT_B5G5R5A1_UNORM_PACK16", VK_FORMAT_B5G5R5A1_UNORM_PACK16},
+        {"VK_FORMAT_A1R5G5B5_UNORM_PACK16", VK_FORMAT_A1R5G5B5_UNORM_PACK16},
+        {"VK_FORMAT_R8_UNORM", VK_FORMAT_R8_UNORM},
+        {"VK_FORMAT_R8_SNORM", VK_FORMAT_R8_SNORM},
+        {"VK_FORMAT_R8_USCALED", VK_FORMAT_R8_USCALED},
+        {"VK_FORMAT_R8_SSCALED", VK_FORMAT_R8_SSCALED},
+        {"VK_FORMAT_R8_UINT", VK_FORMAT_R8_UINT},
+        {"VK_FORMAT_R8_SINT", VK_FORMAT_R8_SINT},
+        {"VK_FORMAT_R8_SRGB", VK_FORMAT_R8_SRGB},
+        {"VK_FORMAT_R8G8_UNORM", VK_FORMAT_R8G8_UNORM},
+        {"VK_FORMAT_R8G8_SNORM", VK_FORMAT_R8G8_SNORM},
+        {"VK_FORMAT_R8G8_USCALED", VK_FORMAT_R8G8_USCALED},
+        {"VK_FORMAT_R8G8_SSCALED", VK_FORMAT_R8G8_SSCALED},
+        {"VK_FORMAT_R8G8_UINT", VK_FORMAT_R8G8_UINT},
+        {"VK_FORMAT_R8G8_SINT", VK_FORMAT_R8G8_SINT},
+        {"VK_FORMAT_R8G8_SRGB", VK_FORMAT_R8G8_SRGB},
+        {"VK_FORMAT_R8G8B8_UNORM", VK_FORMAT_R8G8B8_UNORM},
+        {"VK_FORMAT_R8G8B8_SNORM", VK_FORMAT_R8G8B8_SNORM},
+        {"VK_FORMAT_R8G8B8_USCALED", VK_FORMAT_R8G8B8_USCALED},
+        {"VK_FORMAT_R8G8B8_SSCALED", VK_FORMAT_R8G8B8_SSCALED},
+        {"VK_FORMAT_R8G8B8_UINT", VK_FORMAT_R8G8B8_UINT},
+        {"VK_FORMAT_R8G8B8_SINT", VK_FORMAT_R8G8B8_SINT},
+        {"VK_FORMAT_R8G8B8_SRGB", VK_FORMAT_R8G8B8_SRGB},
+        {"VK_FORMAT_B8G8R8_UNORM", VK_FORMAT_B8G8R8_UNORM},
+        {"VK_FORMAT_B8G8R8_SNORM", VK_FORMAT_B8G8R8_SNORM},
+        {"VK_FORMAT_B8G8R8_USCALED", VK_FORMAT_B8G8R8_USCALED},
+        {"VK_FORMAT_B8G8R8_SSCALED", VK_FORMAT_B8G8R8_SSCALED},
+        {"VK_FORMAT_B8G8R8_UINT", VK_FORMAT_B8G8R8_UINT},
+        {"VK_FORMAT_B8G8R8_SINT", VK_FORMAT_B8G8R8_SINT},
+        {"VK_FORMAT_B8G8R8_SRGB", VK_FORMAT_B8G8R8_SRGB},
+        {"VK_FORMAT_R8G8B8A8_UNORM", VK_FORMAT_R8G8B8A8_UNORM},
+        {"VK_FORMAT_R8G8B8A8_SNORM", VK_FORMAT_R8G8B8A8_SNORM},
+        {"VK_FORMAT_R8G8B8A8_USCALED", VK_FORMAT_R8G8B8A8_USCALED},
+        {"VK_FORMAT_R8G8B8A8_SSCALED", VK_FORMAT_R8G8B8A8_SSCALED},
+        {"VK_FORMAT_R8G8B8A8_UINT", VK_FORMAT_R8G8B8A8_UINT},
+        {"VK_FORMAT_R8G8B8A8_SINT", VK_FORMAT_R8G8B8A8_SINT},
+        {"VK_FORMAT_R8G8B8A8_SRGB", VK_FORMAT_R8G8B8A8_SRGB},
+        {"VK_FORMAT_B8G8R8A8_UNORM", VK_FORMAT_B8G8R8A8_UNORM},
+        {"VK_FORMAT_B8G8R8A8_SNORM", VK_FORMAT_B8G8R8A8_SNORM},
+        {"VK_FORMAT_B8G8R8A8_USCALED", VK_FORMAT_B8G8R8A8_USCALED},
+        {"VK_FORMAT_B8G8R8A8_SSCALED", VK_FORMAT_B8G8R8A8_SSCALED},
+        {"VK_FORMAT_B8G8R8A8_UINT", VK_FORMAT_B8G8R8A8_UINT},
+        {"VK_FORMAT_B8G8R8A8_SINT", VK_FORMAT_B8G8R8A8_SINT},
+        {"VK_FORMAT_B8G8R8A8_SRGB", VK_FORMAT_B8G8R8A8_SRGB},
+        {"VK_FORMAT_A8B8G8R8_UNORM_PACK32", VK_FORMAT_A8B8G8R8_UNORM_PACK32},
+        {"VK_FORMAT_A8B8G8R8_SNORM_PACK32", VK_FORMAT_A8B8G8R8_SNORM_PACK32},
+        {"VK_FORMAT_A8B8G8R8_USCALED_PACK32", VK_FORMAT_A8B8G8R8_USCALED_PACK32},
+        {"VK_FORMAT_A8B8G8R8_SSCALED_PACK32", VK_FORMAT_A8B8G8R8_SSCALED_PACK32},
+        {"VK_FORMAT_A8B8G8R8_UINT_PACK32", VK_FORMAT_A8B8G8R8_UINT_PACK32},
+        {"VK_FORMAT_A8B8G8R8_SINT_PACK32", VK_FORMAT_A8B8G8R8_SINT_PACK32},
+        {"VK_FORMAT_A8B8G8R8_SRGB_PACK32", VK_FORMAT_A8B8G8R8_SRGB_PACK32},
+        {"VK_FORMAT_A2R10G10B10_UNORM_PACK32", VK_FORMAT_A2R10G10B10_UNORM_PACK32},
+        {"VK_FORMAT_A2R10G10B10_SNORM_PACK32", VK_FORMAT_A2R10G10B10_SNORM_PACK32},
+        {"VK_FORMAT_A2R10G10B10_USCALED_PACK32", VK_FORMAT_A2R10G10B10_USCALED_PACK32},
+        {"VK_FORMAT_A2R10G10B10_SSCALED_PACK32", VK_FORMAT_A2R10G10B10_SSCALED_PACK32},
+        {"VK_FORMAT_A2R10G10B10_UINT_PACK32", VK_FORMAT_A2R10G10B10_UINT_PACK32},
+        {"VK_FORMAT_A2R10G10B10_SINT_PACK32", VK_FORMAT_A2R10G10B10_SINT_PACK32},
+        {"VK_FORMAT_A2B10G10R10_UNORM_PACK32", VK_FORMAT_A2B10G10R10_UNORM_PACK32},
+        {"VK_FORMAT_A2B10G10R10_SNORM_PACK32", VK_FORMAT_A2B10G10R10_SNORM_PACK32},
+        {"VK_FORMAT_A2B10G10R10_USCALED_PACK32", VK_FORMAT_A2B10G10R10_USCALED_PACK32},
+        {"VK_FORMAT_A2B10G10R10_SSCALED_PACK32", VK_FORMAT_A2B10G10R10_SSCALED_PACK32},
+        {"VK_FORMAT_A2B10G10R10_UINT_PACK32", VK_FORMAT_A2B10G10R10_UINT_PACK32},
+        {"VK_FORMAT_A2B10G10R10_SINT_PACK32", VK_FORMAT_A2B10G10R10_SINT_PACK32},
+        {"VK_FORMAT_R16_UNORM", VK_FORMAT_R16_UNORM},
+        {"VK_FORMAT_R16_SNORM", VK_FORMAT_R16_SNORM},
+        {"VK_FORMAT_R16_USCALED", VK_FORMAT_R16_USCALED},
+        {"VK_FORMAT_R16_SSCALED", VK_FORMAT_R16_SSCALED},
+        {"VK_FORMAT_R16_UINT", VK_FORMAT_R16_UINT},
+        {"VK_FORMAT_R16_SINT", VK_FORMAT_R16_SINT},
+        {"VK_FORMAT_R16_SFLOAT", VK_FORMAT_R16_SFLOAT},
+        {"VK_FORMAT_R16G16_UNORM", VK_FORMAT_R16G16_UNORM},
+        {"VK_FORMAT_R16G16_SNORM", VK_FORMAT_R16G16_SNORM},
+        {"VK_FORMAT_R16G16_USCALED", VK_FORMAT_R16G16_USCALED},
+        {"VK_FORMAT_R16G16_SSCALED", VK_FORMAT_R16G16_SSCALED},
+        {"VK_FORMAT_R16G16_UINT", VK_FORMAT_R16G16_UINT},
+        {"VK_FORMAT_R16G16_SINT", VK_FORMAT_R16G16_SINT},
+        {"VK_FORMAT_R16G16_SFLOAT", VK_FORMAT_R16G16_SFLOAT},
+        {"VK_FORMAT_R16G16B16_UNORM", VK_FORMAT_R16G16B16_UNORM},
+        {"VK_FORMAT_R16G16B16_SNORM", VK_FORMAT_R16G16B16_SNORM},
+        {"VK_FORMAT_R16G16B16_USCALED", VK_FORMAT_R16G16B16_USCALED},
+        {"VK_FORMAT_R16G16B16_SSCALED", VK_FORMAT_R16G16B16_SSCALED},
+        {"VK_FORMAT_R16G16B16_UINT", VK_FORMAT_R16G16B16_UINT},
+        {"VK_FORMAT_R16G16B16_SINT", VK_FORMAT_R16G16B16_SINT},
+        {"VK_FORMAT_R16G16B16_SFLOAT", VK_FORMAT_R16G16B16_SFLOAT},
+        {"VK_FORMAT_R16G16B16A16_UNORM", VK_FORMAT_R16G16B16A16_UNORM},
+        {"VK_FORMAT_R16G16B16A16_SNORM", VK_FORMAT_R16G16B16A16_SNORM},
+        {"VK_FORMAT_R16G16B16A16_USCALED", VK_FORMAT_R16G16B16A16_USCALED},
+        {"VK_FORMAT_R16G16B16A16_SSCALED", VK_FORMAT_R16G16B16A16_SSCALED},
+        {"VK_FORMAT_R16G16B16A16_UINT", VK_FORMAT_R16G16B16A16_UINT},
+        {"VK_FORMAT_R16G16B16A16_SINT", VK_FORMAT_R16G16B16A16_SINT},
+        {"VK_FORMAT_R16G16B16A16_SFLOAT", VK_FORMAT_R16G16B16A16_SFLOAT},
+        {"VK_FORMAT_R32_UINT", VK_FORMAT_R32_UINT},
+        {"VK_FORMAT_R32_SINT", VK_FORMAT_R32_SINT},
+        {"VK_FORMAT_R32_SFLOAT", VK_FORMAT_R32_SFLOAT},
+        {"VK_FORMAT_R32G32_UINT", VK_FORMAT_R32G32_UINT},
+        {"VK_FORMAT_R32G32_SINT", VK_FORMAT_R32G32_SINT},
+        {"VK_FORMAT_R32G32_SFLOAT", VK_FORMAT_R32G32_SFLOAT},
+        {"VK_FORMAT_R32G32B32_UINT", VK_FORMAT_R32G32B32_UINT},
+        {"VK_FORMAT_R32G32B32_SINT", VK_FORMAT_R32G32B32_SINT},
+        {"VK_FORMAT_R32G32B32_SFLOAT", VK_FORMAT_R32G32B32_SFLOAT},
+        {"VK_FORMAT_R32G32B32A32_UINT", VK_FORMAT_R32G32B32A32_UINT},
+        {"VK_FORMAT_R32G32B32A32_SINT", VK_FORMAT_R32G32B32A32_SINT},
+        {"VK_FORMAT_R32G32B32A32_SFLOAT", VK_FORMAT_R32G32B32A32_SFLOAT},
+        {"VK_FORMAT_R64_UINT", VK_FORMAT_R64_UINT},
+        {"VK_FORMAT_R64_SINT", VK_FORMAT_R64_SINT},
+        {"VK_FORMAT_R64_SFLOAT", VK_FORMAT_R64_SFLOAT},
+        {"VK_FORMAT_R64G64_UINT", VK_FORMAT_R64G64_UINT},
+        {"VK_FORMAT_R64G64_SINT", VK_FORMAT_R64G64_SINT},
+        {"VK_FORMAT_R64G64_SFLOAT", VK_FORMAT_R64G64_SFLOAT},
+        {"VK_FORMAT_R64G64B64_UINT", VK_FORMAT_R64G64B64_UINT},
+        {"VK_FORMAT_R64G64B64_SINT", VK_FORMAT_R64G64B64_SINT},
+        {"VK_FORMAT_R64G64B64_SFLOAT", VK_FORMAT_R64G64B64_SFLOAT},
+        {"VK_FORMAT_R64G64B64A64_UINT", VK_FORMAT_R64G64B64A64_UINT},
+        {"VK_FORMAT_R64G64B64A64_SINT", VK_FORMAT_R64G64B64A64_SINT},
+        {"VK_FORMAT_R64G64B64A64_SFLOAT", VK_FORMAT_R64G64B64A64_SFLOAT},
+        {"VK_FORMAT_B10G11R11_UFLOAT_PACK32", VK_FORMAT_B10G11R11_UFLOAT_PACK32},
+        {"VK_FORMAT_E5B9G9R9_UFLOAT_PACK32", VK_FORMAT_E5B9G9R9_UFLOAT_PACK32},
+        {"VK_FORMAT_D16_UNORM", VK_FORMAT_D16_UNORM},
+        {"VK_FORMAT_X8_D24_UNORM_PACK32", VK_FORMAT_X8_D24_UNORM_PACK32},
+        {"VK_FORMAT_D32_SFLOAT", VK_FORMAT_D32_SFLOAT},
+        {"VK_FORMAT_S8_UINT", VK_FORMAT_S8_UINT},
+        {"VK_FORMAT_D16_UNORM_S8_UINT", VK_FORMAT_D16_UNORM_S8_UINT},
+        {"VK_FORMAT_D24_UNORM_S8_UINT", VK_FORMAT_D24_UNORM_S8_UINT},
+        {"VK_FORMAT_D32_SFLOAT_S8_UINT", VK_FORMAT_D32_SFLOAT_S8_UINT},
+        {"VK_FORMAT_BC1_RGB_UNORM_BLOCK", VK_FORMAT_BC1_RGB_UNORM_BLOCK},
+        {"VK_FORMAT_BC1_RGB_SRGB_BLOCK", VK_FORMAT_BC1_RGB_SRGB_BLOCK},
+        {"VK_FORMAT_BC1_RGBA_UNORM_BLOCK", VK_FORMAT_BC1_RGBA_UNORM_BLOCK},
+        {"VK_FORMAT_BC1_RGBA_SRGB_BLOCK", VK_FORMAT_BC1_RGBA_SRGB_BLOCK},
+        {"VK_FORMAT_BC2_UNORM_BLOCK", VK_FORMAT_BC2_UNORM_BLOCK},
+        {"VK_FORMAT_BC2_SRGB_BLOCK", VK_FORMAT_BC2_SRGB_BLOCK},
+        {"VK_FORMAT_BC3_UNORM_BLOCK", VK_FORMAT_BC3_UNORM_BLOCK},
+        {"VK_FORMAT_BC3_SRGB_BLOCK", VK_FORMAT_BC3_SRGB_BLOCK},
+        {"VK_FORMAT_BC4_UNORM_BLOCK", VK_FORMAT_BC4_UNORM_BLOCK},
+        {"VK_FORMAT_BC4_SNORM_BLOCK", VK_FORMAT_BC4_SNORM_BLOCK},
+        {"VK_FORMAT_BC5_UNORM_BLOCK", VK_FORMAT_BC5_UNORM_BLOCK},
+        {"VK_FORMAT_BC5_SNORM_BLOCK", VK_FORMAT_BC5_SNORM_BLOCK},
+        {"VK_FORMAT_BC6H_UFLOAT_BLOCK", VK_FORMAT_BC6H_UFLOAT_BLOCK},
+        {"VK_FORMAT_BC6H_SFLOAT_BLOCK", VK_FORMAT_BC6H_SFLOAT_BLOCK},
+        {"VK_FORMAT_BC7_UNORM_BLOCK", VK_FORMAT_BC7_UNORM_BLOCK},
+        {"VK_FORMAT_BC7_SRGB_BLOCK", VK_FORMAT_BC7_SRGB_BLOCK},
+        {"VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK", VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK},
+        {"VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK", VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK},
+        {"VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK", VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK},
+        {"VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK", VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK},
+        {"VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK", VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK},
+        {"VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK", VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK},
+        {"VK_FORMAT_EAC_R11_UNORM_BLOCK", VK_FORMAT_EAC_R11_UNORM_BLOCK},
+        {"VK_FORMAT_EAC_R11_SNORM_BLOCK", VK_FORMAT_EAC_R11_SNORM_BLOCK},
+        {"VK_FORMAT_EAC_R11G11_UNORM_BLOCK", VK_FORMAT_EAC_R11G11_UNORM_BLOCK},
+        {"VK_FORMAT_EAC_R11G11_SNORM_BLOCK", VK_FORMAT_EAC_R11G11_SNORM_BLOCK},
+        {"VK_FORMAT_ASTC_4x4_UNORM_BLOCK", VK_FORMAT_ASTC_4x4_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_4x4_SRGB_BLOCK", VK_FORMAT_ASTC_4x4_SRGB_BLOCK},
+        {"VK_FORMAT_ASTC_5x4_UNORM_BLOCK", VK_FORMAT_ASTC_5x4_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_5x4_SRGB_BLOCK", VK_FORMAT_ASTC_5x4_SRGB_BLOCK},
+        {"VK_FORMAT_ASTC_5x5_UNORM_BLOCK", VK_FORMAT_ASTC_5x5_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_5x5_SRGB_BLOCK", VK_FORMAT_ASTC_5x5_SRGB_BLOCK},
+        {"VK_FORMAT_ASTC_6x5_UNORM_BLOCK", VK_FORMAT_ASTC_6x5_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_6x5_SRGB_BLOCK", VK_FORMAT_ASTC_6x5_SRGB_BLOCK},
+        {"VK_FORMAT_ASTC_6x6_UNORM_BLOCK", VK_FORMAT_ASTC_6x6_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_6x6_SRGB_BLOCK", VK_FORMAT_ASTC_6x6_SRGB_BLOCK},
+        {"VK_FORMAT_ASTC_8x5_UNORM_BLOCK", VK_FORMAT_ASTC_8x5_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_8x5_SRGB_BLOCK", VK_FORMAT_ASTC_8x5_SRGB_BLOCK},
+        {"VK_FORMAT_ASTC_8x6_UNORM_BLOCK", VK_FORMAT_ASTC_8x6_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_8x6_SRGB_BLOCK", VK_FORMAT_ASTC_8x6_SRGB_BLOCK},
+        {"VK_FORMAT_ASTC_8x8_UNORM_BLOCK", VK_FORMAT_ASTC_8x8_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_8x8_SRGB_BLOCK", VK_FORMAT_ASTC_8x8_SRGB_BLOCK},
+        {"VK_FORMAT_ASTC_10x5_UNORM_BLOCK", VK_FORMAT_ASTC_10x5_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_10x5_SRGB_BLOCK", VK_FORMAT_ASTC_10x5_SRGB_BLOCK},
+        {"VK_FORMAT_ASTC_10x6_UNORM_BLOCK", VK_FORMAT_ASTC_10x6_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_10x6_SRGB_BLOCK", VK_FORMAT_ASTC_10x6_SRGB_BLOCK},
+        {"VK_FORMAT_ASTC_10x8_UNORM_BLOCK", VK_FORMAT_ASTC_10x8_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_10x8_SRGB_BLOCK", VK_FORMAT_ASTC_10x8_SRGB_BLOCK},
+        {"VK_FORMAT_ASTC_10x10_UNORM_BLOCK", VK_FORMAT_ASTC_10x10_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_10x10_SRGB_BLOCK", VK_FORMAT_ASTC_10x10_SRGB_BLOCK},
+        {"VK_FORMAT_ASTC_12x10_UNORM_BLOCK", VK_FORMAT_ASTC_12x10_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_12x10_SRGB_BLOCK", VK_FORMAT_ASTC_12x10_SRGB_BLOCK},
+        {"VK_FORMAT_ASTC_12x12_UNORM_BLOCK", VK_FORMAT_ASTC_12x12_UNORM_BLOCK},
+        {"VK_FORMAT_ASTC_12x12_SRGB_BLOCK", VK_FORMAT_ASTC_12x12_SRGB_BLOCK},
+        {"VK_FORMAT_G8B8G8R8_422_UNORM", VK_FORMAT_G8B8G8R8_422_UNORM},
+        {"VK_FORMAT_B8G8R8G8_422_UNORM", VK_FORMAT_B8G8R8G8_422_UNORM},
+        {"VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM", VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM},
+        {"VK_FORMAT_G8_B8R8_2PLANE_420_UNORM", VK_FORMAT_G8_B8R8_2PLANE_420_UNORM},
+        {"VK_FORMAT_G8_B8_R8_3PLANE_422_UNORM", VK_FORMAT_G8_B8_R8_3PLANE_422_UNORM},
+        {"VK_FORMAT_G8_B8R8_2PLANE_422_UNORM", VK_FORMAT_G8_B8R8_2PLANE_422_UNORM},
+        {"VK_FORMAT_G8_B8_R8_3PLANE_444_UNORM", VK_FORMAT_G8_B8_R8_3PLANE_444_UNORM},
+        {"VK_FORMAT_R10X6_UNORM_PACK16", VK_FORMAT_R10X6_UNORM_PACK16},
+        {"VK_FORMAT_R10X6G10X6_UNORM_2PACK16", VK_FORMAT_R10X6G10X6_UNORM_2PACK16},
+        {"VK_FORMAT_R10X6G10X6B10X6A10X6_UNORM_4PACK16", VK_FORMAT_R10X6G10X6B10X6A10X6_UNORM_4PACK16},
+        {"VK_FORMAT_G10X6B10X6G10X6R10X6_422_UNORM_4PACK16", VK_FORMAT_G10X6B10X6G10X6R10X6_422_UNORM_4PACK16},
+        {"VK_FORMAT_B10X6G10X6R10X6G10X6_422_UNORM_4PACK16", VK_FORMAT_B10X6G10X6R10X6G10X6_422_UNORM_4PACK16},
+        {"VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_420_UNORM_3PACK16", VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_420_UNORM_3PACK16},
+        {"VK_FORMAT_G10X6_B10X6R10X6_2PLANE_420_UNORM_3PACK16", VK_FORMAT_G10X6_B10X6R10X6_2PLANE_420_UNORM_3PACK16},
+        {"VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_422_UNORM_3PACK16", VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_422_UNORM_3PACK16},
+        {"VK_FORMAT_G10X6_B10X6R10X6_2PLANE_422_UNORM_3PACK16", VK_FORMAT_G10X6_B10X6R10X6_2PLANE_422_UNORM_3PACK16},
+        {"VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_444_UNORM_3PACK16", VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_444_UNORM_3PACK16},
+        {"VK_FORMAT_R12X4_UNORM_PACK16", VK_FORMAT_R12X4_UNORM_PACK16},
+        {"VK_FORMAT_R12X4G12X4_UNORM_2PACK16", VK_FORMAT_R12X4G12X4_UNORM_2PACK16},
+        {"VK_FORMAT_R12X4G12X4B12X4A12X4_UNORM_4PACK16", VK_FORMAT_R12X4G12X4B12X4A12X4_UNORM_4PACK16},
+        {"VK_FORMAT_G12X4B12X4G12X4R12X4_422_UNORM_4PACK16", VK_FORMAT_G12X4B12X4G12X4R12X4_422_UNORM_4PACK16},
+        {"VK_FORMAT_B12X4G12X4R12X4G12X4_422_UNORM_4PACK16", VK_FORMAT_B12X4G12X4R12X4G12X4_422_UNORM_4PACK16},
+        {"VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_420_UNORM_3PACK16", VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_420_UNORM_3PACK16},
+        {"VK_FORMAT_G12X4_B12X4R12X4_2PLANE_420_UNORM_3PACK16", VK_FORMAT_G12X4_B12X4R12X4_2PLANE_420_UNORM_3PACK16},
+        {"VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_422_UNORM_3PACK16", VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_422_UNORM_3PACK16},
+        {"VK_FORMAT_G12X4_B12X4R12X4_2PLANE_422_UNORM_3PACK16", VK_FORMAT_G12X4_B12X4R12X4_2PLANE_422_UNORM_3PACK16},
+        {"VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_444_UNORM_3PACK16", VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_444_UNORM_3PACK16},
+        {"VK_FORMAT_G16B16G16R16_422_UNORM", VK_FORMAT_G16B16G16R16_422_UNORM},
+        {"VK_FORMAT_B16G16R16G16_422_UNORM", VK_FORMAT_B16G16R16G16_422_UNORM},
+        {"VK_FORMAT_G16_B16_R16_3PLANE_420_UNORM", VK_FORMAT_G16_B16_R16_3PLANE_420_UNORM},
+        {"VK_FORMAT_G16_B16R16_2PLANE_420_UNORM", VK_FORMAT_G16_B16R16_2PLANE_420_UNORM},
+        {"VK_FORMAT_G16_B16_R16_3PLANE_422_UNORM", VK_FORMAT_G16_B16_R16_3PLANE_422_UNORM},
+        {"VK_FORMAT_G16_B16R16_2PLANE_422_UNORM", VK_FORMAT_G16_B16R16_2PLANE_422_UNORM},
+        {"VK_FORMAT_G16_B16_R16_3PLANE_444_UNORM", VK_FORMAT_G16_B16_R16_3PLANE_444_UNORM},
+        {"VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG", VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG},
+        {"VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG", VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG},
+        {"VK_FORMAT_PVRTC2_2BPP_UNORM_BLOCK_IMG", VK_FORMAT_PVRTC2_2BPP_UNORM_BLOCK_IMG},
+        {"VK_FORMAT_PVRTC2_4BPP_UNORM_BLOCK_IMG", VK_FORMAT_PVRTC2_4BPP_UNORM_BLOCK_IMG},
+        {"VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG", VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG},
+        {"VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG", VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG},
+        {"VK_FORMAT_PVRTC2_2BPP_SRGB_BLOCK_IMG", VK_FORMAT_PVRTC2_2BPP_SRGB_BLOCK_IMG},
+        {"VK_FORMAT_PVRTC2_4BPP_SRGB_BLOCK_IMG", VK_FORMAT_PVRTC2_4BPP_SRGB_BLOCK_IMG},
+        {"VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_ASTC_5x4_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_5x4_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_ASTC_5x5_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_5x5_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_ASTC_6x5_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_6x5_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_ASTC_8x5_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_8x5_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_ASTC_8x6_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_8x6_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_ASTC_8x8_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_8x8_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_ASTC_10x5_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_10x5_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_ASTC_10x6_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_10x6_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_ASTC_10x8_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_10x8_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_ASTC_10x10_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_10x10_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_ASTC_12x10_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_12x10_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK_EXT", VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK_EXT},
+        {"VK_FORMAT_G8_B8R8_2PLANE_444_UNORM_EXT", VK_FORMAT_G8_B8R8_2PLANE_444_UNORM_EXT},
+        {"VK_FORMAT_G10X6_B10X6R10X6_2PLANE_444_UNORM_3PACK16_EXT", VK_FORMAT_G10X6_B10X6R10X6_2PLANE_444_UNORM_3PACK16_EXT},
+        {"VK_FORMAT_G12X4_B12X4R12X4_2PLANE_444_UNORM_3PACK16_EXT", VK_FORMAT_G12X4_B12X4R12X4_2PLANE_444_UNORM_3PACK16_EXT},
+        {"VK_FORMAT_G16_B16R16_2PLANE_444_UNORM_EXT", VK_FORMAT_G16_B16R16_2PLANE_444_UNORM_EXT},
+        {"VK_FORMAT_A4R4G4B4_UNORM_PACK16_EXT", VK_FORMAT_A4R4G4B4_UNORM_PACK16_EXT},
+        {"VK_FORMAT_A4B4G4R4_UNORM_PACK16_EXT", VK_FORMAT_A4B4G4R4_UNORM_PACK16_EXT},
+        {"VK_FORMAT_G8B8G8R8_422_UNORM_KHR", VK_FORMAT_G8B8G8R8_422_UNORM_KHR},
+        {"VK_FORMAT_B8G8R8G8_422_UNORM_KHR", VK_FORMAT_B8G8R8G8_422_UNORM_KHR},
+        {"VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM_KHR", VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM_KHR},
+        {"VK_FORMAT_G8_B8R8_2PLANE_420_UNORM_KHR", VK_FORMAT_G8_B8R8_2PLANE_420_UNORM_KHR},
+        {"VK_FORMAT_G8_B8_R8_3PLANE_422_UNORM_KHR", VK_FORMAT_G8_B8_R8_3PLANE_422_UNORM_KHR},
+        {"VK_FORMAT_G8_B8R8_2PLANE_422_UNORM_KHR", VK_FORMAT_G8_B8R8_2PLANE_422_UNORM_KHR},
+        {"VK_FORMAT_G8_B8_R8_3PLANE_444_UNORM_KHR", VK_FORMAT_G8_B8_R8_3PLANE_444_UNORM_KHR},
+        {"VK_FORMAT_R10X6_UNORM_PACK16_KHR", VK_FORMAT_R10X6_UNORM_PACK16_KHR},
+        {"VK_FORMAT_R10X6G10X6_UNORM_2PACK16_KHR", VK_FORMAT_R10X6G10X6_UNORM_2PACK16_KHR},
+        {"VK_FORMAT_R10X6G10X6B10X6A10X6_UNORM_4PACK16_KHR", VK_FORMAT_R10X6G10X6B10X6A10X6_UNORM_4PACK16_KHR},
+        {"VK_FORMAT_G10X6B10X6G10X6R10X6_422_UNORM_4PACK16_KHR", VK_FORMAT_G10X6B10X6G10X6R10X6_422_UNORM_4PACK16_KHR},
+        {"VK_FORMAT_B10X6G10X6R10X6G10X6_422_UNORM_4PACK16_KHR", VK_FORMAT_B10X6G10X6R10X6G10X6_422_UNORM_4PACK16_KHR},
+        {"VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_420_UNORM_3PACK16_KHR", VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_420_UNORM_3PACK16_KHR},
+        {"VK_FORMAT_G10X6_B10X6R10X6_2PLANE_420_UNORM_3PACK16_KHR", VK_FORMAT_G10X6_B10X6R10X6_2PLANE_420_UNORM_3PACK16_KHR},
+        {"VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_422_UNORM_3PACK16_KHR", VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_422_UNORM_3PACK16_KHR},
+        {"VK_FORMAT_G10X6_B10X6R10X6_2PLANE_422_UNORM_3PACK16_KHR", VK_FORMAT_G10X6_B10X6R10X6_2PLANE_422_UNORM_3PACK16_KHR},
+        {"VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_444_UNORM_3PACK16_KHR", VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_444_UNORM_3PACK16_KHR},
+        {"VK_FORMAT_R12X4_UNORM_PACK16_KHR", VK_FORMAT_R12X4_UNORM_PACK16_KHR},
+        {"VK_FORMAT_R12X4G12X4_UNORM_2PACK16_KHR", VK_FORMAT_R12X4G12X4_UNORM_2PACK16_KHR},
+        {"VK_FORMAT_R12X4G12X4B12X4A12X4_UNORM_4PACK16_KHR", VK_FORMAT_R12X4G12X4B12X4A12X4_UNORM_4PACK16_KHR},
+        {"VK_FORMAT_G12X4B12X4G12X4R12X4_422_UNORM_4PACK16_KHR", VK_FORMAT_G12X4B12X4G12X4R12X4_422_UNORM_4PACK16_KHR},
+        {"VK_FORMAT_B12X4G12X4R12X4G12X4_422_UNORM_4PACK16_KHR", VK_FORMAT_B12X4G12X4R12X4G12X4_422_UNORM_4PACK16_KHR},
+        {"VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_420_UNORM_3PACK16_KHR", VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_420_UNORM_3PACK16_KHR},
+        {"VK_FORMAT_G12X4_B12X4R12X4_2PLANE_420_UNORM_3PACK16_KHR", VK_FORMAT_G12X4_B12X4R12X4_2PLANE_420_UNORM_3PACK16_KHR},
+        {"VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_422_UNORM_3PACK16_KHR", VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_422_UNORM_3PACK16_KHR},
+        {"VK_FORMAT_G12X4_B12X4R12X4_2PLANE_422_UNORM_3PACK16_KHR", VK_FORMAT_G12X4_B12X4R12X4_2PLANE_422_UNORM_3PACK16_KHR},
+        {"VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_444_UNORM_3PACK16_KHR", VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_444_UNORM_3PACK16_KHR},
+        {"VK_FORMAT_G16B16G16R16_422_UNORM_KHR", VK_FORMAT_G16B16G16R16_422_UNORM_KHR},
+        {"VK_FORMAT_B16G16R16G16_422_UNORM_KHR", VK_FORMAT_B16G16R16G16_422_UNORM_KHR},
+        {"VK_FORMAT_G16_B16_R16_3PLANE_420_UNORM_KHR", VK_FORMAT_G16_B16_R16_3PLANE_420_UNORM_KHR},
+        {"VK_FORMAT_G16_B16R16_2PLANE_420_UNORM_KHR", VK_FORMAT_G16_B16R16_2PLANE_420_UNORM_KHR},
+        {"VK_FORMAT_G16_B16_R16_3PLANE_422_UNORM_KHR", VK_FORMAT_G16_B16_R16_3PLANE_422_UNORM_KHR},
+        {"VK_FORMAT_G16_B16R16_2PLANE_422_UNORM_KHR", VK_FORMAT_G16_B16R16_2PLANE_422_UNORM_KHR},
+        {"VK_FORMAT_G16_B16_R16_3PLANE_444_UNORM_KHR", VK_FORMAT_G16_B16_R16_3PLANE_444_UNORM_KHR},
+    };
+    auto it = map.find(input_value);
+    if (it != map.end()) {
+        return it->second;
+    }
+    return VK_FORMAT_UNDEFINED;
+}
+
+
+static inline VkFormatFeatureFlags StringToVkFormatFeatureFlags(const std::string &input_value) {
+    static const std::unordered_map<std::string, VkFormatFeatureFlags> map = {
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT},
+        {"VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT", VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT},
+        {"VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT", VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT},
+        {"VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT", VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT},
+        {"VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT", VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT},
+        {"VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT", VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT},
+        {"VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT", VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT},
+        {"VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT},
+        {"VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT", VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT},
+        {"VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT", VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT},
+        {"VK_FORMAT_FEATURE_BLIT_SRC_BIT", VK_FORMAT_FEATURE_BLIT_SRC_BIT},
+        {"VK_FORMAT_FEATURE_BLIT_DST_BIT", VK_FORMAT_FEATURE_BLIT_DST_BIT},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT", VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT},
+        {"VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", VK_FORMAT_FEATURE_TRANSFER_SRC_BIT},
+        {"VK_FORMAT_FEATURE_TRANSFER_DST_BIT", VK_FORMAT_FEATURE_TRANSFER_DST_BIT},
+        {"VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT", VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT",
+         VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT",
+         VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT",
+         VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT",
+         VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT},
+        {"VK_FORMAT_FEATURE_DISJOINT_BIT", VK_FORMAT_FEATURE_DISJOINT_BIT},
+        {"VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT", VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT", VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG", VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG},
+        {"VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR", VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR", VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR},
+        {"VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR",
+         VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR},
+        {"VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT", VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT},
+        {"VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR", VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_VIDEO_ENCODE_INPUT_BIT_KHR", VK_FORMAT_FEATURE_VIDEO_ENCODE_INPUT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_VIDEO_ENCODE_DPB_BIT_KHR", VK_FORMAT_FEATURE_VIDEO_ENCODE_DPB_BIT_KHR},
+        {"VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR", VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR},
+        {"VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR", VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT", VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT},
+        {"VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR", VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR",
+         VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR",
+         VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR",
+         VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR",
+         VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR},
+        {"VK_FORMAT_FEATURE_DISJOINT_BIT_KHR", VK_FORMAT_FEATURE_DISJOINT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR", VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT", VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT},
+    };
+    auto it = map.find(input_value);
+    if (it != map.end()) {
+        return it->second;
+    }
+    return 0;
+}
+
 bool JsonLoader::LoadFiles() {
     if (inputFilename.str.empty()) {
         ErrorPrintf("envar %s and %s in vk_layer_settings.txt are unset\n", kEnvarDevsimFilename, kLayerSettingsDevsimFilename);
@@ -2807,7 +3492,402 @@ bool JsonLoader::LoadFiles(const char *filename_list) {
     return true;
 }
 
+void JsonLoader::GetFeature(const Json::Value &feature) {
+    const auto feature_name = feature["struct"].asString();
+
+    if (feature_name == "VkPhysicalDeviceFeatures") {
+        GetValue(feature, &pdd_.physical_device_features_);
+    } else if (feature_name == "VkPhysicalDeviceHostQueryResetFeatures") {
+        GetValue(feature, &pdd_.physical_device_host_query_reset_features_);
+    } else if (feature_name == "VkPhysicalDeviceHostQueryResetFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_host_query_reset_features_);
+    } else if (feature_name == "VkPhysicalDeviceMaintenance4FeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_maintenance_4_features_);
+    } else if (feature_name == "VkPhysicalDevice16BitStorageFeatures") {
+        GetValue(feature, &pdd_.physical_device_16bit_storage_features_);
+    } else if (feature_name == "VkPhysicalDevice16BitStorageFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_16bit_storage_features_);
+    } else if (feature_name == "VkPhysicalDevice8BitStorageFeatures") {
+        GetValue(feature, &pdd_.physical_device_8bit_storage_features_);
+    } else if (feature_name == "VkPhysicalDevice8BitStorageFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_8bit_storage_features_);
+    } else if (feature_name == "VkPhysicalDeviceBufferDeviceAddressFeatures") {
+        GetValue(feature, &pdd_.physical_device_buffer_device_address_features_);
+    } else if (feature_name == "VkPhysicalDeviceBufferDeviceAddressFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_buffer_device_address_features_);
+    } else if (feature_name == "VkPhysicalDeviceDescriptorIndexingFeatures") {
+        GetValue(feature, &pdd_.physical_device_descriptor_indexing_features_);
+    } else if (feature_name == "VkPhysicalDeviceDescriptorIndexingFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_descriptor_indexing_features_);
+    } else if (feature_name == "VkPhysicalDeviceImagelessFramebufferFeatures") {
+        GetValue(feature, &pdd_.physical_device_imageless_framebuffer_features_);
+    } else if (feature_name == "VkPhysicalDeviceImagelessFramebufferFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_imageless_framebuffer_features_);
+    } else if (feature_name == "VkPhysicalDeviceMultiviewFeatures") {
+        GetValue(feature, &pdd_.physical_device_multiview_features_);
+    } else if (feature_name == "VkPhysicalDeviceMultiviewFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_multiview_features_);
+    } else if (feature_name == "VkPhysicalDeviceProtectedMemoryFeatures") {
+        GetValue(feature, &pdd_.physical_device_protected_memory_features_);
+    } else if (feature_name == "VkPhysicalDeviceSamplerYcbcrConversionFeatures") {
+        GetValue(feature, &pdd_.physical_device_sampler_ycbcr_conversion_features_);
+    } else if (feature_name == "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_sampler_ycbcr_conversion_features_);
+    } else if (feature_name == "VkPhysicalDeviceScalarBlockLayoutFeatures") {
+        GetValue(feature, &pdd_.physical_device_scalar_block_layout_features_);
+    } else if (feature_name == "VkPhysicalDeviceScalarBlockLayoutFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_scalar_block_layout_features_);
+    } else if (feature_name == "VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures") {
+        GetValue(feature, &pdd_.physical_device_separate_depth_stencil_layouts_features_);
+    } else if (feature_name == "VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_separate_depth_stencil_layouts_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderAtomicInt64Features") {
+        GetValue(feature, &pdd_.physical_device_shader_atomic_int64_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderAtomicInt64FeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_shader_atomic_int64_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderDrawParametersFeatures") {
+        GetValue(feature, &pdd_.physical_device_shader_draw_parameters_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderFloat16Int8Features") {
+        GetValue(feature, &pdd_.physical_device_shader_float16_int8_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_shader_float16_int8_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures") {
+        GetValue(feature, &pdd_.physical_device_shader_subgroup_extended_types_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_shader_subgroup_extended_types_features_);
+    } else if (feature_name == "VkPhysicalDeviceTimelineSemaphoreFeatures") {
+        GetValue(feature, &pdd_.physical_device_timeline_semaphore_features_);
+    } else if (feature_name == "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_timeline_semaphore_features_);
+    } else if (feature_name == "VkPhysicalDeviceUniformBufferStandardLayoutFeatures") {
+        GetValue(feature, &pdd_.physical_device_uniform_buffer_standard_layout_features_);
+    } else if (feature_name == "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_uniform_buffer_standard_layout_features_);
+    } else if (feature_name == "VkPhysicalDeviceVariablePointersFeatures") {
+        GetValue(feature, &pdd_.physical_device_variable_pointers_features_);
+    } else if (feature_name == "VkPhysicalDeviceVariablePointersFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_variable_pointers_features_);
+    } else if (feature_name == "VkPhysicalDeviceVulkanMemoryModelFeatures") {
+        GetValue(feature, &pdd_.physical_device_vulkan_memory_model_features_);
+    } else if (feature_name == "VkPhysicalDeviceVulkanMemoryModelFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_vulkan_memory_model_features_);
+    } else if (feature_name == "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_zero_initialize_workgroup_memory_features_);
+    } else if (feature_name == "VkPhysicalDeviceAccelerationStructureFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_acceleration_structure_features_);
+    } else if (feature_name == "VkPhysicalDevicePerformanceQueryFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_performance_query_features_);
+    } else if (feature_name == "VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_pipeline_executable_properties_features_);
+    } else if (feature_name == "VkPhysicalDevicePresentIdFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_present_id_features_);
+    } else if (feature_name == "VkPhysicalDevicePresentWaitFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_present_wait_features_);
+    } else if (feature_name == "VkPhysicalDeviceRayQueryFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_ray_query_features_);
+    } else if (feature_name == "VkPhysicalDeviceRayTracingPipelineFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_ray_tracing_pipeline_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderClockFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_shader_clock_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_shader_integer_dot_product_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_shader_subgroup_uniform_control_flow_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_shader_terminate_invocation_features_);
+    } else if (feature_name == "VkPhysicalDeviceSynchronization2FeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_synchronization2_features_);
+    } else if (feature_name == "VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_workgroup_memory_explicit_layout_features_);
+    } else if (feature_name == "VkPhysicalDevice4444FormatsFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_4444_formats_features_);
+    } else if (feature_name == "VkPhysicalDeviceASTCDecodeFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_astc_decode_features_);
+    } else if (feature_name == "VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_blend_operation_advanced_features_);
+    } else if (feature_name == "VkPhysicalDeviceBorderColorSwizzleFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_border_color_swizzle_features_);
+    } else if (feature_name == "VkPhysicalDeviceColorWriteEnableFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_color_write_enable_features_);
+    } else if (feature_name == "VkPhysicalDeviceConditionalRenderingFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_conditional_rendering_features_);
+    } else if (feature_name == "VkPhysicalDeviceCustomBorderColorFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_custom_border_color_features_);
+    } else if (feature_name == "VkPhysicalDeviceDepthClipEnableFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_depth_clip_enable_features_ext_);
+    } else if (feature_name == "VkPhysicalDeviceDeviceMemoryReportFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_device_memory_report_features_);
+    } else if (feature_name == "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_extended_dynamic_state_features_);
+    } else if (feature_name == "VkPhysicalDeviceExtendedDynamicState2FeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_extended_dynamic_state2_features_);
+    } else if (feature_name == "VkPhysicalDeviceFragmentDensityMapFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_fragment_density_map_features_);
+    } else if (feature_name == "VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_fragment_shader_interlock_features_);
+    } else if (feature_name == "VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_global_priority_query_features_);
+    } else if (feature_name == "VkPhysicalDeviceImageRobustnessFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_image_robustness_features_);
+    } else if (feature_name == "VkPhysicalDeviceIndexTypeUint8FeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_index_type_uint8_features_);
+    } else if (feature_name == "VkPhysicalDeviceInlineUniformBlockFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_inline_uniform_block_features_);
+    } else if (feature_name == "VkPhysicalDeviceLineRasterizationFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_line_rasterization_features_);
+    } else if (feature_name == "VkPhysicalDeviceMemoryPriorityFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_memory_priority_features_);
+    } else if (feature_name == "VkPhysicalDeviceMultiDrawFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_multi_draw_features_);
+    } else if (feature_name == "VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_pageable_device_local_memory_features_);
+    } else if (feature_name == "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_pipeline_creation_cache_control_features_);
+    } else if (feature_name == "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_primitive_topology_list_restart_features_);
+    } else if (feature_name == "VkPhysicalDevicePrivateDataFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_private_data_features_);
+    } else if (feature_name == "VkPhysicalDeviceProvokingVertexFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_provoking_vertex_features_);
+    } else if (feature_name == "VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_rgba10x6_formats_features_);
+    } else if (feature_name == "VkPhysicalDeviceRobustness2FeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_robustness_2_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderAtomicFloatFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_shader_atomic_float_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_shader_atomic_float2_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_shader_demote_to_helper_invocation_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_shader_image_atomic_int64_features_);
+    } else if (feature_name == "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_subgroup_size_control_features_);
+    } else if (feature_name == "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_texel_buffer_alignment_features_);
+    } else if (feature_name == "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_texture_compression_astc_hdr_features_);
+    } else if (feature_name == "VkPhysicalDeviceTransformFeedbackFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_transform_feedback_features_);
+    } else if (feature_name == "VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_vertex_attribute_divisor_features_);
+    } else if (feature_name == "VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_vertex_input_dynamic_state_features_);
+    } else if (feature_name == "VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_ycbcr_2plane_444_formats_features_);
+    } else if (feature_name == "VkPhysicalDeviceYcbcrImageArraysFeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_ycbcr_image_arrays_features_);
+    } else if (feature_name == "VkPhysicalDeviceFragmentShadingRateFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_fragment_shading_rate_features_);
+    } else if (feature_name == "VkPhysicalDeviceCoherentMemoryFeaturesAMD") {
+        GetValue(feature, &pdd_.physical_device_coherent_memory_features_);
+    } else if (feature_name == "VkPhysicalDeviceInvocationMaskFeaturesHUAWEI") {
+        GetValue(feature, &pdd_.physical_device_invocation_mask_features_);
+    } else if (feature_name == "VkPhysicalDeviceSubpassShadingFeaturesHUAWEI") {
+        GetValue(feature, &pdd_.physical_device_subpass_shading_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL") {
+        GetValue(feature, &pdd_.physical_device_shader_integer_functions_2_features_);
+    } else if (feature_name == "VkPhysicalDeviceComputeShaderDerivativesFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_compute_shader_derivatives_features_);
+    } else if (feature_name == "VkPhysicalDeviceCooperativeMatrixFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_cooperative_matrix_features_);
+    } else if (feature_name == "VkPhysicalDeviceCornerSampledImageFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_corner_sampled_image_features_);
+    } else if (feature_name == "VkPhysicalDeviceCoverageReductionModeFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_coverage_reduction_mode_features_);
+    } else if (feature_name == "VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_dedicated_allocation_image_aliasing_features_);
+    } else if (feature_name == "VkPhysicalDeviceDiagnosticsConfigFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_diagnostics_config_features_);
+    } else if (feature_name == "VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_device_generated_commands_features_);
+    } else if (feature_name == "VkPhysicalDeviceExternalMemoryRDMAFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_external_memory_rdma_features_);
+    } else if (feature_name == "VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_fragment_shader_barycentric_features_);
+    } else if (feature_name == "VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_fragment_shading_rate_enums_features_);
+    } else if (feature_name == "VkPhysicalDeviceInheritedViewportScissorFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_inherited_viewport_scissor_features_);
+    } else if (feature_name == "VkPhysicalDeviceMeshShaderFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_mesh_shader_features_);
+    } else if (feature_name == "VkPhysicalDeviceRayTracingMotionBlurFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_ray_tracing_motiuon_blur_features_);
+    } else if (feature_name == "VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_representative_fragment_test_features_);
+    } else if (feature_name == "VkPhysicalDeviceExclusiveScissorFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_exclusive_scissor_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderImageFootprintFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_shader_image_footprint_features_);
+    } else if (feature_name == "VkPhysicalDeviceShaderSMBuiltinsFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_shader_sm_builtins_features_);
+    } else if (feature_name == "VkPhysicalDeviceShadingRateImageFeaturesNV") {
+        GetValue(feature, &pdd_.physical_device_shading_rate_image_features_);
+    } else if (feature_name == "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE") {
+        GetValue(feature, &pdd_.physical_device_mutable_descriptor_type_features_);
+    } else if (feature_name == "Vulkan12Features") {
+        GetValue(feature, &pdd_.physical_device_vulkan_1_2_features_);
+    } else if (feature_name == "VkPhysicalDevicePortabilitySubsetFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_portability_subset_features_);
+    }
+}
+
+void JsonLoader::GetProperty(const Json::Value &prop) {
+    const auto property_name = prop["struct"].asString();
+
+    if (property_name == "VkPhysicalDeviceProperties") {
+        GetValue(prop, &pdd_.physical_device_properties_);
+    } else if (property_name == "VkPhysicalDeviceLimits") {
+        GetValue(prop, &pdd_.physical_device_properties_.limits);
+    } else if (property_name == "VkPhysicalDeviceSparseProperties") {
+        GetValue(prop, &pdd_.physical_device_properties_.sparseProperties);
+    } else if (property_name == "VkPhysicalDeviceDepthStencilResolveProperties") {
+        GetValue(prop, &pdd_.physical_device_depth_stencil_resolve_properties_);
+    } else if (property_name == "VkPhysicalDeviceDepthStencilResolvePropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_depth_stencil_resolve_properties_);
+    } else if (property_name == "VkPhysicalDeviceSubgroupProperties") {
+        GetValue(prop, &pdd_.physical_device_subgroup_properties_);
+    } else if (property_name == "VkPhysicalDeviceDescriptorIndexingProperties") {
+        GetValue(prop, &pdd_.physical_device_descriptor_indexing_properties_);
+    } else if (property_name == "VkPhysicalDeviceDescriptorIndexingPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_descriptor_indexing_properties_);
+    } else if (property_name == "VkPhysicalDeviceFloatControlsProperties") {
+        GetValue(prop, &pdd_.physical_device_float_controls_properties_);
+    } else if (property_name == "VkPhysicalDeviceFloatControlsPropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_float_controls_properties_);
+    } else if (property_name == "VkPhysicalDeviceMaintenance3Properties") {
+        GetValue(prop, &pdd_.physical_device_maintenance_3_properties_);
+    } else if (property_name == "VkPhysicalDeviceMaintenance3PropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_maintenance_3_properties_);
+    } else if (property_name == "VkPhysicalDeviceMaintenance4PropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_maintenance_4_properties_);
+    } else if (property_name == "VkPhysicalDeviceMultiviewProperties") {
+        GetValue(prop, &pdd_.physical_device_multiview_properties_);
+    } else if (property_name == "VkPhysicalDeviceMultiviewPropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_multiview_properties_);
+    } else if (property_name == "VkPhysicalDevicePointClippingProperties") {
+        GetValue(prop, &pdd_.physical_device_point_clipping_properties_);
+    } else if (property_name == "VkPhysicalDevicePointClippingPropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_point_clipping_properties_);
+    } else if (property_name == "VkPhysicalDeviceProtectedMemoryProperties") {
+        GetValue(prop, &pdd_.physical_device_protected_memory_properties_);
+    } else if (property_name == "VkPhysicalDeviceTimelineSemaphoreProperties") {
+        GetValue(prop, &pdd_.physical_device_timeline_semaphore_properties_);
+    } else if (property_name == "VkPhysicalDeviceTimelineSemaphorePropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_timeline_semaphore_properties_);
+    } else if (property_name == "VkPhysicalDeviceSamplerFilterMinmaxProperties") {
+        GetValue(prop, &pdd_.physical_device_sampler_filter_minmax_properties_);
+    } else if (property_name == "VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_sampler_filter_minmax_properties_);
+    } else if (property_name == "VkPhysicalDeviceAccelerationStructurePropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_acceleration_structure_properties_);
+    } else if (property_name == "VkPhysicalDevicePerformanceQueryPropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_performance_query_properties_);
+    } else if (property_name == "VkPhysicalDevicePushDescriptorPropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_push_descriptor_properites_);
+    } else if (property_name == "VkPhysicalDeviceRayTracingPipelinePropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_ray_tracing_pipeline_properties_);
+    } else if (property_name == "VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_shader_integer_dot_products_properties_);
+    } else if (property_name == "VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_blend_operation_advanced_properties_);
+    } else if (property_name == "VkPhysicalDeviceConservativeRasterizationPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_conservative_rasterization_properties_);
+    } else if (property_name == "VkPhysicalDeviceCustomBorderColorPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_custom_border_color_properties_);
+    } else if (property_name == "VkPhysicalDeviceDiscardRectanglePropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_discard_rectangle_properties_);
+    } else if (property_name == "VkPhysicalDeviceExternalMemoryHostPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_external_memory_host_properties_);
+    } else if (property_name == "VkPhysicalDeviceFragmentDensityMapPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_fragment_density_map_properties_);
+    } else if (property_name == "VkPhysicalDeviceInlineUniformBlockPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_inline_uniform_block_properties_);
+    } else if (property_name == "VkPhysicalDeviceLineRasterizationPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_line_rasterization_properties_);
+    } else if (property_name == "VkPhysicalDeviceMultiDrawPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_multi_draw_properties_);
+    } else if (property_name == "VkPhysicalDeviceProvokingVertexPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_provoking_vertex_properties_);
+    } else if (property_name == "VkPhysicalDeviceRobustness2PropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_robustness_2_properties_);
+    } else if (property_name == "VkPhysicalDeviceSampleLocationsPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_sample_locations_properties_);
+    } else if (property_name == "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_subgroup_size_control_properties_);
+    } else if (property_name == "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_texel_buffer_alignment_properties_);
+    } else if (property_name == "VkPhysicalDeviceTransformFeedbackPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_transform_feedback_properties_);
+    } else if (property_name == "VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_vertex_attirbute_divisor_properties_);
+    } else if (property_name == "VkPhysicalDeviceFragmentShadingRatePropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_fragment_shading_rate_properties_);
+    } else if (property_name == "VkPhysicalDeviceShaderCorePropertiesAMD") {
+        GetValue(prop, &pdd_.physical_device_shader_core_properties_);
+    } else if (property_name == "VkPhysicalDeviceShaderCoreProperties2AMD") {
+        GetValue(prop, &pdd_.physical_device_shader_core_properties_2_);
+    } else if (property_name == "VkPhysicalDeviceSubpassShadingPropertiesHUAWEI") {
+        GetValue(prop, &pdd_.physical_device_subpass_shading_properties_);
+    } else if (property_name == "VkPhysicalDeviceCooperativeMatrixPropertiesNV") {
+        GetValue(prop, &pdd_.physical_device_cooperative_matrix_properties_);
+    } else if (property_name == "VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV") {
+        GetValue(prop, &pdd_.physical_device_device_generated_commands_properties_);
+    } else if (property_name == "VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV") {
+        GetValue(prop, &pdd_.physical_device_fragment_shading_rate_enums_properties_);
+    } else if (property_name == "VkPhysicalDeviceMeshShaderPropertiesNV") {
+        GetValue(prop, &pdd_.physical_device_mesh_shader_properties_);
+    } else if (property_name == "VkPhysicalDeviceRayTracingPropertiesNV") {
+        GetValue(prop, &pdd_.physical_device_ray_tracing_properties_);
+    } else if (property_name == "VkPhysicalDeviceShaderSMBuiltinsPropertiesNV") {
+        GetValue(prop, &pdd_.physical_device_shader_sm_builtins_properties_);
+    } else if (property_name == "VkPhysicalDeviceShadingRateImagePropertiesNV") {
+        GetValue(prop, &pdd_.physical_device_shading_rate_image_properties_);
+    } else if (property_name == "VkPhysicalDeviceMemoryProperties") {
+        GetValue(prop, &pdd_.physical_device_memory_properties_);
+    } else if (property_name == "VkSurfaceCapabilitiesKHR") {
+        GetValue(prop, &pdd_.surface_capabilities_);
+    } else if (property_name == "ArrayOfVkQueueFamilyProperties") {
+        GetArray(prop, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
+    } else if (property_name == "ArrayOfVkLayerProperties") {
+        GetArray(prop, "ArrayOfVkLayerProperties", &pdd_.arrayof_layer_properties_);
+    } else if (property_name == "ArrayOfVkExtensionProperties") {
+        GetArray(prop, "ArrayOfVkExtensionProperties", &pdd_.arrayof_extension_properties_);
+    } else if (property_name == "ArrayOfVkSurfaceFormats") {
+        GetArray(prop, "ArrayOfVkSurfaceFormats", &pdd_.arrayof_surface_formats_);
+    } else if (property_name == "ArrayOfVkPresentModes") {
+        GetArray(prop, "ArrayOfVkPresentModes", &pdd_.arrayof_present_modes_);
+    } else if (property_name == "Vulkan12Properties") {
+        GetValue(prop, &pdd_.physical_device_vulkan_1_2_properties_);
+    } else if (property_name == "VkPhysicalDevicePortabilitySubsetPropertiesKHR") {
+        GetValue(prop, &pdd_.physical_device_portability_subset_properties_);
+    }
+}
+
+void JsonLoader::GetFormat(const Json::Value &value, ArrayOfVkFormatProperties *dest) {
+    VkFormat format = StringToFormat(value["value"].asString());
+    auto &format_properties = (*dest)[format];
+    const Json::Value& properties = value["properties"];
+    for (const auto &prop : properties) {
+        if (prop["struct"].asString() == "VkFormatProperties2") {
+            const auto &members = prop["members"];
+            for (const auto &feature : members["linearTilingFeatures"]) {
+                format_properties.linearTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+            }
+            for (const auto &feature : members["optimalTilingFeatures"]) {
+                format_properties.optimalTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+            }
+            for (const auto &feature : members["bufferFeatures"]) {
+                format_properties.bufferFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+            }
+        }
+    }
+}
+
 bool JsonLoader::LoadFile(const char *filename) {
+    // Todo
+    profile_name = "baseline";
+
     std::ifstream json_file(filename);
     if (!json_file) {
         ErrorPrintf("JsonLoader failed to open file \"%s\"\n", filename);
@@ -2838,220 +3918,31 @@ bool JsonLoader::LoadFile(const char *filename) {
         return result;
     }
 
+    const auto &caps = root["capabilities"];
+    pdd_.physical_device_imageless_framebuffer_features_ = {};
+    for (const auto &c : caps) {
+        if (c["name"] == profile_name) {
+            const auto &extensions = c["extensions"];
+            profile_extensions.reserve(extensions.size());
+            for (const auto &e : extensions) {
+                profile_extensions.push_back({e["extensionName"].asString(), e["specVersion"].asInt()});
+            }
+            const auto &features = c["features"];
+            for (const auto &feature : features) {
+                GetFeature(feature);
+            }
+            const auto &properties = c["properties"];
+            for (const auto &prop : properties) {
+                GetProperty(prop);
+            }
+            const auto& formats = c["formats"];
+            for (const auto& format : formats) {
+                GetFormat(format, &pdd_.arrayof_format_properties_);
+            }
+        }
+    }
+
     result = true;
-
-    GetValue(root, "VkPhysicalDeviceProperties", &pdd_.physical_device_properties_);
-    GetValue(root, "VkPhysicalDeviceDepthStencilResolveProperties", &pdd_.physical_device_depth_stencil_resolve_properties_);
-    GetValue(root, "VkPhysicalDeviceDepthStencilResolvePropertiesKHR", &pdd_.physical_device_depth_stencil_resolve_properties_);
-    GetValue(root, "VkPhysicalDeviceSubgroupProperties", &pdd_.physical_device_subgroup_properties_);
-    GetValue(root, "VkPhysicalDeviceDescriptorIndexingProperties", &pdd_.physical_device_descriptor_indexing_properties_);
-    GetValue(root, "VkPhysicalDeviceDescriptorIndexingPropertiesEXT", &pdd_.physical_device_descriptor_indexing_properties_);
-    GetValue(root, "VkPhysicalDeviceFloatControlsProperties", &pdd_.physical_device_float_controls_properties_);
-    GetValue(root, "VkPhysicalDeviceFloatControlsPropertiesKHR", &pdd_.physical_device_float_controls_properties_);
-    GetValue(root, "VkPhysicalDeviceHostQueryResetFeatures", &pdd_.physical_device_host_query_reset_features_);
-    GetValue(root, "VkPhysicalDeviceHostQueryResetFeaturesEXT", &pdd_.physical_device_host_query_reset_features_);
-    GetValue(root, "VkPhysicalDeviceMaintenance3Properties", &pdd_.physical_device_maintenance_3_properties_);
-    GetValue(root, "VkPhysicalDeviceMaintenance3PropertiesKHR", &pdd_.physical_device_maintenance_3_properties_);
-    GetValue(root, "VkPhysicalDeviceMaintenance4FeaturesKHR", &pdd_.physical_device_maintenance_4_features_);
-    GetValue(root, "VkPhysicalDeviceMaintenance4PropertiesKHR", &pdd_.physical_device_maintenance_4_properties_);
-    GetValue(root, "VkPhysicalDeviceMultiviewProperties", &pdd_.physical_device_multiview_properties_);
-    GetValue(root, "VkPhysicalDeviceMultiviewPropertiesKHR", &pdd_.physical_device_multiview_properties_);
-    GetValue(root, "VkPhysicalDevicePointClippingProperties", &pdd_.physical_device_point_clipping_properties_);
-    GetValue(root, "VkPhysicalDevicePointClippingPropertiesKHR", &pdd_.physical_device_point_clipping_properties_);
-    GetValue(root, "VkPhysicalDeviceProtectedMemoryProperties", &pdd_.physical_device_protected_memory_properties_);
-    GetValue(root, "VkPhysicalDeviceTimelineSemaphoreProperties", &pdd_.physical_device_timeline_semaphore_properties_);
-    GetValue(root, "VkPhysicalDeviceTimelineSemaphorePropertiesKHR", &pdd_.physical_device_timeline_semaphore_properties_);
-    GetValue(root, "VkPhysicalDeviceFeatures", &pdd_.physical_device_features_);
-    GetValue(root, "VkPhysicalDevice16BitStorageFeatures", &pdd_.physical_device_16bit_storage_features_);
-    GetValue(root, "VkPhysicalDevice16BitStorageFeaturesKHR", &pdd_.physical_device_16bit_storage_features_);
-    GetValue(root, "VkPhysicalDevice8BitStorageFeatures", &pdd_.physical_device_8bit_storage_features_);
-    GetValue(root, "VkPhysicalDevice8BitStorageFeaturesKHR", &pdd_.physical_device_8bit_storage_features_);
-    GetValue(root, "VkPhysicalDeviceBufferDeviceAddressFeatures", &pdd_.physical_device_buffer_device_address_features_);
-    GetValue(root, "VkPhysicalDeviceBufferDeviceAddressFeaturesKHR", &pdd_.physical_device_buffer_device_address_features_);
-    GetValue(root, "VkPhysicalDeviceDescriptorIndexingFeatures", &pdd_.physical_device_descriptor_indexing_features_);
-    GetValue(root, "VkPhysicalDeviceDescriptorIndexingFeaturesEXT", &pdd_.physical_device_descriptor_indexing_features_);
-    GetValue(root, "VkPhysicalDeviceImagelessFramebufferFeatures", &pdd_.physical_device_imageless_framebuffer_features_);
-    GetValue(root, "VkPhysicalDeviceImagelessFramebufferFeaturesKHR", &pdd_.physical_device_imageless_framebuffer_features_);
-    GetValue(root, "VkPhysicalDeviceMultiviewFeatures", &pdd_.physical_device_multiview_features_);
-    GetValue(root, "VkPhysicalDeviceMultiviewFeaturesKHR", &pdd_.physical_device_multiview_features_);
-    GetValue(root, "VkPhysicalDeviceProtectedMemoryFeatures", &pdd_.physical_device_protected_memory_features_);
-    GetValue(root, "VkPhysicalDeviceSamplerFilterMinmaxProperties", &pdd_.physical_device_sampler_filter_minmax_properties_);
-    GetValue(root, "VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT", &pdd_.physical_device_sampler_filter_minmax_properties_);
-    GetValue(root, "VkPhysicalDeviceSamplerYcbcrConversionFeatures", &pdd_.physical_device_sampler_ycbcr_conversion_features_);
-    GetValue(root, "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR", &pdd_.physical_device_sampler_ycbcr_conversion_features_);
-    GetValue(root, "VkPhysicalDeviceScalarBlockLayoutFeatures", &pdd_.physical_device_scalar_block_layout_features_);
-    GetValue(root, "VkPhysicalDeviceScalarBlockLayoutFeaturesEXT", &pdd_.physical_device_scalar_block_layout_features_);
-    GetValue(root, "VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures",
-             &pdd_.physical_device_separate_depth_stencil_layouts_features_);
-    GetValue(root, "VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR",
-             &pdd_.physical_device_separate_depth_stencil_layouts_features_);
-    GetValue(root, "VkPhysicalDeviceShaderAtomicInt64Features", &pdd_.physical_device_shader_atomic_int64_features_);
-    GetValue(root, "VkPhysicalDeviceShaderAtomicInt64FeaturesKHR", &pdd_.physical_device_shader_atomic_int64_features_);
-    GetValue(root, "VkPhysicalDeviceShaderDrawParametersFeatures", &pdd_.physical_device_shader_draw_parameters_features_);
-    GetValue(root, "VkPhysicalDeviceShaderFloat16Int8Features", &pdd_.physical_device_shader_float16_int8_features_);
-    GetValue(root, "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR", &pdd_.physical_device_shader_float16_int8_features_);
-    GetValue(root, "VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures",
-             &pdd_.physical_device_shader_subgroup_extended_types_features_);
-    GetValue(root, "VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR",
-             &pdd_.physical_device_shader_subgroup_extended_types_features_);
-    GetValue(root, "VkPhysicalDeviceTimelineSemaphoreFeatures", &pdd_.physical_device_timeline_semaphore_features_);
-    GetValue(root, "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR", &pdd_.physical_device_timeline_semaphore_features_);
-    GetValue(root, "VkPhysicalDeviceUniformBufferStandardLayoutFeatures",
-             &pdd_.physical_device_uniform_buffer_standard_layout_features_);
-    GetValue(root, "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR",
-             &pdd_.physical_device_uniform_buffer_standard_layout_features_);
-    GetValue(root, "VkPhysicalDeviceVariablePointersFeatures", &pdd_.physical_device_variable_pointers_features_);
-    GetValue(root, "VkPhysicalDeviceVariablePointersFeaturesKHR", &pdd_.physical_device_variable_pointers_features_);
-    GetValue(root, "VkPhysicalDeviceVulkanMemoryModelFeatures", &pdd_.physical_device_vulkan_memory_model_features_);
-    GetValue(root, "VkPhysicalDeviceVulkanMemoryModelFeaturesKHR", &pdd_.physical_device_vulkan_memory_model_features_);
-    GetValue(root, "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR",
-             &pdd_.physical_device_zero_initialize_workgroup_memory_features_);
-    GetValue(root, "VkPhysicalDeviceAccelerationStructureFeaturesKHR", &pdd_.physical_device_acceleration_structure_features_);
-    GetValue(root, "VkPhysicalDeviceAccelerationStructurePropertiesKHR", &pdd_.physical_device_acceleration_structure_properties_);
-    GetValue(root, "VkPhysicalDevicePerformanceQueryFeaturesKHR", &pdd_.physical_device_performance_query_features_);
-    GetValue(root, "VkPhysicalDevicePerformanceQueryPropertiesKHR", &pdd_.physical_device_performance_query_properties_);
-    GetValue(root, "VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR",
-             &pdd_.physical_device_pipeline_executable_properties_features_);
-    GetValue(root, "VkPhysicalDevicePresentIdFeaturesKHR", &pdd_.physical_device_present_id_features_);
-    GetValue(root, "VkPhysicalDevicePresentWaitFeaturesKHR", &pdd_.physical_device_present_wait_features_);
-    GetValue(root, "VkPhysicalDevicePushDescriptorPropertiesKHR", &pdd_.physical_device_push_descriptor_properites_);
-    GetValue(root, "VkPhysicalDeviceRayQueryFeaturesKHR", &pdd_.physical_device_ray_query_features_);
-    GetValue(root, "VkPhysicalDeviceRayTracingPipelineFeaturesKHR", &pdd_.physical_device_ray_tracing_pipeline_features_);
-    GetValue(root, "VkPhysicalDeviceRayTracingPipelinePropertiesKHR", &pdd_.physical_device_ray_tracing_pipeline_properties_);
-    GetValue(root, "VkPhysicalDeviceShaderClockFeaturesKHR", &pdd_.physical_device_shader_clock_features_);
-    GetValue(root, "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR",
-             &pdd_.physical_device_shader_integer_dot_product_features_);
-    GetValue(root, "VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR",
-             &pdd_.physical_device_shader_integer_dot_products_properties_);
-    GetValue(root, "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR",
-             &pdd_.physical_device_shader_subgroup_uniform_control_flow_features_);
-    GetValue(root, "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR",
-             &pdd_.physical_device_shader_terminate_invocation_features_);
-    GetValue(root, "VkPhysicalDeviceSynchronization2FeaturesKHR", &pdd_.physical_device_synchronization2_features_);
-    GetValue(root, "VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR",
-             &pdd_.physical_device_workgroup_memory_explicit_layout_features_);
-    GetValue(root, "VkPhysicalDevice4444FormatsFeaturesEXT", &pdd_.physical_device_4444_formats_features_);
-    GetValue(root, "VkPhysicalDeviceASTCDecodeFeaturesEXT", &pdd_.physical_device_astc_decode_features_);
-    GetValue(root, "VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT", &pdd_.physical_device_blend_operation_advanced_features_);
-    GetValue(root, "VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT",
-             &pdd_.physical_device_blend_operation_advanced_properties_);
-    GetValue(root, "VkPhysicalDeviceBorderColorSwizzleFeaturesEXT", &pdd_.physical_device_border_color_swizzle_features_);
-    GetValue(root, "VkPhysicalDeviceColorWriteEnableFeaturesEXT", &pdd_.physical_device_color_write_enable_features_);
-    GetValue(root, "VkPhysicalDeviceConditionalRenderingFeaturesEXT", &pdd_.physical_device_conditional_rendering_features_);
-    GetValue(root, "VkPhysicalDeviceConservativeRasterizationPropertiesEXT",
-             &pdd_.physical_device_conservative_rasterization_properties_);
-    GetValue(root, "VkPhysicalDeviceCustomBorderColorFeaturesEXT", &pdd_.physical_device_custom_border_color_features_);
-    GetValue(root, "VkPhysicalDeviceCustomBorderColorPropertiesEXT", &pdd_.physical_device_custom_border_color_properties_);
-    GetValue(root, "VkPhysicalDeviceDepthClipEnableFeaturesEXT", &pdd_.physical_device_depth_clip_enable_features_ext_);
-    GetValue(root, "VkPhysicalDeviceDeviceMemoryReportFeaturesEXT", &pdd_.physical_device_device_memory_report_features_);
-    GetValue(root, "VkPhysicalDeviceDiscardRectanglePropertiesEXT", &pdd_.physical_device_discard_rectangle_properties_);
-    GetValue(root, "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT", &pdd_.physical_device_extended_dynamic_state_features_);
-    GetValue(root, "VkPhysicalDeviceExtendedDynamicState2FeaturesEXT", &pdd_.physical_device_extended_dynamic_state2_features_);
-    GetValue(root, "VkPhysicalDeviceExternalMemoryHostPropertiesEXT", &pdd_.physical_device_external_memory_host_properties_);
-    GetValue(root, "VkPhysicalDeviceFragmentDensityMapFeaturesEXT", &pdd_.physical_device_fragment_density_map_features_);
-    GetValue(root, "VkPhysicalDeviceFragmentDensityMapPropertiesEXT", &pdd_.physical_device_fragment_density_map_properties_);
-    GetValue(root, "VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT", &pdd_.physical_device_fragment_shader_interlock_features_);
-    GetValue(root, "VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT", &pdd_.physical_device_global_priority_query_features_);
-    GetValue(root, "VkPhysicalDeviceImageRobustnessFeaturesEXT", &pdd_.physical_device_image_robustness_features_);
-    GetValue(root, "VkPhysicalDeviceIndexTypeUint8FeaturesEXT", &pdd_.physical_device_index_type_uint8_features_);
-    GetValue(root, "VkPhysicalDeviceInlineUniformBlockFeaturesEXT", &pdd_.physical_device_inline_uniform_block_features_);
-    GetValue(root, "VkPhysicalDeviceInlineUniformBlockPropertiesEXT", &pdd_.physical_device_inline_uniform_block_properties_);
-    GetValue(root, "VkPhysicalDeviceLineRasterizationFeaturesEXT", &pdd_.physical_device_line_rasterization_features_);
-    GetValue(root, "VkPhysicalDeviceLineRasterizationPropertiesEXT", &pdd_.physical_device_line_rasterization_properties_);
-    GetValue(root, "VkPhysicalDeviceMemoryPriorityFeaturesEXT", &pdd_.physical_device_memory_priority_features_);
-    GetValue(root, "VkPhysicalDeviceMultiDrawFeaturesEXT", &pdd_.physical_device_multi_draw_features_);
-    GetValue(root, "VkPhysicalDeviceMultiDrawPropertiesEXT", &pdd_.physical_device_multi_draw_properties_);
-    GetValue(root, "VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT",
-             &pdd_.physical_device_pageable_device_local_memory_features_);
-    GetValue(root, "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT",
-             &pdd_.physical_device_pipeline_creation_cache_control_features_);
-    GetValue(root, "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT",
-             &pdd_.physical_device_primitive_topology_list_restart_features_);
-    GetValue(root, "VkPhysicalDevicePrivateDataFeaturesEXT", &pdd_.physical_device_private_data_features_);
-    GetValue(root, "VkPhysicalDeviceProvokingVertexFeaturesEXT", &pdd_.physical_device_provoking_vertex_features_);
-    GetValue(root, "VkPhysicalDeviceProvokingVertexPropertiesEXT", &pdd_.physical_device_provoking_vertex_properties_);
-    GetValue(root, "VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT", &pdd_.physical_device_rgba10x6_formats_features_);
-    GetValue(root, "VkPhysicalDeviceRobustness2FeaturesEXT", &pdd_.physical_device_robustness_2_features_);
-    GetValue(root, "VkPhysicalDeviceRobustness2PropertiesEXT", &pdd_.physical_device_robustness_2_properties_);
-    GetValue(root, "VkPhysicalDeviceSampleLocationsPropertiesEXT", &pdd_.physical_device_sample_locations_properties_);
-    GetValue(root, "VkPhysicalDeviceShaderAtomicFloatFeaturesEXT", &pdd_.physical_device_shader_atomic_float_features_);
-    GetValue(root, "VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT", &pdd_.physical_device_shader_atomic_float2_features_);
-    GetValue(root, "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT",
-             &pdd_.physical_device_shader_demote_to_helper_invocation_features_);
-    GetValue(root, "VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT", &pdd_.physical_device_shader_image_atomic_int64_features_);
-    GetValue(root, "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT", &pdd_.physical_device_subgroup_size_control_features_);
-    GetValue(root, "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT", &pdd_.physical_device_subgroup_size_control_properties_);
-    GetValue(root, "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT", &pdd_.physical_device_texel_buffer_alignment_features_);
-    GetValue(root, "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT", &pdd_.physical_device_texel_buffer_alignment_properties_);
-    GetValue(root, "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT",
-             &pdd_.physical_device_texture_compression_astc_hdr_features_);
-    GetValue(root, "VkPhysicalDeviceTransformFeedbackFeaturesEXT", &pdd_.physical_device_transform_feedback_features_);
-    GetValue(root, "VkPhysicalDeviceTransformFeedbackPropertiesEXT", &pdd_.physical_device_transform_feedback_properties_);
-    GetValue(root, "VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT", &pdd_.physical_device_vertex_attribute_divisor_features_);
-    GetValue(root, "VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT",
-             &pdd_.physical_device_vertex_attirbute_divisor_properties_);
-    GetValue(root, "VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT",
-             &pdd_.physical_device_vertex_input_dynamic_state_features_);
-    GetValue(root, "VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT", &pdd_.physical_device_ycbcr_2plane_444_formats_features_);
-    GetValue(root, "VkPhysicalDeviceYcbcrImageArraysFeaturesEXT", &pdd_.physical_device_ycbcr_image_arrays_features_);
-    GetValue(root, "VkPhysicalDeviceFragmentShadingRateFeaturesKHR", &pdd_.physical_device_fragment_shading_rate_features_);
-    GetValue(root, "VkPhysicalDeviceFragmentShadingRatePropertiesKHR", &pdd_.physical_device_fragment_shading_rate_properties_);
-    GetValue(root, "VkPhysicalDeviceCoherentMemoryFeaturesAMD", &pdd_.physical_device_coherent_memory_features_);
-    GetValue(root, "VkPhysicalDeviceShaderCorePropertiesAMD", &pdd_.physical_device_shader_core_properties_);
-    GetValue(root, "VkPhysicalDeviceShaderCoreProperties2AMD", &pdd_.physical_device_shader_core_properties_2_);
-    GetValue(root, "VkPhysicalDeviceInvocationMaskFeaturesHUAWEI", &pdd_.physical_device_invocation_mask_features_);
-    GetValue(root, "VkPhysicalDeviceSubpassShadingFeaturesHUAWEI", &pdd_.physical_device_subpass_shading_features_);
-    GetValue(root, "VkPhysicalDeviceSubpassShadingPropertiesHUAWEI", &pdd_.physical_device_subpass_shading_properties_);
-    GetValue(root, "VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL",
-             &pdd_.physical_device_shader_integer_functions_2_features_);
-    GetValue(root, "VkPhysicalDeviceComputeShaderDerivativesFeaturesNV",
-             &pdd_.physical_device_compute_shader_derivatives_features_);
-    GetValue(root, "VkPhysicalDeviceCooperativeMatrixFeaturesNV", &pdd_.physical_device_cooperative_matrix_features_);
-    GetValue(root, "VkPhysicalDeviceCooperativeMatrixPropertiesNV", &pdd_.physical_device_cooperative_matrix_properties_);
-    GetValue(root, "VkPhysicalDeviceCornerSampledImageFeaturesNV", &pdd_.physical_device_corner_sampled_image_features_);
-    GetValue(root, "VkPhysicalDeviceCoverageReductionModeFeaturesNV", &pdd_.physical_device_coverage_reduction_mode_features_);
-    GetValue(root, "VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV",
-             &pdd_.physical_device_dedicated_allocation_image_aliasing_features_);
-    GetValue(root, "VkPhysicalDeviceDiagnosticsConfigFeaturesNV", &pdd_.physical_device_diagnostics_config_features_);
-    GetValue(root, "VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV", &pdd_.physical_device_device_generated_commands_features_);
-    GetValue(root, "VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV",
-             &pdd_.physical_device_device_generated_commands_properties_);
-    GetValue(root, "VkPhysicalDeviceExternalMemoryRDMAFeaturesNV", &pdd_.physical_device_external_memory_rdma_features_);
-    GetValue(root, "VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV",
-             &pdd_.physical_device_fragment_shader_barycentric_features_);
-    GetValue(root, "VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV",
-             &pdd_.physical_device_fragment_shading_rate_enums_features_);
-    GetValue(root, "VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV",
-             &pdd_.physical_device_fragment_shading_rate_enums_properties_);
-    GetValue(root, "VkPhysicalDeviceInheritedViewportScissorFeaturesNV",
-             &pdd_.physical_device_inherited_viewport_scissor_features_);
-    GetValue(root, "VkPhysicalDeviceMeshShaderFeaturesNV", &pdd_.physical_device_mesh_shader_features_);
-    GetValue(root, "VkPhysicalDeviceMeshShaderPropertiesNV", &pdd_.physical_device_mesh_shader_properties_);
-    GetValue(root, "VkPhysicalDeviceRayTracingPropertiesNV", &pdd_.physical_device_ray_tracing_properties_);
-    GetValue(root, "VkPhysicalDeviceRayTracingMotionBlurFeaturesNV", &pdd_.physical_device_ray_tracing_motiuon_blur_features_);
-    GetValue(root, "VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV",
-             &pdd_.physical_device_representative_fragment_test_features_);
-    GetValue(root, "VkPhysicalDeviceExclusiveScissorFeaturesNV", &pdd_.physical_device_exclusive_scissor_features_);
-    GetValue(root, "VkPhysicalDeviceShaderImageFootprintFeaturesNV", &pdd_.physical_device_shader_image_footprint_features_);
-    GetValue(root, "VkPhysicalDeviceShaderSMBuiltinsFeaturesNV", &pdd_.physical_device_shader_sm_builtins_features_);
-    GetValue(root, "VkPhysicalDeviceShaderSMBuiltinsPropertiesNV", &pdd_.physical_device_shader_sm_builtins_properties_);
-    GetValue(root, "VkPhysicalDeviceShadingRateImageFeaturesNV", &pdd_.physical_device_shading_rate_image_features_);
-    GetValue(root, "VkPhysicalDeviceShadingRateImagePropertiesNV", &pdd_.physical_device_shading_rate_image_properties_);
-    GetValue(root, "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE", &pdd_.physical_device_mutable_descriptor_type_features_);
-    GetValue(root, "VkPhysicalDeviceMemoryProperties", &pdd_.physical_device_memory_properties_);
-    GetValue(root, "VkSurfaceCapabilitiesKHR", &pdd_.surface_capabilities_);
-    GetArray(root, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
-    GetArray(root, "ArrayOfVkFormatProperties", &pdd_.arrayof_format_properties_);
-    GetArray(root, "ArrayOfVkLayerProperties", &pdd_.arrayof_layer_properties_);
-    GetArray(root, "ArrayOfVkExtensionProperties", &pdd_.arrayof_extension_properties_);
-    GetArray(root, "ArrayOfVkSurfaceFormats", &pdd_.arrayof_surface_formats_);
-    GetArray(root, "ArrayOfVkPresentModes", &pdd_.arrayof_present_modes_);
-
-    GetValue(root, "Vulkan12Features", &pdd_.physical_device_vulkan_1_2_features_);
-    GetValue(root, "Vulkan12Properties", &pdd_.physical_device_vulkan_1_2_properties_);
-
-    GetValue(root, "VkPhysicalDevicePortabilitySubsetPropertiesKHR", &pdd_.physical_device_portability_subset_properties_);
-    GetValue(root, "VkPhysicalDevicePortabilitySubsetFeaturesKHR", &pdd_.physical_device_portability_subset_features_);
 
     // GPUinfo structures
     GetValueGPUinfoCore11(root);
@@ -3071,62 +3962,8 @@ JsonLoader::SchemaId JsonLoader::IdentifySchema(const Json::Value &value) {
 
     SchemaId schema_id = SchemaId::kUnknown;
     const char *schema_string = value.asCString();
-    if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_1_0_0.json#") == 0) {
-        schema_id = SchemaId::kDevsim100;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_1_1_0.json#") == 0) {
-        schema_id = SchemaId::kDevsim110;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_1_2_0.json#") == 0) {
-        schema_id = SchemaId::kDevsim120;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_8bit_storage_1.json#") == 0) {
-        schema_id = SchemaId::kDevsim8BitStorageKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_16bit_storage_1.json#") == 0) {
-        schema_id = SchemaId::kDevsim16BitStorageKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_buffer_device_address_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimBufferDeviceAddressKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_depth_stencil_resolve_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimDepthStencilResolveKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_EXT_descriptor_indexing_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimDescriptorIndexingEXT;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_EXT_host_query_reset_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimHostQueryResetEXT;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_imageless_framebuffer_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimImagelessFramebufferKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_maintenance2_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimMaintenance2KHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_maintenance3_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimMaintenance3KHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_multiview_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimMultiviewKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_portability_subset-provisional-1.json#") ==
-               0) {
-        schema_id = SchemaId::kDevsimPortabilitySubsetKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_EXT_sampler_filter_minmax_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimSamplerFilterMinmaxEXT;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_sampler_ycbcr_conversion_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimSamplerYcbcrConversionKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_EXT_scalar_block_layout_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimScalarBlockLayoutEXT;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_separate_depth_stencil_layouts_1.json#") ==
-               0) {
-        schema_id = SchemaId::kDevsimSeparateDepthStencilLayoutsKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_shader_atomic_int64_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimShaderAtomicInt64KHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_shader_float_controls_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimShaderFloatControlsKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_shader_float16_int8_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimShaderFloat16Int8KHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_shader_subgroup_extended_types_1.json#") ==
-               0) {
-        schema_id = SchemaId::kDevsimShaderSubgroupExtendedTypesKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_timeline_semaphore_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimTimelineSemaphoreKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_uniform_buffer_standard_layout_1.json#") ==
-               0) {
-        schema_id = SchemaId::kDevsimUniformBufferStandardLayoutKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_variable_pointers_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimVariablePointersKHR;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/devsim_VK_KHR_vulkan_memory_model_1.json#") == 0) {
-        schema_id = SchemaId::kDevsimVulkanMemoryModelKHR;
+    if (strcmp(schema_string, "https://schema.khronos.org/vulkan/profiles-1.3.200.json#") == 0) {
+        schema_id = SchemaId::kDevsimProfiles130;
     }
 
     if (schema_id != SchemaId::kUnknown) {
@@ -3142,25 +3979,46 @@ JsonLoader::SchemaId JsonLoader::IdentifySchema(const Json::Value &value) {
 #define GET_ARRAY(name) GetArray(value, #name, dest->name)
 #define GET_VALUE_WARN(name, warn_func) GetValue(value, #name, &dest->name, warn_func)
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProperties *dest) {
-    const Json::Value value = parent[name];
+#define GET_PROPERTY_WARN(prop_name)                           \
+    if (strcmp(p.name, #prop_name) == 0) {                     \
+        if (p.limit == Limit::MIN) {                           \
+            PropertyWarnIfGreater(p.name, p, dest->prop_name); \
+        } else if (p.limit == Limit::MAX) {                    \
+            PropertyWarnIfLesser(p.name, p, dest->prop_name);  \
+        } else if (p.limit == Limit::RANGE) {                  \
+            PropertyWarnIfLesser(p.name, p, dest->prop_name);  \
+            PropertyWarnIfGreater(p.name, p, dest->prop_name); \
+        } else if (p.limit == Limit::EQUAL) {                  \
+            PropertyWarnIfEqual(p.name, p, dest->prop_name);   \
+        } else if (p.limit == Limit::NEQUAL) {                 \
+            PropertyWarnIfNEqual(p.name, p, dest->prop_name);  \
+        }                                                      \
+                                                               \
+        WriteValue(&dest->prop_name, p);                       \
+    }
+
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProperties)\n");
-    GET_VALUE(apiVersion);
-    GET_VALUE(driverVersion);
-    GET_VALUE(vendorID);
-    GET_VALUE(deviceID);
-    GET_VALUE(deviceType);
-    GET_ARRAY(deviceName);         // size < VK_MAX_PHYSICAL_DEVICE_NAME_SIZE
-    GET_ARRAY(pipelineCacheUUID);  // size == VK_UUID_SIZE
-    GET_VALUE(limits);
-    GET_VALUE(sparseProperties);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(apiVersion);
+        GET_PROPERTY_WARN(driverVersion);
+        GET_PROPERTY_WARN(vendorID);
+        GET_PROPERTY_WARN(deviceID);
+        GET_PROPERTY_WARN(deviceType);
+        GET_ARRAY(deviceName);         // size < VK_MAX_PHYSICAL_DEVICE_NAME_SIZE
+        GET_ARRAY(pipelineCacheUUID);  // size == VK_UUID_SIZE
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDepthStencilResolveProperties *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStencilResolveProperties *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3171,15 +4029,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_KHR_depth_stencil_resolve is "
             "not supported by the device.\n");
     }
-    GET_VALUE(supportedDepthResolveModes);
-    GET_VALUE(supportedStencilResolveModes);
-    GET_VALUE_WARN(independentResolveNone, WarnIfGreater);
-    GET_VALUE_WARN(independentResolve, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(supportedDepthResolveModes);
+        GET_PROPERTY_WARN(supportedStencilResolveModes);
+        GET_PROPERTY_WARN(independentResolveNone);
+        GET_PROPERTY_WARN(independentResolve);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
-    if (value.type() != Json::objectValue) {
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
+    auto type = value.type();
+    if (value.type() != Json::arrayValue) {
         return;
     }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDescriptorIndexingPropertiesEXT)\n");
@@ -3189,33 +4053,39 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_descriptor_indexing is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxUpdateAfterBindDescriptorsInAllPools, WarnIfGreater);
-    GET_VALUE_WARN(shaderUniformBufferArrayNonUniformIndexingNative, WarnIfGreater);
-    GET_VALUE_WARN(shaderSampledImageArrayNonUniformIndexingNative, WarnIfGreater);
-    GET_VALUE_WARN(shaderStorageBufferArrayNonUniformIndexingNative, WarnIfGreater);
-    GET_VALUE_WARN(shaderStorageImageArrayNonUniformIndexingNative, WarnIfGreater);
-    GET_VALUE_WARN(shaderInputAttachmentArrayNonUniformIndexingNative, WarnIfGreater);
-    GET_VALUE_WARN(robustBufferAccessUpdateAfterBind, WarnIfGreater);
-    GET_VALUE_WARN(quadDivergentImplicitLod, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorUpdateAfterBindSamplers, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorUpdateAfterBindUniformBuffers, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorUpdateAfterBindStorageBuffers, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorUpdateAfterBindSampledImages, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorUpdateAfterBindStorageImages, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorUpdateAfterBindInputAttachments, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageUpdateAfterBindResources, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetUpdateAfterBindSamplers, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetUpdateAfterBindUniformBuffers, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetUpdateAfterBindUniformBuffersDynamic, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetUpdateAfterBindStorageBuffers, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetUpdateAfterBindStorageBuffersDynamic, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetUpdateAfterBindSampledImages, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetUpdateAfterBindStorageImages, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetUpdateAfterBindInputAttachments, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxUpdateAfterBindDescriptorsInAllPools);
+        GET_PROPERTY_WARN(maxUpdateAfterBindDescriptorsInAllPools);
+        GET_PROPERTY_WARN(shaderUniformBufferArrayNonUniformIndexingNative);
+        GET_PROPERTY_WARN(shaderSampledImageArrayNonUniformIndexingNative);
+        GET_PROPERTY_WARN(shaderStorageBufferArrayNonUniformIndexingNative);
+        GET_PROPERTY_WARN(shaderStorageImageArrayNonUniformIndexingNative);
+        GET_PROPERTY_WARN(shaderInputAttachmentArrayNonUniformIndexingNative);
+        GET_PROPERTY_WARN(robustBufferAccessUpdateAfterBind);
+        GET_PROPERTY_WARN(quadDivergentImplicitLod);
+        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindSamplers);
+        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindUniformBuffers);
+        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindStorageBuffers);
+        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindSampledImages);
+        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindStorageImages);
+        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindInputAttachments);
+        GET_PROPERTY_WARN(maxPerStageUpdateAfterBindResources);
+        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindSamplers);
+        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindUniformBuffers);
+        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindUniformBuffersDynamic);
+        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindStorageBuffers);
+        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindStorageBuffersDynamic);
+        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindSampledImages);
+        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindStorageImages);
+        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindInputAttachments);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFloatControlsPropertiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatControlsPropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3226,27 +4096,32 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_KHR_shader_float_controls is "
             "not supported by the device.\n");
     }
-    GET_VALUE(denormBehaviorIndependence);
-    GET_VALUE(roundingModeIndependence);
-    GET_VALUE_WARN(shaderSignedZeroInfNanPreserveFloat16, WarnIfGreater);
-    GET_VALUE_WARN(shaderSignedZeroInfNanPreserveFloat32, WarnIfGreater);
-    GET_VALUE_WARN(shaderSignedZeroInfNanPreserveFloat64, WarnIfGreater);
-    GET_VALUE_WARN(shaderDenormPreserveFloat16, WarnIfGreater);
-    GET_VALUE_WARN(shaderDenormPreserveFloat32, WarnIfGreater);
-    GET_VALUE_WARN(shaderDenormPreserveFloat64, WarnIfGreater);
-    GET_VALUE_WARN(shaderDenormFlushToZeroFloat16, WarnIfGreater);
-    GET_VALUE_WARN(shaderDenormFlushToZeroFloat32, WarnIfGreater);
-    GET_VALUE_WARN(shaderDenormFlushToZeroFloat64, WarnIfGreater);
-    GET_VALUE_WARN(shaderRoundingModeRTEFloat16, WarnIfGreater);
-    GET_VALUE_WARN(shaderRoundingModeRTEFloat32, WarnIfGreater);
-    GET_VALUE_WARN(shaderRoundingModeRTEFloat64, WarnIfGreater);
-    GET_VALUE_WARN(shaderRoundingModeRTZFloat16, WarnIfGreater);
-    GET_VALUE_WARN(shaderRoundingModeRTZFloat32, WarnIfGreater);
-    GET_VALUE_WARN(shaderRoundingModeRTZFloat64, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(denormBehaviorIndependence);
+        GET_PROPERTY_WARN(roundingModeIndependence);
+        GET_PROPERTY_WARN(shaderSignedZeroInfNanPreserveFloat16);
+        GET_PROPERTY_WARN(shaderSignedZeroInfNanPreserveFloat32);
+        GET_PROPERTY_WARN(shaderSignedZeroInfNanPreserveFloat64);
+        GET_PROPERTY_WARN(shaderDenormPreserveFloat16);
+        GET_PROPERTY_WARN(shaderDenormPreserveFloat32);
+        GET_PROPERTY_WARN(shaderDenormPreserveFloat64);
+        GET_PROPERTY_WARN(shaderDenormFlushToZeroFloat16);
+        GET_PROPERTY_WARN(shaderDenormFlushToZeroFloat32);
+        GET_PROPERTY_WARN(shaderDenormFlushToZeroFloat64);
+        GET_PROPERTY_WARN(shaderRoundingModeRTEFloat16);
+        GET_PROPERTY_WARN(shaderRoundingModeRTEFloat32);
+        GET_PROPERTY_WARN(shaderRoundingModeRTEFloat64);
+        GET_PROPERTY_WARN(shaderRoundingModeRTZFloat16);
+        GET_PROPERTY_WARN(shaderRoundingModeRTZFloat32);
+        GET_PROPERTY_WARN(shaderRoundingModeRTZFloat64);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMaintenance3PropertiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance3PropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3256,12 +4131,17 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "JSON file sets variables for structs provided by VK_KHR_maintenance3, but VK_KHR_maintenance3 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxPerSetDescriptors, WarnIfGreater);
-    GET_VALUE_WARN(maxMemoryAllocationSize, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxPerSetDescriptors);
+        GET_PROPERTY_WARN(maxMemoryAllocationSize);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMaintenance4FeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4FeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3271,11 +4151,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "JSON file sets variables for structs provided by VK_KHR_maintenance4, but VK_KHR_maintenance4 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maintenance4, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maintenance4);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMaintenance4PropertiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4PropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3285,11 +4170,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "JSON file sets variables for structs provided by VK_KHR_maintenance4, but VK_KHR_maintenance4 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxBufferSize, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxBufferSize);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiviewPropertiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3299,12 +4189,17 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "JSON file sets variables for structs provided by VK_KHR_multiview, but VK_KHR_multiview is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxMultiviewViewCount, WarnIfGreater);
-    GET_VALUE_WARN(maxMultiviewInstanceIndex, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxMultiviewViewCount);
+        GET_PROPERTY_WARN(maxMultiviewInstanceIndex);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePointClippingPropertiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePointClippingPropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3313,8 +4208,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     // GET_VALUE(pointClippingBehavior);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3326,11 +4221,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_KHR_portability_subset, please set environment variable %s to 1.\n",
             kEnvarDevsimEmulatePortability);
     }
-    GET_VALUE_WARN(minVertexInputBindingStrideAlignment, WarnIfLesser);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(minVertexInputBindingStrideAlignment);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProtectedMemoryProperties *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryProperties *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3338,8 +4238,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(protectedNoFault, WarnIfLesser);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3350,12 +4250,17 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_sampler_filter_minmax is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(filterMinmaxSingleComponentFormats, WarnIfGreater);
-    GET_VALUE_WARN(filterMinmaxImageComponentMapping, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(filterMinmaxSingleComponentFormats);
+        GET_PROPERTY_WARN(filterMinmaxImageComponentMapping);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTimelineSemaphorePropertiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphorePropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3366,147 +4271,167 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_KHR_timeline_semaphore is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxTimelineSemaphoreValueDifference, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxTimelineSemaphoreValueDifference);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceLimits *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
-    GET_VALUE(maxImageDimension1D);
-    GET_VALUE(maxImageDimension2D);
-    GET_VALUE(maxImageDimension3D);
-    GET_VALUE(maxImageDimensionCube);
-    GET_VALUE(maxImageArrayLayers);
-    GET_VALUE(maxTexelBufferElements);
-    GET_VALUE(maxUniformBufferRange);
-    GET_VALUE(maxStorageBufferRange);
-    GET_VALUE(maxPushConstantsSize);
-    GET_VALUE(maxMemoryAllocationCount);
-    GET_VALUE(maxSamplerAllocationCount);
-    GET_VALUE(bufferImageGranularity);
-    GET_VALUE(sparseAddressSpaceSize);
-    GET_VALUE_WARN(maxBoundDescriptorSets, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorSamplers, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorUniformBuffers, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorStorageBuffers, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorSampledImages, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorStorageImages, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorInputAttachments, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageResources, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetSamplers, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetUniformBuffers, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetUniformBuffersDynamic, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetStorageBuffers, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetStorageBuffersDynamic, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetSampledImages, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetStorageImages, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetInputAttachments, WarnIfGreater);
-    GET_VALUE(maxVertexInputAttributes);
-    GET_VALUE(maxVertexInputBindings);
-    GET_VALUE(maxVertexInputAttributeOffset);
-    GET_VALUE(maxVertexInputBindingStride);
-    GET_VALUE(maxVertexOutputComponents);
-    GET_VALUE(maxTessellationGenerationLevel);
-    GET_VALUE(maxTessellationPatchSize);
-    GET_VALUE(maxTessellationControlPerVertexInputComponents);
-    GET_VALUE(maxTessellationControlPerVertexOutputComponents);
-    GET_VALUE(maxTessellationControlPerPatchOutputComponents);
-    GET_VALUE(maxTessellationControlTotalOutputComponents);
-    GET_VALUE(maxTessellationEvaluationInputComponents);
-    GET_VALUE(maxTessellationEvaluationOutputComponents);
-    GET_VALUE(maxGeometryShaderInvocations);
-    GET_VALUE(maxGeometryInputComponents);
-    GET_VALUE(maxGeometryOutputComponents);
-    GET_VALUE(maxGeometryOutputVertices);
-    GET_VALUE(maxGeometryTotalOutputComponents);
-    GET_VALUE(maxFragmentInputComponents);
-    GET_VALUE(maxFragmentOutputAttachments);
-    GET_VALUE(maxFragmentDualSrcAttachments);
-    GET_VALUE(maxFragmentCombinedOutputResources);
-    GET_VALUE(maxComputeSharedMemorySize);
-    GET_ARRAY(maxComputeWorkGroupCount);  // size == 3
-    GET_VALUE(maxComputeWorkGroupInvocations);
-    GET_ARRAY(maxComputeWorkGroupSize);  // size == 3
-    GET_VALUE(subPixelPrecisionBits);
-    GET_VALUE(subTexelPrecisionBits);
-    GET_VALUE(mipmapPrecisionBits);
-    GET_VALUE(maxDrawIndexedIndexValue);
-    GET_VALUE(maxDrawIndirectCount);
-    GET_VALUE(maxSamplerLodBias);
-    GET_VALUE(maxSamplerAnisotropy);
-    GET_VALUE(maxViewports);
-    GET_ARRAY(maxViewportDimensions);  // size == 2
-    GET_ARRAY(viewportBoundsRange);    // size == 2
-    GET_VALUE(viewportSubPixelBits);
-    GET_VALUE(minMemoryMapAlignment);
-    GET_VALUE(minTexelBufferOffsetAlignment);
-    GET_VALUE(minUniformBufferOffsetAlignment);
-    GET_VALUE(minStorageBufferOffsetAlignment);
-    GET_VALUE(minTexelOffset);
-    GET_VALUE(maxTexelOffset);
-    GET_VALUE(minTexelGatherOffset);
-    GET_VALUE(maxTexelGatherOffset);
-    GET_VALUE(minInterpolationOffset);
-    GET_VALUE(maxInterpolationOffset);
-    GET_VALUE(subPixelInterpolationOffsetBits);
-    GET_VALUE(maxFramebufferWidth);
-    GET_VALUE(maxFramebufferHeight);
-    GET_VALUE(maxFramebufferLayers);
-    GET_VALUE(framebufferColorSampleCounts);
-    GET_VALUE(framebufferDepthSampleCounts);
-    GET_VALUE(framebufferStencilSampleCounts);
-    GET_VALUE(framebufferNoAttachmentsSampleCounts);
-    GET_VALUE(maxColorAttachments);
-    GET_VALUE(sampledImageColorSampleCounts);
-    GET_VALUE(sampledImageIntegerSampleCounts);
-    GET_VALUE(sampledImageDepthSampleCounts);
-    GET_VALUE(sampledImageStencilSampleCounts);
-    GET_VALUE(storageImageSampleCounts);
-    GET_VALUE(maxSampleMaskWords);
-    GET_VALUE(timestampComputeAndGraphics);
-    GET_VALUE(timestampPeriod);
-    GET_VALUE(maxClipDistances);
-    GET_VALUE(maxCullDistances);
-    GET_VALUE(maxCombinedClipAndCullDistances);
-    GET_VALUE(discreteQueuePriorities);
-    GET_ARRAY(pointSizeRange);  // size == 2
-    GET_ARRAY(lineWidthRange);  // size == 2
-    GET_VALUE(pointSizeGranularity);
-    GET_VALUE(lineWidthGranularity);
-    GET_VALUE(strictLines);
-    GET_VALUE(standardSampleLocations);
-    GET_VALUE(optimalBufferCopyOffsetAlignment);
-    GET_VALUE(optimalBufferCopyRowPitchAlignment);
-    GET_VALUE(nonCoherentAtomSize);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxImageDimension1D);
+        GET_PROPERTY_WARN(maxImageDimension2D);
+        GET_PROPERTY_WARN(maxImageDimension3D);
+        GET_PROPERTY_WARN(maxImageDimensionCube);
+        GET_PROPERTY_WARN(maxImageArrayLayers);
+        GET_PROPERTY_WARN(maxTexelBufferElements);
+        GET_PROPERTY_WARN(maxUniformBufferRange);
+        GET_PROPERTY_WARN(maxStorageBufferRange);
+        GET_PROPERTY_WARN(maxPushConstantsSize);
+        GET_PROPERTY_WARN(maxMemoryAllocationCount);
+        GET_PROPERTY_WARN(maxSamplerAllocationCount);
+        GET_PROPERTY_WARN(bufferImageGranularity);
+        GET_PROPERTY_WARN(sparseAddressSpaceSize);
+        GET_PROPERTY_WARN(maxBoundDescriptorSets);
+        GET_PROPERTY_WARN(maxPerStageDescriptorSamplers);
+        GET_PROPERTY_WARN(maxPerStageDescriptorUniformBuffers);
+        GET_PROPERTY_WARN(maxPerStageDescriptorStorageBuffers);
+        GET_PROPERTY_WARN(maxPerStageDescriptorSampledImages);
+        GET_PROPERTY_WARN(maxPerStageDescriptorStorageImages);
+        GET_PROPERTY_WARN(maxPerStageDescriptorInputAttachments);
+        GET_PROPERTY_WARN(maxPerStageResources);
+        GET_PROPERTY_WARN(maxDescriptorSetSamplers);
+        GET_PROPERTY_WARN(maxDescriptorSetUniformBuffers);
+        GET_PROPERTY_WARN(maxDescriptorSetUniformBuffersDynamic);
+        GET_PROPERTY_WARN(maxDescriptorSetStorageBuffers);
+        GET_PROPERTY_WARN(maxDescriptorSetStorageBuffersDynamic);
+        GET_PROPERTY_WARN(maxDescriptorSetSampledImages);
+        GET_PROPERTY_WARN(maxDescriptorSetStorageImages);
+        GET_PROPERTY_WARN(maxDescriptorSetInputAttachments);
+        GET_PROPERTY_WARN(maxVertexInputAttributes);
+        GET_PROPERTY_WARN(maxVertexInputBindings);
+        GET_PROPERTY_WARN(maxVertexInputAttributeOffset);
+        GET_PROPERTY_WARN(maxVertexInputBindingStride);
+        GET_PROPERTY_WARN(maxVertexOutputComponents);
+        GET_PROPERTY_WARN(maxTessellationGenerationLevel);
+        GET_PROPERTY_WARN(maxTessellationPatchSize);
+        GET_PROPERTY_WARN(maxTessellationControlPerVertexInputComponents);
+        GET_PROPERTY_WARN(maxTessellationControlPerVertexOutputComponents);
+        GET_PROPERTY_WARN(maxTessellationControlPerPatchOutputComponents);
+        GET_PROPERTY_WARN(maxTessellationControlTotalOutputComponents);
+        GET_PROPERTY_WARN(maxTessellationEvaluationInputComponents);
+        GET_PROPERTY_WARN(maxTessellationEvaluationOutputComponents);
+        GET_PROPERTY_WARN(maxGeometryShaderInvocations);
+        GET_PROPERTY_WARN(maxGeometryInputComponents);
+        GET_PROPERTY_WARN(maxGeometryOutputComponents);
+        GET_PROPERTY_WARN(maxGeometryOutputVertices);
+        GET_PROPERTY_WARN(maxGeometryTotalOutputComponents);
+        GET_PROPERTY_WARN(maxFragmentInputComponents);
+        GET_PROPERTY_WARN(maxFragmentOutputAttachments);
+        GET_PROPERTY_WARN(maxFragmentDualSrcAttachments);
+        GET_PROPERTY_WARN(maxFragmentCombinedOutputResources);
+        GET_PROPERTY_WARN(maxComputeSharedMemorySize);
+        GET_ARRAY(maxComputeWorkGroupCount);  // size == 3
+        GET_PROPERTY_WARN(maxComputeWorkGroupInvocations);
+        GET_ARRAY(maxComputeWorkGroupSize);  // size == 3
+        GET_PROPERTY_WARN(subPixelPrecisionBits);
+        GET_PROPERTY_WARN(subTexelPrecisionBits);
+        GET_PROPERTY_WARN(mipmapPrecisionBits);
+        GET_PROPERTY_WARN(maxDrawIndexedIndexValue);
+        GET_PROPERTY_WARN(maxDrawIndirectCount);
+        GET_PROPERTY_WARN(maxSamplerLodBias);
+        GET_PROPERTY_WARN(maxSamplerAnisotropy);
+        GET_PROPERTY_WARN(maxViewports);
+        GET_ARRAY(maxViewportDimensions);  // size == 2
+        GET_ARRAY(viewportBoundsRange);    // size == 2
+        GET_PROPERTY_WARN(viewportSubPixelBits);
+        GET_PROPERTY_WARN(minMemoryMapAlignment);
+        GET_PROPERTY_WARN(minTexelBufferOffsetAlignment);
+        GET_PROPERTY_WARN(minUniformBufferOffsetAlignment);
+        GET_PROPERTY_WARN(minStorageBufferOffsetAlignment);
+        GET_PROPERTY_WARN(minTexelOffset);
+        GET_PROPERTY_WARN(maxTexelOffset);
+        GET_PROPERTY_WARN(minTexelGatherOffset);
+        GET_PROPERTY_WARN(maxTexelGatherOffset);
+        GET_PROPERTY_WARN(minInterpolationOffset);
+        GET_PROPERTY_WARN(maxInterpolationOffset);
+        GET_PROPERTY_WARN(subPixelInterpolationOffsetBits);
+        GET_PROPERTY_WARN(maxFramebufferWidth);
+        GET_PROPERTY_WARN(maxFramebufferHeight);
+        GET_PROPERTY_WARN(maxFramebufferLayers);
+        GET_PROPERTY_WARN(framebufferColorSampleCounts);
+        GET_PROPERTY_WARN(framebufferDepthSampleCounts);
+        GET_PROPERTY_WARN(framebufferStencilSampleCounts);
+        GET_PROPERTY_WARN(framebufferNoAttachmentsSampleCounts);
+        GET_PROPERTY_WARN(maxColorAttachments);
+        GET_PROPERTY_WARN(sampledImageColorSampleCounts);
+        GET_PROPERTY_WARN(sampledImageIntegerSampleCounts);
+        GET_PROPERTY_WARN(sampledImageDepthSampleCounts);
+        GET_PROPERTY_WARN(sampledImageStencilSampleCounts);
+        GET_PROPERTY_WARN(storageImageSampleCounts);
+        GET_PROPERTY_WARN(maxSampleMaskWords);
+        GET_PROPERTY_WARN(timestampComputeAndGraphics);
+        GET_PROPERTY_WARN(timestampPeriod);
+        GET_PROPERTY_WARN(maxClipDistances);
+        GET_PROPERTY_WARN(maxCullDistances);
+        GET_PROPERTY_WARN(maxCombinedClipAndCullDistances);
+        GET_PROPERTY_WARN(discreteQueuePriorities);
+        GET_ARRAY(pointSizeRange);  // size == 2
+        GET_ARRAY(lineWidthRange);  // size == 2
+        GET_PROPERTY_WARN(pointSizeGranularity);
+        GET_PROPERTY_WARN(lineWidthGranularity);
+        GET_PROPERTY_WARN(strictLines);
+        GET_PROPERTY_WARN(standardSampleLocations);
+        GET_PROPERTY_WARN(optimalBufferCopyOffsetAlignment);
+        GET_PROPERTY_WARN(optimalBufferCopyRowPitchAlignment);
+        GET_PROPERTY_WARN(nonCoherentAtomSize);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSparseProperties *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSparseProperties *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
-    GET_VALUE(residencyStandard2DBlockShape);
-    GET_VALUE(residencyStandard2DMultisampleBlockShape);
-    GET_VALUE(residencyStandard3DBlockShape);
-    GET_VALUE(residencyAlignedMipSize);
-    GET_VALUE(residencyNonResidentStrict);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(residencyStandard2DBlockShape);
+        GET_PROPERTY_WARN(residencyStandard2DMultisampleBlockShape);
+        GET_PROPERTY_WARN(residencyStandard3DBlockShape);
+        GET_PROPERTY_WARN(residencyAlignedMipSize);
+        GET_PROPERTY_WARN(residencyNonResidentStrict);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubgroupProperties *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupProperties *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
-    GET_VALUE(subgroupSize);
-    GET_VALUE(supportedStages);
-    GET_VALUE(supportedOperations);
-    GET_VALUE(quadOperationsInAllStages);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(subgroupSize);
+        GET_PROPERTY_WARN(supportedStages);
+        GET_PROPERTY_WARN(supportedOperations);
+        GET_PROPERTY_WARN(quadOperationsInAllStages);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFeatures *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3568,8 +4493,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE(inheritedQueries);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevice8BitStorageFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorageFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3584,8 +4509,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(storagePushConstant8, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevice16BitStorageFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorageFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3601,8 +4526,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(storageInputOutput16, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3618,8 +4543,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(bufferDeviceAddressMultiDevice, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3652,8 +4577,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(runtimeDescriptorArray, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceHostQueryResetFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryResetFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3667,8 +4592,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(hostQueryReset, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceImagelessFramebufferFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFramebufferFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3682,8 +4607,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(imagelessFramebuffer, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiviewFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3698,8 +4623,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(multiviewTessellationShader, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3728,8 +4653,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(vertexAttributeAccessBeyondStride, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProtectedMemoryFeatures *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryFeatures *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3737,8 +4662,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(protectedMemory, WarnIfLesser);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3752,8 +4677,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(samplerYcbcrConversion, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3767,9 +4692,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(scalarBlockLayout, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name,
-                          VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3783,8 +4707,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(separateDepthStencilLayouts, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3799,8 +4723,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(shaderSharedInt64Atomics, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderDrawParametersFeatures *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawParametersFeatures *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3808,8 +4732,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(shaderDrawParameters, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3824,9 +4748,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(shaderInt8, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name,
-                          VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3840,8 +4763,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(shaderSubgroupExtendedTypes, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3849,9 +4772,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(timelineSemaphore, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name,
-                          VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3865,8 +4787,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(uniformBufferStandardLayout, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVariablePointersFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePointersFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3880,8 +4802,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(variablePointers, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3897,9 +4819,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(vulkanMemoryModelAvailabilityVisibilityChains, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name,
-                          VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3913,8 +4834,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(shaderZeroInitializeWorkgroupMemory, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceAccelerationStructureFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructureFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3932,8 +4853,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(descriptorBindingAccelerationStructureUpdateAfterBind, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceAccelerationStructurePropertiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructurePropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3944,18 +4865,23 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_KHR_acceleration_structure is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxGeometryCount, WarnIfGreater);
-    GET_VALUE_WARN(maxInstanceCount, WarnIfGreater);
-    GET_VALUE_WARN(maxPrimitiveCount, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorAccelerationStructures, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorUpdateAfterBindAccelerationStructures, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetAccelerationStructures, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetUpdateAfterBindAccelerationStructures, WarnIfGreater);
-    GET_VALUE_WARN(minAccelerationStructureScratchOffsetAlignment, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxGeometryCount);
+        GET_PROPERTY_WARN(maxInstanceCount);
+        GET_PROPERTY_WARN(maxPrimitiveCount);
+        GET_PROPERTY_WARN(maxPerStageDescriptorAccelerationStructures);
+        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindAccelerationStructures);
+        GET_PROPERTY_WARN(maxDescriptorSetAccelerationStructures);
+        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindAccelerationStructures);
+        GET_PROPERTY_WARN(minAccelerationStructureScratchOffsetAlignment);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePerformanceQueryFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3970,8 +4896,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(performanceCounterMultipleQueryPools, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePerformanceQueryPropertiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryPropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -3982,12 +4908,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_KHR_performance_query is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(allowCommandBufferQueryCopies, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(allowCommandBufferQueryCopies);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name,
-                          VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4001,8 +4931,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(pipelineExecutableInfo, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePresentIdFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4016,8 +4946,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(presentId, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePresentWaitFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWaitFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4031,8 +4961,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(presentWait, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePushDescriptorPropertiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescriptorPropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4043,11 +4973,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_KHR_push_descriptor is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxPushDescriptors, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxPushDescriptors);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayQueryFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4061,8 +4996,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(rayQuery, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPipelineFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelineFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4080,8 +5015,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(rayTraversalPrimitiveCulling, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPipelinePropertiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelinePropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4092,18 +5027,23 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_KHR_ray_tracing_pipeline is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderGroupHandleSize, WarnIfGreater);
-    GET_VALUE_WARN(maxRayRecursionDepth, WarnIfGreater);
-    GET_VALUE_WARN(maxShaderGroupStride, WarnIfGreater);
-    GET_VALUE_WARN(shaderGroupBaseAlignment, WarnIfGreater);
-    GET_VALUE_WARN(shaderGroupHandleCaptureReplaySize, WarnIfGreater);
-    GET_VALUE_WARN(maxRayDispatchInvocationCount, WarnIfGreater);
-    GET_VALUE_WARN(shaderGroupHandleAlignment, WarnIfGreater);
-    GET_VALUE_WARN(maxRayHitAttributeSize, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(shaderGroupHandleSize);
+        GET_PROPERTY_WARN(maxRayRecursionDepth);
+        GET_PROPERTY_WARN(maxShaderGroupStride);
+        GET_PROPERTY_WARN(shaderGroupBaseAlignment);
+        GET_PROPERTY_WARN(shaderGroupHandleCaptureReplaySize);
+        GET_PROPERTY_WARN(maxRayDispatchInvocationCount);
+        GET_PROPERTY_WARN(shaderGroupHandleAlignment);
+        GET_PROPERTY_WARN(maxRayHitAttributeSize);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderClockFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClockFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4118,8 +5058,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(shaderDeviceClock, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4133,8 +5073,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(shaderIntegerDotProduct, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4145,41 +5085,45 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_KHR_shader_integer_dot_product is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(integerDotProduct8BitUnsignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct8BitSignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct8BitMixedSignednessAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct4x8BitPackedUnsignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct4x8BitPackedSignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct4x8BitPackedMixedSignednessAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct16BitUnsignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct16BitSignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct16BitMixedSignednessAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct32BitUnsignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct32BitSignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct32BitMixedSignednessAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct64BitUnsignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct64BitSignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProduct64BitMixedSignednessAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating8BitUnsignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating8BitSignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating16BitUnsignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating16BitSignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating32BitUnsignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating32BitSignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating64BitUnsignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating64BitSignedAccelerated, WarnIfGreater);
-    GET_VALUE_WARN(integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(integerDotProduct8BitUnsignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct8BitSignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct8BitMixedSignednessAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct4x8BitPackedUnsignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct4x8BitPackedSignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct4x8BitPackedMixedSignednessAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct16BitUnsignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct16BitSignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct16BitMixedSignednessAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct32BitUnsignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct32BitSignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct32BitMixedSignednessAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct64BitUnsignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct64BitSignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProduct64BitMixedSignednessAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating8BitUnsignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating8BitSignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating16BitUnsignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating16BitSignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating32BitUnsignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating32BitSignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating64BitUnsignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating64BitSignedAccelerated);
+        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name,
-                          VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4193,8 +5137,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(shaderSubgroupUniformControlFlow, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4208,8 +5152,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(shaderTerminateInvocation, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSynchronization2FeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchronization2FeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4223,9 +5167,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(synchronization2, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name,
-                          VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4242,8 +5185,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(workgroupMemoryExplicitLayout16BitAccess, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevice4444FormatsFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444FormatsFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4258,8 +5201,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(formatA4B4G4R4, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceASTCDecodeFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4273,8 +5216,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(decodeModeSharedExponent, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4288,8 +5231,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(advancedBlendCoherentOperations, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4300,16 +5243,21 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_blend_operation_advanced is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(advancedBlendMaxColorAttachments, WarnIfGreater);
-    GET_VALUE_WARN(advancedBlendIndependentBlend, WarnIfGreater);
-    GET_VALUE_WARN(advancedBlendNonPremultipliedSrcColor, WarnIfGreater);
-    GET_VALUE_WARN(advancedBlendNonPremultipliedDstColor, WarnIfGreater);
-    GET_VALUE_WARN(advancedBlendCorrelatedOverlap, WarnIfGreater);
-    GET_VALUE_WARN(advancedBlendAllOperations, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(advancedBlendMaxColorAttachments);
+        GET_PROPERTY_WARN(advancedBlendIndependentBlend);
+        GET_PROPERTY_WARN(advancedBlendNonPremultipliedSrcColor);
+        GET_PROPERTY_WARN(advancedBlendNonPremultipliedDstColor);
+        GET_PROPERTY_WARN(advancedBlendCorrelatedOverlap);
+        GET_PROPERTY_WARN(advancedBlendAllOperations);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4324,8 +5272,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(borderColorSwizzleFromImage, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4339,8 +5287,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(colorWriteEnable, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4355,9 +5303,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(inheritedConditionalRendering, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name,
-                          VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4368,19 +5315,24 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
             "VK_EXT_conservative_rasterization is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(primitiveOverestimationSize, WarnIfGreater);
-    GET_VALUE_WARN(maxExtraPrimitiveOverestimationSize, WarnIfGreater);
-    GET_VALUE_WARN(extraPrimitiveOverestimationSizeGranularity, WarnIfGreater);
-    GET_VALUE_WARN(primitiveUnderestimation, WarnIfGreater);
-    GET_VALUE_WARN(conservativePointAndLineRasterization, WarnIfGreater);
-    GET_VALUE_WARN(degenerateTrianglesRasterized, WarnIfGreater);
-    GET_VALUE_WARN(degenerateLinesRasterized, WarnIfGreater);
-    GET_VALUE_WARN(fullyCoveredFragmentShaderInputVariable, WarnIfGreater);
-    GET_VALUE_WARN(conservativeRasterizationPostDepthCoverage, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(primitiveOverestimationSize);
+        GET_PROPERTY_WARN(maxExtraPrimitiveOverestimationSize);
+        GET_PROPERTY_WARN(extraPrimitiveOverestimationSizeGranularity);
+        GET_PROPERTY_WARN(primitiveUnderestimation);
+        GET_PROPERTY_WARN(conservativePointAndLineRasterization);
+        GET_PROPERTY_WARN(degenerateTrianglesRasterized);
+        GET_PROPERTY_WARN(degenerateLinesRasterized);
+        GET_PROPERTY_WARN(fullyCoveredFragmentShaderInputVariable);
+        GET_PROPERTY_WARN(conservativeRasterizationPostDepthCoverage);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCustomBorderColorFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4395,8 +5347,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(customBorderColorWithoutFormat, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCustomBorderColorPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4407,11 +5359,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_custom_border_color is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxCustomBorderColorSamplers, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxCustomBorderColorSamplers);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4425,8 +5382,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(depthClipEnable, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4440,8 +5397,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(deviceMemoryReport, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4452,11 +5409,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_discard_rectangles is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxDiscardRectangles, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxDiscardRectangles);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4470,8 +5432,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(extendedDynamicState, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4487,8 +5449,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(extendedDynamicState2PatchControlPoints, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExternalMemoryHostPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryHostPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4499,11 +5461,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_external_memory_host is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(minImportedHostPointerAlignment, WarnIfLesser);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(minImportedHostPointerAlignment);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentDensityMapFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4519,8 +5486,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(fragmentDensityMapNonSubsampledImages, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentDensityMapPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4531,13 +5498,18 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_fragment_density_map is "
             "not supported by the device.\n");
     }
-    GET_VALUE(minFragmentDensityTexelSize);
-    GET_VALUE(maxFragmentDensityTexelSize);
-    GET_VALUE_WARN(fragmentDensityInvocations, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(minFragmentDensityTexelSize);
+        GET_PROPERTY_WARN(maxFragmentDensityTexelSize);
+        GET_PROPERTY_WARN(fragmentDensityInvocations);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4553,8 +5525,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(fragmentShaderShadingRateInterlock, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4568,8 +5540,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(globalPriorityQuery, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceImageRobustnessFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobustnessFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4583,8 +5555,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(robustImageAccess, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceIndexTypeUint8FeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUint8FeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4598,8 +5570,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(indexTypeUint8, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceInlineUniformBlockFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4614,8 +5586,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(descriptorBindingInlineUniformBlockUpdateAfterBind, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceInlineUniformBlockPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4626,15 +5598,20 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_inline_uniform_block is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxInlineUniformBlockSize, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorInlineUniformBlocks, WarnIfGreater);
-    GET_VALUE_WARN(maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetInlineUniformBlocks, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetUpdateAfterBindInlineUniformBlocks, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxInlineUniformBlockSize);
+        GET_PROPERTY_WARN(maxPerStageDescriptorInlineUniformBlocks);
+        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks);
+        GET_PROPERTY_WARN(maxDescriptorSetInlineUniformBlocks);
+        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindInlineUniformBlocks);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceLineRasterizationFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4653,8 +5630,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(stippledSmoothLines, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceLineRasterizationPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4665,11 +5642,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_line_rasterization is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(lineSubPixelPrecisionBits, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(lineSubPixelPrecisionBits);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryPriorityFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPriorityFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4683,8 +5665,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(memoryPriority, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiDrawFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4698,8 +5680,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(multiDraw, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMultiDrawPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4710,11 +5692,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_multi_draw is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxMultiDrawCount, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxMultiDrawCount);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4728,9 +5715,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(pageableDeviceLocalMemory, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name,
-                          VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4744,9 +5730,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(pipelineCreationCacheControl, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name,
-                          VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4761,8 +5746,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(primitiveTopologyPatchListRestart, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDevicePrivateDataFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateDataFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4776,8 +5761,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(privateData, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProvokingVertexFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4792,8 +5777,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(transformFeedbackPreservesProvokingVertex, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceProvokingVertexPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4804,12 +5789,17 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_provoking_vertex is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(provokingVertexModePerPipeline, WarnIfGreater);
-    GET_VALUE_WARN(transformFeedbackPreservesTriangleFanProvokingVertex, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(provokingVertexModePerPipeline);
+        GET_PROPERTY_WARN(transformFeedbackPreservesTriangleFanProvokingVertex);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4823,8 +5813,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(formatRgba10x6WithoutYCbCrSampler, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRobustness2FeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2FeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4840,8 +5830,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(nullDescriptor, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRobustness2PropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2PropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4852,12 +5842,17 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_robustness2 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(robustStorageBufferAccessSizeAlignment, WarnIfGreater);
-    GET_VALUE_WARN(robustUniformBufferAccessSizeAlignment, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(robustStorageBufferAccessSizeAlignment);
+        GET_PROPERTY_WARN(robustUniformBufferAccessSizeAlignment);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSampleLocationsPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocationsPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4868,15 +5863,20 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_sample_locations is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(sampleLocationSampleCounts, WarnIfGreater);
-    GET_VALUE(maxSampleLocationGridSize);
-    GET_ARRAY(sampleLocationCoordinateRange);
-    GET_VALUE_WARN(sampleLocationSubPixelBits, WarnIfGreater);
-    GET_VALUE_WARN(variableSampleLocations, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(sampleLocationSampleCounts);
+        GET_PROPERTY_WARN(maxSampleLocationGridSize);
+        GET_ARRAY(sampleLocationCoordinateRange);
+        GET_PROPERTY_WARN(sampleLocationSubPixelBits);
+        GET_PROPERTY_WARN(variableSampleLocations);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4901,8 +5901,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(sparseImageFloat32AtomicAdd, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4927,9 +5927,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(sparseImageFloat32AtomicMinMax, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name,
-                          VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4943,8 +5942,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(shaderDemoteToHelperInvocation, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4959,8 +5958,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(sparseImageInt64Atomics, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4975,8 +5974,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(computeFullSubgroups, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -4987,14 +5986,19 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_subgroup_size_control is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(minSubgroupSize, WarnIfLesser);
-    GET_VALUE_WARN(maxSubgroupSize, WarnIfGreater);
-    GET_VALUE_WARN(maxComputeWorkgroupSubgroups, WarnIfGreater);
-    GET_VALUE_WARN(requiredSubgroupSizeStages, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(minSubgroupSize);
+        GET_PROPERTY_WARN(maxSubgroupSize);
+        GET_PROPERTY_WARN(maxComputeWorkgroupSubgroups);
+        GET_PROPERTY_WARN(requiredSubgroupSizeStages);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5008,8 +6012,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(texelBufferAlignment, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5020,14 +6024,19 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_texel_buffer_alignment is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(storageTexelBufferOffsetAlignmentBytes, WarnIfGreater);
-    GET_VALUE_WARN(storageTexelBufferOffsetSingleTexelAlignment, WarnIfGreater);
-    GET_VALUE_WARN(uniformTexelBufferOffsetAlignmentBytes, WarnIfGreater);
-    GET_VALUE_WARN(uniformTexelBufferOffsetSingleTexelAlignment, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(storageTexelBufferOffsetAlignmentBytes);
+        GET_PROPERTY_WARN(storageTexelBufferOffsetSingleTexelAlignment);
+        GET_PROPERTY_WARN(uniformTexelBufferOffsetAlignmentBytes);
+        GET_PROPERTY_WARN(uniformTexelBufferOffsetSingleTexelAlignment);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5041,8 +6050,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(textureCompressionASTC_HDR, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTransformFeedbackFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5057,8 +6066,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(geometryStreams, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceTransformFeedbackPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5069,20 +6078,25 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_transform_feedback is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxTransformFeedbackStreams, WarnIfGreater);
-    GET_VALUE_WARN(maxTransformFeedbackBuffers, WarnIfGreater);
-    GET_VALUE_WARN(maxTransformFeedbackBufferSize, WarnIfGreater);
-    GET_VALUE_WARN(maxTransformFeedbackStreamDataSize, WarnIfGreater);
-    GET_VALUE_WARN(maxTransformFeedbackBufferDataSize, WarnIfGreater);
-    GET_VALUE_WARN(maxTransformFeedbackBufferDataStride, WarnIfGreater);
-    GET_VALUE_WARN(transformFeedbackQueries, WarnIfGreater);
-    GET_VALUE_WARN(transformFeedbackStreamsLinesTriangles, WarnIfGreater);
-    GET_VALUE_WARN(transformFeedbackRasterizationStreamSelect, WarnIfGreater);
-    GET_VALUE_WARN(transformFeedbackDraw, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxTransformFeedbackStreams);
+        GET_PROPERTY_WARN(maxTransformFeedbackBuffers);
+        GET_PROPERTY_WARN(maxTransformFeedbackBufferSize);
+        GET_PROPERTY_WARN(maxTransformFeedbackStreamDataSize);
+        GET_PROPERTY_WARN(maxTransformFeedbackBufferDataSize);
+        GET_PROPERTY_WARN(maxTransformFeedbackBufferDataStride);
+        GET_PROPERTY_WARN(transformFeedbackQueries);
+        GET_PROPERTY_WARN(transformFeedbackStreamsLinesTriangles);
+        GET_PROPERTY_WARN(transformFeedbackRasterizationStreamSelect);
+        GET_PROPERTY_WARN(transformFeedbackDraw);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5097,8 +6111,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(vertexAttributeInstanceRateZeroDivisor, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5109,11 +6123,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_EXT_vertex_attribute_divisor is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxVertexAttribDivisor, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxVertexAttribDivisor);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5127,8 +6146,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(vertexInputDynamicState, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5142,8 +6161,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(ycbcr2plane444Formats, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5157,8 +6176,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(ycbcrImageArrays, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5174,8 +6193,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(attachmentFragmentShadingRate, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5186,27 +6205,32 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_KHR_fragment_shading_rate is "
             "not supported by the device.\n");
     }
-    GET_VALUE(minFragmentShadingRateAttachmentTexelSize);
-    GET_VALUE(maxFragmentShadingRateAttachmentTexelSize);
-    GET_VALUE_WARN(maxFragmentShadingRateAttachmentTexelSizeAspectRatio, WarnIfGreater);
-    GET_VALUE_WARN(primitiveFragmentShadingRateWithMultipleViewports, WarnIfGreater);
-    GET_VALUE_WARN(layeredShadingRateAttachments, WarnIfGreater);
-    GET_VALUE_WARN(fragmentShadingRateNonTrivialCombinerOps, WarnIfGreater);
-    GET_VALUE(maxFragmentSize);
-    GET_VALUE_WARN(maxFragmentSizeAspectRatio, WarnIfGreater);
-    GET_VALUE_WARN(maxFragmentShadingRateCoverageSamples, WarnIfGreater);
-    GET_VALUE(maxFragmentShadingRateRasterizationSamples);
-    GET_VALUE_WARN(fragmentShadingRateWithShaderDepthStencilWrites, WarnIfGreater);
-    GET_VALUE_WARN(fragmentShadingRateWithSampleMask, WarnIfGreater);
-    GET_VALUE_WARN(fragmentShadingRateWithShaderSampleMask, WarnIfGreater);
-    GET_VALUE_WARN(fragmentShadingRateWithConservativeRasterization, WarnIfGreater);
-    GET_VALUE_WARN(fragmentShadingRateWithFragmentShaderInterlock, WarnIfGreater);
-    GET_VALUE_WARN(fragmentShadingRateWithCustomSampleLocations, WarnIfGreater);
-    GET_VALUE_WARN(fragmentShadingRateStrictMultiplyCombiner, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(minFragmentShadingRateAttachmentTexelSize);
+        GET_PROPERTY_WARN(maxFragmentShadingRateAttachmentTexelSize);
+        GET_PROPERTY_WARN(maxFragmentShadingRateAttachmentTexelSizeAspectRatio);
+        GET_PROPERTY_WARN(primitiveFragmentShadingRateWithMultipleViewports);
+        GET_PROPERTY_WARN(layeredShadingRateAttachments);
+        GET_PROPERTY_WARN(fragmentShadingRateNonTrivialCombinerOps);
+        GET_PROPERTY_WARN(maxFragmentSize);
+        GET_PROPERTY_WARN(maxFragmentSizeAspectRatio);
+        GET_PROPERTY_WARN(maxFragmentShadingRateCoverageSamples);
+        GET_PROPERTY_WARN(maxFragmentShadingRateRasterizationSamples);
+        GET_PROPERTY_WARN(fragmentShadingRateWithShaderDepthStencilWrites);
+        GET_PROPERTY_WARN(fragmentShadingRateWithSampleMask);
+        GET_PROPERTY_WARN(fragmentShadingRateWithShaderSampleMask);
+        GET_PROPERTY_WARN(fragmentShadingRateWithConservativeRasterization);
+        GET_PROPERTY_WARN(fragmentShadingRateWithFragmentShaderInterlock);
+        GET_PROPERTY_WARN(fragmentShadingRateWithCustomSampleLocations);
+        GET_PROPERTY_WARN(fragmentShadingRateStrictMultiplyCombiner);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCoherentMemoryFeaturesAMD *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMemoryFeaturesAMD *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5220,8 +6244,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(deviceCoherentMemory, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderCorePropertiesAMD *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCorePropertiesAMD *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5232,24 +6256,29 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_AMD_shader_core_properties is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderEngineCount, WarnIfGreater);
-    GET_VALUE_WARN(shaderArraysPerEngineCount, WarnIfGreater);
-    GET_VALUE_WARN(computeUnitsPerShaderArray, WarnIfGreater);
-    GET_VALUE_WARN(simdPerComputeUnit, WarnIfGreater);
-    GET_VALUE_WARN(wavefrontsPerSimd, WarnIfGreater);
-    GET_VALUE_WARN(wavefrontSize, WarnIfGreater);
-    GET_VALUE_WARN(sgprsPerSimd, WarnIfGreater);
-    GET_VALUE_WARN(minSgprAllocation, WarnIfGreater);
-    GET_VALUE_WARN(maxSgprAllocation, WarnIfGreater);
-    GET_VALUE_WARN(sgprAllocationGranularity, WarnIfGreater);
-    GET_VALUE_WARN(vgprsPerSimd, WarnIfGreater);
-    GET_VALUE_WARN(minVgprAllocation, WarnIfGreater);
-    GET_VALUE_WARN(maxVgprAllocation, WarnIfGreater);
-    GET_VALUE_WARN(vgprAllocationGranularity, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(shaderEngineCount);
+        GET_PROPERTY_WARN(shaderArraysPerEngineCount);
+        GET_PROPERTY_WARN(computeUnitsPerShaderArray);
+        GET_PROPERTY_WARN(simdPerComputeUnit);
+        GET_PROPERTY_WARN(wavefrontsPerSimd);
+        GET_PROPERTY_WARN(wavefrontSize);
+        GET_PROPERTY_WARN(sgprsPerSimd);
+        GET_PROPERTY_WARN(minSgprAllocation);
+        GET_PROPERTY_WARN(maxSgprAllocation);
+        GET_PROPERTY_WARN(sgprAllocationGranularity);
+        GET_PROPERTY_WARN(vgprsPerSimd);
+        GET_PROPERTY_WARN(minVgprAllocation);
+        GET_PROPERTY_WARN(maxVgprAllocation);
+        GET_PROPERTY_WARN(vgprAllocationGranularity);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderCoreProperties2AMD *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreProperties2AMD *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5260,12 +6289,17 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_AMD_shader_core_properties2 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderCoreFeatures, WarnIfGreater);
-    GET_VALUE_WARN(activeComputeUnitCount, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(shaderCoreFeatures);
+        GET_PROPERTY_WARN(activeComputeUnitCount);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5279,8 +6313,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(invocationMask, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5294,8 +6328,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(subpassShading, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5306,11 +6340,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_HUAWEI_subpass_shading is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxSubpassShadingWorkgroupSizeAspectRatio, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxSubpassShadingWorkgroupSizeAspectRatio);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5324,8 +6363,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(shaderIntegerFunctions2, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5340,8 +6379,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(computeDerivativeGroupLinear, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCooperativeMatrixFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5356,8 +6395,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(cooperativeMatrixRobustBufferAccess, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCooperativeMatrixPropertiesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixPropertiesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5368,11 +6407,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_NV_cooperative_matrix is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(cooperativeMatrixSupportedStages, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(cooperativeMatrixSupportedStages);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCornerSampledImageFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampledImageFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5386,8 +6430,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(cornerSampledImage, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceCoverageReductionModeFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageReductionModeFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5401,9 +6445,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(coverageReductionMode, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name,
-                          VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5417,8 +6460,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name,
     GET_VALUE_WARN(dedicatedAllocationImageAliasing, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5432,8 +6475,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(diagnosticsConfig, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5447,8 +6490,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(deviceGeneratedCommands, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5459,19 +6502,24 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_NV_device_generated_commands is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxGraphicsShaderGroupCount, WarnIfGreater);
-    GET_VALUE_WARN(maxIndirectSequenceCount, WarnIfGreater);
-    GET_VALUE_WARN(maxIndirectCommandsTokenCount, WarnIfGreater);
-    GET_VALUE_WARN(maxIndirectCommandsStreamCount, WarnIfGreater);
-    GET_VALUE_WARN(maxIndirectCommandsTokenOffset, WarnIfGreater);
-    GET_VALUE_WARN(maxIndirectCommandsStreamStride, WarnIfGreater);
-    GET_VALUE_WARN(minSequencesCountBufferOffsetAlignment, WarnIfGreater);
-    GET_VALUE_WARN(minSequencesIndexBufferOffsetAlignment, WarnIfGreater);
-    GET_VALUE_WARN(minIndirectCommandsBufferOffsetAlignment, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxGraphicsShaderGroupCount);
+        GET_PROPERTY_WARN(maxIndirectSequenceCount);
+        GET_PROPERTY_WARN(maxIndirectCommandsTokenCount);
+        GET_PROPERTY_WARN(maxIndirectCommandsStreamCount);
+        GET_PROPERTY_WARN(maxIndirectCommandsTokenOffset);
+        GET_PROPERTY_WARN(maxIndirectCommandsStreamStride);
+        GET_PROPERTY_WARN(minSequencesCountBufferOffsetAlignment);
+        GET_PROPERTY_WARN(minSequencesIndexBufferOffsetAlignment);
+        GET_PROPERTY_WARN(minIndirectCommandsBufferOffsetAlignment);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5485,8 +6533,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(externalMemoryRDMA, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5500,8 +6548,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(fragmentShaderBarycentric, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5517,8 +6565,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(noInvocationFragmentShadingRates, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5529,11 +6577,16 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_NV_fragment_shading_rate_enums is "
             "not supported by the device.\n");
     }
-    GET_VALUE(maxFragmentShadingRateInvocationCount);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxFragmentShadingRateInvocationCount);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceInheritedViewportScissorFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedViewportScissorFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5547,8 +6600,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(inheritedViewportScissor2D, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMeshShaderFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5563,8 +6616,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(meshShader, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMeshShaderPropertiesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderPropertiesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5575,23 +6628,28 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_NV_mesh_shader is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(maxDrawMeshTasksCount, WarnIfGreater);
-    GET_VALUE_WARN(maxTaskWorkGroupInvocations, WarnIfGreater);
-    GET_ARRAY(maxTaskWorkGroupSize);
-    GET_VALUE_WARN(maxTaskTotalMemorySize, WarnIfGreater);
-    GET_VALUE_WARN(maxTaskOutputCount, WarnIfGreater);
-    GET_VALUE_WARN(maxMeshWorkGroupInvocations, WarnIfGreater);
-    GET_ARRAY(maxMeshWorkGroupSize);
-    GET_VALUE_WARN(maxMeshTotalMemorySize, WarnIfGreater);
-    GET_VALUE_WARN(maxMeshOutputVertices, WarnIfGreater);
-    GET_VALUE_WARN(maxMeshOutputPrimitives, WarnIfGreater);
-    GET_VALUE_WARN(maxMeshMultiviewViewCount, WarnIfGreater);
-    GET_VALUE_WARN(meshOutputPerVertexGranularity, WarnIfGreater);
-    GET_VALUE_WARN(meshOutputPerPrimitiveGranularity, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(maxDrawMeshTasksCount);
+        GET_PROPERTY_WARN(maxTaskWorkGroupInvocations);
+        GET_ARRAY(maxTaskWorkGroupSize);
+        GET_PROPERTY_WARN(maxTaskTotalMemorySize);
+        GET_PROPERTY_WARN(maxTaskOutputCount);
+        GET_PROPERTY_WARN(maxMeshWorkGroupInvocations);
+        GET_ARRAY(maxMeshWorkGroupSize);
+        GET_PROPERTY_WARN(maxMeshTotalMemorySize);
+        GET_PROPERTY_WARN(maxMeshOutputVertices);
+        GET_PROPERTY_WARN(maxMeshOutputPrimitives);
+        GET_PROPERTY_WARN(maxMeshMultiviewViewCount);
+        GET_PROPERTY_WARN(meshOutputPerVertexGranularity);
+        GET_PROPERTY_WARN(meshOutputPerPrimitiveGranularity);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingPropertiesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPropertiesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5602,18 +6660,23 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_NV_ray_tracing is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderGroupHandleSize, WarnIfGreater);
-    GET_VALUE_WARN(maxRecursionDepth, WarnIfGreater);
-    GET_VALUE_WARN(maxShaderGroupStride, WarnIfGreater);
-    GET_VALUE_WARN(shaderGroupBaseAlignment, WarnIfGreater);
-    GET_VALUE_WARN(maxGeometryCount, WarnIfGreater);
-    GET_VALUE_WARN(maxInstanceCount, WarnIfGreater);
-    GET_VALUE_WARN(maxTriangleCount, WarnIfGreater);
-    GET_VALUE_WARN(maxDescriptorSetAccelerationStructures, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(shaderGroupHandleSize);
+        GET_PROPERTY_WARN(maxRecursionDepth);
+        GET_PROPERTY_WARN(maxShaderGroupStride);
+        GET_PROPERTY_WARN(shaderGroupBaseAlignment);
+        GET_PROPERTY_WARN(maxGeometryCount);
+        GET_PROPERTY_WARN(maxInstanceCount);
+        GET_PROPERTY_WARN(maxTriangleCount);
+        GET_PROPERTY_WARN(maxDescriptorSetAccelerationStructures);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5628,8 +6691,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(rayTracingMotionBlurPipelineTraceRaysIndirect, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5643,8 +6706,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(representativeFragmentTest, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceExclusiveScissorFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveScissorFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5658,8 +6721,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(exclusiveScissor, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderImageFootprintFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageFootprintFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5673,8 +6736,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(imageFootprint, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderSMBuiltinsFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5688,8 +6751,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(shaderSMBuiltins, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShaderSMBuiltinsPropertiesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsPropertiesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5700,12 +6763,17 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_NV_shader_sm_builtins is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderSMCount, WarnIfGreater);
-    GET_VALUE_WARN(shaderWarpsPerSM, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(shaderSMCount);
+        GET_PROPERTY_WARN(shaderWarpsPerSM);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShadingRateImageFeaturesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImageFeaturesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5720,8 +6788,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     GET_VALUE_WARN(shadingRateCoarseSampleOrder, WarnIfGreater);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceShadingRateImagePropertiesNV *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImagePropertiesNV *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5732,13 +6800,18 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
             "VK_NV_shading_rate_image is "
             "not supported by the device.\n");
     }
-    GET_VALUE(shadingRateTexelSize);
-    GET_VALUE_WARN(shadingRatePaletteSize, WarnIfGreater);
-    GET_VALUE_WARN(shadingRateMaxCoarseSamples, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(shadingRateTexelSize);
+        GET_PROPERTY_WARN(shadingRatePaletteSize);
+        GET_PROPERTY_WARN(shadingRateMaxCoarseSamples);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5800,8 +6873,8 @@ void JsonLoader::GetValue(const Json::Value &parent, int index, VkMemoryHeap *de
     GET_VALUE(flags);
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceMemoryProperties *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryProperties *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5822,8 +6895,8 @@ void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysica
     }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkSurfaceCapabilitiesKHR *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkSurfaceCapabilitiesKHR *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
@@ -5901,26 +6974,36 @@ void JsonLoader::GetValue(const Json::Value &parent, int index, VkDeviceSize *de
     *dest = static_cast<VkDeviceSize>(value.asUInt64());
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVulkan12Properties *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Properties *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
-    GET_VALUE(framebufferIntegerColorSampleCounts);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(framebufferIntegerColorSampleCounts);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkPhysicalDeviceVulkan12Features *dest) {
-    const Json::Value value = parent[name];
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Features *dest) {
+    const Json::Value value = parent["members"];
     if (value.type() != Json::objectValue) {
         return;
     }
-    GET_VALUE_WARN(samplerMirrorClampToEdge, WarnIfGreater);
-    GET_VALUE_WARN(shaderOutputViewportIndex, WarnIfGreater);
-    GET_VALUE_WARN(shaderOutputLayer, WarnIfGreater);
-    GET_VALUE_WARN(subgroupBroadcastDynamicId, WarnIfGreater);
-    GET_VALUE_WARN(drawIndirectCount, WarnIfGreater);
-    GET_VALUE_WARN(descriptorIndexing, WarnIfGreater);
-    GET_VALUE_WARN(samplerFilterMinmax, WarnIfGreater);
+
+    for (const auto &prop : value) {
+        Property p(prop);
+
+        GET_PROPERTY_WARN(samplerMirrorClampToEdge);
+        GET_PROPERTY_WARN(shaderOutputViewportIndex);
+        GET_PROPERTY_WARN(shaderOutputLayer);
+        GET_PROPERTY_WARN(subgroupBroadcastDynamicId);
+        GET_PROPERTY_WARN(drawIndirectCount);
+        GET_PROPERTY_WARN(descriptorIndexing);
+        GET_PROPERTY_WARN(samplerFilterMinmax);
+    }
 }
 
 void JsonLoader::GetValueGPUinfoCore11(const Json::Value &parent) {
@@ -5977,7 +7060,7 @@ void JsonLoader::GetValueGPUinfoCore11(const Json::Value &parent) {
 
     const Json::Value device_props = parent["VkPhysicalDeviceProperties"];
     if (device_props.type() == Json::objectValue) {
-        GetValue(device_props, "subgroupProperties", &pdd_.physical_device_subgroup_properties_);
+        GetValue(device_props, &pdd_.physical_device_subgroup_properties_);
     }
 }
 
@@ -7437,7 +8520,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
                     VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *shf = (VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *)place;
                     void *pNext = shf->pNext;
-                    *shf= physicalDeviceData->physical_device_subpass_shading_features_;
+                    *shf = physicalDeviceData->physical_device_subpass_shading_features_;
                     shf->pNext = pNext;
                 }
                 break;
@@ -7976,9 +9059,9 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
                 *pFormatProperties = (iter != pdd->arrayof_format_properties_.end()) ? VkFormatProperties{} : device_format;
                 break;
             case ARRAY_COMBINATION_MODE_INTERSECT:
-                *pFormatProperties = IsFormatSupported(device_format)
-                                         ? device_format
-                                         : (iter != pdd->arrayof_format_properties_.end()) ? iter->second : VkFormatProperties{};
+                *pFormatProperties = IsFormatSupported(device_format)                  ? device_format
+                                     : (iter != pdd->arrayof_format_properties_.end()) ? iter->second
+                                                                                       : VkFormatProperties{};
                 break;
             default:
                 *pFormatProperties = device_format;
@@ -9462,7 +10545,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
 
                     property_chain.pNext = &(pdd.physical_device_shading_rate_image_properties_);
                 }
-
 
                 if (PhysicalDeviceData::HasExtension(physical_device, VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME)) {
                     pdd.physical_device_mutable_descriptor_type_features_.pNext = feature_chain.pNext;
