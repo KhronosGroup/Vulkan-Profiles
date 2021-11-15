@@ -1,4 +1,5 @@
 // Implementation details:
+#include <cstddef>
 #include <cstring>
 #include <cassert>
 #include <vector>

@@ -807,6 +807,7 @@ static const VpFormatProperties _VP_LUNARG_DESKTOP_PORTABILITY_2022_FORMATS[] = 
          VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
      0}};
 // Implementation details:
+#include <cstddef>
 #include <cstring>
 #include <cassert>
 #include <vector>
