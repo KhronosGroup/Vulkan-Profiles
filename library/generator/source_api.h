@@ -1,48 +1,3 @@
-#pragma once
-
-static const char *TEXT_COPYRIGHT = R"(
-/*
- * Copyright (c) 2021-2022 LunarG, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License")
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * Authors:
- * - Christophe Riccio <christophe@lunarg.com>
- */
-)";
-
-static const char *TEXT_IFNDEF = R"(
-#ifndef VULKAN_PROFILES_
-#define VULKAN_PROFILES_ 1
-)";
-
-static const char *TEXT_ENDIF = R"(
-#endif//VULKAN_PROFILES_
-)";
-
-static const char *TEXT_CPP_BEGIN = R"(
-#ifdef __cplusplus
-    extern "C" {
-#endif
-)";
-
-static const char *TEXT_CPP_END = R"(
-#ifdef __cplusplus
-}
-#endif
-)";
-
-static const char *TEXT_API_DECL = R"(
 #include <vulkan/vulkan_core.h>
 #ifdef VK_ENABLE_BETA_EXTENSIONS
 #include <vulkan/vulkan_beta.h>
@@ -151,6 +106,4 @@ void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMem
 
 // Query the requirements of queue families by a profile
 void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
-)";
-
 
