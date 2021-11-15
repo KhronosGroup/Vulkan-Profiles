@@ -119,6 +119,7 @@ int build_header_split(std::string& buffer) {
 
     buffer += TEXT_COPYRIGHT;
     buffer += TEXT_IFNDEF;
+    buffer += "#define VP_INLINE\n";
     buffer += TEXT_CPP_BEGIN;
 
     buffer += fetch("library/generator/source_api.h");
@@ -134,6 +135,7 @@ int build_header_only(std::string &buffer) {
 
     buffer += TEXT_COPYRIGHT;
     buffer += TEXT_IFNDEF;
+    buffer += "#define VP_INLINE inline\n";
 
     buffer += fetch("library/generator/source_api.h");
 

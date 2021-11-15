@@ -21,11 +21,17 @@
 #define VK_ENABLE_BETA_EXTENSIONS 1
 
 #include "test.hpp"
+#ifndef VULKAN_PROFILES_HEADER_ONLY
 #include <vulkan/vulkan_profiles.hpp>
+#else
+#include <vulkan/vulkan_profiles.h>
+#endif
 
 #include <cstdio>
 #include <memory>
 #include <vector>
+
+#define countof(arr) sizeof(arr) / sizeof(arr[0])
 
 TEST(api_create_device_profile, overrite_with_profile_only) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
@@ -63,7 +69,7 @@ TEST(api_create_device_profile, overrite_with_supported_extensions) {
     info.pNext = nullptr;
     info.queueCreateInfoCount = 1;
     info.pQueueCreateInfos = &scaffold.queueCreateInfo;
-    info.enabledExtensionCount = _vpCountOf(extensions);
+    info.enabledExtensionCount = countof(extensions);
     info.ppEnabledExtensionNames = extensions;
     info.pEnabledFeatures = nullptr;
 
@@ -90,7 +96,7 @@ TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
     info.pNext = nullptr;
     info.queueCreateInfoCount = 1;
     info.pQueueCreateInfos = &scaffold.queueCreateInfo;
-    info.enabledExtensionCount = _vpCountOf(extensions);
+    info.enabledExtensionCount = countof(extensions);
     info.ppEnabledExtensionNames = extensions;
     info.pEnabledFeatures = nullptr;
 
@@ -182,7 +188,7 @@ TEST(api_create_device_profile, with_extensions_flag) {
 
     // override profile extensions
     {
-        info.enabledExtensionCount = _vpCountOf(extensions);
+        info.enabledExtensionCount = countof(extensions);
         info.ppEnabledExtensionNames = extensions;
         profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
@@ -194,7 +200,7 @@ TEST(api_create_device_profile, with_extensions_flag) {
 
     // add extensions to the profile extension list
     {
-        info.enabledExtensionCount = _vpCountOf(extensions);
+        info.enabledExtensionCount = countof(extensions);
         info.ppEnabledExtensionNames = extensions;
         profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
 

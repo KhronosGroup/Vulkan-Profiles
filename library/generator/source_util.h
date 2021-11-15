@@ -1,10 +1,11 @@
 // Implementation details:
 #include <cstring>
+#include <cassert>
 #include <vector>
 
 #define _vpCountOf(arr) sizeof(arr) / sizeof(arr[0])
 
-inline bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, std::size_t supportedSize,
+VP_INLINE bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, std::size_t supportedSize,
                               const char *requestedExtension) {
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
         if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) {
@@ -15,7 +16,7 @@ inline bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, 
     return false;
 }
 
-inline bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memoryProperties,
+VP_INLINE bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memoryProperties,
                                    const VkMemoryPropertyFlags &memoryPropertyFlags) {
     assert(&memoryProperties != nullptr);
 
@@ -26,7 +27,7 @@ inline bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memor
     return false;
 }
 
-inline bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const VpFormatProperties &profileProps) {
+VP_INLINE bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const VpFormatProperties &profileProps) {
     if ((deviceProps->formatProperties.linearTilingFeatures & profileProps.linearTilingFeatures) !=
         profileProps.linearTilingFeatures) {
         return false;
@@ -40,7 +41,7 @@ inline bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const
     return true;
 }
 
-inline bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties,
+VP_INLINE bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties,
                                         std::size_t queueFamilyPropertiesCount,
                                         const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
     assert(queueFamilyProperties != nullptr);
@@ -70,7 +71,7 @@ inline bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFami
     return false;
 }
 
-inline void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t propertyCount,
+VP_INLINE void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t propertyCount,
                              const VkExtensionProperties *pProperties, std::vector<const char *> &extensions) {
     if (pCreateInfo->flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) {
         for (int i = 0, n = propertyCount; i < n; ++i) {
@@ -90,7 +91,7 @@ inline void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t pro
     }
 }
 
-inline const void *_vpGetStructure(const void *pNext, VkStructureType type) {
+VP_INLINE const void *_vpGetStructure(const void *pNext, VkStructureType type) {
     if (pNext == nullptr) {
         return nullptr;
     }

@@ -1,4 +1,4 @@
-inline void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
+VP_INLINE void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
     static const VpProfileProperties table[] = {
         {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION},
 #ifdef VK_ENABLE_BETA_EXTENSIONS
@@ -16,7 +16,8 @@ inline void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProper
     }
 }
 
-inline void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
+VP_INLINE void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                     VpProfileProperties *pProperties) {
     static const VpProfileProperties VP_LUNARG_1_1_desktop_portability_2022_subset_fallbacks[] = {
         {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION}};
 
@@ -44,7 +45,7 @@ inline void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t 
 #endif  // VK_ENABLE_BETA_EXTENSIONS
 }
 
-inline void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext) {
+VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext) {
     if (pProfile == nullptr || pNext == nullptr) return;
 
     struct VkStruct {
@@ -473,7 +474,7 @@ inline void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pN
     }
 }
 
-inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
+VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
                                const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {
     assert(pCreateInfo != nullptr);
 
@@ -938,7 +939,7 @@ inline VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCr
     }
 }
 
-inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName,
+VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName,
                                           const VpProfileProperties *pProfile, VkBool32 *pSupported) {
     assert(pProfile != nullptr);
     assert(pSupported != nullptr);
@@ -2192,7 +2193,7 @@ inline VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const
     return result;
 }
 
-inline void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VP_INLINE void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                             VkExtensionProperties *pProperties) {
     if (pProperties == nullptr) {
         if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
@@ -2217,7 +2218,7 @@ inline void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile,
     }
 }
 
-inline void vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VP_INLINE void vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                             VpStructureProperties *pProperties) {
     if (pProperties == nullptr) {
         if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
@@ -2242,7 +2243,7 @@ inline void vpGetProfileStructureProperties(const VpProfileProperties *pProfile,
     }
 }
 
-inline void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormat) {
+VP_INLINE void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormat) {
     if (pFormat == nullptr) {
         if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             *pFormatCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_FORMATS);
@@ -2260,7 +2261,7 @@ inline void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *p
     }
 }
 
-inline void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext) {
+VP_INLINE void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext) {
     if (pProfile == nullptr || pNext == nullptr) {
         return;
     }
@@ -2300,7 +2301,7 @@ inline void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, Vk
     }
 }
 
-inline void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryPropertyFlagsCount,
+VP_INLINE void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryPropertyFlagsCount,
                                     VkMemoryPropertyFlags *pMemoryPropertyFlags) {
     if (pMemoryPropertyFlags == nullptr) {
         if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
@@ -2320,7 +2321,7 @@ inline void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_
     }
 }
 
-inline void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
+VP_INLINE void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
                                       VkQueueFamilyProperties *pQueueFamilyProperties) {
     if (pQueueFamilyProperties == nullptr) {
         if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
