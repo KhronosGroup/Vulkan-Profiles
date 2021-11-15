@@ -1,6 +1,11 @@
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-add_executable(library_generator generator.cpp)
+file(GLOB FILES_SOURCE ./*.cpp)
+file(GLOB FILES_HEADER ./*.h)
+
+add_executable(library_generator ${FILES_SOURCE} ${FILES_HEADER})
+target_compile_definitions(library_generator PUBLIC "_CRT_SECURE_NO_WARNINGS=1")
+target_compile_definitions(library_generator PUBLIC "VULKAN_INCLUDE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 target_link_libraries(library_generator PRIVATE Vulkan::Headers Vulkan::Profiles vulkan)
 add_dependencies(library_generator library_profiles)
 

@@ -21,7 +21,6 @@
 #define VULKAN_PROFILES_HPP_ 1
 
 #include <vulkan/vulkan_core.h>
-#include <algorithm>
 #ifdef VK_ENABLE_BETA_EXTENSIONS
 #include <vulkan/vulkan_beta.h>
 #endif
