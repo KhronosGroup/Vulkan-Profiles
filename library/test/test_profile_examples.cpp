@@ -18,10 +18,14 @@
  * - Christophe Riccio <christophe@lunarg.com>
  */
 
-#define VK_ENABLE_BETA_EXTENSIONS 1
-
 #include "test.hpp"
+#ifndef VULKAN_PROFILES_HEADER_ONLY
 #include <vulkan/vulkan_profiles.hpp>
+#else
+#include <vulkan/vulkan_profiles.h>
+#endif
+
+#define countof(arr) sizeof(arr) / sizeof(arr[0])
 
 // In this example, a typical usage of profiles with additional features and extensions
 TEST(test_profile, example_add_features_add_extensions) {
@@ -47,7 +51,7 @@ TEST(test_profile, example_add_features_add_extensions) {
     info.queueCreateInfoCount = 1;
     info.pQueueCreateInfos = &scaffold.queueCreateInfo;
     info.pEnabledFeatures = nullptr;
-    info.enabledExtensionCount = _vpCountOf(extensions);
+    info.enabledExtensionCount = countof(extensions);
     info.ppEnabledExtensionNames = extensions;
 
     VpDeviceCreateInfo profileInfo = {};

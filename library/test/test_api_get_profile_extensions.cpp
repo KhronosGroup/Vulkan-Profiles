@@ -18,10 +18,12 @@
  * - Christophe Riccio <christophe@lunarg.com>
  */
 
-#define VK_ENABLE_BETA_EXTENSIONS 1
-
 #include "test.hpp"
+#ifndef VULKAN_PROFILES_HEADER_ONLY
 #include <vulkan/vulkan_profiles.hpp>
+#else
+#include <vulkan/vulkan_profiles.h>
+#endif
 
 TEST(api_get_profile_extension_properties, full) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};

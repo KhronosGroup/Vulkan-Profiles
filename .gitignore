@@ -36,4 +36,5 @@ helper.cmake
 Vulkan-Headers/
 Vulkan-Tools/
 Vulkan-ValidationLayers/
-library/include/vulkan/vulkan_profiles_gen.hpp
+
+
