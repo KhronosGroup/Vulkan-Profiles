@@ -698,6 +698,7 @@ static const VpFormatProperties _VP_LUNARG_DESKTOP_PORTABILITY_2022_FORMATS[] = 
 #include <cstddef>
 #include <cstring>
 #include <cassert>
+#include <cstdint>
 #include <vector>
 #include <algorithm>
 
@@ -705,7 +706,7 @@ static const VpFormatProperties _VP_LUNARG_DESKTOP_PORTABILITY_2022_FORMATS[] = 
 
 VP_INLINE bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, std::size_t supportedSize,
                               const char *requestedExtension) {
-    for (size_t i = 0, n = supportedSize; i < n; ++i) {
+    for (std::size_t i = 0, n = supportedSize; i < n; ++i) {
         if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) {
             return true;
         }
@@ -718,7 +719,7 @@ VP_INLINE bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &me
                                    const VkMemoryPropertyFlags &memoryPropertyFlags) {
     assert(&memoryProperties != nullptr);
 
-    for (size_t i = 0, n = memoryProperties.memoryTypeCount; i < n; ++i) {
+    for (std::size_t i = 0, n = memoryProperties.memoryTypeCount; i < n; ++i) {
         if ((memoryProperties.memoryTypes[i].propertyFlags & memoryPropertyFlags) == memoryPropertyFlags) return true;
     }
 
@@ -744,7 +745,7 @@ VP_INLINE bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueF
                                         const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
     assert(queueFamilyProperties != nullptr);
 
-    for (size_t i = 0, n = queueFamilyPropertiesCount; i < n; ++i) {
+    for (std::size_t i = 0, n = queueFamilyPropertiesCount; i < n; ++i) {
         if (queueFamilyProperties[i].queueCount < profileQueueFamilyPropertie.queueCount) {
             continue;
         } else if (queueFamilyProperties[i].timestampValidBits < profileQueueFamilyPropertie.timestampValidBits) {
