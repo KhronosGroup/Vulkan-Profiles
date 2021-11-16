@@ -99,7 +99,7 @@ add_subdirectory(library)
 
 add_subdirectory(vku)
 add_subdirectory(device_simulation)
-add_subdirectory(device_simulation_manual)
+add_subdirectory(layer)
 
 include_directories(external)
 
