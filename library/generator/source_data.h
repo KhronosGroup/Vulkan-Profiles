@@ -1,4 +1,5 @@
 static const VkExtensionProperties _VP_KHR_ROADMAP_2022_EXTENSIONS[] = {
+    VkExtensionProperties{VK_EXT_GLOBAL_PRIORITY_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 2},
