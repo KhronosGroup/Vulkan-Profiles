@@ -699,6 +699,7 @@ static const VpFormatProperties _VP_LUNARG_DESKTOP_PORTABILITY_2022_FORMATS[] = 
 #include <cstring>
 #include <cassert>
 #include <vector>
+#include <algorithm>
 
 #define _vpCountOf(arr) sizeof(arr) / sizeof(arr[0])
 

@@ -3,6 +3,7 @@
 #include <cstring>
 #include <cassert>
 #include <vector>
+#include <algorithm>
 
 #define _vpCountOf(arr) sizeof(arr) / sizeof(arr[0])
 
