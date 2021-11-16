@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdarg>
 #include <cassert>
+#include <cstring>
 #include <string>
 
 static const char *TEXT_COPYRIGHT = R"(
