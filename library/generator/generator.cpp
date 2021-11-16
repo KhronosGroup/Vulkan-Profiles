@@ -4,6 +4,12 @@
 #include <cstring>
 #include <string>
 
+#define VP_INLINE inline
+#include "source_api.h"
+#include "source_data.h"
+#include "source_util.h"
+#include "source_impl.h"
+
 static const char *TEXT_COPYRIGHT = R"(
 /*
  * Copyright (c) 2021-2022 LunarG, Inc.
