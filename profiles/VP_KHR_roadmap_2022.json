@@ -2,7 +2,7 @@
     "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.200.json#",
     "comments": {
         "info": "Khronos Vulkan roadmap 2022 profile",
-        "desc": "Collection on nonsensical features to test completeness"
+        "desc": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices."
     },
     "capabilities": [
         {
@@ -207,6 +207,18 @@
                             "type": "float",
                             "limit": "MAX",
                             "value": 0.5
+                        },
+                        {
+                            "name": "standardSampleLocations",
+                            "type": "VkBool32",
+                            "limit": "EQUAL",
+                            "value": true
+                        },
+                        {
+                            "name": "maxColorAttachments",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 7
                         }
                     ]
                 },
@@ -218,6 +230,18 @@
                             "type": "uint32_t",
                             "limit": "MIN",
                             "value": 4
+                        },
+                        {
+                            "name": "subgroupSupportedStages",
+                            "type": "VkShaderStageFlagBits",
+                            "limit": "ALL",
+                            "value": [ "VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT" ]
+                        },
+                        {
+                            "name": "subgroupSupportedOperations",
+                            "type": "VkSubgroupFeatureFlagBits",
+                            "limit": "ALL",
+                            "value": [ "VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_VOTE_BIT", "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT", "VK_SUBGROUP_FEATURE_BALLOT_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT", "VK_SUBGROUP_FEATURE_QUAD_BIT" ]
                         }
                     ]
                 },
@@ -245,132 +269,13 @@
             ]
         },
         {
-            "name": "vulkan12",
+            "name": "vulkan13",
             "extensions": [
                 {
-                    "extensionName": "VK_KHR_shader_terminate_invocation",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_synchronization2",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_zero_initialize_workgroup_memory",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_image_robustness",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_inline_uniform_block",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_pipeline_creation_cache_control",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_private_data",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_shader_demote_to_helper_invocation",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_subgroup_size_control",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_texel_buffer_alignment",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_extended_dynamic_state2",
+                    "extensionName": "VK_KHR_global_priority",
                     "specVersion": 1
                 }
             ],
-            "features": [
-                {
-                    "struct": "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR",
-                    "members": {
-                        "shaderTerminateInvocation": true
-                    }
-                },
-                {
-                    "struct": "VkPhysicalDeviceSynchronization2FeaturesKHR",
-                    "members": {
-                        "shaderTerminateInvocation": true
-                    }
-                },
-                {
-                    "struct": "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR",
-                    "members": {
-                        "shaderZeroInitializeWorkgroupMemory": true
-                    }
-                },
-                {
-                    "struct": "VkPhysicalDeviceImageRobustnessFeaturesEXT",
-                    "members": {
-                        "robustImageAccess": true
-                    }
-                },
-                {
-                    "struct": "VkPhysicalDeviceInlineUniformBlockFeaturesEXT",
-                    "members": {
-                        "inlineUniformBlock": true
-                    }
-                },
-                {
-                    "struct": "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT",
-                    "members": {
-                        "pipelineCreationCacheControl": true
-                    }
-                },
-                {
-                    "struct": "VkPhysicalDevicePrivateDataFeaturesEXT",
-                    "members": {
-                        "privateData": true
-                    }
-                },
-                {
-                    "struct": "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT",
-                    "members": {
-                        "shaderDemoteToHelperInvocation": true
-                    }
-                },
-                {
-                    "struct": "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT",
-                    "members": {
-                        "subgroupSizeControl": true,
-                        "computeFullSubgroups": true
-                    }
-                },
-                {
-                    "struct": "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT",
-                    "members": {
-                        "texelBufferAlignment": true
-                    }
-                },
-                {
-                    "struct": "VkPhysicalDeviceExtendedDynamicState2FeaturesEXT",
-                    "members": {
-                        "extendedDynamicState2": true
-                    }
-                },
-                {
-                    "struct": "VkPhysicalDevice4444FormatsFeaturesEXT",
-                    "members": {
-                        "formatA4R4G4B4": true,
-                        "formatA4B4G4R4": true
-                    }
-                }
-            ]
-        },
-        {
-            "name": "vulkan13",
             "features": [
                 {
                     "struct": "VkPhysicalDeviceVulkan13Features",
@@ -401,15 +306,6 @@
             "capabilities": [
                 "common",
                 "vulkan13"
-            ],
-            "fallback": [ "VP_LUNARG_roadmap_2022" ]
-        },
-        {
-            "name": "VP_LUNARG_roadmap_2022",
-            "api-version": "1.2.189",
-            "capabilities": [
-                "common",
-                "vulkan12"
             ]
         }
     ]

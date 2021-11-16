@@ -20,6 +20,7 @@
 
 #include <vulkan/vulkan_profiles.h>
 static const VkExtensionProperties _VP_KHR_ROADMAP_2022_EXTENSIONS[] = {
+    VkExtensionProperties{VK_EXT_GLOBAL_PRIORITY_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 2},
@@ -1006,10 +1007,16 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
                     properties->properties.limits.maxSamplerLodBias = 14.0;
                     properties->properties.limits.pointSizeGranularity = 0.125;
                     properties->properties.limits.lineWidthGranularity = 0.5;
+                    properties->properties.limits.standardSampleLocations = VK_TRUE;
+                    properties->properties.limits.maxColorAttachments = 7;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES: {
                     VkPhysicalDeviceVulkan11Properties *properties = (VkPhysicalDeviceVulkan11Properties *)p;
                     properties->subgroupSize = 4;
+                    properties->subgroupSupportedStages = VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT; 
+                    properties->subgroupSupportedOperations = VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT |
+                        VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT |
+                        VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT | VK_SUBGROUP_FEATURE_QUAD_BIT;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES: {
                     VkPhysicalDeviceVulkan12Properties *properties = (VkPhysicalDeviceVulkan12Properties *)p;
@@ -2381,6 +2388,12 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         }
 
         if (devicePropertiesVulkan11.subgroupSize < profilePropertiesVulkan11.subgroupSize) {
+            return result;
+        } else if ((devicePropertiesVulkan11.subgroupSupportedStages & profilePropertiesVulkan11.subgroupSupportedStages) !=
+                   profilePropertiesVulkan11.subgroupSupportedStages) {
+            return result;
+        } else if ((devicePropertiesVulkan11.subgroupSupportedOperations & profilePropertiesVulkan11.subgroupSupportedOperations) !=
+                   profilePropertiesVulkan11.subgroupSupportedOperations) {
             return result;
         }
 

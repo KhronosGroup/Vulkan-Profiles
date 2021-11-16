@@ -128,6 +128,24 @@
                 "extent": { "$ref": "#/definitions/VkExtent2D" }
             }
         },
+        "VkShaderStageFlagBits": {
+            "description": "TODO.",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [ "VK_SHADER_STAGE_VERTEX_BIT", "VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT", "VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT", "VK_SHADER_STAGE_GEOMETRY_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT", "VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_ALL_GRAPHICS", "VK_SHADER_STAGE_ALL", "VK_SHADER_STAGE_RAYGEN_BIT_KHR", "VK_SHADER_STAGE_ANY_HIT_BIT_KHR", "VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR", "VK_SHADER_STAGE_MISS_BIT_KHR", "VK_SHADER_STAGE_INTERSECTION_BIT_KHR", "VK_SHADER_STAGE_CALLABLE_BIT_KHR", "VK_SHADER_STAGE_TASK_BIT_NV", "VK_SHADER_STAGE_MESH_BIT_NV", "VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI", "VK_SHADER_STAGE_RAYGEN_BIT_NV", "VK_SHADER_STAGE_ANY_HIT_BIT_NV", "VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV", "VK_SHADER_STAGE_MISS_BIT_NV", "VK_SHADER_STAGE_INTERSECTION_BIT_NV", "VK_SHADER_STAGE_CALLABLE_BIT_NV" ],
+                "uniqueItems": true
+            }
+        },
+        "VkSubgroupFeatureFlagBits": {
+            "description": "TODO.",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [ "VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_VOTE_BIT", "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT", "VK_SUBGROUP_FEATURE_BALLOT_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT", "VK_SUBGROUP_FEATURE_CLUSTERED_BIT", "VK_SUBGROUP_FEATURE_QUAD_BIT", "VK_SUBGROUP_FEATURE_PARTITIONED_BIT_NV" ],
+                "uniqueItems": true
+            }
+        },
         "VkSampleCountFlagBits": {
             "description": "TODO.",
             "type": "array",
@@ -404,6 +422,60 @@
                             },
                             "value": {
                                 "$ref": "#/definitions/VkSampleCountFlagBits"
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "VkSubgroupFeatureFlagBits" ]
+                            },
+                            "value": {
+                                "$ref": "#/definitions/VkSubgroupFeatureFlagBits"
+                            },
+                            "limit": {
+                                "$ref": "#/definitions/limit"
+                            }
+                        }
+                    },
+                    {
+                        "description": "TODO",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type",
+                            "limit",
+                            "value"
+                        ],
+                        "properties": {
+                            "name": {
+                                "description": "The unique identifier of a setting",
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [ "VkShaderStageFlagBits" ]
+                            },
+                            "value": {
+                                "$ref": "#/definitions/VkShaderStageFlagBits"
                             },
                             "limit": {
                                 "$ref": "#/definitions/limit"
