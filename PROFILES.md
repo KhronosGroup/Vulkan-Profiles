@@ -11,11 +11,12 @@
 
 # Vulkan Profiles definitions
 
-## Vulkan Profiles API Version
+## Vulkan Profiles Registry
 
 | Profiles | VP_KHR_roadmap_2022 | VP_LUNARG_desktop_portability_2022 | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
 | -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
-| API version | 1.3 | 1.1  | 1.1 | 1.0 |
+| Min API version | 1.3 | 1.1  | 1.1 | 1.0 |
+| Description | This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices. | Common desktop platforms with drivers supporting Vulkan 1.1 on Windows, Linux and macOS. | ANGLE Layer Support for GLES 3.1 | Collection on features supported in the majority of devices |
 
 ## Vulkan Profiles Extensions
 
