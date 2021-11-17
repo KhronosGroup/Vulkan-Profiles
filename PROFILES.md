@@ -15,8 +15,8 @@
 
 | Profiles | VP_KHR_roadmap_2022 | VP_LUNARG_desktop_portability_2022 | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
 | -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
-| Min API version | 1.3 | 1.1  | 1.1 | 1.0 |
 | Description | This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices. | Common desktop platforms with drivers supporting Vulkan 1.1 on Windows, Linux and macOS. | ANGLE Layer Support for GLES 3.1 | Collection on features supported in the majority of devices |
+| Required API version | 1.3.XXX | 1.1.142  | 1.1.131 | 1.0.68 |
 
 ## Vulkan Profiles Extensions
 
@@ -49,35 +49,36 @@
 
 | Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceFeatures) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceFeatures) | VP_ANDROID_angle_es31 (VkPhysicalDeviceFeatures) | VP_ANDROID_baseline_2022 (VkPhysicalDeviceFeatures) |
 | -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
-| depthBiasClamp | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| depthClamp | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| drawIndirectFirstInstance | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| dualSrcBlend | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| fillModeNonSolid | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| fragmentStoresAndAtomics | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| fullDrawIndexUint32 | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| imageCubeArray | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| independentBlend | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| inheritedQueries | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| largePoints | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| multiDrawIndirect | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| multiViewport | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| occlusionQueryPrecise | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| robustBufferAccess | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| sampleRateShading | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| samplerAnisotropy | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| shaderClipDistance | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| shaderImageGatherExtended | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| shaderSampledImageArrayDynamicIndexing | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| shaderStorageBufferArrayDynamicIndexing | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| shaderStorageImageArrayDynamicIndexing | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| shaderStorageImageExtendedFormats | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| shaderStorageImageWriteWithoutFormat | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| shaderTessellationAndGeometryPointSize | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| shaderUniformBufferArrayDynamicIndexing | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| tessellationShader | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| textureCompressionBC | 1.2 Core | :heavy_check_mark: | :x: | :x: |
-| vertexPipelineStoresAndAtomics | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| depthBiasClamp               | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| depthClamp                   | :x:  | :heavy_check_mark: | :x: | :x: |
+| drawIndirectFirstInstance    | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| dualSrcBlend                 | :x:  | :heavy_check_mark: | :x: | :x: |
+| fillModeNonSolid             | :x:  | :heavy_check_mark: | :x: | :x: |
+| fragmentStoresAndAtomics     | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| fullDrawIndexUint32          | :x:  | :heavy_check_mark: | :x: | :x: |
+| imageCubeArray               | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| independentBlend             | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :x: |
+| inheritedQueries             | :x:  | :heavy_check_mark: | :x: | :x: |
+| largePoints                  | :x:  | :heavy_check_mark: | :x: | :x: |
+| multiDrawIndirect            | :x:  | :heavy_check_mark: | :x: | :x: |
+| multiViewport                | :x:  | :heavy_check_mark: | :x: | :x: |
+| occlusionQueryPrecise        | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| robustBufferAccess           | 1.3 Core | :heavy_check_mark: | :heavy_check_mark: | :x: |
+| sampleRateShading            | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| samplerAnisotropy            | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| shaderClipDistance           | :x:  | :heavy_check_mark: | :x: | :x: |
+| shaderImageGatherExtended    | :x:  | :heavy_check_mark: | :x: | :x: |
+| shaderSampledImageArrayDynamicIndexing   | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| shaderStorageBufferArrayDynamicIndexing  | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| shaderStorageImageArrayDynamicIndexing   | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| shaderStorageImageExtendedFormats        | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| shaderStorageImageReadWithoutFormat      | :heavy_check_mark: | :x: | :x: | :x: |
+| shaderStorageImageWriteWithoutFormat     | :x:  | :heavy_check_mark: | :x: | :x: |
+| shaderTessellationAndGeometryPointSize   | :x:  | :heavy_check_mark: | :x: | :x: |
+| shaderUniformBufferArrayDynamicIndexing  | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| tessellationShader                       | :x:  | :heavy_check_mark: | :x: | :x: |
+| textureCompressionBC                     | :x:  | :heavy_check_mark: | :x: | :x: |
+| vertexPipelineStoresAndAtomics           | :x:  | :heavy_check_mark: | :heavy_check_mark: | :x: |
 
 | Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan12Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceImagelessFramebufferFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
 | -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
@@ -291,5 +292,9 @@
 
 ## Vulkan Profiles Formats
 
-
+| VK_FORMAT_R8_UNORM | VP_KHR_roadmap_2022 (VkFormatProperties2) | VP_LUNARG_desktop_portability_2022 (VkFormatProperties2) | VP_ANDROID_angle_es31 (VkFormatProperties2) | VP_ANDROID_baseline_2022 (VkFormatProperties2) |
+| ------------------ | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| linearTilingFeatures | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT, VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT |
+| optimalTilingFeatures | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT, VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT |
+| bufferFeatures | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT, VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT |
 
