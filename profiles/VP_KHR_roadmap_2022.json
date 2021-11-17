@@ -43,6 +43,7 @@
                         "uniformBufferStandardLayout": true,
                         "shaderSubgroupExtendedTypes": true,
                         "separateDepthStencilLayouts": true,
+                        "timelineSemaphore": true,
                         "hostQueryReset": true,
                         "bufferDeviceAddress": true,
                         "vulkanMemoryModel": true,
