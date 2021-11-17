@@ -26,7 +26,6 @@ Finally *Vulkan Configurator* allows using layers from user-defined directories.
 | OS       | Windows            | Linux               | macOS              | iOS     | Android |
 | -------- | ------------------ | ------------------- | ------------------ | ------- | ------- |
 | Vulkan Profiles Library | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark: | :x:     | :heavy_check_mark:     |
-| -------- | ------------------ | ------------------- | ------------------ | ------- | ------- |
 | VK_LAYER_device_simulation2 | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark: | :x:     | :heavy_check_mark:     |
 
 --------------
