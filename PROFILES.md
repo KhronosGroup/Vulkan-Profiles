@@ -46,6 +46,38 @@
 
 ## Vulkan Profiles Features
 
+| Profiles | VP_KHR_roadmap_2022 | VP_LUNARG_desktop_portability_2022 | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| depthBiasClamp | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| depthClamp | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| drawIndirectFirstInstance | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| dualSrcBlend | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| fillModeNonSolid | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| fragmentStoresAndAtomics | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| fullDrawIndexUint32 | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| imageCubeArray | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| independentBlend | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| inheritedQueries | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| largePoints | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| multiDrawIndirect | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| multiViewport | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| occlusionQueryPrecise | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| robustBufferAccess | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| sampleRateShading | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| samplerAnisotropy | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| shaderClipDistance | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| shaderImageGatherExtended | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| shaderSampledImageArrayDynamicIndexing | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| shaderStorageBufferArrayDynamicIndexing | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| shaderStorageImageArrayDynamicIndexing | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| shaderStorageImageExtendedFormats | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| shaderStorageImageWriteWithoutFormat | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| shaderTessellationAndGeometryPointSize | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| shaderUniformBufferArrayDynamicIndexing | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| tessellationShader | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| textureCompressionBC | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+| vertexPipelineStoresAndAtomics | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+
 ## Vulkan Profiles Properties
 
 ## Vulkan Profiles Formats
