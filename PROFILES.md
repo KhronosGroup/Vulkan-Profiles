@@ -149,6 +149,145 @@
 
 ## Vulkan Profiles Properties
 
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceLimits) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceLimits) | VP_ANDROID_angle_es31 (VkPhysicalDeviceLimits) | VP_ANDROID_baseline_2022 (VkPhysicalDeviceLimits) |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| maxImageDimension1D (min) | 16384 | 16384 | 8192 | 8192 |
+| maxImageDimension2D (min) | 16384 | 16384 | 8192 | 8192 |
+| maxImageDimension3D (min) | 2048 | 2048 | 2048 | 2048 |
+| maxImageDimensionCube (min) | 16384 | 16384 | 8192 | 8192 |
+| maxImageArrayLayers (min) | 2048 | 2048 | 2048 | 2048 |
+| maxTexelBufferElements (min) | 67108900 | 67108900 | 67108900 | 67108900 |
+| maxUniformBufferRange (min) | 65536 | 65536 | 65536 | 65536 |
+| maxStorageBufferRange (min) | 134217728 | 134217728 | 134217728 | 134217728 |
+| maxPushConstantsSize (min) | 128 | 128 | 128 | 128 |
+| maxMemoryAllocationCount (min) | 4096 | 4096 | 4096 | 4096 |
+| maxSamplerAllocationCount (min) | 1024 | 1024 | 1024 | 1024 |
+| bufferImageGranularity (max) | 1024 | 1024 | 1024 | 1024 |
+| sparseAddressSpaceSize (min) | 1073741824 | 1073741824 | 1073741824 | 1073741824 |
+| maxBoundDescriptorSets (min) | 8 | 8 | 8 | 8 |
+| maxPerStageDescriptorSamplers (min) | 16 | 16 | 16 | 16 |
+| maxPerStageDescriptorUniformBuffers (min) | 15 | 15 | 15 | 15 |
+| maxPerStageDescriptorStorageBuffers (min) | 16 | 16 | 16 | 16 |
+| maxPerStageDescriptorSampledImages (min) | 128 | 128 | 128 | 128 |
+| maxPerStageDescriptorStorageImages (min) | 8 | 8 | 8 | 8 |
+| maxPerStageDescriptorInputAttachments (min) | 8 | 8 | 8 | 8 |
+| maxPerStageResources (min) | 128 | 128 | 128 | 128 |
+| maxDescriptorSetSamplers (min) | 80 | 80 | 80 | 80 |
+| maxDescriptorSetUniformBuffers (min) | 90 | 90 | 90 | 90 |
+| maxDescriptorSetUniformBuffersDynamic (min) | 8 | 8 | 8 | 8 |
+| maxDescriptorSetStorageBuffers (min) | 155 | 155 | 155 | 155 
+| maxDescriptorSetStorageBuffersDynamic (min) | 8 | 8 | 8 | 8 |
+| maxDescriptorSetSampledImages (min) | 256 | 256 | 256 | 256 |
+| maxDescriptorSetStorageImages (min) | 40 | 40 | 40 | 40 |
+| maxDescriptorSetInputAttachments (min) | 8 | 8 | 8 | 8 |
+| maxVertexInputAttributes (min) | 28 | 28 | 28 | 28 |
+| maxVertexInputBindings (min) | 28 | 28 | 28 | 28 |
+| maxVertexInputAttributeOffset (min) | 2047 | 2047 | 2047 | 2047 |
+| maxVertexInputBindingStride (min) | 2048 | 2048 | 2048 | 2048 |
+| maxVertexOutputComponents (min) | 124 | 124 | 124 | 124 |
+| maxTessellationGenerationLevel (min) | 64 | 64 | 64 | 64 |
+| maxTessellationPatchSize (min) | 32 | 32 | 32 | 32 |
+| maxTessellationControlPerVertexInputComponents (min) | 124 | 124 | 124 | 124 |
+| maxTessellationControlPerVertexOutputComponents (min) | 124 | 124 | 124 | 124 |
+| maxTessellationControlPerPatchOutputComponents (min) | 120 | 120 | 120 | 120 |
+| maxTessellationControlTotalOutputComponents (min) | 2048 | 2048 | 2048 | 2048 |
+| maxTessellationEvaluationInputComponents (min) | 124 | 124 | 124 | 124 |
+| maxTessellationEvaluationOutputComponents (min) | 124 | 124 | 124 | 124 |
+| maxFragmentInputComponents (min) | 116 | 116 | 116 | 116 |
+| maxFragmentOutputAttachments (min) | 8 | 8 | 8 | 8 |
+| maxFragmentDualSrcAttachments (min) | 1 | 1 | 1 | 1 |
+| maxFragmentCombinedOutputResources (min) | 8 | 8 | 8 | 8 |
+| maxComputeSharedMemorySize (min) | 32768 | 32768 | 32768 | 32768 |
+| maxComputeWorkGroupCount[0] (min) | 65535 | 65535 | 65535 | 65535 |
+| maxComputeWorkGroupCount[1] (min) | 65535 | 65535 | 65535 | 65535 |
+| maxComputeWorkGroupCount[2] (min) | 65535 | 65535 | 65535 | 65535 |
+| maxComputeWorkGroupInvocations (min) | 1024 | 1024 | 1024 | 1024 |
+| maxComputeWorkGroupSize[0] (min) | 1024 | 1024 | 1024 | 1024 |
+| maxComputeWorkGroupSize[1] (min) | 1024 | 1024 | 1024 | 1024 |
+| maxComputeWorkGroupSize[2] (min) | 64 | 64 | 64 | 64 |
+| subPixelPrecisionBits (min) | 4 | 4 | 4 | 4 |
+| subTexelPrecisionBits (min) | 4 | 4 | 4 | 4 |
+| mipmapPrecisionBits (min) | 4 | 4 | 4 | 4 |
+| maxDrawIndexedIndexValue (min) | 4294967295 | 4294967295 | 4294967295 | 4294967295 |
+| maxDrawIndirectCount (min) | 1073740000 | 1073740000 | 1073740000 | 1073740000 |
+| maxSamplerLodBias (min) | 14.0 | 14.0 | 14.0 | 14.0 |
+| maxSamplerAnisotropy (min) | 16.0 | 16.0 | 16.0 | 16.0 |
+| maxViewports (min) | 16 | 16 | 16 | 16 |
+| maxViewportDimensions[0] (min) | 16384 | 16384 | 16384 | 16384 |
+| maxViewportDimensions[1] (min) | 16384 | 16384 | 16384 | 16384 |
+| viewportBoundsRange[0] (min) | -32768.0 | -32768.0 | -32768.0 | -32768.0 |
+| viewportBoundsRange[1] (min) | 32767.0 | 32767.0 | 32767.0 | 32767.0 |
+| minMemoryMapAlignment (min) | 64 | 64 | 64 | 64 |
+| minTexelBufferOffsetAlignment (max) | 64 | 64 | 64 | 64 |
+| minUniformBufferOffsetAlignment (max) | 256 | 256 | 256 | 256 |
+| minStorageBufferOffsetAlignment (max) | 64 | 64 | 64 | 64 |
+| minTexelOffset (max) | -8 | -8 | -8 | -8 |
+| maxTexelOffset (min) | 7 | 7 | 7 | 7 |
+| minTexelGatherOffset (max) | -8 | -8 | -8 | -8 |
+| maxTexelGatherOffset (min) | 7 | 7 | 7 | 7 |
+| minInterpolationOffset (max) | -0.5 | -0.5 | -0.5 | -0.5 |
+| maxInterpolationOffset (min) | 0.4375 | 0.4375 | 0.4375 | 0.4375 |
+| subPixelInterpolationOffsetBits (min) | 4 | 4 | 4 | 4 |
+| maxFramebufferWidth (min) | 16384 | 16384 | 16384 | 16384 |
+| maxFramebufferHeight (min) | 16384 | 16384 | 16384 | 16384 |
+| maxFramebufferLayers (min) | 1024 | 1024 | 1024 | 1024 |
+| framebufferColorSampleCounts (VkSampleCountFlags) | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT |
+| framebufferDepthSampleCounts (VkSampleCountFlags) | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT |
+| framebufferStencilSampleCounts (VkSampleCountFlags) | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT |
+| maxColorAttachments (min) | 8 | 8 | 8 | 8 |
+| sampledImageColorSampleCounts (VkSampleCountFlags) | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT |
+| sampledImageIntegerSampleCounts (VkSampleCountFlags) | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT |
+| sampledImageDepthSampleCounts (VkSampleCountFlags) | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT |
+| sampledImageStencilSampleCounts (VkSampleCountFlags) | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_4_BIT |
+| storageImageSampleCounts (VkSampleCountFlags) | VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_1_BIT |
+| maxSampleMaskWords (max) | 1 | 1 | 1 | 1 |
+| maxClipDistances (min) | 8 | 8 | 8 | 8 |
+| maxCullDistances (min) | 8 | 8 | 8 | 8 |
+| maxCombinedClipAndCullDistances (min) | 8 | 8 | 8 | 8 |
+| discreteQueuePriorities (min) | 2 | 2 | 2 | 2 |
+| pointSizeRange[0] (max) | 1.0 | 1.0 | 1.0 | 1.0 |
+| pointSizeRange[1] (min) | 64.0 | 64.0 | 64.0 | 64.0 |
+| lineWidthRange[0] (max) | 1.0 | 1.0 | 1.0 | 1.0 |
+| lineWidthRange[1] (min) | 1.0 | 1.0 | 1.0 | 1.0 |
+| pointSizeGranularity (max) | 0.125 | 0.125 | 0.125 | 0.125 |
+| lineWidthGranularity (max) | 0.5 | 0.5 | 0.5 | 0.5 |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan12Properties) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceDescriptorIndexingProperties) | VP_ANDROID_angle_es31 (N/A) | VP_ANDROID_baseline_2022 (N/A) |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| maxUpdateAfterBindDescriptorsInAllPools (min) | 1048576 | 1048576 | 1048576 | 1048576 |
+| maxPerStageDescriptorUpdateAfterBindSamplers (min) | 16 | 16 | 16 | 16 |
+| maxPerStageDescriptorUpdateAfterBindUniformBuffers (min) | 15 | 15 | 15 | 15 |
+| maxPerStageDescriptorUpdateAfterBindStorageBuffers (min) | 31 | 31 | 31 | 31 |
+| maxPerStageDescriptorUpdateAfterBindSampledImages (min) | 128 | 128 | 128 | 128 |
+| maxPerStageDescriptorUpdateAfterBindStorageImages (min) | 8 | 8 | 8 | 8 |
+| maxPerStageDescriptorUpdateAfterBindInputAttachments (min) | 128 | 128 | 128 | 128 |
+| maxPerStageUpdateAfterBindResources (min) | 159 | 159 | 159 | 159 |
+| maxDescriptorSetUpdateAfterBindSamplers (min) | 80 | 80 | 80 | 80 |
+| maxDescriptorSetUpdateAfterBindUniformBuffers (min) | 90 | 90 | 90 | 90 |
+| maxDescriptorSetUpdateAfterBindUniformBuffersDynamic (min) | 8 | 8 | 8 | 8 |
+| maxDescriptorSetUpdateAfterBindStorageBuffers (min) | 155 | 155 | 155 | 155 |
+| maxDescriptorSetUpdateAfterBindStorageBuffersDynamic (min) | 8 | 8 | 8 | 8 |
+| maxDescriptorSetUpdateAfterBindSampledImages (min) | 640 | 640 | 640 | 640 |
+| maxDescriptorSetUpdateAfterBindStorageImages (min) | 40 | 40 | 40 | 40 |
+| maxDescriptorSetUpdateAfterBindInputAttachments (min) | 640 | 640 | 640 | 640 |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan12Properties) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceMultiviewProperties) | VP_ANDROID_angle_es31 (N/A) | VP_ANDROID_baseline_2022 (N/A) |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| maxMultiviewViewCount (min) | 6 | 6 | 6 | 6 |
+| maxMultiviewInstanceIndex (min) | 134217727 | 134217727 | 134217727 | 134217727 |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan12Properties) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceDepthStencilResolveProperties) | VP_ANDROID_angle_es31 (N/A) | VP_ANDROID_baseline_2022 (N/A) |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| independentResolve | true | true | true | true |
+| independentResolveNone | true | true | true | true |
+| supportedDepthResolveModes | VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_SAMPLE_ZERO_BIT |
+| supportedStencilResolveModes | VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_SAMPLE_ZERO_BIT |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan12Properties) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceMaintenance3Properties) | VP_ANDROID_angle_es31 (N/A) | VP_ANDROID_baseline_2022 (N/A) |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| maxPerSetDescriptors (min) | 700 | 700 | 700 | 700 |
+| maxMemoryAllocationSize (min) | 2147483648 | 2147483648 | 2147483648 | 2147483648 |
+
 ## Vulkan Profiles Formats
 
 

@@ -360,42 +360,6 @@
 							"value": 128
 						},
 						{
-							"name": "maxPerStageDescriptorUniformBuffers",
-							"type": "uint32_t",
-							"limit": "MIN",
-							"value": 15
-						},
-						{
-							"name": "maxPerStageDescriptorStorageBuffers",
-							"type": "uint32_t",
-							"limit": "MIN",
-							"value": 16
-						},
-						{
-							"name": "maxPerStageDescriptorSampledImages",
-							"type": "uint32_t",
-							"limit": "MIN",
-							"value": 128
-						},
-						{
-							"name": "maxPerStageDescriptorStorageImages",
-							"type": "uint32_t",
-							"limit": "MIN",
-							"value": 8
-						},
-						{
-							"name": "maxPerStageDescriptorInputAttachments",
-							"type": "uint32_t",
-							"limit": "MIN",
-							"value": 8
-						},
-						{
-							"name": "maxPerStageResources",
-							"type": "uint32_t",
-							"limit": "MIN",
-							"value": 128
-						},
-						{
 							"name": "maxDescriptorSetSamplers",
 							"type": "uint32_t",
 							"limit": "MIN",
