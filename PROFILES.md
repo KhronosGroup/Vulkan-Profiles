@@ -46,7 +46,7 @@
 
 ## Vulkan Profiles Features
 
-| Profiles | VP_KHR_roadmap_2022 | VP_LUNARG_desktop_portability_2022 | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceFeatures) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceFeatures) | VP_ANDROID_angle_es31 (VkPhysicalDeviceFeatures) | VP_ANDROID_baseline_2022 (VkPhysicalDeviceFeatures) |
 | -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
 | depthBiasClamp | 1.2 Core | :heavy_check_mark: | :x: | :x: |
 | depthClamp | 1.2 Core | :heavy_check_mark: | :x: | :x: |
@@ -77,6 +77,75 @@
 | tessellationShader | 1.2 Core | :heavy_check_mark: | :x: | :x: |
 | textureCompressionBC | 1.2 Core | :heavy_check_mark: | :x: | :x: |
 | vertexPipelineStoresAndAtomics | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan12Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceImagelessFramebufferFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| imagelessFramebuffer | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan12Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDevice16BitStorageFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| storageBuffer16BitAccess | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| uniformAndStorageBuffer16BitAccess | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan11Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceMultiviewFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| multiview | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan11Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDevice8BitStorageFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| multiview | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan11Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceDescriptorIndexingFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| shaderUniformTexelBufferArrayDynamicIndexing | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| shaderStorageTexelBufferArrayDynamicIndexing | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| shaderSampledImageArrayNonUniformIndexing | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| shaderStorageBufferArrayNonUniformIndexing | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| shaderUniformTexelBufferArrayNonUniformIndexing | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| descriptorBindingSampledImageUpdateAfterBind | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| descriptorBindingStorageImageUpdateAfterBind | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| descriptorBindingStorageBufferUpdateAfterBind | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| descriptorBindingUniformTexelBufferUpdateAfterBind | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| descriptorBindingStorageTexelBufferUpdateAfterBind | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| descriptorBindingUpdateUnusedWhilePending | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| descriptorBindingPartiallyBound | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| descriptorBindingVariableDescriptorCount | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| runtimeDescriptorArray | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan11Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceHostQueryResetFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| hostQueryReset | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan11Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| shaderSubgroupExtendedTypes | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan11Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceUniformBufferStandardLayoutFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| uniformBufferStandardLayout | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan11Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceShaderDrawParametersFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| shaderDrawParameters | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan11Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDevice8BitStorageFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| storageBuffer8BitAccess | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| storagePushConstant8 | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| uniformAndStorageBuffer8BitAccess | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan11Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceShaderFloat16Int8Features) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| shaderInt8 | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan11Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceSamplerYcbcrConversionFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| samplerYcbcrConversion | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan11Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceVariablePointersFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| variablePointersStorageBuffer | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| variablePointers | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
 
 ## Vulkan Profiles Properties
 
