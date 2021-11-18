@@ -417,7 +417,91 @@
                             "value": true
                         },
                         {
+                            "name": "maxPerStageDescriptorUpdateAfterBindSamplers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 500000
+                        },
+                        {
+                            "name": "maxPerStageDescriptorUpdateAfterBindUniformBuffers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 12
+                        },
+                        {
+                            "name": "maxPerStageDescriptorUpdateAfterBindStorageBuffers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 500000
+                        },
+                        {
+                            "name": "maxPerStageDescriptorUpdateAfterBindSampledImages",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 500000
+                        },
+                        {
+                            "name": "maxPerStageDescriptorUpdateAfterBindStorageImages",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 500000
+                        },
+                        {
                             "name": "maxPerStageDescriptorUpdateAfterBindInputAttachments",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 7
+                        },
+                        {
+                            "name": "maxPerStageUpdateAfterBindResources",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 500000
+                        },
+                        {
+                            "name": "maxDescriptorSetUpdateAfterBindSamplers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 500000
+                        },
+                        {
+                            "name": "maxDescriptorSetUpdateAfterBindUniformBuffers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 72
+                        },
+                        {
+                            "name": "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 8
+                        },
+                        {
+                            "name": "maxDescriptorSetUpdateAfterBindStorageBuffers",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 500000
+                        },
+                        {
+                            "name": "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 4
+                        },
+                        {
+                            "name": "maxDescriptorSetUpdateAfterBindSampledImages",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 500000
+                        },
+                        {
+                            "name": "maxDescriptorSetUpdateAfterBindStorageImages",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 500000
+                        },
+                        {
+                            "name": "maxDescriptorSetUpdateAfterBindInputAttachments",
                             "type": "uint32_t",
                             "limit": "MIN",
                             "value": 7
