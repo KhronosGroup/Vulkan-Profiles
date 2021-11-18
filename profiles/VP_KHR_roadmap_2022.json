@@ -28,16 +28,21 @@
             ],
             "properties": [
                 {
-                    "name": "maxMultiviewViewCount",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 6
-                },
-                {
-                    "name": "maxMultiviewInstanceIndex",
-                    "type": "uint32_t",
-                    "limit": "MIN",
-                    "value": 134217727
+                    "struct": "VkPhysicalDeviceVulkan11Properties",
+                    "members": [
+                        {
+                            "name": "maxMultiviewViewCount",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 6
+                        },
+                        {
+                            "name": "maxMultiviewInstanceIndex",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 134217727
+                        }
+                    ]
                 }
             ]
         },
