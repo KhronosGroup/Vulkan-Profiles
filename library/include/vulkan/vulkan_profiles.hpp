@@ -999,16 +999,17 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {
                     VkPhysicalDeviceFeatures2 *features = (VkPhysicalDeviceFeatures2 *)p;
                     features->features.robustBufferAccess = VK_TRUE;
+                    features->features.fullDrawIndexUint32 = VK_TRUE;
                     features->features.imageCubeArray = VK_TRUE;
                     features->features.independentBlend = VK_TRUE;
                     features->features.sampleRateShading = VK_TRUE;
                     features->features.drawIndirectFirstInstance = VK_TRUE;
+                    features->features.depthClamp = VK_TRUE;
                     features->features.depthBiasClamp = VK_TRUE;
                     features->features.samplerAnisotropy = VK_TRUE;
                     features->features.occlusionQueryPrecise = VK_TRUE;
                     features->features.fragmentStoresAndAtomics = VK_TRUE;
                     features->features.shaderStorageImageExtendedFormats = VK_TRUE;
-                    features->features.shaderStorageImageReadWithoutFormat = VK_TRUE;
                     features->features.shaderUniformBufferArrayDynamicIndexing = VK_TRUE;
                     features->features.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
                     features->features.shaderStorageBufferArrayDynamicIndexing = VK_TRUE;
@@ -1021,18 +1022,39 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES: {
                     VkPhysicalDeviceVulkan12Features *features = (VkPhysicalDeviceVulkan12Features *)p;
-                    features->samplerMirrorClampToEdge = VK_TRUE;
-                    features->shaderUniformTexelBufferArrayDynamicIndexing = VK_TRUE;
                     features->uniformBufferStandardLayout = VK_TRUE;
-                    features->shaderSubgroupExtendedTypes = VK_TRUE;
+                    features->subgroupBroadcastDynamicId = VK_TRUE;
+                    features->imagelessFramebuffer = VK_TRUE;
                     features->separateDepthStencilLayouts = VK_TRUE;
                     features->hostQueryReset = VK_TRUE;
-                    features->bufferDeviceAddress = VK_TRUE;
+                    features->timelineSemaphore = VK_TRUE;
+                    features->shaderSubgroupExtendedTypes = VK_TRUE;
                     features->vulkanMemoryModel = VK_TRUE;
                     features->vulkanMemoryModelDeviceScope = VK_TRUE;
                     features->vulkanMemoryModelAvailabilityVisibilityChains = VK_TRUE;
-                    features->subgroupBroadcastDynamicId = VK_TRUE;
-                    features->imagelessFramebuffer = VK_TRUE;
+                    features->bufferDeviceAddress = VK_TRUE;
+                    features->samplerMirrorClampToEdge = VK_TRUE;
+                    features->descriptorIndexing = VK_TRUE;
+                    features->shaderUniformTexelBufferArrayDynamicIndexing = VK_TRUE;
+                    features->shaderUniformTexelBufferArrayDynamicIndexing = VK_TRUE;
+                    features->shaderStorageTexelBufferArrayDynamicIndexing = VK_TRUE;
+                    features->shaderUniformBufferArrayNonUniformIndexing = VK_TRUE;
+                    features->shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+                    features->shaderStorageBufferArrayNonUniformIndexing = VK_TRUE;
+                    features->shaderStorageImageArrayNonUniformIndexing = VK_TRUE;
+                    features->shaderUniformTexelBufferArrayNonUniformIndexing = VK_TRUE;
+                    features->shaderStorageTexelBufferArrayNonUniformIndexing = VK_TRUE;
+                    features->descriptorBindingUniformBufferUpdateAfterBind = VK_TRUE;
+                    features->descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+                    features->descriptorBindingStorageImageUpdateAfterBind = VK_TRUE;
+                    features->descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE;
+                    features->descriptorBindingUniformTexelBufferUpdateAfterBind = VK_TRUE;
+                    features->descriptorBindingStorageTexelBufferUpdateAfterBind = VK_TRUE;
+                    features->descriptorBindingUpdateUnusedWhilePending = VK_TRUE;
+                    features->descriptorBindingPartiallyBound = VK_TRUE;
+                    features->descriptorBindingVariableDescriptorCount = VK_TRUE;
+                    features->runtimeDescriptorArray = VK_TRUE;
+                    features->scalarBlockLayout = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR: {
                     VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *features =
@@ -1075,16 +1097,6 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
                     features->subgroupSizeControl = VK_TRUE;
                     features->computeFullSubgroups = VK_TRUE;
                 } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT: {
-                    VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *features =
-                        (VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *)p;
-                    features->texelBufferAlignment = VK_TRUE;
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT: {
-                    VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *features =
-                        (VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *)p;
-                    features->extendedDynamicState2 = VK_TRUE;
-                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
                     VkPhysicalDeviceProperties2 *properties = (VkPhysicalDeviceProperties2 *)p;
                     properties->properties.limits.maxImageDimension1D = 8192;
@@ -1120,8 +1132,9 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES: {
                     VkPhysicalDeviceVulkan11Properties *properties = (VkPhysicalDeviceVulkan11Properties *)p;
                     properties->subgroupSize = 4;
-                    properties->subgroupSupportedStages = VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT; 
-                    properties->subgroupSupportedOperations = VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT |
+                    properties->subgroupSupportedStages = VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+                    properties->subgroupSupportedOperations =
+                        VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT |
                         VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT |
                         VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT | VK_SUBGROUP_FEATURE_QUAD_BIT;
                 } break;
@@ -1129,7 +1142,22 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
                     VkPhysicalDeviceVulkan12Properties *properties = (VkPhysicalDeviceVulkan12Properties *)p;
                     properties->shaderSignedZeroInfNanPreserveFloat16 = VK_TRUE;
                     properties->shaderSignedZeroInfNanPreserveFloat32 = VK_TRUE;
+
+                    properties->maxPerStageDescriptorUpdateAfterBindSamplers = 500000;
+                    properties->maxPerStageDescriptorUpdateAfterBindUniformBuffers = 12;
+                    properties->maxPerStageDescriptorUpdateAfterBindStorageBuffers = 500000;
+                    properties->maxPerStageDescriptorUpdateAfterBindSampledImages = 500000;
+                    properties->maxPerStageDescriptorUpdateAfterBindStorageImages = 500000;
                     properties->maxPerStageDescriptorUpdateAfterBindInputAttachments = 7;
+                    properties->maxPerStageUpdateAfterBindResources = 500000;
+                    properties->maxDescriptorSetUpdateAfterBindSamplers = 500000;
+                    properties->maxDescriptorSetUpdateAfterBindUniformBuffers = 72;
+                    properties->maxDescriptorSetUpdateAfterBindUniformBuffersDynamic = 8;
+                    properties->maxDescriptorSetUpdateAfterBindStorageBuffers = 500000;
+                    properties->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic = 4;
+                    properties->maxDescriptorSetUpdateAfterBindSampledImages = 500000;
+                    properties->maxDescriptorSetUpdateAfterBindStorageImages = 500000;
+                    properties->maxDescriptorSetUpdateAfterBindInputAttachments = 7;
                 } break;
                 default:
                     break;
@@ -1676,7 +1704,7 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         return vkCreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : pCreateInfo->pCreateInfo, pAllocator, pDevice);
     } else if (strcmp(pCreateInfo->pProfile->profileName, "") == 0) {
         return vkCreateDevice(physicalDevice, pCreateInfo->pCreateInfo, pAllocator, pDevice);
-    } else if (strcmp(pCreateInfo->pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
+    } else if (strcmp(VP_KHR_ROADMAP_2022_NAME, pCreateInfo->pProfile->profileName) == 0) {
         std::vector<const char *> extensions;
         _vpGetExtensions(pCreateInfo, _vpCountOf(_VP_KHR_ROADMAP_2022_EXTENSIONS), &_VP_KHR_ROADMAP_2022_EXTENSIONS[0], extensions);
 
@@ -1727,14 +1755,6 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         const VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *requestedSubgroupSizeFeatures =
             (const VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *)_vpGetStructure(
                 pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT);
-
-        const VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *requestedTexelBufferFeatures =
-            (const VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT);
-
-        const VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *requestedExtendedDynamicState2Features =
-            (const VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT);
 
         VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
         deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
@@ -1795,16 +1815,6 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         deviceSubgroupSizeFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
         deviceSubgroupSizeFeatures.pNext = pProfileNext;
         pProfileNext = &deviceSubgroupSizeFeatures;
-
-        VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT deviceTexelBufferFeatures = {};
-        deviceTexelBufferFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT;
-        deviceTexelBufferFeatures.pNext = pProfileNext;
-        pProfileNext = &deviceTexelBufferFeatures;
-
-        VkPhysicalDeviceExtendedDynamicState2FeaturesEXT deviceExtendedDynamicState2Features = {};
-        deviceExtendedDynamicState2Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT;
-        deviceExtendedDynamicState2Features.pNext = pProfileNext;
-        pProfileNext = &deviceExtendedDynamicState2Features;
 
         vpGetProfileStructures(pCreateInfo->pProfile, pProfileNext);
 
@@ -1879,14 +1889,212 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
             pNext = &deviceSubgroupSizeFeatures;
         }
 
-        if (requestedTexelBufferFeatures == nullptr) {
-            deviceTexelBufferFeatures.pNext = pNext;
-            pNext = &deviceTexelBufferFeatures;
+        VkDeviceCreateInfo deviceCreateInfo = {};
+        deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        deviceCreateInfo.pNext = pNext;
+        deviceCreateInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;
+        deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;
+        deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+        deviceCreateInfo.ppEnabledExtensionNames = static_cast<const char *const *>(extensions.data());
+        deviceCreateInfo.pEnabledFeatures =
+            pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr ? &deviceFeatures2.features : nullptr;
+        return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
+    } else if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, pCreateInfo->pProfile->profileName) == 0) {
+        std::vector<const char *> extensions;
+        _vpGetExtensions(pCreateInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
+
+        void *pProfileNext = nullptr;
+        void *pRoot = const_cast<void *>(pCreateInfo->pCreateInfo->pNext);
+
+        const VkPhysicalDeviceFeatures2 *requestedFeatures2 =
+            (const VkPhysicalDeviceFeatures2 *)_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2);
+
+        const VkPhysicalDeviceImagelessFramebufferFeatures *requestedImagelessFeatures =
+            (const VkPhysicalDeviceImagelessFramebufferFeatures *)_vpGetStructure(
+                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES);
+
+        const VkPhysicalDevice16BitStorageFeatures *requested16BitFeatures =
+            (const VkPhysicalDevice16BitStorageFeatures *)_vpGetStructure(pRoot,
+                                                                          VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES);
+
+        const VkPhysicalDeviceMultiviewFeatures *requestedMultiviewFeatures =
+            (const VkPhysicalDeviceMultiviewFeatures *)_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES);
+
+        const VkPhysicalDeviceDescriptorIndexingFeatures *requestedDescriptorInxedingFeatures =
+            (const VkPhysicalDeviceDescriptorIndexingFeatures *)_vpGetStructure(
+                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES);
+
+        const VkPhysicalDeviceHostQueryResetFeatures *requestedHostQueryResetFeatures =
+            (const VkPhysicalDeviceHostQueryResetFeatures *)_vpGetStructure(
+                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES);
+
+        const VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures *requestedShaderSubgroupFeatures =
+            (const VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures *)_vpGetStructure(
+                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES);
+
+        const VkPhysicalDeviceUniformBufferStandardLayoutFeatures *requestedUniformBufferFeatures =
+            (const VkPhysicalDeviceUniformBufferStandardLayoutFeatures *)_vpGetStructure(
+                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES);
+
+        const VkPhysicalDeviceShaderDrawParametersFeatures *requestedShaderDrawFeatures =
+            (const VkPhysicalDeviceShaderDrawParametersFeatures *)_vpGetStructure(
+                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES);
+
+        const VkPhysicalDevice8BitStorageFeatures *requested8BitStorageFeatures =
+            (const VkPhysicalDevice8BitStorageFeatures *)_vpGetStructure(pRoot,
+                                                                         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES);
+
+        const VkPhysicalDeviceShaderFloat16Int8Features *requestedShaderFloatFeatures =
+            (const VkPhysicalDeviceShaderFloat16Int8Features *)_vpGetStructure(
+                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES);
+
+        const VkPhysicalDeviceSamplerYcbcrConversionFeatures *requestedSamplerYcbcrFeatures =
+            (const VkPhysicalDeviceSamplerYcbcrConversionFeatures *)_vpGetStructure(
+                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES);
+
+        const VkPhysicalDeviceVariablePointersFeatures *requestedVariableFeatures =
+            (const VkPhysicalDeviceVariablePointersFeatures *)_vpGetStructure(
+                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES);
+
+        VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
+        deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+        deviceFeatures2.pNext = nullptr;
+        pProfileNext = &deviceFeatures2;
+
+        VkPhysicalDeviceImagelessFramebufferFeatures deviceImagelessFeatures = {};
+        deviceImagelessFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES;
+        deviceImagelessFeatures.pNext = pProfileNext;
+        pProfileNext = &deviceImagelessFeatures;
+
+        VkPhysicalDevice16BitStorageFeatures device16BitFeatures = {};
+        device16BitFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES;
+        device16BitFeatures.pNext = pProfileNext;
+        pProfileNext = &device16BitFeatures;
+
+        VkPhysicalDeviceMultiviewFeatures deviceMultiviewFeatures = {};
+        deviceMultiviewFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES;
+        deviceMultiviewFeatures.pNext = pProfileNext;
+        pProfileNext = &deviceMultiviewFeatures;
+
+        VkPhysicalDeviceDescriptorIndexingFeatures deviceDescriptorInxedingFeatures = {};
+        deviceDescriptorInxedingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+        deviceDescriptorInxedingFeatures.pNext = pProfileNext;
+        pProfileNext = &deviceDescriptorInxedingFeatures;
+
+        VkPhysicalDeviceHostQueryResetFeatures deviceHostQueryResetFeatures = {};
+        deviceHostQueryResetFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES;
+        deviceHostQueryResetFeatures.pNext = pProfileNext;
+        pProfileNext = &deviceHostQueryResetFeatures;
+
+        VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures deviceShaderSubgroupFeatures = {};
+        deviceShaderSubgroupFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES;
+        deviceShaderSubgroupFeatures.pNext = pProfileNext;
+        pProfileNext = &deviceShaderSubgroupFeatures;
+
+        VkPhysicalDeviceUniformBufferStandardLayoutFeatures deviceUniformBufferFeatures = {};
+        deviceUniformBufferFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES;
+        deviceUniformBufferFeatures.pNext = pProfileNext;
+        pProfileNext = &deviceUniformBufferFeatures;
+
+        VkPhysicalDeviceShaderDrawParametersFeatures deviceShaderDrawFeatures = {};
+        deviceShaderDrawFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES;
+        deviceShaderDrawFeatures.pNext = pProfileNext;
+        pProfileNext = &deviceShaderDrawFeatures;
+
+        VkPhysicalDevice8BitStorageFeatures device8BitFeatures = {};
+        device8BitFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES;
+        device8BitFeatures.pNext = pProfileNext;
+        pProfileNext = &device8BitFeatures;
+
+        VkPhysicalDeviceShaderFloat16Int8Features deviceShaderFloatFeatures = {};
+        deviceShaderFloatFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES;
+        deviceShaderFloatFeatures.pNext = pProfileNext;
+        pProfileNext = &deviceShaderFloatFeatures;
+
+        VkPhysicalDeviceSamplerYcbcrConversionFeatures deviceSamplerYcbcrFeatures = {};
+        deviceSamplerYcbcrFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES;
+        deviceSamplerYcbcrFeatures.pNext = pProfileNext;
+        pProfileNext = &deviceSamplerYcbcrFeatures;
+
+        VkPhysicalDeviceVariablePointersFeatures deviceVariableFeatures = {};
+        deviceVariableFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES;
+        deviceVariableFeatures.pNext = pProfileNext;
+        pProfileNext = &deviceVariableFeatures;
+
+        vpGetProfileStructures(pCreateInfo->pProfile, pProfileNext);
+
+        void *pNext = pRoot;
+
+        if (pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr) {
+            deviceFeatures2.features = *pCreateInfo->pCreateInfo->pEnabledFeatures;
+        }
+        if (requestedFeatures2 == nullptr && pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {
+            deviceFeatures2.pNext = pNext;
+            pNext = &deviceFeatures2;
+        }
+        if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
+            deviceFeatures2.features.robustBufferAccess = VK_FALSE;
         }
 
-        if (requestedExtendedDynamicState2Features == nullptr) {
-            deviceExtendedDynamicState2Features.pNext = pNext;
-            pNext = &deviceExtendedDynamicState2Features;
+        if (requestedImagelessFeatures == nullptr) {
+            deviceImagelessFeatures.pNext = pNext;
+            pNext = &deviceImagelessFeatures;
+        }
+
+        if (requested16BitFeatures == nullptr) {
+            device16BitFeatures.pNext = pNext;
+            pNext = &device16BitFeatures;
+        }
+
+        if (requestedMultiviewFeatures == nullptr) {
+            deviceMultiviewFeatures.pNext = pNext;
+            pNext = &deviceMultiviewFeatures;
+        }
+
+        if (requestedDescriptorInxedingFeatures == nullptr) {
+            deviceDescriptorInxedingFeatures.pNext = pNext;
+            pNext = &deviceDescriptorInxedingFeatures;
+        }
+
+        if (requestedHostQueryResetFeatures == nullptr) {
+            deviceHostQueryResetFeatures.pNext = pNext;
+            pNext = &deviceHostQueryResetFeatures;
+        }
+
+        if (requestedShaderSubgroupFeatures == nullptr) {
+            deviceShaderSubgroupFeatures.pNext = pNext;
+            pNext = &deviceShaderSubgroupFeatures;
+        }
+
+        if (requestedUniformBufferFeatures == nullptr) {
+            deviceUniformBufferFeatures.pNext = pNext;
+            pNext = &deviceUniformBufferFeatures;
+        }
+
+        if (requestedShaderDrawFeatures == nullptr) {
+            deviceShaderDrawFeatures.pNext = pNext;
+            pNext = &deviceShaderDrawFeatures;
+        }
+
+        if (requested8BitStorageFeatures == nullptr) {
+            device8BitFeatures.pNext = pNext;
+            pNext = &device8BitFeatures;
+        }
+
+        if (requestedShaderFloatFeatures == nullptr) {
+            deviceShaderFloatFeatures.pNext = pNext;
+            pNext = &deviceShaderFloatFeatures;
+        }
+
+        if (requestedSamplerYcbcrFeatures == nullptr) {
+            deviceSamplerYcbcrFeatures.pNext = pNext;
+            pNext = &deviceSamplerYcbcrFeatures;
+        }
+
+        if (requestedVariableFeatures == nullptr) {
+            deviceVariableFeatures.pNext = pNext;
+            pNext = &deviceVariableFeatures;
         }
 
         VkDeviceCreateInfo deviceCreateInfo = {};
@@ -1899,10 +2107,12 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         deviceCreateInfo.pEnabledFeatures =
             pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr ? &deviceFeatures2.features : nullptr;
         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
-    } else if (strcmp(pCreateInfo->pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+    }
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+    else if (strcmp(VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME, pCreateInfo->pProfile->profileName) == 0) {
         std::vector<const char *> extensions;
-        _vpGetExtensions(pCreateInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS),
-                         &_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[0], extensions);
+        _vpGetExtensions(pCreateInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_EXTENSIONS[0], extensions);
 
         void *pProfileNext = nullptr;
         void *pRoot = const_cast<void *>(pCreateInfo->pCreateInfo->pNext);
@@ -2127,7 +2337,9 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         deviceCreateInfo.pEnabledFeatures =
             pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr ? &deviceFeatures2.features : nullptr;
         return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);
-    } else {
+    }
+#endif
+    else {
         return VK_ERROR_UNKNOWN;
     }
 }
@@ -3400,6 +3612,11 @@ VP_INLINE void vpGetProfileExtensionProperties(const VpProfileProperties *pProfi
         } else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS);
         }
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+            *pPropertyCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_EXTENSIONS);
+        }
+#endif
         return;
     }
 
@@ -3415,6 +3632,15 @@ VP_INLINE void vpGetProfileExtensionProperties(const VpProfileProperties *pProfi
             pProperties[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
         }
     }
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+    else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+        for (std::size_t i = 0,
+                         n = std::min<std::size_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS), *pPropertyCount);
+             i < n; ++i) {
+            pProperties[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2022_EXTENSIONS[i];
+        }
+    }
+#endif
 }
 
 VP_INLINE void vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
@@ -3428,6 +3654,8 @@ VP_INLINE void vpGetProfileStructureProperties(const VpProfileProperties *pProfi
         } else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_STRUCTURE_PROPERTIES);
 #endif
+        } else {
+            *pPropertyCount = 0;
         }
         return;
     }
@@ -3458,7 +3686,13 @@ VP_INLINE void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t
     if (pFormat == nullptr) {
         if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             *pFormatCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_FORMATS);
-        } else {
+        }
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+            *pFormatCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_FORMATS);
+        }
+#endif
+        else {
             *pFormatCount = 0;
         }
         return;
@@ -3493,7 +3727,11 @@ VP_INLINE void vpGetProfileFormatProperties(const VpProfileProperties *pProfile,
 
     VkStruct *p = static_cast<VkStruct *>(pNext);
 
-    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        || strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0
+#endif
+    ) {
         for (std::size_t i = 0, n = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_FORMATS); i < n; ++i) {
             const VpFormatProperties &props = _VP_LUNARG_DESKTOP_PORTABILITY_2022_FORMATS[i];
             if (props.format != format) continue;
@@ -3526,7 +3764,13 @@ VP_INLINE void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint
     if (pMemoryPropertyFlags == nullptr) {
         if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             *pMemoryPropertyFlagsCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_MEMORY_TYPES);
-        } else {
+        }
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+            *pMemoryPropertyFlagsCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_MEMORY_TYPES);
+        }
+#endif
+        else {
             *pMemoryPropertyFlagsCount = 0;
         }
         return;
@@ -3539,6 +3783,15 @@ VP_INLINE void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint
             pMemoryPropertyFlags[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[i];
         }
     }
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+    else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
+        std::size_t n =
+            std::min<std::size_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_MEMORY_TYPES), *pMemoryPropertyFlagsCount);
+        for (std::size_t i = 0; i < n; ++i) {
+            pMemoryPropertyFlags[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2022_MEMORY_TYPES[i];
+        }
+    }
+#endif
 }
 
 VP_INLINE void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
@@ -3546,7 +3799,13 @@ VP_INLINE void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, ui
     if (pQueueFamilyProperties == nullptr) {
         if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME) == 0) {
             *pQueueFamilyPropertiesCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES);
-        } else {
+        }
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+            *pQueueFamilyPropertiesCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES);
+        }
+#endif
+        else {
             *pQueueFamilyPropertiesCount = 0;
         }
         return;
@@ -3559,6 +3818,15 @@ VP_INLINE void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, ui
             pQueueFamilyProperties[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES[i];
         }
     }
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+    else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2022_SUBSET_NAME) == 0) {
+        std::size_t n = std::min<std::size_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES),
+                                              *pQueueFamilyPropertiesCount);
+        for (std::size_t i = 0; i < n; ++i) {
+            pQueueFamilyProperties[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2022_QUEUE_FAMILY_PROPERTIES[i];
+        }
+    }
+#endif
 }
 
 #endif//VULKAN_PROFILES_
