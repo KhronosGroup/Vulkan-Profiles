@@ -60,14 +60,14 @@
             "properties": [
                 {
                     "struct": "VkPhysicalDeviceVulkan12Properties",
-                    "members": {
+                    "members": [
                         {
                             "name": "maxTimelineSemaphoreValueDifference",
                             "type": "uint32_t",
                             "limit": "MIN",
                             "value": 2147483647
                         }
-                    }
+                    ]
                 }
             ]
         },
@@ -103,7 +103,7 @@
             "properties": [
                 {
                     "struct": "VkPhysicalDeviceVulkan13Properties",
-                    "members": {
+                    "members": [
                         {
                             "name": "maxInlineUniformBlockSize",
                             "type": "uint32_t",
@@ -140,12 +140,18 @@
                             "limit": "MIN",
                             "value": 256
                         }
-                    }
+                    ]
                 }
             ]
         },
         {
             "name": "roadmap2020requirements",
+            "extensions": [
+                {
+                    "extensionName": "VK_KHR_global_priority",
+                    "specVersion": 1
+                }
+            ],
             "features": [
                 {
                     "struct": "VkPhysicalDeviceFeatures",
@@ -412,39 +418,6 @@
                             "value": 7
                         }
                     ]
-                }
-            ]
-        },
-        {
-            "name": "vulkan13",
-            "extensions": [
-                {
-                    "extensionName": "VK_KHR_global_priority",
-                    "specVersion": 1
-                }
-            ],
-            "features": [
-                {
-                    "struct": "VkPhysicalDeviceVulkan13Features",
-                    "members": {
-                        "bufferDeviceAddress": true,
-                        "shaderTerminateInvocation": true,
-                        "synchronization2": true,
-                        "shaderZeroInitializeWorkgroupMem": true,
-                        "robustImageAccess": true,
-                        "inlineUniformBlock": true,
-                        "pipelineCreationCacheControl": true,
-                        "descriptorBindingInlineUniformBlockUpdateAfterBind": true,
-                        "privateData": true,
-                        "shaderDemoteToHelperInvocation": true,
-                        "subgroupSizeControl": true,
-                        "computeFullSubgroups": true,
-                        "texelBufferAlignment": true,
-                        "shaderIntegerDotProduct": true,
-                        "maintenance4": true,
-                        "extendedDynamicState": true,
-                        "extendedDynamicState2": true
-                    }
                 }
             ]
         }
