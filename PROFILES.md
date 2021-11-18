@@ -126,7 +126,11 @@
 
 | Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan12Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceImagelessFramebufferFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
 | -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
-| imagelessFramebuffer | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| imagelessFramebuffer | 1.2 Core | :heavy_check_mark: | :x: | :x: |
+
+| Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan12Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
+| -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
+| separateDepthStencilLayouts | 1.2 Core | :x: | :x: | :x: |
 
 | Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan12Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDevice16BitStorageFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
 | -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
@@ -135,7 +139,7 @@
 
 | Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan11Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDeviceMultiviewFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
 | -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
-| multiview | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: |
+| multiview | 1.1 Core | 1.1 Core | 1.1 Core | :x: |
 
 | Profiles | VP_KHR_roadmap_2022 (VkPhysicalDeviceVulkan11Features) | VP_LUNARG_desktop_portability_2022 (VkPhysicalDevice8BitStorageFeatures) | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
 | -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
