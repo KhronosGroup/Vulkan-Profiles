@@ -11,10 +11,11 @@
 
 *Vulkan Profiles Tools* is a collection of tools for Vulkan application developers to leverage *Vulkan Profiles* while developing a Vulkan application.
 
-* **[Change Log](https://github.com/LunarG/VulkanProfiles/blob/master/CHANGELOG.md)**: The history of *Vulkan Profiles Tools* releases.
+* **[Change Log](./CHANGELOG.md)**: The history of *Vulkan Profiles Tools* releases.
 * **[Bug reports](https://github.com/LunarG/VulkanProfiles/issues)**: Open a GitHub issue when you encounter a bug.
 * **[Roadmap](https://github.com/LunarG/VulkanProfiles/projects)**: Follow *Vulkan Profiles Tools* future developments.
-* **[Contributing](https://github.com/LunarG/VulkanProfiles/blob/master/CONTRIBUTING.md)**: Submit a fix or a feature to *Vulkan Profiles Tools*.
+* **[Contributing](./PROFILES.md)**: The definitions of *Vulkan Profiles*.
+* **[Contributing](./TUTORIAL.md)**: How to use the *Vulkan Profiles Tools*.
 
 --------------
 ## Vulkan Profiles Library
@@ -60,6 +61,15 @@ specification.
 The *Vulkan Capabilities Schema* aims at providing a human readable format to store and share data representing properties, features, formats, etc.
 
 This format is used to store *Vulkan Profiles*.
+
+--------------
+### Vulkan Profiles
+
+This repository contains representation of profiles following the *Vulkan Capabilities Schema*:
+- [VP_KHR_roadmap_2022](./profiles/VP_KHR_roadmap_2022.json)
+- [VP_LUNARG_desktop_portability_2022](./profiles/VP_LUNARG_desktop_portability_2022.json)
+- [VP_ANDROID_angle_es31](./profiles/VP_ANDROID_angle_es31.json)
+- [VP_ANDROID_baseline_2022](./profiles/VP_ANDROID_baseline_2022.json)
 
 --------------
 ## Downloads
