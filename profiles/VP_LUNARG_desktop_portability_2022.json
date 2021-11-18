@@ -2,7 +2,7 @@
 	"$schema": "https://schema.khronos.org/vulkan/profiles-1.3.200.json#",
 	"comments": {
 		"info": "LunarG Vulkan 1.1 Desktop Portability Profile",
-		"desc": "Common desktop platforms with drivers supporting Vulkan 1.0 on Windows, Linux and macOS."
+		"desc": "Common desktop platforms with drivers supporting Vulkan 1.1 on Windows, Linux and macOS."
 	},
 	"capabilities": [
 		{
@@ -322,42 +322,6 @@
 							"type": "uint32_t",
 							"limit": "MIN",
 							"value": 16
-						},
-						{
-							"name": "maxPerStageDescriptorUniformBuffers",
-							"type": "uint32_t",
-							"limit": "MIN",
-							"value": 15
-						},
-						{
-							"name": "maxPerStageDescriptorStorageBuffers",
-							"type": "uint32_t",
-							"limit": "MIN",
-							"value": 16
-						},
-						{
-							"name": "maxPerStageDescriptorSampledImages",
-							"type": "uint32_t",
-							"limit": "MIN",
-							"value": 128
-						},
-						{
-							"name": "maxPerStageDescriptorStorageImages",
-							"type": "uint32_t",
-							"limit": "MIN",
-							"value": 8
-						},
-						{
-							"name": "maxPerStageDescriptorInputAttachments",
-							"type": "uint32_t",
-							"limit": "MIN",
-							"value": 8
-						},
-						{
-							"name": "maxPerStageResources",
-							"type": "uint32_t",
-							"limit": "MIN",
-							"value": 128
 						},
 						{
 							"name": "maxPerStageDescriptorUniformBuffers",
