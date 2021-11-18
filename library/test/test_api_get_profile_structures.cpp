@@ -91,7 +91,7 @@ TEST(api_get_profile_structures, get_features) {
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.shaderSharedInt64Atomics);
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.shaderFloat16);
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.shaderInt8);
-    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.descriptorIndexing);
+    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.descriptorIndexing);
     EXPECT_EQ(VK_TRUE, deviceVulkan12Features.shaderUniformTexelBufferArrayDynamicIndexing);
     EXPECT_EQ(VK_TRUE, deviceVulkan12Features.uniformBufferStandardLayout);
     EXPECT_EQ(VK_TRUE, deviceVulkan12Features.shaderSubgroupExtendedTypes);
