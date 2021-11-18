@@ -6,6 +6,47 @@
     },
     "capabilities": [
         {
+            "name": "vulkan10requirements",
+            "features": [
+                {
+                    "struct": "VkPhysicalDeviceFeatures",
+                    "members": {
+                        "robustBufferAccess": true
+                    }
+                }
+            ]
+        },
+        {
+            "name": "vulkan11requirements",
+            "features": [
+                {
+                    "struct": "VkPhysicalDeviceVulkan11Features",
+                    "members": {
+                        "multiview": true
+                    }
+                }
+            ],
+            "properties": [
+                {
+                    "struct": "VkPhysicalDeviceVulkan11Properties",
+                    "members": [
+                        {
+                            "name": "maxMultiviewViewCount",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 6
+                        },
+                        {
+                            "name": "maxMultiviewInstanceIndex",
+                            "type": "uint32_t",
+                            "limit": "MIN",
+                            "value": 134217727
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "baseline",
             "extensions": [
                 {
@@ -50,7 +91,6 @@
                     "struct": "VkPhysicalDeviceFeatures",
                     "members": {
                         "independentBlend": true,
-                        "robustBufferAccess": true,
                         "vertexPipelineStoresAndAtomics": true
                     }
                 },
@@ -176,6 +216,8 @@
             "name": "VP_ANDROID_angle_es31",
             "api-version": "1.1.131",
             "capabilities": [
+                "vulkan10requirements",
+                "vulkan11requirements",
                 "baseline"
             ]
         }
