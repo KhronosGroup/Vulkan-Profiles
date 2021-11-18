@@ -6,6 +6,31 @@
 	},
 	"capabilities": [
 		{
+			"name": "vulkan11requirements",
+			"features": [
+				{
+					"struct": "VkPhysicalDeviceVulkan11Features",
+					"members": {
+						"multiview": true
+					}
+				}
+			],
+			"properties": [
+				{
+					"name": "maxMultiviewViewCount",
+					"type": "uint32_t",
+					"limit": "MIN",
+					"value": 6
+				},
+				{
+					"name": "maxMultiviewInstanceIndex",
+					"type": "uint32_t",
+					"limit": "MIN",
+					"value": 134217727
+				}
+			]
+		},
+		{
 			"name": "baseline",
 			"extensions": [
 				{
@@ -1869,6 +1894,7 @@
 			"status": "BETA",
 			"api-version": "1.1.142",
 			"capabilities": [
+				"vulkan11requirements",
 				"baseline",
 				"macos-specific"
 			],
@@ -1879,6 +1905,7 @@
 			"version": 1,
 			"api-version": "1.1.142",
 			"capabilities": [
+				"vulkan11requirements",
 				"baseline"
 			]
 		}
