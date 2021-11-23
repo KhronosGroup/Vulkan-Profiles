@@ -64,7 +64,7 @@
                     "specVersion": 1
                 },
                 {
-                    "extensionName": "VK_KHR_get_memory_requirements",
+                    "extensionName": "VK_KHR_get_memory_requirements2",
                     "specVersion": 1
                 },
                 {
