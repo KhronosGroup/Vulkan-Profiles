@@ -9,7 +9,7 @@
 			"name": "vulkan11requirements",
 			"features": [
 				{
-					"struct": "VkPhysicalDeviceVulkan11Features",
+					"struct": "VkPhysicalDeviceMultiviewFeatures",
 					"members": {
 						"multiview": true
 					}
@@ -17,7 +17,7 @@
 			],
 			"properties": [
 				{
-					"struct": "VkPhysicalDeviceVulkan11Properties",
+					"struct": "VkPhysicalDeviceMultiviewProperties",
 					"members": [
 						{
 							"name": "maxMultiviewViewCount",
