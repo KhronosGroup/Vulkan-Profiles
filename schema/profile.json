@@ -418,7 +418,7 @@
                             },
                             "type": {
                                 "type": "string",
-                                "enum": [ "VkSampleCountFlags" ]
+                                "enum": [ "VkSampleCountFlagBits" ]
                             },
                             "value": {
                                 "$ref": "#/definitions/VkSampleCountFlagBits"

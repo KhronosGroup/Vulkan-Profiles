@@ -98,7 +98,7 @@
                         "shaderDemoteToHelperInvocation": true,
                         "robustImageAccess": true,
                         "shaderTerminateInvocation": true,
-                        "shaderZeroInitializeWorkgroupMem": true,
+                        "shaderZeroInitializeWorkgroupMemory": true,
                         "synchronization2": true,
                         "shaderIntegerDotProduct": true,
                         "maintenance4": true

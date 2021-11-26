@@ -593,25 +593,25 @@
                         },
                         {
                             "name": "framebufferColorSampleCounts",
-                            "type": "VkSampleCountFlags",
+                            "type": "VkSampleCountFlagBits",
                             "limit": "ALL",
                             "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
                         },
                         {
                             "name": "framebufferDepthSampleCounts",
-                            "type": "VkSampleCountFlags",
+                            "type": "VkSampleCountFlagBits",
                             "limit": "ALL",
                             "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
                         },
                         {
                             "name": "framebufferStencilSampleCounts",
-                            "type": "VkSampleCountFlags",
+                            "type": "VkSampleCountFlagBits",
                             "limit": "ALL",
                             "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
                         },
                         {
                             "name": "framebufferNoAttachmentsSampleCounts",
-                            "type": "VkSampleCountFlags",
+                            "type": "VkSampleCountFlagBits",
                             "limit": "ALL",
                             "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
                         },
@@ -623,31 +623,31 @@
                         },
                         {
                             "name": "sampledImageColorSampleCounts",
-                            "type": "VkSampleCountFlags",
+                            "type": "VkSampleCountFlagBits",
                             "limit": "ALL",
                             "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
                         },
                         {
                             "name": "sampledImageIntegerSampleCounts",
-                            "type": "VkSampleCountFlags",
+                            "type": "VkSampleCountFlagBits",
                             "limit": "ALL",
                             "value": [ "VK_SAMPLE_COUNT_1_BIT" ]
                         },
                         {
                             "name": "sampledImageDepthSampleCounts",
-                            "type": "VkSampleCountFlags",
+                            "type": "VkSampleCountFlagBits",
                             "limit": "ALL",
                             "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
                         },
                         {
                             "name": "sampledImageStencilSampleCounts",
-                            "type": "VkSampleCountFlags",
+                            "type": "VkSampleCountFlagBits",
                             "limit": "ALL",
                             "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
                         },
                         {
                             "name": "storageImageSampleCounts",
-                            "type": "VkSampleCountFlags",
+                            "type": "VkSampleCountFlagBits",
                             "limit": "ALL",
                             "value": [ "VK_SAMPLE_COUNT_1_BIT" ]
                         },
