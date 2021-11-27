@@ -2430,6 +2430,12 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4PropertiesKHR *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPropertiesKHR *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDevicePointClippingPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceGroupPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceDriverPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceIDPropertiesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryBudgetPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDevicePCIBusInfoPropertiesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceToolPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryProperties *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *dest);
@@ -4206,6 +4212,60 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePointClippi
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePointClippingPropertiesKHR)\n");
     DebugPrintf("WARN VkPhysicalDevicePointClippingProperties only reports how a device functions and will not be set.");
     // GET_VALUE(pointClippingBehavior);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGroupPropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceGroupPropertiesKHR)\n");
+    DebugPrintf("WARN VkPhysicalDeviceGroupPropertiesKHR only reports how a device functions and will not be set.");
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDriverPropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDriverPropertiesKHR)\n");
+    DebugPrintf("WARN VkPhysicalDeviceDriverPropertiesKHR only reports how a device functions and will not be set.");
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIDPropertiesKHR *dest) {
+    const Json::Value value = parent["members"];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceIDPropertiesKHR)\n");
+    DebugPrintf("WARN VkPhysicalDeviceIDPropertiesKHR only reports how a device functions and will not be set.");
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryBudgetPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMemoryBudgetPropertiesEXT)\n");
+    DebugPrintf("WARN VkPhysicalDeviceMemoryBudgetPropertiesEXT only reports how a device functions and will not be set.");
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePCIBusInfoPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePCIBusInfoPropertiesEXT)\n");
+    DebugPrintf("WARN VkPhysicalDevicePCIBusInfoPropertiesEXT only reports how a device functions and will not be set.");
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceToolPropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceToolPropertiesEXT)\n");
+    DebugPrintf("WARN VkPhysicalDeviceToolPropertiesEXT only reports how a device functions and will not be set.");
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
