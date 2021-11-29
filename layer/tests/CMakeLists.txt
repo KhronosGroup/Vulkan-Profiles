@@ -14,6 +14,4 @@ function(DevsimTest NAME)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 endfunction(DevsimTest)
 
-DevsimTest(test_array_combination_modes)
-DevsimTest(test_physical_device_extended_property_modification)
-DevsimTest(test_physical_device_main_property_modification)
+DevsimTest(manual_devsim_tests)
