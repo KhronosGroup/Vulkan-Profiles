@@ -26,7 +26,7 @@
 #endif
 
 TEST(api_get_profile_queue_families, full) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     uint32_t count = 0;
     vpGetProfileQueueFamilies(&profile, &count, nullptr);

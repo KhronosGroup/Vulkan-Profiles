@@ -31,7 +31,7 @@
 TEST(test_profile, example_add_features_add_extensions) {
     TestScaffold scaffold;
 
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
@@ -67,7 +67,7 @@ TEST(test_profile, example_add_features_add_extensions) {
 TEST(test_profile, example_individual_override_features) {
     TestScaffold scaffold;
 
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
@@ -105,7 +105,7 @@ TEST(test_profile, example_individual_override_features) {
 TEST(test_profile, example_collective_override_features) {
     TestScaffold scaffold;
 
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
@@ -145,7 +145,7 @@ TEST(test_profile, example_collective_override_features) {
 TEST(test_profile, example_flag_disable_robust_access) {
     TestScaffold scaffold;
 
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);

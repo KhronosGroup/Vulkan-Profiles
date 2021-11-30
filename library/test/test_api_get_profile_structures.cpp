@@ -30,7 +30,7 @@ TEST(api_get_profile_structures, get_properties2) {
     profileProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     profileProperties2.pNext = nullptr;
 
-    const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, 1};
+    const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     vpGetProfileStructures(&Profile, &profileProperties2);
 
@@ -47,7 +47,7 @@ TEST(api_get_profile_structures, get_properties_single) {
     properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES;
     properties.pNext = nullptr;
 
-    const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, 1};
+    const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     vpGetProfileStructures(&Profile, &properties);
 
@@ -64,7 +64,7 @@ TEST(api_get_profile_structures, get_properties_chain) {
     properties1.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT;
     properties1.pNext = &properties0;
 
-    const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, 1};
+    const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     vpGetProfileStructures(&Profile, &properties1);
 
