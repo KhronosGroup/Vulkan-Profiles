@@ -34,7 +34,7 @@
 #define countof(arr) sizeof(arr) / sizeof(arr[0])
 
 TEST(api_create_device_profile, overrite_with_profile_only) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     TestScaffold scaffold;
 
@@ -58,7 +58,7 @@ TEST(api_create_device_profile, overrite_with_profile_only) {
 }
 
 TEST(api_create_device_profile, overrite_with_supported_extensions) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     TestScaffold scaffold;
 
@@ -84,7 +84,7 @@ TEST(api_create_device_profile, overrite_with_supported_extensions) {
 }
 
 TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     TestScaffold scaffold;
 
@@ -112,7 +112,7 @@ TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
 
 
 TEST(api_create_device_profile, overrite_with_enabled_features) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     TestScaffold scaffold;
 
@@ -139,7 +139,7 @@ TEST(api_create_device_profile, overrite_with_enabled_features) {
 }
 
 TEST(api_create_device_profile, overrite_with_pnext_features) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     TestScaffold scaffold;
 
@@ -171,7 +171,7 @@ TEST(api_create_device_profile, overrite_with_pnext_features) {
 TEST(api_create_device_profile, with_extensions_flag) {
     TestScaffold scaffold;
 
-    const VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION};
+    const VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     static const char* extensions[] = {VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME};
 

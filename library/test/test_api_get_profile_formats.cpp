@@ -28,7 +28,7 @@
 #endif
 
 TEST(api_get_profile_formats, full) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     uint32_t formatCount = 0;
     vpGetProfileFormats(&profile, &formatCount, nullptr);
@@ -44,7 +44,7 @@ TEST(api_get_profile_formats, full) {
 }
 
 TEST(api_get_profile_formats, partial) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     uint32_t formatCount = 0;
     vpGetProfileFormats(&profile, &formatCount, nullptr);
@@ -70,7 +70,7 @@ TEST(api_get_profile_formats, unspecified) {
 }
 
 TEST(api_get_profile_formats, properties_single) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     VkFormatProperties2 properties2 = {};
     properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
@@ -94,7 +94,7 @@ TEST(api_get_profile_formats, properties_single) {
 }
 
 TEST(api_get_profile_formats, properties_chained) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     VkFormatProperties2 properties2 = {};
     properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;

@@ -40,8 +40,8 @@ TEST(api_get_profiles_core, full) {
     EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, pProperties[0].profileName);
     EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, pProperties[0].specVersion);
 
-    EXPECT_STREQ(VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, pProperties[1].profileName);
-    EXPECT_EQ(VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION, pProperties[1].specVersion);
+    EXPECT_STREQ(VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, pProperties[1].profileName);
+    EXPECT_EQ(VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION, pProperties[1].specVersion);
 }
 
 TEST(api_get_profiles_core, partial) {

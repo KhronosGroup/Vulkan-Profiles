@@ -26,7 +26,7 @@
 #endif
 
 TEST(api_get_profile_memory_types, full) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     uint32_t memoryPropertyFlagsCount = 0;
     vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, nullptr);
@@ -42,7 +42,7 @@ TEST(api_get_profile_memory_types, full) {
 }
 
 TEST(api_get_profile_memory_types, partial) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     uint32_t memoryPropertyFlagsCount = 0;
     vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, nullptr);
