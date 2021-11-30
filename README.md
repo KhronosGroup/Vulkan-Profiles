@@ -12,10 +12,10 @@
 The *Vulkan Profiles Tools* are a collection of tools for Vulkan application developers to leverage *Vulkan Profiles* while developing a Vulkan application.
 
 * **[Change Log](./CHANGELOG.md)**: The history of *Vulkan Profiles Tools* releases.
+* **[Using Vulkan Profiles Tools](./TUTORIAL.md)**: How to use the *Vulkan Profiles Tools*.
 * **[Bug reports](https://github.com/LunarG/VulkanProfiles/issues)**: Open a GitHub issue when you encounter a bug.
 * **[Roadmap](https://github.com/LunarG/VulkanProfiles/projects)**: Follow *Vulkan Profiles Tools* future developments.
 * **[Contributing](./PROFILES.md)**: The definitions of *Vulkan Profiles*.
-* **[Contributing](./TUTORIAL.md)**: How to use the *Vulkan Profiles Tools*.
 
 --------------
 ### The Vulkan Profiles Schema
