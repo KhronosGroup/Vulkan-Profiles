@@ -56,16 +56,16 @@ specification.
 | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark: | :x:                | :heavy_check_mark: |
 
 --------------
-### Vulkan Capabilities Schema
+### Vulkan Profile Schema
 
-The *Vulkan Capabilities Schema* aims at providing a human readable format to store and share data representing properties, features, formats, etc.
+The *[Vulkan Profile Schema](./schema/profiles.json)* aims at providing a human readable format to store and share data representing properties, features, formats, etc.
 
 This format is used to store *Vulkan Profiles*.
 
 --------------
 ### Vulkan Profiles
 
-This repository contains representation of profiles following the *Vulkan Capabilities Schema*:
+This repository contains representation of profiles following the *Vulkan Profile Schema*:
 - [VP_KHR_roadmap_2022](./profiles/VP_KHR_roadmap_2022.json)
 - [VP_LUNARG_desktop_portability_2021](./profiles/VP_LUNARG_desktop_portability_2021.json)
 - [VP_ANDROID_angle_es31](./profiles/VP_ANDROID_angle_es31.json)
