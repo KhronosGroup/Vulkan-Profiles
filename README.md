@@ -39,14 +39,10 @@ Note: Marked version releases have undergone thorough testing but do not imply t
 
 This scheme was adopted following the 1.1.96 Vulkan specification release.
 
-
-
 --------------
 ## License
 
-This work is released as open source under a Apache-style license from Khronos including a Khronos copyright.
-
-See [LICENSE.txt]() for a full list of licenses used in this repository.
+This work is released as open source under a [Apache-style license](./LICENSE.md) from Khronos including a Khronos copyright.
 
 --------------
 ## Downloads
