@@ -67,7 +67,7 @@ This format is used to store *Vulkan Profiles*.
 
 This repository contains representation of profiles following the *Vulkan Capabilities Schema*:
 - [VP_KHR_roadmap_2022](./profiles/VP_KHR_roadmap_2022.json)
-- [VP_LUNARG_desktop_portability_2022](./profiles/VP_LUNARG_desktop_portability_2022.json)
+- [VP_LUNARG_desktop_portability_2021](./profiles/VP_LUNARG_desktop_portability_2021.json)
 - [VP_ANDROID_angle_es31](./profiles/VP_ANDROID_angle_es31.json)
 - [VP_ANDROID_baseline_2022](./profiles/VP_ANDROID_baseline_2022.json)
 
