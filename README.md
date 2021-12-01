@@ -9,67 +9,40 @@
 [3]: https://i.creativecommons.org/l/by-nd/4.0/88x31.png "Creative Commons License"
 [4]: https://creativecommons.org/licenses/by-nd/4.0/
 
-*Vulkan Profiles Tools* is a collection of tools for Vulkan application developers to leverage *Vulkan Profiles* while developing a Vulkan application.
+# Vulkan Profiles Tools
+
+The *Vulkan Profiles Tools* are a collection of tools for Vulkan application developers to leverage *Vulkan Profiles* while developing a Vulkan application.
 
 * **[Change Log](./CHANGELOG.md)**: The history of *Vulkan Profiles Tools* releases.
+* **[Using Vulkan Profiles Tools](./TUTORIAL.md)**: How to use the *Vulkan Profiles Tools*.
 * **[Bug reports](https://github.com/LunarG/VulkanProfiles/issues)**: Open a GitHub issue when you encounter a bug.
 * **[Roadmap](https://github.com/LunarG/VulkanProfiles/projects)**: Follow *Vulkan Profiles Tools* future developments.
 * **[Contributing](./PROFILES.md)**: The definitions of *Vulkan Profiles*.
-* **[Contributing](./TUTORIAL.md)**: How to use the *Vulkan Profiles Tools*.
 
 --------------
-## Vulkan Profiles Library
+## Contact Information
 
-The *Vulkan Profiles Library* provides an API to leverage *Vulkan Profiles* in Vulkan applications code with the following features:
-- Checking whether the some *Vulkan Profiles* are supported
-- Creating `VkDevice` instances with the features of a *Vulkan Profile* emabled
-- Reflecting on *Vulkan Profiles* features
 
 --------------
-### Platforms Support
+## Information for Developing or Contributing:
 
-| Windows            | Linux               | macOS              | iOS                | Android            |
-| ------------------ | ------------------- | ------------------ | ------------------ | ------------------ |
-| :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark: | :x:                | :heavy_check_mark: |
 
 --------------
-## VK_LAYER_KHRONOS_device_simulation
+## How to Build and Run
 
-The validation layer assists developers in checking their code for improper use of Vulkan, but
-these checks take into account only the limits of the test platform. To ensure an application
-properly handles multiple platforms, these checks must be run on all platforms of interest to the
-developer. Combinations of GPUs, ICDs, drivers, and operating systems to name a few factors
-create an exponential number of possible test platforms, which is infeasible for a developer to
-obtain and maintain.
-
-The *Device Simulation Layer* (also called Devsim) seeks to mitigate this obstacle by providing a
-method to simulate arbitrary property, feature, and limit combinations representing different
-platforms for specific test cases. For example, it can be configured as though the application is
-running on a device with the minimum properties, features, and limits defined by the Vulkan
-specification.
 
 --------------
-### Platforms Support
+## Version Tagging Scheme
+Updates to the Vulkan-ValidationLayers repository which correspond to a new Vulkan specification release are tagged using the following format: v<version> (e.g., v1.1.96).
 
-| Windows            | Linux               | macOS              | iOS                | Android            |
-| ------------------ | ------------------- | ------------------ | ------------------ | ------------------ |
-| :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark: | :x:                | :heavy_check_mark: |
+Note: Marked version releases have undergone thorough testing but do not imply the same quality level as SDK tags. SDK tags follow the sdk-<version>.<patch> format (e.g., sdk-1.1.92.0).
 
---------------
-### Vulkan Capabilities Schema
-
-The *Vulkan Capabilities Schema* aims at providing a human readable format to store and share data representing properties, features, formats, etc.
-
-This format is used to store *Vulkan Profiles*.
+This scheme was adopted following the 1.1.96 Vulkan specification release.
 
 --------------
-### Vulkan Profiles
+## License
 
-This repository contains representation of profiles following the *Vulkan Capabilities Schema*:
-- [VP_KHR_roadmap_2022](./profiles/VP_KHR_roadmap_2022.json)
-- [VP_LUNARG_desktop_portability_2022](./profiles/VP_LUNARG_desktop_portability_2022.json)
-- [VP_ANDROID_angle_es31](./profiles/VP_ANDROID_angle_es31.json)
-- [VP_ANDROID_baseline_2022](./profiles/VP_ANDROID_baseline_2022.json)
+This work is released as open source under a [Apache-style license](./LICENSE.md) from Khronos including a Khronos copyright.
 
 --------------
 ## Downloads
