@@ -424,7 +424,7 @@
                             "type": "uint32_t",
                             "dimensions": 3,
                             "limit": "MIN",
-                            "value": [ 65536, 65536, 65536 ]
+                            "value": [ 65535, 65535, 65535 ]
                         },
                         {
                             "name": "maxComputeWorkGroupInvocations",
