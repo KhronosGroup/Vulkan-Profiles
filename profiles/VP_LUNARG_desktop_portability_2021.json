@@ -609,7 +609,7 @@
                         },
                         {
                             "name": "maxViewportDimensions",
-                            "type": "int32_t",
+                            "type": "uint32_t",
                             "dimensions": 2,
                             "limit": "MIN",
                             "value": [ 16384, 16384 ]
