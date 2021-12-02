@@ -11,7 +11,19 @@ function(DevsimTest NAME)
     add_executable(${TEST_NAME} ${TEST_FILE} ${FILES_JSON} devsim_test_helper.h devsim_test_helper.cpp ${jsoncpp_SOURCE_DIR}/dist/jsoncpp.cpp)
     target_link_libraries(${TEST_NAME} gtest gtest_main Vulkan::Vulkan)
     target_compile_definitions(${TEST_NAME} PUBLIC TEST_SOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME ${TEST_NAME}_env COMMAND env)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+
+    # try to be OS-independent
+    if(WIN32)
+        set(run_environment "VK_LAYER_PATH=${CMAKE_BINARY_DIR}\\lib\;PATH=${CMAKE_BINARY_DIR};$ENV{PATH}")
+    elseif(UNIX)
+        set(run_environment "VK_LAYER_PATH=${CMAKE_BINARY_DIR}/lib\;LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}:$ENV{LD_LIBRARY_PATH}")
+    else()
+        message(FATAL_ERROR "Unsupported Platform ${CMAKE_SYSTEM_NAME}")
+    endif()
+
+    set_tests_properties(${TEST_NAME} ${TEST_NAME}_env PROPERTIES ENVIRONMENT ${run_environment})
 endfunction(DevsimTest)
 
 DevsimTest(manual_devsim_tests)
