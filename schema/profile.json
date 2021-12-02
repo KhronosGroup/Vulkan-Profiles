@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://schema.khronos.org/vulkan/profiles-1.3.120.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.3.200",
+    "$id": "https://schema.khronos.org/vulkan/profiles-1.3.XXX.json#",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.XXX",
     "description": "TODO",
     "additionalProperties": true,
     "required": [
@@ -790,7 +790,8 @@
                                     "pattern": "Vk[A-Za-z0-9_]+"
                                 },
                                 "members": {
-                                    "$ref": "#/definitions/members"
+                                    "description": "TODO",
+                                    "type": "object"
                                 }
                             }
                         }
