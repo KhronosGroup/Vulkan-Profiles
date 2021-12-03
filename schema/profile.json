@@ -237,9 +237,9 @@
                 "bufferFeatures"
             ],
             "properties": {
-                "linearTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlagBits" },
-                "optimalTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlagBits" },
-                "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlagBits" }
+                "linearTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags" },
+                "optimalTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags" },
+                "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags" }
             }
         },
         "VkFormatProperties2": {
@@ -252,9 +252,9 @@
                 "bufferFeatures"
             ],
             "properties": {
-                "linearTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlagBits" },
-                "optimalTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlagBits" },
-                "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlagBits" }
+                "linearTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags" },
+                "optimalTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags" },
+                "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags" }
             }
         },
         "VkFormatProperties3KHR": {
@@ -267,9 +267,9 @@
                 "bufferFeatures"
             ],
             "properties": {
-                "linearTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlagBits2KHR" },
-                "optimalTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlagBits2KHR" },
-                "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlagBits2KHR" }
+                "linearTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2KHR" },
+                "optimalTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2KHR" },
+                "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2KHR" }
             }
         },
         "platforms": {
@@ -300,7 +300,7 @@
             ],
             "properties": {
                 "memoryType": {
-                    "$ref": "#/definitions/VkMemoryPropertyFlagBits"
+                    "$ref": "#/definitions/VkMemoryPropertyFlags"
                 }
             }
         },
@@ -4970,13 +4970,13 @@
                                                 ],
                                                 "properties": {
                                                     "linearTilingFeatures": {
-                                                        "$ref": "#/definitions/VkFormatFeatureFlagBits"
+                                                        "$ref": "#/definitions/VkFormatFeatureFlags"
                                                     },
                                                     "optimalTilingFeatures": {
-                                                        "$ref": "#/definitions/VkFormatFeatureFlagBits"
+                                                        "$ref": "#/definitions/VkFormatFeatureFlags"
                                                     },
                                                     "bufferFeatures": {
-                                                        "$ref": "#/definitions/VkFormatFeatureFlagBits"
+                                                        "$ref": "#/definitions/VkFormatFeatureFlags"
                                                     }
                                                 }
                                             }
@@ -5015,7 +5015,7 @@
                         }
                     },
                     "memoryTypes": {
-                        "description": "TODO VkMemoryPropertyFlagBits",
+                        "description": "TODO VkMemoryPropertyFlags",
                         "type": "array",
                         "additionalProperties": false,
                         "items": {
