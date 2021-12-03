@@ -600,6 +600,28 @@
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
+                        "presentId": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDevicePresentWaitFeaturesKHR": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDevicePresentWaitFeaturesKHR" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
                         "presentWait": {
                             "type": "boolean"
                         }
@@ -698,6 +720,28 @@
                     "additionalProperties": false,
                     "properties": {
                         "protectedMemory": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "advancedBlendCoherentOperations": {
                             "type": "boolean"
                         }
                     }
@@ -977,14 +1021,10 @@
                     "enum": [ "VkPhysicalDeviceTimelineSemaphoreFeatures", "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR" ]
                 },
                 "members": {
-                    "description": "TODO",
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
-                        "transformFeedback": {
-                            "type": "boolean"
-                        },
-                        "geometryStreams": {
+                        "timelineSemaphore": {
                             "type": "boolean"
                         }
                     }
@@ -1003,7 +1043,6 @@
                     "enum": [ "VkPhysicalDevice8BitStorageFeatures", "VkPhysicalDevice8BitStorageFeaturesKHR" ]
                 },
                 "members": {
-                    "description": "TODO",
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -1652,6 +1691,28 @@
                 }
             }
         },
+        "VkPhysicalDeviceScalarBlockLayoutFeatures": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceScalarBlockLayoutFeatures", "VkPhysicalDeviceScalarBlockLayoutFeaturesEXT" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "scalarBlockLayout": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
         "VkPhysicalDeviceUniformBufferStandardLayoutFeatures": {
             "additionalProperties": false,
             "required": [
@@ -1668,6 +1729,28 @@
                     "additionalProperties": false,
                     "properties": {
                         "uniformBufferStandardLayout": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceDepthClipEnableFeaturesEXT": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceDepthClipEnableFeaturesEXT" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "depthClipEnable": {
                             "type": "boolean"
                         }
                     }
@@ -1972,7 +2055,7 @@
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
-                        "shaderSMCount": {
+                        "shaderSMBuiltins": {
                             "type": "boolean"
                         }
                     }
@@ -2129,7 +2212,7 @@
             "properties": {
                 "struct": {
                     "type": "string",
-                    "enum": [ "VkPhysicalDeviceSubgroupSizeControlFeatures", "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT" ]
+                    "enum": [ "VkPhysicalDeviceSubgroupSizeControlFeatures", "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT" ]
                 },
                 "members": {
                     "type": "object",
@@ -2968,7 +3051,7 @@
             "properties": {
                 "struct": {
                     "type": "string",
-                    "enum": [ "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR" ]
+                    "enum": [ "VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV" ]
                 },
                 "members": {
                     "description": "TODO",
@@ -4395,6 +4478,9 @@
                                     "$ref": "#/definitions/VkPhysicalDevicePresentIdFeaturesKHR"
                                 },
                                 {
+                                    "$ref": "#/definitions/VkPhysicalDevicePresentWaitFeaturesKHR"
+                                },
+                                {
                                     "$ref": "#/definitions/VkPhysicalDevice16BitStorageFeatures"
                                 },
                                 {
@@ -4405,6 +4491,9 @@
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceProtectedMemoryFeatures"
+                                },
+                                {
+                                    "$ref": "#/definitions/VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT"
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceMultiDrawFeaturesEXT"
@@ -4509,7 +4598,13 @@
                                     "$ref": "#/definitions/VkPhysicalDeviceFragmentDensityMap2FeaturesEXT"
                                 },
                                 {
+                                    "$ref": "#/definitions/VkPhysicalDeviceScalarBlockLayoutFeatures"
+                                },
+                                {
                                     "$ref": "#/definitions/VkPhysicalDeviceUniformBufferStandardLayoutFeatures"
+                                },
+                                {
+                                    "$ref": "#/definitions/VkPhysicalDeviceDepthClipEnableFeaturesEXT"
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceMemoryPriorityFeaturesEXT"
