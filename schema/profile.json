@@ -1243,7 +1243,6 @@
                     "enum": [ "VkPhysicalDeviceTransformFeedbackFeaturesEXT" ]
                 },
                 "members": {
-                    "description": "TODO",
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -1257,13 +1256,375 @@
                 }
             }
         },
-
-
-
-
-
-
-
+        "VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "representativeFragmentTest": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceExclusiveScissorFeaturesNV": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceExclusiveScissorFeaturesNV" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "exclusiveScissor": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceCornerSampledImageFeaturesNV": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceCornerSampledImageFeaturesNV" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "cornerSampledImage": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceComputeShaderDerivativesFeaturesNV": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceComputeShaderDerivativesFeaturesNV" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "computeDerivativeGroupQuads": {
+                            "type": "boolean"
+                        },
+                        "computeDerivativeGroupLinear": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "fragmentShaderBarycentric": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceShaderImageFootprintFeaturesNV": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceShaderImageFootprintFeaturesNV" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "imageFootprint": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "dedicatedAllocationImageAliasing": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceShadingRateImageFeaturesNV": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceShadingRateImageFeaturesNV" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "shadingRateImage": {
+                            "type": "boolean"
+                        },
+                        "shadingRateCoarseSampleOrder": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceInvocationMaskFeaturesHUAWEI": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceInvocationMaskFeaturesHUAWEI" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "invocationMask": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceMeshShaderFeaturesNV": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceMeshShaderFeaturesNV" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "taskShader": {
+                            "type": "boolean"
+                        },
+                        "meshShader": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceAccelerationStructureFeaturesKHR": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceAccelerationStructureFeaturesKHR" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "accelerationStructure": {
+                            "type": "boolean"
+                        },
+                        "accelerationStructureCaptureReplay": {
+                            "type": "boolean"
+                        },
+                        "accelerationStructureIndirectBuild": {
+                            "type": "boolean"
+                        },
+                        "accelerationStructureHostCommands": {
+                            "type": "boolean"
+                        },
+                        "descriptorBindingAccelerationStructureUpdateAfterBind": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceRayTracingPipelineFeaturesKHR": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceRayTracingPipelineFeaturesKHR" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "rayTracingPipeline": {
+                            "type": "boolean"
+                        },
+                        "rayTracingPipelineShaderGroupHandleCaptureReplay": {
+                            "type": "boolean"
+                        },
+                        "rayTracingPipelineShaderGroupHandleCaptureReplayMixed": {
+                            "type": "boolean"
+                        },
+                        "rayTracingPipelineTraceRaysIndirect": {
+                            "type": "boolean"
+                        },
+                        "rayTraversalPrimitiveCulling": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceRayQueryFeaturesKHR": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceRayQueryFeaturesKHR" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "rayQuery": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceFragmentDensityMapFeaturesEXT": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceFragmentDensityMapFeaturesEXT" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "fragmentDensityMap": {
+                            "type": "boolean"
+                        },
+                        "fragmentDensityMapDynamic": {
+                            "type": "boolean"
+                        },
+                        "fragmentDensityMapNonSubsampledImages": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceFragmentDensityMap2FeaturesEXT": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceFragmentDensityMap2FeaturesEXT" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "fragmentDensityMapDeferred": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
         "VkPhysicalDeviceUniformBufferStandardLayoutFeatures": {
             "additionalProperties": false,
             "required": [
@@ -1276,7 +1637,6 @@
                     "enum": [ "VkPhysicalDeviceUniformBufferStandardLayoutFeatures", "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR" ]
                 },
                 "members": {
-                    "description": "TODO",
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -1287,16 +1647,50 @@
                 }
             }
         },
-
-
-
-
-
-
-
-
-
-
+        "VkPhysicalDeviceMemoryPriorityFeaturesEXT": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceMemoryPriorityFeaturesEXT" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "memoryPriority": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "pageableDeviceLocalMemory": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
         "VkPhysicalDeviceBufferDeviceAddressFeatures": {
             "additionalProperties": false,
             "required": [
@@ -2932,9 +3326,6 @@
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceTransformFeedbackFeaturesEXT"
                                 },
-
-
-
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV"
                                 },
