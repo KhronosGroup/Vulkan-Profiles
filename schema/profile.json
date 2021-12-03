@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://schema.khronos.org/vulkan/profiles-1.2.198.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.2.198",
+    "$id": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.201",
     "description": "TODO",
     "additionalProperties": true,
     "required": [
@@ -699,7 +699,7 @@
                 }
             }
         },
-        "VkPhysicalDeviceInlineUniformBlockFeaturesEXT": {
+        "VkPhysicalDeviceInlineUniformBlockFeatures": {
             "additionalProperties": false,
             "required": [
                 "struct",
@@ -708,7 +708,7 @@
             "properties": {
                 "struct": {
                     "type": "string",
-                    "enum": [ "VkPhysicalDeviceInlineUniformBlockFeaturesEXT" ]
+                    "enum": [ "VkPhysicalDeviceInlineUniformBlockFeatures", "VkPhysicalDeviceInlineUniformBlockFeaturesEXT" ]
                 },
                 "members": {
                     "type": "object",
@@ -1745,7 +1745,7 @@
                 }
             }
         },
-        "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT": {
+        "VkPhysicalDeviceTextureCompressionASTCHDRFeatures": {
             "additionalProperties": false,
             "required": [
                 "struct",
@@ -1754,7 +1754,7 @@
             "properties": {
                 "struct": {
                     "type": "string",
-                    "enum": [ "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT" ]
+                    "enum": [ "VkPhysicalDeviceTextureCompressionASTCHDRFeatures", "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT" ]
                 },
                 "members": {
                     "type": "object",
@@ -2093,7 +2093,7 @@
                 }
             }
         },
-        "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT": {
+        "VkPhysicalDeviceSubgroupSizeControlFeatures": {
             "additionalProperties": false,
             "required": [
                 "struct",
@@ -2102,7 +2102,7 @@
             "properties": {
                 "struct": {
                     "type": "string",
-                    "enum": [ "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT" ]
+                    "enum": [ "VkPhysicalDeviceSubgroupSizeControlFeatures", "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT" ]
                 },
                 "members": {
                     "type": "object",
@@ -2396,6 +2396,70 @@
                 }
             }
         },
+        "VkPhysicalDeviceVulkan13Features": {
+            "additionalProperties": false,
+            "required": [
+                "struct",
+                "members"
+            ],
+            "properties": {
+                "struct": {
+                    "type": "string",
+                    "enum": [ "VkPhysicalDeviceVulkan13Features" ]
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "robustImageAccess": {
+                            "type": "boolean"
+                        },
+                        "inlineUniformBlock": {
+                            "type": "boolean"
+                        },
+                        "descriptorBindingInlineUniformBlockUpdateAfterBind": {
+                            "type": "boolean"
+                        },
+                        "pipelineCreationCacheControl": {
+                            "type": "boolean"
+                        },
+                        "privateData": {
+                            "type": "boolean"
+                        },
+                        "shaderDemoteToHelperInvocation": {
+                            "type": "boolean"
+                        },
+                        "shaderTerminateInvocation": {
+                            "type": "boolean"
+                        },
+                        "subgroupSizeControl": {
+                            "type": "boolean"
+                        },
+                        "computeFullSubgroups": {
+                            "type": "boolean"
+                        },
+                        "synchronization2": {
+                            "type": "boolean"
+                        },
+                        "textureCompressionASTC_HDR": {
+                            "type": "boolean"
+                        },
+                        "shaderZeroInitializeWorkgroupMemory": {
+                            "type": "boolean"
+                        },
+                        "dynamicRendering": {
+                            "type": "boolean"
+                        },
+                        "shaderIntegerDotProduct": {
+                            "type": "boolean"
+                        },
+                        "maintenance4": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
         "VkPhysicalDeviceCoherentMemoryFeaturesAMD": {
             "additionalProperties": false,
             "required": [
@@ -2546,7 +2610,7 @@
                 }
             }
         },
-        "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR": {
+        "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures": {
             "additionalProperties": false,
             "required": [
                 "struct",
@@ -2555,7 +2619,7 @@
             "properties": {
                 "struct": {
                     "type": "string",
-                    "enum": [ "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR" ]
+                    "enum": [ "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures", "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR" ]
                 },
                 "members": {
                     "description": "TODO",
@@ -2621,7 +2685,7 @@
                 }
             }
         },      
-        "VkPhysicalDeviceImageRobustnessFeaturesEXT": {
+        "VkPhysicalDeviceImageRobustnessFeatures": {
             "additionalProperties": false,
             "required": [
                 "struct",
@@ -2630,7 +2694,7 @@
             "properties": {
                 "struct": {
                     "type": "string",
-                    "enum": [ "VkPhysicalDeviceImageRobustnessFeaturesEXT" ]
+                    "enum": [ "VkPhysicalDeviceImageRobustnessFeatures", "VkPhysicalDeviceImageRobustnessFeaturesEXT" ]
                 },
                 "members": {
                     "description": "TODO",
@@ -2845,7 +2909,7 @@
                 }
             }
         },
-        "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR": {
+        "VkPhysicalDeviceShaderTerminateInvocationFeatures": {
             "additionalProperties": false,
             "required": [
                 "struct",
@@ -2854,7 +2918,7 @@
             "properties": {
                 "struct": {
                     "type": "string",
-                    "enum": [ "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR" ]
+                    "enum": [ "VkPhysicalDeviceShaderTerminateInvocationFeatures", "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR" ]
                 },
                 "members": {
                     "description": "TODO",
@@ -2978,7 +3042,6 @@
                     "enum": [ "VkPhysicalDeviceColorWriteEnableFeaturesEXT" ]
                 },
                 "members": {
-                    "description": "TODO",
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -2989,7 +3052,7 @@
                 }
             }
         },
-        "VkPhysicalDeviceSynchronization2FeaturesKHR": {
+        "VkPhysicalDeviceSynchronization2Features": {
             "additionalProperties": false,
             "required": [
                 "struct",
@@ -2998,10 +3061,9 @@
             "properties": {
                 "struct": {
                     "type": "string",
-                    "enum": [ "VkPhysicalDeviceSynchronization2FeaturesKHR" ]
+                    "enum": [ "VkPhysicalDeviceSynchronization2Features", "VkPhysicalDeviceSynchronization2FeaturesKHR" ]
                 },
                 "members": {
-                    "description": "TODO",
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -3084,7 +3146,7 @@
                 }
             }
         },
-        "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR": {
+        "VkPhysicalDeviceShaderIntegerDotProductFeatures": {
             "additionalProperties": false,
             "required": [
                 "struct",
@@ -3093,7 +3155,7 @@
             "properties": {
                 "struct": {
                     "type": "string",
-                    "enum": [ "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR" ]
+                    "enum": [ "VkPhysicalDeviceShaderIntegerDotProductFeatures", "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR" ]
                 },
                 "members": {
                     "description": "TODO",
@@ -3156,7 +3218,7 @@
                 }
             }
         },
-        "VkPhysicalDeviceDynamicRenderingFeaturesKHR": {
+        "VkPhysicalDeviceDynamicRenderingFeatures": {
             "additionalProperties": false,
             "required": [
                 "struct",
@@ -3165,10 +3227,9 @@
             "properties": {
                 "struct": {
                     "type": "string",
-                    "enum": [ "VkPhysicalDeviceDynamicRenderingFeaturesKHR" ]
+                    "enum": [ "VkPhysicalDeviceDynamicRenderingFeatures", "VkPhysicalDeviceDynamicRenderingFeaturesKHR" ]
                 },
                 "members": {
-                    "description": "TODO",
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -3273,7 +3334,7 @@
                                     "$ref": "#/definitions/VkPhysicalDeviceMultiDrawFeaturesEXT"
                                 },
                                 {
-                                    "$ref": "#/definitions/VkPhysicalDeviceInlineUniformBlockFeaturesEXT"
+                                    "$ref": "#/definitions/VkPhysicalDeviceInlineUniformBlockFeatures"
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceMaintenance4FeaturesKHR"
@@ -3387,7 +3448,7 @@
                                     "$ref": "#/definitions/VkPhysicalDeviceImagelessFramebufferFeatures"
                                 },
                                 {
-                                    "$ref": "#/definitions/VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT"
+                                    "$ref": "#/definitions/VkPhysicalDeviceTextureCompressionASTCHDRFeatures"
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceCooperativeMatrixFeaturesNV"
@@ -3432,7 +3493,7 @@
                                     "$ref": "#/definitions/VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT"
                                 },
                                 {
-                                    "$ref": "#/definitions/VkPhysicalDeviceSubgroupSizeControlFeaturesEXT"
+                                    "$ref": "#/definitions/VkPhysicalDeviceSubgroupSizeControlFeatures"
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceLineRasterizationFeaturesEXT"
@@ -3445,6 +3506,9 @@
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceVulkan12Features"
+                                },
+                                {
+                                    "$ref": "#/definitions/VkPhysicalDeviceVulkan13Features"
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceCoherentMemoryFeaturesAMD"
@@ -3465,7 +3529,7 @@
                                     "$ref": "#/definitions/VkPhysicalDeviceDiagnosticsConfigFeaturesNV"
                                 },
                                 {
-                                    "$ref": "#/definitions/VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR"
+                                    "$ref": "#/definitions/VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures"
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR"
@@ -3474,7 +3538,7 @@
                                     "$ref": "#/definitions/VkPhysicalDeviceRobustness2FeaturesEXT"
                                 }, 
                                 {
-                                    "$ref": "#/definitions/VkPhysicalDeviceImageRobustnessFeaturesEXT"
+                                    "$ref": "#/definitions/VkPhysicalDeviceImageRobustnessFeatures"
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR"
@@ -3495,7 +3559,7 @@
                                     "$ref": "#/definitions/VkPhysicalDeviceFragmentShadingRateFeaturesKHR"
                                 },
                                 {
-                                    "$ref": "#/definitions/VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR"
+                                    "$ref": "#/definitions/VkPhysicalDeviceShaderTerminateInvocationFeatures"
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV"
@@ -3513,7 +3577,7 @@
                                     "$ref": "#/definitions/VkPhysicalDeviceColorWriteEnableFeaturesEXT"
                                 },
                                 {
-                                    "$ref": "#/definitions/VkPhysicalDeviceSynchronization2FeaturesKHR"
+                                    "$ref": "#/definitions/VkPhysicalDeviceSynchronization2Features"
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceInheritedViewportScissorFeaturesNV"
@@ -3525,7 +3589,7 @@
                                     "$ref": "#/definitions/VkPhysicalDeviceProvokingVertexFeaturesEXT"
                                 },
                                 {
-                                    "$ref": "#/definitions/VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR"
+                                    "$ref": "#/definitions/VkPhysicalDeviceShaderIntegerDotProductFeatures"
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceRayTracingMotionBlurFeaturesNV"
@@ -3534,7 +3598,7 @@
                                     "$ref": "#/definitions/VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT"
                                 },
                                 {
-                                    "$ref": "#/definitions/VkPhysicalDeviceDynamicRenderingFeaturesKHR"
+                                    "$ref": "#/definitions/VkPhysicalDeviceDynamicRenderingFeatures"
                                 }
                             ]
                         }
