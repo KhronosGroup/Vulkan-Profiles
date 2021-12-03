@@ -359,7 +359,7 @@
                         "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 8,
                         "maxDescriptorSetUpdateAfterBindSampledImages": 640,
                         "maxDescriptorSetUpdateAfterBindStorageImages": 40,
-                        "maxDescriptorSetUpdateAfterBindInputAttachments": 640
+                        "maxDescriptorSetUpdateAfterBindInputAttachments": 8
                     }
                 },
                 {
