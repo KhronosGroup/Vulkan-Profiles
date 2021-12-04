@@ -237,7 +237,7 @@
     "profiles": [
         {
             "name": "VP_KHR_roadmap_2022",
-            "api-version": "1.3.000",
+            "api-version": "1.3.201",
             "capabilities": [
                 "vulkan10requirements",
                 "vulkan11requirements",
