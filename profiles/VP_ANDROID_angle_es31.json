@@ -123,20 +123,22 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceLimits",
+                    "struct": "VkPhysicalDeviceProperties",
                     "members": {
-                        "standardSampleLocations": true,
-                        "maxVertexOutputComponents": 64,
-                        "maxTessellationControlPerVertexOutputComponents": 64,
-                        "maxTessellationControlPerPatchOutputComponents": 64,
-                        "maxTessellationControlTotalOutputComponents": 64,
-                        "maxTessellationEvaluationOutputComponents": 64,
-                        "maxGeometryOutputComponents": 64,
-                        "maxGeometryTotalOutputComponents": 64,
-                        "maxPerStageDescriptorUniformBuffers": 12,
-                        "maxPerStageDescriptorStorageBuffers": 12,
-                        "maxVertexInputAttributeOffset": 2048,
-                        "subPixelPrecisionBits": 8
+                        "limits": {
+                            "standardSampleLocations": true,
+                            "maxVertexOutputComponents": 64,
+                            "maxTessellationControlPerVertexOutputComponents": 64,
+                            "maxTessellationControlPerPatchOutputComponents": 64,
+                            "maxTessellationControlTotalOutputComponents": 64,
+                            "maxTessellationEvaluationOutputComponents": 64,
+                            "maxGeometryOutputComponents": 64,
+                            "maxGeometryTotalOutputComponents": 64,
+                            "maxPerStageDescriptorUniformBuffers": 12,
+                            "maxPerStageDescriptorStorageBuffers": 12,
+                            "maxVertexInputAttributeOffset": 2048,
+                            "subPixelPrecisionBits": 8
+                        }
                     }
                 }
             ]
