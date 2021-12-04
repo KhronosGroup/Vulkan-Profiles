@@ -3566,10 +3566,10 @@
                     "$ref": "#/definitions/uint32_t"
                 },
                 "maxSamplerLodBias": {
-                    "$ref": "#/definitions/uint32_t"
+                    "$ref": "#/definitions/float"
                 },
                 "maxSamplerAnisotropy": {
-                    "$ref": "#/definitions/uint32_t"
+                    "$ref": "#/definitions/float"
                 },
                 "maxViewports": {
                     "$ref": "#/definitions/uint32_t"
@@ -6363,9 +6363,6 @@
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceConservativeRasterizationPropertiesEXT"
-                                },
-                                {
-                                    "$ref": "#/definitions/VkPhysicalDeviceDepthStencilResolveProperties"
                                 },
                                 {
                                     "$ref": "#/definitions/VkPhysicalDeviceShaderCorePropertiesAMD"
