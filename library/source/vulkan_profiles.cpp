@@ -1199,7 +1199,7 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
                     properties->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic = 8;
                     properties->maxDescriptorSetUpdateAfterBindSampledImages = 640;
                     properties->maxDescriptorSetUpdateAfterBindStorageImages = 40;
-                    properties->maxDescriptorSetUpdateAfterBindInputAttachments = 640;
+                    properties->maxDescriptorSetUpdateAfterBindInputAttachments = 8;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
                     VkPhysicalDeviceProperties2 *properties = (VkPhysicalDeviceProperties2 *)p;
@@ -1473,7 +1473,7 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
                     properties->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic = 8;
                     properties->maxDescriptorSetUpdateAfterBindSampledImages = 640;
                     properties->maxDescriptorSetUpdateAfterBindStorageImages = 40;
-                    properties->maxDescriptorSetUpdateAfterBindInputAttachments = 640;
+                    properties->maxDescriptorSetUpdateAfterBindInputAttachments = 8;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
                     VkPhysicalDeviceProperties2 *properties = (VkPhysicalDeviceProperties2 *)p;

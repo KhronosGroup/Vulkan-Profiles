@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
     "comments": {
         "info": "Khronos Vulkan roadmap 2022 profile",
         "desc": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices."
@@ -168,35 +168,37 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceLimits",
+                    "struct": "VkPhysicalDeviceProperties",
                     "members": {
-                        "maxImageDimension1D": 8192,
-                        "maxImageDimension2D": 8192,
-                        "maxImageDimensionCube": 8192,
-                        "maxImageArrayLayers": 2048,
-                        "maxUniformBufferRange": 65536,
-                        "bufferImageGranularity": 4096,
-                        "maxPerStageDescriptorSamplers": 64,
-                        "maxPerStageDescriptorUniformBuffers": 15,
-                        "maxPerStageDescriptorStorageBuffers": 30,
-                        "maxPerStageDescriptorSampledImages": 200,
-                        "maxPerStageDescriptorStorageImages": 16,
-                        "maxPerStageResources": 200,
-                        "maxDescriptorSetSamplers": 576,
-                        "maxDescriptorSetUniformBuffers": 90,
-                        "maxDescriptorSetStorageBuffers": 96,
-                        "maxDescriptorSetSampledImages": 1800,
-                        "maxDescriptorSetStorageImages": 144,
-                        "maxFragmentCombinedOutputResources": 16,
-                        "maxComputeWorkGroupInvocations": 256,
-                        "maxComputeWorkGroupSize": [ 1024, 1024, 64 ],
-                        "subTexelPrecisionBits": 8,
-                        "mipmapPrecisionBits": 6,
-                        "maxSamplerLodBias": 14,
-                        "pointSizeGranularity": 0.125,
-                        "lineWidthGranularity": 0.5,
-                        "standardSampleLocations": true,
-                        "maxColorAttachments": 7
+                        "limits": {
+                            "maxImageDimension1D": 8192,
+                            "maxImageDimension2D": 8192,
+                            "maxImageDimensionCube": 8192,
+                            "maxImageArrayLayers": 2048,
+                            "maxUniformBufferRange": 65536,
+                            "bufferImageGranularity": 4096,
+                            "maxPerStageDescriptorSamplers": 64,
+                            "maxPerStageDescriptorUniformBuffers": 15,
+                            "maxPerStageDescriptorStorageBuffers": 30,
+                            "maxPerStageDescriptorSampledImages": 200,
+                            "maxPerStageDescriptorStorageImages": 16,
+                            "maxPerStageResources": 200,
+                            "maxDescriptorSetSamplers": 576,
+                            "maxDescriptorSetUniformBuffers": 90,
+                            "maxDescriptorSetStorageBuffers": 96,
+                            "maxDescriptorSetSampledImages": 1800,
+                            "maxDescriptorSetStorageImages": 144,
+                            "maxFragmentCombinedOutputResources": 16,
+                            "maxComputeWorkGroupInvocations": 256,
+                            "maxComputeWorkGroupSize": [ 1024, 1024, 64 ],
+                            "subTexelPrecisionBits": 8,
+                            "mipmapPrecisionBits": 6,
+                            "maxSamplerLodBias": 14,
+                            "pointSizeGranularity": 0.125,
+                            "lineWidthGranularity": 0.5,
+                            "standardSampleLocations": true,
+                            "maxColorAttachments": 7
+                        }
                     }
                 },
                 {
@@ -235,7 +237,7 @@
     "profiles": [
         {
             "name": "VP_KHR_roadmap_2022",
-            "api-version": "1.3.000",
+            "api-version": "1.3.201",
             "capabilities": [
                 "vulkan10requirements",
                 "vulkan11requirements",
