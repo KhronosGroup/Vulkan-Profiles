@@ -10,11 +10,6 @@
 [4]: https://creativecommons.org/licenses/by-nd/4.0/
 
 --------------
-## What are Vulkan Profiles?
-
-
-
---------------
 ## What tools are available to develop Vulkan Profiles?
 
 --------------
