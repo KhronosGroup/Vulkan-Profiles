@@ -9,8 +9,7 @@
             "name": "vulkan10requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceFeatures",
-                    "members": {
+                    "VkPhysicalDeviceFeatures": {
                         "robustBufferAccess": true
                     }
                 }
@@ -20,8 +19,7 @@
             "name": "vulkan11requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceMultiviewFeatures",
-                    "members": {
+                    "VkPhysicalDeviceMultiviewFeatures": {
                         "multiview": true
                     }
                 }
@@ -78,45 +76,38 @@
             ],
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceFeatures",
-                    "members": {
+                    "VkPhysicalDeviceFeatures": {
                         "independentBlend": true,
                         "vertexPipelineStoresAndAtomics": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceLineRasterizationFeaturesEXT",
-                    "members": {
+                    "VkPhysicalDeviceLineRasterizationFeaturesEXT": {
                         "bresenhamLines": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR",
-                    "members": {
+                    "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR": {
                         "shaderTerminateInvocation": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceProvokingVertexFeaturesEXT",
-                    "members": {
+                    "VkPhysicalDeviceProvokingVertexFeaturesEXT": {
                         "provokingVertexLast": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceTransformFeedbackFeaturesEXT",
-                    "members": {
+                    "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
                         "transformFeedback": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT",
-                    "members": {
+                    "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT": {
                         "primitiveTopologyListRestart": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceImageRobustnessFeaturesEXT",
-                    "members": {
+                    "VkPhysicalDeviceImageRobustnessFeaturesEXT": {
                         "robustImageAccess": true
                     }
                 }
