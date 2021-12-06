@@ -236,8 +236,135 @@
                 "uniqueItems": true
             }
         },
+        "VkQueueFamilyProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "queueFlags",
+                "queueCount",
+                "timestampValidBits",
+                "minImageTransferGranularity"
+            ],
+            "properties": {
+                "queueFlags": {
+                    "$ref": "#/definitions/VkQueueFlags"
+                },
+                "queueCount": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "timestampValidBits": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "minImageTransferGranularity": {
+                    "$ref": "#/definitions/VkExtent3D"
+                }
+            }
+        },
+        "VkQueueFamilyProperties2": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "queueFamilyProperties"
+            ],
+            "properties": {
+                "queueFamilyProperties": {
+                    "$ref": "#/definitions/VkQueueFamilyProperties"
+                }
+            }
+        },
+        "VkMemoryType": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "propertyFlags"
+            ],
+            "properties": {
+                "propertyFlags": {
+                    "$ref": "#/definitions/VkMemoryPropertyFlags"
+                },
+                "heapIndex": {
+                    "$ref": "#/definitions/uint32_t"
+                }
+            }
+        },
+        "VkMemoryHeapFlags": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [ "VK_MEMORY_HEAP_DEVICE_LOCAL_BIT" ],
+                "uniqueItems": true
+            }
+        },
+        "VkMemoryHeap": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "size",
+                "flags"
+            ],
+            "properties": {
+                "size": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "flags": {
+                    "$ref": "#/definitions/VkMemoryHeapFlags"
+                }
+            }
+        },
+        "VkPhysicalDeviceMemoryProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "memoryTypes": {
+                    "type": "array",
+                    "maxItems": 16,
+                    "items": {
+                        "$ref": "#/definitions/VkMemoryType"
+                    }
+                },
+                "memoryHeaps": {
+                    "type": "array",
+                    "maxItems": 16,
+                    "items": {
+                        "$ref": "#/definitions/VkMemoryHeap"
+                    }
+                }
+            }
+        },
+        "VkPhysicalDeviceMemoryProperties2": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "memoryProperties": {
+                    "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties"
+                }
+            }
+        },
+        "VkPhysicalDeviceMemoryBudgetPropertiesEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "heapBudget",
+                "heapUsage"
+            ],
+            "properties": {
+                "heapBudget": {
+                    "type": "array",
+                    "maxItems": 16,
+                    "items": {
+                        "$ref": "#/definitions/VkDeviceSize"
+                    }
+                },
+                "heapUsage": {
+                    "type": "array",
+                    "maxItems": 16,
+                    "items": {
+                        "$ref": "#/definitions/VkDeviceSize"
+                    }
+                }
+            }
+        },
         "VkFormatProperties": {
-            "description": "TODO",
             "type": "object",
             "additionalProperties": false,
             "required": [
@@ -252,7 +379,6 @@
             }
         },
         "VkConformanceVersion": {
-            "description": "TODO",
             "type": "object",
             "additionalProperties": false,
             "required": [
@@ -2825,7 +2951,7 @@
                     }
                 }
             }
-        },      
+        },
         "VkPhysicalDeviceImageRobustnessFeatures": {
             "additionalProperties": false,
             "required": [
@@ -5727,7 +5853,7 @@
                     }
                 }
             }
-        },        
+        },
         "VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV": {
             "additionalProperties": false,
             "required": [
@@ -6523,40 +6649,102 @@
                             }
                         }
                     },
-                    "queueFamilies": {
-                        "description": "TODO",
+                    "queueFamiliesProperties": {
                         "type": "array",
                         "items": {
-                            "type": "object",
-                            "additionalProperties": false,
-                            "required": [
-                                "queueFlags",
-                                "queueCount",
-                                "timestampValidBits",
-                                "minImageTransferGranularity"
-                            ],
-                            "properties": {
-                                "queueFlags": {
-                                    "$ref": "#/definitions/VkQueueFlags"
+                            "oneOf": [
+                                {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "VkQueueFamilyProperties"
+                                    ],
+                                    "properties": {
+                                        "VkQueueFamilyProperties": {
+                                            "$ref": "#/definitions/VkQueueFamilyProperties"
+                                        }
+                                    }
                                 },
-                                "queueCount": {
-                                    "$ref": "#/definitions/uint32_t"
+                                {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "VkQueueFamilyProperties2"
+                                    ],
+                                    "properties": {
+                                        "VkQueueFamilyProperties2": {
+                                            "$ref": "#/definitions/VkQueueFamilyProperties2"
+                                        }
+                                    }
                                 },
-                                "timestampValidBits": {
-                                    "$ref": "#/definitions/uint32_t"
-                                },
-                                "minImageTransferGranularity": {
-                                    "$ref": "#/definitions/VkExtent3D"
+                                {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "VkQueueFamilyProperties2KHR"
+                                    ],
+                                    "properties": {
+                                        "VkQueueFamilyProperties2KHR": {
+                                            "$ref": "#/definitions/VkQueueFamilyProperties2"
+                                        }
+                                    }
                                 }
-                            }
+                            ]
                         }
                     },
-                    "memoryTypes": {
-                        "description": "TODO VkMemoryPropertyFlags",
+                    "memoryProperties": {
                         "type": "array",
-                        "additionalProperties": false,
                         "items": {
-                            "$ref": "#/definitions/memoryType"
+                            "oneOf": [
+                                {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "VkPhysicalDeviceMemoryProperties"
+                                    ],
+                                    "properties": {
+                                        "VkPhysicalDeviceMemoryProperties": {
+                                            "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties"
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "VkPhysicalDeviceMemoryProperties2"
+                                    ],
+                                    "properties": {
+                                        "VkPhysicalDeviceMemoryProperties2": {
+                                            "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties2"
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "VkPhysicalDeviceMemoryProperties2KHR"
+                                    ],
+                                    "properties": {
+                                        "VkPhysicalDeviceMemoryProperties2KHR": {
+                                            "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties2"
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "VkPhysicalDeviceMemoryBudgetPropertiesEXT"
+                                    ],
+                                    "properties": {
+                                        "VkPhysicalDeviceMemoryBudgetPropertiesEXT": {
+                                            "$ref": "#/definitions/VkPhysicalDeviceMemoryBudgetPropertiesEXT"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
