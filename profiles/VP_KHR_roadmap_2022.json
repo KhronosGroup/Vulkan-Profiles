@@ -9,8 +9,7 @@
             "name": "vulkan10requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceFeatures",
-                    "members": {
+                    "VkPhysicalDeviceFeatures": {
                         "robustBufferAccess": true
                     }
                 }
@@ -20,8 +19,7 @@
             "name": "vulkan11requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceVulkan11Features",
-                    "members": {
+                    "VkPhysicalDeviceVulkan11Features": {
                         "multiview": true
                     }
                 }
@@ -40,8 +38,7 @@
             "name": "vulkan12requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceVulkan12Features",
-                    "members": {
+                    "VkPhysicalDeviceVulkan12Features": {
                         "uniformBufferStandardLayout": true,
                         "subgroupBroadcastDynamicId": true,
                         "imagelessFramebuffer": true,
@@ -65,8 +62,7 @@
             "name": "vulkan13requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceVulkan12Features",
-                    "members": {
+                    "VkPhysicalDeviceVulkan12Features": {
                         "vulkanMemoryModel": true,
                         "vulkanMemoryModelDeviceScope": true,
                         "vulkanMemoryModelAvailabilityVisibilityChains": true,
@@ -74,8 +70,7 @@
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceVulkan13Features",
-                    "members": {
+                    "VkPhysicalDeviceVulkan13Features": {
                         "inlineUniformBlock": true,
                         "subgroupSizeControl": true,
                         "computeFullSubgroups": true,
@@ -114,8 +109,7 @@
             ],
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceFeatures",
-                    "members": {
+                    "VkPhysicalDeviceFeatures": {
                         "fullDrawIndexUint32": true,
                         "imageCubeArray": true,
                         "independentBlend": true,
@@ -134,14 +128,12 @@
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceVulkan11Features",
-                    "members": {
+                    "VkPhysicalDeviceVulkan11Features": {
                         "samplerYcbcrConversion": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceVulkan12Features",
-                    "members": {
+                    "VkPhysicalDeviceVulkan12Features": {
                         "samplerMirrorClampToEdge": true,
                         "descriptorIndexing": true,
                         "shaderUniformTexelBufferArrayDynamicIndexing": true,
