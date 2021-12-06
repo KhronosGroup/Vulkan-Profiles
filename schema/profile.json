@@ -236,8 +236,43 @@
                 "uniqueItems": true
             }
         },
+        "VkQueueFamilyProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "queueFlags",
+                "queueCount",
+                "timestampValidBits",
+                "minImageTransferGranularity"
+            ],
+            "properties": {
+                "queueFlags": {
+                    "$ref": "#/definitions/VkQueueFlags"
+                },
+                "queueCount": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "timestampValidBits": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "minImageTransferGranularity": {
+                    "$ref": "#/definitions/VkExtent3D"
+                }
+            }
+        },
+        "VkQueueFamilyProperties2": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "queueFamilyProperties"
+            ],
+            "properties": {
+                "queueFamilyProperties": {
+                    "$ref": "#/definitions/VkQueueFamilyProperties"
+                }
+            }
+        },
         "VkFormatProperties": {
-            "description": "TODO",
             "type": "object",
             "additionalProperties": false,
             "required": [
@@ -252,7 +287,6 @@
             }
         },
         "VkConformanceVersion": {
-            "description": "TODO",
             "type": "object",
             "additionalProperties": false,
             "required": [
@@ -2825,7 +2859,7 @@
                     }
                 }
             }
-        },      
+        },
         "VkPhysicalDeviceImageRobustnessFeatures": {
             "additionalProperties": false,
             "required": [
@@ -5727,7 +5761,7 @@
                     }
                 }
             }
-        },        
+        },
         "VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV": {
             "additionalProperties": false,
             "required": [
@@ -6524,35 +6558,49 @@
                         }
                     },
                     "queueFamilies": {
-                        "description": "TODO",
                         "type": "array",
                         "items": {
-                            "type": "object",
-                            "additionalProperties": false,
-                            "required": [
-                                "queueFlags",
-                                "queueCount",
-                                "timestampValidBits",
-                                "minImageTransferGranularity"
-                            ],
-                            "properties": {
-                                "queueFlags": {
-                                    "$ref": "#/definitions/VkQueueFlags"
+                            "oneOf": [
+                                {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "VkQueueFamilyProperties"
+                                    ],
+                                    "properties": {
+                                        "VkQueueFamilyProperties": {
+                                            "$ref": "#/definitions/VkQueueFamilyProperties"
+                                        }
+                                    }
                                 },
-                                "queueCount": {
-                                    "$ref": "#/definitions/uint32_t"
+                                {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "VkQueueFamilyProperties2"
+                                    ],
+                                    "properties": {
+                                        "VkQueueFamilyProperties2": {
+                                            "$ref": "#/definitions/VkQueueFamilyProperties2"
+                                        }
+                                    }
                                 },
-                                "timestampValidBits": {
-                                    "$ref": "#/definitions/uint32_t"
-                                },
-                                "minImageTransferGranularity": {
-                                    "$ref": "#/definitions/VkExtent3D"
+                                {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "VkQueueFamilyProperties2KHR"
+                                    ],
+                                    "properties": {
+                                        "VkQueueFamilyProperties2KHR": {
+                                            "$ref": "#/definitions/VkQueueFamilyProperties2"
+                                        }
+                                    }
                                 }
-                            }
+                            ]
                         }
                     },
                     "memoryTypes": {
-                        "description": "TODO VkMemoryPropertyFlags",
                         "type": "array",
                         "additionalProperties": false,
                         "items": {
