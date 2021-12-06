@@ -1228,7 +1228,7 @@
                     ]
                 }
             ],
-            "queueFamilies": [
+            "queueFamiliesProperties": [
                 {
                     "VkQueueFamilyProperties": {
                         "queueFlags": [ "VK_QUEUE_GRAPHICS_BIT", "VK_QUEUE_COMPUTE_BIT", "VK_QUEUE_TRANSFER_BIT", "VK_QUEUE_SPARSE_BINDING_BIT" ],
@@ -1270,12 +1270,18 @@
                     }
                 }
             ],
-            "memoryTypes": [
+            "memoryProperties": [
                 {
-                    "memoryType": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT" ]
-                },
-                {
-                    "memoryType": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT" ]
+                    "VkPhysicalDeviceMemoryProperties": {
+                        "memoryTypes": [
+                            {
+                                "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT" ]
+                            },
+                            {
+                                "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT" ]
+                            }
+                        ]
+                    }
                 }
             ]
         },
