@@ -15,25 +15,27 @@ The *Vulkan Profiles Tools* are a collection of tools for Vulkan application dev
 
 * **[Change Log](./CHANGELOG.md)**: The history of *Vulkan Profiles Tools* releases.
 * **[Using Vulkan Profiles Tools](./TUTORIAL.md)**: How to use the *Vulkan Profiles Tools*.
+* **[Vulkan Profiles Documentation](./PROFILES.md)**: *Tables to compare profiles capabilities*.
 * **[Bug reports](https://github.com/LunarG/VulkanProfiles/issues)**: Open a GitHub issue when you encounter a bug.
-* **[Roadmap](https://github.com/LunarG/VulkanProfiles/projects)**: Follow *Vulkan Profiles Tools* future developments.
-* **[Contributing](./PROFILES.md)**: The definitions of *Vulkan Profiles*.
+* **[Roadmap](https://github.com/LunarG/VulkanProfiles/projects)**: Follow *Vulkan Profiles Tools* future developments of each components.
+* **[Contributing](./CONTRIBUTING.md)**: The definitions of *Vulkan Profiles*.
 
 --------------
 ## Contact Information
-
+* [Christophe Riccio](mailto:christophe@lunarg.com)
+* [Žiga Markuš](mailto:ziga@lunarg.com)
 
 --------------
 ## Information for Developing or Contributing:
-
+Please see the [CONTRIBUTING.md](./CONTRIBUTING.md) file in this repository for more details. 
 
 --------------
 ## How to Build and Run
-
+[BUILD.md](./BUILD.md) Includes directions for building all components as well as running tests.
 
 --------------
 ## Version Tagging Scheme
-Updates to the Vulkan-ValidationLayers repository which correspond to a new Vulkan specification release are tagged using the following format: v<version> (e.g., v1.1.96).
+Updates to the *Vulkan Profiles* repository which correspond to a new Vulkan specification release are tagged using the following format: v<version> (e.g., v1.1.96).
 
 Note: Marked version releases have undergone thorough testing but do not imply the same quality level as SDK tags. SDK tags follow the sdk-<version>.<patch> format (e.g., sdk-1.1.92.0).
 
