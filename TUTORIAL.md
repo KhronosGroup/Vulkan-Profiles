@@ -62,6 +62,8 @@ The validation layer assists developers in checking their code for improper use 
 The *Profile* layer seeks to mitigate this obstacle by providing a method to simulate arbitrary Vulkan capabilities from the actual device capabilities to run specific test cases. The layer can be configured using a profile to ensure the application is never using more features than expected, preventing it from not running on expected supported platforms.
 
 The primary function of the *Profiles* layer is simply to simulate the limits, properties, and features of a device, i.e. modifying device responses to query function calls by the application. Of course, the underlying device or driver function are never actually changed, they merely appear to have the limits, properties, and features of a different device or driver. This is different from emulation that would change the actual behavior of the underlying device or driver to match that of a different device or driver.
+
+Like any layer, the *Profile* layer can be configured through [Vulkan Configurator](https://vulkan.lunarg.com/doc/sdk/latest/windows/vkconfig.html).
 --------------
 #### Platforms Support
 
