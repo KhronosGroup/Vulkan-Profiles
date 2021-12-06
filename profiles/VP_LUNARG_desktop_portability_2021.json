@@ -1230,13 +1230,43 @@
             ],
             "queueFamilies": [
                 {
-                    "queueFlags": [ "VK_QUEUE_GRAPHICS_BIT", "VK_QUEUE_COMPUTE_BIT", "VK_QUEUE_TRANSFER_BIT", "VK_QUEUE_SPARSE_BINDING_BIT" ],
-                    "queueCount": 1,
-                    "timestampValidBits": 36,
-                    "minImageTransferGranularity": {
-                        "width": 1,
-                        "height": 1,
-                        "depth": 1
+                    "VkQueueFamilyProperties": {
+                        "queueFlags": [ "VK_QUEUE_GRAPHICS_BIT", "VK_QUEUE_COMPUTE_BIT", "VK_QUEUE_TRANSFER_BIT", "VK_QUEUE_SPARSE_BINDING_BIT" ],
+                        "queueCount": 1,
+                        "timestampValidBits": 36,
+                        "minImageTransferGranularity": {
+                            "width": 1,
+                            "height": 1,
+                            "depth": 1
+                        }
+                    }
+                },
+                {
+                    "VkQueueFamilyProperties2": {
+                        "queueFamilyProperties": {
+                            "queueFlags": [ "VK_QUEUE_GRAPHICS_BIT", "VK_QUEUE_COMPUTE_BIT", "VK_QUEUE_TRANSFER_BIT", "VK_QUEUE_SPARSE_BINDING_BIT" ],
+                            "queueCount": 1,
+                            "timestampValidBits": 36,
+                            "minImageTransferGranularity": {
+                                "width": 1,
+                                "height": 1,
+                                "depth": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "VkQueueFamilyProperties2KHR": {
+                        "queueFamilyProperties": {
+                            "queueFlags": [ "VK_QUEUE_GRAPHICS_BIT", "VK_QUEUE_COMPUTE_BIT", "VK_QUEUE_TRANSFER_BIT", "VK_QUEUE_SPARSE_BINDING_BIT" ],
+                            "queueCount": 1,
+                            "timestampValidBits": 36,
+                            "minImageTransferGranularity": {
+                                "width": 1,
+                                "height": 1,
+                                "depth": 1
+                            }
+                        }
                     }
                 }
             ],
