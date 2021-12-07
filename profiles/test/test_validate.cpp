@@ -133,13 +133,6 @@ TEST(test_validate, VP_LUNARG_test_vkformatproperties) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate, VP_LUNARG_test_vkformatproperties2) {
-    JsonValidator validator;
-
-    const Json::Value document = ParseJsonFile("VP_LUNARG_test_vkformatproperties2.json");
-    EXPECT_TRUE(validator.Check(document));
-}
-
 TEST(test_validate, VP_LUNARG_desktop_portability_2021) {
     JsonValidator validator;
 
