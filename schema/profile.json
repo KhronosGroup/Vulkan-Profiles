@@ -2022,26 +2022,12 @@
             }
         },
         "VkPhysicalDeviceExternalMemoryRDMAFeaturesNV": {
+            "type": "object",
             "additionalProperties": false,
-            "required": [
-                "struct",
-                "members"
-            ],
             "properties": {
-                "struct": {
-                    "type": "string",
-                    "enum": [ "VkPhysicalDeviceExternalMemoryRDMAFeaturesNV" ]
-                },
-                "members": {
-                    "description": "TODO",
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "externalMemoryRDMA": {
-                            "type": "boolean"
-                        }
-                    }
-                }
+				"externalMemoryRDMA": {
+					"type": "boolean"
+				}
             }
         },
         "VkPhysicalDeviceColorWriteEnableFeaturesEXT": {
@@ -2127,26 +2113,12 @@
             }
         },
         "VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT": {
+            "type": "object",
             "additionalProperties": false,
-            "required": [
-                "struct",
-                "members"
-            ],
             "properties": {
-                "struct": {
-                    "type": "string",
-                    "enum": [ "VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT" ]
-                },
-                "members": {
-                    "description": "TODO",
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "formatRgba10x6WithoutYCbCrSampler": {
-                            "type": "boolean"
-                        }
-                    }
-                }
+				"formatRgba10x6WithoutYCbCrSampler": {
+					"type": "boolean"
+				}
             }
         },
         "VkPhysicalDeviceDynamicRenderingFeatures": {
