@@ -245,8 +245,7 @@
                 {
                     "VK_FORMAT_R8G8B8_UNORM": [
                         {
-                            "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -258,7 +257,7 @@
                     "VK_FORMAT_X8_D24_UNORM_PACK32": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -270,7 +269,7 @@
                     "VK_FORMAT_ASTC_4x4_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -282,7 +281,7 @@
                     "VK_FORMAT_ASTC_4x4_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -294,7 +293,7 @@
                     "VK_FORMAT_ASTC_5x4_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -306,7 +305,7 @@
                     "VK_FORMAT_ASTC_5x4_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -318,7 +317,7 @@
                     "VK_FORMAT_ASTC_5x5_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -330,7 +329,7 @@
                     "VK_FORMAT_ASTC_5x5_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -342,7 +341,7 @@
                     "VK_FORMAT_ASTC_6x5_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -354,7 +353,7 @@
                     "VK_FORMAT_ASTC_6x5_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -366,7 +365,7 @@
                     "VK_FORMAT_ASTC_6x6_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -378,7 +377,7 @@
                     "VK_FORMAT_ASTC_6x6_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -390,7 +389,7 @@
                     "VK_FORMAT_ASTC_8x5_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -402,7 +401,7 @@
                     "VK_FORMAT_ASTC_8x5_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -414,7 +413,7 @@
                     "VK_FORMAT_ASTC_8x6_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -426,7 +425,7 @@
                     "VK_FORMAT_ASTC_8x6_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -438,7 +437,7 @@
                     "VK_FORMAT_ASTC_8x8_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -450,7 +449,7 @@
                     "VK_FORMAT_ASTC_8x8_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -462,7 +461,7 @@
                     "VK_FORMAT_ASTC_10x5_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -474,7 +473,7 @@
                     "VK_FORMAT_ASTC_10x5_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -486,7 +485,7 @@
                     "VK_FORMAT_ASTC_10x6_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -498,7 +497,7 @@
                     "VK_FORMAT_ASTC_10x6_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -522,7 +521,7 @@
                     "VK_FORMAT_ASTC_10x8_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -534,7 +533,7 @@
                     "VK_FORMAT_ASTC_10x10_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -546,7 +545,7 @@
                     "VK_FORMAT_ASTC_10x10_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -558,7 +557,7 @@
                     "VK_FORMAT_ASTC_12x10_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -570,7 +569,7 @@
                     "VK_FORMAT_ASTC_12x10_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -582,7 +581,7 @@
                     "VK_FORMAT_ASTC_12x12_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -594,7 +593,7 @@
                     "VK_FORMAT_ASTC_12x12_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -606,7 +605,7 @@
                     "VK_FORMAT_D24_UNORM_S8_UINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -618,7 +617,7 @@
                     "VK_FORMAT_B4G4R4A4_UNORM_PACK16": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -630,7 +629,7 @@
                     "VK_FORMAT_R5G6B5_UNORM_PACK16": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -642,7 +641,7 @@
                     "VK_FORMAT_A1R5G5B5_UNORM_PACK16": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -654,7 +653,7 @@
                     "VK_FORMAT_R8_UNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -666,7 +665,7 @@
                     "VK_FORMAT_R8_SNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -678,7 +677,7 @@
                     "VK_FORMAT_R8_UINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -690,7 +689,7 @@
                     "VK_FORMAT_R8_SINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -702,7 +701,7 @@
                     "VK_FORMAT_R8G8_UNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -714,7 +713,7 @@
                     "VK_FORMAT_R8G8_SNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -726,7 +725,7 @@
                     "VK_FORMAT_R8G8_UINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -738,7 +737,7 @@
                     "VK_FORMAT_R8G8_SINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -750,7 +749,7 @@
                     "VK_FORMAT_R8G8B8A8_UNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -762,7 +761,7 @@
                     "VK_FORMAT_R8G8B8A8_SNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -774,7 +773,7 @@
                     "VK_FORMAT_R8G8B8A8_UINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -786,7 +785,7 @@
                     "VK_FORMAT_R8G8B8A8_SINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -798,7 +797,7 @@
                     "VK_FORMAT_R8G8B8A8_SRGB": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -810,7 +809,7 @@
                     "VK_FORMAT_B8G8R8A8_UNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -822,7 +821,7 @@
                     "VK_FORMAT_B8G8R8A8_SRGB": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -834,7 +833,7 @@
                     "VK_FORMAT_A8B8G8R8_UNORM_PACK32": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -846,7 +845,7 @@
                     "VK_FORMAT_A8B8G8R8_SNORM_PACK32": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -858,7 +857,7 @@
                     "VK_FORMAT_A8B8G8R8_UINT_PACK32": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -870,7 +869,7 @@
                     "VK_FORMAT_A8B8G8R8_SINT_PACK32": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -882,7 +881,7 @@
                     "VK_FORMAT_A8B8G8R8_SRGB_PACK32": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -894,7 +893,7 @@
                     "VK_FORMAT_A2B10G10R10_UNORM_PACK32": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -906,7 +905,7 @@
                     "VK_FORMAT_A2B10G10R10_UINT_PACK32": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -918,7 +917,7 @@
                     "VK_FORMAT_R16_UNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -930,7 +929,7 @@
                     "VK_FORMAT_R16_SNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -942,7 +941,7 @@
                     "VK_FORMAT_R16_UINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -954,7 +953,7 @@
                     "VK_FORMAT_R16_SINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -966,7 +965,7 @@
                     "VK_FORMAT_R16_SFLOAT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -978,7 +977,7 @@
                     "VK_FORMAT_R16G16_UNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -990,7 +989,7 @@
                     "VK_FORMAT_R16G16_SNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1002,7 +1001,7 @@
                     "VK_FORMAT_R16G16_UINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1014,7 +1013,7 @@
                     "VK_FORMAT_R16G16_SINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1026,7 +1025,7 @@
                     "VK_FORMAT_R16G16_SFLOAT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1038,7 +1037,7 @@
                     "VK_FORMAT_R16G16B16A16_UNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1050,7 +1049,7 @@
                     "VK_FORMAT_R16G16B16A16_SNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1062,7 +1061,7 @@
                     "VK_FORMAT_R16G16B16A16_UINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1074,7 +1073,7 @@
                     "VK_FORMAT_R16G16B16A16_SINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1086,7 +1085,7 @@
                     "VK_FORMAT_R16G16B16A16_SFLOAT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1098,7 +1097,7 @@
                     "VK_FORMAT_R32_UINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1110,7 +1109,7 @@
                     "VK_FORMAT_R32_SINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1122,7 +1121,7 @@
                     "VK_FORMAT_R32_SFLOAT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1134,7 +1133,7 @@
                     "VK_FORMAT_R32G32_UINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1146,7 +1145,7 @@
                     "VK_FORMAT_R32G32_SINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1158,7 +1157,7 @@
                     "VK_FORMAT_R32G32_SFLOAT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1170,7 +1169,7 @@
                     "VK_FORMAT_R32G32B32_UINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1182,7 +1181,7 @@
                     "VK_FORMAT_R32G32B32_SINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1194,7 +1193,7 @@
                     "VK_FORMAT_R32G32B32_SFLOAT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1206,7 +1205,7 @@
                     "VK_FORMAT_R32G32B32A32_UINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1218,7 +1217,7 @@
                     "VK_FORMAT_R32G32B32A32_SINT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1230,7 +1229,7 @@
                     "VK_FORMAT_R32G32B32A32_SFLOAT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1242,7 +1241,7 @@
                     "VK_FORMAT_B10G11R11_UFLOAT_PACK32": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1254,7 +1253,7 @@
                     "VK_FORMAT_E5B9G9R9_UFLOAT_PACK32": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1266,7 +1265,7 @@
                     "VK_FORMAT_D16_UNORM": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1278,7 +1277,7 @@
                     "VK_FORMAT_D32_SFLOAT": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1290,7 +1289,7 @@
                     "VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1302,7 +1301,7 @@
                     "VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1314,7 +1313,7 @@
                     "VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1326,7 +1325,7 @@
                     "VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1338,7 +1337,7 @@
                     "VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK": [
                         {
                             "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1349,8 +1348,7 @@
                 {
                      "VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK": [
                         {
-                            "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1361,8 +1359,7 @@
                 {
                     "VK_FORMAT_EAC_R11_UNORM_BLOCK": [
                         {
-                            "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1373,8 +1370,7 @@
                 {
                     "VK_FORMAT_EAC_R11_SNORM_BLOCK": [
                         {
-                            "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1385,8 +1381,7 @@
                 {
                     "VK_FORMAT_EAC_R11G11_UNORM_BLOCK": [
                         {
-                            "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
@@ -1397,8 +1392,7 @@
                 {
                     "VK_FORMAT_EAC_R11G11_SNORM_BLOCK": [
                         {
-                            "struct": "VkFormatProperties",
-                            "members": {
+                            "VkFormatProperties": {
                                 "linearTilingFeatures": [],
                                 "optimalTilingFeatures": [],
                                 "bufferFeatures": []
