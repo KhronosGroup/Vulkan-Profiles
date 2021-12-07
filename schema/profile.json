@@ -413,6 +413,35 @@
                 "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" }
             }
         },
+        "VkDrmFormatModifierPropertiesEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "drmFormatModifier",
+                "drmFormatModifierPlaneCount",
+                "drmFormatModifierTilingFeatures"
+            ],
+            "properties": {
+                "drmFormatModifier": { "$ref": "#/definitions/uint64_t" },
+                "drmFormatModifierPlaneCount": { "$ref": "#/definitions/uint32_t" },
+                "drmFormatModifierTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags" }
+            }
+        },
+        "VkDrmFormatModifierPropertiesListEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "pDrmFormatModifierProperties"
+            ],
+            "properties": {
+                "pDrmFormatModifierProperties": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/VkDrmFormatModifierPropertiesEXT"
+                    }
+                }
+            }
+        },
         "platforms": {
             "description": "The platforms where the setting is available. When missing, this property is inherited from parent nodes. If no parent node defines it, the default value is all platforms.",
             "type": "array",
@@ -5750,6 +5779,14 @@
                                                 "properties": {
                                                     "VkFormatProperties3KHR": {
                                                         "$ref": "#/definitions/VkFormatProperties3"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkFormatProperties3KHR": {
+                                                        "$ref": "#/definitions/VkDrmFormatModifierPropertiesListEXT"
                                                     }
                                                 }
                                             }
