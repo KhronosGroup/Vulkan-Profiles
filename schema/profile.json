@@ -5729,18 +5729,10 @@
                         "description": "TODO",
                         "type": "array",
                         "items": {
+                            "type": "object",
                             "additionalProperties": false,
-                            "required": [
-                                "value",
-                                "properties"
-                            ],
-                            "properties": {
-                                "value": {
-                                    "description": "TODO",
-                                    "type": "string",
-                                    "pattern": "VK_[A-Z0-9_]+"
-                                },
-                                "properties": {
+                            "patternProperties": {
+                                "^VK_FORMAT_[A-Z0-9_]+": {
                                     "type": "array",
                                     "items": {
                                         "additionalProperties": false,
