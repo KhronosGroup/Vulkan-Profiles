@@ -126,6 +126,20 @@ struct JsonValidator {
     std::string message;
 };
 
+TEST(test_validate, VP_LUNARG_test_vkformatproperties) {
+    JsonValidator validator;
+
+    const Json::Value document = ParseJsonFile("VP_LUNARG_test_vkformatproperties.json");
+    EXPECT_TRUE(validator.Check(document));
+}
+
+TEST(test_validate, VP_LUNARG_test_vkformatproperties2) {
+    JsonValidator validator;
+
+    const Json::Value document = ParseJsonFile("VP_LUNARG_test_vkformatproperties2.json");
+    EXPECT_TRUE(validator.Check(document));
+}
+
 TEST(test_validate, VP_LUNARG_desktop_portability_2021) {
     JsonValidator validator;
 
@@ -153,3 +167,4 @@ TEST(test_validate, VP_ANDROID_angle_es31) {
     const Json::Value json_document4 = ParseJsonFile("VP_ANDROID_angle_es31.json");
     EXPECT_TRUE(validator.Check(json_document4));
 }
+
