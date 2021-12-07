@@ -199,7 +199,69 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT_KHR", "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT_KHR", "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT_KHR", "VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT_KHR", "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_BIT_KHR", "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT_KHR", "VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT_KHR", "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT_KHR", "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT_KHR", "VK_FORMAT_FEATURE_2_DEPTH_STENCIL_ATTACHMENT_BIT_KHR", "VK_FORMAT_FEATURE_2_BLIT_SRC_BIT_KHR", "VK_FORMAT_FEATURE_2_BLIT_DST_BIT_KHR", "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_BIT_KHR", "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT", "VK_FORMAT_FEATURE_2_TRANSFER_SRC_BIT_KHR", "VK_FORMAT_FEATURE_2_TRANSFER_DST_BIT_KHR", "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_MINMAX_BIT_KHR", "VK_FORMAT_FEATURE_2_MIDPOINT_CHROMA_SAMPLES_BIT_KHR", "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR", "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR", "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR", "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR", "VK_FORMAT_FEATURE_2_DISJOINT_BIT_KHR", "VK_FORMAT_FEATURE_2_COSITED_CHROMA_SAMPLES_BIT_KHR", "VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT_KHR", "VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT_KHR", "VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR", "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT_KHR", "VK_FORMAT_FEATURE_2_VIDEO_DECODE_OUTPUT_BIT_KHR", "VK_FORMAT_FEATURE_VIDEO_ENCODE_INPUT_BIT_KHR", "VK_FORMAT_FEATURE_2_VIDEO_DECODE_DPB_BIT_KHR", "VK_FORMAT_FEATURE_2_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR", "VK_FORMAT_FEATURE_2_FRAGMENT_DENSITY_MAP_BIT_EXT", "VK_FORMAT_FEATURE_2_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR", "VK_FORMAT_FEATURE_2_VIDEO_ENCODE_INPUT_BIT_KHR", "VK_FORMAT_FEATURE_2_VIDEO_ENCODE_DPB_BIT_KHR" ],
+                "enum": [
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT",
+                    "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT",
+                    "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT",
+                    "VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_BIT",
+                    "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
+                    "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT",
+                    "VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT",
+                    "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT",
+                    "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_DEPTH_STENCIL_ATTACHMENT_BIT",
+                    "VK_FORMAT_FEATURE_2_DEPTH_STENCIL_ATTACHMENT_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_BLIT_SRC_BIT",
+                    "VK_FORMAT_FEATURE_2_BLIT_SRC_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_BLIT_DST_BIT",
+                    "VK_FORMAT_FEATURE_2_BLIT_DST_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_CUBIC_BIT",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT",
+                    "VK_FORMAT_FEATURE_2_TRANSFER_SRC_BIT",
+                    "VK_FORMAT_FEATURE_2_TRANSFER_SRC_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_TRANSFER_DST_BIT",
+                    "VK_FORMAT_FEATURE_2_TRANSFER_DST_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_MINMAX_BIT",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_MINMAX_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_MIDPOINT_CHROMA_SAMPLES_BIT",
+                    "VK_FORMAT_FEATURE_2_MIDPOINT_CHROMA_SAMPLES_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_DISJOINT_BIT",
+                    "VK_FORMAT_FEATURE_2_DISJOINT_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_COSITED_CHROMA_SAMPLES_BIT",
+                    "VK_FORMAT_FEATURE_2_COSITED_CHROMA_SAMPLES_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_FRAGMENT_DENSITY_MAP_BIT_EXT",
+                    "VK_FORMAT_FEATURE_2_VIDEO_DECODE_OUTPUT_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_VIDEO_DECODE_DPB_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_VIDEO_ENCODE_INPUT_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_VIDEO_ENCODE_DPB_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT",
+                    "VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT",
+                    "VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT_KHR",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT",
+                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT_KHR"
+                ],
                 "uniqueItems": true
             }
         },
@@ -411,6 +473,141 @@
                 "linearTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" },
                 "optimalTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" },
                 "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" }
+            }
+        },
+        "VkFormatProperties3KHR": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "linearTilingFeatures",
+                "optimalTilingFeatures",
+                "bufferFeatures"
+            ],
+            "properties": {
+                "linearTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" },
+                "optimalTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" },
+                "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" }
+            }
+        },
+        "VkDrmFormatModifierPropertiesEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "drmFormatModifier",
+                "drmFormatModifierPlaneCount",
+                "drmFormatModifierTilingFeatures"
+            ],
+            "properties": {
+                "drmFormatModifier": { "$ref": "#/definitions/uint64_t" },
+                "drmFormatModifierPlaneCount": { "$ref": "#/definitions/uint32_t" },
+                "drmFormatModifierTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags" }
+            }
+        },
+        "VkDrmFormatModifierPropertiesListEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "pDrmFormatModifierProperties"
+            ],
+            "properties": {
+                "pDrmFormatModifierProperties": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/VkDrmFormatModifierPropertiesEXT"
+                    }
+                }
+            }
+        },
+        "VkDrmFormatModifierProperties2EXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "drmFormatModifier",
+                "drmFormatModifierPlaneCount",
+                "drmFormatModifierTilingFeatures"
+            ],
+            "properties": {
+                "drmFormatModifier": { "$ref": "#/definitions/uint64_t" },
+                "drmFormatModifierPlaneCount": { "$ref": "#/definitions/uint32_t" },
+                "drmFormatModifierTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" }
+            }
+        },
+        "VkDrmFormatModifierPropertiesList2EXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "pDrmFormatModifierProperties"
+            ],
+            "properties": {
+                "pDrmFormatModifierProperties": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/VkDrmFormatModifierProperties2EXT"
+                    }
+                }
+            }
+        },
+        "VkVideoCodecOperationFlagBitsKHR": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [ "VK_VIDEO_CODEC_OPERATION_INVALID_BIT_KHR" ],
+                "uniqueItems": true
+            }
+        },
+        "VkVideoChromaSubsamplingFlagsKHR": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [ "VK_VIDEO_CHROMA_SUBSAMPLING_INVALID_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_MONOCHROME_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_422_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_444_BIT_KHR" ],
+                "uniqueItems": true
+            }
+        },
+        "VkVideoComponentBitDepthFlagsKHR": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [ "VK_VIDEO_COMPONENT_BIT_DEPTH_INVALID_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_12_BIT_KHR" ],
+                "uniqueItems": true
+            }
+        },
+        "VkVideoProfileKHR": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "videoCodecOperation",
+                "chromaSubsampling",
+                "lumaBitDepth",
+                "chromaBitDepth"
+            ],
+            "properties": {
+                "videoCodecOperation": {
+                    "$ref": "#/definitions/VkVideoCodecOperationFlagBitsKHR"
+                },
+                "chromaSubsampling": {
+                    "$ref": "#/definitions/VkVideoChromaSubsamplingFlagsKHR"
+                },
+                "lumaBitDepth": {
+                    "$ref": "#/definitions/VkVideoComponentBitDepthFlagsKHR"
+                },
+                "chromaBitDepth": {
+                    "$ref": "#/definitions/VkVideoComponentBitDepthFlagsKHR"
+                }
+            }
+        },
+        "VkVideoProfilesKHR": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "pProfiles"
+            ],
+            "properties": {
+                "pProfiles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/VkVideoProfileKHR"
+                    }
+                }
             }
         },
         "platforms": {
@@ -5749,7 +5946,39 @@
                                                 "additionalProperties": false,
                                                 "properties": {
                                                     "VkFormatProperties3KHR": {
-                                                        "$ref": "#/definitions/VkFormatProperties3"
+                                                        "$ref": "#/definitions/VkFormatProperties3KHR"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkDrmFormatModifierPropertiesListEXT": {
+                                                        "$ref": "#/definitions/VkDrmFormatModifierPropertiesListEXT"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkDrmFormatModifierPropertiesList2EXT": {
+                                                        "$ref": "#/definitions/VkDrmFormatModifierPropertiesList2EXT"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkVideoProfileKHR": {
+                                                        "$ref": "#/definitions/VkVideoProfileKHR"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkVideoProfilesKHR": {
+                                                        "$ref": "#/definitions/VkVideoProfilesKHR"
                                                     }
                                                 }
                                             }
