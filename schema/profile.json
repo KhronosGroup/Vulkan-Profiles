@@ -567,7 +567,7 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_VIDEO_COMPONENT_BIT_DEPTH_INVALID_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_12_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_444_BIT_KHR" ],
+                "enum": [ "VK_VIDEO_COMPONENT_BIT_DEPTH_INVALID_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_12_BIT_KHR" ],
                 "uniqueItems": true
             }
         },
