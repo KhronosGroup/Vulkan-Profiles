@@ -135,7 +135,7 @@
         {
             "name": "VP_LUNARG_test_vkformatproperties",
             "version": 1,
-            "api-version": "1.1.142",
+            "api-version": "1.2.198",
             "capabilities": [
                 "baseline"
             ]
