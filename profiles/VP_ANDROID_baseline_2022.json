@@ -139,8 +139,7 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceProperties",
-                    "members": {
+                    "VkPhysicalDeviceProperties": {
                         "limits": {
                             "maxImageDimension1D": 16384,
                             "maxImageDimension2D": 8192,
