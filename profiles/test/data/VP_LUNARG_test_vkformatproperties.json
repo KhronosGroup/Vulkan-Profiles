@@ -1,0 +1,97 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
+    "comments": {
+        "info": "LunarG Test Profile for VkFormatProperties",
+        "desc": "LunarG Test Profile for VkFormatProperties"
+    },
+    "capabilities": [
+        {
+            "name": "baseline",
+            "formats": [
+                {
+                    "VK_FORMAT_R8_UNORM": [
+                        {
+                            "VkFormatProperties": {
+                                "linearTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
+                                "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
+                                "bufferFeatures": [ "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT" ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "VK_FORMAT_R8_SNORM": [
+                        {
+                            "VkFormatProperties2": {
+                                "formatProperties": {
+                                    "linearTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
+                                    "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
+                                    "bufferFeatures": [ "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT" ]
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "VK_FORMAT_R8G8_UNORM": [
+                        {
+                            "VkFormatProperties2": {
+                                "formatProperties": {
+                                    "linearTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
+                                    "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
+                                    "bufferFeatures": [ "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT" ]
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "VK_FORMAT_R8G8_SNORM": [
+                        {
+                            "VkFormatProperties2KHR": {
+                                "formatProperties": {
+                                    "linearTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
+                                    "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
+                                    "bufferFeatures": [ "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT" ]
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "VK_FORMAT_R8G8B8A8_UNORM": [
+                        {
+                            "VkFormatProperties3": {
+                                "linearTilingFeatures": [ "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT" ],
+                                "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT", "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT" ],
+                                "bufferFeatures": [ "VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT" ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "VK_FORMAT_R8G8B8A8_SNORM": [
+                        {
+                            "VkFormatProperties3KHR": {
+                                "linearTilingFeatures": [ "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT_KHR" ],
+                                "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT_KHR", "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT_KHR" ],
+                                "bufferFeatures": [ "VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT_KHR", "VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT_KHR" ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "profiles": [
+        {
+            "name": "VP_LUNARG_test_vkformatproperties",
+            "version": 1,
+            "api-version": "1.1.142",
+            "capabilities": [
+                "baseline"
+            ]
+        }
+    ]
+}
+
