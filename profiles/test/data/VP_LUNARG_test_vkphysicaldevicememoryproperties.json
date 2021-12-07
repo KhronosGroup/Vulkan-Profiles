@@ -77,6 +77,12 @@
                             ]
                         }
                     }
+                },
+                {
+                    "VkPhysicalDeviceMemoryBudgetPropertiesEXT": {
+                        "heapBudget": [ 4, 16, 256, 4096 ],
+                        "heapUsage": [ 4, 16, 256, 4096 ]
+                    }
                 }
             ]
         }
