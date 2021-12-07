@@ -65,6 +65,14 @@
                             "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT"
                         ]
                     }
+                },
+                {
+                    "VkQueueFamilyCheckpointPropertiesNV": {
+                        "checkpointExecutionStageMask": [
+                            "VK_PIPELINE_STAGE_TRANSFER_BIT",
+                            "VK_PIPELINE_STAGE_HOST_BIT"
+                        ]
+                    }
                 }
             ]
         }
