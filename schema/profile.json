@@ -399,31 +399,7 @@
                 "formatProperties": { "$ref": "#/definitions/VkFormatProperties" }
             }
         },
-        "VkFormatProperties2KHR": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-                "formatProperties"
-            ],
-            "properties": {
-                "formatProperties": { "$ref": "#/definitions/VkFormatProperties" }
-            }
-        },
         "VkFormatProperties3": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-                "linearTilingFeatures",
-                "optimalTilingFeatures",
-                "bufferFeatures"
-            ],
-            "properties": {
-                "linearTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" },
-                "optimalTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" },
-                "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" }
-            }
-        },
-        "VkFormatProperties3KHR": {
             "type": "object",
             "additionalProperties": false,
             "required": [
@@ -5735,40 +5711,49 @@
                                 "^VK_FORMAT_[A-Z0-9_]+": {
                                     "type": "array",
                                     "items": {
-                                        "additionalProperties": false,
-                                        "required": [
-                                            "struct",
-                                            "members"
-                                        ],
-                                        "properties": {
-                                            "struct": {
-                                                "description": "TODO",
-                                                "type": "string",
-                                                "pattern": "Vk[A-Za-z0-9_]+"
-                                            },
-                                            "members": {
-                                                "$ref": "#/definitions/VkFormatProperties",
-                                                "description": "TODO",
-                                                "type": "object",
+                                        "type": "object",
+                                        "oneOf": [
+                                            {
                                                 "additionalProperties": false,
-                                                "required": [
-                                                    "linearTilingFeatures",
-                                                    "optimalTilingFeatures",
-                                                    "bufferFeatures"
-                                                ],
                                                 "properties": {
-                                                    "linearTilingFeatures": {
-                                                        "$ref": "#/definitions/VkFormatFeatureFlags"
-                                                    },
-                                                    "optimalTilingFeatures": {
-                                                        "$ref": "#/definitions/VkFormatFeatureFlags"
-                                                    },
-                                                    "bufferFeatures": {
-                                                        "$ref": "#/definitions/VkFormatFeatureFlags"
+                                                    "VkFormatProperties": {
+                                                        "$ref": "#/definitions/VkFormatProperties"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkFormatProperties2": {
+                                                        "$ref": "#/definitions/VkFormatProperties2"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkFormatProperties2KHR": {
+                                                        "$ref": "#/definitions/VkFormatProperties2"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkFormatProperties3": {
+                                                        "$ref": "#/definitions/VkFormatProperties3"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkFormatProperties3KHR": {
+                                                        "$ref": "#/definitions/VkFormatProperties3"
                                                     }
                                                 }
                                             }
-                                        }
+                                        ]
                                     }
                                 }
                             }
