@@ -26,8 +26,7 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceMultiviewProperties",
-                    "members": {
+                    "VkPhysicalDeviceMultiviewProperties": {
                         "maxMultiviewViewCount": 0,
                         "maxMultiviewInstanceIndex": 134217727
                     }
@@ -114,8 +113,7 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceProperties",
-                    "members": {
+                    "VkPhysicalDeviceProperties": {
                         "limits": {
                             "standardSampleLocations": true,
                             "maxVertexOutputComponents": 64,
