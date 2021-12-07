@@ -471,6 +471,69 @@
                 }
             }
         },
+        "VkVideoCodecOperationFlagBitsKHR": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [ "VK_VIDEO_CODEC_OPERATION_INVALID_BIT_KHR" ],
+                "uniqueItems": true
+            }
+        },
+        "VkVideoChromaSubsamplingFlagsKHR": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [ "VK_VIDEO_CHROMA_SUBSAMPLING_INVALID_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_MONOCHROME_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_422_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_444_BIT_KHR" ],
+                "uniqueItems": true
+            }
+        },
+        "VkVideoComponentBitDepthFlagsKHR": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [ "VK_VIDEO_COMPONENT_BIT_DEPTH_INVALID_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_12_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_444_BIT_KHR" ],
+                "uniqueItems": true
+            }
+        },
+        "VkVideoProfileKHR": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "videoCodecOperation",
+                "chromaSubsampling",
+                "lumaBitDepth",
+                "chromaBitDepth"
+            ],
+            "properties": {
+                "videoCodecOperation": {
+                    "$ref": "#/definitions/VkVideoCodecOperationFlagBitsKHR"
+                },
+                "chromaSubsampling": {
+                    "$ref": "#/definitions/VkVideoChromaSubsamplingFlagsKHR"
+                },
+                "lumaBitDepth": {
+                    "$ref": "#/definitions/VkVideoComponentBitDepthFlagsKHR"
+                },
+                "chromaBitDepth": {
+                    "$ref": "#/definitions/VkVideoComponentBitDepthFlagsKHR"
+                }
+            }
+        },
+        "VkVideoProfilesKHR": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "pProfiles"
+            ],
+            "properties": {
+                "pProfiles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/VkVideoProfileKHR"
+                    }
+                }
+            }
+        },
         "platforms": {
             "description": "The platforms where the setting is available. When missing, this property is inherited from parent nodes. If no parent node defines it, the default value is all platforms.",
             "type": "array",
@@ -5824,6 +5887,22 @@
                                                 "properties": {
                                                     "VkFormatProperties3KHR": {
                                                         "$ref": "#/definitions/VkDrmFormatModifierPropertiesList2EXT"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkVideoProfileKHR": {
+                                                        "$ref": "#/definitions/VkVideoProfileKHR"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkVideoProfilesKHR": {
+                                                        "$ref": "#/definitions/VkVideoProfilesKHR"
                                                     }
                                                 }
                                             }
