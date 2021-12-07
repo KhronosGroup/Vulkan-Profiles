@@ -88,9 +88,9 @@
     ],
     "profiles": [
         {
-            "name": "VP_LUNARG_test_vkformatproperties",
+            "name": "VP_LUNARG_test_vkqueuefamilyproperties",
             "version": 1,
-            "api-version": "1.1.142",
+            "api-version": "1.2.198",
             "capabilities": [
                 "baseline"
             ]
