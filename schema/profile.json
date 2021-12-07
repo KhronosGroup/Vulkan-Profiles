@@ -6096,13 +6096,10 @@
                     "queueFamiliesProperties": {
                         "type": "array",
                         "items": {
+                            "type": "object",
                             "oneOf": [
                                 {
-                                    "type": "object",
                                     "additionalProperties": false,
-                                    "required": [
-                                        "VkQueueFamilyProperties"
-                                    ],
                                     "properties": {
                                         "VkQueueFamilyProperties": {
                                             "$ref": "#/definitions/VkQueueFamilyProperties"
@@ -6110,11 +6107,7 @@
                                     }
                                 },
                                 {
-                                    "type": "object",
                                     "additionalProperties": false,
-                                    "required": [
-                                        "VkQueueFamilyProperties2"
-                                    ],
                                     "properties": {
                                         "VkQueueFamilyProperties2": {
                                             "$ref": "#/definitions/VkQueueFamilyProperties2"
@@ -6122,11 +6115,7 @@
                                     }
                                 },
                                 {
-                                    "type": "object",
                                     "additionalProperties": false,
-                                    "required": [
-                                        "VkQueueFamilyProperties2KHR"
-                                    ],
                                     "properties": {
                                         "VkQueueFamilyProperties2KHR": {
                                             "$ref": "#/definitions/VkQueueFamilyProperties2"
@@ -6139,13 +6128,10 @@
                     "memoryProperties": {
                         "type": "array",
                         "items": {
+                            "type": "object",
                             "oneOf": [
                                 {
-                                    "type": "object",
                                     "additionalProperties": false,
-                                    "required": [
-                                        "VkPhysicalDeviceMemoryProperties"
-                                    ],
                                     "properties": {
                                         "VkPhysicalDeviceMemoryProperties": {
                                             "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties"
@@ -6153,11 +6139,7 @@
                                     }
                                 },
                                 {
-                                    "type": "object",
                                     "additionalProperties": false,
-                                    "required": [
-                                        "VkPhysicalDeviceMemoryProperties2"
-                                    ],
                                     "properties": {
                                         "VkPhysicalDeviceMemoryProperties2": {
                                             "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties2"
@@ -6165,11 +6147,7 @@
                                     }
                                 },
                                 {
-                                    "type": "object",
                                     "additionalProperties": false,
-                                    "required": [
-                                        "VkPhysicalDeviceMemoryProperties2KHR"
-                                    ],
                                     "properties": {
                                         "VkPhysicalDeviceMemoryProperties2KHR": {
                                             "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties2"
@@ -6177,11 +6155,7 @@
                                     }
                                 },
                                 {
-                                    "type": "object",
                                     "additionalProperties": false,
-                                    "required": [
-                                        "VkPhysicalDeviceMemoryBudgetPropertiesEXT"
-                                    ],
                                     "properties": {
                                         "VkPhysicalDeviceMemoryBudgetPropertiesEXT": {
                                             "$ref": "#/definitions/VkPhysicalDeviceMemoryBudgetPropertiesEXT"
