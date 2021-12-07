@@ -73,6 +73,15 @@
                             "VK_PIPELINE_STAGE_HOST_BIT"
                         ]
                     }
+                },
+                {
+                    "VkQueueFamilyCheckpointProperties2NV": {
+                        "checkpointExecutionStageMask": [
+                            "VK_PIPELINE_STAGE_2_NONE_KHR",
+                            "VK_PIPELINE_STAGE_2_SUBPASS_SHADING_BIT_HUAWEI",
+                            "VK_PIPELINE_STAGE_2_INVOCATION_MASK_BIT_HUAWEI"
+                        ]
+                    }
                 }
             ]
         }
