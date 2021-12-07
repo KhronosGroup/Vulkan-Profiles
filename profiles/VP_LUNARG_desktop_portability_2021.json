@@ -16,8 +16,7 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceMultiviewProperties",
-                    "members": {
+                    "VkPhysicalDeviceMultiviewProperties": {
                         "maxMultiviewViewCount": 0,
                         "maxMultiviewInstanceIndex": 134217727
                     }
@@ -231,8 +230,7 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceProperties",
-                    "members": {
+                    "VkPhysicalDeviceProperties": {
                         "limits": {
                             "maxImageDimension1D": 16384,
                             "maxImageDimension2D": 16384,
@@ -330,8 +328,7 @@
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceDescriptorIndexingProperties",
-                    "members": {
+                    "VkPhysicalDeviceDescriptorIndexingProperties": {
                         "maxUpdateAfterBindDescriptorsInAllPools": 1048576,
                         "maxPerStageDescriptorUpdateAfterBindSamplers": 16,
                         "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 15,
@@ -351,8 +348,7 @@
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceDepthStencilResolveProperties",
-                    "members": {
+                    "VkPhysicalDeviceDepthStencilResolveProperties": {
                         "independentResolve": true,
                         "independentResolveNone": true,
                         "supportedDepthResolveModes": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ],
@@ -360,8 +356,7 @@
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceMaintenance3Properties",
-                    "members": {
+                    "VkPhysicalDeviceMaintenance3Properties": {
                         "maxPerSetDescriptors": 700,
                         "maxMemoryAllocationSize": 2147483648
                     }
@@ -1295,8 +1290,7 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDevicePortabilitySubsetPropertiesKHR",
-                    "members": {
+                    "VkPhysicalDevicePortabilitySubsetPropertiesKHR": {
                         "minVertexInputBindingStrideAlignment": 4
                     }
                 }
