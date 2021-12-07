@@ -1,0 +1,37 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
+    "comments": {
+        "info": "LunarG Test Profile for VkPhysicalDeviceMemoryProperties",
+        "desc": "LunarG Test Profile for VkPhysicalDeviceMemoryProperties"
+    },
+    "capabilities": [
+        {
+            "name": "baseline",
+            "memoryProperties": [
+                {
+                    "VkPhysicalDeviceMemoryProperties": {
+                        "memoryTypes": [
+                            {
+                                "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT" ]
+                            },
+                            {
+                                "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT" ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "profiles": [
+        {
+            "name": "VP_LUNARG_test_vkphysicaldevicememoryproperties",
+            "version": 1,
+            "api-version": "1.2.198",
+            "capabilities": [
+                "baseline"
+            ]
+        }
+    ]
+}
+
