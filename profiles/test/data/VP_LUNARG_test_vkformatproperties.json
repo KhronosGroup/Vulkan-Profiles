@@ -16,6 +16,17 @@
                                 "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
                                 "bufferFeatures": [ "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT" ]
                             }
+                        },
+                        {
+                            "VkDrmFormatModifierPropertiesListEXT": {
+                                "pDrmFormatModifierProperties": [
+                                    {
+                                        "drmFormatModifier": 1,
+                                        "drmFormatModifierPlaneCount": 3,
+                                        "drmFormatModifierTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT" ]
+                                    }
+                                ]
+                            }
                         }
                     ]
                 },
@@ -64,7 +75,18 @@
                             "VkFormatProperties3": {
                                 "linearTilingFeatures": [ "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT" ],
                                 "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT", "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT" ],
-                                "bufferFeatures": [ "VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT" ]
+                                "bufferFeatures": [ "VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT_KHR" ]
+                            }
+                        },
+                        {
+                            "VkDrmFormatModifierPropertiesList2EXT": {
+                                "pDrmFormatModifierProperties": [
+                                    {
+                                        "drmFormatModifier": 1,
+                                        "drmFormatModifierPlaneCount": 3,
+                                        "drmFormatModifierTilingFeatures": [ "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT_KHR" ]
+                                    }
+                                ]
                             }
                         }
                     ]
