@@ -9,8 +9,7 @@
             "name": "vulkan10requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceFeatures",
-                    "members": {
+                    "VkPhysicalDeviceFeatures": {
                         "robustBufferAccess": true
                     }
                 }
@@ -118,8 +117,7 @@
             ],
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceFeatures",
-                    "members": {
+                    "VkPhysicalDeviceFeatures": {
                         "depthBiasClamp": true,
                         "fragmentStoresAndAtomics": true,
                         "fullDrawIndexUint32": true,
@@ -141,8 +139,7 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceProperties",
-                    "members": {
+                    "VkPhysicalDeviceProperties": {
                         "limits": {
                             "maxImageDimension1D": 16384,
                             "maxImageDimension2D": 8192,

@@ -9,8 +9,7 @@
             "name": "vulkan10requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceFeatures",
-                    "members": {
+                    "VkPhysicalDeviceFeatures": {
                         "robustBufferAccess": true
                     }
                 }
@@ -20,16 +19,14 @@
             "name": "vulkan11requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceMultiviewFeatures",
-                    "members": {
+                    "VkPhysicalDeviceMultiviewFeatures": {
                         "multiview": true
                     }
                 }
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceMultiviewProperties",
-                    "members": {
+                    "VkPhysicalDeviceMultiviewProperties": {
                         "maxMultiviewViewCount": 0,
                         "maxMultiviewInstanceIndex": 134217727
                     }
@@ -78,53 +75,45 @@
             ],
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceFeatures",
-                    "members": {
+                    "VkPhysicalDeviceFeatures": {
                         "independentBlend": true,
                         "vertexPipelineStoresAndAtomics": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceLineRasterizationFeaturesEXT",
-                    "members": {
+                    "VkPhysicalDeviceLineRasterizationFeaturesEXT": {
                         "bresenhamLines": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR",
-                    "members": {
+                    "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR": {
                         "shaderTerminateInvocation": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceProvokingVertexFeaturesEXT",
-                    "members": {
+                    "VkPhysicalDeviceProvokingVertexFeaturesEXT": {
                         "provokingVertexLast": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceTransformFeedbackFeaturesEXT",
-                    "members": {
+                    "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
                         "transformFeedback": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT",
-                    "members": {
+                    "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT": {
                         "primitiveTopologyListRestart": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceImageRobustnessFeaturesEXT",
-                    "members": {
+                    "VkPhysicalDeviceImageRobustnessFeaturesEXT": {
                         "robustImageAccess": true
                     }
                 }
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceProperties",
-                    "members": {
+                    "VkPhysicalDeviceProperties": {
                         "limits": {
                             "standardSampleLocations": true,
                             "maxVertexOutputComponents": 64,

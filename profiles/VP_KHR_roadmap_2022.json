@@ -9,8 +9,7 @@
             "name": "vulkan10requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceFeatures",
-                    "members": {
+                    "VkPhysicalDeviceFeatures": {
                         "robustBufferAccess": true
                     }
                 }
@@ -20,16 +19,14 @@
             "name": "vulkan11requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceVulkan11Features",
-                    "members": {
+                    "VkPhysicalDeviceVulkan11Features": {
                         "multiview": true
                     }
                 }
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceVulkan11Properties",
-                    "members": {
+                    "VkPhysicalDeviceVulkan11Properties": {
                         "maxMultiviewViewCount": 6,
                         "maxMultiviewInstanceIndex": 134217727
                     }
@@ -40,8 +37,7 @@
             "name": "vulkan12requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceVulkan12Features",
-                    "members": {
+                    "VkPhysicalDeviceVulkan12Features": {
                         "uniformBufferStandardLayout": true,
                         "subgroupBroadcastDynamicId": true,
                         "imagelessFramebuffer": true,
@@ -54,8 +50,7 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceVulkan12Properties",
-                    "members": {
+                    "VkPhysicalDeviceVulkan12Properties": {
                         "maxTimelineSemaphoreValueDifference": 2147483647
                     }
                 }
@@ -65,8 +60,7 @@
             "name": "vulkan13requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceVulkan12Features",
-                    "members": {
+                    "VkPhysicalDeviceVulkan12Features": {
                         "vulkanMemoryModel": true,
                         "vulkanMemoryModelDeviceScope": true,
                         "vulkanMemoryModelAvailabilityVisibilityChains": true,
@@ -74,8 +68,7 @@
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceVulkan13Features",
-                    "members": {
+                    "VkPhysicalDeviceVulkan13Features": {
                         "inlineUniformBlock": true,
                         "subgroupSizeControl": true,
                         "computeFullSubgroups": true,
@@ -92,8 +85,7 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceVulkan13Properties",
-                    "members": {
+                    "VkPhysicalDeviceVulkan13Properties": {
                         "maxInlineUniformBlockSize": 256,
                         "maxPerStageDescriptorInlineUniformBlocks": 4,
                         "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4,
@@ -114,8 +106,7 @@
             ],
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceFeatures",
-                    "members": {
+                    "VkPhysicalDeviceFeatures": {
                         "fullDrawIndexUint32": true,
                         "imageCubeArray": true,
                         "independentBlend": true,
@@ -134,14 +125,12 @@
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceVulkan11Features",
-                    "members": {
+                    "VkPhysicalDeviceVulkan11Features": {
                         "samplerYcbcrConversion": true
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceVulkan12Features",
-                    "members": {
+                    "VkPhysicalDeviceVulkan12Features": {
                         "samplerMirrorClampToEdge": true,
                         "descriptorIndexing": true,
                         "shaderUniformTexelBufferArrayDynamicIndexing": true,
@@ -168,8 +157,7 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceProperties",
-                    "members": {
+                    "VkPhysicalDeviceProperties": {
                         "limits": {
                             "maxImageDimension1D": 8192,
                             "maxImageDimension2D": 8192,
@@ -202,16 +190,14 @@
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceVulkan11Properties",
-                    "members": {
+                    "VkPhysicalDeviceVulkan11Properties": {
                         "subgroupSize": 4,
                         "subgroupSupportedStages": [ "VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT" ],
                         "subgroupSupportedOperations": [ "VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_VOTE_BIT", "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT", "VK_SUBGROUP_FEATURE_BALLOT_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT", "VK_SUBGROUP_FEATURE_QUAD_BIT" ]
                     }
                 },
                 {
-                    "struct": "VkPhysicalDeviceVulkan12Properties",
-                    "members": {
+                    "VkPhysicalDeviceVulkan12Properties": {
                         "shaderSignedZeroInfNanPreserveFloat16": true,
                         "shaderSignedZeroInfNanPreserveFloat32": true,
                         "maxPerStageDescriptorUpdateAfterBindSamplers": 500000,
