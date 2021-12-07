@@ -5877,7 +5877,7 @@
                                             {
                                                 "additionalProperties": false,
                                                 "properties": {
-                                                    "VkFormatProperties3KHR": {
+                                                    "VkDrmFormatModifierPropertiesListEXT": {
                                                         "$ref": "#/definitions/VkDrmFormatModifierPropertiesListEXT"
                                                     }
                                                 }
@@ -5885,7 +5885,7 @@
                                             {
                                                 "additionalProperties": false,
                                                 "properties": {
-                                                    "VkFormatProperties3KHR": {
+                                                    "VkDrmFormatModifierPropertiesList2EXT": {
                                                         "$ref": "#/definitions/VkDrmFormatModifierPropertiesList2EXT"
                                                     }
                                                 }
