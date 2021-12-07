@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
     "comments": {
         "info": "LunarG Vulkan Desktop Portability Profile 2021",
         "desc": "Common desktop platforms with drivers supporting Vulkan 1.1 on Windows, Linux and macOS."
@@ -18,20 +18,10 @@
             "properties": [
                 {
                     "struct": "VkPhysicalDeviceMultiviewProperties",
-                    "members": [
-                        {
-                            "name": "maxMultiviewViewCount",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 6
-                        },
-                        {
-                            "name": "maxMultiviewInstanceIndex",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 134217727
-                        }
-                    ]
+                    "members": {
+                        "maxMultiviewViewCount": 0,
+                        "maxMultiviewInstanceIndex": 134217727
+                    }
                 }
             ]
         },
@@ -255,712 +245,140 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceLimits",
-                    "members": [
-                        {
-                            "name": "maxImageDimension1D",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 16384
-                        },
-                        {
-                            "name": "maxImageDimension2D",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 16384
-                        },
-                        {
-                            "name": "maxImageDimension3D",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 2048
-                        },
-                        {
-                            "name": "maxImageDimensionCube",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 16384
-                        },
-                        {
-                            "name": "maxImageArrayLayers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 2048
-                        },
-                        {
-                            "name": "maxTexelBufferElements",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 67108900
-                        },
-                        {
-                            "name": "maxUniformBufferRange",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 65536
-                        },
-                        {
-                            "name": "maxStorageBufferRange",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 134217728
-                        },
-                        {
-                            "name": "maxPushConstantsSize",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 128
-                        },
-                        {
-                            "name": "maxMemoryAllocationCount",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 4096
-                        },
-                        {
-                            "name": "maxSamplerAllocationCount",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 1024
-                        },
-                        {
-                            "name": "bufferImageGranularity",
-                            "type": "VkDeviceSize",
-                            "limit": "MAX",
-                            "value": 1024
-                        },
-                        {
-                            "name": "sparseAddressSpaceSize",
-                            "type": "VkDeviceSize",
-                            "limit": "MIN",
-                            "value": 1073741824
-                        },
-                        {
-                            "name": "maxBoundDescriptorSets",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "maxPerStageDescriptorSamplers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 16
-                        },
-                        {
-                            "name": "maxPerStageDescriptorUniformBuffers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 15
-                        },
-                        {
-                            "name": "maxPerStageDescriptorStorageBuffers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 16
-                        },
-                        {
-                            "name": "maxPerStageDescriptorSampledImages",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 128
-                        },
-                        {
-                            "name": "maxPerStageDescriptorStorageImages",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "maxPerStageDescriptorInputAttachments",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "maxPerStageResources",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 128
-                        },
-                        {
-                            "name": "maxDescriptorSetSamplers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 80
-                        },
-                        {
-                            "name": "maxDescriptorSetUniformBuffers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 90
-                        },
-                        {
-                            "name": "maxDescriptorSetUniformBuffersDynamic",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "maxDescriptorSetStorageBuffers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 155
-                        },
-                        {
-                            "name": "maxDescriptorSetStorageBuffersDynamic",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "maxDescriptorSetSampledImages",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 256
-                        },
-                        {
-                            "name": "maxDescriptorSetStorageImages",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 40
-                        },
-                        {
-                            "name": "maxDescriptorSetInputAttachments",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "maxVertexInputAttributes",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 28
-                        },
-                        {
-                            "name": "maxVertexInputBindings",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 28
-                        },
-                        {
-                            "name": "maxVertexInputAttributeOffset",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 2047
-                        },
-                        {
-                            "name": "maxVertexInputBindingStride",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 2048
-                        },
-                        {
-                            "name": "maxVertexOutputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 124
-                        },
-                        {
-                            "name": "maxTessellationGenerationLevel",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 64
-                        },
-                        {
-                            "name": "maxTessellationPatchSize",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 32
-                        },
-                        {
-                            "name": "maxTessellationControlPerVertexInputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 124
-                        },
-                        {
-                            "name": "maxTessellationControlPerVertexOutputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 124
-                        },
-                        {
-                            "name": "maxTessellationControlPerPatchOutputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 120
-                        },
-                        {
-                            "name": "maxTessellationControlTotalOutputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 2048
-                        },
-                        {
-                            "name": "maxTessellationEvaluationInputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 124
-                        },
-                        {
-                            "name": "maxTessellationEvaluationOutputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 124
-                        },
-                        {
-                            "name": "maxFragmentInputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 116
-                        },
-                        {
-                            "name": "maxFragmentOutputAttachments",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "maxFragmentDualSrcAttachments",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 1
-                        },
-                        {
-                            "name": "maxFragmentCombinedOutputResources",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "maxComputeSharedMemorySize",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 32768
-                        },
-                        {
-                            "name": "maxComputeWorkGroupCount",
-                            "type": "uint32_t",
-                            "dimensions": 3,
-                            "limit": "MIN",
-                            "value": [ 65535, 65535, 65535 ]
-                        },
-                        {
-                            "name": "maxComputeWorkGroupInvocations",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 1024
-                        },
-                        {
-                            "name": "maxComputeWorkGroupSize",
-                            "type": "uint32_t",
-                            "dimensions": 3,
-                            "limit": "MIN",
-                            "value": [ 1024, 1024, 64 ]
-                        },
-                        {
-                            "name": "subPixelPrecisionBits",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 4
-                        },
-                        {
-                            "name": "subTexelPrecisionBits",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 4
-                        },
-                        {
-                            "name": "mipmapPrecisionBits",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 4
-                        },
-                        {
-                            "name": "maxDrawIndexedIndexValue",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 4294967295
-                        },
-                        {
-                            "name": "maxDrawIndirectCount",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 1073740000
-                        },
-                        {
-                            "name": "maxSamplerLodBias",
-                            "type": "float",
-                            "limit": "MIN",
-                            "value": 14.0
-                        },
-                        {
-                            "name": "maxSamplerAnisotropy",
-                            "type": "float",
-                            "limit": "MIN",
-                            "value": 16.0
-                        },
-                        {
-                            "name": "maxViewports",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 16
-                        },
-                        {
-                            "name": "maxViewportDimensions",
-                            "type": "uint32_t",
-                            "dimensions": 2,
-                            "limit": "MIN",
-                            "value": [ 16384, 16384 ]
-                        },
-                        {
-                            "name": "viewportBoundsRange",
-                            "type": "float",
-                            "dimensions": 2,
-                            "limit": "RANGE",
-                            "value": [ -32768, 32767 ]
-                        },
-                        {
-                            "name": "minMemoryMapAlignment",
-                            "type": "size_t",
-                            "limit": "MIN",
-                            "value": 64
-                        },
-                        {
-                            "name": "minTexelBufferOffsetAlignment",
-                            "type": "VkDeviceSize",
-                            "limit": "MAX",
-                            "value": 64
-                        },
-                        {
-                            "name": "minUniformBufferOffsetAlignment",
-                            "type": "VkDeviceSize",
-                            "limit": "MAX",
-                            "value": 256
-                        },
-                        {
-                            "name": "minStorageBufferOffsetAlignment",
-                            "type": "VkDeviceSize",
-                            "limit": "MAX",
-                            "value": 64
-                        },
-                        {
-                            "name": "minTexelOffset",
-                            "type": "int32_t",
-                            "limit": "MAX",
-                            "value": -8
-                        },
-                        {
-                            "name": "maxTexelOffset",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 7
-                        },
-                        {
-                            "name": "minTexelGatherOffset",
-                            "type": "int32_t",
-                            "limit": "MAX",
-                            "value": -8
-                        },
-                        {
-                            "name": "maxTexelGatherOffset",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 7
-                        },
-                        {
-                            "name": "minInterpolationOffset",
-                            "type": "float",
-                            "limit": "MAX",
-                            "value": -0.5
-                        },
-                        {
-                            "name": "maxInterpolationOffset",
-                            "type": "float",
-                            "limit": "MIN",
-                            "value": 0.4375
-                        },
-                        {
-                            "name": "subPixelInterpolationOffsetBits",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 4
-                        },
-                        {
-                            "name": "maxFramebufferWidth",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 16384
-                        },
-                        {
-                            "name": "maxFramebufferHeight",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 16384
-                        },
-                        {
-                            "name": "maxFramebufferLayers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 1024
-                        },
-                        {
-                            "name": "framebufferColorSampleCounts",
-                            "type": "VkSampleCountFlagBits",
-                            "limit": "ALL",
-                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                        },
-                        {
-                            "name": "framebufferDepthSampleCounts",
-                            "type": "VkSampleCountFlagBits",
-                            "limit": "ALL",
-                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                        },
-                        {
-                            "name": "framebufferStencilSampleCounts",
-                            "type": "VkSampleCountFlagBits",
-                            "limit": "ALL",
-                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                        },
-                        {
-                            "name": "maxColorAttachments",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "sampledImageColorSampleCounts",
-                            "type": "VkSampleCountFlagBits",
-                            "limit": "ALL",
-                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                        },
-                        {
-                            "name": "sampledImageIntegerSampleCounts",
-                            "type": "VkSampleCountFlagBits",
-                            "limit": "ALL",
-                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                        },
-                        {
-                            "name": "sampledImageDepthSampleCounts",
-                            "type": "VkSampleCountFlagBits",
-                            "limit": "ALL",
-                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                        },
-                        {
-                            "name": "sampledImageStencilSampleCounts",
-                            "type": "VkSampleCountFlagBits",
-                            "limit": "ALL",
-                            "value": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
-                        },
-                        {
-                            "name": "storageImageSampleCounts",
-                            "type": "VkSampleCountFlagBits",
-                            "limit": "ALL",
-                            "value": [ "VK_SAMPLE_COUNT_1_BIT" ]
-                        },
-                        {
-                            "name": "maxSampleMaskWords",
-                            "type": "uint32_t",
-                            "limit": "MAX",
-                            "value": 1
-                        },
-                        {
-                            "name": "maxClipDistances",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "maxCullDistances",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "maxCombinedClipAndCullDistances",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "discreteQueuePriorities",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 2
-                        },
-                        {
-                            "name": "pointSizeRange",
-                            "type": "float",
-                            "dimensions": 2,
-                            "limit": "RANGE",
-                            "value": [ 1.0, 64.0 ]
-                        },
-                        {
-                            "name": "lineWidthRange",
-                            "type": "float",
-                            "dimensions": 2,
-                            "limit": "RANGE",
-                            "value": [ 1.0, 1.0 ]
-                        },
-                        {
-                            "name": "pointSizeGranularity",
-                            "type": "float",
-                            "limit": "MAX",
-                            "value": 0.125
-                        },
-                        {
-                            "name": "lineWidthGranularity",
-                            "type": "float",
-                            "limit": "MAX",
-                            "value": 0.5
+                    "struct": "VkPhysicalDeviceProperties",
+                    "members": {
+                        "limits": {
+                            "maxImageDimension1D": 16384,
+                            "maxImageDimension2D": 16384,
+                            "maxImageDimension3D": 2048,
+                            "maxImageDimensionCube": 16384,
+                            "maxImageArrayLayers": 2048,
+                            "maxTexelBufferElements": 67108900,
+                            "maxUniformBufferRange": 65536,
+                            "maxStorageBufferRange": 134217728,
+                            "maxPushConstantsSize": 128,
+                            "maxMemoryAllocationCount": 4096,
+                            "maxSamplerAllocationCount": 1024,
+                            "bufferImageGranularity": 1024,
+                            "sparseAddressSpaceSize": 1073741824,
+                            "maxBoundDescriptorSets": 8,
+                            "maxPerStageDescriptorSamplers": 16,
+                            "maxPerStageDescriptorUniformBuffers": 15,
+                            "maxPerStageDescriptorStorageBuffers": 16,
+                            "maxPerStageDescriptorSampledImages": 128,
+                            "maxPerStageDescriptorStorageImages": 8,
+                            "maxPerStageDescriptorInputAttachments": 8,
+                            "maxPerStageResources": 128,
+                            "maxDescriptorSetSamplers": 80,
+                            "maxDescriptorSetUniformBuffers": 90,
+                            "maxDescriptorSetUniformBuffersDynamic": 8,
+                            "maxDescriptorSetStorageBuffers": 155,
+                            "maxDescriptorSetStorageBuffersDynamic": 8,
+                            "maxDescriptorSetSampledImages": 256,
+                            "maxDescriptorSetStorageImages": 40,
+                            "maxDescriptorSetInputAttachments": 8,
+                            "maxVertexInputAttributes": 28,
+                            "maxVertexInputBindings": 28,
+                            "maxVertexInputAttributeOffset": 2047,
+                            "maxVertexInputBindingStride": 2048,
+                            "maxVertexOutputComponents": 124,
+                            "maxTessellationGenerationLevel": 64,
+                            "maxTessellationPatchSize": 32,
+                            "maxTessellationControlPerVertexInputComponents": 124,
+                            "maxTessellationControlPerVertexOutputComponents": 124,
+                            "maxTessellationControlPerPatchOutputComponents": 120,
+                            "maxTessellationControlTotalOutputComponents": 2048,
+                            "maxTessellationEvaluationInputComponents": 124,
+                            "maxTessellationEvaluationOutputComponents": 124,
+                            "maxFragmentInputComponents": 116,
+                            "maxFragmentOutputAttachments": 8,
+                            "maxFragmentDualSrcAttachments": 1,
+                            "maxFragmentCombinedOutputResources": 8,
+                            "maxComputeSharedMemorySize": 32768,
+                            "maxComputeWorkGroupCount": [ 65535, 65535, 65535 ],
+                            "maxComputeWorkGroupInvocations": 1024,
+                            "maxComputeWorkGroupSize": [ 1024, 1024, 64 ],
+                            "subPixelPrecisionBits": 4,
+                            "subTexelPrecisionBits": 4,
+                            "mipmapPrecisionBits": 4,
+                            "maxDrawIndexedIndexValue": 4294967295,
+                            "maxDrawIndirectCount": 1073740000,
+                            "maxSamplerLodBias": 14.0,
+                            "maxSamplerAnisotropy": 16.0,
+                            "maxViewports": 16,
+                            "maxViewportDimensions": [ 16384, 16384 ],
+                            "viewportBoundsRange": [ -32768, 32767 ],
+                            "minMemoryMapAlignment": 64,
+                            "minTexelBufferOffsetAlignment": 64,
+                            "minUniformBufferOffsetAlignment": 256,
+                            "minStorageBufferOffsetAlignment": 64,
+                            "minTexelOffset": -8,
+                            "maxTexelOffset": 7,
+                            "minTexelGatherOffset": -8,
+                            "maxTexelGatherOffset": 7,
+                            "minInterpolationOffset": -0.5,
+                            "maxInterpolationOffset": 0.4375,
+                            "subPixelInterpolationOffsetBits": 4,
+                            "maxFramebufferWidth": 16384,
+                            "maxFramebufferHeight": 16384,
+                            "maxFramebufferLayers": 1024,
+                            "framebufferColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                            "framebufferDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                            "framebufferStencilSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                            "maxColorAttachments": 8,
+                            "sampledImageColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                            "sampledImageIntegerSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                            "sampledImageDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                            "sampledImageStencilSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                            "storageImageSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
+                            "maxSampleMaskWords": 1,
+                            "maxClipDistances": 8,
+                            "maxCullDistances": 8,
+                            "maxCombinedClipAndCullDistances": 8,
+                            "discreteQueuePriorities": 2,
+                            "pointSizeRange": [ 1.0, 64.0 ],
+                            "lineWidthRange": [ 1.0, 1.0 ],
+                            "pointSizeGranularity": 0.125,
+                            "lineWidthGranularity": 0.5
                         }
-                    ]
+                    }
                 },
                 {
                     "struct": "VkPhysicalDeviceDescriptorIndexingProperties",
-                    "members": [
-                        {
-                            "name": "maxUpdateAfterBindDescriptorsInAllPools",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 1048576
-                        },
-                        {
-                            "name": "maxPerStageDescriptorUpdateAfterBindSamplers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 16
-                        },
-                        {
-                            "name": "maxPerStageDescriptorUpdateAfterBindUniformBuffers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 15
-                        },
-                        {
-                            "name": "maxPerStageDescriptorUpdateAfterBindStorageBuffers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 31
-                        },
-                        {
-                            "name": "maxPerStageDescriptorUpdateAfterBindSampledImages",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 128
-                        },
-                        {
-                            "name": "maxPerStageDescriptorUpdateAfterBindStorageImages",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "maxPerStageDescriptorUpdateAfterBindInputAttachments",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 128
-                        },
-                        {
-                            "name": "maxPerStageUpdateAfterBindResources",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 159
-                        },
-                        {
-                            "name": "maxDescriptorSetUpdateAfterBindSamplers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 80
-                        },
-                        {
-                            "name": "maxDescriptorSetUpdateAfterBindUniformBuffers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 90
-                        },
-                        {
-                            "name": "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "maxDescriptorSetUpdateAfterBindStorageBuffers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 155
-                        },
-                        {
-                            "name": "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
-                        },
-                        {
-                            "name": "maxDescriptorSetUpdateAfterBindSampledImages",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 640
-                        },
-                        {
-                            "name": "maxDescriptorSetUpdateAfterBindStorageImages",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 40
-                        },
-                        {
-                            "name": "maxDescriptorSetUpdateAfterBindInputAttachments",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 640
-                        }
-                    ]
+                    "members": {
+                        "maxUpdateAfterBindDescriptorsInAllPools": 1048576,
+                        "maxPerStageDescriptorUpdateAfterBindSamplers": 16,
+                        "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 15,
+                        "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 31,
+                        "maxPerStageDescriptorUpdateAfterBindSampledImages": 128,
+                        "maxPerStageDescriptorUpdateAfterBindStorageImages": 8,
+                        "maxPerStageDescriptorUpdateAfterBindInputAttachments": 128,
+                        "maxPerStageUpdateAfterBindResources": 159,
+                        "maxDescriptorSetUpdateAfterBindSamplers": 80,
+                        "maxDescriptorSetUpdateAfterBindUniformBuffers": 90,
+                        "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 8,
+                        "maxDescriptorSetUpdateAfterBindStorageBuffers": 155,
+                        "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 8,
+                        "maxDescriptorSetUpdateAfterBindSampledImages": 640,
+                        "maxDescriptorSetUpdateAfterBindStorageImages": 40,
+                        "maxDescriptorSetUpdateAfterBindInputAttachments": 8
+                    }
                 },
                 {
                     "struct": "VkPhysicalDeviceDepthStencilResolveProperties",
-                    "members": [
-                        {
-                            "name": "independentResolve",
-                            "type": "VkBool32",
-                            "value": true
-                        },
-                        {
-                            "name": "independentResolveNone",
-                            "type": "VkBool32",
-                            "value": true
-                        },
-                        {
-                            "name": "supportedDepthResolveModes",
-                            "type": "VkResolveModeFlagBits",
-                            "limit": "ALL",
-                            "value": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ]
-                        },
-                        {
-                            "name": "supportedStencilResolveModes",
-                            "type": "VkResolveModeFlagBits",
-                            "limit": "ALL",
-                            "value": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ]
-                        }
-                    ]
+                    "members": {
+                        "independentResolve": true,
+                        "independentResolveNone": true,
+                        "supportedDepthResolveModes": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ],
+                        "supportedStencilResolveModes": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ]
+                    }
                 },
                 {
                     "struct": "VkPhysicalDeviceMaintenance3Properties",
-                    "members": [
-                        {
-                            "name": "maxPerSetDescriptors",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 700
-                        },
-                        {
-                            "name": "maxMemoryAllocationSize",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 2147483648
-                        }
-                    ]
+                    "members": {
+                        "maxPerSetDescriptors": 700,
+                        "maxMemoryAllocationSize": 2147483648
+                    }
                 }
             ],
             "formats": [
@@ -1857,14 +1275,9 @@
             "properties": [
                 {
                     "struct": "VkPhysicalDevicePortabilitySubsetPropertiesKHR",
-                    "members": [
-                        {
-                            "name": "minVertexInputBindingStrideAlignment",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 4
-                        }
-                    ]
+                    "members": {
+                        "minVertexInputBindingStrideAlignment": 4
+                    }
                 }
             ]
         }
@@ -1893,3 +1306,4 @@
         }
     ]
 }
+

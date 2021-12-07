@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
     "comments": {
         "info": "Android Vulkan 1.1 ANGLE 2022 Profile",
         "desc": "ANGLE Layer Support for GLES 3.1"
@@ -20,7 +20,7 @@
             "name": "vulkan11requirements",
             "features": [
                 {
-                    "struct": "VkPhysicalDeviceVulkan11Features",
+                    "struct": "VkPhysicalDeviceMultiviewFeatures",
                     "members": {
                         "multiview": true
                     }
@@ -28,21 +28,11 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceVulkan11Properties",
-                    "members": [
-                        {
-                            "name": "maxMultiviewViewCount",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 6
-                        },
-                        {
-                            "name": "maxMultiviewInstanceIndex",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 134217727
-                        }
-                    ]
+                    "struct": "VkPhysicalDeviceMultiviewProperties",
+                    "members": {
+                        "maxMultiviewViewCount": 0,
+                        "maxMultiviewInstanceIndex": 134217727
+                    }
                 }
             ]
         },
@@ -133,80 +123,23 @@
             ],
             "properties": [
                 {
-                    "struct": "VkPhysicalDeviceLimits",
-                    "members": [
-                        {
-                            "name": "standardSampleLocations",
-                            "type": "VkBool32",
-                            "value": true
-                        },
-                        {
-                            "name": "maxVertexOutputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 64
-                        },
-                        {
-                            "name": "maxTessellationControlPerVertexOutputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 64
-                        },
-                        {
-                            "name": "maxTessellationControlPerPatchOutputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 64
-                        },
-                        {
-                            "name": "maxTessellationControlTotalOutputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 64
-                        },
-                        {
-                            "name": "maxTessellationEvaluationOutputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 64
-                        },
-                        {
-                            "name": "maxGeometryOutputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 64
-                        },
-                        {
-                            "name": "maxGeometryTotalOutputComponents",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 64
-                        },
-                        {
-                            "name": "maxPerStageDescriptorUniformBuffers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 12
-                        },
-                        {
-                            "name": "maxPerStageDescriptorStorageBuffers",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 12
-                        },
-                        {
-                            "name": "maxVertexInputAttributeOffset",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 2048
-                        },
-                        {
-                            "name": "subPixelPrecisionBits",
-                            "type": "uint32_t",
-                            "limit": "MIN",
-                            "value": 8
+                    "struct": "VkPhysicalDeviceProperties",
+                    "members": {
+                        "limits": {
+                            "standardSampleLocations": true,
+                            "maxVertexOutputComponents": 64,
+                            "maxTessellationControlPerVertexOutputComponents": 64,
+                            "maxTessellationControlPerPatchOutputComponents": 64,
+                            "maxTessellationControlTotalOutputComponents": 64,
+                            "maxTessellationEvaluationOutputComponents": 64,
+                            "maxGeometryOutputComponents": 64,
+                            "maxGeometryTotalOutputComponents": 64,
+                            "maxPerStageDescriptorUniformBuffers": 12,
+                            "maxPerStageDescriptorStorageBuffers": 12,
+                            "maxVertexInputAttributeOffset": 2048,
+                            "subPixelPrecisionBits": 8
                         }
-                    ]
+                    }
                 }
             ]
         }

@@ -1925,6 +1925,13 @@ class PhysicalDeviceData {
     // VK_VALVE_mutable_descriptor_type structs
     VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE physical_device_mutable_descriptor_type_features_;
 
+    // VK_KHR_dynamic_rendering structs
+    VkPhysicalDeviceDynamicRenderingFeaturesKHR physical_device_dynamic_rendering_features_;
+
+    // VK_EXT_fragment_density_map2 structs
+    VkPhysicalDeviceFragmentDensityMap2FeaturesEXT physical_device_fragment_density_map_2_features_;
+    VkPhysicalDeviceFragmentDensityMap2PropertiesEXT physical_device_fragment_density_map_2_properties_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2143,9 +2150,8 @@ class PhysicalDeviceData {
         physical_device_external_memory_host_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT};
 
         // VK_EXT_fragment_density_map structs
-        physical_device_fragment_density_map_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_FEATURES_EXT};
-        physical_device_fragment_density_map_properties_ = {
-            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_PROPERTIES_EXT};
+        physical_device_fragment_density_map_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_FEATURES_EXT};
+        physical_device_fragment_density_map_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_PROPERTIES_EXT};
 
         // VK_EXT_fragment_shader_interlock structs
         physical_device_fragment_shader_interlock_features_ = {
@@ -2354,6 +2360,14 @@ class PhysicalDeviceData {
         // VK_VALVE_mutable_descriptor_type structs
         physical_device_mutable_descriptor_type_features_ = {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MUTABLE_DESCRIPTOR_TYPE_FEATURES_VALVE};
+
+        // VK_KHR_dynamic_rendering structs
+        physical_device_dynamic_rendering_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR};
+
+        // VK_EXT_fragment_density_map2 structs
+        physical_device_fragment_density_map_2_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_FEATURES_EXT};
+        physical_device_fragment_density_map_2_properties_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_PROPERTIES_EXT};
     }
 
     const VkInstance instance_;
@@ -2573,6 +2587,9 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImageFeaturesNV *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImagePropertiesNV *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRenderingFeaturesKHR *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *dest);
+    void GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryProperties *dest);
@@ -3731,6 +3748,12 @@ void JsonLoader::GetFeature(const Json::Value &feature) {
         GetValue(feature, &pdd_.physical_device_shading_rate_image_features_);
     } else if (feature_name == "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE") {
         GetValue(feature, &pdd_.physical_device_mutable_descriptor_type_features_);
+    } else if (feature_name == "VkPhysicalDeviceDynamicRenderingFeaturesKHR") {
+        GetValue(feature, &pdd_.physical_device_dynamic_rendering_features_);
+    } else if (feature_name == "VkPhysicalDeviceFragmentDensityMap2FeaturesEXT") {
+        GetValue(feature, &pdd_.physical_device_fragment_density_map_2_features_);
+    } else if (feature_name == "VkPhysicalDeviceFragmentDensityMap2PropertiesEXT") {
+        GetValue(feature, &pdd_.physical_device_fragment_density_map_2_properties_);
     } else if (feature_name == "Vulkan12Features") {
         GetValue(feature, &pdd_.physical_device_vulkan_1_2_features_);
     } else if (feature_name == "VkPhysicalDevicePortabilitySubsetFeaturesKHR") {
@@ -6885,6 +6908,54 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDesc
     GET_VALUE_WARN(mutableDescriptorType, WarnIfGreater);
 }
 
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRenderingFeaturesKHR *dest) {
+    const Json::Value value = parent["members"];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDynamicRenderingFeaturesKHR)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_KHR_dynamic_rendering, but "
+            "VK_KHR_dynamic_rendering is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(dynamicRendering, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *dest) {
+    const Json::Value value = parent["members"];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMap2FeaturesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_fragment_density_map2, but "
+            "VK_EXT_fragment_density_map2 is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE_WARN(fragmentDensityMapDeferred, WarnIfGreater);
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *dest) {
+    const Json::Value value = parent["members"];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMap2PropertiesEXT)\n");
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
+        ErrorPrintf(
+            "JSON file sets variables for structs provided by VK_EXT_fragment_density_map2, but "
+            "VK_EXT_fragment_density_map2 is "
+            "not supported by the device.\n");
+    }
+    GET_VALUE(subsampledLoads);
+    GET_VALUE(subsampledCoarseReconstructionEarlyAccess);
+    GET_VALUE(maxSubsampledArrayLayers);
+    GET_VALUE(maxDescriptorSetSubsampledSamplers);
+}
+
 void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
@@ -8198,7 +8269,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     emhp->pNext = pNext;
                 }
                 break;
-            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_FEATURES_EXT:
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_FEATURES_EXT:
                 if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentDensityMapFeaturesEXT *fdmf = (VkPhysicalDeviceFragmentDensityMapFeaturesEXT *)place;
                     void *pNext = fdmf->pNext;
@@ -8206,7 +8277,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     fdmf->pNext = pNext;
                 }
                 break;
-            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_PROPERTIES_EXT:
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_PROPERTIES_EXT:
                 if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentDensityMapPropertiesEXT *fdmp =
                         (VkPhysicalDeviceFragmentDensityMapPropertiesEXT *)place;
@@ -8819,6 +8890,31 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     void *pNext = mdtf->pNext;
                     *mdtf = physicalDeviceData->physical_device_mutable_descriptor_type_features_;
                     mdtf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDynamicRenderingFeaturesKHR *drf = (VkPhysicalDeviceDynamicRenderingFeaturesKHR *)place;
+                    void *pNext = drf->pNext;
+                    *drf = physicalDeviceData->physical_device_dynamic_rendering_features_;
+                    drf->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_FEATURES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
+                    VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *fdm2f = (VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *)place;
+                    void *pNext = fdm2f->pNext;
+                    *fdm2f = physicalDeviceData->physical_device_fragment_density_map_2_features_;
+                    fdm2f->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
+                    VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *fdm2p =
+                        (VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *)place;
+                    void *pNext = fdm2p->pNext;
+                    *fdm2p = physicalDeviceData->physical_device_fragment_density_map_2_properties_;
+                    fdm2p->pNext = pNext;
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES:
@@ -10610,6 +10706,22 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_mutable_descriptor_type_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_mutable_descriptor_type_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
+                    pdd.physical_device_dynamic_rendering_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_dynamic_rendering_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
+                    pdd.physical_device_fragment_density_map_2_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_fragment_density_map_2_features_);
+
+                    pdd.physical_device_fragment_density_map_2_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_fragment_density_map_2_properties_);
                 }
 
                 if (api_version_above_1_1) {
