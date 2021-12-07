@@ -345,6 +345,26 @@
                 }
             }
         },
+        "VkVideoCodecOperationFlagsKHR": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [ "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT" ],
+                "uniqueItems": true
+            }
+        },
+        "VkVideoQueueFamilyProperties2KHR": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "videoCodecOperations"
+            ],
+            "properties": {
+                "videoCodecOperations": {
+                    "$ref": "#/definitions/VkVideoCodecOperationFlagsKHR"
+                }
+            }
+        },
         "VkMemoryType": {
             "type": "object",
             "additionalProperties": false,
@@ -6042,6 +6062,14 @@
                                     "properties": {
                                         "VkQueueFamilyGlobalPriorityPropertiesEXT": {
                                             "$ref": "#/definitions/VkQueueFamilyGlobalPriorityPropertiesEXT"
+                                        }
+                                    }
+                                },
+                                {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "VkVideoQueueFamilyProperties2KHR": {
+                                            "$ref": "#/definitions/VkVideoQueueFamilyProperties2KHR"
                                         }
                                     }
                                 }
