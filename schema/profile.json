@@ -129,7 +129,6 @@
             }
         },
         "VkPhysicalDeviceType": {
-            "description": "TODO.",
             "type": "array",
             "items": {
                 "type": "string",
@@ -138,7 +137,6 @@
             }
         },
         "VkShaderCorePropertiesFlagsAMD": {
-            "description": "TODO.",
             "type": "array",
             "items": {
                 "type": "string",
@@ -147,7 +145,6 @@
             }
         },
         "VkShaderFloatControlsIndependence": {
-            "description": "TODO.",
             "type": "array",
             "items": {
                 "type": "string",
@@ -156,7 +153,6 @@
             }
         },
         "VkPointClippingBehavior": {
-            "description": "TODO.",
             "type": "array",
             "items": {
                 "type": "string",
@@ -165,7 +161,6 @@
             }
         },
         "VkShaderStageFlags": {
-            "description": "TODO.",
             "type": "array",
             "items": {
                 "type": "string",
@@ -174,7 +169,6 @@
             }
         },
         "VkSubgroupFeatureFlags": {
-            "description": "TODO.",
             "type": "array",
             "items": {
                 "type": "string",
@@ -200,7 +194,7 @@
                 "uniqueItems": true
             }
         },
-        "VkFormatFeatureFlags2KHR": {
+        "VkFormatFeatureFlags2": {
             "description": "The platforms where the setting is available. When missing, this property is inherited from parent nodes. If no parent node defines it, the default value is all platforms.",
             "type": "array",
             "items": {
@@ -210,7 +204,6 @@
             }
         },
         "VkMemoryPropertyFlags": {
-            "description": "TODO.",
             "type": "array",
             "items": {
                 "type": "string",
@@ -219,7 +212,6 @@
             }
         },
         "VkResolveModeFlags": {
-            "description": "TODO.",
             "type": "array",
             "items": {
                 "type": "string",
@@ -228,7 +220,6 @@
             }
         },
         "VkQueueFlags": {
-            "description": "TODO.",
             "type": "array",
             "items": {
                 "type": "string",
@@ -364,20 +355,6 @@
                 }
             }
         },
-        "VkFormatProperties": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-                "linearTilingFeatures",
-                "optimalTilingFeatures",
-                "bufferFeatures"
-            ],
-            "properties": {
-                "linearTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags" },
-                "optimalTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags" },
-                "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags" }
-            }
-        },
         "VkConformanceVersion": {
             "type": "object",
             "additionalProperties": false,
@@ -395,12 +372,10 @@
             }
         },
         "VkDriverId": {
-            "description": "TODO",
             "type": "string",
             "enum": [ "VK_DRIVER_ID_AMD_PROPRIETARY", "VK_DRIVER_ID_AMD_OPEN_SOURCE", "VK_DRIVER_ID_MESA_RADV", "VK_DRIVER_ID_NVIDIA_PROPRIETARY", "VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS", "VK_DRIVER_ID_INTEL_OPEN_SOURCE_MESA", "VK_DRIVER_ID_IMAGINATION_PROPRIETARY", "VK_DRIVER_ID_QUALCOMM_PROPRIETARY", "VK_DRIVER_ID_ARM_PROPRIETARY", "VK_DRIVER_ID_GOOGLE_SWIFTSHADER", "VK_DRIVER_ID_GGP_PROPRIETARY", "VK_DRIVER_ID_BROADCOM_PROPRIETARY", "VK_DRIVER_ID_MESA_LLVMPIPE", "VK_DRIVER_ID_MOLTENVK", "VK_DRIVER_ID_COREAVI_PROPRIETARY", "VK_DRIVER_ID_JUICE_PROPRIETARY", "VK_DRIVER_ID_VERISILICON_PROPRIETARY", "VK_DRIVER_ID_MESA_TURNIP", "VK_DRIVER_ID_MESA_V3DV", "VK_DRIVER_ID_MESA_PANVK", "VK_DRIVER_ID_SAMSUNG_PROPRIETARY" ]
         },
-        "VkFormatProperties2": {
-            "description": "TODO",
+        "VkFormatProperties": {
             "type": "object",
             "additionalProperties": false,
             "required": [
@@ -414,8 +389,17 @@
                 "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags" }
             }
         },
-        "VkFormatProperties3KHR": {
-            "description": "TODO",
+        "VkFormatProperties2": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "formatProperties"
+            ],
+            "properties": {
+                "formatProperties": { "$ref": "#/definitions/VkFormatProperties" }
+            }
+        },
+        "VkFormatProperties3": {
             "type": "object",
             "additionalProperties": false,
             "required": [
@@ -424,9 +408,9 @@
                 "bufferFeatures"
             ],
             "properties": {
-                "linearTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2KHR" },
-                "optimalTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2KHR" },
-                "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2KHR" }
+                "linearTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" },
+                "optimalTilingFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" },
+                "bufferFeatures": { "$ref": "#/definitions/VkFormatFeatureFlags2" }
             }
         },
         "platforms": {
@@ -2025,9 +2009,9 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-				"externalMemoryRDMA": {
-					"type": "boolean"
-				}
+                "externalMemoryRDMA": {
+                    "type": "boolean"
+                }
             }
         },
         "VkPhysicalDeviceColorWriteEnableFeaturesEXT": {
@@ -2116,9 +2100,9 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-				"formatRgba10x6WithoutYCbCrSampler": {
-					"type": "boolean"
-				}
+                "formatRgba10x6WithoutYCbCrSampler": {
+                    "type": "boolean"
+                }
             }
         },
         "VkPhysicalDeviceDynamicRenderingFeatures": {
@@ -5721,54 +5705,55 @@
                         "description": "TODO",
                         "type": "array",
                         "items": {
+                            "type": "object",
                             "additionalProperties": false,
-                            "required": [
-                                "value",
-                                "properties"
-                            ],
-                            "properties": {
-                                "value": {
-                                    "description": "TODO",
-                                    "type": "string",
-                                    "pattern": "VK_[A-Z0-9_]+"
-                                },
-                                "properties": {
+                            "patternProperties": {
+                                "^VK_FORMAT_[A-Z0-9_]+": {
                                     "type": "array",
                                     "items": {
-                                        "additionalProperties": false,
-                                        "required": [
-                                            "struct",
-                                            "members"
-                                        ],
-                                        "properties": {
-                                            "struct": {
-                                                "description": "TODO",
-                                                "type": "string",
-                                                "pattern": "Vk[A-Za-z0-9_]+"
-                                            },
-                                            "members": {
-                                                "$ref": "#/definitions/VkFormatProperties",
-                                                "description": "TODO",
-                                                "type": "object",
+                                        "type": "object",
+                                        "oneOf": [
+                                            {
                                                 "additionalProperties": false,
-                                                "required": [
-                                                    "linearTilingFeatures",
-                                                    "optimalTilingFeatures",
-                                                    "bufferFeatures"
-                                                ],
                                                 "properties": {
-                                                    "linearTilingFeatures": {
-                                                        "$ref": "#/definitions/VkFormatFeatureFlags"
-                                                    },
-                                                    "optimalTilingFeatures": {
-                                                        "$ref": "#/definitions/VkFormatFeatureFlags"
-                                                    },
-                                                    "bufferFeatures": {
-                                                        "$ref": "#/definitions/VkFormatFeatureFlags"
+                                                    "VkFormatProperties": {
+                                                        "$ref": "#/definitions/VkFormatProperties"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkFormatProperties2": {
+                                                        "$ref": "#/definitions/VkFormatProperties2"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkFormatProperties2KHR": {
+                                                        "$ref": "#/definitions/VkFormatProperties2"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkFormatProperties3": {
+                                                        "$ref": "#/definitions/VkFormatProperties3"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "VkFormatProperties3KHR": {
+                                                        "$ref": "#/definitions/VkFormatProperties3"
                                                     }
                                                 }
                                             }
-                                        }
+                                        ]
                                     }
                                 }
                             }
