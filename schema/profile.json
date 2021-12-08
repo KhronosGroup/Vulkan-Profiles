@@ -2392,25 +2392,12 @@
             }
         },
         "VkPhysicalDeviceColorWriteEnableFeaturesEXT": {
+            "type": "object",
             "additionalProperties": false,
-            "required": [
-                "struct",
-                "members"
-            ],
             "properties": {
-                "struct": {
-                    "type": "string",
-                    "enum": [ "VkPhysicalDeviceColorWriteEnableFeaturesEXT" ]
-                },
-                "members": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "colorWriteEnable": {
-                            "type": "boolean"
-                        }
-                    }
-                }
+				"colorWriteEnable": {
+					"type": "boolean"
+				}
             }
         },
         "VkPhysicalDeviceSynchronization2Features": {
