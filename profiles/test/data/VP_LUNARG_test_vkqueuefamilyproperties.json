@@ -89,9 +89,11 @@
             "api-version": "1.2.198",
             "label": "LunarG VkQueueFamilyProperties unit tests",
             "description": "LunarG VkQueueFamilyProperties unit tests",
-            "authors": [
+            "contacts": [
                 {
-                    "Christophe Riccio": "christophe@lunarg.com"
+                    "name": "Christophe Riccio",
+                    "email": "christophe@lunarg.com",
+                    "github": "christophe-lunarg"
                 }
             ],
             "capabilities": [
