@@ -1310,10 +1310,10 @@
     ],
     "profiles": [
         {
-            "name": "VP_ANDROID_1_0_baseline_2022",
+            "name": "VP_ANDROID_baseline_2022",
             "version": 1,
             "api-version": "1.0.68",
-            "label": "Android Vulkan 1.0 baseline 2022 profile",
+            "label": "Android Vulkan Baseline 2022 profile",
             "description": "Collection on features supported in the majority of devices",
             "contributors": [
                 {
@@ -1321,6 +1321,14 @@
                     "company": "Google",
                     "email": "vantablack@google.com",
                     "contact": true
+                }
+            ],
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2021-12-08",
+                    "author": "Christophe Riccio",
+                    "comment": "Initial revision"
                 }
             ],
             "capabilities": [
