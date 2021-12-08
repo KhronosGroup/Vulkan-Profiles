@@ -5790,22 +5790,6 @@
                                 {
                                     "additionalProperties": false,
                                     "properties": {
-                                        "VkPhysicalDevicePCIBusInfoPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDevicePCIBusInfoPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDevicePCIBusInfoPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDevicePCIBusInfoPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
                                         "VkPhysicalDeviceDepthStencilResolveProperties": {
                                             "$ref": "#/definitions/VkPhysicalDeviceDepthStencilResolveProperties"
                                         }
