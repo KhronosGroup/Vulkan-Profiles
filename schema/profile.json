@@ -3049,7 +3049,7 @@
                     "$ref": "#/definitions/VkExtent2D"
                 },
                 "sampleLocationCoordinateRange": {
-                    "$ref": "#/definitions/float"
+                    "$ref": "#/definitions/float2"
                 },
                 "sampleLocationSubPixelBits": {
                     "$ref": "#/definitions/uint32_t"
