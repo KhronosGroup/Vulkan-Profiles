@@ -90,11 +90,13 @@
             "api-version": "1.2.198",
             "label": "LunarG VkPhysicalDeviceMemoryProperties unit tests",
             "description": "LunarG VkPhysicalDeviceMemoryProperties unit tests",
-            "contacts": [
+            "contributors": [
                 {
                     "name": "Christophe Riccio",
+                    "company": "LunarG",
                     "email": "christophe@lunarg.com",
-                    "github": "christophe-lunarg"
+                    "github": "christophe-lunarg",
+                    "contact": true
                 }
             ],
             "capabilities": [

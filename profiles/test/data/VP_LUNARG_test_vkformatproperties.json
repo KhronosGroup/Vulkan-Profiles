@@ -134,11 +134,13 @@
             "api-version": "1.2.198",
             "label": "LunarG VkFormatProperties unit tests",
             "description": "LunarG VkFormatProperties unit tests",
-            "contacts": [
+            "contributors": [
                 {
                     "name": "Christophe Riccio",
+                    "company": "LunarG",
                     "email": "christophe@lunarg.com",
-                    "github": "christophe-lunarg"
+                    "github": "christophe-lunarg",
+                    "contact": true
                 }
             ],
             "capabilities": [
