@@ -6285,6 +6285,7 @@
                         "description": "TODO",
                         "type": "array",
                         "uniqueItems": true,
+                        "minItems": 1,
                         "items": {
                             "$ref": "#/definitions/contributor"
                         }
@@ -6292,6 +6293,7 @@
                     "history": {
                         "type": "array",
                         "uniqueItems": true,
+                        "minItems": 1,
                         "items": {
                             "type": "object",
                             "required": [
