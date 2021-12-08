@@ -521,7 +521,7 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_MEMORY_HEAP_DEVICE_LOCAL_BIT" ],
+                "enum": [ "VK_MEMORY_HEAP_DEVICE_LOCAL_BIT", "VK_MEMORY_HEAP_MULTI_INSTANCE_BIT", "VK_MEMORY_HEAP_MULTI_INSTANCE_BIT_KHR" ],
                 "uniqueItems": true
             }
         },
@@ -534,7 +534,7 @@
             ],
             "properties": {
                 "size": {
-                    "$ref": "#/definitions/uint32_t"
+                    "$ref": "#/definitions/VkDeviceSize"
                 },
                 "flags": {
                     "$ref": "#/definitions/VkMemoryHeapFlags"
@@ -3543,7 +3543,7 @@
                 "shaderGroupHandleSize": {
                     "$ref": "#/definitions/uint32_t"
                 },
-                "maxRecursionDepth": {
+                "maxRayRecursionDepth": {
                     "$ref": "#/definitions/uint32_t"
                 },
                 "maxShaderGroupStride": {
@@ -3667,13 +3667,13 @@
                     "$ref": "#/definitions/VkDeviceSize"
                 },
                 "storageTexelBufferOffsetSingleTexelAlignment": {
-                    "$ref": "#/definitions/uint32_t"
+                    "type": "boolean"
                 },
                 "uniformTexelBufferOffsetAlignmentBytes": {
                     "$ref": "#/definitions/VkDeviceSize"
                 },
                 "uniformTexelBufferOffsetSingleTexelAlignment": {
-                    "$ref": "#/definitions/uint32_t"
+                    "type": "boolean"
                 }
             }
         },
