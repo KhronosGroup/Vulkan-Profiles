@@ -1315,9 +1315,10 @@
             "api-version": "1.0.68",
             "label": "Android Vulkan 1.0 baseline 2022 profile",
             "description": "Collection on features supported in the majority of devices",
-            "authors": [
+            "contacts": [
                 {
-                    "Tobias Hector": "vantablack@google.com"
+                    "name": "Trevor Black",
+                    "email": "vantablack@google.com"
                 }
             ],
             "capabilities": [
