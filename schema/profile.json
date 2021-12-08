@@ -5582,6 +5582,14 @@
                                 {
                                     "additionalProperties": false,
                                     "properties": {
+                                        "VkPhysicalDeviceSubgroupProperties": {
+                                            "$ref": "#/definitions/VkPhysicalDeviceSubgroupProperties"
+                                        }
+                                    }
+                                },
+                                {
+                                    "additionalProperties": false,
+                                    "properties": {
                                         "VkPhysicalDevicePointClippingProperties": {
                                             "$ref": "#/definitions/VkPhysicalDevicePointClippingProperties"
                                         }
