@@ -1,0 +1,71 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
+    "capabilities": [
+        {
+            "name": "baseline",
+            "extensions": []
+        },
+        {
+            "name": "advanced",
+            "extensions": []
+        }
+    ],
+    "profiles": [
+        {
+            "name": "VP_LUNARG_test_structure_fallback",
+            "version": 1,
+            "api-version": "1.2.198",
+            "label": "LunarG Profiles Structure Complex unit test",
+            "description": "For schema unit test on C.I.",
+            "contributors": [
+                {
+                    "name": "Christophe Riccio",
+                    "company": "LunarG",
+                    "email": "christophe@lunarg.com",
+                    "github": "christophe-lunarg",
+                    "contact": true
+                }
+            ],
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2021-12-08",
+                    "author": "Christophe Riccio",
+                    "comment": "Initial revision"
+                }
+            ],
+            "capabilities": [
+                "baseline",
+                "advanced"
+            ],
+            "fallback": [ "VP_LUNARG_test_structure_fallback_fallback" ]
+        },
+        {
+            "name": "VP_LUNARG_test_structure_fallback_fallback",
+            "version": 1,
+            "api-version": "1.2.198",
+            "label": "LunarG Profiles Structure Complex fallback unit test",
+            "description": "For schema unit test on C.I.",
+            "contributors": [
+                {
+                    "name": "Christophe Riccio",
+                    "company": "LunarG",
+                    "email": "christophe@lunarg.com",
+                    "github": "christophe-lunarg",
+                    "contact": true
+                }
+            ],
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2021-12-08",
+                    "author": "Christophe Riccio",
+                    "comment": "Initial revision"
+                }
+            ],
+            "capabilities": [
+                "baseline"
+            ]
+        }
+    ]
+}

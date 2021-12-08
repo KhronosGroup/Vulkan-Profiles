@@ -140,6 +140,13 @@ TEST(test_validate, VP_LUNARG_test_structure_complex) {
     EXPECT_TRUE(validator.Check(document));
 }
 
+TEST(test_validate, VP_LUNARG_test_structure_fallback) {
+    JsonValidator validator;
+
+    const Json::Value document = ParseJsonFile("VP_LUNARG_test_structure_fallback.json");
+    EXPECT_TRUE(validator.Check(document));
+}
+
 TEST(test_validate, VP_LUNARG_test_vkformatproperties) {
     JsonValidator validator;
 
