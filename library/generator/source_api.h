@@ -58,7 +58,7 @@ typedef struct VpDeviceCreateInfo {
 // Query the list of available profiles in the library
 void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
-// List the recommand fallback profiles of a profile
+// List the recommended fallback profiles of a profile
 void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // Check whether a profile is supported by the physical device
