@@ -4321,6 +4321,7 @@
                     "extensions": {
                         "description": "TODO",
                         "type": "array",
+                        "uniqueItems": true,
                         "items": {
                             "additionalProperties": false,
                             "required": [
@@ -4342,6 +4343,7 @@
                     "features": {
                         "description": "TODO",
                         "type": "array",
+                        "uniqueItems": true,
                         "items": {
                             "type": "object",
                             "oneOf": [
@@ -6041,6 +6043,7 @@
                     "formats": {
                         "description": "TODO",
                         "type": "array",
+                        "uniqueItems": true,
                         "items": {
                             "type": "object",
                             "additionalProperties": false,
@@ -6130,6 +6133,7 @@
                     },
                     "queueFamiliesProperties": {
                         "type": "array",
+                        "uniqueItems": true,
                         "items": {
                             "type": "object",
                             "oneOf": [
@@ -6194,6 +6198,7 @@
                     },
                     "memoryProperties": {
                         "type": "array",
+                        "uniqueItems": true,
                         "items": {
                             "type": "object",
                             "oneOf": [
@@ -6279,12 +6284,14 @@
                     "contributors": {
                         "description": "TODO",
                         "type": "array",
+                        "uniqueItems": true,
                         "items": {
                             "$ref": "#/definitions/contributor"
                         }
                     },
                     "history": {
                         "type": "array",
+                        "uniqueItems": true,
                         "items": {
                             "type": "object",
                             "required": [
@@ -6313,6 +6320,7 @@
                     "capabilities": {
                         "description": "TODO",
                         "type": "array",
+                        "uniqueItems": true,
                         "items": {
                             "type": "string"
                         }
@@ -6321,6 +6329,7 @@
                         "description": "TODO",
                         "type": "array",
                         "additionalProperties": false,
+                        "uniqueItems": true,
                         "items": {
                             "type": "string"
                         }
