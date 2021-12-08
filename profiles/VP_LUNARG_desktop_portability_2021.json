@@ -1143,11 +1143,13 @@
             "api-version": "1.1.142",
             "label": "LunarG Vulkan desktop portability 2021 subset profile",
             "description": "Common desktop platforms with drivers supporting Vulkan 1.1 on macOS.",
-            "contacts": [
+            "contributors": [
                 {
                     "name": "Christophe Riccio",
+                    "company": "LunarG",
                     "email": "christophe@lunarg.com",
-                    "github": "christophe-lunarg"
+                    "github": "christophe-lunarg",
+                    "contact": true
                 }
             ],
             "capabilities": [
@@ -1163,11 +1165,13 @@
             "api-version": "1.1.142",
             "label": "LunarG Vulkan desktop portability 2021 profile",
             "description": "Common desktop platforms with drivers supporting Vulkan 1.1 on Windows and Linux.",
-            "contacts": [
+            "contributors": [
                 {
                     "name": "Christophe Riccio",
+                    "company": "LunarG",
                     "email": "christophe@lunarg.com",
-                    "github": "christophe-lunarg"
+                    "github": "christophe-lunarg",
+                    "contact": true
                 }
             ],
             "capabilities": [

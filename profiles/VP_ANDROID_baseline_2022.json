@@ -1315,10 +1315,12 @@
             "api-version": "1.0.68",
             "label": "Android Vulkan 1.0 baseline 2022 profile",
             "description": "Collection on features supported in the majority of devices",
-            "contacts": [
+            "contributors": [
                 {
                     "name": "Trevor Black",
-                    "email": "vantablack@google.com"
+                    "company": "Google",
+                    "email": "vantablack@google.com",
+                    "contact": true
                 }
             ],
             "capabilities": [

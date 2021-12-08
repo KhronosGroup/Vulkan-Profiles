@@ -14,15 +14,18 @@
             "type": "string",
             "enum": [ "ALPHA", "BETA", "STABLE", "DEPRECATED" ]
         },
-        "contact": {
+        "contributor": {
             "type": "object",
             "additionalProperties": false,
             "required": [
                 "name",
-                "email"
+                "company"
             ],
             "properties": {
                 "name": { "type": "string" },
+                "company": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string",
                     "pattern": "^[A-Za-z0-9_.]+@[a-zA-Z0-9-].[a-zA-Z0-9-.]+$"
@@ -30,6 +33,9 @@
                 "github": {
                     "type": "string",
                     "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                "contact": {
+                    "type": "boolean"
                 }
             }
         },
@@ -6261,7 +6267,7 @@
                     "description",
                     "version",
                     "api-version",
-                    "contacts",
+                    "contributors",
                     "capabilities"
                 ],
                 "properties": {
@@ -6290,18 +6296,11 @@
                         "type": "string",
                         "pattern": "^[0-9]+.[0-9]+.[0-9]+$"
                     },
-                    "contacts": {
-                        "description": "TODO",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/definitions/contact"
-                        }
-                    },
                     "contributors": {
                         "description": "TODO",
                         "type": "array",
                         "items": {
-                            "$ref": "#/definitions/contact"
+                            "$ref": "#/definitions/contributor"
                         }
                     },
                     "capabilities": {
