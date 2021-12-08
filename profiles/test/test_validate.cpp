@@ -126,6 +126,27 @@ struct JsonValidator {
     std::string message;
 };
 
+TEST(test_validate, VP_LUNARG_test_structure_simple) {
+    JsonValidator validator;
+
+    const Json::Value document = ParseJsonFile("VP_LUNARG_test_structure_simple.json");
+    EXPECT_TRUE(validator.Check(document));
+}
+
+TEST(test_validate, VP_LUNARG_test_structure_complex) {
+    JsonValidator validator;
+
+    const Json::Value document = ParseJsonFile("VP_LUNARG_test_structure_complex.json");
+    EXPECT_TRUE(validator.Check(document));
+}
+
+TEST(test_validate, VP_LUNARG_test_structure_fallback) {
+    JsonValidator validator;
+
+    const Json::Value document = ParseJsonFile("VP_LUNARG_test_structure_fallback.json");
+    EXPECT_TRUE(validator.Check(document));
+}
+
 TEST(test_validate, VP_LUNARG_test_vkformatproperties) {
     JsonValidator validator;
 
