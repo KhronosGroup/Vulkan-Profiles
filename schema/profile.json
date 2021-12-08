@@ -6268,6 +6268,7 @@
                     "version",
                     "api-version",
                     "contributors",
+                    "history",
                     "capabilities"
                 ],
                 "properties": {
@@ -6301,6 +6302,33 @@
                         "type": "array",
                         "items": {
                             "$ref": "#/definitions/contributor"
+                        }
+                    },
+                    "history": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "revision",
+                                "date",
+                                "author",
+                                "comment"
+                            ],
+                            "properties": {
+                                "revision": {
+                                    "type": "integer"
+                                },
+                                "date": {
+                                    "type": "string",
+                                    "pattern": "((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])"
+                                },
+                                "author": {
+                                    "type": "string"
+                                },
+                                "comment": {
+                                    "type": "string"
+                                }
+                            }
                         }
                     },
                     "capabilities": {
