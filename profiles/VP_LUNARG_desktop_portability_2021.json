@@ -1,9 +1,5 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
-    "comments": {
-        "info": "LunarG Vulkan Desktop Portability Profile 2021",
-        "desc": "Common desktop platforms with drivers supporting Vulkan 1.1 on Windows, Linux and macOS."
-    },
     "capabilities": [
         {
             "name": "vulkan11requirements",
@@ -1145,6 +1141,13 @@
             "version": 1,
             "status": "BETA",
             "api-version": "1.1.142",
+            "label": "LunarG Vulkan desktop portability 2021 subset profile",
+            "description": "Common desktop platforms with drivers supporting Vulkan 1.1 on macOS.",
+            "authors": [
+                {
+                    "Christophe Riccio": "christophe@lunarg.com"
+                }
+            ],
             "capabilities": [
                 "vulkan11requirements",
                 "baseline",
@@ -1156,6 +1159,13 @@
             "name": "VP_LUNARG_desktop_portability_2021",
             "version": 1,
             "api-version": "1.1.142",
+            "label": "LunarG Vulkan desktop portability 2021 profile",
+            "description": "Common desktop platforms with drivers supporting Vulkan 1.1 on Windows and Linux.",
+            "authors": [
+                {
+                    "Christophe Riccio": "christophe@lunarg.com"
+                }
+            ],
             "capabilities": [
                 "vulkan11requirements",
                 "baseline"
