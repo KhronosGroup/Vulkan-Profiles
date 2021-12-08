@@ -1,9 +1,5 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
-    "comments": {
-        "info": "LunarG Test Profile for VkFormatProperties",
-        "desc": "LunarG Test Profile for VkFormatProperties"
-    },
     "capabilities": [
         {
             "name": "baseline",
@@ -136,6 +132,17 @@
             "name": "VP_LUNARG_test_vkformatproperties",
             "version": 1,
             "api-version": "1.2.198",
+            "label": "LunarG VkFormatProperties unit tests",
+            "description": "LunarG VkFormatProperties unit tests",
+            "contributors": [
+                {
+                    "name": "Christophe Riccio",
+                    "company": "LunarG",
+                    "email": "christophe@lunarg.com",
+                    "github": "christophe-lunarg",
+                    "contact": true
+                }
+            ],
             "capabilities": [
                 "baseline"
             ]

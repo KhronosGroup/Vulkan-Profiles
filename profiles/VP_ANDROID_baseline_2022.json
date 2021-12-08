@@ -1,9 +1,5 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
-    "comments": {
-        "info": "Android Vulkan 1.0 baseline 2022 Profile",
-        "desc": "Collection on features supported in the majority of devices"
-    },
     "capabilities": [
         {
             "name": "vulkan10requirements",
@@ -1315,7 +1311,18 @@
     "profiles": [
         {
             "name": "VP_ANDROID_1_0_baseline_2022",
+            "version": 1,
             "api-version": "1.0.68",
+            "label": "Android Vulkan 1.0 baseline 2022 profile",
+            "description": "Collection on features supported in the majority of devices",
+            "contributors": [
+                {
+                    "name": "Trevor Black",
+                    "company": "Google",
+                    "email": "vantablack@google.com",
+                    "contact": true
+                }
+            ],
             "capabilities": [
                 "vulkan10requirements",
                 "baseline"

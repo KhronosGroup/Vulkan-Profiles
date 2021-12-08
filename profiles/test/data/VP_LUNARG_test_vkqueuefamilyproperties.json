@@ -1,9 +1,5 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
-    "comments": {
-        "info": "LunarG Test Profile for VkQueueFamilyProperties",
-        "desc": "LunarG Test Profile for VkQueueFamilyProperties"
-    },
     "capabilities": [
         {
             "name": "baseline",
@@ -91,6 +87,17 @@
             "name": "VP_LUNARG_test_vkqueuefamilyproperties",
             "version": 1,
             "api-version": "1.2.198",
+            "label": "LunarG VkQueueFamilyProperties unit tests",
+            "description": "LunarG VkQueueFamilyProperties unit tests",
+            "contributors": [
+                {
+                    "name": "Christophe Riccio",
+                    "company": "LunarG",
+                    "email": "christophe@lunarg.com",
+                    "github": "christophe-lunarg",
+                    "contact": true
+                }
+            ],
             "capabilities": [
                 "baseline"
             ]
