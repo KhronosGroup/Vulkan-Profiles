@@ -5,7 +5,6 @@
     "description": "TODO",
     "additionalProperties": true,
     "required": [
-        "comments",
         "capabilities",
         "profiles"
     ],
@@ -4294,25 +4293,6 @@
         }
     },
     "properties": {
-        "comments": {
-            "description": "TODO",
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-                "info",
-                "desc"
-            ],
-            "properties": {
-                "info": {
-                    "description": "TODO",
-                    "type": "string"
-                },
-                "desc": {
-                    "description": "TODO",
-                    "type": "string"
-                }
-            }
-        },
         "capabilities": {
             "description": "TODO",
             "type": "array",
@@ -6258,7 +6238,11 @@
                 "additionalProperties": false,
                 "required": [
                     "name",
+                    "label",
+                    "description",
+                    "version",
                     "api-version",
+                    "authors",
                     "capabilities"
                 ],
                 "properties": {
@@ -6266,6 +6250,14 @@
                         "description": "TODO",
                         "type": "string",
                         "pattern": "^VP_[A-Z0-9]+_[A-Za-z0-9_]+"
+                    },
+                    "label": {
+                        "description": "TODO",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "TODO",
+                        "type": "string"
                     },
                     "version": {
                         "description": "TODO",
@@ -6278,6 +6270,13 @@
                         "description": "TODO",
                         "type": "string",
                         "pattern": "^[0-9]+.[0-9]+.[0-9]+$"
+                    },
+                    "authors": {
+                        "description": "TODO",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
                     },
                     "capabilities": {
                         "description": "TODO",
