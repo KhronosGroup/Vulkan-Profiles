@@ -3276,7 +3276,7 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "shaderEngineCount": {
+                "shaderCoreFeatures": {
                     "$ref": "#/definitions/VkShaderCorePropertiesFlagsAMD"
                 },
                 "activeComputeUnitCount": {
