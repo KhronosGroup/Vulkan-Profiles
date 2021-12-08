@@ -508,9 +508,6 @@
         "VkMemoryType": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-                "propertyFlags"
-            ],
             "properties": {
                 "propertyFlags": {
                     "$ref": "#/definitions/VkMemoryPropertyFlags"
