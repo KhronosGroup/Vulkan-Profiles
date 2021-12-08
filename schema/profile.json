@@ -4306,7 +4306,7 @@
     },
     "properties": {
         "capabilities": {
-            "description": "TODO",
+            "description": "The block that specifies the list of capabilities sets.",
             "type": "array",
             "items": {
                 "additionalProperties": false,
@@ -4315,11 +4315,11 @@
                 ],
                 "properties": {
                     "name": {
-                        "description": "TODO",
+                        "description": "The identifier of a capability block.",
                         "type": "string"
                     },
                     "extensions": {
-                        "description": "TODO",
+                        "description": "The block that stores required extensions.",
                         "type": "array",
                         "uniqueItems": true,
                         "items": {
@@ -4330,18 +4330,16 @@
                             ],
                             "properties": {
                                 "extensionName": {
-                                    "description": "TODO",
                                     "type": "string"
                                 },
                                 "specVersion": {
-                                    "description": "TODO",
                                     "type": "integer"
                                 }
                             }
                         }
                     },
                     "features": {
-                        "description": "TODO",
+                        "description": "The block that stores features requirements.",
                         "type": "array",
                         "uniqueItems": true,
                         "items": {
@@ -5455,7 +5453,7 @@
                         }
                     },
                     "properties": {
-                        "description": "TODO",
+                        "description": "The block that stores properties requirements.",
                         "type": "array",
                         "items": {
                             "type": "object",
@@ -6041,7 +6039,7 @@
                         }
                     },
                     "formats": {
-                        "description": "TODO",
+                        "description": "The block that store formats capabilities definitions.",
                         "type": "array",
                         "uniqueItems": true,
                         "items": {
@@ -6241,7 +6239,7 @@
             }
         },
         "profiles": {
-            "description": "TODO",
+            "description": "The list of profile definitions.",
             "type": "array",
             "items": {
                 "additionalProperties": false,
@@ -6257,32 +6255,33 @@
                 ],
                 "properties": {
                     "name": {
-                        "description": "TODO",
+                        "description": "The unique identifier of the profile.",
                         "type": "string",
                         "pattern": "^VP_[A-Z0-9]+_[A-Za-z0-9_]+"
                     },
+                    "version": {
+                        "description": "The revision of the profile.",
+                        "type": "integer"
+                    },
                     "label": {
-                        "description": "TODO",
+                        "description": "The label used to present the profile to the Vulkan developer.",
                         "type": "string"
                     },
                     "description": {
-                        "description": "TODO",
+                        "description": "The description of the profile.",
                         "type": "string"
                     },
-                    "version": {
-                        "description": "TODO",
-                        "type": "integer"
-                    },
                     "status": {
+                        "description": "The developmet status of the profile: ALPHA, BETA, STABLE or DEPRECATED.",
                         "$ref": "#/definitions/status"
                     },
                     "api-version": {
-                        "description": "TODO",
+                        "description": "The Vulkan API version against which the profile is written.",
                         "type": "string",
                         "pattern": "^[0-9]+.[0-9]+.[0-9]+$"
                     },
                     "contributors": {
-                        "description": "TODO",
+                        "description": "The list of contributors of the profile.",
                         "type": "array",
                         "uniqueItems": true,
                         "minItems": 1,
@@ -6291,6 +6290,7 @@
                         }
                     },
                     "history": {
+                        "description": "The version history of the profile file",
                         "type": "array",
                         "uniqueItems": true,
                         "minItems": 1,
@@ -6320,7 +6320,7 @@
                         }
                     },
                     "capabilities": {
-                        "description": "TODO",
+                        "description": "The list of capability sets that can be reference by a profile.",
                         "type": "array",
                         "uniqueItems": true,
                         "items": {
@@ -6328,7 +6328,7 @@
                         }
                     },
                     "fallback": {
-                        "description": "TODO",
+                        "description": "The list of profiles recommended if the checked profile is not supported by the platform.",
                         "type": "array",
                         "additionalProperties": false,
                         "uniqueItems": true,
