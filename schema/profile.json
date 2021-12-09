@@ -156,7 +156,12 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_PHYSICAL_DEVICE_TYPE_OTHER", "VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU", "VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU", "VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU", "VK_PHYSICAL_DEVICE_TYPE_CPU" ],
+                "enum": [
+                    "VK_PHYSICAL_DEVICE_TYPE_OTHER",
+                    "VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU",
+                    "VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU",
+                    "VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU", 
+                    "VK_PHYSICAL_DEVICE_TYPE_CPU" ],
                 "uniqueItems": true
             }
         },
@@ -172,7 +177,10 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY", "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL", "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE" ],
+                "enum": [
+                    "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY",
+                    "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL", 
+                    "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE" ],
                 "uniqueItems": true
             }
         },
@@ -180,7 +188,9 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES", "VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY" ],
+                "enum": [
+                    "VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES", 
+                    "VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY" ],
                 "uniqueItems": true
             }
         },
@@ -188,7 +198,30 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_SHADER_STAGE_VERTEX_BIT", "VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT", "VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT", "VK_SHADER_STAGE_GEOMETRY_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT", "VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_ALL_GRAPHICS", "VK_SHADER_STAGE_ALL", "VK_SHADER_STAGE_RAYGEN_BIT_KHR", "VK_SHADER_STAGE_ANY_HIT_BIT_KHR", "VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR", "VK_SHADER_STAGE_MISS_BIT_KHR", "VK_SHADER_STAGE_INTERSECTION_BIT_KHR", "VK_SHADER_STAGE_CALLABLE_BIT_KHR", "VK_SHADER_STAGE_TASK_BIT_NV", "VK_SHADER_STAGE_MESH_BIT_NV", "VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI", "VK_SHADER_STAGE_RAYGEN_BIT_NV", "VK_SHADER_STAGE_ANY_HIT_BIT_NV", "VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV", "VK_SHADER_STAGE_MISS_BIT_NV", "VK_SHADER_STAGE_INTERSECTION_BIT_NV", "VK_SHADER_STAGE_CALLABLE_BIT_NV" ],
+                "enum": [
+                    "VK_SHADER_STAGE_VERTEX_BIT",
+                    "VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT",
+                    "VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT",
+                    "VK_SHADER_STAGE_GEOMETRY_BIT",
+                    "VK_SHADER_STAGE_FRAGMENT_BIT",
+                    "VK_SHADER_STAGE_COMPUTE_BIT",
+                    "VK_SHADER_STAGE_ALL_GRAPHICS",
+                    "VK_SHADER_STAGE_ALL",
+                    "VK_SHADER_STAGE_RAYGEN_BIT_KHR",
+                    "VK_SHADER_STAGE_ANY_HIT_BIT_KHR",
+                    "VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR",
+                    "VK_SHADER_STAGE_MISS_BIT_KHR",
+                    "VK_SHADER_STAGE_INTERSECTION_BIT_KHR",
+                    "VK_SHADER_STAGE_CALLABLE_BIT_KHR",
+                    "VK_SHADER_STAGE_TASK_BIT_NV",
+                    "VK_SHADER_STAGE_MESH_BIT_NV",
+                    "VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI",
+                    "VK_SHADER_STAGE_RAYGEN_BIT_NV",
+                    "VK_SHADER_STAGE_ANY_HIT_BIT_NV",
+                    "VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV",
+                    "VK_SHADER_STAGE_MISS_BIT_NV",
+                    "VK_SHADER_STAGE_INTERSECTION_BIT_NV", 
+                    "VK_SHADER_STAGE_CALLABLE_BIT_NV" ],
                 "uniqueItems": true
             }
         },
@@ -196,16 +229,31 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_VOTE_BIT", "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT", "VK_SUBGROUP_FEATURE_BALLOT_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT", "VK_SUBGROUP_FEATURE_CLUSTERED_BIT", "VK_SUBGROUP_FEATURE_QUAD_BIT", "VK_SUBGROUP_FEATURE_PARTITIONED_BIT_NV" ],
+                "enum": [
+                    "VK_SUBGROUP_FEATURE_BASIC_BIT",
+                    "VK_SUBGROUP_FEATURE_VOTE_BIT",
+                    "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT",
+                    "VK_SUBGROUP_FEATURE_BALLOT_BIT",
+                    "VK_SUBGROUP_FEATURE_SHUFFLE_BIT",
+                    "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT",
+                    "VK_SUBGROUP_FEATURE_CLUSTERED_BIT",
+                    "VK_SUBGROUP_FEATURE_QUAD_BIT", 
+                    "VK_SUBGROUP_FEATURE_PARTITIONED_BIT_NV" ],
                 "uniqueItems": true
             }
         },
         "VkSampleCountFlags": {
-            "description": "TODO.",
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_2_BIT", "VK_SAMPLE_COUNT_4_BIT", "VK_SAMPLE_COUNT_8_BIT", "VK_SAMPLE_COUNT_16_BIT", "VK_SAMPLE_COUNT_32_BIT", "VK_SAMPLE_COUNT_64_BIT" ],
+                "enum": [
+                    "VK_SAMPLE_COUNT_1_BIT",
+                    "VK_SAMPLE_COUNT_2_BIT",
+                    "VK_SAMPLE_COUNT_4_BIT",
+                    "VK_SAMPLE_COUNT_8_BIT",
+                    "VK_SAMPLE_COUNT_16_BIT",
+                    "VK_SAMPLE_COUNT_32_BIT", 
+                    "VK_SAMPLE_COUNT_64_BIT" ],
                 "uniqueItems": true
             }
         },
@@ -214,7 +262,38 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT", "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT", "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT", "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT", "VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT", "VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT", "VK_FORMAT_FEATURE_DISJOINT_BIT", "VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG", "VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR", "VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR", "VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR", "VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT", "VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR", "VK_FORMAT_FEATURE_VIDEO_ENCODE_INPUT_BIT_KHR", "VK_FORMAT_FEATURE_VIDEO_ENCODE_DPB_BIT_KHR" ],
+                "enum": [
+                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                    "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
+                    "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
+                    "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                    "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
+                    "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
+                    "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT",
+                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT",
+                    "VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT",
+                    "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
+                    "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                    "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                    "VK_FORMAT_FEATURE_TRANSFER_DST_BIT",
+                    "VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT",
+                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT",
+                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT",
+                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT",
+                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT",
+                    "VK_FORMAT_FEATURE_DISJOINT_BIT",
+                    "VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT",
+                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT",
+                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG",
+                    "VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR",
+                    "VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR",
+                    "VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR",
+                    "VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT",
+                    "VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR",
+                    "VK_FORMAT_FEATURE_VIDEO_ENCODE_INPUT_BIT_KHR",
+                    "VK_FORMAT_FEATURE_VIDEO_ENCODE_DPB_BIT_KHR" ],
                 "uniqueItems": true
             }
         },
@@ -293,7 +372,12 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT", "VK_MEMORY_PROPERTY_HOST_CACHED_BIT", "VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT" ],
+                "enum": [
+                    "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT",
+                    "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT",
+                    "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT",
+                    "VK_MEMORY_PROPERTY_HOST_CACHED_BIT",
+                    "VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT" ],
                 "uniqueItems": true
             }
         },
@@ -301,7 +385,11 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT", "VK_RESOLVE_MODE_AVERAGE_BIT", "VK_RESOLVE_MODE_MIN_BIT", "VK_RESOLVE_MODE_MAX_BIT" ],
+                "enum": [
+                    "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT",
+                    "VK_RESOLVE_MODE_AVERAGE_BIT",
+                    "VK_RESOLVE_MODE_MIN_BIT",
+                    "VK_RESOLVE_MODE_MAX_BIT" ],
                 "uniqueItems": true
             }
         },
@@ -309,7 +397,14 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_QUEUE_GRAPHICS_BIT", "VK_QUEUE_COMPUTE_BIT", "VK_QUEUE_TRANSFER_BIT", "VK_QUEUE_SPARSE_BINDING_BIT", "VK_QUEUE_PROTECTED_BIT", "VK_QUEUE_VIDEO_DECODE_BIT_KHR", "VK_QUEUE_VIDEO_ENCODE_BIT_KHR" ],
+                "enum": [
+                    "VK_QUEUE_GRAPHICS_BIT",
+                    "VK_QUEUE_COMPUTE_BIT",
+                    "VK_QUEUE_TRANSFER_BIT",
+                    "VK_QUEUE_SPARSE_BINDING_BIT",
+                    "VK_QUEUE_PROTECTED_BIT",
+                    "VK_QUEUE_VIDEO_DECODE_BIT_KHR",
+                    "VK_QUEUE_VIDEO_ENCODE_BIT_KHR" ],
                 "uniqueItems": true
             }
         },
@@ -351,7 +446,11 @@
         },
         "VkQueueGlobalPriorityEXT": {
             "type": "string",
-            "enum": [ "VK_QUEUE_GLOBAL_PRIORITY_LOW_EXT", "VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_EXT", "VK_QUEUE_GLOBAL_PRIORITY_HIGH_EXT", "VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT" ]
+            "enum": [
+                "VK_QUEUE_GLOBAL_PRIORITY_LOW_EXT",
+                "VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_EXT",
+                "VK_QUEUE_GLOBAL_PRIORITY_HIGH_EXT",
+                "VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT" ]
         },
         "VkQueueFamilyGlobalPriorityPropertiesEXT": {
             "type": "object",
@@ -373,7 +472,11 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT" ],
+                "enum": [
+                    "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT",
+                    "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT",
+                    "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT",
+                    "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT" ],
                 "uniqueItems": true
             }
         },
@@ -612,7 +715,28 @@
         },
         "VkDriverId": {
             "type": "string",
-            "enum": [ "VK_DRIVER_ID_AMD_PROPRIETARY", "VK_DRIVER_ID_AMD_OPEN_SOURCE", "VK_DRIVER_ID_MESA_RADV", "VK_DRIVER_ID_NVIDIA_PROPRIETARY", "VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS", "VK_DRIVER_ID_INTEL_OPEN_SOURCE_MESA", "VK_DRIVER_ID_IMAGINATION_PROPRIETARY", "VK_DRIVER_ID_QUALCOMM_PROPRIETARY", "VK_DRIVER_ID_ARM_PROPRIETARY", "VK_DRIVER_ID_GOOGLE_SWIFTSHADER", "VK_DRIVER_ID_GGP_PROPRIETARY", "VK_DRIVER_ID_BROADCOM_PROPRIETARY", "VK_DRIVER_ID_MESA_LLVMPIPE", "VK_DRIVER_ID_MOLTENVK", "VK_DRIVER_ID_COREAVI_PROPRIETARY", "VK_DRIVER_ID_JUICE_PROPRIETARY", "VK_DRIVER_ID_VERISILICON_PROPRIETARY", "VK_DRIVER_ID_MESA_TURNIP", "VK_DRIVER_ID_MESA_V3DV", "VK_DRIVER_ID_MESA_PANVK", "VK_DRIVER_ID_SAMSUNG_PROPRIETARY" ]
+            "enum": [
+                "VK_DRIVER_ID_AMD_PROPRIETARY",
+                "VK_DRIVER_ID_AMD_OPEN_SOURCE",
+                "VK_DRIVER_ID_MESA_RADV",
+                "VK_DRIVER_ID_NVIDIA_PROPRIETARY",
+                "VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS",
+                "VK_DRIVER_ID_INTEL_OPEN_SOURCE_MESA",
+                "VK_DRIVER_ID_IMAGINATION_PROPRIETARY",
+                "VK_DRIVER_ID_QUALCOMM_PROPRIETARY",
+                "VK_DRIVER_ID_ARM_PROPRIETARY",
+                "VK_DRIVER_ID_GOOGLE_SWIFTSHADER",
+                "VK_DRIVER_ID_GGP_PROPRIETARY",
+                "VK_DRIVER_ID_BROADCOM_PROPRIETARY",
+                "VK_DRIVER_ID_MESA_LLVMPIPE",
+                "VK_DRIVER_ID_MOLTENVK",
+                "VK_DRIVER_ID_COREAVI_PROPRIETARY",
+                "VK_DRIVER_ID_JUICE_PROPRIETARY",
+                "VK_DRIVER_ID_VERISILICON_PROPRIETARY",
+                "VK_DRIVER_ID_MESA_TURNIP",
+                "VK_DRIVER_ID_MESA_V3DV",
+                "VK_DRIVER_ID_MESA_PANVK",
+                "VK_DRIVER_ID_SAMSUNG_PROPRIETARY" ]
         },
         "VkFormatProperties": {
             "type": "object",
@@ -736,7 +860,12 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_VIDEO_CHROMA_SUBSAMPLING_INVALID_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_MONOCHROME_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_422_BIT_KHR", "VK_VIDEO_CHROMA_SUBSAMPLING_444_BIT_KHR" ],
+                "enum": [
+                    "VK_VIDEO_CHROMA_SUBSAMPLING_INVALID_BIT_KHR",
+                    "VK_VIDEO_CHROMA_SUBSAMPLING_MONOCHROME_BIT_KHR",
+                    "VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR",
+                    "VK_VIDEO_CHROMA_SUBSAMPLING_422_BIT_KHR",
+                    "VK_VIDEO_CHROMA_SUBSAMPLING_444_BIT_KHR" ],
                 "uniqueItems": true
             }
         },
@@ -744,7 +873,11 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": [ "VK_VIDEO_COMPONENT_BIT_DEPTH_INVALID_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_12_BIT_KHR" ],
+                "enum": [
+                    "VK_VIDEO_COMPONENT_BIT_DEPTH_INVALID_KHR",
+                    "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR",
+                    "VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR",
+                    "VK_VIDEO_COMPONENT_BIT_DEPTH_12_BIT_KHR" ],
                 "uniqueItems": true
             }
         },
