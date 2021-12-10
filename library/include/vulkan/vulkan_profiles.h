@@ -1,5 +1,5 @@
 
-/*
+/**
  * Copyright (c) 2021-2022 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Authors:
- * - Christophe Riccio <christophe@lunarg.com>
+ * DO NOT EDIT: This file is generated.
  */
 
 #ifndef VULKAN_PROFILES_
@@ -31,27 +30,30 @@
 #include <vulkan/vulkan_beta.h>
 #endif
 
-#define VK_KHR_roadmap_2022 1
+#define VP_ANDROID_angle_es31 1
+#define VP_ANDROID_ANGLE_ES31_NAME "VP_ANDROID_angle_es31"
+#define VP_ANDROID_ANGLE_ES31_SPEC_VERSION 1
+#define VP_ANDROID_ANGLE_ES31_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 131)
+
+#define VP_ANDROID_baseline_2022 1
+#define VP_ANDROID_BASELINE_2022_NAME "VP_ANDROID_baseline_2022"
+#define VP_ANDROID_BASELINE_2022_SPEC_VERSION 1
+#define VP_ANDROID_BASELINE_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 0, 68)
+
+#define VP_KHR_roadmap_2022 1
 #define VP_KHR_ROADMAP_2022_NAME "VP_KHR_roadmap_2022"
 #define VP_KHR_ROADMAP_2022_SPEC_VERSION 1
-#define VP_KHR_ROADMAP_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 3, 200)
+#define VP_KHR_ROADMAP_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 3, 201)
 
-#define VP_ANDROID_baseline_2021 1
-#define VP_ANDROID_BASELINE_2021_NAME "VP_ANDROID_baseline_2021"
-#define VP_ANDROID_BASELINE_2021_SPEC_VERSION 1
-#define VP_ANDROID_BASELINE_2021_MIN_API_VERSION VK_MAKE_VERSION(1, 0, 68)
+#define VP_LUNARG_desktop_portability_2021_subset 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME "VP_LUNARG_desktop_portability_2021_subset"
+#define VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_SPEC_VERSION 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
 
 #define VP_LUNARG_desktop_portability_2021 1
 #define VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME "VP_LUNARG_desktop_portability_2021"
 #define VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION 1
 #define VP_LUNARG_DESKTOP_PORTABILITY_2021_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
-
-#ifdef VK_ENABLE_BETA_EXTENSIONS
-#define VP_LUNARG_desktop_portability_2021_subset 1
-#define VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME "VP_LUNARG_desktop_portability_2021_subset"
-#define VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_SPEC_VERSION 1
-#define VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
-#endif
 
 #define VP_MAX_PROFILE_NAME_SIZE 256U
 
@@ -59,30 +61,6 @@ typedef struct VpProfileProperties {
     char profileName[VP_MAX_PROFILE_NAME_SIZE];
     uint32_t specVersion;
 } VpProfileProperties;
-
-// UNIMPLEMENTED YET. Check whether a profile is supported by the Vulkan instance
-VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported);
-
-typedef enum VpInstanceCreateFlagBits {
-    VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT = 0x00000004,
-    VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT = 0x00000008,
-
-    VP_INSTANCE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
-} VpInstanceCreateFlagBits;
-typedef VkFlags VpInstanceCreateFlags;
-
-typedef struct VpInstanceCreateInfo {
-    const VkInstanceCreateInfo *pCreateInfo;
-    const VpProfileProperties *pProfile;
-    VpInstanceCreateFlags flags;
-} VpInstanceCreateInfo;
-
-// UNIMPLEMENTED YET. Create a VkInstance with the profile features and extensions enabled
-VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkInstance *pInstance);
-
-// Check whether a profile is supported by the physical device
-VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
-                                   VkBool32 *pSupported);
 
 typedef enum VpDeviceCreateFlagBits {
     VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT = 0x00000001,
@@ -102,55 +80,53 @@ typedef struct VpDeviceCreateInfo {
     VpDeviceCreateFlags flags;
 } VpDeviceCreateInfo;
 
-// Create a VkDevice with the profile features and extensions enabled
-VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
-                        const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
-
 // Query the list of available profiles in the library
 VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // List the recommended fallback profiles of a profile
-VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
-// Query the list of device extension of a profile
-VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                               VkExtensionProperties *pProperties);
+// Check whether a profile is supported by the physical device
+VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
+                                   VkBool32 *pSupported);
 
-// Query the list of device extension of a profile
-VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                 VkExtensionProperties *pProperties);
+// Create a VkDevice with the profile features and extensions enabled
+VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
+                        const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
 
-// Fill the feature structures with the requirements of a profile
-void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
+// Query the list of extension of a profile
+void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                     VkExtensionProperties *pProperties);
 
-// Query the list of feature structure types specified by the profile
-VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                           VkStructureType *pProperties);
+// Fill the pNext Vulkan structures with the requirements of a profile
+void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext);
 
-// Fill the property structures with the requirements of a profile
-void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext);
+typedef enum VpStructureArea {
+    VP_STRUCTURE_FEATURES = 0,  // A Vulkan structure specified to expose features
+    VP_STRUCTURE_PROPERTIES     // A Vulkan structure specified to expose properties
+} VpStructureArea;
 
-// Query the list of property structure types specified by the profile
-VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                            VkStructureType *pProperties);
+typedef struct VpStructureProperties {
+    VkStructureType type;
+    VpStructureArea area;
+} VpStructureProperties;
 
-// Query the requirements of queue families by a profile
-VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                           VkQueueFamilyProperties2KHR *pProperties);
-
-// Query the list of query family structure types specified by the profile
-VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                               VkStructureType *pProperties);
+// Query the list of structures used to specify requirements of a profile
+void vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                     VpStructureProperties *pProperties);
 
 // Query the list of formats with specified requirements by a profile
-VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkFormat *pProperties);
+void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
 
 // Query the requirements of a format for a profile
 void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
-// UNIMPLEMENTED YET. Query the list of format structure types specified by the profile
-VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, VkFormat format, uint32_t *pPropertyCount,
-                                          VkStructureType *pProperties);
+// Query the requirements of memory types by a profile
+void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryTypeCount, VkMemoryPropertyFlags *pMemoryTypes);
+
+// Query the requirements of queue families by a profile
+void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
+
 
 #ifdef __cplusplus
 }

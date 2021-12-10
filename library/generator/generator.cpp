@@ -158,7 +158,7 @@ int build_header_only(std::string &buffer) {
 int main(int argc, char *argv[]) {
     int result = 0;
 
-    {
+/*    {
         std::string buffer;
         result += build_header_only(buffer);
         result += store("library/include/vulkan/vulkan_profiles.hpp", buffer);
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
         std::string buffer;
         result += build_source_split(buffer);
         result += store("library/source/vulkan_profiles.cpp", buffer);
-    }
+    }*/
 
     return result;
 }

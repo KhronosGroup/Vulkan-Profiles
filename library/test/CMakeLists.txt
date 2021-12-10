@@ -12,12 +12,14 @@ function(add_unit_test NAME)
     add_executable(${TEST_NAME_HO} ${TEST_FILE})
     target_compile_definitions(${TEST_NAME_HO} PUBLIC "VK_ENABLE_BETA_EXTENSIONS=1")
     target_link_libraries(${TEST_NAME_HO} PRIVATE ${test_libraries})
+    add_dependencies(${TEST_NAME_HO} library_profiles)
     add_test(NAME ${TEST_NAME_HO} COMMAND ${TEST_NAME_HO} --gtest_catch_exceptions=0)
 
     add_executable(${TEST_NAME_WS} ${TEST_FILE} ../source/vulkan_profiles.cpp)
     target_compile_definitions(${TEST_NAME_WS} PUBLIC "VULKAN_PROFILES_HEADER_ONLY=1")
     target_compile_definitions(${TEST_NAME_WS} PUBLIC "VK_ENABLE_BETA_EXTENSIONS=1")
     target_link_libraries(${TEST_NAME_WS} PRIVATE ${test_libraries})
+    add_dependencies(${TEST_NAME_WS} library_profiles)
     add_test(NAME ${TEST_NAME_WS} COMMAND ${TEST_NAME_WS} --gtest_catch_exceptions=0)
 endfunction(add_unit_test)
 
@@ -40,11 +42,13 @@ function(add_unit_test_core NAME)
 
     add_executable(${TEST_NAME_HO} ${TEST_FILE})
     target_link_libraries(${TEST_NAME_HO} PRIVATE ${test_libraries})
+    add_dependencies(${TEST_NAME_HO} library_profiles)
     add_test(NAME ${TEST_NAME_HO} COMMAND ${TEST_NAME_HO} --gtest_catch_exceptions=0)
 
     add_executable(${TEST_NAME_WS} ${TEST_FILE} ../source/vulkan_profiles.cpp)
     target_compile_definitions(${TEST_NAME_WS} PUBLIC "VULKAN_PROFILES_HEADER_ONLY=1")
     target_link_libraries(${TEST_NAME_WS} PRIVATE ${test_libraries})
+    add_dependencies(${TEST_NAME_WS} library_profiles)
     add_test(NAME ${TEST_NAME_WS} COMMAND ${TEST_NAME_WS} --gtest_catch_exceptions=0)
 endfunction(add_unit_test_core)
 
@@ -56,6 +60,7 @@ function(add_unit_test_simple NAME)
 
     add_executable(${TEST_NAME_HO} ${TEST_FILE})
     target_link_libraries(${TEST_NAME_HO} PRIVATE ${test_libraries})
+    add_dependencies(${TEST_NAME_HO} library_profiles)
     add_test(NAME ${TEST_NAME_HO} COMMAND ${TEST_NAME_HO} --gtest_catch_exceptions=0)
 endfunction(add_unit_test_simple)
 
