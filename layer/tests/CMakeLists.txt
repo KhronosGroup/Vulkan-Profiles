@@ -12,8 +12,19 @@ function(DevsimTest NAME)
     target_link_libraries(${TEST_NAME} gtest gtest_main Vulkan::Vulkan)
     target_compile_definitions(${TEST_NAME} PUBLIC TEST_SOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+
+    # try to be OS-independent
+    if(WIN32)
+        string(REPLACE ";" "\\;" path "$ENV{PATH}")
+        string(REPLACE "/" "\\" binary_dir "${CMAKE_BINARY_DIR}\\bin\\${CMAKE_BUILD_TYPE}")
+        set(run_environment "VK_LAYER_PATH=${binary_dir}" "PATH=${binary_dir}\;${path}")
+    elseif(UNIX)
+        set(run_environment "VK_LAYER_PATH=${CMAKE_BINARY_DIR}/lib" "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib:$ENV{LD_LIBRARY_PATH}")
+    else()
+        message(FATAL_ERROR "Unsupported Platform ${CMAKE_SYSTEM_NAME}")
+    endif()
+
+    set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "${run_environment}")
 endfunction(DevsimTest)
 
-DevsimTest(test_array_combination_modes)
-DevsimTest(test_physical_device_extended_property_modification)
-DevsimTest(test_physical_device_main_property_modification)
+DevsimTest(manual_devsim_tests)
