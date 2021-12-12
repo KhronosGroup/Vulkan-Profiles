@@ -10,7 +10,7 @@ TEST(manual_devsim, TestDesktopPortability2022Limits) {
 
     devsim_test::VulkanInstanceBuilder inst_builder;
 
-    std::vector<std::string> filepaths = {TEST_SOURCE_PATH "/VP_LUNARG_1_1_desktop_portability_2022.json"};
+    std::vector<std::string> filepaths = {TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_1_1_desktop_portability_2022.json"};
     devsim_test::setDevsimFilenames(filepaths);
     devsim_test::setDevsimExitOnError(true);
 
@@ -147,6 +147,38 @@ TEST(manual_devsim, TestDesktopPortability2022Limits) {
     EXPECT_GE(gpu_props.limits.lineWidthRange[1], 1.0f);
     EXPECT_LE(gpu_props.limits.pointSizeGranularity, 0.125f);
     EXPECT_LE(gpu_props.limits.lineWidthGranularity, 0.5f);
+
+    // Features
+    EXPECT_EQ(gpu_feats.depthBiasClamp, VK_TRUE);
+    EXPECT_EQ(gpu_feats.depthClamp, VK_TRUE);
+    EXPECT_EQ(gpu_feats.drawIndirectFirstInstance, VK_TRUE);
+    EXPECT_EQ(gpu_feats.dualSrcBlend, VK_TRUE);
+    EXPECT_EQ(gpu_feats.fillModeNonSolid, VK_TRUE);
+    EXPECT_EQ(gpu_feats.fragmentStoresAndAtomics, VK_TRUE);
+    EXPECT_EQ(gpu_feats.fullDrawIndexUint32, VK_TRUE);
+    EXPECT_EQ(gpu_feats.imageCubeArray, VK_TRUE);
+    EXPECT_EQ(gpu_feats.independentBlend, VK_TRUE);
+    EXPECT_EQ(gpu_feats.inheritedQueries, VK_TRUE);
+    EXPECT_EQ(gpu_feats.largePoints, VK_TRUE);
+    EXPECT_EQ(gpu_feats.multiDrawIndirect, VK_TRUE);
+    EXPECT_EQ(gpu_feats.multiViewport, VK_TRUE);
+    EXPECT_EQ(gpu_feats.occlusionQueryPrecise, VK_TRUE);
+    EXPECT_EQ(gpu_feats.robustBufferAccess, VK_TRUE);
+    EXPECT_EQ(gpu_feats.sampleRateShading, VK_TRUE);
+    EXPECT_EQ(gpu_feats.samplerAnisotropy, VK_TRUE);
+    EXPECT_EQ(gpu_feats.shaderClipDistance, VK_TRUE);
+    EXPECT_EQ(gpu_feats.shaderImageGatherExtended, VK_TRUE);
+    EXPECT_EQ(gpu_feats.shaderSampledImageArrayDynamicIndexing, VK_TRUE);
+    EXPECT_EQ(gpu_feats.shaderStorageBufferArrayDynamicIndexing, VK_TRUE);
+    EXPECT_EQ(gpu_feats.shaderStorageImageArrayDynamicIndexing, VK_TRUE);
+    EXPECT_EQ(gpu_feats.shaderStorageImageExtendedFormats, VK_TRUE);
+    EXPECT_EQ(gpu_feats.shaderStorageImageWriteWithoutFormat, VK_TRUE);
+    EXPECT_EQ(gpu_feats.shaderTessellationAndGeometryPointSize, VK_TRUE);
+    EXPECT_EQ(gpu_feats.shaderUniformBufferArrayDynamicIndexing, VK_TRUE);
+    EXPECT_EQ(gpu_feats.tessellationShader, VK_TRUE);
+    EXPECT_EQ(gpu_feats.textureCompressionBC, VK_TRUE);
+    EXPECT_EQ(gpu_feats.vertexPipelineStoresAndAtomics, VK_TRUE);
+
 
     vkDestroyInstance(test_inst, nullptr);
 }
