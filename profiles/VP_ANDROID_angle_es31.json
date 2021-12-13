@@ -25,44 +25,17 @@
         },
         {
             "name": "baseline",
-            "extensions": [
-                {
-                    "extensionName": "VK_EXT_line_rasterization",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_shader_terminate_invocation",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_provoking_vertex",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_transform_feedback",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_primitive_topology_list_restart",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_load_store_op_none",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_swapchain_colorspace",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_image_robustness",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_incremental_present",
-                    "specVersion": 1
-                }
-            ],
+            "extensions": {
+                "VK_EXT_line_rasterization": 1,
+                "VK_KHR_shader_terminate_invocation": 1,
+                "VK_EXT_provoking_vertex": 1,
+                "VK_EXT_transform_feedback": 1,
+                "VK_EXT_primitive_topology_list_restart": 1,
+                "VK_EXT_load_store_op_none": 1,
+                "VK_EXT_swapchain_colorspace": 1,
+                "VK_EXT_image_robustness": 1,
+                "VK_KHR_incremental_present": 1
+            },
             "features": {
                 "VkPhysicalDeviceFeatures": {
                     "independentBlend": true,

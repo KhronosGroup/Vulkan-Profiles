@@ -3,7 +3,7 @@
     "capabilities": [
         {
             "name": "baseline",
-            "extensions": [],
+            "extensions": {},
             "features": {},
             "properties": {},
             "formats": {},
