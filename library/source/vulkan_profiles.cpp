@@ -3502,7 +3502,7 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
 }
 
 VP_INLINE VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                               VkExtensionProperties *pProperties) {
+                                                   VkExtensionProperties *pProperties) {
     if (pProperties == nullptr) {
         if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_KHR_ROADMAP_2022_EXTENSIONS);
@@ -3586,7 +3586,7 @@ VP_INLINE VkResult vpGetProfileStructureProperties(const VpProfileProperties *pP
     }
 }
 
-VP_INLINE void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormat) {
+VP_INLINE VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormat) {
     if (pFormat == nullptr) {
         if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
             *pFormatCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_FORMATS);
@@ -3599,7 +3599,7 @@ VP_INLINE void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t
         else {
             *pFormatCount = 0;
         }
-        return;
+        return VK_SUCCESS;
     }
 
     if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
@@ -3607,16 +3607,20 @@ VP_INLINE void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t
         for (std::size_t i = 0; i < n; ++i) {
             pFormat[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2021_FORMATS[i].format;
         }
+        return _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_FORMATS) <= *pFormatCount ? VK_SUCCESS : VK_INCOMPLETE;
     }
-
 #ifdef VK_ENABLE_BETA_EXTENSIONS
-    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
+    else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
         std::size_t n = std::min<std::size_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_FORMATS), *pFormatCount);
         for (std::size_t i = 0; i < n; ++i) {
             pFormat[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2021_FORMATS[i].format;
         }
+        return _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_FORMATS) <= *pFormatCount ? VK_SUCCESS : VK_INCOMPLETE;
     }
 #endif
+    else {
+        return VK_SUCCESS;
+    }
 }
 
 VP_INLINE void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext) {
