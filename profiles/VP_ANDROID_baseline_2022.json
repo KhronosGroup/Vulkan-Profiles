@@ -3,13 +3,11 @@
     "capabilities": [
         {
             "name": "vulkan10requirements",
-            "features": [
-                {
-                    "VkPhysicalDeviceFeatures": {
-                        "robustBufferAccess": true
-                    }
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "robustBufferAccess": true
                 }
-            ]
+            }
         },
         {
             "name": "baseline",
@@ -111,1201 +109,809 @@
                     "specVersion": 1
                 }
             ],
-            "features": [
-                {
-                    "VkPhysicalDeviceFeatures": {
-                        "depthBiasClamp": true,
-                        "fragmentStoresAndAtomics": true,
-                        "fullDrawIndexUint32": true,
-                        "imageCubeArray": true,
-                        "independentBlend": true,
-                        "largePoints": true,
-                        "robustBufferAccess": true,
-                        "shaderImageGatherExtended": true,
-                        "shaderInt16": true,
-                        "shaderSampledImageArrayDynamicIndexing": true,
-                        "shaderStorageBufferArrayDynamicIndexing": true,
-                        "shaderStorageImageArrayDynamicIndexing": true,
-                        "shaderStorageImageWriteWithoutFormat": true,
-                        "shaderUniformBufferArrayDynamicIndexing": true,
-                        "textureCompressionASTC_LDR": true,
-                        "textureCompressionETC2": true
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "depthBiasClamp": true,
+                    "fragmentStoresAndAtomics": true,
+                    "fullDrawIndexUint32": true,
+                    "imageCubeArray": true,
+                    "independentBlend": true,
+                    "largePoints": true,
+                    "robustBufferAccess": true,
+                    "shaderImageGatherExtended": true,
+                    "shaderInt16": true,
+                    "shaderSampledImageArrayDynamicIndexing": true,
+                    "shaderStorageBufferArrayDynamicIndexing": true,
+                    "shaderStorageImageArrayDynamicIndexing": true,
+                    "shaderStorageImageWriteWithoutFormat": true,
+                    "shaderUniformBufferArrayDynamicIndexing": true,
+                    "textureCompressionASTC_LDR": true,
+                    "textureCompressionETC2": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 16384,
+                        "maxImageDimension2D": 8192,
+                        "maxImageDimension3D": 4096,
+                        "maxImageDimensionCube": 8192,
+                        "maxImageArrayLayers": 256,
+                        "maxTexelBufferElements": 65536,
+                        "maxUniformBufferRange": 65536,
+                        "maxStorageBufferRange": 268435456,
+                        "maxPushConstantsSize": 128,
+                        "maxMemoryAllocationCount": 4294967295,
+                        "maxSamplerAllocationCount": 16384,
+                        "bufferImageGranularity": 4096,
+                        "maxBoundDescriptorSets": 4,
+                        "maxPerStageDescriptorSamplers": 128,
+                        "maxPerStageDescriptorUniformBuffers": 12,
+                        "maxPerStageDescriptorStorageBuffers": 35,
+                        "maxPerStageDescriptorSampledImages": 16,
+                        "maxPerStageDescriptorStorageImages": 8,
+                        "maxPerStageDescriptorInputAttachments": 4,
+                        "maxPerStageResources": 79,
+                        "maxDescriptorSetSamplers": 768,
+                        "maxDescriptorSetUniformBuffers": 72,
+                        "maxDescriptorSetUniformBuffersDynamic": 8,
+                        "maxDescriptorSetStorageBuffers": 72,
+                        "maxDescriptorSetStorageBuffersDynamic": 4,
+                        "maxDescriptorSetSampledImages": 96,
+                        "maxDescriptorSetStorageImages": 48,
+                        "maxDescriptorSetInputAttachments": 4,
+                        "maxVertexInputAttributes": 16,
+                        "maxVertexInputBindings": 16,
+                        "maxVertexInputAttributeOffset": 2047,
+                        "maxVertexInputBindingStride": 2048,
+                        "maxVertexOutputComponents": 128,
+                        "maxTessellationGenerationLevel": 64,
+                        "maxTessellationPatchSize": 32,
+                        "maxTessellationControlPerVertexInputComponents": 128,
+                        "maxTessellationControlPerVertexOutputComponents": 128,
+                        "maxTessellationControlPerPatchOutputComponents": 120,
+                        "maxTessellationControlTotalOutputComponents": 4096,
+                        "maxTessellationEvaluationInputComponents": 128,
+                        "maxTessellationEvaluationOutputComponents": 128,
+                        "maxFragmentInputComponents": 128,
+                        "maxFragmentOutputAttachments": 4,
+                        "maxFragmentDualSrcAttachments": 0,
+                        "maxFragmentCombinedOutputResources": 47,
+                        "maxComputeSharedMemorySize": 32768,
+                        "maxComputeWorkGroupCount": [ 65535, 65535, 65535 ],
+                        "maxComputeWorkGroupInvocations": 128,
+                        "maxComputeWorkGroupSize": [ 128, 128, 128 ],
+                        "subPixelPrecisionBits": 8,
+                        "subTexelPrecisionBits": 8,
+                        "mipmapPrecisionBits": 8,
+                        "maxDrawIndexedIndexValue": 4294967295,
+                        "maxDrawIndirectCount": 1,
+                        "maxSamplerLodBias": 15.9961,
+                        "maxSamplerAnisotropy": 1.0,
+                        "maxViewports": 1,
+                        "maxViewportDimensions": [ 8192, 8192 ],
+                        "viewportBoundsRange": [ -32768, 32767 ],
+                        "viewportSubPixelBits": 0,
+                        "minMemoryMapAlignment": 64,
+                        "minTexelBufferOffsetAlignment": 256,
+                        "minUniformBufferOffsetAlignment": 64,
+                        "minStorageBufferOffsetAlignment": 256,
+                        "minTexelOffset": -8,
+                        "maxTexelOffset": 7,
+                        "minTexelGatherOffset": -8,
+                        "maxTexelGatherOffset": 7,
+                        "minInterpolationOffset": -0.5,
+                        "maxInterpolationOffset": 0.5,
+                        "subPixelInterpolationOffsetBits": 4,
+                        "maxFramebufferWidth": 8192,
+                        "maxFramebufferHeight": 8192,
+                        "maxFramebufferLayers": 256,
+                        "framebufferColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "framebufferDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "framebufferStencilSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "framebufferNoAttachmentsSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "maxColorAttachments": 4,
+                        "sampledImageColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "sampledImageIntegerSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
+                        "sampledImageDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "sampledImageStencilSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "storageImageSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
+                        "maxSampleMaskWords": 1,
+                        "timestampComputeAndGraphics": true,
+                        "timestampPeriod": 38.4615,
+                        "maxClipDistances": 0,
+                        "maxCullDistances": 0,
+                        "maxCombinedClipAndCullDistances": 0,
+                        "discreteQueuePriorities": 2,
+                        "pointSizeRange": [ 1.0, 1024.0 ],
+                        "lineWidthRange": [ 1.0, 1.0 ],
+                        "pointSizeGranularity": 0.0625,
+                        "strictLines": true,
+                        "nonCoherentAtomSize": 64
                     }
                 }
-            ],
-            "properties": [
-                {
-                    "VkPhysicalDeviceProperties": {
-                        "limits": {
-                            "maxImageDimension1D": 16384,
-                            "maxImageDimension2D": 8192,
-                            "maxImageDimension3D": 4096,
-                            "maxImageDimensionCube": 8192,
-                            "maxImageArrayLayers": 256,
-                            "maxTexelBufferElements": 65536,
-                            "maxUniformBufferRange": 65536,
-                            "maxStorageBufferRange": 268435456,
-                            "maxPushConstantsSize": 128,
-                            "maxMemoryAllocationCount": 4294967295,
-                            "maxSamplerAllocationCount": 16384,
-                            "bufferImageGranularity": 4096,
-                            "maxBoundDescriptorSets": 4,
-                            "maxPerStageDescriptorSamplers": 128,
-                            "maxPerStageDescriptorUniformBuffers": 12,
-                            "maxPerStageDescriptorStorageBuffers": 35,
-                            "maxPerStageDescriptorSampledImages": 16,
-                            "maxPerStageDescriptorStorageImages": 8,
-                            "maxPerStageDescriptorInputAttachments": 4,
-                            "maxPerStageResources": 79,
-                            "maxDescriptorSetSamplers": 768,
-                            "maxDescriptorSetUniformBuffers": 72,
-                            "maxDescriptorSetUniformBuffersDynamic": 8,
-                            "maxDescriptorSetStorageBuffers": 72,
-                            "maxDescriptorSetStorageBuffersDynamic": 4,
-                            "maxDescriptorSetSampledImages": 96,
-                            "maxDescriptorSetStorageImages": 48,
-                            "maxDescriptorSetInputAttachments": 4,
-                            "maxVertexInputAttributes": 16,
-                            "maxVertexInputBindings": 16,
-                            "maxVertexInputAttributeOffset": 2047,
-                            "maxVertexInputBindingStride": 2048,
-                            "maxVertexOutputComponents": 128,
-                            "maxTessellationGenerationLevel": 64,
-                            "maxTessellationPatchSize": 32,
-                            "maxTessellationControlPerVertexInputComponents": 128,
-                            "maxTessellationControlPerVertexOutputComponents": 128,
-                            "maxTessellationControlPerPatchOutputComponents": 120,
-                            "maxTessellationControlTotalOutputComponents": 4096,
-                            "maxTessellationEvaluationInputComponents": 128,
-                            "maxTessellationEvaluationOutputComponents": 128,
-                            "maxFragmentInputComponents": 128,
-                            "maxFragmentOutputAttachments": 4,
-                            "maxFragmentDualSrcAttachments": 0,
-                            "maxFragmentCombinedOutputResources": 47,
-                            "maxComputeSharedMemorySize": 32768,
-                            "maxComputeWorkGroupCount": [ 65535, 65535, 65535 ],
-                            "maxComputeWorkGroupInvocations": 128,
-                            "maxComputeWorkGroupSize": [ 128, 128, 128 ],
-                            "subPixelPrecisionBits": 8,
-                            "subTexelPrecisionBits": 8,
-                            "mipmapPrecisionBits": 8,
-                            "maxDrawIndexedIndexValue": 4294967295,
-                            "maxDrawIndirectCount": 1,
-                            "maxSamplerLodBias": 15.9961,
-                            "maxSamplerAnisotropy": 1.0,
-                            "maxViewports": 1,
-                            "maxViewportDimensions": [ 8192, 8192 ],
-                            "viewportBoundsRange": [ -32768, 32767 ],
-                            "viewportSubPixelBits": 0,
-                            "minMemoryMapAlignment": 64,
-                            "minTexelBufferOffsetAlignment": 256,
-                            "minUniformBufferOffsetAlignment": 64,
-                            "minStorageBufferOffsetAlignment": 256,
-                            "minTexelOffset": -8,
-                            "maxTexelOffset": 7,
-                            "minTexelGatherOffset": -8,
-                            "maxTexelGatherOffset": 7,
-                            "minInterpolationOffset": -0.5,
-                            "maxInterpolationOffset": 0.5,
-                            "subPixelInterpolationOffsetBits": 4,
-                            "maxFramebufferWidth": 8192,
-                            "maxFramebufferHeight": 8192,
-                            "maxFramebufferLayers": 256,
-                            "framebufferColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                            "framebufferDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                            "framebufferStencilSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                            "framebufferNoAttachmentsSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                            "maxColorAttachments": 4,
-                            "sampledImageColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                            "sampledImageIntegerSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
-                            "sampledImageDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                            "sampledImageStencilSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                            "storageImageSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
-                            "maxSampleMaskWords": 1,
-                            "timestampComputeAndGraphics": true,
-                            "timestampPeriod": 38.4615,
-                            "maxClipDistances": 0,
-                            "maxCullDistances": 0,
-                            "maxCombinedClipAndCullDistances": 0,
-                            "discreteQueuePriorities": 2,
-                            "pointSizeRange": [ 1.0, 1024.0 ],
-                            "lineWidthRange": [ 1.0, 1.0 ],
-                            "pointSizeGranularity": 0.0625,
-                            "strictLines": true,
-                            "nonCoherentAtomSize": 64
-                        }
+            },
+            "formats": {
+                "VK_FORMAT_R8G8B8_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_X8_D24_UNORM_PACK32": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_4x4_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_4x4_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_5x4_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_5x4_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_5x5_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_5x5_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_6x5_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_6x5_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_6x6_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_6x6_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_8x5_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_8x5_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_8x6_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_8x6_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_8x8_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_8x8_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_10x5_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_10x5_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_10x6_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_10x6_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_10x8_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_10x8_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_10x10_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_10x10_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_12x10_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_12x10_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_12x12_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ASTC_12x12_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_D24_UNORM_S8_UINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_B4G4R4A4_UNORM_PACK16": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R5G6B5_UNORM_PACK16": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_A1R5G5B5_UNORM_PACK16": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R8_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R8_SNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R8_UINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R8_SINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R8G8_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R8G8_SNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R8G8_UINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R8G8_SINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R8G8B8A8_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R8G8B8A8_SNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R8G8B8A8_UINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R8G8B8A8_SINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R8G8B8A8_SRGB": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_B8G8R8A8_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_B8G8R8A8_SRGB": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_A8B8G8R8_UNORM_PACK32": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_A8B8G8R8_SNORM_PACK32": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_A8B8G8R8_UINT_PACK32": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_A8B8G8R8_SINT_PACK32": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_A8B8G8R8_SRGB_PACK32": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_A2B10G10R10_UNORM_PACK32": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_A2B10G10R10_UINT_PACK32": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16_SNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16_UINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16_SINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16_SFLOAT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16G16_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16G16_SNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16G16_UINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16G16_SINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16G16_SFLOAT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16G16B16A16_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16G16B16A16_SNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16G16B16A16_UINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16G16B16A16_SINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R16G16B16A16_SFLOAT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R32_UINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R32_SINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R32_SFLOAT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R32G32_UINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R32G32_SINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R32G32_SFLOAT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R32G32B32_UINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R32G32B32_SINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R32G32B32_SFLOAT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R32G32B32A32_UINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R32G32B32A32_SINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R32G32B32A32_SFLOAT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_B10G11R11_UFLOAT_PACK32": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_E5B9G9R9_UFLOAT_PACK32": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_D16_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_D32_SFLOAT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_EAC_R11_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_EAC_R11_SNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_EAC_R11G11_UNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_EAC_R11G11_SNORM_BLOCK": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": []
                     }
                 }
-            ],
-            "formats": [
-                {
-                    "VK_FORMAT_R8G8B8_UNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_X8_D24_UNORM_PACK32": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_4x4_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_4x4_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_5x4_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_5x4_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_5x5_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_5x5_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_6x5_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_6x5_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_6x6_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_6x6_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_8x5_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_8x5_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_8x6_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_8x6_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_8x8_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_8x8_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_10x5_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_10x5_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_10x6_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_10x6_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_10x8_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_10x8_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_10x10_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_10x10_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_12x10_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_12x10_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_12x12_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ASTC_12x12_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_D24_UNORM_S8_UINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_B4G4R4A4_UNORM_PACK16": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R5G6B5_UNORM_PACK16": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_A1R5G5B5_UNORM_PACK16": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R8_UNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R8_SNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R8_UINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R8_SINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R8G8_UNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R8G8_SNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R8G8_UINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R8G8_SINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R8G8B8A8_UNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R8G8B8A8_SNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R8G8B8A8_UINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R8G8B8A8_SINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R8G8B8A8_SRGB": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_B8G8R8A8_UNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_B8G8R8A8_SRGB": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_A8B8G8R8_UNORM_PACK32": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_A8B8G8R8_SNORM_PACK32": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_A8B8G8R8_UINT_PACK32": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_A8B8G8R8_SINT_PACK32": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_A8B8G8R8_SRGB_PACK32": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_A2B10G10R10_UNORM_PACK32": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_A2B10G10R10_UINT_PACK32": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16_UNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16_SNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16_UINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16_SINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16_SFLOAT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16G16_UNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16G16_SNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16G16_UINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16G16_SINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16G16_SFLOAT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16G16B16A16_UNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16G16B16A16_SNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16G16B16A16_UINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16G16B16A16_SINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R16G16B16A16_SFLOAT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R32_UINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R32_SINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R32_SFLOAT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R32G32_UINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R32G32_SINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R32G32_SFLOAT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R32G32B32_UINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R32G32B32_SINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R32G32B32_SFLOAT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R32G32B32A32_UINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R32G32B32A32_SINT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_R32G32B32A32_SFLOAT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_B10G11R11_UFLOAT_PACK32": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_E5B9G9R9_UFLOAT_PACK32": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_D16_UNORM": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_D32_SFLOAT": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                     "VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_EAC_R11_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_EAC_R11_SNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_EAC_R11G11_UNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                },
-                {
-                    "VK_FORMAT_EAC_R11G11_SNORM_BLOCK": [
-                        {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [],
-                                "optimalTilingFeatures": [],
-                                "bufferFeatures": []
-                            }
-                        }
-                    ]
-                }
-            ]
+            }
         }
     ],
     "profiles": [

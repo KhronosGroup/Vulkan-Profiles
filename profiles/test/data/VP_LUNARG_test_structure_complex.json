@@ -4,11 +4,11 @@
         {
             "name": "baseline",
             "extensions": [],
-            "features": [],
-            "properties": [],
-            "formats": [],
-            "queueFamiliesProperties": [],
-            "memoryProperties": []
+            "features": {},
+            "properties": {},
+            "formats": {},
+            "queueFamiliesProperties": {},
+            "memoryProperties": {}
         },
         {
             "name": "unused"

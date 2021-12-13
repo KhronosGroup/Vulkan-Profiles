@@ -3,31 +3,25 @@
     "capabilities": [
         {
             "name": "vulkan10requirements",
-            "features": [
-                {
-                    "VkPhysicalDeviceFeatures": {
-                        "robustBufferAccess": true
-                    }
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "robustBufferAccess": true
                 }
-            ]
+            }
         },
         {
             "name": "vulkan11requirements",
-            "features": [
-                {
-                    "VkPhysicalDeviceMultiviewFeatures": {
-                        "multiview": true
-                    }
+            "features": {
+                "VkPhysicalDeviceMultiviewFeatures": {
+                    "multiview": true
                 }
-            ],
-            "properties": [
-                {
-                    "VkPhysicalDeviceMultiviewProperties": {
-                        "maxMultiviewViewCount": 0,
-                        "maxMultiviewInstanceIndex": 134217727
-                    }
+            },
+            "properties": {
+                "VkPhysicalDeviceMultiviewProperties": {
+                    "maxMultiviewViewCount": 0,
+                    "maxMultiviewInstanceIndex": 134217727
                 }
-            ]
+            }
         },
         {
             "name": "baseline",
@@ -69,64 +63,48 @@
                     "specVersion": 1
                 }
             ],
-            "features": [
-                {
-                    "VkPhysicalDeviceFeatures": {
-                        "independentBlend": true,
-                        "vertexPipelineStoresAndAtomics": true
-                    }
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "independentBlend": true,
+                    "vertexPipelineStoresAndAtomics": true
                 },
-                {
-                    "VkPhysicalDeviceLineRasterizationFeaturesEXT": {
-                        "bresenhamLines": true
-                    }
+                "VkPhysicalDeviceLineRasterizationFeaturesEXT": {
+                    "bresenhamLines": true
                 },
-                {
-                    "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR": {
-                        "shaderTerminateInvocation": true
-                    }
+                "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR": {
+                    "shaderTerminateInvocation": true
                 },
-                {
-                    "VkPhysicalDeviceProvokingVertexFeaturesEXT": {
-                        "provokingVertexLast": true
-                    }
+                "VkPhysicalDeviceProvokingVertexFeaturesEXT": {
+                    "provokingVertexLast": true
                 },
-                {
-                    "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
-                        "transformFeedback": true
-                    }
+                "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
+                    "transformFeedback": true
                 },
-                {
-                    "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT": {
-                        "primitiveTopologyListRestart": true
-                    }
+                "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT": {
+                    "primitiveTopologyListRestart": true
                 },
-                {
-                    "VkPhysicalDeviceImageRobustnessFeaturesEXT": {
-                        "robustImageAccess": true
+                "VkPhysicalDeviceImageRobustnessFeaturesEXT": {
+                    "robustImageAccess": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "standardSampleLocations": true,
+                        "maxVertexOutputComponents": 64,
+                        "maxTessellationControlPerVertexOutputComponents": 64,
+                        "maxTessellationControlPerPatchOutputComponents": 64,
+                        "maxTessellationControlTotalOutputComponents": 64,
+                        "maxTessellationEvaluationOutputComponents": 64,
+                        "maxGeometryOutputComponents": 64,
+                        "maxGeometryTotalOutputComponents": 64,
+                        "maxPerStageDescriptorUniformBuffers": 12,
+                        "maxPerStageDescriptorStorageBuffers": 12,
+                        "maxVertexInputAttributeOffset": 2048,
+                        "subPixelPrecisionBits": 8
                     }
                 }
-            ],
-            "properties": [
-                {
-                    "VkPhysicalDeviceProperties": {
-                        "limits": {
-                            "standardSampleLocations": true,
-                            "maxVertexOutputComponents": 64,
-                            "maxTessellationControlPerVertexOutputComponents": 64,
-                            "maxTessellationControlPerPatchOutputComponents": 64,
-                            "maxTessellationControlTotalOutputComponents": 64,
-                            "maxTessellationEvaluationOutputComponents": 64,
-                            "maxGeometryOutputComponents": 64,
-                            "maxGeometryTotalOutputComponents": 64,
-                            "maxPerStageDescriptorUniformBuffers": 12,
-                            "maxPerStageDescriptorStorageBuffers": 12,
-                            "maxVertexInputAttributeOffset": 2048,
-                            "subPixelPrecisionBits": 8
-                        }
-                    }
-                }
-            ]
+            }
         }
     ],
     "profiles": [
