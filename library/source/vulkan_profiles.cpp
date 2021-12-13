@@ -847,7 +847,7 @@ VP_INLINE void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pPro
     }
 }
 
-VP_INLINE void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VP_INLINE VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                      VpProfileProperties *pProperties) {
     static const VpProfileProperties LUNARG_desktop_portability_2021_subset_fallbacks[] = {
         {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION}};
@@ -862,7 +862,7 @@ VP_INLINE void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32
 #endif  // VK_ENABLE_BETA_EXTENSIONS
             *pPropertyCount = 0;
         }
-        return;
+        return VK_SUCCESS;
     }
 
 #ifdef VK_ENABLE_BETA_EXTENSIONS
@@ -873,6 +873,10 @@ VP_INLINE void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32
             pProperties[i] = LUNARG_desktop_portability_2021_subset_fallbacks[i];
         }
     }
+
+    return _vpCountOf(LUNARG_desktop_portability_2021_subset_fallbacks) <= *pPropertyCount ? VK_SUCCESS : VK_INCOMPLETE;
+#else
+    return VK_SUCCESS;
 #endif  // VK_ENABLE_BETA_EXTENSIONS
 }
 
@@ -2268,7 +2272,7 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
 
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-        if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_KHR_ROADMAP_2022_MIN_VERSION)) return result;
+        if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_KHR_ROADMAP_2022_MIN_API_VERSION)) return result;
 
         VkBool32 extensionSupported = VK_TRUE;
         for (std::size_t i = 0, n = _vpCountOf(_VP_KHR_ROADMAP_2022_EXTENSIONS); i < n && extensionSupported; ++i) {

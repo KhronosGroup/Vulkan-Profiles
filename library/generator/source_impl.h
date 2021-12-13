@@ -43,7 +43,7 @@ VP_INLINE VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, ui
         }
     }
 
-    return _vpCountOf(LUNARG_desktop_portability_2021_subset_fallbacks) <= pPropertyCount ? VK_SUCCESS : VK_INCOMPLETE;
+    return _vpCountOf(LUNARG_desktop_portability_2021_subset_fallbacks) <= *pPropertyCount ? VK_SUCCESS : VK_INCOMPLETE;
 #else
     return VK_SUCCESS;
 #endif  // VK_ENABLE_BETA_EXTENSIONS

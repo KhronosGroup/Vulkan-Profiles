@@ -30,7 +30,7 @@
 #define VK_KHR_roadmap_2022 1
 #define VP_KHR_ROADMAP_2022_NAME "VP_KHR_roadmap_2022"
 #define VP_KHR_ROADMAP_2022_SPEC_VERSION 1
-#define VP_KHR_ROADMAP_2022_MIN_VERSION VK_MAKE_VERSION(1, 3, 200)
+#define VP_KHR_ROADMAP_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 3, 200)
 
 #define VP_ANDROID_baseline_2022 1
 #define VP_ANDROID_BASELINE_2022_NAME "VP_ANDROID_baseline_2022"
@@ -83,7 +83,7 @@ typedef struct VpDeviceCreateInfo {
 void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // List the recommended fallback profiles of a profile
-void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // Check whether a profile is supported by the physical device
 VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
@@ -954,7 +954,7 @@ VP_INLINE void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pPro
     }
 }
 
-VP_INLINE void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VP_INLINE VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                      VpProfileProperties *pProperties) {
     static const VpProfileProperties LUNARG_desktop_portability_2021_subset_fallbacks[] = {
         {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION}};
@@ -969,7 +969,7 @@ VP_INLINE void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32
 #endif  // VK_ENABLE_BETA_EXTENSIONS
             *pPropertyCount = 0;
         }
-        return;
+        return VK_SUCCESS;
     }
 
 #ifdef VK_ENABLE_BETA_EXTENSIONS
@@ -980,6 +980,10 @@ VP_INLINE void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32
             pProperties[i] = LUNARG_desktop_portability_2021_subset_fallbacks[i];
         }
     }
+
+    return _vpCountOf(LUNARG_desktop_portability_2021_subset_fallbacks) <= *pPropertyCount ? VK_SUCCESS : VK_INCOMPLETE;
+#else
+    return VK_SUCCESS;
 #endif  // VK_ENABLE_BETA_EXTENSIONS
 }
 
@@ -2375,7 +2379,7 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
 
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-        if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_KHR_ROADMAP_2022_MIN_VERSION)) return result;
+        if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_KHR_ROADMAP_2022_MIN_API_VERSION)) return result;
 
         VkBool32 extensionSupported = VK_TRUE;
         for (std::size_t i = 0, n = _vpCountOf(_VP_KHR_ROADMAP_2022_EXTENSIONS); i < n && extensionSupported; ++i) {

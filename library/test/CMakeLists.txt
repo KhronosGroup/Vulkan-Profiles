@@ -22,6 +22,7 @@ endfunction(add_unit_test)
 add_unit_test(test_api_create_device)
 add_unit_test(test_api_get_profiles_beta)
 add_unit_test(test_api_get_profile_extensions)
+add_unit_test(test_api_get_profile_fallbacks)
 add_unit_test(test_api_get_profile_formats)
 add_unit_test(test_api_get_profile_memory_types)
 add_unit_test(test_api_get_profile_queue_families)
@@ -60,5 +61,6 @@ function(add_unit_test_simple NAME)
 endfunction(add_unit_test_simple)
 
 add_unit_test_simple(test_util)
+
 
 

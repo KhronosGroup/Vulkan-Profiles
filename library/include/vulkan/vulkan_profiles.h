@@ -34,7 +34,7 @@
 #define VK_KHR_roadmap_2022 1
 #define VP_KHR_ROADMAP_2022_NAME "VP_KHR_roadmap_2022"
 #define VP_KHR_ROADMAP_2022_SPEC_VERSION 1
-#define VP_KHR_ROADMAP_2022_MIN_VERSION VK_MAKE_VERSION(1, 3, 200)
+#define VP_KHR_ROADMAP_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 3, 200)
 
 #define VP_ANDROID_baseline_2022 1
 #define VP_ANDROID_BASELINE_2022_NAME "VP_ANDROID_baseline_2022"
@@ -87,7 +87,7 @@ typedef struct VpDeviceCreateInfo {
 void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // List the recommended fallback profiles of a profile
-void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // Check whether a profile is supported by the physical device
 VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
