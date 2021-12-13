@@ -79,6 +79,9 @@
         },
         {
             "name": "roadmap2020requirements",
+            "extensions": {
+                "VK_EXT_global_priority": 1
+            },
             "features": {
                 "VkPhysicalDeviceFeatures": {
                     "fullDrawIndexUint32": true,
