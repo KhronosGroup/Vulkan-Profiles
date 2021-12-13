@@ -5212,68 +5212,30 @@
                         }
                     },
                     "queueFamiliesProperties": {
-                        "type": "array",
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "object",
-                            "oneOf": [
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkQueueFamilyProperties": {
-                                            "$ref": "#/definitions/VkQueueFamilyProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkQueueFamilyProperties2": {
-                                            "$ref": "#/definitions/VkQueueFamilyProperties2"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkQueueFamilyProperties2KHR": {
-                                            "$ref": "#/definitions/VkQueueFamilyProperties2"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkQueueFamilyGlobalPriorityPropertiesEXT": {
-                                            "$ref": "#/definitions/VkQueueFamilyGlobalPriorityPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkVideoQueueFamilyProperties2KHR": {
-                                            "$ref": "#/definitions/VkVideoQueueFamilyProperties2KHR"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkQueueFamilyCheckpointPropertiesNV": {
-                                            "$ref": "#/definitions/VkQueueFamilyCheckpointPropertiesNV"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkQueueFamilyCheckpointProperties2NV": {
-                                            "$ref": "#/definitions/VkQueueFamilyCheckpointProperties2NV"
-                                        }
-                                    }
-                                }
-                            ]
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "VkQueueFamilyProperties": {
+                                "$ref": "#/definitions/VkQueueFamilyProperties"
+                            },
+                            "VkQueueFamilyProperties2": {
+                                "$ref": "#/definitions/VkQueueFamilyProperties2"
+                            },
+                            "VkQueueFamilyProperties2KHR": {
+                                "$ref": "#/definitions/VkQueueFamilyProperties2"
+                            },
+                            "VkQueueFamilyGlobalPriorityPropertiesEXT": {
+                                "$ref": "#/definitions/VkQueueFamilyGlobalPriorityPropertiesEXT"
+                            },
+                            "VkVideoQueueFamilyProperties2KHR": {
+                                "$ref": "#/definitions/VkVideoQueueFamilyProperties2KHR"
+                            },
+                            "VkQueueFamilyCheckpointPropertiesNV": {
+                                "$ref": "#/definitions/VkQueueFamilyCheckpointPropertiesNV"
+                            },
+                            "VkQueueFamilyCheckpointProperties2NV": {
+                                "$ref": "#/definitions/VkQueueFamilyCheckpointProperties2NV"
+                            }
                         }
                     },
                     "memoryProperties": {
