@@ -29,11 +29,14 @@ TEST(api_get_profile_extension_properties, full) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
-    vpGetProfileExtensionProperties(&profile, &propertyCount, nullptr);
+    VkResult result0 = vpGetProfileExtensionProperties(&profile, &propertyCount, nullptr);
+    EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(13, propertyCount);
 
     std::vector<VkExtensionProperties> properties(propertyCount);
-    vpGetProfileExtensionProperties(&profile, &propertyCount, &properties[0]);
+    VkResult result1 = vpGetProfileExtensionProperties(&profile, &propertyCount, &properties[0]);
+    EXPECT_EQ(VK_SUCCESS, result1);
+    EXPECT_EQ(13, propertyCount);
 
     EXPECT_STREQ(VK_EXT_GLOBAL_PRIORITY_EXTENSION_NAME, properties[0].extensionName);
     EXPECT_STREQ(VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME, properties[1].extensionName);
@@ -54,13 +57,15 @@ TEST(api_get_profile_extension_properties, partial) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
-    vpGetProfileExtensionProperties(&profile, &propertyCount, nullptr);
+    VkResult result0 = vpGetProfileExtensionProperties(&profile, &propertyCount, nullptr);
+    EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(13, propertyCount);
 
     propertyCount = 5;
 
     std::vector<VkExtensionProperties> properties(propertyCount);
-    vpGetProfileExtensionProperties(&profile, &propertyCount, &properties[0]);
+    VkResult result1 = vpGetProfileExtensionProperties(&profile, &propertyCount, &properties[0]);
+    EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(5, propertyCount);
 
     EXPECT_STREQ(VK_EXT_GLOBAL_PRIORITY_EXTENSION_NAME, properties[0].extensionName);

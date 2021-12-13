@@ -98,7 +98,7 @@ VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInf
                         const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
 
 // Query the list of extension of a profile
-void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                      VkExtensionProperties *pProperties);
 
 // Fill the pNext Vulkan structures with the requirements of a profile

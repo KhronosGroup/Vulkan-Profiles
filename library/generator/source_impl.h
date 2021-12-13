@@ -2670,7 +2670,7 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
     return result;
 }
 
-VP_INLINE void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VP_INLINE VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                                VkExtensionProperties *pProperties) {
     if (pProperties == nullptr) {
         if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
@@ -2683,7 +2683,7 @@ VP_INLINE void vpGetProfileExtensionProperties(const VpProfileProperties *pProfi
             *pPropertyCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS);
         }
 #endif
-        return;
+        return VK_SUCCESS;
     }
 
     if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
@@ -2691,20 +2691,23 @@ VP_INLINE void vpGetProfileExtensionProperties(const VpProfileProperties *pProfi
              ++i) {
             pProperties[i] = _VP_KHR_ROADMAP_2022_EXTENSIONS[i];
         }
+        return _vpCountOf(_VP_KHR_ROADMAP_2022_EXTENSIONS) <= *pPropertyCount ? VK_SUCCESS : VK_INCOMPLETE;
     } else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
         for (std::size_t i = 0,
                          n = std::min<std::size_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS), *pPropertyCount);
              i < n; ++i) {
             pProperties[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[i];
         }
+        return _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS) <= *pPropertyCount ? VK_SUCCESS : VK_INCOMPLETE;
     }
 #ifdef VK_ENABLE_BETA_EXTENSIONS
     else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
-        for (std::size_t i = 0,
-                         n = std::min<std::size_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS), *pPropertyCount);
+        for (std::size_t i = 0, n = std::min<std::size_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS),
+                                                          *pPropertyCount);
              i < n; ++i) {
-            pProperties[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[i];
+            pProperties[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS[i];
         }
+        return _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS) <= *pPropertyCount ? VK_SUCCESS : VK_INCOMPLETE;
     }
 #endif
 }
