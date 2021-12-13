@@ -3,9 +3,29 @@
     "capabilities": [
         {
             "name": "baseline",
-            "memoryProperties": [
-                {
-                    "VkPhysicalDeviceMemoryProperties": {
+            "memoryProperties": {
+                "VkPhysicalDeviceMemoryProperties": {
+                    "memoryTypes": [
+                        {
+                            "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT" ]
+                        },
+                        {
+                            "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT" ]
+                        }
+                    ],
+                    "memoryHeaps": [
+                        {
+                            "size": 16,
+                            "flags": [ "VK_MEMORY_HEAP_DEVICE_LOCAL_BIT" ]
+                        },
+                        {
+                            "size": 256,
+                            "flags": []
+                        }
+                    ]
+                },
+                "VkPhysicalDeviceMemoryProperties2": {
+                    "memoryProperties": {
                         "memoryTypes": [
                             {
                                 "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT" ]
@@ -26,61 +46,33 @@
                         ]
                     }
                 },
-                {
-                    "VkPhysicalDeviceMemoryProperties2": {
-                        "memoryProperties": {
-                            "memoryTypes": [
-                                {
-                                    "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT" ]
-                                },
-                                {
-                                    "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT" ]
-                                }
-                            ],
-                            "memoryHeaps": [
-                                {
-                                    "size": 16,
-                                    "flags": [ "VK_MEMORY_HEAP_DEVICE_LOCAL_BIT" ]
-                                },
-                                {
-                                    "size": 256,
-                                    "flags": []
-                                }
-                            ]
-                        }
+                "VkPhysicalDeviceMemoryProperties2KHR": {
+                    "memoryProperties": {
+                        "memoryTypes": [
+                            {
+                                "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT" ]
+                            },
+                            {
+                                "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT" ]
+                            }
+                        ],
+                        "memoryHeaps": [
+                            {
+                                "size": 16,
+                                "flags": [ "VK_MEMORY_HEAP_DEVICE_LOCAL_BIT" ]
+                            },
+                            {
+                                "size": 256,
+                                "flags": []
+                            }
+                        ]
                     }
                 },
-                {
-                    "VkPhysicalDeviceMemoryProperties2KHR": {
-                        "memoryProperties": {
-                            "memoryTypes": [
-                                {
-                                    "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT" ]
-                                },
-                                {
-                                    "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT" ]
-                                }
-                            ],
-                            "memoryHeaps": [
-                                {
-                                    "size": 16,
-                                    "flags": [ "VK_MEMORY_HEAP_DEVICE_LOCAL_BIT" ]
-                                },
-                                {
-                                    "size": 256,
-                                    "flags": []
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "VkPhysicalDeviceMemoryBudgetPropertiesEXT": {
-                        "heapBudget": [ 4, 16, 256, 4096 ],
-                        "heapUsage": [ 4, 16, 256, 4096 ]
-                    }
+                "VkPhysicalDeviceMemoryBudgetPropertiesEXT": {
+                    "heapBudget": [ 4, 16, 256, 4096 ],
+                    "heapUsage": [ 4, 16, 256, 4096 ]
                 }
-            ]
+            }
         }
     ],
     "profiles": [

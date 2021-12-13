@@ -915,20 +915,18 @@
                     }
                 }
             },
-            "memoryProperties": [
-                {
-                    "VkPhysicalDeviceMemoryProperties": {
-                        "memoryTypes": [
-                            {
-                                "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT" ]
-                            },
-                            {
-                                "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT" ]
-                            }
-                        ]
-                    }
+            "memoryProperties": {
+                "VkPhysicalDeviceMemoryProperties": {
+                    "memoryTypes": [
+                        {
+                            "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT" ]
+                        },
+                        {
+                            "propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT" ]
+                        }
+                    ]
                 }
-            ]
+            }
         },
         {
             "name": "macos-specific",

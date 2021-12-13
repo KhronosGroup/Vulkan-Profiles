@@ -8,7 +8,7 @@
             "properties": {},
             "formats": {},
             "queueFamiliesProperties": {},
-            "memoryProperties": []
+            "memoryProperties": {}
         },
         {
             "name": "unused"

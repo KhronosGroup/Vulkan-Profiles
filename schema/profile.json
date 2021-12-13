@@ -5239,44 +5239,21 @@
                         }
                     },
                     "memoryProperties": {
-                        "type": "array",
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "object",
-                            "oneOf": [
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMemoryProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMemoryProperties2": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties2"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMemoryProperties2KHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties2"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMemoryBudgetPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMemoryBudgetPropertiesEXT"
-                                        }
-                                    }
-                                }
-                            ]
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "VkPhysicalDeviceMemoryProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties"
+                            },
+                            "VkPhysicalDeviceMemoryProperties2": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties2"
+                            },
+                            "VkPhysicalDeviceMemoryProperties2KHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties2"
+                            },
+                            "VkPhysicalDeviceMemoryBudgetPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMemoryBudgetPropertiesEXT"
+                            }
                         }
                     }
                 }
