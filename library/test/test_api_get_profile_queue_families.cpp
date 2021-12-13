@@ -29,11 +29,13 @@ TEST(api_get_profile_queue_families, full) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     uint32_t count = 0;
-    vpGetProfileQueueFamilies(&profile, &count, nullptr);
+    VkResult result0 = vpGetProfileQueueFamilies(&profile, &count, nullptr);
+    EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(1, count);
 
     std::vector<VkQueueFamilyProperties> data(count);
-    vpGetProfileQueueFamilies(&profile, &count, &data[0]);
+    VkResult result1 = vpGetProfileQueueFamilies(&profile, &count, &data[0]);
+    EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(1, count);
 
     EXPECT_EQ(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT,
@@ -49,6 +51,7 @@ TEST(api_get_profile_queue_families, unspecified) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t count = 0;
-    vpGetProfileQueueFamilies(&profile, &count, nullptr);
+    VkResult result0 = vpGetProfileQueueFamilies(&profile, &count, nullptr);
+    EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(0, count);
 }

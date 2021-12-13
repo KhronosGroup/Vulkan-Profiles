@@ -101,5 +101,6 @@ VkResult vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *
                                  VkMemoryPropertyFlags *pMemoryTypes);
 
 // Query the requirements of queue families by a profile
-void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
+VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                   VkQueueFamilyProperties *pProperties);
 
