@@ -17,14 +17,12 @@
                     "multiview": true
                 }
             },
-            "properties": [
-                {
-                    "VkPhysicalDeviceVulkan11Properties": {
-                        "maxMultiviewViewCount": 6,
-                        "maxMultiviewInstanceIndex": 134217727
-                    }
+            "properties": {
+                "VkPhysicalDeviceVulkan11Properties": {
+                    "maxMultiviewViewCount": 6,
+                    "maxMultiviewInstanceIndex": 134217727
                 }
-            ]
+            }
         },
         {
             "name": "vulkan12requirements",
@@ -39,13 +37,11 @@
                     "shaderSubgroupExtendedTypes": true
                 }
             },
-            "properties": [
-                {
-                    "VkPhysicalDeviceVulkan12Properties": {
-                        "maxTimelineSemaphoreValueDifference": 2147483647
-                    }
+            "properties": {
+                "VkPhysicalDeviceVulkan12Properties": {
+                    "maxTimelineSemaphoreValueDifference": 2147483647
                 }
-            ]
+            }
         },
         {
             "name": "vulkan13requirements",
@@ -70,18 +66,16 @@
                     "maintenance4": true
                 }
             },
-            "properties": [
-                {
-                    "VkPhysicalDeviceVulkan13Properties": {
-                        "maxInlineUniformBlockSize": 256,
-                        "maxPerStageDescriptorInlineUniformBlocks": 4,
-                        "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4,
-                        "maxDescriptorSetInlineUniformBlocks": 4,
-                        "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 4,
-                        "maxInlineUniformTotalSize": 4
-                    }
+            "properties": {
+                "VkPhysicalDeviceVulkan13Properties": {
+                    "maxInlineUniformBlockSize": 256,
+                    "maxPerStageDescriptorInlineUniformBlocks": 4,
+                    "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4,
+                    "maxDescriptorSetInlineUniformBlocks": 4,
+                    "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 4,
+                    "maxInlineUniformTotalSize": 4
                 }
-            ]
+            }
         },
         {
             "name": "roadmap2020requirements",
@@ -136,69 +130,63 @@
                     "scalarBlockLayout": true
                 }
             },
-            "properties": [
-                {
-                    "VkPhysicalDeviceProperties": {
-                        "limits": {
-                            "maxImageDimension1D": 8192,
-                            "maxImageDimension2D": 8192,
-                            "maxImageDimensionCube": 8192,
-                            "maxImageArrayLayers": 2048,
-                            "maxUniformBufferRange": 65536,
-                            "bufferImageGranularity": 4096,
-                            "maxPerStageDescriptorSamplers": 64,
-                            "maxPerStageDescriptorUniformBuffers": 15,
-                            "maxPerStageDescriptorStorageBuffers": 30,
-                            "maxPerStageDescriptorSampledImages": 200,
-                            "maxPerStageDescriptorStorageImages": 16,
-                            "maxPerStageResources": 200,
-                            "maxDescriptorSetSamplers": 576,
-                            "maxDescriptorSetUniformBuffers": 90,
-                            "maxDescriptorSetStorageBuffers": 96,
-                            "maxDescriptorSetSampledImages": 1800,
-                            "maxDescriptorSetStorageImages": 144,
-                            "maxFragmentCombinedOutputResources": 16,
-                            "maxComputeWorkGroupInvocations": 256,
-                            "maxComputeWorkGroupSize": [ 1024, 1024, 64 ],
-                            "subTexelPrecisionBits": 8,
-                            "mipmapPrecisionBits": 6,
-                            "maxSamplerLodBias": 14,
-                            "pointSizeGranularity": 0.125,
-                            "lineWidthGranularity": 0.5,
-                            "standardSampleLocations": true,
-                            "maxColorAttachments": 7
-                        }
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 8192,
+                        "maxImageDimension2D": 8192,
+                        "maxImageDimensionCube": 8192,
+                        "maxImageArrayLayers": 2048,
+                        "maxUniformBufferRange": 65536,
+                        "bufferImageGranularity": 4096,
+                        "maxPerStageDescriptorSamplers": 64,
+                        "maxPerStageDescriptorUniformBuffers": 15,
+                        "maxPerStageDescriptorStorageBuffers": 30,
+                        "maxPerStageDescriptorSampledImages": 200,
+                        "maxPerStageDescriptorStorageImages": 16,
+                        "maxPerStageResources": 200,
+                        "maxDescriptorSetSamplers": 576,
+                        "maxDescriptorSetUniformBuffers": 90,
+                        "maxDescriptorSetStorageBuffers": 96,
+                        "maxDescriptorSetSampledImages": 1800,
+                        "maxDescriptorSetStorageImages": 144,
+                        "maxFragmentCombinedOutputResources": 16,
+                        "maxComputeWorkGroupInvocations": 256,
+                        "maxComputeWorkGroupSize": [ 1024, 1024, 64 ],
+                        "subTexelPrecisionBits": 8,
+                        "mipmapPrecisionBits": 6,
+                        "maxSamplerLodBias": 14,
+                        "pointSizeGranularity": 0.125,
+                        "lineWidthGranularity": 0.5,
+                        "standardSampleLocations": true,
+                        "maxColorAttachments": 7
                     }
                 },
-                {
-                    "VkPhysicalDeviceVulkan11Properties": {
-                        "subgroupSize": 4,
-                        "subgroupSupportedStages": [ "VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT" ],
-                        "subgroupSupportedOperations": [ "VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_VOTE_BIT", "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT", "VK_SUBGROUP_FEATURE_BALLOT_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT", "VK_SUBGROUP_FEATURE_QUAD_BIT" ]
-                    }
+                "VkPhysicalDeviceVulkan11Properties": {
+                    "subgroupSize": 4,
+                    "subgroupSupportedStages": [ "VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT" ],
+                    "subgroupSupportedOperations": [ "VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_VOTE_BIT", "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT", "VK_SUBGROUP_FEATURE_BALLOT_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT", "VK_SUBGROUP_FEATURE_QUAD_BIT" ]
                 },
-                {
-                    "VkPhysicalDeviceVulkan12Properties": {
-                        "shaderSignedZeroInfNanPreserveFloat16": true,
-                        "shaderSignedZeroInfNanPreserveFloat32": true,
-                        "maxPerStageDescriptorUpdateAfterBindSamplers": 500000,
-                        "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 12,
-                        "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 500000,
-                        "maxPerStageDescriptorUpdateAfterBindSampledImages": 500000,
-                        "maxPerStageDescriptorUpdateAfterBindStorageImages": 500000,
-                        "maxPerStageDescriptorUpdateAfterBindInputAttachments": 7,
-                        "maxPerStageUpdateAfterBindResources": 500000,
-                        "maxDescriptorSetUpdateAfterBindSamplers": 500000,
-                        "maxDescriptorSetUpdateAfterBindUniformBuffers": 72,
-                        "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 8,
-                        "maxDescriptorSetUpdateAfterBindStorageBuffers": 500000,
-                        "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 4,
-                        "maxDescriptorSetUpdateAfterBindSampledImages": 500000,
-                        "maxDescriptorSetUpdateAfterBindStorageImages": 500000,
-                        "maxDescriptorSetUpdateAfterBindInputAttachments": 7
-                    }
+                "VkPhysicalDeviceVulkan12Properties": {
+                    "shaderSignedZeroInfNanPreserveFloat16": true,
+                    "shaderSignedZeroInfNanPreserveFloat32": true,
+                    "maxPerStageDescriptorUpdateAfterBindSamplers": 500000,
+                    "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 12,
+                    "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 500000,
+                    "maxPerStageDescriptorUpdateAfterBindSampledImages": 500000,
+                    "maxPerStageDescriptorUpdateAfterBindStorageImages": 500000,
+                    "maxPerStageDescriptorUpdateAfterBindInputAttachments": 7,
+                    "maxPerStageUpdateAfterBindResources": 500000,
+                    "maxDescriptorSetUpdateAfterBindSamplers": 500000,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffers": 72,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 8,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffers": 500000,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 4,
+                    "maxDescriptorSetUpdateAfterBindSampledImages": 500000,
+                    "maxDescriptorSetUpdateAfterBindStorageImages": 500000,
+                    "maxDescriptorSetUpdateAfterBindInputAttachments": 7
                 }
-            ]
+            }
         }
     ],
     "profiles": [

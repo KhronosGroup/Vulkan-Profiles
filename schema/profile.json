@@ -4903,588 +4903,225 @@
                     },
                     "properties": {
                         "description": "The block that stores properties requirements.",
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "oneOf": [
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceProperties2": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceProperties2"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceProperties2KHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceProperties2"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMultiDrawProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMultiDrawProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMultiDrawPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMultiDrawProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDevicePushDescriptorPropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDevicePushDescriptorPropertiesKHR"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceDriverProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceDriverProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceDriverPropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceDriverProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceIDProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceIDProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceIDPropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceIDProperties"
-                                        }
-                                    }
-                                },
-
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMultiviewProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMultiviewProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMultiviewProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceDiscardRectanglePropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceDiscardRectanglePropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceSubgroupProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceSubgroupProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDevicePointClippingProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDevicePointClippingProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDevicePointClippingPropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDevicePointClippingProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceProtectedMemoryProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceProtectedMemoryProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceSamplerFilterMinmaxProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceSamplerFilterMinmaxProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceSamplerFilterMinmaxProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceSampleLocationsPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceSampleLocationsPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceInlineUniformBlockProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceInlineUniformBlockProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceInlineUniformBlockPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceInlineUniformBlockProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMaintenance3Properties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMaintenance3Properties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMaintenance3PropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMaintenance3Properties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMaintenance4Properties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMaintenance4Properties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMaintenance4PropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMaintenance4Properties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceFloatControlsProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceFloatControlsProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceFloatControlsPropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceFloatControlsProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceExternalMemoryHostPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceExternalMemoryHostPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceConservativeRasterizationPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceConservativeRasterizationPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceShaderCorePropertiesAMD": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceShaderCorePropertiesAMD"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceShaderCoreProperties2AMD": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceShaderCoreProperties2AMD"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceDescriptorIndexingProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceDescriptorIndexingProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceDescriptorIndexingPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceDescriptorIndexingProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceTimelineSemaphoreProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceTimelineSemaphoreProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceTimelineSemaphoreProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDevicePCIBusInfoPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDevicePCIBusInfoPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceDepthStencilResolveProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceDepthStencilResolveProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceDepthStencilResolvePropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceDepthStencilResolveProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceTransformFeedbackPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceTransformFeedbackPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceShadingRateImagePropertiesNV": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceShadingRateImagePropertiesNV"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceMeshShaderPropertiesNV": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceMeshShaderPropertiesNV"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceAccelerationStructurePropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceAccelerationStructurePropertiesKHR"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceRayTracingPipelinePropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceRayTracingPipelinePropertiesKHR"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceRayTracingPropertiesNV": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceRayTracingPropertiesNV"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceFragmentDensityMapPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceFragmentDensityMapPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceFragmentDensityMap2PropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceFragmentDensityMap2PropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceCooperativeMatrixPropertiesNV": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceCooperativeMatrixPropertiesNV"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDevicePerformanceQueryPropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDevicePerformanceQueryPropertiesKHR"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceShaderSMBuiltinsPropertiesNV": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceShaderSMBuiltinsPropertiesNV"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceTexelBufferAlignmentProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceTexelBufferAlignmentProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceTexelBufferAlignmentProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceSubgroupSizeControlProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceSubgroupSizeControlProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceSubgroupSizeControlProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceSubpassShadingPropertiesHUAWEI": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceSubpassShadingPropertiesHUAWEI"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceLineRasterizationPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceLineRasterizationPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceVulkan11Properties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceVulkan11Properties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceVulkan12Properties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceVulkan12Properties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceVulkan13Properties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceVulkan13Properties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceCustomBorderColorPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceCustomBorderColorPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceRobustness2PropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceRobustness2PropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDevicePortabilitySubsetPropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDevicePortabilitySubsetPropertiesKHR"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceFragmentShadingRatePropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceFragmentShadingRatePropertiesKHR"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceProvokingVertexPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceProvokingVertexPropertiesEXT"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceShaderIntegerDotProductProperties": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceShaderIntegerDotProductProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceShaderIntegerDotProductProperties"
-                                        }
-                                    }
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "VkPhysicalDeviceDrmPropertiesEXT": {
-                                            "$ref": "#/definitions/VkPhysicalDeviceDrmPropertiesEXT"
-                                        }
-                                    }
-                                }
-                            ]
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "VkPhysicalDeviceProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceProperties"
+                            },
+                            "VkPhysicalDeviceProperties2": {
+                                "$ref": "#/definitions/VkPhysicalDeviceProperties2"
+                            },
+                            "VkPhysicalDeviceProperties2KHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceProperties2"
+                            },
+                            "VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV": {
+                                "$ref": "#/definitions/VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV"
+                            },
+                            "VkPhysicalDeviceMultiDrawProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMultiDrawProperties"
+                            },
+                            "VkPhysicalDeviceMultiDrawPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMultiDrawProperties"
+                            },
+                            "VkPhysicalDevicePushDescriptorPropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDevicePushDescriptorPropertiesKHR"
+                            },
+                            "VkPhysicalDeviceDriverProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceDriverProperties"
+                            },
+                            "VkPhysicalDeviceDriverPropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceDriverProperties"
+                            },
+                            "VkPhysicalDeviceIDProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceIDProperties"
+                            },
+                            "VkPhysicalDeviceIDPropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceIDProperties"
+                            },
+                            "VkPhysicalDeviceMultiviewProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMultiviewProperties"
+                            },
+                            "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMultiviewProperties"
+                            },
+                            "VkPhysicalDeviceDiscardRectanglePropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceDiscardRectanglePropertiesEXT"
+                            },
+                            "VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX"
+                            },
+                            "VkPhysicalDeviceSubgroupProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceSubgroupProperties"
+                            },
+                            "VkPhysicalDevicePointClippingProperties": {
+                                "$ref": "#/definitions/VkPhysicalDevicePointClippingProperties"
+                            },
+                            "VkPhysicalDevicePointClippingPropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDevicePointClippingProperties"
+                            },
+                            "VkPhysicalDeviceProtectedMemoryProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceProtectedMemoryProperties"
+                            },
+                            "VkPhysicalDeviceSamplerFilterMinmaxProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceSamplerFilterMinmaxProperties"
+                            },
+                            "VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceSamplerFilterMinmaxProperties"
+                            },
+                            "VkPhysicalDeviceSampleLocationsPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceSampleLocationsPropertiesEXT"
+                            },
+                            "VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT"
+                            },
+                            "VkPhysicalDeviceInlineUniformBlockProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceInlineUniformBlockProperties"
+                            },
+                            "VkPhysicalDeviceInlineUniformBlockPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceInlineUniformBlockProperties"
+                            },
+                            "VkPhysicalDeviceMaintenance3Properties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMaintenance3Properties"
+                            },
+                            "VkPhysicalDeviceMaintenance3PropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMaintenance3Properties"
+                            },
+                            "VkPhysicalDeviceMaintenance4Properties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMaintenance4Properties"
+                            },
+                            "VkPhysicalDeviceMaintenance4PropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMaintenance4Properties"
+                            },
+                            "VkPhysicalDeviceFloatControlsProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceFloatControlsProperties"
+                            },
+                            "VkPhysicalDeviceFloatControlsPropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceFloatControlsProperties"
+                            },
+                            "VkPhysicalDeviceExternalMemoryHostPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceExternalMemoryHostPropertiesEXT"
+                            },
+                            "VkPhysicalDeviceConservativeRasterizationPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceConservativeRasterizationPropertiesEXT"
+                            },
+                            "VkPhysicalDeviceShaderCorePropertiesAMD": {
+                                "$ref": "#/definitions/VkPhysicalDeviceShaderCorePropertiesAMD"
+                            },
+                            "VkPhysicalDeviceShaderCoreProperties2AMD": {
+                                "$ref": "#/definitions/VkPhysicalDeviceShaderCoreProperties2AMD"
+                            },
+                            "VkPhysicalDeviceDescriptorIndexingProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceDescriptorIndexingProperties"
+                            },
+                            "VkPhysicalDeviceDescriptorIndexingPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceDescriptorIndexingProperties"
+                            },
+                            "VkPhysicalDeviceTimelineSemaphoreProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceTimelineSemaphoreProperties"
+                            },
+                            "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceTimelineSemaphoreProperties"
+                            },
+                            "VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT"
+                            },
+                            "VkPhysicalDevicePCIBusInfoPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDevicePCIBusInfoPropertiesEXT"
+                            },
+                            "VkPhysicalDeviceDepthStencilResolveProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceDepthStencilResolveProperties"
+                            },
+                            "VkPhysicalDeviceDepthStencilResolvePropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceDepthStencilResolveProperties"
+                            },
+                            "VkPhysicalDeviceTransformFeedbackPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceTransformFeedbackPropertiesEXT"
+                            },
+                            "VkPhysicalDeviceShadingRateImagePropertiesNV": {
+                                "$ref": "#/definitions/VkPhysicalDeviceShadingRateImagePropertiesNV"
+                            },
+                            "VkPhysicalDeviceMeshShaderPropertiesNV": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMeshShaderPropertiesNV"
+                            },
+                            "VkPhysicalDeviceAccelerationStructurePropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceAccelerationStructurePropertiesKHR"
+                            },
+                            "VkPhysicalDeviceRayTracingPipelinePropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceRayTracingPipelinePropertiesKHR"
+                            },
+                            "VkPhysicalDeviceRayTracingPropertiesNV": {
+                                "$ref": "#/definitions/VkPhysicalDeviceRayTracingPropertiesNV"
+                            },
+                            "VkPhysicalDeviceFragmentDensityMapPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceFragmentDensityMapPropertiesEXT"
+                            },
+                            "VkPhysicalDeviceFragmentDensityMap2PropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceFragmentDensityMap2PropertiesEXT"
+                            },
+                            "VkPhysicalDeviceCooperativeMatrixPropertiesNV": {
+                                "$ref": "#/definitions/VkPhysicalDeviceCooperativeMatrixPropertiesNV"
+                            },
+                            "VkPhysicalDevicePerformanceQueryPropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDevicePerformanceQueryPropertiesKHR"
+                            },
+                            "VkPhysicalDeviceShaderSMBuiltinsPropertiesNV": {
+                                "$ref": "#/definitions/VkPhysicalDeviceShaderSMBuiltinsPropertiesNV"
+                            },
+                            "VkPhysicalDeviceTexelBufferAlignmentProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceTexelBufferAlignmentProperties"
+                            },
+                            "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceTexelBufferAlignmentProperties"
+                            },
+                            "VkPhysicalDeviceSubgroupSizeControlProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceSubgroupSizeControlProperties"
+                            },
+                            "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceSubgroupSizeControlProperties"
+                            },
+                            "VkPhysicalDeviceSubpassShadingPropertiesHUAWEI": {
+                                "$ref": "#/definitions/VkPhysicalDeviceSubpassShadingPropertiesHUAWEI"
+                            },
+                            "VkPhysicalDeviceLineRasterizationPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceLineRasterizationPropertiesEXT"
+                            },
+                            "VkPhysicalDeviceVulkan11Properties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceVulkan11Properties"
+                            },
+                            "VkPhysicalDeviceVulkan12Properties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceVulkan12Properties"
+                            },
+                            "VkPhysicalDeviceVulkan13Properties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceVulkan13Properties"
+                            },
+                            "VkPhysicalDeviceCustomBorderColorPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceCustomBorderColorPropertiesEXT"
+                            },
+                            "VkPhysicalDeviceRobustness2PropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceRobustness2PropertiesEXT"
+                            },
+                            "VkPhysicalDevicePortabilitySubsetPropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDevicePortabilitySubsetPropertiesKHR"
+                            },
+                            "VkPhysicalDeviceFragmentShadingRatePropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceFragmentShadingRatePropertiesKHR"
+                            },
+                            "VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV": {
+                                "$ref": "#/definitions/VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV"
+                            },
+                            "VkPhysicalDeviceProvokingVertexPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceProvokingVertexPropertiesEXT"
+                            },
+                            "VkPhysicalDeviceShaderIntegerDotProductProperties": {
+                                "$ref": "#/definitions/VkPhysicalDeviceShaderIntegerDotProductProperties"
+                            },
+                            "VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceShaderIntegerDotProductProperties"
+                            },
+                            "VkPhysicalDeviceDrmPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceDrmPropertiesEXT"
+                            }
                         }
                     },
                     "formats": {

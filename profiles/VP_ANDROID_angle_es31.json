@@ -16,14 +16,12 @@
                     "multiview": true
                 }
             },
-            "properties": [
-                {
-                    "VkPhysicalDeviceMultiviewProperties": {
-                        "maxMultiviewViewCount": 0,
-                        "maxMultiviewInstanceIndex": 134217727
-                    }
+            "properties": {
+                "VkPhysicalDeviceMultiviewProperties": {
+                    "maxMultiviewViewCount": 0,
+                    "maxMultiviewInstanceIndex": 134217727
                 }
-            ]
+            }
         },
         {
             "name": "baseline",
@@ -89,26 +87,24 @@
                     "robustImageAccess": true
                 }
             },
-            "properties": [
-                {
-                    "VkPhysicalDeviceProperties": {
-                        "limits": {
-                            "standardSampleLocations": true,
-                            "maxVertexOutputComponents": 64,
-                            "maxTessellationControlPerVertexOutputComponents": 64,
-                            "maxTessellationControlPerPatchOutputComponents": 64,
-                            "maxTessellationControlTotalOutputComponents": 64,
-                            "maxTessellationEvaluationOutputComponents": 64,
-                            "maxGeometryOutputComponents": 64,
-                            "maxGeometryTotalOutputComponents": 64,
-                            "maxPerStageDescriptorUniformBuffers": 12,
-                            "maxPerStageDescriptorStorageBuffers": 12,
-                            "maxVertexInputAttributeOffset": 2048,
-                            "subPixelPrecisionBits": 8
-                        }
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "standardSampleLocations": true,
+                        "maxVertexOutputComponents": 64,
+                        "maxTessellationControlPerVertexOutputComponents": 64,
+                        "maxTessellationControlPerPatchOutputComponents": 64,
+                        "maxTessellationControlTotalOutputComponents": 64,
+                        "maxTessellationEvaluationOutputComponents": 64,
+                        "maxGeometryOutputComponents": 64,
+                        "maxGeometryTotalOutputComponents": 64,
+                        "maxPerStageDescriptorUniformBuffers": 12,
+                        "maxPerStageDescriptorStorageBuffers": 12,
+                        "maxVertexInputAttributeOffset": 2048,
+                        "subPixelPrecisionBits": 8
                     }
                 }
-            ]
+            }
         }
     ],
     "profiles": [
