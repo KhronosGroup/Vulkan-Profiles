@@ -160,8 +160,9 @@
                     "VK_PHYSICAL_DEVICE_TYPE_OTHER",
                     "VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU",
                     "VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU",
-                    "VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU", 
-                    "VK_PHYSICAL_DEVICE_TYPE_CPU" ],
+                    "VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU",
+                    "VK_PHYSICAL_DEVICE_TYPE_CPU"
+                ],
                 "uniqueItems": true
             }
         },
@@ -179,8 +180,9 @@
                 "type": "string",
                 "enum": [
                     "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY",
-                    "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL", 
-                    "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE" ],
+                    "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL",
+                    "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE"
+                ],
                 "uniqueItems": true
             }
         },
@@ -189,8 +191,9 @@
             "items": {
                 "type": "string",
                 "enum": [
-                    "VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES", 
-                    "VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY" ],
+                    "VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES",
+                    "VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY"
+                ],
                 "uniqueItems": true
             }
         },
@@ -220,8 +223,9 @@
                     "VK_SHADER_STAGE_ANY_HIT_BIT_NV",
                     "VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV",
                     "VK_SHADER_STAGE_MISS_BIT_NV",
-                    "VK_SHADER_STAGE_INTERSECTION_BIT_NV", 
-                    "VK_SHADER_STAGE_CALLABLE_BIT_NV" ],
+                    "VK_SHADER_STAGE_INTERSECTION_BIT_NV",
+                    "VK_SHADER_STAGE_CALLABLE_BIT_NV"
+                ],
                 "uniqueItems": true
             }
         },
@@ -237,8 +241,9 @@
                     "VK_SUBGROUP_FEATURE_SHUFFLE_BIT",
                     "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT",
                     "VK_SUBGROUP_FEATURE_CLUSTERED_BIT",
-                    "VK_SUBGROUP_FEATURE_QUAD_BIT", 
-                    "VK_SUBGROUP_FEATURE_PARTITIONED_BIT_NV" ],
+                    "VK_SUBGROUP_FEATURE_QUAD_BIT",
+                    "VK_SUBGROUP_FEATURE_PARTITIONED_BIT_NV"
+                ],
                 "uniqueItems": true
             }
         },
@@ -252,8 +257,9 @@
                     "VK_SAMPLE_COUNT_4_BIT",
                     "VK_SAMPLE_COUNT_8_BIT",
                     "VK_SAMPLE_COUNT_16_BIT",
-                    "VK_SAMPLE_COUNT_32_BIT", 
-                    "VK_SAMPLE_COUNT_64_BIT" ],
+                    "VK_SAMPLE_COUNT_32_BIT",
+                    "VK_SAMPLE_COUNT_64_BIT"
+                ],
                 "uniqueItems": true
             }
         },
@@ -389,7 +395,8 @@
                     "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT",
                     "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT",
                     "VK_MEMORY_PROPERTY_HOST_CACHED_BIT",
-                    "VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT" ],
+                    "VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT"
+                ],
                 "uniqueItems": true
             }
         },
@@ -401,7 +408,8 @@
                     "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT",
                     "VK_RESOLVE_MODE_AVERAGE_BIT",
                     "VK_RESOLVE_MODE_MIN_BIT",
-                    "VK_RESOLVE_MODE_MAX_BIT" ],
+                    "VK_RESOLVE_MODE_MAX_BIT"
+                ],
                 "uniqueItems": true
             }
         },
@@ -416,7 +424,8 @@
                     "VK_QUEUE_SPARSE_BINDING_BIT",
                     "VK_QUEUE_PROTECTED_BIT",
                     "VK_QUEUE_VIDEO_DECODE_BIT_KHR",
-                    "VK_QUEUE_VIDEO_ENCODE_BIT_KHR" ],
+                    "VK_QUEUE_VIDEO_ENCODE_BIT_KHR"
+                ],
                 "uniqueItems": true
             }
         },
@@ -462,7 +471,8 @@
                 "VK_QUEUE_GLOBAL_PRIORITY_LOW_EXT",
                 "VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_EXT",
                 "VK_QUEUE_GLOBAL_PRIORITY_HIGH_EXT",
-                "VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT" ]
+                "VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT"
+            ]
         },
         "VkQueueFamilyGlobalPriorityPropertiesEXT": {
             "type": "object",
@@ -488,7 +498,8 @@
                     "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT",
                     "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT",
                     "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT",
-                    "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT" ],
+                    "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT"
+                ],
                 "uniqueItems": true
             }
         },
@@ -748,7 +759,8 @@
                 "VK_DRIVER_ID_MESA_TURNIP",
                 "VK_DRIVER_ID_MESA_V3DV",
                 "VK_DRIVER_ID_MESA_PANVK",
-                "VK_DRIVER_ID_SAMSUNG_PROPRIETARY" ]
+                "VK_DRIVER_ID_SAMSUNG_PROPRIETARY"
+            ]
         },
         "VkFormatProperties": {
             "type": "object",
@@ -860,6 +872,39 @@
                 }
             }
         },
+        "imageformat": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "VkFormatProperties": {
+                    "$ref": "#/definitions/VkFormatProperties"
+                },
+                "VkFormatProperties2": {
+                    "$ref": "#/definitions/VkFormatProperties2"
+                },
+                "VkFormatProperties2KHR": {
+                    "$ref": "#/definitions/VkFormatProperties2"
+                },
+                "VkFormatProperties3": {
+                    "$ref": "#/definitions/VkFormatProperties3"
+                },
+                "VkFormatProperties3KHR": {
+                    "$ref": "#/definitions/VkFormatProperties3KHR"
+                },
+                "VkDrmFormatModifierPropertiesListEXT": {
+                    "$ref": "#/definitions/VkDrmFormatModifierPropertiesListEXT"
+                },
+                "VkDrmFormatModifierPropertiesList2EXT": {
+                    "$ref": "#/definitions/VkDrmFormatModifierPropertiesList2EXT"
+                },
+                "VkVideoProfileKHR": {
+                    "$ref": "#/definitions/VkVideoProfileKHR"
+                },
+                "VkVideoProfilesKHR": {
+                    "$ref": "#/definitions/VkVideoProfilesKHR"
+                }
+            }
+        },
         "VkVideoCodecOperationFlagBitsKHR": {
             "type": "array",
             "items": {
@@ -877,7 +922,8 @@
                     "VK_VIDEO_CHROMA_SUBSAMPLING_MONOCHROME_BIT_KHR",
                     "VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR",
                     "VK_VIDEO_CHROMA_SUBSAMPLING_422_BIT_KHR",
-                    "VK_VIDEO_CHROMA_SUBSAMPLING_444_BIT_KHR" ],
+                    "VK_VIDEO_CHROMA_SUBSAMPLING_444_BIT_KHR"
+                ],
                 "uniqueItems": true
             }
         },
@@ -889,7 +935,8 @@
                     "VK_VIDEO_COMPONENT_BIT_DEPTH_INVALID_KHR",
                     "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR",
                     "VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR",
-                    "VK_VIDEO_COMPONENT_BIT_DEPTH_12_BIT_KHR" ],
+                    "VK_VIDEO_COMPONENT_BIT_DEPTH_12_BIT_KHR"
+                ],
                 "uniqueItems": true
             }
         },
@@ -2537,9 +2584,9 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-				"colorWriteEnable": {
-					"type": "boolean"
-				}
+                "colorWriteEnable": {
+                    "type": "boolean"
+                }
             }
         },
         "VkPhysicalDeviceSynchronization2Features": {
@@ -5128,86 +5175,846 @@
                         "description": "The block that store formats capabilities definitions.",
                         "type": "object",
                         "additionalProperties": false,
-                        "patternProperties": {
-                            "^VK_FORMAT_[A-Z0-9_]+": {
-                                "type": "array",
-                                "items": {
-                                    "type": "object",
-                                    "oneOf": [
-                                        {
-                                            "additionalProperties": false,
-                                            "properties": {
-                                                "VkFormatProperties": {
-                                                    "$ref": "#/definitions/VkFormatProperties"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "additionalProperties": false,
-                                            "properties": {
-                                                "VkFormatProperties2": {
-                                                    "$ref": "#/definitions/VkFormatProperties2"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "additionalProperties": false,
-                                            "properties": {
-                                                "VkFormatProperties2KHR": {
-                                                    "$ref": "#/definitions/VkFormatProperties2"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "additionalProperties": false,
-                                            "properties": {
-                                                "VkFormatProperties3": {
-                                                    "$ref": "#/definitions/VkFormatProperties3"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "additionalProperties": false,
-                                            "properties": {
-                                                "VkFormatProperties3KHR": {
-                                                    "$ref": "#/definitions/VkFormatProperties3KHR"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "additionalProperties": false,
-                                            "properties": {
-                                                "VkDrmFormatModifierPropertiesListEXT": {
-                                                    "$ref": "#/definitions/VkDrmFormatModifierPropertiesListEXT"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "additionalProperties": false,
-                                            "properties": {
-                                                "VkDrmFormatModifierPropertiesList2EXT": {
-                                                    "$ref": "#/definitions/VkDrmFormatModifierPropertiesList2EXT"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "additionalProperties": false,
-                                            "properties": {
-                                                "VkVideoProfileKHR": {
-                                                    "$ref": "#/definitions/VkVideoProfileKHR"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "additionalProperties": false,
-                                            "properties": {
-                                                "VkVideoProfilesKHR": {
-                                                    "$ref": "#/definitions/VkVideoProfilesKHR"
-                                                }
-                                            }
-                                        }
-                                    ]
-                                }
+                        "properties": {
+                            "VK_FORMAT_R4G4_UNORM_PACK8": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R4G4B4A4_UNORM_PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B4G4R4A4_UNORM_PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R5G6B5_UNORM_PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B5G6R5_UNORM_PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R5G5B5A1_UNORM_PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B5G5R5A1_UNORM_PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A1R5G5B5_UNORM_PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8_SNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8_USCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8_SSCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8_SRGB": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8_SNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8_USCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8_SSCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8_SRGB": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8_SNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8_USCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8_SSCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8_SRGB": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8_SNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8_USCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8_SSCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8_SRGB": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8A8_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8A8_SNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8A8_USCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8A8_SSCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8A8_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8A8_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R8G8B8A8_SRGB": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8A8_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8A8_SNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8A8_USCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8A8_SSCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8A8_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8A8_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8A8_SRGB": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A8B8G8R8_UNORM_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A8B8G8R8_SNORM_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A8B8G8R8_USCALED_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A8B8G8R8_SSCALED_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A8B8G8R8_UINT_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A8B8G8R8_SINT_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A8B8G8R8_SRGB_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A2R10G10B10_UNORM_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A2R10G10B10_SNORM_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A2R10G10B10_USCALED_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A2R10G10B10_SSCALED_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A2R10G10B10_UINT_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A2R10G10B10_SINT_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A2B10G10R10_UNORM_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A2B10G10R10_SNORM_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A2B10G10R10_USCALED_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A2B10G10R10_SSCALED_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A2B10G10R10_UINT_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A2B10G10R10_SINT_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16_SNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16_USCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16_SSCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16_SFLOAT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16_SNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16_USCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16_SSCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16_SFLOAT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16_SNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16_USCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16_SSCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16_SFLOAT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16A16_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16A16_SNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16A16_USCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16A16_SSCALED": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16A16_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16A16_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R16G16B16A16_SFLOAT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R32_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R32_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R32_SFLOAT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R32G32_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R32G32_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R32G32_SFLOAT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R32G32B32_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R32G32B32_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R32G32B32_SFLOAT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R32G32B32A32_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R32G32B32A32_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R32G32B32A32_SFLOAT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R64_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R64_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R64_SFLOAT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R64G64_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R64G64_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R64G64_SFLOAT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R64G64B64_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R64G64B64_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R64G64B64_SFLOAT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R64G64B64A64_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R64G64B64A64_SINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R64G64B64A64_SFLOAT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B10G11R11_UFLOAT_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_E5B9G9R9_UFLOAT_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_D16_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_X8_D24_UNORM_PACK32": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_D32_SFLOAT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_S8_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_D16_UNORM_S8_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_D24_UNORM_S8_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_D32_SFLOAT_S8_UINT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC1_RGB_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC1_RGB_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC1_RGBA_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC1_RGBA_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC2_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC2_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC3_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC3_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC4_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC4_SNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC5_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC5_SNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC6H_UFLOAT_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC6H_SFLOAT_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC7_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_BC7_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_EAC_R11_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_EAC_R11_SNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_EAC_R11G11_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_EAC_R11G11_SNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_4x4_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_4x4_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_5x4_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_5x4_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_5x5_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_5x5_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_6x5_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_6x5_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_6x6_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_6x6_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_8x5_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_8x5_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_8x6_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_8x6_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_8x8_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_8x8_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_10x5_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_10x5_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_10x6_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_10x6_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_10x8_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_10x8_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_10x10_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_10x10_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_12x10_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_12x10_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_12x12_UNORM_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_12x12_SRGB_BLOCK": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G8B8G8R8_422_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8G8_422_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G8_B8R8_2PLANE_420_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G8_B8_R8_3PLANE_422_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G8_B8R8_2PLANE_422_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G8_B8_R8_3PLANE_444_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R10X6_UNORM_PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R10X6G10X6_UNORM_2PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R10X6G10X6B10X6A10X6_UNORM_4PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G10X6B10X6G10X6R10X6_422_UNORM_4PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B10X6G10X6R10X6G10X6_422_UNORM_4PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_420_UNORM_3PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G10X6_B10X6R10X6_2PLANE_420_UNORM_3PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_422_UNORM_3PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G10X6_B10X6R10X6_2PLANE_422_UNORM_3PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_444_UNORM_3PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R12X4_UNORM_PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R12X4G12X4_UNORM_2PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R12X4G12X4B12X4A12X4_UNORM_4PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G12X4B12X4G12X4R12X4_422_UNORM_4PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B12X4G12X4R12X4G12X4_422_UNORM_4PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_420_UNORM_3PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G12X4_B12X4R12X4_2PLANE_420_UNORM_3PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_422_UNORM_3PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G12X4_B12X4R12X4_2PLANE_422_UNORM_3PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_444_UNORM_3PACK16": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G16B16G16R16_422_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B16G16R16G16_422_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G16_B16_R16_3PLANE_420_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G16_B16R16_2PLANE_420_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G16_B16_R16_3PLANE_422_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G16_B16R16_2PLANE_422_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G16_B16_R16_3PLANE_444_UNORM": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_PVRTC2_2BPP_UNORM_BLOCK_IMG": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_PVRTC2_4BPP_UNORM_BLOCK_IMG": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_PVRTC2_2BPP_SRGB_BLOCK_IMG": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_PVRTC2_4BPP_SRGB_BLOCK_IMG": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_5x4_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_5x5_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_6x5_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_8x5_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_8x6_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_8x8_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_10x5_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_10x6_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_10x8_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_10x10_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_12x10_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G8_B8R8_2PLANE_444_UNORM_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G10X6_B10X6R10X6_2PLANE_444_UNORM_3PACK16_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G12X4_B12X4R12X4_2PLANE_444_UNORM_3PACK16_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G16_B16R16_2PLANE_444_UNORM_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A4R4G4B4_UNORM_PACK16_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_A4B4G4R4_UNORM_PACK16_EXT": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G8B8G8R8_422_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B8G8R8G8_422_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G8_B8R8_2PLANE_420_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G8_B8_R8_3PLANE_422_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G8_B8R8_2PLANE_422_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G8_B8_R8_3PLANE_444_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R10X6_UNORM_PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R10X6G10X6_UNORM_2PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R10X6G10X6B10X6A10X6_UNORM_4PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G10X6B10X6G10X6R10X6_422_UNORM_4PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B10X6G10X6R10X6G10X6_422_UNORM_4PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_420_UNORM_3PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G10X6_B10X6R10X6_2PLANE_420_UNORM_3PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_422_UNORM_3PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G10X6_B10X6R10X6_2PLANE_422_UNORM_3PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_444_UNORM_3PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R12X4_UNORM_PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R12X4G12X4_UNORM_2PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_R12X4G12X4B12X4A12X4_UNORM_4PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G12X4B12X4G12X4R12X4_422_UNORM_4PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B12X4G12X4R12X4G12X4_422_UNORM_4PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_420_UNORM_3PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G12X4_B12X4R12X4_2PLANE_420_UNORM_3PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_422_UNORM_3PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G12X4_B12X4R12X4_2PLANE_422_UNORM_3PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_444_UNORM_3PACK16_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G16B16G16R16_422_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_B16G16R16G16_422_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G16_B16_R16_3PLANE_420_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G16_B16R16_2PLANE_420_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G16_B16_R16_3PLANE_422_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G16_B16R16_2PLANE_422_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
+                            },
+                            "VK_FORMAT_G16_B16_R16_3PLANE_444_UNORM_KHR": {
+                                "$ref": "#/definitions/imageformat"
                             }
                         }
                     },
