@@ -29,11 +29,13 @@ TEST(api_get_profile_memory_types, full) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     uint32_t memoryPropertyFlagsCount = 0;
-    vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, nullptr);
+    VkResult result0 = vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, nullptr);
+    EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(2, memoryPropertyFlagsCount);
 
     std::vector<VkMemoryPropertyFlags> memoryPropertyFlags(memoryPropertyFlagsCount);
-    vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, &memoryPropertyFlags[0]);
+    VkResult result1 = vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, &memoryPropertyFlags[0]);
+    EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(2, memoryPropertyFlagsCount);
 
     EXPECT_EQ(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, memoryPropertyFlags[0]);
@@ -45,13 +47,15 @@ TEST(api_get_profile_memory_types, partial) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     uint32_t memoryPropertyFlagsCount = 0;
-    vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, nullptr);
+    VkResult result0 = vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, nullptr);
+    EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(2, memoryPropertyFlagsCount);
 
     memoryPropertyFlagsCount = 1;
 
     std::vector<VkMemoryPropertyFlags> memoryPropertyFlags(memoryPropertyFlagsCount);
-    vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, &memoryPropertyFlags[0]);
+    VkResult result1 = vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, &memoryPropertyFlags[0]);
+    EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(1, memoryPropertyFlagsCount);
 
     EXPECT_EQ(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, memoryPropertyFlags[0]);
@@ -61,6 +65,7 @@ TEST(api_get_profile_memory_types, unspecified) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t memoryPropertyFlagsCount = 0;
-    vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, nullptr);
+    VkResult result0 = vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, nullptr);
+    EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(0, memoryPropertyFlagsCount);
 }

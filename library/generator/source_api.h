@@ -97,7 +97,8 @@ VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFor
 void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
 // Query the requirements of memory types by a profile
-void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryTypeCount, VkMemoryPropertyFlags *pMemoryTypes);
+VkResult vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryTypeCount,
+                                 VkMemoryPropertyFlags *pMemoryTypes);
 
 // Query the requirements of queue families by a profile
 void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);

@@ -121,7 +121,8 @@ VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFor
 void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
 // Query the requirements of memory types by a profile
-void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryTypeCount, VkMemoryPropertyFlags *pMemoryTypes);
+VkResult vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryTypeCount,
+                                 VkMemoryPropertyFlags *pMemoryTypes);
 
 // Query the requirements of queue families by a profile
 void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
@@ -3774,39 +3775,42 @@ VP_INLINE void vpGetProfileFormatProperties(const VpProfileProperties *pProfile,
     }
 }
 
-VP_INLINE void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryPropertyFlagsCount,
+VP_INLINE VkResult vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryTypeCount,
                                        VkMemoryPropertyFlags *pMemoryPropertyFlags) {
     if (pMemoryPropertyFlags == nullptr) {
         if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
-            *pMemoryPropertyFlagsCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES);
+            *pMemoryTypeCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES);
         }
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
-            *pMemoryPropertyFlagsCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES);
+            *pMemoryTypeCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES);
         }
 #endif
         else {
-            *pMemoryPropertyFlagsCount = 0;
+            *pMemoryTypeCount = 0;
         }
-        return;
+        return VK_SUCCESS;
     }
 
     if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
-        std::size_t n =
-            std::min<std::size_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES), *pMemoryPropertyFlagsCount);
+        std::size_t n = std::min<std::size_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES), *pMemoryTypeCount);
         for (std::size_t i = 0; i < n; ++i) {
             pMemoryPropertyFlags[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES[i];
         }
+        return _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES) <= *pMemoryTypeCount ? VK_SUCCESS : VK_INCOMPLETE;
     }
 #ifdef VK_ENABLE_BETA_EXTENSIONS
-    else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
-        std::size_t n =
-            std::min<std::size_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES), *pMemoryPropertyFlagsCount);
+    else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
+        std::size_t n = std::min<std::size_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES), *pMemoryTypeCount);
         for (std::size_t i = 0; i < n; ++i) {
             pMemoryPropertyFlags[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES[i];
         }
+        return _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES) <= *pMemoryTypeCount ? VK_SUCCESS : VK_INCOMPLETE;
     }
 #endif
+    else {
+        return VK_SUCCESS;
+    }
 }
 
 VP_INLINE void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
