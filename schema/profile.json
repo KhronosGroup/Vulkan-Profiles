@@ -5126,91 +5126,87 @@
                     },
                     "formats": {
                         "description": "The block that store formats capabilities definitions.",
-                        "type": "array",
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "object",
-                            "additionalProperties": false,
-                            "patternProperties": {
-                                "^VK_FORMAT_[A-Z0-9_]+": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "oneOf": [
-                                            {
-                                                "additionalProperties": false,
-                                                "properties": {
-                                                    "VkFormatProperties": {
-                                                        "$ref": "#/definitions/VkFormatProperties"
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "additionalProperties": false,
-                                                "properties": {
-                                                    "VkFormatProperties2": {
-                                                        "$ref": "#/definitions/VkFormatProperties2"
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "additionalProperties": false,
-                                                "properties": {
-                                                    "VkFormatProperties2KHR": {
-                                                        "$ref": "#/definitions/VkFormatProperties2"
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "additionalProperties": false,
-                                                "properties": {
-                                                    "VkFormatProperties3": {
-                                                        "$ref": "#/definitions/VkFormatProperties3"
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "additionalProperties": false,
-                                                "properties": {
-                                                    "VkFormatProperties3KHR": {
-                                                        "$ref": "#/definitions/VkFormatProperties3KHR"
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "additionalProperties": false,
-                                                "properties": {
-                                                    "VkDrmFormatModifierPropertiesListEXT": {
-                                                        "$ref": "#/definitions/VkDrmFormatModifierPropertiesListEXT"
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "additionalProperties": false,
-                                                "properties": {
-                                                    "VkDrmFormatModifierPropertiesList2EXT": {
-                                                        "$ref": "#/definitions/VkDrmFormatModifierPropertiesList2EXT"
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "additionalProperties": false,
-                                                "properties": {
-                                                    "VkVideoProfileKHR": {
-                                                        "$ref": "#/definitions/VkVideoProfileKHR"
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "additionalProperties": false,
-                                                "properties": {
-                                                    "VkVideoProfilesKHR": {
-                                                        "$ref": "#/definitions/VkVideoProfilesKHR"
-                                                    }
+                        "type": "object",
+                        "additionalProperties": false,
+                        "patternProperties": {
+                            "^VK_FORMAT_[A-Z0-9_]+": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "oneOf": [
+                                        {
+                                            "additionalProperties": false,
+                                            "properties": {
+                                                "VkFormatProperties": {
+                                                    "$ref": "#/definitions/VkFormatProperties"
                                                 }
                                             }
-                                        ]
-                                    }
+                                        },
+                                        {
+                                            "additionalProperties": false,
+                                            "properties": {
+                                                "VkFormatProperties2": {
+                                                    "$ref": "#/definitions/VkFormatProperties2"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "additionalProperties": false,
+                                            "properties": {
+                                                "VkFormatProperties2KHR": {
+                                                    "$ref": "#/definitions/VkFormatProperties2"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "additionalProperties": false,
+                                            "properties": {
+                                                "VkFormatProperties3": {
+                                                    "$ref": "#/definitions/VkFormatProperties3"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "additionalProperties": false,
+                                            "properties": {
+                                                "VkFormatProperties3KHR": {
+                                                    "$ref": "#/definitions/VkFormatProperties3KHR"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "additionalProperties": false,
+                                            "properties": {
+                                                "VkDrmFormatModifierPropertiesListEXT": {
+                                                    "$ref": "#/definitions/VkDrmFormatModifierPropertiesListEXT"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "additionalProperties": false,
+                                            "properties": {
+                                                "VkDrmFormatModifierPropertiesList2EXT": {
+                                                    "$ref": "#/definitions/VkDrmFormatModifierPropertiesList2EXT"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "additionalProperties": false,
+                                            "properties": {
+                                                "VkVideoProfileKHR": {
+                                                    "$ref": "#/definitions/VkVideoProfileKHR"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "additionalProperties": false,
+                                            "properties": {
+                                                "VkVideoProfilesKHR": {
+                                                    "$ref": "#/definitions/VkVideoProfilesKHR"
+                                                }
+                                            }
+                                        }
+                                    ]
                                 }
                             }
                         }
