@@ -1437,7 +1437,7 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
 
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-        if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_KHR_ROADMAP_2022_MIN_VERSION)) return result;
+        if (VK_VERSION_PATCH(properties.apiVersion) < VK_VERSION_PATCH(VP_KHR_ROADMAP_2022_MIN_API_VERSION)) return result;
 
         VkBool32 extensionSupported = VK_TRUE;
         for (std::size_t i = 0, n = _vpCountOf(_VP_KHR_ROADMAP_2022_EXTENSIONS); i < n && extensionSupported; ++i) {
