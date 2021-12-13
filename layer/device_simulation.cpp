@@ -2420,7 +2420,8 @@ class JsonLoader {
         kDevsimUniformBufferStandardLayoutKHR,
         kDevsimVariablePointersKHR,
         kDevsimVulkanMemoryModelKHR,
-        kDevsimProfiles130
+        kDevsimProfiles_1_3_200,
+        kDevsimProfiles_1_3_201
     };
 
     struct Extension {
@@ -3992,7 +3993,9 @@ JsonLoader::SchemaId JsonLoader::IdentifySchema(const Json::Value &value) {
     SchemaId schema_id = SchemaId::kUnknown;
     const char *schema_string = value.asCString();
     if (strcmp(schema_string, "https://schema.khronos.org/vulkan/profiles-1.3.200.json#") == 0) {
-        schema_id = SchemaId::kDevsimProfiles130;
+        schema_id = SchemaId::kDevsimProfiles_1_3_200;
+    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/profiles-1.3.201.json#") == 0) {
+        schema_id = SchemaId::kDevsimProfiles_1_3_201;
     }
 
     if (schema_id != SchemaId::kUnknown) {
