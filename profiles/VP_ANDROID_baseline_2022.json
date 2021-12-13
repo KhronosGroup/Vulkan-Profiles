@@ -3,13 +3,11 @@
     "capabilities": [
         {
             "name": "vulkan10requirements",
-            "features": [
-                {
-                    "VkPhysicalDeviceFeatures": {
-                        "robustBufferAccess": true
-                    }
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "robustBufferAccess": true
                 }
-            ]
+            }
         },
         {
             "name": "baseline",
@@ -111,28 +109,26 @@
                     "specVersion": 1
                 }
             ],
-            "features": [
-                {
-                    "VkPhysicalDeviceFeatures": {
-                        "depthBiasClamp": true,
-                        "fragmentStoresAndAtomics": true,
-                        "fullDrawIndexUint32": true,
-                        "imageCubeArray": true,
-                        "independentBlend": true,
-                        "largePoints": true,
-                        "robustBufferAccess": true,
-                        "shaderImageGatherExtended": true,
-                        "shaderInt16": true,
-                        "shaderSampledImageArrayDynamicIndexing": true,
-                        "shaderStorageBufferArrayDynamicIndexing": true,
-                        "shaderStorageImageArrayDynamicIndexing": true,
-                        "shaderStorageImageWriteWithoutFormat": true,
-                        "shaderUniformBufferArrayDynamicIndexing": true,
-                        "textureCompressionASTC_LDR": true,
-                        "textureCompressionETC2": true
-                    }
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "depthBiasClamp": true,
+                    "fragmentStoresAndAtomics": true,
+                    "fullDrawIndexUint32": true,
+                    "imageCubeArray": true,
+                    "independentBlend": true,
+                    "largePoints": true,
+                    "robustBufferAccess": true,
+                    "shaderImageGatherExtended": true,
+                    "shaderInt16": true,
+                    "shaderSampledImageArrayDynamicIndexing": true,
+                    "shaderStorageBufferArrayDynamicIndexing": true,
+                    "shaderStorageImageArrayDynamicIndexing": true,
+                    "shaderStorageImageWriteWithoutFormat": true,
+                    "shaderUniformBufferArrayDynamicIndexing": true,
+                    "textureCompressionASTC_LDR": true,
+                    "textureCompressionETC2": true
                 }
-            ],
+            },
             "properties": [
                 {
                     "VkPhysicalDeviceProperties": {
@@ -1251,7 +1247,7 @@
                     ]
                 },
                 {
-                     "VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK": [
+                    "VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK": [
                         {
                             "VkFormatProperties": {
                                 "linearTilingFeatures": [],

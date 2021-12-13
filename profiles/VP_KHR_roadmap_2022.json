@@ -3,23 +3,20 @@
     "capabilities": [
         {
             "name": "vulkan10requirements",
-            "features": [
-                {
-                    "VkPhysicalDeviceFeatures": {
-                        "robustBufferAccess": true
-                    }
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "robustBufferAccess": true
                 }
-            ]
+            }
+
         },
         {
             "name": "vulkan11requirements",
-            "features": [
-                {
-                    "VkPhysicalDeviceVulkan11Features": {
-                        "multiview": true
-                    }
+            "features": {
+                "VkPhysicalDeviceVulkan11Features": {
+                    "multiview": true
                 }
-            ],
+            },
             "properties": [
                 {
                     "VkPhysicalDeviceVulkan11Properties": {
@@ -31,19 +28,17 @@
         },
         {
             "name": "vulkan12requirements",
-            "features": [
-                {
-                    "VkPhysicalDeviceVulkan12Features": {
-                        "uniformBufferStandardLayout": true,
-                        "subgroupBroadcastDynamicId": true,
-                        "imagelessFramebuffer": true,
-                        "separateDepthStencilLayouts": true,
-                        "hostQueryReset": true,
-                        "timelineSemaphore": true,
-                        "shaderSubgroupExtendedTypes": true
-                    }
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "uniformBufferStandardLayout": true,
+                    "subgroupBroadcastDynamicId": true,
+                    "imagelessFramebuffer": true,
+                    "separateDepthStencilLayouts": true,
+                    "hostQueryReset": true,
+                    "timelineSemaphore": true,
+                    "shaderSubgroupExtendedTypes": true
                 }
-            ],
+            },
             "properties": [
                 {
                     "VkPhysicalDeviceVulkan12Properties": {
@@ -54,31 +49,27 @@
         },
         {
             "name": "vulkan13requirements",
-            "features": [
-                {
-                    "VkPhysicalDeviceVulkan12Features": {
-                        "vulkanMemoryModel": true,
-                        "vulkanMemoryModelDeviceScope": true,
-                        "vulkanMemoryModelAvailabilityVisibilityChains": true,
-                        "bufferDeviceAddress": true
-                    }
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "vulkanMemoryModel": true,
+                    "vulkanMemoryModelDeviceScope": true,
+                    "vulkanMemoryModelAvailabilityVisibilityChains": true,
+                    "bufferDeviceAddress": true
                 },
-                {
-                    "VkPhysicalDeviceVulkan13Features": {
-                        "inlineUniformBlock": true,
-                        "subgroupSizeControl": true,
-                        "computeFullSubgroups": true,
-                        "pipelineCreationCacheControl": true,
-                        "shaderDemoteToHelperInvocation": true,
-                        "robustImageAccess": true,
-                        "shaderTerminateInvocation": true,
-                        "shaderZeroInitializeWorkgroupMemory": true,
-                        "synchronization2": true,
-                        "shaderIntegerDotProduct": true,
-                        "maintenance4": true
-                    }
+                "VkPhysicalDeviceVulkan13Features": {
+                    "inlineUniformBlock": true,
+                    "subgroupSizeControl": true,
+                    "computeFullSubgroups": true,
+                    "pipelineCreationCacheControl": true,
+                    "shaderDemoteToHelperInvocation": true,
+                    "robustImageAccess": true,
+                    "shaderTerminateInvocation": true,
+                    "shaderZeroInitializeWorkgroupMemory": true,
+                    "synchronization2": true,
+                    "shaderIntegerDotProduct": true,
+                    "maintenance4": true
                 }
-            ],
+            },
             "properties": [
                 {
                     "VkPhysicalDeviceVulkan13Properties": {
@@ -100,57 +91,51 @@
                     "specVersion": 1
                 }
             ],
-            "features": [
-                {
-                    "VkPhysicalDeviceFeatures": {
-                        "fullDrawIndexUint32": true,
-                        "imageCubeArray": true,
-                        "independentBlend": true,
-                        "sampleRateShading": true,
-                        "drawIndirectFirstInstance": true,
-                        "depthClamp": true,
-                        "depthBiasClamp": true,
-                        "samplerAnisotropy": true,
-                        "occlusionQueryPrecise": true,
-                        "fragmentStoresAndAtomics": true,
-                        "shaderStorageImageExtendedFormats": true,
-                        "shaderUniformBufferArrayDynamicIndexing": true,
-                        "shaderSampledImageArrayDynamicIndexing": true,
-                        "shaderStorageBufferArrayDynamicIndexing": true,
-                        "shaderStorageImageArrayDynamicIndexing": true
-                    }
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "fullDrawIndexUint32": true,
+                    "imageCubeArray": true,
+                    "independentBlend": true,
+                    "sampleRateShading": true,
+                    "drawIndirectFirstInstance": true,
+                    "depthClamp": true,
+                    "depthBiasClamp": true,
+                    "samplerAnisotropy": true,
+                    "occlusionQueryPrecise": true,
+                    "fragmentStoresAndAtomics": true,
+                    "shaderStorageImageExtendedFormats": true,
+                    "shaderUniformBufferArrayDynamicIndexing": true,
+                    "shaderSampledImageArrayDynamicIndexing": true,
+                    "shaderStorageBufferArrayDynamicIndexing": true,
+                    "shaderStorageImageArrayDynamicIndexing": true
                 },
-                {
-                    "VkPhysicalDeviceVulkan11Features": {
-                        "samplerYcbcrConversion": true
-                    }
+                "VkPhysicalDeviceVulkan11Features": {
+                    "samplerYcbcrConversion": true
                 },
-                {
-                    "VkPhysicalDeviceVulkan12Features": {
-                        "samplerMirrorClampToEdge": true,
-                        "descriptorIndexing": true,
-                        "shaderUniformTexelBufferArrayDynamicIndexing": true,
-                        "shaderStorageTexelBufferArrayDynamicIndexing": true,
-                        "shaderUniformBufferArrayNonUniformIndexing": true,
-                        "shaderSampledImageArrayNonUniformIndexing": true,
-                        "shaderStorageBufferArrayNonUniformIndexing": true,
-                        "shaderStorageImageArrayNonUniformIndexing": true,
-                        "shaderUniformTexelBufferArrayNonUniformIndexing": true,
-                        "shaderStorageTexelBufferArrayNonUniformIndexing": true,
-                        "descriptorBindingUniformBufferUpdateAfterBind": true,
-                        "descriptorBindingSampledImageUpdateAfterBind": true,
-                        "descriptorBindingStorageImageUpdateAfterBind": true,
-                        "descriptorBindingStorageBufferUpdateAfterBind": true,
-                        "descriptorBindingUniformTexelBufferUpdateAfterBind": true,
-                        "descriptorBindingStorageTexelBufferUpdateAfterBind": true,
-                        "descriptorBindingUpdateUnusedWhilePending": true,
-                        "descriptorBindingPartiallyBound": true,
-                        "descriptorBindingVariableDescriptorCount": true,
-                        "runtimeDescriptorArray": true,
-                        "scalarBlockLayout": true
-                    }
+                "VkPhysicalDeviceVulkan12Features": {
+                    "samplerMirrorClampToEdge": true,
+                    "descriptorIndexing": true,
+                    "shaderUniformTexelBufferArrayDynamicIndexing": true,
+                    "shaderStorageTexelBufferArrayDynamicIndexing": true,
+                    "shaderUniformBufferArrayNonUniformIndexing": true,
+                    "shaderSampledImageArrayNonUniformIndexing": true,
+                    "shaderStorageBufferArrayNonUniformIndexing": true,
+                    "shaderStorageImageArrayNonUniformIndexing": true,
+                    "shaderUniformTexelBufferArrayNonUniformIndexing": true,
+                    "shaderStorageTexelBufferArrayNonUniformIndexing": true,
+                    "descriptorBindingUniformBufferUpdateAfterBind": true,
+                    "descriptorBindingSampledImageUpdateAfterBind": true,
+                    "descriptorBindingStorageImageUpdateAfterBind": true,
+                    "descriptorBindingStorageBufferUpdateAfterBind": true,
+                    "descriptorBindingUniformTexelBufferUpdateAfterBind": true,
+                    "descriptorBindingStorageTexelBufferUpdateAfterBind": true,
+                    "descriptorBindingUpdateUnusedWhilePending": true,
+                    "descriptorBindingPartiallyBound": true,
+                    "descriptorBindingVariableDescriptorCount": true,
+                    "runtimeDescriptorArray": true,
+                    "scalarBlockLayout": true
                 }
-            ],
+            },
             "properties": [
                 {
                     "VkPhysicalDeviceProperties": {

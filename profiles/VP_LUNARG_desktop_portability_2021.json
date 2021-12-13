@@ -3,13 +3,11 @@
     "capabilities": [
         {
             "name": "vulkan11requirements",
-            "features": [
-                {
-                    "VkPhysicalDeviceMultiviewFeatures": {
-                        "multiview": true
-                    }
+            "features": {
+                "VkPhysicalDeviceMultiviewFeatures": {
+                    "multiview": true
                 }
-            ],
+            },
             "properties": [
                 {
                     "VkPhysicalDeviceMultiviewProperties": {
@@ -111,119 +109,89 @@
                     "specVersion": 1
                 }
             ],
-            "features": [
-                {
-                    "VkPhysicalDeviceFeatures": {
-                        "depthBiasClamp": true,
-                        "depthClamp": true,
-                        "drawIndirectFirstInstance": true,
-                        "dualSrcBlend": true,
-                        "fillModeNonSolid": true,
-                        "fragmentStoresAndAtomics": true,
-                        "fullDrawIndexUint32": true,
-                        "imageCubeArray": true,
-                        "independentBlend": true,
-                        "inheritedQueries": true,
-                        "largePoints": true,
-                        "multiDrawIndirect": true,
-                        "multiViewport": true,
-                        "occlusionQueryPrecise": true,
-                        "robustBufferAccess": true,
-                        "sampleRateShading": true,
-                        "samplerAnisotropy": true,
-                        "shaderClipDistance": true,
-                        "shaderImageGatherExtended": true,
-                        "shaderSampledImageArrayDynamicIndexing": true,
-                        "shaderStorageBufferArrayDynamicIndexing": true,
-                        "shaderStorageImageArrayDynamicIndexing": true,
-                        "shaderStorageImageExtendedFormats": true,
-                        "shaderStorageImageWriteWithoutFormat": true,
-                        "shaderTessellationAndGeometryPointSize": true,
-                        "shaderUniformBufferArrayDynamicIndexing": true,
-                        "tessellationShader": true,
-                        "textureCompressionBC": true,
-                        "vertexPipelineStoresAndAtomics": true
-                    }
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "depthBiasClamp": true,
+                    "depthClamp": true,
+                    "drawIndirectFirstInstance": true,
+                    "dualSrcBlend": true,
+                    "fillModeNonSolid": true,
+                    "fragmentStoresAndAtomics": true,
+                    "fullDrawIndexUint32": true,
+                    "imageCubeArray": true,
+                    "independentBlend": true,
+                    "inheritedQueries": true,
+                    "largePoints": true,
+                    "multiDrawIndirect": true,
+                    "multiViewport": true,
+                    "occlusionQueryPrecise": true,
+                    "robustBufferAccess": true,
+                    "sampleRateShading": true,
+                    "samplerAnisotropy": true,
+                    "shaderClipDistance": true,
+                    "shaderImageGatherExtended": true,
+                    "shaderSampledImageArrayDynamicIndexing": true,
+                    "shaderStorageBufferArrayDynamicIndexing": true,
+                    "shaderStorageImageArrayDynamicIndexing": true,
+                    "shaderStorageImageExtendedFormats": true,
+                    "shaderStorageImageWriteWithoutFormat": true,
+                    "shaderTessellationAndGeometryPointSize": true,
+                    "shaderUniformBufferArrayDynamicIndexing": true,
+                    "tessellationShader": true,
+                    "textureCompressionBC": true,
+                    "vertexPipelineStoresAndAtomics": true
                 },
-                {
-                    "VkPhysicalDeviceImagelessFramebufferFeatures": {
-                        "imagelessFramebuffer": true
-                    }
+                "VkPhysicalDeviceImagelessFramebufferFeatures": {
+                    "imagelessFramebuffer": true
                 },
-                {
-                    "VkPhysicalDevice16BitStorageFeatures": {
-                        "storageBuffer16BitAccess": true,
-                        "uniformAndStorageBuffer16BitAccess": true
-                    }
+                "VkPhysicalDevice16BitStorageFeatures": {
+                    "storageBuffer16BitAccess": true,
+                    "uniformAndStorageBuffer16BitAccess": true
                 },
-                {
-                    "VkPhysicalDevice8BitStorageFeatures": {
-                        "storageBuffer8BitAccess": true,
-                        "uniformAndStorageBuffer8BitAccess": true
-                    }
+                "VkPhysicalDevice8BitStorageFeatures": {
+                    "storageBuffer8BitAccess": true,
+                    "storagePushConstant8": true,
+                    "uniformAndStorageBuffer8BitAccess": true
                 },
-                {
-                    "VkPhysicalDeviceDescriptorIndexingFeatures": {
-                        "shaderUniformTexelBufferArrayDynamicIndexing": true,
-                        "shaderStorageTexelBufferArrayDynamicIndexing": true,
-                        "shaderSampledImageArrayNonUniformIndexing": true,
-                        "shaderStorageBufferArrayNonUniformIndexing": true,
-                        "shaderUniformTexelBufferArrayNonUniformIndexing": true,
-                        "descriptorBindingSampledImageUpdateAfterBind": true,
-                        "descriptorBindingStorageImageUpdateAfterBind": true,
-                        "descriptorBindingStorageBufferUpdateAfterBind": true,
-                        "descriptorBindingUniformTexelBufferUpdateAfterBind": true,
-                        "descriptorBindingStorageTexelBufferUpdateAfterBind": true,
-                        "descriptorBindingUpdateUnusedWhilePending": true,
-                        "descriptorBindingPartiallyBound": true,
-                        "descriptorBindingVariableDescriptorCount": true,
-                        "runtimeDescriptorArray": true
-                    }
+                "VkPhysicalDeviceDescriptorIndexingFeatures": {
+                    "shaderUniformTexelBufferArrayDynamicIndexing": true,
+                    "shaderStorageTexelBufferArrayDynamicIndexing": true,
+                    "shaderSampledImageArrayNonUniformIndexing": true,
+                    "shaderStorageBufferArrayNonUniformIndexing": true,
+                    "shaderUniformTexelBufferArrayNonUniformIndexing": true,
+                    "descriptorBindingSampledImageUpdateAfterBind": true,
+                    "descriptorBindingStorageImageUpdateAfterBind": true,
+                    "descriptorBindingStorageBufferUpdateAfterBind": true,
+                    "descriptorBindingUniformTexelBufferUpdateAfterBind": true,
+                    "descriptorBindingStorageTexelBufferUpdateAfterBind": true,
+                    "descriptorBindingUpdateUnusedWhilePending": true,
+                    "descriptorBindingPartiallyBound": true,
+                    "descriptorBindingVariableDescriptorCount": true,
+                    "runtimeDescriptorArray": true
                 },
-                {
-                    "VkPhysicalDeviceHostQueryResetFeatures": {
-                        "hostQueryReset": true
-                    }
+                "VkPhysicalDeviceHostQueryResetFeatures": {
+                    "hostQueryReset": true
                 },
-                {
-                    "VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures": {
-                        "shaderSubgroupExtendedTypes": true
-                    }
+                "VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures": {
+                    "shaderSubgroupExtendedTypes": true
                 },
-                {
-                    "VkPhysicalDeviceUniformBufferStandardLayoutFeatures": {
-                        "uniformBufferStandardLayout": true
-                    }
+                "VkPhysicalDeviceUniformBufferStandardLayoutFeatures": {
+                    "uniformBufferStandardLayout": true
                 },
-                {
-                    "VkPhysicalDeviceShaderDrawParametersFeatures": {
-                        "shaderDrawParameters": true
-                    }
+                "VkPhysicalDeviceShaderDrawParametersFeatures": {
+                    "shaderDrawParameters": true
                 },
-                {
-                    "VkPhysicalDevice8BitStorageFeatures": {
-                        "storageBuffer8BitAccess": true,
-                        "storagePushConstant8": true,
-                        "uniformAndStorageBuffer8BitAccess": true
-                    }
+                "VkPhysicalDeviceShaderFloat16Int8Features": {
+                    "shaderInt8": true
                 },
-                {
-                    "VkPhysicalDeviceShaderFloat16Int8Features": {
-                        "shaderInt8": true
-                    }
+                "VkPhysicalDeviceSamplerYcbcrConversionFeatures": {
+                    "samplerYcbcrConversion": true
                 },
-                {
-                    "VkPhysicalDeviceSamplerYcbcrConversionFeatures": {
-                        "samplerYcbcrConversion": true
-                    }
-                },
-                {
-                    "VkPhysicalDeviceVariablePointersFeatures": {
-                        "variablePointersStorageBuffer": true,
-                        "variablePointers": true
-                    }
+                "VkPhysicalDeviceVariablePointersFeatures": {
+                    "variablePointersStorageBuffer": true,
+                    "variablePointers": true
                 }
-            ],
+            },
             "properties": [
                 {
                     "VkPhysicalDeviceProperties": {
@@ -1112,20 +1080,18 @@
                     "specVersion": 1
                 }
             ],
-            "features": [
-                {
-                    "VkPhysicalDevicePortabilitySubsetFeaturesKHR": {
-                        "vertexAttributeAccessBeyondStride": true,
-                        "separateStencilMaskRef": true,
-                        "mutableComparisonSamplers": true,
-                        "multisampleArrayImage": true,
-                        "imageViewFormatSwizzle": true,
-                        "imageViewFormatReinterpretation": true,
-                        "events": true,
-                        "constantAlphaColorBlendFactors": true
-                    }
+            "features": {
+                "VkPhysicalDevicePortabilitySubsetFeaturesKHR": {
+                    "vertexAttributeAccessBeyondStride": true,
+                    "separateStencilMaskRef": true,
+                    "mutableComparisonSamplers": true,
+                    "multisampleArrayImage": true,
+                    "imageViewFormatSwizzle": true,
+                    "imageViewFormatReinterpretation": true,
+                    "events": true,
+                    "constantAlphaColorBlendFactors": true
                 }
-            ],
+            },
             "properties": [
                 {
                     "VkPhysicalDevicePortabilitySubsetPropertiesKHR": {

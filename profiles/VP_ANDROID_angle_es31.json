@@ -3,23 +3,19 @@
     "capabilities": [
         {
             "name": "vulkan10requirements",
-            "features": [
-                {
-                    "VkPhysicalDeviceFeatures": {
-                        "robustBufferAccess": true
-                    }
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "robustBufferAccess": true
                 }
-            ]
+            }
         },
         {
             "name": "vulkan11requirements",
-            "features": [
-                {
-                    "VkPhysicalDeviceMultiviewFeatures": {
-                        "multiview": true
-                    }
+            "features": {
+                "VkPhysicalDeviceMultiviewFeatures": {
+                    "multiview": true
                 }
-            ],
+            },
             "properties": [
                 {
                     "VkPhysicalDeviceMultiviewProperties": {
@@ -69,44 +65,30 @@
                     "specVersion": 1
                 }
             ],
-            "features": [
-                {
-                    "VkPhysicalDeviceFeatures": {
-                        "independentBlend": true,
-                        "vertexPipelineStoresAndAtomics": true
-                    }
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "independentBlend": true,
+                    "vertexPipelineStoresAndAtomics": true
                 },
-                {
-                    "VkPhysicalDeviceLineRasterizationFeaturesEXT": {
-                        "bresenhamLines": true
-                    }
+                "VkPhysicalDeviceLineRasterizationFeaturesEXT": {
+                    "bresenhamLines": true
                 },
-                {
-                    "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR": {
-                        "shaderTerminateInvocation": true
-                    }
+                "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR": {
+                    "shaderTerminateInvocation": true
                 },
-                {
-                    "VkPhysicalDeviceProvokingVertexFeaturesEXT": {
-                        "provokingVertexLast": true
-                    }
+                "VkPhysicalDeviceProvokingVertexFeaturesEXT": {
+                    "provokingVertexLast": true
                 },
-                {
-                    "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
-                        "transformFeedback": true
-                    }
+                "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
+                    "transformFeedback": true
                 },
-                {
-                    "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT": {
-                        "primitiveTopologyListRestart": true
-                    }
+                "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT": {
+                    "primitiveTopologyListRestart": true
                 },
-                {
-                    "VkPhysicalDeviceImageRobustnessFeaturesEXT": {
-                        "robustImageAccess": true
-                    }
+                "VkPhysicalDeviceImageRobustnessFeaturesEXT": {
+                    "robustImageAccess": true
                 }
-            ],
+            },
             "properties": [
                 {
                     "VkPhysicalDeviceProperties": {
