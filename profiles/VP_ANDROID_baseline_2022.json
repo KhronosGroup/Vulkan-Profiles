@@ -11,104 +11,32 @@
         },
         {
             "name": "baseline",
-            "extensions": [
-                {
-                    "extensionName": "VK_KHR_surface",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_android_surface",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_swapchain",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_get_physical_device_properties2",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_maintenance1",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_EXT_swapchain_colorspace",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_get_surface_capabilities2",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_incremental_present",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_GOOGLE_display_timing",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_shader_draw_parameters",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_descriptor_update_template",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_get_memory_requirements2",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_dedicated_allocation",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_storage_buffer_storage_class",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_external_semaphore_capabilities",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_external_semaphore",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_external_memory_capbilities",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_external_memory",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_external_fence_capabilities",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_external_semaphore_fd",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_external_fence",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_external_fence_fd",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_variable_pointers",
-                    "specVersion": 1
-                },
-                {
-                    "extensionName": "VK_KHR_maintenance2",
-                    "specVersion": 1
-                }
-            ],
+            "extensions": {
+                "VK_KHR_surface": 1,
+                "VK_KHR_android_surface": 1,
+                "VK_KHR_swapchain": 1,
+                "VK_KHR_get_physical_device_properties2": 1,
+                "VK_KHR_maintenance1": 1,
+                "VK_EXT_swapchain_colorspace": 1,
+                "VK_KHR_get_surface_capabilities2": 1,
+                "VK_KHR_incremental_present": 1,
+                "VK_GOOGLE_display_timing": 1,
+                "VK_KHR_shader_draw_parameters": 1,
+                "VK_KHR_descriptor_update_template": 1,
+                "VK_KHR_get_memory_requirements2": 1,
+                "VK_KHR_dedicated_allocation": 1,
+                "VK_KHR_storage_buffer_storage_class": 1,
+                "VK_KHR_external_semaphore_capabilities": 1,
+                "VK_KHR_external_semaphore": 1,
+                "VK_KHR_external_memory_capabilities": 1,
+                "VK_KHR_external_memory": 1,
+                "VK_KHR_external_fence_capabilities": 1,
+                "VK_KHR_external_semaphore_fd": 1,
+                "VK_KHR_external_fence": 1,
+                "VK_KHR_external_fence_fd": 1,
+                "VK_KHR_variable_pointers": 1,
+                "VK_KHR_maintenance2": 1
+            },
             "features": {
                 "VkPhysicalDeviceFeatures": {
                     "depthBiasClamp": true,
