@@ -110,11 +110,13 @@ TEST(api_get_profile_structures, properties_full) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
-    vpGetProfileStructureProperties(&profile, &propertyCount, nullptr);
+    VkResult result0 = vpGetProfileStructureProperties(&profile, &propertyCount, nullptr);
+    EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(17, propertyCount);
 
     std::vector<VpStructureProperties> properties(propertyCount);
-    vpGetProfileStructureProperties(&profile, &propertyCount, &properties[0]);
+    VkResult result1 = vpGetProfileStructureProperties(&profile, &propertyCount, &properties[0]);
+    EXPECT_EQ(VK_SUCCESS, result1);
 
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, properties[0].type);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, properties[1].type);
@@ -140,13 +142,15 @@ TEST(api_get_profile_structures, properties_partial) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t structureTypesCount = 0;
-    vpGetProfileStructureProperties(&profile, &structureTypesCount, nullptr);
+    VkResult result0 = vpGetProfileStructureProperties(&profile, &structureTypesCount, nullptr);
+    EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(17, structureTypesCount);
 
     structureTypesCount = 5;
 
     std::vector<VpStructureProperties> structureTypes(structureTypesCount);
-    vpGetProfileStructureProperties(&profile, &structureTypesCount, &structureTypes[0]);
+    VkResult result1 = vpGetProfileStructureProperties(&profile, &structureTypesCount, &structureTypes[0]);
+    EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(5, structureTypesCount);
 
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, structureTypes[0].type);

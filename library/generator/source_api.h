@@ -87,7 +87,7 @@ typedef struct VpStructureProperties {
 } VpStructureProperties;
 
 // Query the list of structures used to specify requirements of a profile
-void vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                      VpStructureProperties *pProperties);
 
 // Query the list of formats with specified requirements by a profile
