@@ -33,6 +33,8 @@ TEST(api_get_profile_extension_properties, full) {
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(13, propertyCount);
 
+    propertyCount = 14;
+
     std::vector<VkExtensionProperties> properties(propertyCount);
     VkResult result1 = vpGetProfileExtensionProperties(&profile, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
