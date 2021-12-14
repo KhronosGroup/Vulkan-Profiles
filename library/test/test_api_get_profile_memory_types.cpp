@@ -33,6 +33,8 @@ TEST(api_get_profile_memory_types, full) {
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(2, memoryPropertyFlagsCount);
 
+    memoryPropertyFlagsCount = 3;
+
     std::vector<VkMemoryPropertyFlags> memoryPropertyFlags(memoryPropertyFlagsCount);
     VkResult result1 = vpGetProfileMemoryTypes(&profile, &memoryPropertyFlagsCount, &memoryPropertyFlags[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
