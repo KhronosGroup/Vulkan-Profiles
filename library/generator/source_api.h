@@ -6,7 +6,7 @@
 #define VK_KHR_roadmap_2022 1
 #define VP_KHR_ROADMAP_2022_NAME "VP_KHR_roadmap_2022"
 #define VP_KHR_ROADMAP_2022_SPEC_VERSION 1
-#define VP_KHR_ROADMAP_2022_MIN_VERSION VK_MAKE_VERSION(1, 3, 200)
+#define VP_KHR_ROADMAP_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 3, 200)
 
 #define VP_ANDROID_baseline_2022 1
 #define VP_ANDROID_BASELINE_2022_NAME "VP_ANDROID_baseline_2022"
@@ -59,7 +59,7 @@ typedef struct VpDeviceCreateInfo {
 void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // List the recommended fallback profiles of a profile
-void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // Check whether a profile is supported by the physical device
 VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
@@ -70,7 +70,7 @@ VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInf
                         const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
 
 // Query the list of extension of a profile
-void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                      VkExtensionProperties *pProperties);
 
 // Fill the pNext Vulkan structures with the requirements of a profile
@@ -87,18 +87,19 @@ typedef struct VpStructureProperties {
 } VpStructureProperties;
 
 // Query the list of structures used to specify requirements of a profile
-void vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                      VpStructureProperties *pProperties);
 
 // Query the list of formats with specified requirements by a profile
-void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
+VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkFormat *pProperties);
 
 // Query the requirements of a format for a profile
 void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
 // Query the requirements of memory types by a profile
-void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryTypeCount, VkMemoryPropertyFlags *pMemoryTypes);
+VkResult vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkMemoryPropertyFlags *pProperties);
 
 // Query the requirements of queue families by a profile
-void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
+VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                   VkQueueFamilyProperties *pProperties);
 
