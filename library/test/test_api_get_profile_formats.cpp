@@ -35,6 +35,8 @@ TEST(api_get_profile_formats, full) {
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(66, formatCount);
 
+    formatCount = 67;
+
     std::vector<VkFormat> formats(formatCount);
     VkResult result1 = vpGetProfileFormats(&profile, &formatCount, &formats[0]);
     EXPECT_EQ(VK_SUCCESS, result1);

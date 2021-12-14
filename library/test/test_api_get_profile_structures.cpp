@@ -114,9 +114,12 @@ TEST(api_get_profile_structures, properties_full) {
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(17, propertyCount);
 
+    propertyCount = 18;
+
     std::vector<VpStructureProperties> properties(propertyCount);
     VkResult result1 = vpGetProfileStructureProperties(&profile, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
+    EXPECT_EQ(17, propertyCount);
 
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, properties[0].type);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, properties[1].type);

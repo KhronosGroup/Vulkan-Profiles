@@ -91,7 +91,7 @@ VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, ui
                                      VpStructureProperties *pProperties);
 
 // Query the list of formats with specified requirements by a profile
-VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
+VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkFormat *pProperties);
 
 // Query the requirements of a format for a profile
 void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
