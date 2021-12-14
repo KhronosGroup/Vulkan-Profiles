@@ -29,17 +29,14 @@
                 "VK_EXT_line_rasterization": 1,
                 "VK_KHR_shader_terminate_invocation": 1,
                 "VK_EXT_provoking_vertex": 1,
-                "VK_EXT_transform_feedback": 1,
                 "VK_EXT_primitive_topology_list_restart": 1,
                 "VK_EXT_load_store_op_none": 1,
-                "VK_EXT_swapchain_colorspace": 1,
                 "VK_EXT_image_robustness": 1,
                 "VK_KHR_incremental_present": 1
             },
             "features": {
                 "VkPhysicalDeviceFeatures": {
-                    "independentBlend": true,
-                    "vertexPipelineStoresAndAtomics": true
+                    "independentBlend": true
                 },
                 "VkPhysicalDeviceLineRasterizationFeaturesEXT": {
                     "bresenhamLines": true
@@ -78,13 +75,27 @@
                     }
                 }
             }
+        },
+        {
+            "name": "transform_feedback_ext",
+            "extensions": {
+                "VK_EXT_transform_feedback": 1
+            }
+        },
+        {
+            "name": "vertex_pipeline_store",
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "vertexPipelineStoresAndAtomics": true
+                }
+            }
         }
     ],
     "profiles": [
         {
             "name": "VP_ANDROID_angle_es31",
             "version": 1,
-            "api-version": "1.1.131",
+            "api-version": "1.1.196",
             "label": "Android Vulkan 1.1 ANGLE 2022 profile",
             "description": "ANGLE Layer Support for GLES 3.1",
             "contributors": [
@@ -98,15 +109,46 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2021-12-08",
-                    "author": "Christophe Riccio",
-                    "comment": "Initial revision"
+                    "date": "2021-12-13",
+                    "author": "Trevor David Black",
+                    "comment": "First Draft"
                 }
             ],
             "capabilities": [
                 "vulkan10requirements",
                 "vulkan11requirements",
-                "baseline"
+                "baseline",
+                "transform_feedback_ext"
+            ],
+            "fallback": [ "VP_ANDROID_angle_es31_vertex_pipeline_store" ]
+        },
+        {
+            "name": "VP_ANDROID_angle_es31_vertex_pipeline_store",
+            "version": 1,
+            "api-version": "1.1.196",
+            "label": "Android Vulkan 1.1 ANGLE 2022 profile",
+            "description": "ANGLE Layer Support for GLES 3.1",
+            "contributors": [
+                {
+                    "name": "Trevor Black",
+                    "company": "Google",
+                    "email": "vantablack@google.com",
+                    "contact": true
+                }
+            ],
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2021-12-13",
+                    "author": "Trevor David Black",
+                    "comment": "First Draft"
+                }
+            ],
+            "capabilities": [
+                "vulkan10requirements",
+                "vulkan11requirements",
+                "baseline",
+                "vertex_pipeline_store"
             ]
         }
     ]
