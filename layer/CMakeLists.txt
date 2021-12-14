@@ -42,27 +42,6 @@ set(TARGET_NAMES
     VkLayer_device_simulation_manual
     )
 
-if (WIN32)
-    macro(add_vk_layer target)
-    FILE(TO_NATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/VkLayer_${target}.def DEF_FILE)
-    add_custom_target(copy-${target}-def-file ALL
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DEF_FILE} VkLayer_${target}.def
-        VERBATIM
-    )
-    add_library(VkLayer_${target} SHARED ${ARGN} VkLayer_${target}.def)
-    target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} vku)
-    endmacro()
-else()
-    macro(add_vk_layer target)
-    add_library(VkLayer_${target} SHARED ${ARGN})
-    target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} vku)
-    if (NOT APPLE)
-        set_target_properties(VkLayer_${target} PROPERTIES LINK_FLAGS "-Wl,-Bsymbolic")
-    endif ()
-    install(TARGETS VkLayer_${target} DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    endmacro()
-endif()
-
 if (APPLE)
     include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}

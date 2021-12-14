@@ -54,15 +54,19 @@ FetchContent_Declare(
 	GIT_TAG ${VULKAN_TAG}
 )
 FetchContent_Declare(
-	vulkan-loader
-	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Loader
-	GIT_TAG ${VULKAN_TAG}
-)
-FetchContent_Declare(
 	vulkan-validationlayers
 	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-ValidationLayers
 	GIT_TAG ${VULKAN_TAG}
 )
+# Desktop builds link against the loader vulkan library.  Android
+# builds just link against the system vulkan library.
+if (NOT ANDROID)
+    FetchContent_Declare(
+        vulkan-loader
+        GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Loader
+        GIT_TAG ${VULKAN_TAG}
+    )
+endif()
 
 # After all the content is declared, it can safely be made available.
 FetchContent_MakeAvailable(googletest)
@@ -76,7 +80,9 @@ set(_build_type ${CMAKE_BUILD_TYPE})
 set(VVL_CPP_STANDARD 11)
 set(_build_type ${CMAKE_BUILD_TYPE})
 FetchContent_MakeAvailable(vulkan-headers)
-FetchContent_MakeAvailable(vulkan-loader)
+if (NOT ANDROID)
+    FetchContent_MakeAvailable(vulkan-loader)
+endif()
 
 # We want the code for Vulkan-ValidationLayers, to get source required
 # to build devsim, but we don't need its build and build dependencies;
@@ -98,11 +104,35 @@ add_definitions(-DAPI_NAME="${API_NAME}")
 add_subdirectory(library)
 
 add_subdirectory(vku)
+
+# add_vk_layer macro is used by both device_simulation/ and layer/.
+if (WIN32)
+    macro(add_vk_layer target)
+    FILE(TO_NATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/VkLayer_${target}.def DEF_FILE)
+    add_custom_target(copy-${target}-def-file ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DEF_FILE} VkLayer_${target}.def
+        VERBATIM
+    )
+    add_library(VkLayer_${target} SHARED ${ARGN} VkLayer_${target}.def)
+    target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} vku)
+    endmacro()
+else()
+    macro(add_vk_layer target)
+    add_library(VkLayer_${target} SHARED ${ARGN})
+    target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} vku)
+    if(ANDROID)
+        # Android needs -llog for __android_print_log()
+        target_link_Libraries(VkLayer_${target} log)
+    endif()
+    if (NOT APPLE)
+        set_target_properties(VkLayer_${target} PROPERTIES LINK_FLAGS "-Wl,-Bsymbolic")
+    endif ()
+    install(TARGETS VkLayer_${target} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    endmacro()
+endif()
 add_subdirectory(device_simulation)
 add_subdirectory(layer)
 
 include_directories(external)
 
 add_subdirectory(profiles/test)
-
-
