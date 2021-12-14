@@ -55,6 +55,15 @@ TEST(api_create_device_profile, overrite_with_profile_only) {
     VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res == VK_SUCCESS);
     EXPECT_TRUE(device != VK_NULL_HANDLE);
+
+    std::uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(scaffold.physicalDevice, &queueFamilyCount, nullptr);
+    std::vector<VkQueueFamilyProperties> queueFamily(queueFamilyCount);
+
+    queueFamilyCount = 4;
+    vkGetPhysicalDeviceQueueFamilyProperties(scaffold.physicalDevice, &queueFamilyCount, queueFamily.data());
+
+    EXPECT_EQ(1, queueFamilyCount);
 }
 
 TEST(api_create_device_profile, overrite_with_supported_extensions) {

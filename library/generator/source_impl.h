@@ -21,24 +21,21 @@ VP_INLINE VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, ui
     static const VpProfileProperties LUNARG_desktop_portability_2021_subset_fallbacks[] = {
         {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION}};
 
-    if (pProperties == nullptr) {
 #ifdef VK_ENABLE_BETA_EXTENSIONS
-        if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
-            *pPropertyCount = _vpCountOf(LUNARG_desktop_portability_2021_subset_fallbacks);
-        } else {
+    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
+        *pPropertyCount = std::min<std::size_t>(_vpCountOf(LUNARG_desktop_portability_2021_subset_fallbacks), *pPropertyCount);
+    } else {
 #else
-        {
+    {
 #endif  // VK_ENABLE_BETA_EXTENSIONS
-            *pPropertyCount = 0;
-        }
-        return VK_SUCCESS;
+        *pPropertyCount = 0;
     }
+
+    if (pProperties == nullptr) return VK_SUCCESS;
 
 #ifdef VK_ENABLE_BETA_EXTENSIONS
     if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
-        for (std::size_t i = 0,
-                         n = std::min<std::size_t>(_vpCountOf(LUNARG_desktop_portability_2021_subset_fallbacks), *pPropertyCount);
-             i < n; ++i) {
+        for (std::size_t i = 0, n = *pPropertyCount; i < n; ++i) {
             pProperties[i] = LUNARG_desktop_portability_2021_subset_fallbacks[i];
         }
     }

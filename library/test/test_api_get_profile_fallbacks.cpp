@@ -34,6 +34,8 @@ TEST(api_get_profile_fallbacks, full) {
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(1, count);
 
+    count = 2;
+
     std::vector<VpProfileProperties> data(count);
     VkResult result1 = vpGetProfileFallbacks(&profile_subset, &count, &data[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
