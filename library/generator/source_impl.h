@@ -21,17 +21,19 @@ VP_INLINE VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, ui
     static const VpProfileProperties LUNARG_desktop_portability_2021_subset_fallbacks[] = {
         {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION}};
 
+    if (pProperties == nullptr) {
 #ifdef VK_ENABLE_BETA_EXTENSIONS
-    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
-        *pPropertyCount = _vpCountOf(LUNARG_desktop_portability_2021_subset_fallbacks);
-    } else {
+        if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
+            *pPropertyCount = _vpCountOf(LUNARG_desktop_portability_2021_subset_fallbacks);
+        } else {
 #else
-    {
+        {
 #endif  // VK_ENABLE_BETA_EXTENSIONS
-        *pPropertyCount = 0;
-    }
+            *pPropertyCount = 0;
+        }
 
-    if (pProperties == nullptr) return VK_SUCCESS;
+        return VK_SUCCESS;
+    }
 
 #ifdef VK_ENABLE_BETA_EXTENSIONS
     if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
@@ -2718,11 +2720,11 @@ VP_INLINE VkResult vpGetProfileStructureProperties(const VpProfileProperties *pP
             *pPropertyCount = _vpCountOf(_VP_KHR_ROADMAP_2022_STRUCTURE_PROPERTIES);
         } else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_STRUCTURE_PROPERTIES);
-        } 
+        }
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
             *pPropertyCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_STRUCTURE_PROPERTIES);
-        } 
+        }
 #endif
         else {
             *pPropertyCount = 0;
@@ -2737,23 +2739,22 @@ VP_INLINE VkResult vpGetProfileStructureProperties(const VpProfileProperties *pP
         }
         return _vpCountOf(_VP_KHR_ROADMAP_2022_STRUCTURE_PROPERTIES) <= *pPropertyCount ? VK_SUCCESS : VK_INCOMPLETE;
     } else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
-        *pPropertyCount = 
-            std::min<uint32_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_STRUCTURE_PROPERTIES), *pPropertyCount);
+        *pPropertyCount = std::min<uint32_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_STRUCTURE_PROPERTIES), *pPropertyCount);
         for (uint32_t i = 0, n = *pPropertyCount; i < n; ++i) {
             pProperties[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2021_STRUCTURE_PROPERTIES[i];
         }
         return _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_STRUCTURE_PROPERTIES) <= *pPropertyCount ? VK_SUCCESS : VK_INCOMPLETE;
-    } 
+    }
 #ifdef VK_ENABLE_BETA_EXTENSIONS
     else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
-        *pPropertyCount = 
+        *pPropertyCount =
             std::min<uint32_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_STRUCTURE_PROPERTIES), *pPropertyCount);
         for (uint32_t i = 0, n = *pPropertyCount; i < n; ++i) {
             pProperties[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_STRUCTURE_PROPERTIES[i];
         }
         return _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_STRUCTURE_PROPERTIES) <= *pPropertyCount ? VK_SUCCESS
                                                                                                               : VK_INCOMPLETE;
-    } 
+    }
 #endif
     else {
         return VK_SUCCESS;
