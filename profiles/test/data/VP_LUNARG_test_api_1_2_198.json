@@ -2836,42 +2836,6 @@
 						"VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT"
 					]
 				}
-			},
-            "memoryProperties": {
-				"VkPhysicalDeviceMemoryProperties": {
-					"memoryTypes": [
-						{
-							"propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT" ],
-							"heapIndex": 0
-						},
-						{
-							"propertyFlags": [ "VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT", "VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT", "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT", "VK_MEMORY_PROPERTY_HOST_CACHED_BIT", "VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT" ],
-							"heapIndex": 99
-						},
-						{
-							"propertyFlags": [ "VK_MEMORY_PROPERTY_HOST_COHERENT_BIT", "VK_MEMORY_PROPERTY_HOST_CACHED_BIT" ],
-							"heapIndex": 900
-						},
-						{
-							"propertyFlags": [],
-							"heapIndex": 1234
-						}
-					],
-					"memoryHeaps": [
-						{
-							"flags": [ "VK_MEMORY_HEAP_DEVICE_LOCAL_BIT" ],
-							"size": 80000002001
-						},
-						{
-							"flags": [ "VK_MEMORY_HEAP_DEVICE_LOCAL_BIT", "VK_MEMORY_HEAP_MULTI_INSTANCE_BIT" ],
-							"size": 80000002003
-						},
-						{
-							"flags": [],
-							"size": 80000002003
-						}
-					]
-				}
 			}
         },
         {

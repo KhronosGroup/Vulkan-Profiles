@@ -161,10 +161,6 @@ static const VpStructureProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_ST
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, VP_STRUCTURE_PROPERTIES}};
 #endif
 
-static const VkMemoryPropertyFlags _VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES[] = {
-    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
-
 static const VkQueueFamilyProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_QUEUE_FAMILY_PROPERTIES[] = {
     {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT, 1, 36, {1, 1, 1}}};
 
@@ -2714,22 +2710,6 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
             return result;
         }
 
-        VkPhysicalDeviceMemoryProperties memoryProperties;
-        vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
-
-        VkBool32 memorySupported = VK_TRUE;
-        for (uint32_t i = 0, n = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES); i < n && memorySupported; ++i) {
-            const VkMemoryPropertyFlags memoryPropertyFlags = _VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES[i];
-
-            if (!_vpCheckMemoryProperty(memoryProperties, _VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES[i])) {
-                memorySupported = VK_FALSE;
-            }
-        }
-
-        if (memorySupported == VK_FALSE) {
-            return result;
-        }
-
         std::uint32_t queueFamilyCount = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
         std::vector<VkQueueFamilyProperties> queueFamily(queueFamilyCount);
@@ -3670,44 +3650,6 @@ VP_INLINE void vpGetProfileFormatProperties(const VpProfileProperties *pProfile,
                 p = static_cast<VkStruct *>(p->pNext);
             }
         }
-    }
-}
-
-VP_INLINE VkResult vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                           VkMemoryPropertyFlags *pProperties) {
-    if (pProperties == nullptr) {
-        if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
-            *pPropertyCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES);
-        }
-#ifdef VK_ENABLE_BETA_EXTENSIONS
-        else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
-            *pPropertyCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES);
-        }
-#endif
-        else {
-            *pPropertyCount = 0;
-        }
-        return VK_SUCCESS;
-    }
-
-    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
-        *pPropertyCount = std::min<uint32_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES), *pPropertyCount);
-        for (uint32_t i = 0, n = *pPropertyCount; i < n; ++i) {
-            pProperties[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES[i];
-        }
-        return _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES) <= *pPropertyCount ? VK_SUCCESS : VK_INCOMPLETE;
-    }
-#ifdef VK_ENABLE_BETA_EXTENSIONS
-    else if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
-        *pPropertyCount = std::min<uint32_t>(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES), *pPropertyCount);
-        for (uint32_t i = 0, n = *pPropertyCount; i < n; ++i) {
-            pProperties[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES[i];
-        }
-        return _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_MEMORY_TYPES) <= *pPropertyCount ? VK_SUCCESS : VK_INCOMPLETE;
-    }
-#endif
-    else {
-        return VK_SUCCESS;
     }
 }
 
