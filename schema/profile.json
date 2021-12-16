@@ -6834,101 +6834,101 @@
         },
         "profiles": {
             "description": "The list of profile definitions.",
-            "type": "array",
-            "uniqueItems": true,
-            "items": {
-                "additionalProperties": false,
-                "required": [
-                    "name",
-                    "label",
-                    "description",
-                    "version",
-                    "api-version",
-                    "contributors",
-                    "history",
-                    "capabilities"
-                ],
-                "properties": {
-                    "name": {
-                        "description": "The unique identifier of the profile.",
-                        "type": "string",
-                        "pattern": "^VP_[A-Z0-9]+_[A-Za-z0-9_]+"
-                    },
-                    "version": {
-                        "description": "The revision of the profile.",
-                        "type": "integer"
-                    },
-                    "label": {
-                        "description": "The label used to present the profile to the Vulkan developer.",
-                        "type": "string"
-                    },
-                    "description": {
-                        "description": "The description of the profile.",
-                        "type": "string"
-                    },
-                    "status": {
-                        "description": "The developmet status of the profile: ALPHA, BETA, STABLE or DEPRECATED.",
-                        "$ref": "#/definitions/status"
-                    },
-                    "api-version": {
-                        "description": "The Vulkan API version against which the profile is written.",
-                        "type": "string",
-                        "pattern": "^[0-9]+.[0-9]+.[0-9]+$"
-                    },
-                    "contributors": {
-                        "description": "The list of contributors of the profile.",
-                        "type": "array",
-                        "uniqueItems": true,
-                        "minItems": 1,
-                        "items": {
-                            "$ref": "#/definitions/contributor"
-                        }
-                    },
-                    "history": {
-                        "description": "The version history of the profile file",
-                        "type": "array",
-                        "uniqueItems": true,
-                        "minItems": 1,
-                        "items": {
-                            "type": "object",
-                            "required": [
-                                "revision",
-                                "date",
-                                "author",
-                                "comment"
-                            ],
-                            "properties": {
-                                "revision": {
-                                    "type": "integer"
-                                },
-                                "date": {
-                                    "type": "string",
-                                    "pattern": "((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])"
-                                },
-                                "author": {
-                                    "type": "string"
-                                },
-                                "comment": {
-                                    "type": "string"
+            "patternProperties": {
+                "^VP_[A-Z0-9]+_[A-Za-z0-9_]+": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "label",
+                        "description",
+                        "version",
+                        "api-version",
+                        "contributors",
+                        "history",
+                        "capabilities"
+                    ],
+                    "properties": {
+                        "name": {
+                            "description": "The unique identifier of the profile.",
+                            "type": "string",
+                            "pattern": "^VP_[A-Z0-9]+_[A-Za-z0-9_]+"
+                        },
+                        "version": {
+                            "description": "The revision of the profile.",
+                            "type": "integer"
+                        },
+                        "label": {
+                            "description": "The label used to present the profile to the Vulkan developer.",
+                            "type": "string"
+                        },
+                        "description": {
+                            "description": "The description of the profile.",
+                            "type": "string"
+                        },
+                        "status": {
+                            "description": "The developmet status of the profile: ALPHA, BETA, STABLE or DEPRECATED.",
+                            "$ref": "#/definitions/status"
+                        },
+                        "api-version": {
+                            "description": "The Vulkan API version against which the profile is written.",
+                            "type": "string",
+                            "pattern": "^[0-9]+.[0-9]+.[0-9]+$"
+                        },
+                        "contributors": {
+                            "description": "The list of contributors of the profile.",
+                            "type": "array",
+                            "uniqueItems": true,
+                            "minItems": 1,
+                            "items": {
+                                "$ref": "#/definitions/contributor"
+                            }
+                        },
+                        "history": {
+                            "description": "The version history of the profile file",
+                            "type": "array",
+                            "uniqueItems": true,
+                            "minItems": 1,
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "revision",
+                                    "date",
+                                    "author",
+                                    "comment"
+                                ],
+                                "properties": {
+                                    "revision": {
+                                        "type": "integer"
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "pattern": "((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])"
+                                    },
+                                    "author": {
+                                        "type": "string"
+                                    },
+                                    "comment": {
+                                        "type": "string"
+                                    }
                                 }
                             }
-                        }
-                    },
-                    "capabilities": {
-                        "description": "The list of capability sets that can be reference by a profile.",
-                        "type": "array",
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "fallback": {
-                        "description": "The list of profiles recommended if the checked profile is not supported by the platform.",
-                        "type": "array",
-                        "additionalProperties": false,
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "string"
+                        },
+                        "capabilities": {
+                            "description": "The list of capability sets that can be reference by a profile.",
+                            "type": "array",
+                            "uniqueItems": true,
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "fallback": {
+                            "description": "The list of profiles recommended if the checked profile is not supported by the platform.",
+                            "type": "array",
+                            "additionalProperties": false,
+                            "uniqueItems": true,
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 }

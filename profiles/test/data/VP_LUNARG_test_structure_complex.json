@@ -11,9 +11,8 @@
         "unused": {
         }
     },
-    "profiles": [
-        {
-            "name": "VP_LUNARG_test_structure_complex",
+    "profiles": {
+        "VP_LUNARG_test_structure_complex": {
             "version": 1,
             "api-version": "1.2.198",
             "label": "LunarG Profiles Structure Complex unit test",
@@ -39,5 +38,6 @@
                 "baseline"
             ]
         }
-    ]
+    }
 }
+

@@ -840,9 +840,8 @@
             }
         }
     },
-    "profiles": [
-        {
-            "name": "VP_ANDROID_baseline_2021",
+    "profiles": {
+        "VP_ANDROID_baseline_2021": {
             "version": 1,
             "api-version": "1.0.68",
             "label": "Android Vulkan Baseline 2021 profile",
@@ -868,5 +867,5 @@
                 "baseline"
             ]
         }
-    ]
+    }
 }

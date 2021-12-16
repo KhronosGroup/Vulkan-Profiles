@@ -741,9 +741,8 @@
             }
         }
     },
-    "profiles": [
-        {
-            "name": "VP_LUNARG_desktop_portability_2021_subset",
+    "profiles": {
+        "VP_LUNARG_desktop_portability_2021_subset": {
             "version": 1,
             "status": "BETA",
             "api-version": "1.1.142",
@@ -773,8 +772,7 @@
             ],
             "fallback": [ "VP_LUNARG_desktop_portability_2021" ]
         },
-        {
-            "name": "VP_LUNARG_desktop_portability_2021",
+        "VP_LUNARG_desktop_portability_2021": {
             "version": 1,
             "api-version": "1.1.142",
             "label": "LunarG Vulkan Desktop Portability 2021 profile",
@@ -801,5 +799,5 @@
                 "baseline"
             ]
         }
-    ]
+    }
 }
