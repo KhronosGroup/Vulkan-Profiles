@@ -60,8 +60,8 @@ TEST(api_get_profile_structures, get_properties_chain) {
     properties0.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES;
     properties0.pNext = nullptr;
 
-    VkPhysicalDeviceInlineUniformBlockPropertiesEXT properties1{};
-    properties1.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT;
+    VkPhysicalDeviceMultiviewPropertiesKHR properties1{};
+    properties1.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR;
     properties1.pNext = &properties0;
 
     const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
@@ -70,7 +70,8 @@ TEST(api_get_profile_structures, get_properties_chain) {
 
     EXPECT_EQ(1048576, properties0.maxUpdateAfterBindDescriptorsInAllPools);
     EXPECT_EQ(16, properties0.maxPerStageDescriptorUpdateAfterBindSamplers);
-    EXPECT_EQ(256, properties1.maxInlineUniformBlockSize);
+    EXPECT_EQ(134217727, properties1.maxMultiviewInstanceIndex);
+    EXPECT_EQ(6, properties1.maxMultiviewViewCount);
 }
 
 TEST(api_get_profile_structures, get_features) {
