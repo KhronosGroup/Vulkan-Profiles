@@ -6842,6 +6842,7 @@
         "profiles": {
             "description": "The list of profile definitions.",
             "type": "array",
+            "uniqueItems": true,
             "items": {
                 "additionalProperties": false,
                 "required": [
