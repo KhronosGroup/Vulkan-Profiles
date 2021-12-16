@@ -120,19 +120,7 @@ VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t
                                    VkQueueFamilyProperties *pProperties);
 
 static const VkExtensionProperties _VP_KHR_ROADMAP_2022_EXTENSIONS[] = {
-    VkExtensionProperties{VK_EXT_GLOBAL_PRIORITY_EXTENSION_NAME, 1},
-    VkExtensionProperties{VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME, 1},
-    VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
-    VkExtensionProperties{VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 2},
-    VkExtensionProperties{VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME, 1},
-    VkExtensionProperties{VK_EXT_PRIVATE_DATA_EXTENSION_NAME, 1},
-    VkExtensionProperties{VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME, 1},
-    VkExtensionProperties{VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, 1},
-    VkExtensionProperties{VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME, 1},
-    VkExtensionProperties{VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME, 1},
-    VkExtensionProperties{VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME, 1},
-    VkExtensionProperties{VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME, 1},
-    VkExtensionProperties{VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, 1}};
+    VkExtensionProperties{VK_EXT_GLOBAL_PRIORITY_EXTENSION_NAME, 1}};
 
 static const VkExtensionProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[] = {
     // Vulkan 1.2 extensions
@@ -203,21 +191,12 @@ static const VpStructureProperties _VP_KHR_ROADMAP_2022_STRUCTURE_PROPERTIES[] =
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, VP_STRUCTURE_FEATURES},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, VP_STRUCTURE_FEATURES},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, VP_STRUCTURE_FEATURES},
-    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR, VP_STRUCTURE_FEATURES},
-    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR, VP_STRUCTURE_FEATURES},
-    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR, VP_STRUCTURE_FEATURES},
-    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT, VP_STRUCTURE_FEATURES},
-    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT, VP_STRUCTURE_FEATURES},
-    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT, VP_STRUCTURE_FEATURES},
-    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT, VP_STRUCTURE_FEATURES},
-    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT, VP_STRUCTURE_FEATURES},
-    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT, VP_STRUCTURE_FEATURES},
-    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT, VP_STRUCTURE_FEATURES},
-    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT, VP_STRUCTURE_FEATURES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES, VP_STRUCTURE_FEATURES},
     // Properties:
-    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, VP_STRUCTURE_PROPERTIES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, VP_STRUCTURE_PROPERTIES},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, VP_STRUCTURE_PROPERTIES},
-    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, VP_STRUCTURE_PROPERTIES}};
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, VP_STRUCTURE_PROPERTIES},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES, VP_STRUCTURE_PROPERTIES}};
 
 static const VpStructureProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_STRUCTURE_PROPERTIES[] = {
     // Features:
@@ -1058,46 +1037,20 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
                     features->runtimeDescriptorArray = VK_TRUE;
                     features->scalarBlockLayout = VK_TRUE;
                 } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR: {
-                    VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *features =
-                        (VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *)p;
-                    features->shaderTerminateInvocation = VK_TRUE;
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR: {
-                    VkPhysicalDeviceSynchronization2FeaturesKHR *features = (VkPhysicalDeviceSynchronization2FeaturesKHR *)p;
-                    features->synchronization2 = VK_TRUE;
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR: {
-                    VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *features =
-                        (VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *)p;
-                    features->shaderZeroInitializeWorkgroupMemory = VK_TRUE;
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT: {
-                    VkPhysicalDeviceImageRobustnessFeaturesEXT *features = (VkPhysicalDeviceImageRobustnessFeaturesEXT *)p;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES: {
+                    VkPhysicalDeviceVulkan13Features *features = (VkPhysicalDeviceVulkan13Features *)p;
                     features->robustImageAccess = VK_TRUE;
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT: {
-                    VkPhysicalDeviceInlineUniformBlockFeaturesEXT *features = (VkPhysicalDeviceInlineUniformBlockFeaturesEXT *)p;
-                    features->inlineUniformBlock = VK_TRUE;
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT: {
-                    VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *features =
-                        (VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *)p;
+                    features->shaderTerminateInvocation = VK_TRUE;
+                    features->shaderZeroInitializeWorkgroupMemory = VK_TRUE;
+                    features->synchronization2 = VK_TRUE;
+                    features->shaderIntegerDotProduct = VK_TRUE;
+                    features->maintenance4 = VK_TRUE;
                     features->pipelineCreationCacheControl = VK_TRUE;
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT: {
-                    VkPhysicalDevicePrivateDataFeaturesEXT *features = (VkPhysicalDevicePrivateDataFeaturesEXT *)p;
-                    features->privateData = VK_TRUE;
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT: {
-                    VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *features =
-                        (VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *)p;
-                    features->shaderDemoteToHelperInvocation = VK_TRUE;
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT: {
-                    VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *features = (VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *)p;
                     features->subgroupSizeControl = VK_TRUE;
                     features->computeFullSubgroups = VK_TRUE;
+                    features->shaderDemoteToHelperInvocation = VK_TRUE;
+                    features->inlineUniformBlock = VK_TRUE;
+                    features->descriptorBindingInlineUniformBlockUpdateAfterBind = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
                     VkPhysicalDeviceProperties2 *properties = (VkPhysicalDeviceProperties2 *)p;
@@ -1144,7 +1097,6 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
                     VkPhysicalDeviceVulkan12Properties *properties = (VkPhysicalDeviceVulkan12Properties *)p;
                     properties->shaderSignedZeroInfNanPreserveFloat16 = VK_TRUE;
                     properties->shaderSignedZeroInfNanPreserveFloat32 = VK_TRUE;
-
                     properties->maxPerStageDescriptorUpdateAfterBindSamplers = 500000;
                     properties->maxPerStageDescriptorUpdateAfterBindUniformBuffers = 12;
                     properties->maxPerStageDescriptorUpdateAfterBindStorageBuffers = 500000;
@@ -1160,6 +1112,16 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
                     properties->maxDescriptorSetUpdateAfterBindSampledImages = 500000;
                     properties->maxDescriptorSetUpdateAfterBindStorageImages = 500000;
                     properties->maxDescriptorSetUpdateAfterBindInputAttachments = 7;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES: {
+                    VkPhysicalDeviceVulkan13Properties *properties = (VkPhysicalDeviceVulkan13Properties *)p;
+                    properties->maxBufferSize = 1073741824;
+                    properties->maxInlineUniformBlockSize = 256;
+                    properties->maxPerStageDescriptorInlineUniformBlocks = 4;
+                    properties->maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks = 4;
+                    properties->maxDescriptorSetInlineUniformBlocks = 4;
+                    properties->maxDescriptorSetUpdateAfterBindInlineUniformBlocks = 4;
+                    properties->maxInlineUniformTotalSize = 256;
                 } break;
                 default:
                     break;

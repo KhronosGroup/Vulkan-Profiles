@@ -112,53 +112,44 @@ TEST(api_get_profile_structures, properties_full) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileStructureProperties(&profile, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(17, propertyCount);
+    EXPECT_EQ(8, propertyCount);
 
-    propertyCount = 18;
+    propertyCount = 9;
 
     std::vector<VpStructureProperties> properties(propertyCount);
     VkResult result1 = vpGetProfileStructureProperties(&profile, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(17, propertyCount);
+    EXPECT_EQ(8, propertyCount);
 
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, properties[0].type);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, properties[1].type);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, properties[2].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR, properties[3].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR, properties[4].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR, properties[5].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT, properties[6].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT, properties[7].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT, properties[8].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT, properties[9].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT, properties[10].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT, properties[11].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT, properties[12].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT, properties[13].type);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES, properties[3].type);
 
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, properties[14].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, properties[15].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, properties[16].type);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, properties[4].type);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, properties[5].type);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, properties[6].type);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES, properties[7].type);
 }
 
 TEST(api_get_profile_structures, properties_partial) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
-    uint32_t structureTypesCount = 0;
-    VkResult result0 = vpGetProfileStructureProperties(&profile, &structureTypesCount, nullptr);
+    uint32_t propertyCount = 0;
+    VkResult result0 = vpGetProfileStructureProperties(&profile, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(17, structureTypesCount);
+    EXPECT_EQ(8, propertyCount);
 
-    structureTypesCount = 5;
+    propertyCount = 5;
 
-    std::vector<VpStructureProperties> structureTypes(structureTypesCount);
-    VkResult result1 = vpGetProfileStructureProperties(&profile, &structureTypesCount, &structureTypes[0]);
+    std::vector<VpStructureProperties> structureTypes(propertyCount);
+    VkResult result1 = vpGetProfileStructureProperties(&profile, &propertyCount, &structureTypes[0]);
     EXPECT_EQ(VK_INCOMPLETE, result1);
-    EXPECT_EQ(5, structureTypesCount);
+    EXPECT_EQ(5, propertyCount);
 
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, structureTypes[0].type);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, structureTypes[1].type);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, structureTypes[2].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR, structureTypes[3].type);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR, structureTypes[4].type);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES, structureTypes[3].type);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, structureTypes[4].type);
 }
