@@ -31,14 +31,14 @@ TEST(api_get_profile_extension_properties, full) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileExtensionProperties(&profile, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(23, propertyCount);
+    EXPECT_EQ(22, propertyCount);
 
-    propertyCount = 24;
+    propertyCount = 23;
 
     std::vector<VkExtensionProperties> properties(propertyCount);
     VkResult result1 = vpGetProfileExtensionProperties(&profile, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(23, propertyCount);
+    EXPECT_EQ(22, propertyCount);
 
     EXPECT_STREQ(VK_KHR_8BIT_STORAGE_EXTENSION_NAME, properties[0].extensionName);
     EXPECT_STREQ(VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, properties[1].extensionName);
@@ -53,7 +53,7 @@ TEST(api_get_profile_extension_properties, partial) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileExtensionProperties(&profile, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(23, propertyCount);
+    EXPECT_EQ(22, propertyCount);
 
     propertyCount = 5;
 

@@ -22,7 +22,6 @@ static const VkExtensionProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSION
 
     VkExtensionProperties{VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
                           1},  // Not supported by Intel 520 https://vulkan.gpuinfo.org/displayreport.php?id=12491#extensions
-    VkExtensionProperties{VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
@@ -53,7 +52,6 @@ static const VkExtensionProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EX
 
     VkExtensionProperties{VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
                           1},  // Not supported by Intel 520 https://vulkan.gpuinfo.org/displayreport.php?id=12491#extensions
-    VkExtensionProperties{VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
