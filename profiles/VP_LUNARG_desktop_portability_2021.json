@@ -32,7 +32,6 @@
                 "VK_EXT_host_query_reset": 1,
                 "VK_EXT_scalar_block_layout": 1,
                 "VK_KHR_swapchain": 70,
-                "VK_KHR_get_surface_capabilities2": 1,
                 "VK_KHR_swapchain_mutable_format": 1,
                 "VK_KHR_sampler_ycbcr_conversion": 1,
                 "VK_EXT_inline_uniform_block": 1,
