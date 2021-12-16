@@ -7,7 +7,6 @@
                     "robustBufferAccess": true
                 }
             }
-
         },
         "vulkan11requirements": {
             "features": {
