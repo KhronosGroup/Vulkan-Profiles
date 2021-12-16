@@ -79,7 +79,7 @@ typedef struct VpDeviceCreateInfo {
 } VpDeviceCreateInfo;
 
 // Query the list of available profiles in the library
-void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // List the recommended fallback profiles of a profile
 VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
