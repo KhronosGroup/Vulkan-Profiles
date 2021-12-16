@@ -772,41 +772,8 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         const VkPhysicalDeviceVulkan12Features *requestedVulkan12Features =
             (const VkPhysicalDeviceVulkan12Features *)_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES);
 
-        const VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *requestedShaderTerminateFeatures =
-            (const VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR);
-
-        const VkPhysicalDeviceSynchronization2FeaturesKHR *requestedSync2Features =
-            (const VkPhysicalDeviceSynchronization2FeaturesKHR *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR);
-
-        const VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *requestedZeroInitFeatures =
-            (const VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR);
-
-        const VkPhysicalDeviceImageRobustnessFeaturesEXT *requestedImageRobustnessFeatures =
-            (const VkPhysicalDeviceImageRobustnessFeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT);
-
-        const VkPhysicalDeviceInlineUniformBlockFeaturesEXT *requestedInlineBlockFeatures =
-            (const VkPhysicalDeviceInlineUniformBlockFeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT);
-
-        const VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *requestedPipelineCreationFeatures =
-            (const VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT);
-
-        const VkPhysicalDevicePrivateDataFeaturesEXT *requestedPrivateDataFeatures =
-            (const VkPhysicalDevicePrivateDataFeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT);
-
-        const VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *requestedShaderDemoteFeatures =
-            (const VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT);
-
-        const VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *requestedSubgroupSizeFeatures =
-            (const VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT);
+        const VkPhysicalDeviceVulkan13Features *requestedVulkan13Features =
+            (const VkPhysicalDeviceVulkan13Features *)_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES);
 
         VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
         deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
@@ -823,50 +790,10 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         deviceVulkan12Features.pNext = pProfileNext;
         pProfileNext = &deviceVulkan12Features;
 
-        VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR deviceShaderTerminateFeatures = {};
-        deviceShaderTerminateFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR;
-        deviceShaderTerminateFeatures.pNext = pProfileNext;
-        pProfileNext = &deviceShaderTerminateFeatures;
-
-        VkPhysicalDeviceSynchronization2FeaturesKHR deviceSync2Features = {};
-        deviceSync2Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR;
-        deviceSync2Features.pNext = pProfileNext;
-        pProfileNext = &deviceSync2Features;
-
-        VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR deviceZeroInitFeatures = {};
-        deviceZeroInitFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR;
-        deviceZeroInitFeatures.pNext = pProfileNext;
-        pProfileNext = &deviceZeroInitFeatures;
-
-        VkPhysicalDeviceImageRobustnessFeaturesEXT deviceImageRobustnessFeatures = {};
-        deviceImageRobustnessFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT;
-        deviceImageRobustnessFeatures.pNext = pProfileNext;
-        pProfileNext = &deviceImageRobustnessFeatures;
-
-        VkPhysicalDeviceInlineUniformBlockFeaturesEXT deviceInlineBlockFeatures = {};
-        deviceInlineBlockFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        deviceInlineBlockFeatures.pNext = pProfileNext;
-        pProfileNext = &deviceInlineBlockFeatures;
-
-        VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT devicePipelineCreationFeatures = {};
-        devicePipelineCreationFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT;
-        devicePipelineCreationFeatures.pNext = pProfileNext;
-        pProfileNext = &devicePipelineCreationFeatures;
-
-        VkPhysicalDevicePrivateDataFeaturesEXT devicePrivateDataFeatures = {};
-        devicePrivateDataFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT;
-        devicePrivateDataFeatures.pNext = pProfileNext;
-        pProfileNext = &devicePrivateDataFeatures;
-
-        VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT deviceShaderDemoteFeatures = {};
-        deviceShaderDemoteFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT;
-        deviceShaderDemoteFeatures.pNext = pProfileNext;
-        pProfileNext = &deviceShaderDemoteFeatures;
-
-        VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceSubgroupSizeFeatures = {};
-        deviceSubgroupSizeFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
-        deviceSubgroupSizeFeatures.pNext = pProfileNext;
-        pProfileNext = &deviceSubgroupSizeFeatures;
+        VkPhysicalDeviceVulkan13Features deviceVulkan13Features = {};
+        deviceVulkan13Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+        deviceVulkan13Features.pNext = pProfileNext;
+        pProfileNext = &deviceVulkan13Features;
 
         vpGetProfileStructures(pCreateInfo->pProfile, pProfileNext);
 
@@ -893,52 +820,12 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
             pNext = &deviceVulkan12Features;
         }
 
-        if (requestedShaderTerminateFeatures == nullptr) {
-            deviceShaderTerminateFeatures.pNext = pNext;
-            pNext = &deviceShaderTerminateFeatures;
-        }
-
-        if (requestedSync2Features == nullptr) {
-            deviceSync2Features.pNext = pNext;
-            pNext = &deviceSync2Features;
-        }
-
-        if (requestedZeroInitFeatures == nullptr) {
-            deviceZeroInitFeatures.pNext = pNext;
-            pNext = &deviceZeroInitFeatures;
-        }
-
-        if (requestedImageRobustnessFeatures == nullptr) {
-            deviceImageRobustnessFeatures.pNext = pNext;
-            pNext = &deviceImageRobustnessFeatures;
+        if (requestedVulkan13Features == nullptr) {
+            deviceVulkan13Features.pNext = pNext;
+            pNext = &deviceVulkan13Features;
         }
         if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT) {
-            deviceImageRobustnessFeatures.robustImageAccess = VK_FALSE;
-        }
-
-        if (requestedInlineBlockFeatures == nullptr) {
-            deviceInlineBlockFeatures.pNext = pNext;
-            pNext = &deviceInlineBlockFeatures;
-        }
-
-        if (requestedPipelineCreationFeatures == nullptr) {
-            devicePipelineCreationFeatures.pNext = pNext;
-            pNext = &devicePipelineCreationFeatures;
-        }
-
-        if (requestedPrivateDataFeatures == nullptr) {
-            devicePrivateDataFeatures.pNext = pNext;
-            pNext = &devicePrivateDataFeatures;
-        }
-
-        if (requestedShaderDemoteFeatures == nullptr) {
-            deviceShaderDemoteFeatures.pNext = pNext;
-            pNext = &deviceShaderDemoteFeatures;
-        }
-
-        if (requestedSubgroupSizeFeatures == nullptr) {
-            deviceSubgroupSizeFeatures.pNext = pNext;
-            pNext = &deviceSubgroupSizeFeatures;
+            deviceVulkan13Features.robustImageAccess = VK_FALSE;
         }
 
         VkDeviceCreateInfo deviceCreateInfo = {};
