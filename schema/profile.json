@@ -18,11 +18,9 @@
             "type": "object",
             "additionalProperties": false,
             "required": [
-                "name",
                 "company"
             ],
             "properties": {
-                "name": { "type": "string" },
                 "company": {
                     "type": "string"
                 },
@@ -4496,6 +4494,7 @@
     "properties": {
         "capabilities": {
             "description": "The block that specifies the list of capabilities sets.",
+            "type": "object",
             "additionalProperties": {
                 "type": "object",
                 "additionalProperties": false,
@@ -6834,6 +6833,7 @@
         },
         "profiles": {
             "description": "The list of profile definitions.",
+            "type": "object",
             "patternProperties": {
                 "^VP_[A-Z0-9]+_[A-Za-z0-9_]+": {
                     "type": "object",
@@ -6875,11 +6875,9 @@
                             "pattern": "^[0-9]+.[0-9]+.[0-9]+$"
                         },
                         "contributors": {
+                            "type": "object",
                             "description": "The list of contributors of the profile.",
-                            "type": "array",
-                            "uniqueItems": true,
-                            "minItems": 1,
-                            "items": {
+                            "additionalProperties": {
                                 "$ref": "#/definitions/contributor"
                             }
                         },

@@ -187,14 +187,13 @@
             "api-version": "1.3.201",
             "label": "Khronos Vulkan Roadmap 2022 profile",
             "description": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices.",
-            "contributors": [
-                {
-                    "name": "Tobias Hector",
+            "contributors": {
+                "Tobias Hector": {
                     "company": "AMD",
                     "email": "tobias.hector@amd.com",
                     "contact": true
                 }
-            ],
+            },
             "history": [
                 {
                     "revision": 1,

@@ -846,14 +846,13 @@
             "api-version": "1.0.68",
             "label": "Android Vulkan Baseline 2021 profile",
             "description": "Collection on features supported in the majority of devices",
-            "contributors": [
-                {
-                    "name": "Trevor Black",
+            "contributors": {
+                "Trevor Black": {
                     "company": "Google",
                     "email": "vantablack@google.com",
                     "contact": true
                 }
-            ],
+            },
             "history": [
                 {
                     "revision": 1,
