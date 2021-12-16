@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include "devsim_test_helper.h"
 
-TEST(manual_devsim, TestDesktopPortability2022Limits) {
+TEST(profiles, TestDesktopPortability2022Limits) {
     VkResult err = VK_SUCCESS;
 
     devsim_test::VulkanInstanceBuilder inst_builder;
@@ -14,7 +14,7 @@ TEST(manual_devsim, TestDesktopPortability2022Limits) {
     devsim_test::setDevsimFilenames(filepaths);
     devsim_test::setDevsimExitOnError(true);
 
-    inst_builder.addLayer("VK_LAYER_LUNARG_device_simulation_manual");
+    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
     err = inst_builder.makeInstance();
     ASSERT_EQ(err, VK_SUCCESS);

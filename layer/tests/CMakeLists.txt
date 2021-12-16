@@ -27,4 +27,4 @@ function(DevsimTest NAME)
     set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "${run_environment}")
 endfunction(DevsimTest)
 
-DevsimTest(manual_devsim_tests)
+DevsimTest(profiles_tests)

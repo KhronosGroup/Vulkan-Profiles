@@ -20,7 +20,7 @@
 ;
 ;;;;  End Copyright Notice ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-LIBRARY VkLayer_device_simulation_manual
+LIBRARY VkLayer_profiles
 EXPORTS
 vkGetInstanceProcAddr
 vkCreateInstance

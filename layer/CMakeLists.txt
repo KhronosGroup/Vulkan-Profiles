@@ -39,7 +39,7 @@ endif()
 add_definitions(-DVK_ENABLE_BETA_EXTENSIONS)
 
 set(TARGET_NAMES
-    VkLayer_device_simulation_manual
+    VkLayer_profiles
     )
 
 if (APPLE)
@@ -73,7 +73,7 @@ else()
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wpointer-arith")
 endif()
 
-add_vk_layer(device_simulation_manual device_simulation.cpp vk_layer_table.cpp ${jsoncpp_SOURCE_DIR}/dist/jsoncpp.cpp ${jsoncpp_SOURCE_DIR}/include/json/json.h)
+add_vk_layer(profiles device_simulation.cpp vk_layer_table.cpp ${jsoncpp_SOURCE_DIR}/dist/jsoncpp.cpp ${jsoncpp_SOURCE_DIR}/include/json/json.h)
 
 # json file creation
 
