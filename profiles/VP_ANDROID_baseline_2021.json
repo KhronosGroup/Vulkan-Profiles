@@ -8,15 +8,22 @@
                 }
             }
         },
-        "baseline": {
+        "instanceRequirements": {
             "extensions": {
-                "VK_KHR_surface": 1,
-                "VK_KHR_android_surface": 1,
-                "VK_KHR_swapchain": 1,
                 "VK_KHR_get_physical_device_properties2": 1,
-                "VK_KHR_maintenance1": 1,
-                "VK_EXT_swapchain_colorspace": 1,
+                "VK_KHR_surface": 1,
                 "VK_KHR_get_surface_capabilities2": 1,
+                "VK_KHR_android_surface": 1,
+                "VK_EXT_swapchain_colorspace": 1,
+                "VK_KHR_external_semaphore_capabilities": 1,
+                "VK_KHR_external_memory_capabilities": 1,
+                "VK_KHR_external_fence_capabilities": 1
+            }
+        },
+        "deviceRequirements": {
+            "extensions": {
+                "VK_KHR_swapchain": 1,
+                "VK_KHR_maintenance1": 1,
                 "VK_KHR_incremental_present": 1,
                 "VK_GOOGLE_display_timing": 1,
                 "VK_KHR_shader_draw_parameters": 1,
@@ -24,11 +31,8 @@
                 "VK_KHR_get_memory_requirements2": 1,
                 "VK_KHR_dedicated_allocation": 1,
                 "VK_KHR_storage_buffer_storage_class": 1,
-                "VK_KHR_external_semaphore_capabilities": 1,
                 "VK_KHR_external_semaphore": 1,
-                "VK_KHR_external_memory_capabilities": 1,
                 "VK_KHR_external_memory": 1,
-                "VK_KHR_external_fence_capabilities": 1,
                 "VK_KHR_external_semaphore_fd": 1,
                 "VK_KHR_external_fence": 1,
                 "VK_KHR_external_fence_fd": 1,
@@ -863,7 +867,8 @@
             ],
             "capabilities": [
                 "vulkan10requirements",
-                "baseline"
+                "instanceRequirements",
+                "deviceRequirements"
             ]
         }
     }

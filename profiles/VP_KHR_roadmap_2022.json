@@ -7,7 +7,6 @@
                     "robustBufferAccess": true
                 }
             }
-
         },
         "vulkan11requirements": {
             "features": {
@@ -49,21 +48,22 @@
                     "bufferDeviceAddress": true
                 },
                 "VkPhysicalDeviceVulkan13Features": {
-                    "inlineUniformBlock": true,
-                    "subgroupSizeControl": true,
-                    "computeFullSubgroups": true,
-                    "pipelineCreationCacheControl": true,
-                    "shaderDemoteToHelperInvocation": true,
                     "robustImageAccess": true,
                     "shaderTerminateInvocation": true,
                     "shaderZeroInitializeWorkgroupMemory": true,
                     "synchronization2": true,
                     "shaderIntegerDotProduct": true,
-                    "maintenance4": true
+                    "maintenance4": true,
+                    "pipelineCreationCacheControl": true,
+                    "subgroupSizeControl": true,
+                    "computeFullSubgroups": true,
+                    "shaderDemoteToHelperInvocation": true,
+                    "inlineUniformBlock": true
                 }
             },
             "properties": {
                 "VkPhysicalDeviceVulkan13Properties": {
+                    "maxBufferSize": 1073741824,
                     "maxInlineUniformBlockSize": 256,
                     "maxPerStageDescriptorInlineUniformBlocks": 4,
                     "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4,
@@ -120,6 +120,9 @@
                     "descriptorBindingVariableDescriptorCount": true,
                     "runtimeDescriptorArray": true,
                     "scalarBlockLayout": true
+                },
+                "VkPhysicalDeviceVulkan13Features": {
+                    "descriptorBindingInlineUniformBlockUpdateAfterBind": true
                 }
             },
             "properties": {
