@@ -2463,9 +2463,13 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
 
         vkGetPhysicalDeviceProperties2(physicalDevice, &deviceProperties);
 
+        VkPhysicalDeviceVulkan13Properties profilePropertiesVulkan13 = {};
+        profilePropertiesVulkan13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES;
+        profilePropertiesVulkan13.pNext = nullptr;
+
         VkPhysicalDeviceVulkan12Properties profilePropertiesVulkan12 = {};
         profilePropertiesVulkan12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES;
-        profilePropertiesVulkan12.pNext = nullptr;
+        profilePropertiesVulkan12.pNext = &profilePropertiesVulkan13;
 
         VkPhysicalDeviceVulkan11Properties profilePropertiesVulkan11 = {};
         profilePropertiesVulkan11.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
@@ -2554,9 +2558,19 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         } else if (deviceProperties.properties.limits.lineWidthGranularity >
                    profileProperties.properties.limits.lineWidthGranularity) {
             return result;
+        } else if (deviceProperties.properties.limits.standardSampleLocations !=
+                   profileProperties.properties.limits.standardSampleLocations) {
+            return result;
+        } else if (deviceProperties.properties.limits.maxColorAttachments >
+                   profileProperties.properties.limits.maxColorAttachments) {
+            return result;
         }
 
-        if (devicePropertiesVulkan11.subgroupSize < profilePropertiesVulkan11.subgroupSize) {
+        if (devicePropertiesVulkan11.maxMultiviewViewCount < profilePropertiesVulkan11.maxMultiviewViewCount) {
+            return result;
+        } else if (devicePropertiesVulkan11.maxMultiviewInstanceIndex < profilePropertiesVulkan11.maxMultiviewInstanceIndex) {
+            return result;
+        } else if (devicePropertiesVulkan11.subgroupSize < profilePropertiesVulkan11.subgroupSize) {
             return result;
         } else if ((devicePropertiesVulkan11.subgroupSupportedStages & profilePropertiesVulkan11.subgroupSupportedStages) !=
                    profilePropertiesVulkan11.subgroupSupportedStages) {
@@ -2566,14 +2580,79 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
             return result;
         }
 
-        if (devicePropertiesVulkan12.shaderSignedZeroInfNanPreserveFloat16 !=
-            profilePropertiesVulkan12.shaderSignedZeroInfNanPreserveFloat16) {
+        if (devicePropertiesVulkan12.maxTimelineSemaphoreValueDifference <
+            profilePropertiesVulkan12.maxTimelineSemaphoreValueDifference) {
+            return result;
+        } else if (devicePropertiesVulkan12.shaderSignedZeroInfNanPreserveFloat16 !=
+                   profilePropertiesVulkan12.shaderSignedZeroInfNanPreserveFloat16) {
             return result;
         } else if (devicePropertiesVulkan12.shaderSignedZeroInfNanPreserveFloat32 !=
                    profilePropertiesVulkan12.shaderSignedZeroInfNanPreserveFloat32) {
             return result;
+        } else if (devicePropertiesVulkan12.maxPerStageDescriptorUpdateAfterBindSamplers <
+                   profilePropertiesVulkan12.maxPerStageDescriptorUpdateAfterBindSamplers) {
+            return result;
+        } else if (devicePropertiesVulkan12.maxPerStageDescriptorUpdateAfterBindUniformBuffers <
+                   profilePropertiesVulkan12.maxPerStageDescriptorUpdateAfterBindUniformBuffers) {
+            return result;
+        } else if (devicePropertiesVulkan12.maxPerStageDescriptorUpdateAfterBindStorageBuffers <
+                   profilePropertiesVulkan12.maxPerStageDescriptorUpdateAfterBindStorageBuffers) {
+            return result;
+        } else if (devicePropertiesVulkan12.maxPerStageDescriptorUpdateAfterBindSampledImages <
+                   profilePropertiesVulkan12.maxPerStageDescriptorUpdateAfterBindSampledImages) {
+            return result;
+        } else if (devicePropertiesVulkan12.maxPerStageDescriptorUpdateAfterBindStorageImages <
+                   profilePropertiesVulkan12.maxPerStageDescriptorUpdateAfterBindStorageImages) {
+            return result;
         } else if (devicePropertiesVulkan12.maxPerStageDescriptorUpdateAfterBindInputAttachments <
                    profilePropertiesVulkan12.maxPerStageDescriptorUpdateAfterBindInputAttachments) {
+            return result;
+        } else if (devicePropertiesVulkan12.maxPerStageUpdateAfterBindResources <
+                   profilePropertiesVulkan12.maxPerStageUpdateAfterBindResources) {
+            return result;
+        } else if (devicePropertiesVulkan12.maxDescriptorSetUpdateAfterBindSamplers <
+                   profilePropertiesVulkan12.maxDescriptorSetUpdateAfterBindSamplers) {
+            return result;
+        } else if (devicePropertiesVulkan12.maxDescriptorSetUpdateAfterBindUniformBuffers <
+                   profilePropertiesVulkan12.maxDescriptorSetUpdateAfterBindUniformBuffers) {
+            return result;
+        } else if (devicePropertiesVulkan12.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic <
+                   profilePropertiesVulkan12.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic) {
+            return result;
+        } else if (devicePropertiesVulkan12.maxDescriptorSetUpdateAfterBindStorageBuffers <
+                   profilePropertiesVulkan12.maxDescriptorSetUpdateAfterBindStorageBuffers) {
+            return result;
+        } else if (devicePropertiesVulkan12.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic <
+                   profilePropertiesVulkan12.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic) {
+            return result;
+        } else if (devicePropertiesVulkan12.maxDescriptorSetUpdateAfterBindSampledImages <
+                   profilePropertiesVulkan12.maxDescriptorSetUpdateAfterBindSampledImages) {
+            return result;
+        } else if (devicePropertiesVulkan12.maxDescriptorSetUpdateAfterBindStorageImages <
+                   profilePropertiesVulkan12.maxDescriptorSetUpdateAfterBindStorageImages) {
+            return result;
+        } else if (devicePropertiesVulkan12.maxDescriptorSetUpdateAfterBindInputAttachments <
+                   profilePropertiesVulkan12.maxDescriptorSetUpdateAfterBindInputAttachments) {
+            return result;
+        }
+
+        if (devicePropertiesVulkan13.maxBufferSize < profilePropertiesVulkan13.maxBufferSize) {
+            return result;
+        } else if (devicePropertiesVulkan13.maxInlineUniformBlockSize < profilePropertiesVulkan13.maxInlineUniformBlockSize) {
+            return result;
+        } else if (devicePropertiesVulkan13.maxPerStageDescriptorInlineUniformBlocks <
+                   profilePropertiesVulkan13.maxPerStageDescriptorInlineUniformBlocks) {
+            return result;
+        } else if (devicePropertiesVulkan13.maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks <
+                   profilePropertiesVulkan13.maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks) {
+            return result;
+        } else if (devicePropertiesVulkan13.maxDescriptorSetInlineUniformBlocks <
+                   profilePropertiesVulkan13.maxDescriptorSetInlineUniformBlocks) {
+            return result;
+        } else if (devicePropertiesVulkan13.maxDescriptorSetUpdateAfterBindInlineUniformBlocks <
+                   profilePropertiesVulkan13.maxDescriptorSetUpdateAfterBindInlineUniformBlocks) {
+            return result;
+        } else if (devicePropertiesVulkan13.maxInlineUniformTotalSize < profilePropertiesVulkan13.maxInlineUniformTotalSize) {
             return result;
         }
 
