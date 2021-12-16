@@ -1,18 +1,16 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
-    "capabilities": [
-        {
-            "name": "baseline",
+    "capabilities": {
+        "baseline": {
             "extensions": {},
             "features": {},
             "properties": {},
             "formats": {},
             "queueFamiliesProperties": {}
         },
-        {
-            "name": "unused"
+        "unused": {
         }
-    ],
+    },
     "profiles": [
         {
             "name": "VP_LUNARG_test_structure_complex",

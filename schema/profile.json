@@ -4496,17 +4496,10 @@
     "properties": {
         "capabilities": {
             "description": "The block that specifies the list of capabilities sets.",
-            "type": "array",
-            "items": {
+            "additionalProperties": {
+                "type": "object",
                 "additionalProperties": false,
-                "required": [
-                    "name"
-                ],
                 "properties": {
-                    "name": {
-                        "description": "The identifier of a capability block.",
-                        "type": "string"
-                    },
                     "extensions": {
                         "description": "The block that stores required extensions.",
                         "type": "object",

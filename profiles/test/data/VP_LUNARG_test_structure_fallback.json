@@ -1,13 +1,9 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
-    "capabilities": [
-        {
-            "name": "baseline"
-        },
-        {
-            "name": "advanced"
-        }
-    ],
+    "capabilities": {
+        "baseline": {},
+        "advanced": {}
+    },
     "profiles": [
         {
             "name": "VP_LUNARG_test_structure_fallback",
