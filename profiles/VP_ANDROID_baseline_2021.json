@@ -844,10 +844,10 @@
     ],
     "profiles": [
         {
-            "name": "VP_ANDROID_baseline_2022",
+            "name": "VP_ANDROID_baseline_2021",
             "version": 1,
             "api-version": "1.0.68",
-            "label": "Android Vulkan Baseline 2022 profile",
+            "label": "Android Vulkan Baseline 2021 profile",
             "description": "Collection on features supported in the majority of devices",
             "contributors": [
                 {
