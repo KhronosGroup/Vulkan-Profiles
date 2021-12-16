@@ -1,8 +1,7 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
-    "capabilities": [
-        {
-            "name": "baseline",
+    "capabilities": {
+        "baseline": {
             "queueFamiliesProperties": {
                 "VkQueueFamilyProperties": {
                     "queueFlags": [ "VK_QUEUE_GRAPHICS_BIT", "VK_QUEUE_COMPUTE_BIT", "VK_QUEUE_TRANSFER_BIT", "VK_QUEUE_SPARSE_BINDING_BIT" ],
@@ -67,23 +66,21 @@
                 }
             }
         }
-    ],
-    "profiles": [
-        {
-            "name": "VP_LUNARG_test_vkqueuefamilyproperties",
+    },
+    "profiles": {
+        "VP_LUNARG_test_vkqueuefamilyproperties": {
             "version": 1,
             "api-version": "1.2.198",
             "label": "LunarG VkQueueFamilyProperties unit tests",
             "description": "LunarG VkQueueFamilyProperties unit tests",
-            "contributors": [
-                {
-                    "name": "Christophe Riccio",
+            "contributors": {
+                "Christophe Riccio": {
                     "company": "LunarG",
                     "email": "christophe@lunarg.com",
                     "github": "christophe-lunarg",
                     "contact": true
                 }
-            ],
+            },
             "history": [
                 {
                     "revision": 1,
@@ -96,6 +93,6 @@
                 "baseline"
             ]
         }
-    ]
+    }
 }
 

@@ -1,16 +1,14 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
-    "capabilities": [
-        {
-            "name": "vulkan10requirements",
+    "capabilities": {
+        "vulkan10requirements": {
             "features": {
                 "VkPhysicalDeviceFeatures": {
                     "robustBufferAccess": true
                 }
             }
         },
-        {
-            "name": "baseline",
+        "baseline": {
             "extensions": {
                 "VK_KHR_surface": 1,
                 "VK_KHR_android_surface": 1,
@@ -841,22 +839,20 @@
                 }
             }
         }
-    ],
-    "profiles": [
-        {
-            "name": "VP_ANDROID_baseline_2021",
+    },
+    "profiles": {
+        "VP_ANDROID_baseline_2021": {
             "version": 1,
             "api-version": "1.0.68",
             "label": "Android Vulkan Baseline 2021 profile",
             "description": "Collection on features supported in the majority of devices",
-            "contributors": [
-                {
-                    "name": "Trevor Black",
+            "contributors": {
+                "Trevor Black": {
                     "company": "Google",
                     "email": "vantablack@google.com",
                     "contact": true
                 }
-            ],
+            },
             "history": [
                 {
                     "revision": 1,
@@ -870,5 +866,5 @@
                 "baseline"
             ]
         }
-    ]
+    }
 }
