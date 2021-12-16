@@ -59,7 +59,10 @@ static const VkExtensionProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSION
     VkExtensionProperties{VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
-    VkExtensionProperties{VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 1}};
+    VkExtensionProperties{VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_SWAPCHAIN_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME, 1}};
 
 #ifdef VK_ENABLE_BETA_EXTENSIONS
 static const VkExtensionProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS[] = {
@@ -81,15 +84,18 @@ static const VkExtensionProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EX
     VkExtensionProperties{VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, 1},
 
-    VkExtensionProperties{VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, 1},
-
     VkExtensionProperties{VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
                           1},  // Not supported by Intel 520 https://vulkan.gpuinfo.org/displayreport.php?id=12491#extensions
     VkExtensionProperties{VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 1},
     VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
-    VkExtensionProperties{VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 1}};
+    VkExtensionProperties{VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_SWAPCHAIN_EXTENSION_NAME, 1},
+    VkExtensionProperties{VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME, 1},
+
+    VkExtensionProperties{VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, 1}};
 #endif
 
 static const VpStructureProperties _VP_KHR_ROADMAP_2022_STRUCTURE_PROPERTIES[] = {
