@@ -1584,41 +1584,8 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         const VkPhysicalDeviceVulkan12Features *requestedVulkan12Features =
             (const VkPhysicalDeviceVulkan12Features *)_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES);
 
-        const VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *requestedShaderTerminateFeatures =
-            (const VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR);
-
-        const VkPhysicalDeviceSynchronization2FeaturesKHR *requestedSync2Features =
-            (const VkPhysicalDeviceSynchronization2FeaturesKHR *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR);
-
-        const VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *requestedZeroInitFeatures =
-            (const VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR);
-
-        const VkPhysicalDeviceImageRobustnessFeaturesEXT *requestedImageRobustnessFeatures =
-            (const VkPhysicalDeviceImageRobustnessFeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT);
-
-        const VkPhysicalDeviceInlineUniformBlockFeaturesEXT *requestedInlineBlockFeatures =
-            (const VkPhysicalDeviceInlineUniformBlockFeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT);
-
-        const VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *requestedPipelineCreationFeatures =
-            (const VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT);
-
-        const VkPhysicalDevicePrivateDataFeaturesEXT *requestedPrivateDataFeatures =
-            (const VkPhysicalDevicePrivateDataFeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT);
-
-        const VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *requestedShaderDemoteFeatures =
-            (const VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT);
-
-        const VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *requestedSubgroupSizeFeatures =
-            (const VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *)_vpGetStructure(
-                pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT);
+        const VkPhysicalDeviceVulkan13Features *requestedVulkan13Features =
+            (const VkPhysicalDeviceVulkan13Features *)_vpGetStructure(pRoot, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES);
 
         VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
         deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
@@ -1635,50 +1602,10 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         deviceVulkan12Features.pNext = pProfileNext;
         pProfileNext = &deviceVulkan12Features;
 
-        VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR deviceShaderTerminateFeatures = {};
-        deviceShaderTerminateFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR;
-        deviceShaderTerminateFeatures.pNext = pProfileNext;
-        pProfileNext = &deviceShaderTerminateFeatures;
-
-        VkPhysicalDeviceSynchronization2FeaturesKHR deviceSync2Features = {};
-        deviceSync2Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR;
-        deviceSync2Features.pNext = pProfileNext;
-        pProfileNext = &deviceSync2Features;
-
-        VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR deviceZeroInitFeatures = {};
-        deviceZeroInitFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR;
-        deviceZeroInitFeatures.pNext = pProfileNext;
-        pProfileNext = &deviceZeroInitFeatures;
-
-        VkPhysicalDeviceImageRobustnessFeaturesEXT deviceImageRobustnessFeatures = {};
-        deviceImageRobustnessFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT;
-        deviceImageRobustnessFeatures.pNext = pProfileNext;
-        pProfileNext = &deviceImageRobustnessFeatures;
-
-        VkPhysicalDeviceInlineUniformBlockFeaturesEXT deviceInlineBlockFeatures = {};
-        deviceInlineBlockFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        deviceInlineBlockFeatures.pNext = pProfileNext;
-        pProfileNext = &deviceInlineBlockFeatures;
-
-        VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT devicePipelineCreationFeatures = {};
-        devicePipelineCreationFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT;
-        devicePipelineCreationFeatures.pNext = pProfileNext;
-        pProfileNext = &devicePipelineCreationFeatures;
-
-        VkPhysicalDevicePrivateDataFeaturesEXT devicePrivateDataFeatures = {};
-        devicePrivateDataFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT;
-        devicePrivateDataFeatures.pNext = pProfileNext;
-        pProfileNext = &devicePrivateDataFeatures;
-
-        VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT deviceShaderDemoteFeatures = {};
-        deviceShaderDemoteFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT;
-        deviceShaderDemoteFeatures.pNext = pProfileNext;
-        pProfileNext = &deviceShaderDemoteFeatures;
-
-        VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceSubgroupSizeFeatures = {};
-        deviceSubgroupSizeFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
-        deviceSubgroupSizeFeatures.pNext = pProfileNext;
-        pProfileNext = &deviceSubgroupSizeFeatures;
+        VkPhysicalDeviceVulkan13Features deviceVulkan13Features = {};
+        deviceVulkan13Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+        deviceVulkan13Features.pNext = pProfileNext;
+        pProfileNext = &deviceVulkan13Features;
 
         vpGetProfileStructures(pCreateInfo->pProfile, pProfileNext);
 
@@ -1705,52 +1632,12 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
             pNext = &deviceVulkan12Features;
         }
 
-        if (requestedShaderTerminateFeatures == nullptr) {
-            deviceShaderTerminateFeatures.pNext = pNext;
-            pNext = &deviceShaderTerminateFeatures;
-        }
-
-        if (requestedSync2Features == nullptr) {
-            deviceSync2Features.pNext = pNext;
-            pNext = &deviceSync2Features;
-        }
-
-        if (requestedZeroInitFeatures == nullptr) {
-            deviceZeroInitFeatures.pNext = pNext;
-            pNext = &deviceZeroInitFeatures;
-        }
-
-        if (requestedImageRobustnessFeatures == nullptr) {
-            deviceImageRobustnessFeatures.pNext = pNext;
-            pNext = &deviceImageRobustnessFeatures;
+        if (requestedVulkan13Features == nullptr) {
+            deviceVulkan13Features.pNext = pNext;
+            pNext = &deviceVulkan13Features;
         }
         if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT) {
-            deviceImageRobustnessFeatures.robustImageAccess = VK_FALSE;
-        }
-
-        if (requestedInlineBlockFeatures == nullptr) {
-            deviceInlineBlockFeatures.pNext = pNext;
-            pNext = &deviceInlineBlockFeatures;
-        }
-
-        if (requestedPipelineCreationFeatures == nullptr) {
-            devicePipelineCreationFeatures.pNext = pNext;
-            pNext = &devicePipelineCreationFeatures;
-        }
-
-        if (requestedPrivateDataFeatures == nullptr) {
-            devicePrivateDataFeatures.pNext = pNext;
-            pNext = &devicePrivateDataFeatures;
-        }
-
-        if (requestedShaderDemoteFeatures == nullptr) {
-            deviceShaderDemoteFeatures.pNext = pNext;
-            pNext = &deviceShaderDemoteFeatures;
-        }
-
-        if (requestedSubgroupSizeFeatures == nullptr) {
-            deviceSubgroupSizeFeatures.pNext = pNext;
-            pNext = &deviceSubgroupSizeFeatures;
+            deviceVulkan13Features.robustImageAccess = VK_FALSE;
         }
 
         VkDeviceCreateInfo deviceCreateInfo = {};
@@ -2257,115 +2144,55 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
             return result;
         }
 
-        VkPhysicalDeviceExtendedDynamicState2FeaturesEXT deviceExtendedDynamicState = {};
-        deviceExtendedDynamicState.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        deviceExtendedDynamicState.pNext = nullptr;
+        void *pDeviceNext = nullptr;
 
-        VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT deviceTexelBufferAlign = {};
-        deviceTexelBufferAlign.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        deviceTexelBufferAlign.pNext = &deviceExtendedDynamicState;
-
-        VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceSubgroupSize = {};
-        deviceSubgroupSize.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        deviceSubgroupSize.pNext = &deviceTexelBufferAlign;
-
-        VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT deviceShaderDemote = {};
-        deviceShaderDemote.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        deviceShaderDemote.pNext = &deviceSubgroupSize;
-
-        VkPhysicalDevicePrivateDataFeaturesEXT devicePrivateData = {};
-        devicePrivateData.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        devicePrivateData.pNext = &deviceShaderDemote;
-
-        VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT devicePipelineCreation = {};
-        devicePipelineCreation.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        devicePipelineCreation.pNext = &devicePrivateData;
-
-        VkPhysicalDeviceInlineUniformBlockFeaturesEXT deviceInlineUniformBlock = {};
-        deviceInlineUniformBlock.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        deviceInlineUniformBlock.pNext = &devicePipelineCreation;
-
-        VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR deviceZeroInitialize = {};
-        deviceZeroInitialize.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR;
-        deviceZeroInitialize.pNext = &deviceInlineUniformBlock;
-
-        VkPhysicalDeviceSynchronization2FeaturesKHR deviceSynchronization2 = {};
-        deviceSynchronization2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR;
-        deviceSynchronization2.pNext = &deviceZeroInitialize;
-
-        VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR deviceShaderTerminateInvocation = {};
-        deviceShaderTerminateInvocation.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR;
-        deviceShaderTerminateInvocation.pNext = &deviceSynchronization2;
+        VkPhysicalDeviceVulkan13Features deviceFeatures13 = {};
+        deviceFeatures13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+        deviceFeatures13.pNext = pDeviceNext;
+        pDeviceNext = &deviceFeatures13;
 
         VkPhysicalDeviceVulkan12Features deviceFeatures12 = {};
         deviceFeatures12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
-        deviceFeatures12.pNext = &deviceShaderTerminateInvocation;
+        deviceFeatures12.pNext = pDeviceNext;
+        pDeviceNext = &deviceFeatures12;
 
         VkPhysicalDeviceVulkan11Features deviceFeatures11 = {};
         deviceFeatures11.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
-        deviceFeatures11.pNext = &deviceFeatures12;
+        deviceFeatures11.pNext = pDeviceNext;
+        pDeviceNext = &deviceFeatures11;
 
         VkPhysicalDeviceFeatures2 deviceFeatures = {};
         deviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-        deviceFeatures.pNext = &deviceFeatures11;
+        deviceFeatures.pNext = pDeviceNext;
 
         vkGetPhysicalDeviceFeatures2(physicalDevice, &deviceFeatures);
 
-        VkPhysicalDeviceExtendedDynamicState2FeaturesEXT profileExtendedDynamicState = {};
-        profileExtendedDynamicState.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        profileExtendedDynamicState.pNext = nullptr;
+        void *pProfileNext = nullptr;
 
-        VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT profileTexelBufferAlign = {};
-        profileTexelBufferAlign.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        profileTexelBufferAlign.pNext = &profileExtendedDynamicState;
-
-        VkPhysicalDeviceSubgroupSizeControlFeaturesEXT profileSubgroupSize = {};
-        profileSubgroupSize.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        profileSubgroupSize.pNext = &profileTexelBufferAlign;
-
-        VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT profileShaderDemote = {};
-        profileShaderDemote.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        profileShaderDemote.pNext = &profileSubgroupSize;
-
-        VkPhysicalDevicePrivateDataFeaturesEXT profilePrivateData = {};
-        profilePrivateData.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        profilePrivateData.pNext = &profileShaderDemote;
-
-        VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT profilePipelineCreation = {};
-        profilePipelineCreation.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        profilePipelineCreation.pNext = &profilePrivateData;
-
-        VkPhysicalDeviceInlineUniformBlockFeaturesEXT profileInlineUniformBlock = {};
-        profileInlineUniformBlock.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
-        profileInlineUniformBlock.pNext = &profilePipelineCreation;
-
-        VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR profileZeroInitialize = {};
-        profileZeroInitialize.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR;
-        profileZeroInitialize.pNext = &profileInlineUniformBlock;
-
-        VkPhysicalDeviceSynchronization2FeaturesKHR profileSynchronization2 = {};
-        profileSynchronization2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR;
-        profileSynchronization2.pNext = &profileZeroInitialize;
-
-        VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR profileShaderTerminateInvocation = {};
-        profileShaderTerminateInvocation.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR;
-        profileShaderTerminateInvocation.pNext = &profileSynchronization2;
+        VkPhysicalDeviceVulkan13Features profileFeatures13 = {};
+        profileFeatures13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+        profileFeatures13.pNext = pProfileNext;
+        pProfileNext = &profileFeatures13;
 
         VkPhysicalDeviceVulkan12Features profileFeatures12 = {};
         profileFeatures12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
-        profileFeatures12.pNext = &profileShaderTerminateInvocation;
+        profileFeatures12.pNext = pProfileNext;
+        pProfileNext = &profileFeatures12;
 
         VkPhysicalDeviceVulkan11Features profileFeatures11 = {};
         profileFeatures11.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
-        profileFeatures11.pNext = &profileFeatures12;
+        profileFeatures11.pNext = pProfileNext;
+        pProfileNext = &profileFeatures11;
 
         VkPhysicalDeviceFeatures2 profileFeatures = {};
         profileFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-        profileFeatures.pNext = &profileFeatures11;
+        profileFeatures.pNext = pProfileNext;
 
         vpGetProfileStructures(pProfile, &profileFeatures);
 
         if (deviceFeatures.features.robustBufferAccess != profileFeatures.features.robustBufferAccess) {
+            return result;
+        } else if (deviceFeatures.features.fullDrawIndexUint32 != profileFeatures.features.fullDrawIndexUint32) {
             return result;
         } else if (deviceFeatures.features.imageCubeArray != profileFeatures.features.imageCubeArray) {
             return result;
@@ -2374,6 +2201,8 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         } else if (deviceFeatures.features.sampleRateShading != profileFeatures.features.sampleRateShading) {
             return result;
         } else if (deviceFeatures.features.drawIndirectFirstInstance != profileFeatures.features.drawIndirectFirstInstance) {
+            return result;
+        } else if (deviceFeatures.features.depthClamp != profileFeatures.features.depthClamp) {
             return result;
         } else if (deviceFeatures.features.depthBiasClamp != profileFeatures.features.depthBiasClamp) {
             return result;
@@ -2385,9 +2214,6 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
             return result;
         } else if (deviceFeatures.features.shaderStorageImageExtendedFormats !=
                    profileFeatures.features.shaderStorageImageExtendedFormats) {
-            return result;
-        } else if (deviceFeatures.features.shaderStorageImageReadWithoutFormat !=
-                   profileFeatures.features.shaderStorageImageReadWithoutFormat) {
             return result;
         } else if (deviceFeatures.features.shaderUniformBufferArrayDynamicIndexing !=
                    profileFeatures.features.shaderUniformBufferArrayDynamicIndexing) {
@@ -2409,20 +2235,19 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
             return result;
         }
 
-        if (deviceFeatures12.samplerMirrorClampToEdge != profileFeatures12.samplerMirrorClampToEdge) {
+        if (deviceFeatures12.uniformBufferStandardLayout != profileFeatures12.uniformBufferStandardLayout) {
             return result;
-        } else if (deviceFeatures12.shaderUniformTexelBufferArrayDynamicIndexing !=
-                   profileFeatures12.shaderUniformTexelBufferArrayDynamicIndexing) {
+        } else if (deviceFeatures12.subgroupBroadcastDynamicId != profileFeatures12.subgroupBroadcastDynamicId) {
             return result;
-        } else if (deviceFeatures12.uniformBufferStandardLayout != profileFeatures12.uniformBufferStandardLayout) {
-            return result;
-        } else if (deviceFeatures12.shaderSubgroupExtendedTypes != profileFeatures12.shaderSubgroupExtendedTypes) {
+        } else if (deviceFeatures12.imagelessFramebuffer != profileFeatures12.imagelessFramebuffer) {
             return result;
         } else if (deviceFeatures12.separateDepthStencilLayouts != profileFeatures12.separateDepthStencilLayouts) {
             return result;
         } else if (deviceFeatures12.hostQueryReset != profileFeatures12.hostQueryReset) {
             return result;
-        } else if (deviceFeatures12.bufferDeviceAddress != profileFeatures12.bufferDeviceAddress) {
+        } else if (deviceFeatures12.timelineSemaphore != profileFeatures12.timelineSemaphore) {
+            return result;
+        } else if (deviceFeatures12.shaderSubgroupExtendedTypes != profileFeatures12.shaderSubgroupExtendedTypes) {
             return result;
         } else if (deviceFeatures12.vulkanMemoryModel != profileFeatures12.vulkanMemoryModel) {
             return result;
@@ -2431,41 +2256,102 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         } else if (deviceFeatures12.vulkanMemoryModelAvailabilityVisibilityChains !=
                    profileFeatures12.vulkanMemoryModelAvailabilityVisibilityChains) {
             return result;
-        } else if (deviceFeatures12.subgroupBroadcastDynamicId != profileFeatures12.subgroupBroadcastDynamicId) {
+        } else if (deviceFeatures12.bufferDeviceAddress != profileFeatures12.bufferDeviceAddress) {
             return result;
-        } else if (deviceFeatures12.imagelessFramebuffer != profileFeatures12.imagelessFramebuffer) {
+        } else if (deviceFeatures12.samplerMirrorClampToEdge != profileFeatures12.samplerMirrorClampToEdge) {
+            return result;
+        } else if (deviceFeatures12.descriptorIndexing != profileFeatures12.descriptorIndexing) {
+            return result;
+        } else if (deviceFeatures12.shaderUniformTexelBufferArrayDynamicIndexing !=
+                   profileFeatures12.shaderUniformTexelBufferArrayDynamicIndexing) {
+            return result;
+        } else if (deviceFeatures12.shaderStorageTexelBufferArrayDynamicIndexing !=
+                   profileFeatures12.shaderStorageTexelBufferArrayDynamicIndexing) {
+            return result;
+        } else if (deviceFeatures12.shaderUniformBufferArrayNonUniformIndexing !=
+                   profileFeatures12.shaderUniformBufferArrayNonUniformIndexing) {
+            return result;
+        } else if (deviceFeatures12.shaderSampledImageArrayNonUniformIndexing !=
+                   profileFeatures12.shaderSampledImageArrayNonUniformIndexing) {
+            return result;
+        } else if (deviceFeatures12.shaderStorageBufferArrayNonUniformIndexing !=
+                   profileFeatures12.shaderStorageBufferArrayNonUniformIndexing) {
+            return result;
+        } else if (deviceFeatures12.shaderStorageImageArrayNonUniformIndexing !=
+                   profileFeatures12.shaderStorageImageArrayNonUniformIndexing) {
+            return result;
+        } else if (deviceFeatures12.shaderUniformTexelBufferArrayNonUniformIndexing !=
+                   profileFeatures12.shaderUniformTexelBufferArrayNonUniformIndexing) {
+            return result;
+        } else if (deviceFeatures12.shaderStorageTexelBufferArrayNonUniformIndexing !=
+                   profileFeatures12.shaderStorageTexelBufferArrayNonUniformIndexing) {
+            return result;
+        } else if (deviceFeatures12.descriptorBindingUniformBufferUpdateAfterBind !=
+                   profileFeatures12.descriptorBindingUniformBufferUpdateAfterBind) {
+            return result;
+        } else if (deviceFeatures12.descriptorBindingSampledImageUpdateAfterBind !=
+                   profileFeatures12.descriptorBindingSampledImageUpdateAfterBind) {
+            return result;
+        } else if (deviceFeatures12.descriptorBindingStorageImageUpdateAfterBind !=
+                   profileFeatures12.descriptorBindingStorageImageUpdateAfterBind) {
+            return result;
+        } else if (deviceFeatures12.descriptorBindingStorageBufferUpdateAfterBind !=
+                   profileFeatures12.descriptorBindingStorageBufferUpdateAfterBind) {
+            return result;
+        } else if (deviceFeatures12.descriptorBindingUniformTexelBufferUpdateAfterBind !=
+                   profileFeatures12.descriptorBindingUniformTexelBufferUpdateAfterBind) {
+            return result;
+        } else if (deviceFeatures12.descriptorBindingStorageTexelBufferUpdateAfterBind !=
+                   profileFeatures12.descriptorBindingStorageTexelBufferUpdateAfterBind) {
+            return result;
+        } else if (deviceFeatures12.descriptorBindingUpdateUnusedWhilePending !=
+                   profileFeatures12.descriptorBindingUpdateUnusedWhilePending) {
+            return result;
+        } else if (deviceFeatures12.descriptorBindingPartiallyBound != profileFeatures12.descriptorBindingPartiallyBound) {
+            return result;
+        } else if (deviceFeatures12.descriptorBindingVariableDescriptorCount !=
+                   profileFeatures12.descriptorBindingVariableDescriptorCount) {
+            return result;
+        } else if (deviceFeatures12.runtimeDescriptorArray != profileFeatures12.runtimeDescriptorArray) {
+            return result;
+        } else if (deviceFeatures12.scalarBlockLayout != profileFeatures12.scalarBlockLayout) {
             return result;
         }
 
-        if (deviceShaderTerminateInvocation.shaderTerminateInvocation !=
-            profileShaderTerminateInvocation.shaderTerminateInvocation) {
+        if (deviceFeatures13.robustImageAccess != profileFeatures13.robustImageAccess) {
             return result;
-        } else if (deviceSynchronization2.synchronization2 != profileSynchronization2.synchronization2) {
+        } else if (deviceFeatures13.shaderTerminateInvocation != profileFeatures13.shaderTerminateInvocation) {
             return result;
-        } else if (deviceZeroInitialize.shaderZeroInitializeWorkgroupMemory !=
-                   profileZeroInitialize.shaderZeroInitializeWorkgroupMemory) {
+        } else if (deviceFeatures13.shaderZeroInitializeWorkgroupMemory != profileFeatures13.shaderZeroInitializeWorkgroupMemory) {
             return result;
-        } else if (deviceInlineUniformBlock.inlineUniformBlock != profileInlineUniformBlock.inlineUniformBlock) {
+        } else if (deviceFeatures13.synchronization2 != profileFeatures13.synchronization2) {
             return result;
-        } else if (devicePipelineCreation.pipelineCreationCacheControl != profilePipelineCreation.pipelineCreationCacheControl) {
+        } else if (deviceFeatures13.shaderIntegerDotProduct != profileFeatures13.shaderIntegerDotProduct) {
             return result;
-        } else if (devicePrivateData.privateData != profilePrivateData.privateData) {
+        } else if (deviceFeatures13.maintenance4 != profileFeatures13.maintenance4) {
             return result;
-        } else if (deviceShaderDemote.shaderDemoteToHelperInvocation != profileShaderDemote.shaderDemoteToHelperInvocation) {
+        } else if (deviceFeatures13.pipelineCreationCacheControl != profileFeatures13.pipelineCreationCacheControl) {
             return result;
-        } else if (deviceSubgroupSize.subgroupSizeControl != profileSubgroupSize.subgroupSizeControl) {
+        } else if (deviceFeatures13.subgroupSizeControl != profileFeatures13.subgroupSizeControl) {
             return result;
-        } else if (deviceSubgroupSize.computeFullSubgroups != profileSubgroupSize.computeFullSubgroups) {
+        } else if (deviceFeatures13.computeFullSubgroups != profileFeatures13.computeFullSubgroups) {
             return result;
-        } else if (deviceTexelBufferAlign.texelBufferAlignment != profileTexelBufferAlign.texelBufferAlignment) {
+        } else if (deviceFeatures13.shaderDemoteToHelperInvocation != profileFeatures13.shaderDemoteToHelperInvocation) {
             return result;
-        } else if (deviceExtendedDynamicState.extendedDynamicState2 != profileExtendedDynamicState.extendedDynamicState2) {
+        } else if (deviceFeatures13.inlineUniformBlock != profileFeatures13.inlineUniformBlock) {
+            return result;
+        } else if (deviceFeatures13.descriptorBindingInlineUniformBlockUpdateAfterBind !=
+                   profileFeatures13.descriptorBindingInlineUniformBlockUpdateAfterBind) {
             return result;
         }
+
+        VkPhysicalDeviceVulkan13Properties devicePropertiesVulkan13 = {};
+        devicePropertiesVulkan13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES;
+        devicePropertiesVulkan13.pNext = nullptr;
 
         VkPhysicalDeviceVulkan12Properties devicePropertiesVulkan12 = {};
         devicePropertiesVulkan12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES;
-        devicePropertiesVulkan12.pNext = nullptr;
+        devicePropertiesVulkan12.pNext = &devicePropertiesVulkan13;
 
         VkPhysicalDeviceVulkan11Properties devicePropertiesVulkan11 = {};
         devicePropertiesVulkan11.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
