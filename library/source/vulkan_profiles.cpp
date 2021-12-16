@@ -825,7 +825,7 @@ VP_INLINE const void *_vpGetStructure(const void *pNext, VkStructureType type) {
         return _vpGetStructure(p->pNext, type);
     }
 }
-VP_INLINE void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
+VP_INLINE VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
     static const VpProfileProperties table[] = {
         {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION},
 #ifdef VK_ENABLE_BETA_EXTENSIONS
@@ -835,12 +835,15 @@ VP_INLINE void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pPro
 
     if (pProperties == nullptr) {
         *pPropertyCount = _vpCountOf(table);
-        return;
+        return VK_SUCCESS;
     }
 
-    for (std::size_t i = 0, n = std::min<std::size_t>(_vpCountOf(table), *pPropertyCount); i < n; ++i) {
+    *pPropertyCount = std::min<uint32_t>(_vpCountOf(table), *pPropertyCount);
+    for (std::size_t i = 0, n = *pPropertyCount; i < n; ++i) {
         pProperties[i] = table[i];
     }
+
+    return _vpCountOf(table) <= *pPropertyCount ? VK_SUCCESS : VK_INCOMPLETE;
 }
 
 VP_INLINE VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
