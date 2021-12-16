@@ -6835,24 +6835,6 @@
                                 "$ref": "#/definitions/VkQueueFamilyCheckpointProperties2NV"
                             }
                         }
-                    },
-                    "memoryProperties": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "properties": {
-                            "VkPhysicalDeviceMemoryProperties": {
-                                "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties"
-                            },
-                            "VkPhysicalDeviceMemoryProperties2": {
-                                "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties2"
-                            },
-                            "VkPhysicalDeviceMemoryProperties2KHR": {
-                                "$ref": "#/definitions/VkPhysicalDeviceMemoryProperties2"
-                            },
-                            "VkPhysicalDeviceMemoryBudgetPropertiesEXT": {
-                                "$ref": "#/definitions/VkPhysicalDeviceMemoryBudgetPropertiesEXT"
-                            }
-                        }
                     }
                 }
             }
