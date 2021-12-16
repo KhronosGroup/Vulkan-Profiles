@@ -583,9 +583,7 @@ class VulkanProfilesBuilder():
 
                         structDef = self.registry['structs'].get(featureStructName)
                         if structDef == None:
-                            # TODO: Make this an error once we have Vulkan 1.3 registry data
-                            self.logMsg('warn', "Feature structure '{0}' does not exist".format(featureStructName))
-                            continue
+                            self.logMsg('error', "Feature structure '{0}' does not exist".format(featureStructName))
 
                         if structDef.get('stype') == None:
                             self.logMsg('error', "Feature structure '{0}' is not chainable".format(featureStructName))
@@ -603,9 +601,7 @@ class VulkanProfilesBuilder():
 
                         structDef = self.registry['structs'].get(propertyStructName)
                         if structDef == None:
-                            # TODO: Make this an error once we have Vulkan 1.3 registry data
-                            self.logMsg('warn', "Properties structure '{0}' does not exist".format(propertyStructName))
-                            continue
+                            self.logMsg('error', "Properties structure '{0}' does not exist".format(propertyStructName))
 
                         if structDef.get('stype') == None:
                             self.logMsg('error', "Properties structure '{0}' is not chainable".format(propertyStructName))
@@ -848,8 +844,7 @@ class VulkanProfilesBuilder():
                     for featureStructName, feature in features.items():
                         structDef = self.registry['structs'].get(featureStructName)
                         if structDef == None:
-                            # TODO: Make this an error once we have Vulkan 1.3 registry data
-                            self.logMsg('warn', "Feature structure '{0}' does not exist".format(featureStructName))
+                            self.logMsg('error', "Feature structure '{0}' does not exist".format(featureStructName))
                             continue
 
                         if featureStructName == 'VkPhysicalDeviceFeatures':
@@ -901,8 +896,7 @@ class VulkanProfilesBuilder():
                     for propertyStructName, property in properties.items():
                         structDef = self.registry['structs'].get(propertyStructName)
                         if structDef == None:
-                            # TODO: Make this an error once we have Vulkan 1.3 registry data
-                            self.logMsg('warn', "Properties structure '{0}' does not exist".format(propertyStructName))
+                            self.logMsg('error', "Properties structure '{0}' does not exist".format(propertyStructName))
                             continue
 
                         if propertyStructName == 'VkPhysicalDeviceProperties':
@@ -1023,8 +1017,7 @@ class VulkanProfilesBuilder():
                 for featureStructName, feature in features.items():
                     structDef = self.registry['structs'].get(featureStructName)
                     if structDef == None:
-                        # TODO: Make this an error once we have Vulkan 1.3 registry data
-                        self.logMsg('warn', "Feature structure '{0}' does not exist".format(featureStructName))
+                        self.logMsg('error', "Feature structure '{0}' does not exist".format(featureStructName))
                         continue
 
                     if featureStructName == 'VkPhysicalDeviceFeatures':
@@ -1254,9 +1247,7 @@ class VulkanProfilesBuilder():
                 for featureStructName in features:
                     structDef = self.registry['structs'].get(featureStructName)
                     if structDef == None:
-                        # TODO: Make this an error once we have Vulkan 1.3 registry data
-                        self.logMsg('warn', "Feature structure '{0}' does not exist".format(featureStructName))
-                        continue
+                        self.logMsg('error', "Feature structure '{0}' does not exist".format(featureStructName))
 
                     if featureStructName == 'VkPhysicalDeviceFeatures':
                         # Special case, as it's wrapped into VkPhysicalDeviceFeatures2
@@ -1278,9 +1269,7 @@ class VulkanProfilesBuilder():
                 for propertyStructName in properties:
                     structDef = self.registry['structs'].get(propertyStructName)
                     if structDef == None:
-                        # TODO: Make this an error once we have Vulkan 1.3 registry data
-                        self.logMsg('warn', "Properties structure '{0}' does not exist".format(propertyStructName))
-                        continue
+                        self.logMsg('error', "Properties structure '{0}' does not exist".format(propertyStructName))
 
                     if propertyStructName == 'VkPhysicalDeviceProperties':
                         # Special case, as it's wrapped into VkPhysicalDeviceProperties2
@@ -1507,6 +1496,7 @@ class VulkanProfilesBuilder():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
+    # TODO: Remove temporary default values used for testing purposes only
     parser.add_argument('-registry', action='store',
                         default='./library/scripts/vk.xml',
                         help='Use specified registry file instead of vk.xml')
