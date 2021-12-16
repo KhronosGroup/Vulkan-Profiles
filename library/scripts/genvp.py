@@ -83,10 +83,10 @@ typedef struct VpDeviceCreateInfo {
 } VpDeviceCreateInfo;
 
 // Query the list of available profiles in the library
-void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // List the recommended fallback profiles of a profile
-void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // Check whether a profile is supported by the physical device
 VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
@@ -97,8 +97,8 @@ VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInf
                         const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
 
 // Query the list of extension of a profile
-void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                     VkExtensionProperties *pProperties);
+VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                         VkExtensionProperties *pProperties);
 
 // Fill the pNext Vulkan structures with the requirements of a profile
 void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext);
@@ -114,21 +114,17 @@ typedef struct VpStructureProperties {
 } VpStructureProperties;
 
 // Query the list of structures used to specify requirements of a profile
-void vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                     VpStructureProperties *pProperties);
+VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                         VpStructureProperties *pProperties);
 
 // Query the list of formats with specified requirements by a profile
-void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
+VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
 
 // Query the requirements of a format for a profile
 void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
-// Query the requirements of memory types by a profile
-void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryTypeCount, VkMemoryPropertyFlags *pMemoryTypes);
-
 // Query the requirements of queue families by a profile
-void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
-
+VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
 
 #ifdef __cplusplus
 }
@@ -408,67 +404,77 @@ class VulkanProfilesBuilder():
                 self.mergeProfileProperties(mergedCaps, caps[capName])
                 self.mergeProfileFormats(mergedCaps, caps[capName])
                 self.mergeProfileQueueFamiliesProperties(mergedCaps, caps[capName])
-                self.mergeProfileMemoryProperties(mergedCaps, caps[capName])
             else:
                 self.logMsg('error', "Capability '{0}' needed by profile '{1}' is missing".format(capName, profile['name']))
         return mergedCaps
+
+
+    def mergeProfileCapData(self, dst, src):
+        if type(src) != type(dst):
+            self.logMsg('error', "Data type confict during profile capability data merge (src is '{0}', dst is '{1}')", type(src), type(dst))
+        elif type(src) == dict:
+            for key, val in src.items():
+                if type(val) == dict:
+                    if not key in dst:
+                        dst[key] = dict()
+                    self.mergeProfileCapData(dst[key], val)
+
+                elif type(val) == list:
+                    if not key in dst:
+                        dst[key] = []
+                    dst[key].extend(val)
+
+                else:
+                    if key in dst and type(dst[key]) != type(val):
+                        self.logMsg('error', "Data type confict during profile capability data merge (src is '{0}', dst is '{1}')", type(val), type(dst[key]))
+                    dst[key] = val
+        else:
+            self.logMsg('error', "Unexpected data type during profile capability data merge (src is '{0}', dst is '{1}')", type(src), type(dst))
 
 
     def mergeProfileExtensions(self, dst, src):
         if src.get('extensions') != None:
             if dst.get('extensions') == None:
                 dst['extensions'] = dict()
-            for ext in src['extensions']:
-                name = ext['extensionName']
-                dst['extensions'][name] = ext
+            for extName, specVersion in src['extensions'].items():
+                dst['extensions'][extName] = {
+                    'specVersion': specVersion
+                }
 
 
     def mergeProfileFeatures(self, dst, src):
         if src.get('features') != None:
             if dst.get('features') == None:
                 dst['features'] = dict()
-            for feats in src['features']:
-                for key in feats:
-                    dst['features'][key] = feats[key]
+            self.mergeProfileCapData(dst['features'], src['features'])
 
 
     def mergeProfileProperties(self, dst, src):
         if src.get('properties') != None:
             if dst.get('properties') == None:
                 dst['properties'] = dict()
-            for props in src['properties']:
-                for key in props:
-                    dst['properties'][key] = props[key]
+            self.mergeProfileCapData(dst['properties'], src['properties'])
 
 
     def mergeProfileFormats(self, dst, src):
         if src.get('formats') != None:
             if dst.get('formats') == None:
                 dst['formats'] = dict()
-            for fmt in src['formats']:
-                for key in fmt:
-                    dst['formats'][key] = dict()
-                    for props in fmt[key]:
-                        for key2 in props:
-                            dst['formats'][key][key2] = props[key2]
+            self.mergeProfileCapData(dst['formats'], src['formats'])
 
 
     def mergeProfileQueueFamiliesProperties(self, dst, src):
         if src.get('queueFamiliesProperties') != None:
             if dst.get('queueFamiliesProperties') == None:
                 dst['queueFamiliesProperties'] = dict()
-            for props in src['queueFamiliesProperties']:
-                for key in props:
-                    dst['queueFamiliesProperties'][key] = props[key]
+            self.mergeProfileCapData(dst['queueFamiliesProperties'], src['queueFamiliesProperties'])
 
 
     def mergeProfileMemoryProperties(self, dst, src):
         if src.get('memoryProperties') != None:
             if dst.get('memoryProperties') == None:
                 dst['memoryProperties'] = dict()
-            for props in src['memoryProperties']:
-                for key in props:
-                    dst['memoryProperties'][key] = props[key]
+            self.mergeProfileCapData(dst['memoryProperties'], src['memoryProperties'])
 
 
     def crossValidate(self):
@@ -511,7 +517,8 @@ class VulkanProfilesBuilder():
             f.write(self.gen_extensionLists())
             f.write(self.gen_structPropLists())
             f.write(self.gen_formatLists())
-            f.write(self.gen_memoryTypeLists())
+            # TODO: Memory types removed for now
+            #f.write(self.gen_memoryTypeLists())
             f.write(self.gen_queueFamilyLists())
             f.write(CPP_IMPL_POSTDEFS)
             f.write(self.gen_vpGetProfiles())
@@ -523,7 +530,8 @@ class VulkanProfilesBuilder():
             f.write(self.gen_vpGetProfileStructureProperties())
             f.write(self.gen_vpGetProfileFormats())
             f.write(self.gen_vpGetProfileFormatProperties())
-            f.write(self.gen_vpGetProfileMemoryTypes())
+            # TODO: Memory types removed for now
+            #f.write(self.gen_vpGetProfileMemoryTypes())
             f.write(self.gen_vpGetProfileQueueFamilies())
 
 
@@ -705,7 +713,8 @@ class VulkanProfilesBuilder():
 
     def gen_vpGetProfiles(self):
         gen = '\n'
-        gen += ('VP_INLINE void vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {\n'
+        gen += ('VP_INLINE VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {\n'
+                '    VkResult result = VK_SUCCESS;\n'
                 '    static const VpProfileProperties profiles[] = {\n')
 
         for name, profile in self.profiles.items():
@@ -718,20 +727,25 @@ class VulkanProfilesBuilder():
                 '\n'
                 '    if (pProperties == nullptr) {\n'
                 '        *pPropertyCount = _vpArraySize(profiles);\n'
-                '        return;\n'
+                '    } else {\n'
+                '        if (*pPropertyCount < _vpArraySize(profiles)) {\n'
+                '            result = VK_INCOMPLETE;\n'
+                '        } else {\n'
+                '            *pPropertyCount = _vpArraySize(profiles);\n'
+                '        }\n'
+                '        for (uint32_t i = 0; i < *pPropertyCount; ++i) {\n'
+                '            pProperties[i] = profiles[i];\n'
+                '        }\n'
                 '    }\n'
-                '\n'
-                '    *pPropertyCount = std::min(_vpArraySize(profiles), *pPropertyCount);\n'
-                '    for (uint32_t i = 0; i < *pPropertyCount; ++i) {\n'
-                '        pProperties[i] = profiles[i];\n'
-                '    }\n'
+                '    return result;\n'
                 '}\n')
         return gen
 
 
     def gen_vpGetProfileFallbacks(self):
         gen = '\n'
-        gen += 'VP_INLINE void vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {\n'
+        gen += ('VP_INLINE VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {\n'
+                '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
             uname = name.upper()
@@ -746,12 +760,15 @@ class VulkanProfilesBuilder():
                         '\n'
                         '        if (pProperties == nullptr) {{\n'
                         '            *pPropertyCount = _vpArraySize({0}_fallbacks);\n'
-                        '            return;\n'
-                        '        }}\n'
-                        '\n'
-                        '        *pPropertyCount = std::min(_vpArraySize({0}_fallbacks), *pPropertyCount);\n'
-                        '        for (uint32_t i = 0; i < *pPropertyCount; ++i) {{\n'
-                        '            pProperties[i] = {0}_fallbacks[i];\n'
+                        '        }} else {{\n'
+                        '            if (*pPropertyCount < _vpArraySize({0}_fallbacks)) {{\n'
+                        '                result = VK_INCOMPLETE;\n'
+                        '            }} else {{\n'
+                        '                *pPropertyCount = _vpArraySize({0}_fallbacks);\n'
+                        '            }}\n'
+                        '            for (uint32_t i = 0; i < *pPropertyCount; ++i) {{\n'
+                        '                pProperties[i] = {0}_fallbacks[i];\n'
+                        '            }}\n'
                         '        }}\n'
                         '    }} else\n').format(uname)
                 gen += guard.end
@@ -759,6 +776,7 @@ class VulkanProfilesBuilder():
         gen += ('    {\n'
                 '        *pPropertyCount = 0;\n'
                 '    }\n'
+                '    return result;\n'
                 '}\n')
         return gen
 
@@ -943,6 +961,7 @@ class VulkanProfilesBuilder():
                             '        if (!queueFamiliesSupported) return result;\n').format(uname)
 
                 # Check memory types
+                if profile['capabilities'].get('memoryProperties') != None:
                     gen += ('\n'
                             '        VkPhysicalDeviceMemoryProperties memoryProperties;\n'
                             '        vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);\n'
@@ -1071,8 +1090,9 @@ class VulkanProfilesBuilder():
     def gen_vpGetProfileExtensionProperties(self):
         gen = '\n'
         # TODO: We should probably have separate APIs for device vs instance extensions
-        gen += ('VP_INLINE void vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,\n'
-                '                                               VkExtensionProperties *pProperties) {\n')
+        gen += ('VP_INLINE VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,\n'
+                '                                                   VkExtensionProperties *pProperties) {\n'
+                '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
             uname = name.upper()
@@ -1083,7 +1103,11 @@ class VulkanProfilesBuilder():
                         '        if (pProperties == nullptr) {{\n'
                         '            *pPropertyCount = _vpArraySize(_{0}_EXTENSIONS);\n'
                         '        }} else {{\n'
-                        '            *pPropertyCount = std::min(_vpArraySize(_{0}_EXTENSIONS), *pPropertyCount);\n'
+                        '            if (*pPropertyCount < _vpArraySize(_{0}_EXTENSIONS)) {{\n'
+                        '                result = VK_INCOMPLETE;\n'
+                        '            }} else {{\n'
+                        '                *pPropertyCount = _vpArraySize(_{0}_EXTENSIONS);\n'
+                        '            }}\n'
                         '            for (uint32_t i = 0; i < *pPropertyCount; ++i) {{\n'
                         '                pProperties[i] = _{0}_EXTENSIONS[i];\n'
                         '            }}\n'
@@ -1094,6 +1118,7 @@ class VulkanProfilesBuilder():
         gen += ('    {\n'
                 '        *pPropertyCount = 0;\n'
                 '    }\n'
+                '    return result;\n'
                 '}\n')
         return gen
 
@@ -1286,8 +1311,9 @@ class VulkanProfilesBuilder():
 
     def gen_vpGetProfileStructureProperties(self):
         gen = '\n'
-        gen += ('VP_INLINE void vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,\n'
-                '                                               VpStructureProperties *pProperties) {\n')
+        gen += ('VP_INLINE VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,\n'
+                '                                                   VpStructureProperties *pProperties) {\n'
+                '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
             uname = name.upper()
@@ -1298,7 +1324,11 @@ class VulkanProfilesBuilder():
                         '        if (pProperties == nullptr) {{\n'
                         '            *pPropertyCount = _vpArraySize(_{0}_STRUCTURE_PROPERTIES);\n'
                         '        }} else {{\n'
-                        '            *pPropertyCount = std::min(_vpArraySize(_{0}_STRUCTURE_PROPERTIES), *pPropertyCount);\n'
+                        '            if (*pPropertyCount < _vpArraySize(_{0}_STRUCTURE_PROPERTIES)) {{\n'
+                        '                result = VK_INCOMPLETE;\n'
+                        '            }} else {{\n'
+                        '                *pPropertyCount = _vpArraySize(_{0}_STRUCTURE_PROPERTIES);\n'
+                        '            }}\n'
                         '            for (uint32_t i = 0; i < *pPropertyCount; ++i) {{\n'
                         '                pProperties[i] = _{0}_STRUCTURE_PROPERTIES[i];\n'
                         '            }}\n'
@@ -1309,13 +1339,15 @@ class VulkanProfilesBuilder():
         gen += ('    {\n'
                 '        *pPropertyCount = 0;\n'
                 '    }\n'
+                '    return result;\n'
                 '}\n')
         return gen
 
 
     def gen_vpGetProfileFormats(self):
         gen = '\n'
-        gen += 'VP_INLINE void vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats) {\n'
+        gen += ('VP_INLINE VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats) {\n'
+                '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
             uname = name.upper()
@@ -1326,7 +1358,11 @@ class VulkanProfilesBuilder():
                         '        if (pFormats == nullptr) {{\n'
                         '            *pFormatCount = _vpArraySize(_{0}_FORMATS);\n'
                         '        }} else {{\n'
-                        '            *pFormatCount = std::min(_vpArraySize(_{0}_FORMATS), *pFormatCount);\n'
+                        '            if (*pFormatCount < _vpArraySize(_{0}_FORMATS)) {{\n'
+                        '                result = VK_INCOMPLETE;\n'
+                        '            }} else {{\n'
+                        '                *pFormatCount = _vpArraySize(_{0}_FORMATS);\n'
+                        '            }}\n'
                         '            for (uint32_t i = 0; i < *pFormatCount; ++i) {{\n'
                         '                pFormats[i] = _{0}_FORMATS[i].format;\n'
                         '            }}\n'
@@ -1337,6 +1373,7 @@ class VulkanProfilesBuilder():
         gen += ('    {\n'
                 '        *pFormatCount = 0;\n'
                 '    }\n'
+                '    return result;\n'
                 '}\n')
         return gen
 
@@ -1399,8 +1436,9 @@ class VulkanProfilesBuilder():
 
     def gen_vpGetProfileMemoryTypes(self):
         gen = '\n'
-        gen += ('VP_INLINE void vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryPropertyFlagsCount,\n'
-                '                                       VkMemoryPropertyFlags *pMemoryPropertyFlags) {\n')
+        gen += ('VP_INLINE VkResult vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryPropertyFlagsCount,\n'
+                '                                           VkMemoryPropertyFlags *pMemoryPropertyFlags) {\n'
+                '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
             uname = name.upper()
@@ -1411,7 +1449,11 @@ class VulkanProfilesBuilder():
                         '        if (pMemoryPropertyFlags == nullptr) {{\n'
                         '            *pMemoryPropertyFlagsCount = _vpArraySize(_{0}_MEMORY_TYPES);\n'
                         '        }} else {{\n'
-                        '            *pMemoryPropertyFlagsCount = std::min(_vpArraySize(_{0}_MEMORY_TYPES), *pMemoryPropertyFlagsCount);\n'
+                        '            if (*pMemoryPropertyFlagsCount < _vpArraySize(_{0}_MEMORY_TYPES)) {{\n'
+                        '                result = VK_INCOMPLETE;\n'
+                        '            }} else {{\n'
+                        '                *pMemoryPropertyFlagsCount = _vpArraySize(_{0}_MEMORY_TYPES);\n'
+                        '            }}\n'
                         '            for (uint32_t i = 0; i < *pMemoryPropertyFlagsCount; ++i) {{\n'
                         '                pMemoryPropertyFlags[i] = _{0}_MEMORY_TYPES[i];\n'
                         '            }}\n'
@@ -1422,14 +1464,16 @@ class VulkanProfilesBuilder():
         gen += ('    {\n'
                 '        *pMemoryPropertyFlagsCount = 0;\n'
                 '    }\n'
+                '    return result;\n'
                 '}\n')
         return gen
 
 
     def gen_vpGetProfileQueueFamilies(self):
         gen = '\n'
-        gen += ('VP_INLINE void vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,\n'
-                '                                         VkQueueFamilyProperties *pQueueFamilyProperties) {\n')
+        gen += ('VP_INLINE VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,\n'
+                '                                             VkQueueFamilyProperties *pQueueFamilyProperties) {\n'
+                '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
             uname = name.upper()
@@ -1440,7 +1484,11 @@ class VulkanProfilesBuilder():
                         '        if (pQueueFamilyProperties == nullptr) {{\n'
                         '            *pQueueFamilyPropertiesCount = _vpArraySize(_{0}_QUEUE_FAMILY_PROPERTIES);\n'
                         '        }} else {{\n'
-                        '            *pQueueFamilyPropertiesCount = std::min(_vpArraySize(_{0}_QUEUE_FAMILY_PROPERTIES), *pQueueFamilyPropertiesCount);\n'
+                        '            if (*pQueueFamilyPropertiesCount < _vpArraySize(_{0}_QUEUE_FAMILY_PROPERTIES)) {{\n'
+                        '                result = VK_INCOMPLETE;\n'
+                        '            }} else {{\n'
+                        '                *pQueueFamilyPropertiesCount = _vpArraySize(_{0}_QUEUE_FAMILY_PROPERTIES);\n'
+                        '            }}\n'
                         '            for (uint32_t i = 0; i < *pQueueFamilyPropertiesCount; ++i) {{\n'
                         '                pQueueFamilyProperties[i] = _{0}_QUEUE_FAMILY_PROPERTIES[i];\n'
                         '            }}\n'
@@ -1451,6 +1499,7 @@ class VulkanProfilesBuilder():
         gen += ('    {\n'
                 '        *pQueueFamilyPropertiesCount = 0;\n'
                 '    }\n'
+                '    return result;\n'
                 '}\n')
         return gen
 
