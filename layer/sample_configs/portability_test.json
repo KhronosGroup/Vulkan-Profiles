@@ -1,17 +1,46 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/devsim_VK_KHR_portability_subset-provisional-1.json#",
-    "comments": {
-        "info": "You may add whatever you wish to this comments section",
-        "filename": "layersvt/device_simulation_examples/portability_test.json",
-        "desc": "A tiny and valid DevSim JSON config file",
-        "author": "jeremyk@lunarg.com"
-    },
-    "VkPhysicalDevicePortabilitySubsetFeaturesKHR": {
-        "imageViewFormatReinterpretation": 0,
-        "pointPolygons": 0,
-        "samplerMipLodBias": 0
-    },
-    "VkPhysicalDevicePortabilitySubsetPropertiesKHR": {
-        "minVertexInputBindingStrideAlignment": 8
-    }
+    "capabilities": [
+		{
+			"features": {
+				"VkPhysicalDevicePortabilitySubsetFeaturesKHR": {
+					"imageViewFormatReinterpretation": false,
+					"pointPolygons": false,
+					"samplerMipLodBias": false
+				}
+			},
+			"properties": {
+				"VkPhysicalDevicePortabilitySubsetPropertiesKHR": {
+					"minVertexInputBindingStrideAlignment": 8
+				}
+			}
+		}
+	],
+    "profiles": [
+      {
+            "name": "VP_LUNARG_test_api_1_2_198",
+            "label": "label",
+            "description": "description",
+            "version": 1,
+            "api-version": "1.2.198",
+            "contributors": [
+                {
+                    "name": "Ziga Markus",
+                    "company": "LunarG",
+                    "email": "ziga@lunarg.com",
+                    "github": "ziga-lunarg",
+                    "contact": true
+                }
+            ],
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2021-12-08",
+                    "author": "Ziga Markus",
+                    "comment": "Initial revision"
+                }
+            ],
+            "capabilities": [ "capabilities" ]
+        }
+    ]
 }
