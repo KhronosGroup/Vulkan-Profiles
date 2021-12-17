@@ -1,27 +1,59 @@
 {
-	"$schema": "https://schema.khronos.org/vulkan/devsim_VK_KHR_portability_subset-provisional-1.json#",
-	"comments": {
-		"desc": "JSON configuration file describing iOS GPU family 3 portability features and properties. Generated using the vulkaninfo program.",
-		"vulkanApiVersion": "1.1.154"
-	},
-	"VkPhysicalDevicePortabilitySubsetPropertiesKHR": {
-		"minVertexInputBindingStrideAlignment": 4
-	},
-	"VkPhysicalDevicePortabilitySubsetFeaturesKHR": {
-		"constantAlphaColorBlendFactors": 1,
-		"events": 1,
-		"imageViewFormatReinterpretation": 1,
-		"imageViewFormatSwizzle": 0,
-		"imageView2DOn3DImage": 0,
-		"multisampleArrayImage": 0,
-		"mutableComparisonSamplers": 1,
-		"pointPolygons": 0,
-		"samplerMipLodBias": 0,
-		"separateStencilMaskRef": 1,
-		"shaderSampleRateInterpolationFunctions": 0,
-		"tessellationIsolines": 0,
-		"tessellationPointMode": 0,
-		"triangleFans": 0,
-		"vertexAttributeAccessBeyondStride": 1
-	}
+    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
+    "capabilities": [
+        {
+            "name": "baseline",
+			"features": {
+				"VkPhysicalDevicePortabilitySubsetFeaturesKHR": {
+					"constantAlphaColorBlendFactors": true,
+					"events": true,
+					"imageViewFormatReinterpretation": true,
+					"imageViewFormatSwizzle": false,
+					"imageView2DOn3DImage": false,
+					"multisampleArrayImage": false,
+					"mutableComparisonSamplers": true,
+					"pointPolygons": false,
+					"samplerMipLodBias": false,
+					"separateStencilMaskRef": true,
+					"shaderSampleRateInterpolationFunctions": false,
+					"tessellationIsolines": false,
+					"tessellationPointMode": false,
+					"triangleFans": false,
+					"vertexAttributeAccessBeyondStride": true
+				}
+			},
+			"properties": {
+				"VkPhysicalDevicePortabilitySubsetPropertiesKHR": {
+					"minVertexInputBindingStrideAlignment": 4
+				}
+			}
+		}
+	],
+    "profiles": [
+      {
+            "name": "VP_LUNARG_test_api_1_2_198",
+            "label": "label",
+            "description": "description",
+            "version": 1,
+            "api-version": "1.2.198",
+            "contributors": [
+                {
+                    "name": "Ziga Markus",
+                    "company": "LunarG",
+                    "email": "ziga@lunarg.com",
+                    "github": "ziga-lunarg",
+                    "contact": true
+                }
+            ],
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2021-12-08",
+                    "author": "Ziga Markus",
+                    "comment": "Initial revision"
+                }
+            ],
+            "capabilities": [ "capabilities" ]
+        }
+    ]
 }
