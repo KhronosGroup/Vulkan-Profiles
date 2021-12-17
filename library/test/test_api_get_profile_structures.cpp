@@ -25,8 +25,13 @@
 #include <vulkan/vulkan_profiles.h>
 #endif
 
-TEST(api_get_profile_properties, get_properties2) {
-    VkPhysicalDeviceProperties2 profileProperties2{};
+auto containsStructType = [](const std::vector<VkStructureType>& vec, VkStructureType type) {
+    for (std::size_t i = 0; i < vec.size(); ++i)
+        if (vec[i] == type) return true;
+    return false;
+};
+
+TEST(api_get_profile_properties, get_properties2) {    VkPhysicalDeviceProperties2 profileProperties2{};
     profileProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     profileProperties2.pNext = nullptr;
 
@@ -117,10 +122,10 @@ TEST(api_get_profile_feature_structure_types, properties_full) {
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(4, propertyCount);
 
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, properties[0]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, properties[1]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, properties[2]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES, properties[3]);
+    EXPECT_TRUE(containsStructType(properties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2));
+    EXPECT_TRUE(containsStructType(properties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES));
+    EXPECT_TRUE(containsStructType(properties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES));
+    EXPECT_TRUE(containsStructType(properties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES));
 }
 
 TEST(api_get_profile_feature_structure_types, properties_partial) {
@@ -133,14 +138,13 @@ TEST(api_get_profile_feature_structure_types, properties_partial) {
 
     propertyCount = 3;
 
-    std::vector<VkStructureType> properties(propertyCount);
+    std::vector<VkStructureType> properties(propertyCount, VK_STRUCTURE_TYPE_APPLICATION_INFO);
     VkResult result1 = vpGetProfileFeatureStructureTypes(&profile, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(3, propertyCount);
 
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, properties[0]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, properties[1]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, properties[2]);
+    for (std::size_t i = 0; i < propertyCount; ++i)
+        EXPECT_NE(properties[i], VK_STRUCTURE_TYPE_APPLICATION_INFO);
 }
 
 TEST(api_get_profile_property_structure_types, properties_full) {
@@ -158,10 +162,10 @@ TEST(api_get_profile_property_structure_types, properties_full) {
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(4, propertyCount);
 
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, properties[0]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, properties[1]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, properties[2]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES, properties[3]);
+    EXPECT_TRUE(containsStructType(properties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2));
+    EXPECT_TRUE(containsStructType(properties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES));
+    EXPECT_TRUE(containsStructType(properties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES));
+    EXPECT_TRUE(containsStructType(properties, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES));
 }
 
 TEST(api_get_profile_property_structure_types, properties_partial) {
@@ -174,13 +178,11 @@ TEST(api_get_profile_property_structure_types, properties_partial) {
 
     propertyCount = 3;
 
-    std::vector<VkStructureType> properties(propertyCount);
+    std::vector<VkStructureType> properties(propertyCount, VK_STRUCTURE_TYPE_APPLICATION_INFO);
     VkResult result1 = vpGetProfilePropertyStructureTypes(&profile, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(3, propertyCount);
 
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, properties[0]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, properties[1]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, properties[2]);
+    for (std::size_t i = 0; i < propertyCount; ++i)
+        EXPECT_NE(properties[i], VK_STRUCTURE_TYPE_APPLICATION_INFO);
 }
-

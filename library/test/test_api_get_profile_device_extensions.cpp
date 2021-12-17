@@ -25,8 +25,13 @@
 #include <vulkan/vulkan_profiles.h>
 #endif
 
-TEST(api_get_profile_device_extension_properties, full) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+auto containsExtension = [](const std::vector<VkExtensionProperties>& vec, const char* name) {
+    for (std::size_t i = 0; i < vec.size(); ++i)
+        if (strcmp(vec[i].extensionName, name) == 0) return true;
+    return false;
+};
+
+TEST(api_get_profile_device_extension_properties, full) {    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, &propertyCount, nullptr);
@@ -40,11 +45,11 @@ TEST(api_get_profile_device_extension_properties, full) {
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(21, propertyCount);
 
-    EXPECT_STREQ(VK_KHR_8BIT_STORAGE_EXTENSION_NAME, properties[0].extensionName);
-    EXPECT_STREQ(VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, properties[1].extensionName);
-    EXPECT_STREQ(VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, properties[2].extensionName);
-    EXPECT_STREQ(VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, properties[3].extensionName);
-    EXPECT_STREQ(VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, properties[4].extensionName);
+    EXPECT_TRUE(containsExtension(properties, VK_KHR_8BIT_STORAGE_EXTENSION_NAME));
+    EXPECT_TRUE(containsExtension(properties, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME));
+    EXPECT_TRUE(containsExtension(properties, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME));
+    EXPECT_TRUE(containsExtension(properties, VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME));
+    EXPECT_TRUE(containsExtension(properties, VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME));
 }
 
 TEST(api_get_profile_device_extension_properties, partial) {
@@ -62,9 +67,9 @@ TEST(api_get_profile_device_extension_properties, partial) {
     EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(5, propertyCount);
 
-    EXPECT_STREQ(VK_KHR_8BIT_STORAGE_EXTENSION_NAME, properties[0].extensionName);
-    EXPECT_STREQ(VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, properties[1].extensionName);
-    EXPECT_STREQ(VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, properties[2].extensionName);
-    EXPECT_STREQ(VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, properties[3].extensionName);
-    EXPECT_STREQ(VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, properties[4].extensionName);
+    EXPECT_TRUE(containsExtension(properties, VK_KHR_8BIT_STORAGE_EXTENSION_NAME));
+    EXPECT_TRUE(containsExtension(properties, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME));
+    EXPECT_TRUE(containsExtension(properties, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME));
+    EXPECT_TRUE(containsExtension(properties, VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME));
+    EXPECT_TRUE(containsExtension(properties, VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME));
 }

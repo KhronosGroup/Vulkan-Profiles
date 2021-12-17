@@ -600,7 +600,7 @@ class VulkanProfilesBuilder():
                 gen += 'static const VpStructureProperties _{0}_STRUCTURE_PROPERTIES[] = {{\n'.format(name.upper())
 
                 if features != None:
-                    for featureStructName in sorted(features):
+                    for featureStructName in features:
                         if featureStructName == 'VkPhysicalDeviceFeatures':
                             # Special case, as it's wrapped into VkPhysicalDeviceFeatures2
                             featureStructName = 'VkPhysicalDeviceFeatures2'
@@ -618,7 +618,7 @@ class VulkanProfilesBuilder():
                         gen += '    {{ {0}, VP_STRUCTURE_FEATURES }},\n'.format(structDef.sType)
 
                 if properties != None:
-                    for propertyStructName in sorted(properties):
+                    for propertyStructName in properties:
                         if propertyStructName == 'VkPhysicalDeviceProperties':
                             # Special case, as it's wrapped into VkPhysicalDeviceProperties2
                             propertyStructName = 'VkPhysicalDeviceProperties2'
