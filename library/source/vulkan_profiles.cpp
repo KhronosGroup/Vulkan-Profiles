@@ -1891,7 +1891,7 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[1] >= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[1]);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[0] <= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[0]);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[1] >= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[1]);
-        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity >= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity <= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.strictLines == profilePhysicalDeviceProperties2.properties.limits.strictLines);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.nonCoherentAtomSize <= profilePhysicalDeviceProperties2.properties.limits.nonCoherentAtomSize);;
         if (!propertiesSupported) return result;
@@ -2069,8 +2069,8 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias);
-        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity >= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity);
-        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthGranularity >= profilePhysicalDeviceProperties2.properties.limits.lineWidthGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity <= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthGranularity <= profilePhysicalDeviceProperties2.properties.limits.lineWidthGranularity);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.standardSampleLocations == profilePhysicalDeviceProperties2.properties.limits.standardSampleLocations);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxColorAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxColorAttachments);;
         if (!propertiesSupported) return result;
@@ -2346,8 +2346,8 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[1] >= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[1]);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[0] <= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[0]);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[1] >= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[1]);
-        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity >= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity);
-        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthGranularity >= profilePhysicalDeviceProperties2.properties.limits.lineWidthGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity <= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthGranularity <= profilePhysicalDeviceProperties2.properties.limits.lineWidthGranularity);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools >= profilePhysicalDeviceDescriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindUniformBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindUniformBuffers);
@@ -2642,8 +2642,8 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[1] >= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[1]);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[0] <= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[0]);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[1] >= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[1]);
-        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity >= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity);
-        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthGranularity >= profilePhysicalDeviceProperties2.properties.limits.lineWidthGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity <= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthGranularity <= profilePhysicalDeviceProperties2.properties.limits.lineWidthGranularity);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools >= profilePhysicalDeviceDescriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers);
         propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindUniformBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindUniformBuffers);
