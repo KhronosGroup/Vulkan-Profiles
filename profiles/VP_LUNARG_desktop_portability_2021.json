@@ -9,7 +9,7 @@
             },
             "properties": {
                 "VkPhysicalDeviceMultiviewProperties": {
-                    "maxMultiviewViewCount": 0,
+                    "maxMultiviewViewCount": 6,
                     "maxMultiviewInstanceIndex": 134217727
                 }
             }

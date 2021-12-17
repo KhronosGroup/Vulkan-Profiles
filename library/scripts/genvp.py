@@ -489,30 +489,14 @@ class VulkanProfiles():
                 Log.i("Loading profile file: '{0}'".format(filename))
                 with open(fileAbsPath, 'r') as f:
                     jsonData = json.load(f)
-                    caps = VulkanProfiles.parseCapabilities(jsonData['capabilities'])
-                    VulkanProfiles.parseProfiles(registry, profiles, jsonData['profiles'], caps)
+                    VulkanProfiles.parseProfiles(registry, profiles, jsonData['profiles'], jsonData['capabilities'])
         return profiles
 
 
-    def parseCapabilities(capData):
-        caps = dict()
-        for cap in capData:
-            name = cap['name']
-            if not name in caps:
-                caps[name] = cap
-            else:
-                Log.f("Capability with name '{0}' already exists".format(name))
-        return caps
-
-
     def parseProfiles(registry, profiles, json, caps):
-        for data in json:
-            name = data['name']
-            if not name in profiles:
-                Log.i("Registering profile '{0}'".format(name))
-                profiles[name] = VulkanProfile(registry, name, data, caps)
-            else:
-                Log.f("Profile with name '{0}' already exists".format(name))
+        for name, data in json.items():
+            Log.i("Registering profile '{0}'".format(name))
+            profiles[name] = VulkanProfile(registry, name, data, caps)
 
 
 class ProfilePlatformGuard():
@@ -616,7 +600,7 @@ class VulkanProfilesBuilder():
                 gen += 'static const VpStructureProperties _{0}_STRUCTURE_PROPERTIES[] = {{\n'.format(name.upper())
 
                 if features != None:
-                    for featureStructName in features:
+                    for featureStructName in sorted(features):
                         if featureStructName == 'VkPhysicalDeviceFeatures':
                             # Special case, as it's wrapped into VkPhysicalDeviceFeatures2
                             featureStructName = 'VkPhysicalDeviceFeatures2'
@@ -634,7 +618,7 @@ class VulkanProfilesBuilder():
                         gen += '    {{ {0}, VP_STRUCTURE_FEATURES }},\n'.format(structDef.sType)
 
                 if properties != None:
-                    for propertyStructName in properties:
+                    for propertyStructName in sorted(properties):
                         if propertyStructName == 'VkPhysicalDeviceProperties':
                             # Special case, as it's wrapped into VkPhysicalDeviceProperties2
                             propertyStructName = 'VkPhysicalDeviceProperties2'
