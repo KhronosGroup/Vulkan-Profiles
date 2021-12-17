@@ -892,7 +892,7 @@ class VulkanProfilesBuilder():
                 pNextProfile = None
                 gen += '\n'
                 genDef = ''
-                genCheck = '        bool featuresSupported = true\n'
+                genCheck = '        bool featuresSupported = true;\n'
                 for featureStructName, feature in features.items():
                     structDef = self.registry.structs.get(featureStructName)
                     if structDef == None:
@@ -920,7 +920,7 @@ class VulkanProfilesBuilder():
                         genDef += '        {0}.pNext = &{1};\n'.format(profileVarName, pNextProfile)
                     pNextProfile = profileVarName
 
-                    genCheck += self.gen_compareStructVar('            && {0}\n', structDef, deviceVarName + varAccessSuffix, profileVarName + varAccessSuffix, feature)
+                    genCheck += self.gen_compareStructVar('        featuresSupported = featuresSupported && {0};\n', structDef, deviceVarName + varAccessSuffix, profileVarName + varAccessSuffix, feature)
 
                 genCheck = genCheck[:-1] + ';\n'
 
@@ -944,7 +944,7 @@ class VulkanProfilesBuilder():
                 pNextProfile = None
                 gen += '\n'
                 genDef = ''
-                genCheck = '        bool propertiesSupported = true\n'
+                genCheck = '        bool propertiesSupported = true;\n'
                 for propertyStructName, property in properties.items():
                     structDef = self.registry.structs.get(propertyStructName)
                     if structDef == None:
@@ -972,7 +972,7 @@ class VulkanProfilesBuilder():
                         genDef += '        {0}.pNext = &{1};\n'.format(profileVarName, pNextProfile)
                     pNextProfile = profileVarName
 
-                    genCheck += self.gen_compareStructVar('            && {0}\n', structDef, deviceVarName + varAccessSuffix, profileVarName + varAccessSuffix, property)
+                    genCheck += self.gen_compareStructVar('        propertiesSupported = propertiesSupported && {0};\n', structDef, deviceVarName + varAccessSuffix, profileVarName + varAccessSuffix, property)
 
                 genCheck = genCheck[:-1] + ';\n'
 

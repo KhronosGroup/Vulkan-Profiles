@@ -1767,133 +1767,133 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         VkPhysicalDeviceFeatures2 profilePhysicalDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
         vkGetPhysicalDeviceFeatures2(physicalDevice, &devicePhysicalDeviceFeatures2);
         vpGetProfileStructures(pProfile, &profilePhysicalDeviceFeatures2);
-        bool featuresSupported = true
-            && (devicePhysicalDeviceFeatures2.features.robustBufferAccess == profilePhysicalDeviceFeatures2.features.robustBufferAccess)
-            && (devicePhysicalDeviceFeatures2.features.depthBiasClamp == profilePhysicalDeviceFeatures2.features.depthBiasClamp)
-            && (devicePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics == profilePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics)
-            && (devicePhysicalDeviceFeatures2.features.fullDrawIndexUint32 == profilePhysicalDeviceFeatures2.features.fullDrawIndexUint32)
-            && (devicePhysicalDeviceFeatures2.features.imageCubeArray == profilePhysicalDeviceFeatures2.features.imageCubeArray)
-            && (devicePhysicalDeviceFeatures2.features.independentBlend == profilePhysicalDeviceFeatures2.features.independentBlend)
-            && (devicePhysicalDeviceFeatures2.features.largePoints == profilePhysicalDeviceFeatures2.features.largePoints)
-            && (devicePhysicalDeviceFeatures2.features.shaderImageGatherExtended == profilePhysicalDeviceFeatures2.features.shaderImageGatherExtended)
-            && (devicePhysicalDeviceFeatures2.features.shaderInt16 == profilePhysicalDeviceFeatures2.features.shaderInt16)
-            && (devicePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageImageWriteWithoutFormat == profilePhysicalDeviceFeatures2.features.shaderStorageImageWriteWithoutFormat)
-            && (devicePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.textureCompressionASTC_LDR == profilePhysicalDeviceFeatures2.features.textureCompressionASTC_LDR)
-            && (devicePhysicalDeviceFeatures2.features.textureCompressionETC2 == profilePhysicalDeviceFeatures2.features.textureCompressionETC2);
+        bool featuresSupported = true;
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.robustBufferAccess == profilePhysicalDeviceFeatures2.features.robustBufferAccess);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.depthBiasClamp == profilePhysicalDeviceFeatures2.features.depthBiasClamp);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics == profilePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.fullDrawIndexUint32 == profilePhysicalDeviceFeatures2.features.fullDrawIndexUint32);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.imageCubeArray == profilePhysicalDeviceFeatures2.features.imageCubeArray);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.independentBlend == profilePhysicalDeviceFeatures2.features.independentBlend);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.largePoints == profilePhysicalDeviceFeatures2.features.largePoints);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderImageGatherExtended == profilePhysicalDeviceFeatures2.features.shaderImageGatherExtended);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderInt16 == profilePhysicalDeviceFeatures2.features.shaderInt16);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageImageWriteWithoutFormat == profilePhysicalDeviceFeatures2.features.shaderStorageImageWriteWithoutFormat);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.textureCompressionASTC_LDR == profilePhysicalDeviceFeatures2.features.textureCompressionASTC_LDR);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.textureCompressionETC2 == profilePhysicalDeviceFeatures2.features.textureCompressionETC2);;
         if (!featuresSupported) return result;
 
         VkPhysicalDeviceProperties2 devicePhysicalDeviceProperties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };
         VkPhysicalDeviceProperties2 profilePhysicalDeviceProperties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };
         vkGetPhysicalDeviceProperties2(physicalDevice, &devicePhysicalDeviceProperties2);
         vpGetProfileStructures(pProfile, &profilePhysicalDeviceProperties2);
-        bool propertiesSupported = true
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension1D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension1D)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension2D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension2D)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension3D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension3D)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers >= profilePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTexelBufferElements >= profilePhysicalDeviceProperties2.properties.limits.maxTexelBufferElements)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxStorageBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxStorageBufferRange)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPushConstantsSize >= profilePhysicalDeviceProperties2.properties.limits.maxPushConstantsSize)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxMemoryAllocationCount >= profilePhysicalDeviceProperties2.properties.limits.maxMemoryAllocationCount)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerAllocationCount >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerAllocationCount)
-            && (devicePhysicalDeviceProperties2.properties.limits.bufferImageGranularity <= profilePhysicalDeviceProperties2.properties.limits.bufferImageGranularity)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxBoundDescriptorSets >= profilePhysicalDeviceProperties2.properties.limits.maxBoundDescriptorSets)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorInputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorInputAttachments)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageResources >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageResources)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffersDynamic >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffersDynamic)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffersDynamic >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffersDynamic)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetInputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetInputAttachments)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributes >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributes)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputBindings >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputBindings)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributeOffset >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributeOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputBindingStride >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputBindingStride)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxVertexOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationGenerationLevel >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationGenerationLevel)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationPatchSize >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationPatchSize)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexInputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerPatchOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerPatchOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlTotalOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlTotalOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationInputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentInputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentOutputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentOutputAttachments)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentDualSrcAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentDualSrcAttachments)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeSharedMemorySize >= profilePhysicalDeviceProperties2.properties.limits.maxComputeSharedMemorySize)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[2])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2])
-            && (devicePhysicalDeviceProperties2.properties.limits.subPixelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subPixelPrecisionBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDrawIndexedIndexValue >= profilePhysicalDeviceProperties2.properties.limits.maxDrawIndexedIndexValue)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDrawIndirectCount >= profilePhysicalDeviceProperties2.properties.limits.maxDrawIndirectCount)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerAnisotropy >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerAnisotropy)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxViewports >= profilePhysicalDeviceProperties2.properties.limits.maxViewports)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[0] >= profilePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[1] >= profilePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[0] <= profilePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[1] >= profilePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.viewportSubPixelBits >= profilePhysicalDeviceProperties2.properties.limits.viewportSubPixelBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.minMemoryMapAlignment >= profilePhysicalDeviceProperties2.properties.limits.minMemoryMapAlignment)
-            && (devicePhysicalDeviceProperties2.properties.limits.minTexelBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minTexelBufferOffsetAlignment)
-            && (devicePhysicalDeviceProperties2.properties.limits.minUniformBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minUniformBufferOffsetAlignment)
-            && (devicePhysicalDeviceProperties2.properties.limits.minStorageBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minStorageBufferOffsetAlignment)
-            && (devicePhysicalDeviceProperties2.properties.limits.minTexelOffset <= profilePhysicalDeviceProperties2.properties.limits.minTexelOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTexelOffset >= profilePhysicalDeviceProperties2.properties.limits.maxTexelOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.minTexelGatherOffset <= profilePhysicalDeviceProperties2.properties.limits.minTexelGatherOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTexelGatherOffset >= profilePhysicalDeviceProperties2.properties.limits.maxTexelGatherOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.minInterpolationOffset <= profilePhysicalDeviceProperties2.properties.limits.minInterpolationOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxInterpolationOffset >= profilePhysicalDeviceProperties2.properties.limits.maxInterpolationOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.subPixelInterpolationOffsetBits >= profilePhysicalDeviceProperties2.properties.limits.subPixelInterpolationOffsetBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferWidth >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferWidth)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferHeight >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferHeight)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferLayers >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferLayers)
-            && ((devicePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.framebufferNoAttachmentsSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferNoAttachmentsSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferNoAttachmentsSampleCounts)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxColorAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxColorAttachments)
-            && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts & profilePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxSampleMaskWords >= profilePhysicalDeviceProperties2.properties.limits.maxSampleMaskWords)
-            && (devicePhysicalDeviceProperties2.properties.limits.timestampComputeAndGraphics == profilePhysicalDeviceProperties2.properties.limits.timestampComputeAndGraphics)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxClipDistances >= profilePhysicalDeviceProperties2.properties.limits.maxClipDistances)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxCullDistances >= profilePhysicalDeviceProperties2.properties.limits.maxCullDistances)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxCombinedClipAndCullDistances >= profilePhysicalDeviceProperties2.properties.limits.maxCombinedClipAndCullDistances)
-            && (devicePhysicalDeviceProperties2.properties.limits.discreteQueuePriorities >= profilePhysicalDeviceProperties2.properties.limits.discreteQueuePriorities)
-            && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[0] <= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[1] >= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[0] <= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[1] >= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity >= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity)
-            && (devicePhysicalDeviceProperties2.properties.limits.strictLines == profilePhysicalDeviceProperties2.properties.limits.strictLines)
-            && (devicePhysicalDeviceProperties2.properties.limits.nonCoherentAtomSize <= profilePhysicalDeviceProperties2.properties.limits.nonCoherentAtomSize);
+        bool propertiesSupported = true;
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension1D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension1D);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension2D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension2D);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension3D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension3D);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers >= profilePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTexelBufferElements >= profilePhysicalDeviceProperties2.properties.limits.maxTexelBufferElements);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxStorageBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxStorageBufferRange);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPushConstantsSize >= profilePhysicalDeviceProperties2.properties.limits.maxPushConstantsSize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxMemoryAllocationCount >= profilePhysicalDeviceProperties2.properties.limits.maxMemoryAllocationCount);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerAllocationCount >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerAllocationCount);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.bufferImageGranularity <= profilePhysicalDeviceProperties2.properties.limits.bufferImageGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxBoundDescriptorSets >= profilePhysicalDeviceProperties2.properties.limits.maxBoundDescriptorSets);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorInputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorInputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageResources >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageResources);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffersDynamic >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffersDynamic);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffersDynamic >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffersDynamic);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetInputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetInputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributes >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributes);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputBindings >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputBindings);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributeOffset >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributeOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputBindingStride >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputBindingStride);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxVertexOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationGenerationLevel >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationGenerationLevel);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationPatchSize >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationPatchSize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexInputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerPatchOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerPatchOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlTotalOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlTotalOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationInputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentInputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentOutputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentOutputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentDualSrcAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentDualSrcAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeSharedMemorySize >= profilePhysicalDeviceProperties2.properties.limits.maxComputeSharedMemorySize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[2]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.subPixelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subPixelPrecisionBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDrawIndexedIndexValue >= profilePhysicalDeviceProperties2.properties.limits.maxDrawIndexedIndexValue);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDrawIndirectCount >= profilePhysicalDeviceProperties2.properties.limits.maxDrawIndirectCount);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerAnisotropy >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerAnisotropy);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxViewports >= profilePhysicalDeviceProperties2.properties.limits.maxViewports);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[0] >= profilePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[1] >= profilePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[0] <= profilePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[1] >= profilePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.viewportSubPixelBits >= profilePhysicalDeviceProperties2.properties.limits.viewportSubPixelBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minMemoryMapAlignment >= profilePhysicalDeviceProperties2.properties.limits.minMemoryMapAlignment);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minTexelBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minTexelBufferOffsetAlignment);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minUniformBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minUniformBufferOffsetAlignment);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minStorageBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minStorageBufferOffsetAlignment);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minTexelOffset <= profilePhysicalDeviceProperties2.properties.limits.minTexelOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTexelOffset >= profilePhysicalDeviceProperties2.properties.limits.maxTexelOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minTexelGatherOffset <= profilePhysicalDeviceProperties2.properties.limits.minTexelGatherOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTexelGatherOffset >= profilePhysicalDeviceProperties2.properties.limits.maxTexelGatherOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minInterpolationOffset <= profilePhysicalDeviceProperties2.properties.limits.minInterpolationOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxInterpolationOffset >= profilePhysicalDeviceProperties2.properties.limits.maxInterpolationOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.subPixelInterpolationOffsetBits >= profilePhysicalDeviceProperties2.properties.limits.subPixelInterpolationOffsetBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferWidth >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferWidth);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferHeight >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferHeight);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferLayers >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferLayers);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.framebufferNoAttachmentsSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferNoAttachmentsSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferNoAttachmentsSampleCounts);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxColorAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxColorAttachments);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts & profilePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSampleMaskWords >= profilePhysicalDeviceProperties2.properties.limits.maxSampleMaskWords);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.timestampComputeAndGraphics == profilePhysicalDeviceProperties2.properties.limits.timestampComputeAndGraphics);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxClipDistances >= profilePhysicalDeviceProperties2.properties.limits.maxClipDistances);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxCullDistances >= profilePhysicalDeviceProperties2.properties.limits.maxCullDistances);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxCombinedClipAndCullDistances >= profilePhysicalDeviceProperties2.properties.limits.maxCombinedClipAndCullDistances);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.discreteQueuePriorities >= profilePhysicalDeviceProperties2.properties.limits.discreteQueuePriorities);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[0] <= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[1] >= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[0] <= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[1] >= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity >= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.strictLines == profilePhysicalDeviceProperties2.properties.limits.strictLines);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.nonCoherentAtomSize <= profilePhysicalDeviceProperties2.properties.limits.nonCoherentAtomSize);;
         if (!propertiesSupported) return result;
     } else
 #endif
@@ -1933,69 +1933,69 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         devicePhysicalDeviceFeatures2.pNext = &devicePhysicalDeviceVulkan13Features;
         vkGetPhysicalDeviceFeatures2(physicalDevice, &devicePhysicalDeviceFeatures2);
         vpGetProfileStructures(pProfile, &profilePhysicalDeviceVulkan13Features);
-        bool featuresSupported = true
-            && (devicePhysicalDeviceFeatures2.features.robustBufferAccess == profilePhysicalDeviceFeatures2.features.robustBufferAccess)
-            && (devicePhysicalDeviceFeatures2.features.fullDrawIndexUint32 == profilePhysicalDeviceFeatures2.features.fullDrawIndexUint32)
-            && (devicePhysicalDeviceFeatures2.features.imageCubeArray == profilePhysicalDeviceFeatures2.features.imageCubeArray)
-            && (devicePhysicalDeviceFeatures2.features.independentBlend == profilePhysicalDeviceFeatures2.features.independentBlend)
-            && (devicePhysicalDeviceFeatures2.features.sampleRateShading == profilePhysicalDeviceFeatures2.features.sampleRateShading)
-            && (devicePhysicalDeviceFeatures2.features.drawIndirectFirstInstance == profilePhysicalDeviceFeatures2.features.drawIndirectFirstInstance)
-            && (devicePhysicalDeviceFeatures2.features.depthClamp == profilePhysicalDeviceFeatures2.features.depthClamp)
-            && (devicePhysicalDeviceFeatures2.features.depthBiasClamp == profilePhysicalDeviceFeatures2.features.depthBiasClamp)
-            && (devicePhysicalDeviceFeatures2.features.samplerAnisotropy == profilePhysicalDeviceFeatures2.features.samplerAnisotropy)
-            && (devicePhysicalDeviceFeatures2.features.occlusionQueryPrecise == profilePhysicalDeviceFeatures2.features.occlusionQueryPrecise)
-            && (devicePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics == profilePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageImageExtendedFormats == profilePhysicalDeviceFeatures2.features.shaderStorageImageExtendedFormats)
-            && (devicePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing)
-            && (devicePhysicalDeviceVulkan11Features.multiview == profilePhysicalDeviceVulkan11Features.multiview)
-            && (devicePhysicalDeviceVulkan11Features.samplerYcbcrConversion == profilePhysicalDeviceVulkan11Features.samplerYcbcrConversion)
-            && (devicePhysicalDeviceVulkan12Features.uniformBufferStandardLayout == profilePhysicalDeviceVulkan12Features.uniformBufferStandardLayout)
-            && (devicePhysicalDeviceVulkan12Features.subgroupBroadcastDynamicId == profilePhysicalDeviceVulkan12Features.subgroupBroadcastDynamicId)
-            && (devicePhysicalDeviceVulkan12Features.imagelessFramebuffer == profilePhysicalDeviceVulkan12Features.imagelessFramebuffer)
-            && (devicePhysicalDeviceVulkan12Features.separateDepthStencilLayouts == profilePhysicalDeviceVulkan12Features.separateDepthStencilLayouts)
-            && (devicePhysicalDeviceVulkan12Features.hostQueryReset == profilePhysicalDeviceVulkan12Features.hostQueryReset)
-            && (devicePhysicalDeviceVulkan12Features.timelineSemaphore == profilePhysicalDeviceVulkan12Features.timelineSemaphore)
-            && (devicePhysicalDeviceVulkan12Features.shaderSubgroupExtendedTypes == profilePhysicalDeviceVulkan12Features.shaderSubgroupExtendedTypes)
-            && (devicePhysicalDeviceVulkan12Features.vulkanMemoryModel == profilePhysicalDeviceVulkan12Features.vulkanMemoryModel)
-            && (devicePhysicalDeviceVulkan12Features.vulkanMemoryModelDeviceScope == profilePhysicalDeviceVulkan12Features.vulkanMemoryModelDeviceScope)
-            && (devicePhysicalDeviceVulkan12Features.vulkanMemoryModelAvailabilityVisibilityChains == profilePhysicalDeviceVulkan12Features.vulkanMemoryModelAvailabilityVisibilityChains)
-            && (devicePhysicalDeviceVulkan12Features.bufferDeviceAddress == profilePhysicalDeviceVulkan12Features.bufferDeviceAddress)
-            && (devicePhysicalDeviceVulkan12Features.samplerMirrorClampToEdge == profilePhysicalDeviceVulkan12Features.samplerMirrorClampToEdge)
-            && (devicePhysicalDeviceVulkan12Features.descriptorIndexing == profilePhysicalDeviceVulkan12Features.descriptorIndexing)
-            && (devicePhysicalDeviceVulkan12Features.shaderUniformTexelBufferArrayDynamicIndexing == profilePhysicalDeviceVulkan12Features.shaderUniformTexelBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceVulkan12Features.shaderStorageTexelBufferArrayDynamicIndexing == profilePhysicalDeviceVulkan12Features.shaderStorageTexelBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceVulkan12Features.shaderUniformBufferArrayNonUniformIndexing == profilePhysicalDeviceVulkan12Features.shaderUniformBufferArrayNonUniformIndexing)
-            && (devicePhysicalDeviceVulkan12Features.shaderSampledImageArrayNonUniformIndexing == profilePhysicalDeviceVulkan12Features.shaderSampledImageArrayNonUniformIndexing)
-            && (devicePhysicalDeviceVulkan12Features.shaderStorageBufferArrayNonUniformIndexing == profilePhysicalDeviceVulkan12Features.shaderStorageBufferArrayNonUniformIndexing)
-            && (devicePhysicalDeviceVulkan12Features.shaderStorageImageArrayNonUniformIndexing == profilePhysicalDeviceVulkan12Features.shaderStorageImageArrayNonUniformIndexing)
-            && (devicePhysicalDeviceVulkan12Features.shaderUniformTexelBufferArrayNonUniformIndexing == profilePhysicalDeviceVulkan12Features.shaderUniformTexelBufferArrayNonUniformIndexing)
-            && (devicePhysicalDeviceVulkan12Features.shaderStorageTexelBufferArrayNonUniformIndexing == profilePhysicalDeviceVulkan12Features.shaderStorageTexelBufferArrayNonUniformIndexing)
-            && (devicePhysicalDeviceVulkan12Features.descriptorBindingUniformBufferUpdateAfterBind == profilePhysicalDeviceVulkan12Features.descriptorBindingUniformBufferUpdateAfterBind)
-            && (devicePhysicalDeviceVulkan12Features.descriptorBindingSampledImageUpdateAfterBind == profilePhysicalDeviceVulkan12Features.descriptorBindingSampledImageUpdateAfterBind)
-            && (devicePhysicalDeviceVulkan12Features.descriptorBindingStorageImageUpdateAfterBind == profilePhysicalDeviceVulkan12Features.descriptorBindingStorageImageUpdateAfterBind)
-            && (devicePhysicalDeviceVulkan12Features.descriptorBindingStorageBufferUpdateAfterBind == profilePhysicalDeviceVulkan12Features.descriptorBindingStorageBufferUpdateAfterBind)
-            && (devicePhysicalDeviceVulkan12Features.descriptorBindingUniformTexelBufferUpdateAfterBind == profilePhysicalDeviceVulkan12Features.descriptorBindingUniformTexelBufferUpdateAfterBind)
-            && (devicePhysicalDeviceVulkan12Features.descriptorBindingStorageTexelBufferUpdateAfterBind == profilePhysicalDeviceVulkan12Features.descriptorBindingStorageTexelBufferUpdateAfterBind)
-            && (devicePhysicalDeviceVulkan12Features.descriptorBindingUpdateUnusedWhilePending == profilePhysicalDeviceVulkan12Features.descriptorBindingUpdateUnusedWhilePending)
-            && (devicePhysicalDeviceVulkan12Features.descriptorBindingPartiallyBound == profilePhysicalDeviceVulkan12Features.descriptorBindingPartiallyBound)
-            && (devicePhysicalDeviceVulkan12Features.descriptorBindingVariableDescriptorCount == profilePhysicalDeviceVulkan12Features.descriptorBindingVariableDescriptorCount)
-            && (devicePhysicalDeviceVulkan12Features.runtimeDescriptorArray == profilePhysicalDeviceVulkan12Features.runtimeDescriptorArray)
-            && (devicePhysicalDeviceVulkan12Features.scalarBlockLayout == profilePhysicalDeviceVulkan12Features.scalarBlockLayout)
-            && (devicePhysicalDeviceVulkan13Features.robustImageAccess == profilePhysicalDeviceVulkan13Features.robustImageAccess)
-            && (devicePhysicalDeviceVulkan13Features.shaderTerminateInvocation == profilePhysicalDeviceVulkan13Features.shaderTerminateInvocation)
-            && (devicePhysicalDeviceVulkan13Features.shaderZeroInitializeWorkgroupMemory == profilePhysicalDeviceVulkan13Features.shaderZeroInitializeWorkgroupMemory)
-            && (devicePhysicalDeviceVulkan13Features.synchronization2 == profilePhysicalDeviceVulkan13Features.synchronization2)
-            && (devicePhysicalDeviceVulkan13Features.shaderIntegerDotProduct == profilePhysicalDeviceVulkan13Features.shaderIntegerDotProduct)
-            && (devicePhysicalDeviceVulkan13Features.maintenance4 == profilePhysicalDeviceVulkan13Features.maintenance4)
-            && (devicePhysicalDeviceVulkan13Features.pipelineCreationCacheControl == profilePhysicalDeviceVulkan13Features.pipelineCreationCacheControl)
-            && (devicePhysicalDeviceVulkan13Features.subgroupSizeControl == profilePhysicalDeviceVulkan13Features.subgroupSizeControl)
-            && (devicePhysicalDeviceVulkan13Features.computeFullSubgroups == profilePhysicalDeviceVulkan13Features.computeFullSubgroups)
-            && (devicePhysicalDeviceVulkan13Features.shaderDemoteToHelperInvocation == profilePhysicalDeviceVulkan13Features.shaderDemoteToHelperInvocation)
-            && (devicePhysicalDeviceVulkan13Features.inlineUniformBlock == profilePhysicalDeviceVulkan13Features.inlineUniformBlock)
-            && (devicePhysicalDeviceVulkan13Features.descriptorBindingInlineUniformBlockUpdateAfterBind == profilePhysicalDeviceVulkan13Features.descriptorBindingInlineUniformBlockUpdateAfterBind);
+        bool featuresSupported = true;
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.robustBufferAccess == profilePhysicalDeviceFeatures2.features.robustBufferAccess);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.fullDrawIndexUint32 == profilePhysicalDeviceFeatures2.features.fullDrawIndexUint32);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.imageCubeArray == profilePhysicalDeviceFeatures2.features.imageCubeArray);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.independentBlend == profilePhysicalDeviceFeatures2.features.independentBlend);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.sampleRateShading == profilePhysicalDeviceFeatures2.features.sampleRateShading);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.drawIndirectFirstInstance == profilePhysicalDeviceFeatures2.features.drawIndirectFirstInstance);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.depthClamp == profilePhysicalDeviceFeatures2.features.depthClamp);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.depthBiasClamp == profilePhysicalDeviceFeatures2.features.depthBiasClamp);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.samplerAnisotropy == profilePhysicalDeviceFeatures2.features.samplerAnisotropy);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.occlusionQueryPrecise == profilePhysicalDeviceFeatures2.features.occlusionQueryPrecise);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics == profilePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageImageExtendedFormats == profilePhysicalDeviceFeatures2.features.shaderStorageImageExtendedFormats);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan11Features.multiview == profilePhysicalDeviceVulkan11Features.multiview);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan11Features.samplerYcbcrConversion == profilePhysicalDeviceVulkan11Features.samplerYcbcrConversion);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.uniformBufferStandardLayout == profilePhysicalDeviceVulkan12Features.uniformBufferStandardLayout);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.subgroupBroadcastDynamicId == profilePhysicalDeviceVulkan12Features.subgroupBroadcastDynamicId);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.imagelessFramebuffer == profilePhysicalDeviceVulkan12Features.imagelessFramebuffer);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.separateDepthStencilLayouts == profilePhysicalDeviceVulkan12Features.separateDepthStencilLayouts);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.hostQueryReset == profilePhysicalDeviceVulkan12Features.hostQueryReset);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.timelineSemaphore == profilePhysicalDeviceVulkan12Features.timelineSemaphore);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.shaderSubgroupExtendedTypes == profilePhysicalDeviceVulkan12Features.shaderSubgroupExtendedTypes);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.vulkanMemoryModel == profilePhysicalDeviceVulkan12Features.vulkanMemoryModel);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.vulkanMemoryModelDeviceScope == profilePhysicalDeviceVulkan12Features.vulkanMemoryModelDeviceScope);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.vulkanMemoryModelAvailabilityVisibilityChains == profilePhysicalDeviceVulkan12Features.vulkanMemoryModelAvailabilityVisibilityChains);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.bufferDeviceAddress == profilePhysicalDeviceVulkan12Features.bufferDeviceAddress);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.samplerMirrorClampToEdge == profilePhysicalDeviceVulkan12Features.samplerMirrorClampToEdge);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.descriptorIndexing == profilePhysicalDeviceVulkan12Features.descriptorIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.shaderUniformTexelBufferArrayDynamicIndexing == profilePhysicalDeviceVulkan12Features.shaderUniformTexelBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.shaderStorageTexelBufferArrayDynamicIndexing == profilePhysicalDeviceVulkan12Features.shaderStorageTexelBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.shaderUniformBufferArrayNonUniformIndexing == profilePhysicalDeviceVulkan12Features.shaderUniformBufferArrayNonUniformIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.shaderSampledImageArrayNonUniformIndexing == profilePhysicalDeviceVulkan12Features.shaderSampledImageArrayNonUniformIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.shaderStorageBufferArrayNonUniformIndexing == profilePhysicalDeviceVulkan12Features.shaderStorageBufferArrayNonUniformIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.shaderStorageImageArrayNonUniformIndexing == profilePhysicalDeviceVulkan12Features.shaderStorageImageArrayNonUniformIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.shaderUniformTexelBufferArrayNonUniformIndexing == profilePhysicalDeviceVulkan12Features.shaderUniformTexelBufferArrayNonUniformIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.shaderStorageTexelBufferArrayNonUniformIndexing == profilePhysicalDeviceVulkan12Features.shaderStorageTexelBufferArrayNonUniformIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.descriptorBindingUniformBufferUpdateAfterBind == profilePhysicalDeviceVulkan12Features.descriptorBindingUniformBufferUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.descriptorBindingSampledImageUpdateAfterBind == profilePhysicalDeviceVulkan12Features.descriptorBindingSampledImageUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.descriptorBindingStorageImageUpdateAfterBind == profilePhysicalDeviceVulkan12Features.descriptorBindingStorageImageUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.descriptorBindingStorageBufferUpdateAfterBind == profilePhysicalDeviceVulkan12Features.descriptorBindingStorageBufferUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.descriptorBindingUniformTexelBufferUpdateAfterBind == profilePhysicalDeviceVulkan12Features.descriptorBindingUniformTexelBufferUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.descriptorBindingStorageTexelBufferUpdateAfterBind == profilePhysicalDeviceVulkan12Features.descriptorBindingStorageTexelBufferUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.descriptorBindingUpdateUnusedWhilePending == profilePhysicalDeviceVulkan12Features.descriptorBindingUpdateUnusedWhilePending);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.descriptorBindingPartiallyBound == profilePhysicalDeviceVulkan12Features.descriptorBindingPartiallyBound);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.descriptorBindingVariableDescriptorCount == profilePhysicalDeviceVulkan12Features.descriptorBindingVariableDescriptorCount);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.runtimeDescriptorArray == profilePhysicalDeviceVulkan12Features.runtimeDescriptorArray);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan12Features.scalarBlockLayout == profilePhysicalDeviceVulkan12Features.scalarBlockLayout);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan13Features.robustImageAccess == profilePhysicalDeviceVulkan13Features.robustImageAccess);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan13Features.shaderTerminateInvocation == profilePhysicalDeviceVulkan13Features.shaderTerminateInvocation);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan13Features.shaderZeroInitializeWorkgroupMemory == profilePhysicalDeviceVulkan13Features.shaderZeroInitializeWorkgroupMemory);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan13Features.synchronization2 == profilePhysicalDeviceVulkan13Features.synchronization2);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan13Features.shaderIntegerDotProduct == profilePhysicalDeviceVulkan13Features.shaderIntegerDotProduct);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan13Features.maintenance4 == profilePhysicalDeviceVulkan13Features.maintenance4);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan13Features.pipelineCreationCacheControl == profilePhysicalDeviceVulkan13Features.pipelineCreationCacheControl);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan13Features.subgroupSizeControl == profilePhysicalDeviceVulkan13Features.subgroupSizeControl);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan13Features.computeFullSubgroups == profilePhysicalDeviceVulkan13Features.computeFullSubgroups);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan13Features.shaderDemoteToHelperInvocation == profilePhysicalDeviceVulkan13Features.shaderDemoteToHelperInvocation);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan13Features.inlineUniformBlock == profilePhysicalDeviceVulkan13Features.inlineUniformBlock);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVulkan13Features.descriptorBindingInlineUniformBlockUpdateAfterBind == profilePhysicalDeviceVulkan13Features.descriptorBindingInlineUniformBlockUpdateAfterBind);;
         if (!featuresSupported) return result;
 
         VkPhysicalDeviceVulkan11Properties devicePhysicalDeviceVulkan11Properties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES };
@@ -2014,65 +2014,65 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         devicePhysicalDeviceProperties2.pNext = &devicePhysicalDeviceVulkan13Properties;
         vkGetPhysicalDeviceProperties2(physicalDevice, &devicePhysicalDeviceProperties2);
         vpGetProfileStructures(pProfile, &profilePhysicalDeviceProperties2);
-        bool propertiesSupported = true
-            && (devicePhysicalDeviceVulkan11Properties.maxMultiviewViewCount >= profilePhysicalDeviceVulkan11Properties.maxMultiviewViewCount)
-            && (devicePhysicalDeviceVulkan11Properties.maxMultiviewInstanceIndex >= profilePhysicalDeviceVulkan11Properties.maxMultiviewInstanceIndex)
-            && ((devicePhysicalDeviceVulkan11Properties.subgroupSupportedStages & profilePhysicalDeviceVulkan11Properties.subgroupSupportedStages) == profilePhysicalDeviceVulkan11Properties.subgroupSupportedStages)
-            && ((devicePhysicalDeviceVulkan11Properties.subgroupSupportedOperations & profilePhysicalDeviceVulkan11Properties.subgroupSupportedOperations) == profilePhysicalDeviceVulkan11Properties.subgroupSupportedOperations)
-            && (devicePhysicalDeviceVulkan12Properties.maxTimelineSemaphoreValueDifference >= profilePhysicalDeviceVulkan12Properties.maxTimelineSemaphoreValueDifference)
-            && (devicePhysicalDeviceVulkan12Properties.shaderSignedZeroInfNanPreserveFloat16 == profilePhysicalDeviceVulkan12Properties.shaderSignedZeroInfNanPreserveFloat16)
-            && (devicePhysicalDeviceVulkan12Properties.shaderSignedZeroInfNanPreserveFloat32 == profilePhysicalDeviceVulkan12Properties.shaderSignedZeroInfNanPreserveFloat32)
-            && (devicePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindSamplers >= profilePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindSamplers)
-            && (devicePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindUniformBuffers >= profilePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindUniformBuffers)
-            && (devicePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindStorageBuffers >= profilePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindStorageBuffers)
-            && (devicePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindSampledImages >= profilePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindSampledImages)
-            && (devicePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindStorageImages >= profilePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindStorageImages)
-            && (devicePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindInputAttachments >= profilePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindInputAttachments)
-            && (devicePhysicalDeviceVulkan12Properties.maxPerStageUpdateAfterBindResources >= profilePhysicalDeviceVulkan12Properties.maxPerStageUpdateAfterBindResources)
-            && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindSamplers >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindSamplers)
-            && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindUniformBuffers >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindUniformBuffers)
-            && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic)
-            && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindStorageBuffers >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindStorageBuffers)
-            && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic)
-            && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindSampledImages >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindSampledImages)
-            && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindStorageImages >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindStorageImages)
-            && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindInputAttachments >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindInputAttachments)
-            && (devicePhysicalDeviceVulkan13Properties.maxBufferSize >= profilePhysicalDeviceVulkan13Properties.maxBufferSize)
-            && (devicePhysicalDeviceVulkan13Properties.maxInlineUniformBlockSize >= profilePhysicalDeviceVulkan13Properties.maxInlineUniformBlockSize)
-            && (devicePhysicalDeviceVulkan13Properties.maxPerStageDescriptorInlineUniformBlocks >= profilePhysicalDeviceVulkan13Properties.maxPerStageDescriptorInlineUniformBlocks)
-            && (devicePhysicalDeviceVulkan13Properties.maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks >= profilePhysicalDeviceVulkan13Properties.maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks)
-            && (devicePhysicalDeviceVulkan13Properties.maxDescriptorSetInlineUniformBlocks >= profilePhysicalDeviceVulkan13Properties.maxDescriptorSetInlineUniformBlocks)
-            && (devicePhysicalDeviceVulkan13Properties.maxDescriptorSetUpdateAfterBindInlineUniformBlocks >= profilePhysicalDeviceVulkan13Properties.maxDescriptorSetUpdateAfterBindInlineUniformBlocks)
-            && (devicePhysicalDeviceVulkan13Properties.maxInlineUniformTotalSize >= profilePhysicalDeviceVulkan13Properties.maxInlineUniformTotalSize)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension1D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension1D)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension2D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension2D)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers >= profilePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange)
-            && (devicePhysicalDeviceProperties2.properties.limits.bufferImageGranularity <= profilePhysicalDeviceProperties2.properties.limits.bufferImageGranularity)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageResources >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageResources)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2])
-            && (devicePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias)
-            && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity >= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity)
-            && (devicePhysicalDeviceProperties2.properties.limits.lineWidthGranularity >= profilePhysicalDeviceProperties2.properties.limits.lineWidthGranularity)
-            && (devicePhysicalDeviceProperties2.properties.limits.standardSampleLocations == profilePhysicalDeviceProperties2.properties.limits.standardSampleLocations)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxColorAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxColorAttachments);
+        bool propertiesSupported = true;
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan11Properties.maxMultiviewViewCount >= profilePhysicalDeviceVulkan11Properties.maxMultiviewViewCount);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan11Properties.maxMultiviewInstanceIndex >= profilePhysicalDeviceVulkan11Properties.maxMultiviewInstanceIndex);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceVulkan11Properties.subgroupSupportedStages & profilePhysicalDeviceVulkan11Properties.subgroupSupportedStages) == profilePhysicalDeviceVulkan11Properties.subgroupSupportedStages);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceVulkan11Properties.subgroupSupportedOperations & profilePhysicalDeviceVulkan11Properties.subgroupSupportedOperations) == profilePhysicalDeviceVulkan11Properties.subgroupSupportedOperations);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxTimelineSemaphoreValueDifference >= profilePhysicalDeviceVulkan12Properties.maxTimelineSemaphoreValueDifference);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.shaderSignedZeroInfNanPreserveFloat16 == profilePhysicalDeviceVulkan12Properties.shaderSignedZeroInfNanPreserveFloat16);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.shaderSignedZeroInfNanPreserveFloat32 == profilePhysicalDeviceVulkan12Properties.shaderSignedZeroInfNanPreserveFloat32);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindSamplers >= profilePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindUniformBuffers >= profilePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindStorageBuffers >= profilePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindSampledImages >= profilePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindStorageImages >= profilePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindInputAttachments >= profilePhysicalDeviceVulkan12Properties.maxPerStageDescriptorUpdateAfterBindInputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxPerStageUpdateAfterBindResources >= profilePhysicalDeviceVulkan12Properties.maxPerStageUpdateAfterBindResources);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindSamplers >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindUniformBuffers >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindStorageBuffers >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindSampledImages >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindStorageImages >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindInputAttachments >= profilePhysicalDeviceVulkan12Properties.maxDescriptorSetUpdateAfterBindInputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan13Properties.maxBufferSize >= profilePhysicalDeviceVulkan13Properties.maxBufferSize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan13Properties.maxInlineUniformBlockSize >= profilePhysicalDeviceVulkan13Properties.maxInlineUniformBlockSize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan13Properties.maxPerStageDescriptorInlineUniformBlocks >= profilePhysicalDeviceVulkan13Properties.maxPerStageDescriptorInlineUniformBlocks);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan13Properties.maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks >= profilePhysicalDeviceVulkan13Properties.maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan13Properties.maxDescriptorSetInlineUniformBlocks >= profilePhysicalDeviceVulkan13Properties.maxDescriptorSetInlineUniformBlocks);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan13Properties.maxDescriptorSetUpdateAfterBindInlineUniformBlocks >= profilePhysicalDeviceVulkan13Properties.maxDescriptorSetUpdateAfterBindInlineUniformBlocks);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceVulkan13Properties.maxInlineUniformTotalSize >= profilePhysicalDeviceVulkan13Properties.maxInlineUniformTotalSize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension1D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension1D);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension2D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension2D);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers >= profilePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.bufferImageGranularity <= profilePhysicalDeviceProperties2.properties.limits.bufferImageGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageResources >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageResources);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity >= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthGranularity >= profilePhysicalDeviceProperties2.properties.limits.lineWidthGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.standardSampleLocations == profilePhysicalDeviceProperties2.properties.limits.standardSampleLocations);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxColorAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxColorAttachments);;
         if (!propertiesSupported) return result;
     } else
 #ifdef VK_ENABLE_BETA_EXTENSIONS
@@ -2152,73 +2152,73 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         devicePhysicalDeviceFeatures2.pNext = &devicePhysicalDevicePortabilitySubsetFeaturesKHR;
         vkGetPhysicalDeviceFeatures2(physicalDevice, &devicePhysicalDeviceFeatures2);
         vpGetProfileStructures(pProfile, &profilePhysicalDevicePortabilitySubsetFeaturesKHR);
-        bool featuresSupported = true
-            && (devicePhysicalDeviceMultiviewFeatures.multiview == profilePhysicalDeviceMultiviewFeatures.multiview)
-            && (devicePhysicalDeviceFeatures2.features.depthBiasClamp == profilePhysicalDeviceFeatures2.features.depthBiasClamp)
-            && (devicePhysicalDeviceFeatures2.features.depthClamp == profilePhysicalDeviceFeatures2.features.depthClamp)
-            && (devicePhysicalDeviceFeatures2.features.drawIndirectFirstInstance == profilePhysicalDeviceFeatures2.features.drawIndirectFirstInstance)
-            && (devicePhysicalDeviceFeatures2.features.dualSrcBlend == profilePhysicalDeviceFeatures2.features.dualSrcBlend)
-            && (devicePhysicalDeviceFeatures2.features.fillModeNonSolid == profilePhysicalDeviceFeatures2.features.fillModeNonSolid)
-            && (devicePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics == profilePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics)
-            && (devicePhysicalDeviceFeatures2.features.fullDrawIndexUint32 == profilePhysicalDeviceFeatures2.features.fullDrawIndexUint32)
-            && (devicePhysicalDeviceFeatures2.features.imageCubeArray == profilePhysicalDeviceFeatures2.features.imageCubeArray)
-            && (devicePhysicalDeviceFeatures2.features.independentBlend == profilePhysicalDeviceFeatures2.features.independentBlend)
-            && (devicePhysicalDeviceFeatures2.features.inheritedQueries == profilePhysicalDeviceFeatures2.features.inheritedQueries)
-            && (devicePhysicalDeviceFeatures2.features.largePoints == profilePhysicalDeviceFeatures2.features.largePoints)
-            && (devicePhysicalDeviceFeatures2.features.multiDrawIndirect == profilePhysicalDeviceFeatures2.features.multiDrawIndirect)
-            && (devicePhysicalDeviceFeatures2.features.multiViewport == profilePhysicalDeviceFeatures2.features.multiViewport)
-            && (devicePhysicalDeviceFeatures2.features.occlusionQueryPrecise == profilePhysicalDeviceFeatures2.features.occlusionQueryPrecise)
-            && (devicePhysicalDeviceFeatures2.features.robustBufferAccess == profilePhysicalDeviceFeatures2.features.robustBufferAccess)
-            && (devicePhysicalDeviceFeatures2.features.sampleRateShading == profilePhysicalDeviceFeatures2.features.sampleRateShading)
-            && (devicePhysicalDeviceFeatures2.features.samplerAnisotropy == profilePhysicalDeviceFeatures2.features.samplerAnisotropy)
-            && (devicePhysicalDeviceFeatures2.features.shaderClipDistance == profilePhysicalDeviceFeatures2.features.shaderClipDistance)
-            && (devicePhysicalDeviceFeatures2.features.shaderImageGatherExtended == profilePhysicalDeviceFeatures2.features.shaderImageGatherExtended)
-            && (devicePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageImageExtendedFormats == profilePhysicalDeviceFeatures2.features.shaderStorageImageExtendedFormats)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageImageWriteWithoutFormat == profilePhysicalDeviceFeatures2.features.shaderStorageImageWriteWithoutFormat)
-            && (devicePhysicalDeviceFeatures2.features.shaderTessellationAndGeometryPointSize == profilePhysicalDeviceFeatures2.features.shaderTessellationAndGeometryPointSize)
-            && (devicePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.tessellationShader == profilePhysicalDeviceFeatures2.features.tessellationShader)
-            && (devicePhysicalDeviceFeatures2.features.textureCompressionBC == profilePhysicalDeviceFeatures2.features.textureCompressionBC)
-            && (devicePhysicalDeviceFeatures2.features.vertexPipelineStoresAndAtomics == profilePhysicalDeviceFeatures2.features.vertexPipelineStoresAndAtomics)
-            && (devicePhysicalDeviceImagelessFramebufferFeatures.imagelessFramebuffer == profilePhysicalDeviceImagelessFramebufferFeatures.imagelessFramebuffer)
-            && (devicePhysicalDevice16BitStorageFeatures.storageBuffer16BitAccess == profilePhysicalDevice16BitStorageFeatures.storageBuffer16BitAccess)
-            && (devicePhysicalDevice16BitStorageFeatures.uniformAndStorageBuffer16BitAccess == profilePhysicalDevice16BitStorageFeatures.uniformAndStorageBuffer16BitAccess)
-            && (devicePhysicalDevice8BitStorageFeatures.storageBuffer8BitAccess == profilePhysicalDevice8BitStorageFeatures.storageBuffer8BitAccess)
-            && (devicePhysicalDevice8BitStorageFeatures.storagePushConstant8 == profilePhysicalDevice8BitStorageFeatures.storagePushConstant8)
-            && (devicePhysicalDevice8BitStorageFeatures.uniformAndStorageBuffer8BitAccess == profilePhysicalDevice8BitStorageFeatures.uniformAndStorageBuffer8BitAccess)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayDynamicIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderStorageTexelBufferArrayDynamicIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderStorageTexelBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayNonUniformIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayNonUniformIndexing)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageImageUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageImageUpdateAfterBind)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUniformTexelBufferUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUniformTexelBufferUpdateAfterBind)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageTexelBufferUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageTexelBufferUpdateAfterBind)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray == profilePhysicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray)
-            && (devicePhysicalDeviceHostQueryResetFeatures.hostQueryReset == profilePhysicalDeviceHostQueryResetFeatures.hostQueryReset)
-            && (devicePhysicalDeviceShaderSubgroupExtendedTypesFeatures.shaderSubgroupExtendedTypes == profilePhysicalDeviceShaderSubgroupExtendedTypesFeatures.shaderSubgroupExtendedTypes)
-            && (devicePhysicalDeviceUniformBufferStandardLayoutFeatures.uniformBufferStandardLayout == profilePhysicalDeviceUniformBufferStandardLayoutFeatures.uniformBufferStandardLayout)
-            && (devicePhysicalDeviceShaderDrawParametersFeatures.shaderDrawParameters == profilePhysicalDeviceShaderDrawParametersFeatures.shaderDrawParameters)
-            && (devicePhysicalDeviceShaderFloat16Int8Features.shaderInt8 == profilePhysicalDeviceShaderFloat16Int8Features.shaderInt8)
-            && (devicePhysicalDeviceSamplerYcbcrConversionFeatures.samplerYcbcrConversion == profilePhysicalDeviceSamplerYcbcrConversionFeatures.samplerYcbcrConversion)
-            && (devicePhysicalDeviceVariablePointersFeatures.variablePointersStorageBuffer == profilePhysicalDeviceVariablePointersFeatures.variablePointersStorageBuffer)
-            && (devicePhysicalDeviceVariablePointersFeatures.variablePointers == profilePhysicalDeviceVariablePointersFeatures.variablePointers)
-            && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.vertexAttributeAccessBeyondStride == profilePhysicalDevicePortabilitySubsetFeaturesKHR.vertexAttributeAccessBeyondStride)
-            && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.separateStencilMaskRef == profilePhysicalDevicePortabilitySubsetFeaturesKHR.separateStencilMaskRef)
-            && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.mutableComparisonSamplers == profilePhysicalDevicePortabilitySubsetFeaturesKHR.mutableComparisonSamplers)
-            && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.multisampleArrayImage == profilePhysicalDevicePortabilitySubsetFeaturesKHR.multisampleArrayImage)
-            && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.imageViewFormatSwizzle == profilePhysicalDevicePortabilitySubsetFeaturesKHR.imageViewFormatSwizzle)
-            && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.imageViewFormatReinterpretation == profilePhysicalDevicePortabilitySubsetFeaturesKHR.imageViewFormatReinterpretation)
-            && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.events == profilePhysicalDevicePortabilitySubsetFeaturesKHR.events)
-            && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.constantAlphaColorBlendFactors == profilePhysicalDevicePortabilitySubsetFeaturesKHR.constantAlphaColorBlendFactors);
+        bool featuresSupported = true;
+        featuresSupported = featuresSupported && (devicePhysicalDeviceMultiviewFeatures.multiview == profilePhysicalDeviceMultiviewFeatures.multiview);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.depthBiasClamp == profilePhysicalDeviceFeatures2.features.depthBiasClamp);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.depthClamp == profilePhysicalDeviceFeatures2.features.depthClamp);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.drawIndirectFirstInstance == profilePhysicalDeviceFeatures2.features.drawIndirectFirstInstance);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.dualSrcBlend == profilePhysicalDeviceFeatures2.features.dualSrcBlend);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.fillModeNonSolid == profilePhysicalDeviceFeatures2.features.fillModeNonSolid);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics == profilePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.fullDrawIndexUint32 == profilePhysicalDeviceFeatures2.features.fullDrawIndexUint32);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.imageCubeArray == profilePhysicalDeviceFeatures2.features.imageCubeArray);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.independentBlend == profilePhysicalDeviceFeatures2.features.independentBlend);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.inheritedQueries == profilePhysicalDeviceFeatures2.features.inheritedQueries);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.largePoints == profilePhysicalDeviceFeatures2.features.largePoints);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.multiDrawIndirect == profilePhysicalDeviceFeatures2.features.multiDrawIndirect);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.multiViewport == profilePhysicalDeviceFeatures2.features.multiViewport);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.occlusionQueryPrecise == profilePhysicalDeviceFeatures2.features.occlusionQueryPrecise);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.robustBufferAccess == profilePhysicalDeviceFeatures2.features.robustBufferAccess);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.sampleRateShading == profilePhysicalDeviceFeatures2.features.sampleRateShading);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.samplerAnisotropy == profilePhysicalDeviceFeatures2.features.samplerAnisotropy);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderClipDistance == profilePhysicalDeviceFeatures2.features.shaderClipDistance);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderImageGatherExtended == profilePhysicalDeviceFeatures2.features.shaderImageGatherExtended);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageImageExtendedFormats == profilePhysicalDeviceFeatures2.features.shaderStorageImageExtendedFormats);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageImageWriteWithoutFormat == profilePhysicalDeviceFeatures2.features.shaderStorageImageWriteWithoutFormat);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderTessellationAndGeometryPointSize == profilePhysicalDeviceFeatures2.features.shaderTessellationAndGeometryPointSize);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.tessellationShader == profilePhysicalDeviceFeatures2.features.tessellationShader);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.textureCompressionBC == profilePhysicalDeviceFeatures2.features.textureCompressionBC);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.vertexPipelineStoresAndAtomics == profilePhysicalDeviceFeatures2.features.vertexPipelineStoresAndAtomics);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceImagelessFramebufferFeatures.imagelessFramebuffer == profilePhysicalDeviceImagelessFramebufferFeatures.imagelessFramebuffer);
+        featuresSupported = featuresSupported && (devicePhysicalDevice16BitStorageFeatures.storageBuffer16BitAccess == profilePhysicalDevice16BitStorageFeatures.storageBuffer16BitAccess);
+        featuresSupported = featuresSupported && (devicePhysicalDevice16BitStorageFeatures.uniformAndStorageBuffer16BitAccess == profilePhysicalDevice16BitStorageFeatures.uniformAndStorageBuffer16BitAccess);
+        featuresSupported = featuresSupported && (devicePhysicalDevice8BitStorageFeatures.storageBuffer8BitAccess == profilePhysicalDevice8BitStorageFeatures.storageBuffer8BitAccess);
+        featuresSupported = featuresSupported && (devicePhysicalDevice8BitStorageFeatures.storagePushConstant8 == profilePhysicalDevice8BitStorageFeatures.storagePushConstant8);
+        featuresSupported = featuresSupported && (devicePhysicalDevice8BitStorageFeatures.uniformAndStorageBuffer8BitAccess == profilePhysicalDevice8BitStorageFeatures.uniformAndStorageBuffer8BitAccess);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayDynamicIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderStorageTexelBufferArrayDynamicIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderStorageTexelBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayNonUniformIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayNonUniformIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageImageUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageImageUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUniformTexelBufferUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUniformTexelBufferUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageTexelBufferUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageTexelBufferUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray == profilePhysicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceHostQueryResetFeatures.hostQueryReset == profilePhysicalDeviceHostQueryResetFeatures.hostQueryReset);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceShaderSubgroupExtendedTypesFeatures.shaderSubgroupExtendedTypes == profilePhysicalDeviceShaderSubgroupExtendedTypesFeatures.shaderSubgroupExtendedTypes);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceUniformBufferStandardLayoutFeatures.uniformBufferStandardLayout == profilePhysicalDeviceUniformBufferStandardLayoutFeatures.uniformBufferStandardLayout);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceShaderDrawParametersFeatures.shaderDrawParameters == profilePhysicalDeviceShaderDrawParametersFeatures.shaderDrawParameters);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceShaderFloat16Int8Features.shaderInt8 == profilePhysicalDeviceShaderFloat16Int8Features.shaderInt8);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceSamplerYcbcrConversionFeatures.samplerYcbcrConversion == profilePhysicalDeviceSamplerYcbcrConversionFeatures.samplerYcbcrConversion);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVariablePointersFeatures.variablePointersStorageBuffer == profilePhysicalDeviceVariablePointersFeatures.variablePointersStorageBuffer);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVariablePointersFeatures.variablePointers == profilePhysicalDeviceVariablePointersFeatures.variablePointers);
+        featuresSupported = featuresSupported && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.vertexAttributeAccessBeyondStride == profilePhysicalDevicePortabilitySubsetFeaturesKHR.vertexAttributeAccessBeyondStride);
+        featuresSupported = featuresSupported && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.separateStencilMaskRef == profilePhysicalDevicePortabilitySubsetFeaturesKHR.separateStencilMaskRef);
+        featuresSupported = featuresSupported && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.mutableComparisonSamplers == profilePhysicalDevicePortabilitySubsetFeaturesKHR.mutableComparisonSamplers);
+        featuresSupported = featuresSupported && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.multisampleArrayImage == profilePhysicalDevicePortabilitySubsetFeaturesKHR.multisampleArrayImage);
+        featuresSupported = featuresSupported && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.imageViewFormatSwizzle == profilePhysicalDevicePortabilitySubsetFeaturesKHR.imageViewFormatSwizzle);
+        featuresSupported = featuresSupported && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.imageViewFormatReinterpretation == profilePhysicalDevicePortabilitySubsetFeaturesKHR.imageViewFormatReinterpretation);
+        featuresSupported = featuresSupported && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.events == profilePhysicalDevicePortabilitySubsetFeaturesKHR.events);
+        featuresSupported = featuresSupported && (devicePhysicalDevicePortabilitySubsetFeaturesKHR.constantAlphaColorBlendFactors == profilePhysicalDevicePortabilitySubsetFeaturesKHR.constantAlphaColorBlendFactors);;
         if (!featuresSupported) return result;
 
         VkPhysicalDeviceMultiviewProperties devicePhysicalDeviceMultiviewProperties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES };
@@ -2245,132 +2245,132 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         devicePhysicalDeviceProperties2.pNext = &devicePhysicalDevicePortabilitySubsetPropertiesKHR;
         vkGetPhysicalDeviceProperties2(physicalDevice, &devicePhysicalDeviceProperties2);
         vpGetProfileStructures(pProfile, &profilePhysicalDevicePortabilitySubsetPropertiesKHR);
-        bool propertiesSupported = true
-            && (devicePhysicalDeviceMultiviewProperties.maxMultiviewViewCount >= profilePhysicalDeviceMultiviewProperties.maxMultiviewViewCount)
-            && (devicePhysicalDeviceMultiviewProperties.maxMultiviewInstanceIndex >= profilePhysicalDeviceMultiviewProperties.maxMultiviewInstanceIndex)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension1D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension1D)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension2D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension2D)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension3D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension3D)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers >= profilePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTexelBufferElements >= profilePhysicalDeviceProperties2.properties.limits.maxTexelBufferElements)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxStorageBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxStorageBufferRange)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPushConstantsSize >= profilePhysicalDeviceProperties2.properties.limits.maxPushConstantsSize)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxMemoryAllocationCount >= profilePhysicalDeviceProperties2.properties.limits.maxMemoryAllocationCount)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerAllocationCount >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerAllocationCount)
-            && (devicePhysicalDeviceProperties2.properties.limits.bufferImageGranularity <= profilePhysicalDeviceProperties2.properties.limits.bufferImageGranularity)
-            && (devicePhysicalDeviceProperties2.properties.limits.sparseAddressSpaceSize >= profilePhysicalDeviceProperties2.properties.limits.sparseAddressSpaceSize)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxBoundDescriptorSets >= profilePhysicalDeviceProperties2.properties.limits.maxBoundDescriptorSets)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorInputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorInputAttachments)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageResources >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageResources)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffersDynamic >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffersDynamic)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffersDynamic >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffersDynamic)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetInputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetInputAttachments)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributes >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributes)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputBindings >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputBindings)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributeOffset >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributeOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputBindingStride >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputBindingStride)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxVertexOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationGenerationLevel >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationGenerationLevel)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationPatchSize >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationPatchSize)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexInputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerPatchOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerPatchOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlTotalOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlTotalOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationInputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentInputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentOutputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentOutputAttachments)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentDualSrcAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentDualSrcAttachments)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeSharedMemorySize >= profilePhysicalDeviceProperties2.properties.limits.maxComputeSharedMemorySize)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[2])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2])
-            && (devicePhysicalDeviceProperties2.properties.limits.subPixelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subPixelPrecisionBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDrawIndexedIndexValue >= profilePhysicalDeviceProperties2.properties.limits.maxDrawIndexedIndexValue)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDrawIndirectCount >= profilePhysicalDeviceProperties2.properties.limits.maxDrawIndirectCount)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerAnisotropy >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerAnisotropy)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxViewports >= profilePhysicalDeviceProperties2.properties.limits.maxViewports)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[0] >= profilePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[1] >= profilePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[0] <= profilePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[1] >= profilePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.minMemoryMapAlignment >= profilePhysicalDeviceProperties2.properties.limits.minMemoryMapAlignment)
-            && (devicePhysicalDeviceProperties2.properties.limits.minTexelBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minTexelBufferOffsetAlignment)
-            && (devicePhysicalDeviceProperties2.properties.limits.minUniformBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minUniformBufferOffsetAlignment)
-            && (devicePhysicalDeviceProperties2.properties.limits.minStorageBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minStorageBufferOffsetAlignment)
-            && (devicePhysicalDeviceProperties2.properties.limits.minTexelOffset <= profilePhysicalDeviceProperties2.properties.limits.minTexelOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTexelOffset >= profilePhysicalDeviceProperties2.properties.limits.maxTexelOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.minTexelGatherOffset <= profilePhysicalDeviceProperties2.properties.limits.minTexelGatherOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTexelGatherOffset >= profilePhysicalDeviceProperties2.properties.limits.maxTexelGatherOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.minInterpolationOffset <= profilePhysicalDeviceProperties2.properties.limits.minInterpolationOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxInterpolationOffset >= profilePhysicalDeviceProperties2.properties.limits.maxInterpolationOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.subPixelInterpolationOffsetBits >= profilePhysicalDeviceProperties2.properties.limits.subPixelInterpolationOffsetBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferWidth >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferWidth)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferHeight >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferHeight)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferLayers >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferLayers)
-            && ((devicePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxColorAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxColorAttachments)
-            && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts & profilePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxSampleMaskWords >= profilePhysicalDeviceProperties2.properties.limits.maxSampleMaskWords)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxClipDistances >= profilePhysicalDeviceProperties2.properties.limits.maxClipDistances)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxCullDistances >= profilePhysicalDeviceProperties2.properties.limits.maxCullDistances)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxCombinedClipAndCullDistances >= profilePhysicalDeviceProperties2.properties.limits.maxCombinedClipAndCullDistances)
-            && (devicePhysicalDeviceProperties2.properties.limits.discreteQueuePriorities >= profilePhysicalDeviceProperties2.properties.limits.discreteQueuePriorities)
-            && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[0] <= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[1] >= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[0] <= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[1] >= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity >= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity)
-            && (devicePhysicalDeviceProperties2.properties.limits.lineWidthGranularity >= profilePhysicalDeviceProperties2.properties.limits.lineWidthGranularity)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools >= profilePhysicalDeviceDescriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindUniformBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindUniformBuffers)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageBuffers)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSampledImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSampledImages)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageImages)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindInputAttachments >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindInputAttachments)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageUpdateAfterBindResources >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageUpdateAfterBindResources)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSamplers >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSamplers)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffers)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffers)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSampledImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSampledImages)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageImages)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindInputAttachments >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindInputAttachments)
-            && (devicePhysicalDeviceDepthStencilResolveProperties.independentResolve == profilePhysicalDeviceDepthStencilResolveProperties.independentResolve)
-            && (devicePhysicalDeviceDepthStencilResolveProperties.independentResolveNone == profilePhysicalDeviceDepthStencilResolveProperties.independentResolveNone)
-            && ((devicePhysicalDeviceDepthStencilResolveProperties.supportedDepthResolveModes & profilePhysicalDeviceDepthStencilResolveProperties.supportedDepthResolveModes) == profilePhysicalDeviceDepthStencilResolveProperties.supportedDepthResolveModes)
-            && ((devicePhysicalDeviceDepthStencilResolveProperties.supportedStencilResolveModes & profilePhysicalDeviceDepthStencilResolveProperties.supportedStencilResolveModes) == profilePhysicalDeviceDepthStencilResolveProperties.supportedStencilResolveModes)
-            && (devicePhysicalDeviceMaintenance3Properties.maxPerSetDescriptors >= profilePhysicalDeviceMaintenance3Properties.maxPerSetDescriptors)
-            && (devicePhysicalDeviceMaintenance3Properties.maxMemoryAllocationSize >= profilePhysicalDeviceMaintenance3Properties.maxMemoryAllocationSize)
-            && (devicePhysicalDevicePortabilitySubsetPropertiesKHR.minVertexInputBindingStrideAlignment <= profilePhysicalDevicePortabilitySubsetPropertiesKHR.minVertexInputBindingStrideAlignment);
+        bool propertiesSupported = true;
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceMultiviewProperties.maxMultiviewViewCount >= profilePhysicalDeviceMultiviewProperties.maxMultiviewViewCount);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceMultiviewProperties.maxMultiviewInstanceIndex >= profilePhysicalDeviceMultiviewProperties.maxMultiviewInstanceIndex);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension1D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension1D);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension2D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension2D);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension3D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension3D);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers >= profilePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTexelBufferElements >= profilePhysicalDeviceProperties2.properties.limits.maxTexelBufferElements);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxStorageBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxStorageBufferRange);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPushConstantsSize >= profilePhysicalDeviceProperties2.properties.limits.maxPushConstantsSize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxMemoryAllocationCount >= profilePhysicalDeviceProperties2.properties.limits.maxMemoryAllocationCount);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerAllocationCount >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerAllocationCount);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.bufferImageGranularity <= profilePhysicalDeviceProperties2.properties.limits.bufferImageGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.sparseAddressSpaceSize >= profilePhysicalDeviceProperties2.properties.limits.sparseAddressSpaceSize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxBoundDescriptorSets >= profilePhysicalDeviceProperties2.properties.limits.maxBoundDescriptorSets);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorInputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorInputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageResources >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageResources);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffersDynamic >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffersDynamic);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffersDynamic >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffersDynamic);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetInputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetInputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributes >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributes);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputBindings >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputBindings);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributeOffset >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributeOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputBindingStride >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputBindingStride);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxVertexOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationGenerationLevel >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationGenerationLevel);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationPatchSize >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationPatchSize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexInputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerPatchOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerPatchOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlTotalOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlTotalOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationInputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentInputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentOutputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentOutputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentDualSrcAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentDualSrcAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeSharedMemorySize >= profilePhysicalDeviceProperties2.properties.limits.maxComputeSharedMemorySize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[2]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.subPixelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subPixelPrecisionBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDrawIndexedIndexValue >= profilePhysicalDeviceProperties2.properties.limits.maxDrawIndexedIndexValue);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDrawIndirectCount >= profilePhysicalDeviceProperties2.properties.limits.maxDrawIndirectCount);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerAnisotropy >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerAnisotropy);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxViewports >= profilePhysicalDeviceProperties2.properties.limits.maxViewports);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[0] >= profilePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[1] >= profilePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[0] <= profilePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[1] >= profilePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minMemoryMapAlignment >= profilePhysicalDeviceProperties2.properties.limits.minMemoryMapAlignment);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minTexelBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minTexelBufferOffsetAlignment);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minUniformBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minUniformBufferOffsetAlignment);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minStorageBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minStorageBufferOffsetAlignment);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minTexelOffset <= profilePhysicalDeviceProperties2.properties.limits.minTexelOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTexelOffset >= profilePhysicalDeviceProperties2.properties.limits.maxTexelOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minTexelGatherOffset <= profilePhysicalDeviceProperties2.properties.limits.minTexelGatherOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTexelGatherOffset >= profilePhysicalDeviceProperties2.properties.limits.maxTexelGatherOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minInterpolationOffset <= profilePhysicalDeviceProperties2.properties.limits.minInterpolationOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxInterpolationOffset >= profilePhysicalDeviceProperties2.properties.limits.maxInterpolationOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.subPixelInterpolationOffsetBits >= profilePhysicalDeviceProperties2.properties.limits.subPixelInterpolationOffsetBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferWidth >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferWidth);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferHeight >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferHeight);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferLayers >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferLayers);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxColorAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxColorAttachments);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts & profilePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSampleMaskWords >= profilePhysicalDeviceProperties2.properties.limits.maxSampleMaskWords);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxClipDistances >= profilePhysicalDeviceProperties2.properties.limits.maxClipDistances);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxCullDistances >= profilePhysicalDeviceProperties2.properties.limits.maxCullDistances);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxCombinedClipAndCullDistances >= profilePhysicalDeviceProperties2.properties.limits.maxCombinedClipAndCullDistances);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.discreteQueuePriorities >= profilePhysicalDeviceProperties2.properties.limits.discreteQueuePriorities);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[0] <= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[1] >= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[0] <= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[1] >= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity >= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthGranularity >= profilePhysicalDeviceProperties2.properties.limits.lineWidthGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools >= profilePhysicalDeviceDescriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindUniformBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSampledImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindInputAttachments >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindInputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageUpdateAfterBindResources >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageUpdateAfterBindResources);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSamplers >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSampledImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindInputAttachments >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindInputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDepthStencilResolveProperties.independentResolve == profilePhysicalDeviceDepthStencilResolveProperties.independentResolve);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDepthStencilResolveProperties.independentResolveNone == profilePhysicalDeviceDepthStencilResolveProperties.independentResolveNone);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceDepthStencilResolveProperties.supportedDepthResolveModes & profilePhysicalDeviceDepthStencilResolveProperties.supportedDepthResolveModes) == profilePhysicalDeviceDepthStencilResolveProperties.supportedDepthResolveModes);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceDepthStencilResolveProperties.supportedStencilResolveModes & profilePhysicalDeviceDepthStencilResolveProperties.supportedStencilResolveModes) == profilePhysicalDeviceDepthStencilResolveProperties.supportedStencilResolveModes);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceMaintenance3Properties.maxPerSetDescriptors >= profilePhysicalDeviceMaintenance3Properties.maxPerSetDescriptors);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceMaintenance3Properties.maxMemoryAllocationSize >= profilePhysicalDeviceMaintenance3Properties.maxMemoryAllocationSize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDevicePortabilitySubsetPropertiesKHR.minVertexInputBindingStrideAlignment <= profilePhysicalDevicePortabilitySubsetPropertiesKHR.minVertexInputBindingStrideAlignment);;
         if (!propertiesSupported) return result;
 
         uint32_t queueFamilyCount = 0;
@@ -2460,65 +2460,65 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         devicePhysicalDeviceFeatures2.pNext = &devicePhysicalDeviceVariablePointersFeatures;
         vkGetPhysicalDeviceFeatures2(physicalDevice, &devicePhysicalDeviceFeatures2);
         vpGetProfileStructures(pProfile, &profilePhysicalDeviceVariablePointersFeatures);
-        bool featuresSupported = true
-            && (devicePhysicalDeviceMultiviewFeatures.multiview == profilePhysicalDeviceMultiviewFeatures.multiview)
-            && (devicePhysicalDeviceFeatures2.features.depthBiasClamp == profilePhysicalDeviceFeatures2.features.depthBiasClamp)
-            && (devicePhysicalDeviceFeatures2.features.depthClamp == profilePhysicalDeviceFeatures2.features.depthClamp)
-            && (devicePhysicalDeviceFeatures2.features.drawIndirectFirstInstance == profilePhysicalDeviceFeatures2.features.drawIndirectFirstInstance)
-            && (devicePhysicalDeviceFeatures2.features.dualSrcBlend == profilePhysicalDeviceFeatures2.features.dualSrcBlend)
-            && (devicePhysicalDeviceFeatures2.features.fillModeNonSolid == profilePhysicalDeviceFeatures2.features.fillModeNonSolid)
-            && (devicePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics == profilePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics)
-            && (devicePhysicalDeviceFeatures2.features.fullDrawIndexUint32 == profilePhysicalDeviceFeatures2.features.fullDrawIndexUint32)
-            && (devicePhysicalDeviceFeatures2.features.imageCubeArray == profilePhysicalDeviceFeatures2.features.imageCubeArray)
-            && (devicePhysicalDeviceFeatures2.features.independentBlend == profilePhysicalDeviceFeatures2.features.independentBlend)
-            && (devicePhysicalDeviceFeatures2.features.inheritedQueries == profilePhysicalDeviceFeatures2.features.inheritedQueries)
-            && (devicePhysicalDeviceFeatures2.features.largePoints == profilePhysicalDeviceFeatures2.features.largePoints)
-            && (devicePhysicalDeviceFeatures2.features.multiDrawIndirect == profilePhysicalDeviceFeatures2.features.multiDrawIndirect)
-            && (devicePhysicalDeviceFeatures2.features.multiViewport == profilePhysicalDeviceFeatures2.features.multiViewport)
-            && (devicePhysicalDeviceFeatures2.features.occlusionQueryPrecise == profilePhysicalDeviceFeatures2.features.occlusionQueryPrecise)
-            && (devicePhysicalDeviceFeatures2.features.robustBufferAccess == profilePhysicalDeviceFeatures2.features.robustBufferAccess)
-            && (devicePhysicalDeviceFeatures2.features.sampleRateShading == profilePhysicalDeviceFeatures2.features.sampleRateShading)
-            && (devicePhysicalDeviceFeatures2.features.samplerAnisotropy == profilePhysicalDeviceFeatures2.features.samplerAnisotropy)
-            && (devicePhysicalDeviceFeatures2.features.shaderClipDistance == profilePhysicalDeviceFeatures2.features.shaderClipDistance)
-            && (devicePhysicalDeviceFeatures2.features.shaderImageGatherExtended == profilePhysicalDeviceFeatures2.features.shaderImageGatherExtended)
-            && (devicePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageImageExtendedFormats == profilePhysicalDeviceFeatures2.features.shaderStorageImageExtendedFormats)
-            && (devicePhysicalDeviceFeatures2.features.shaderStorageImageWriteWithoutFormat == profilePhysicalDeviceFeatures2.features.shaderStorageImageWriteWithoutFormat)
-            && (devicePhysicalDeviceFeatures2.features.shaderTessellationAndGeometryPointSize == profilePhysicalDeviceFeatures2.features.shaderTessellationAndGeometryPointSize)
-            && (devicePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceFeatures2.features.tessellationShader == profilePhysicalDeviceFeatures2.features.tessellationShader)
-            && (devicePhysicalDeviceFeatures2.features.textureCompressionBC == profilePhysicalDeviceFeatures2.features.textureCompressionBC)
-            && (devicePhysicalDeviceFeatures2.features.vertexPipelineStoresAndAtomics == profilePhysicalDeviceFeatures2.features.vertexPipelineStoresAndAtomics)
-            && (devicePhysicalDeviceImagelessFramebufferFeatures.imagelessFramebuffer == profilePhysicalDeviceImagelessFramebufferFeatures.imagelessFramebuffer)
-            && (devicePhysicalDevice16BitStorageFeatures.storageBuffer16BitAccess == profilePhysicalDevice16BitStorageFeatures.storageBuffer16BitAccess)
-            && (devicePhysicalDevice16BitStorageFeatures.uniformAndStorageBuffer16BitAccess == profilePhysicalDevice16BitStorageFeatures.uniformAndStorageBuffer16BitAccess)
-            && (devicePhysicalDevice8BitStorageFeatures.storageBuffer8BitAccess == profilePhysicalDevice8BitStorageFeatures.storageBuffer8BitAccess)
-            && (devicePhysicalDevice8BitStorageFeatures.storagePushConstant8 == profilePhysicalDevice8BitStorageFeatures.storagePushConstant8)
-            && (devicePhysicalDevice8BitStorageFeatures.uniformAndStorageBuffer8BitAccess == profilePhysicalDevice8BitStorageFeatures.uniformAndStorageBuffer8BitAccess)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayDynamicIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderStorageTexelBufferArrayDynamicIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderStorageTexelBufferArrayDynamicIndexing)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayNonUniformIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayNonUniformIndexing)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageImageUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageImageUpdateAfterBind)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUniformTexelBufferUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUniformTexelBufferUpdateAfterBind)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageTexelBufferUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageTexelBufferUpdateAfterBind)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount)
-            && (devicePhysicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray == profilePhysicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray)
-            && (devicePhysicalDeviceHostQueryResetFeatures.hostQueryReset == profilePhysicalDeviceHostQueryResetFeatures.hostQueryReset)
-            && (devicePhysicalDeviceShaderSubgroupExtendedTypesFeatures.shaderSubgroupExtendedTypes == profilePhysicalDeviceShaderSubgroupExtendedTypesFeatures.shaderSubgroupExtendedTypes)
-            && (devicePhysicalDeviceUniformBufferStandardLayoutFeatures.uniformBufferStandardLayout == profilePhysicalDeviceUniformBufferStandardLayoutFeatures.uniformBufferStandardLayout)
-            && (devicePhysicalDeviceShaderDrawParametersFeatures.shaderDrawParameters == profilePhysicalDeviceShaderDrawParametersFeatures.shaderDrawParameters)
-            && (devicePhysicalDeviceShaderFloat16Int8Features.shaderInt8 == profilePhysicalDeviceShaderFloat16Int8Features.shaderInt8)
-            && (devicePhysicalDeviceSamplerYcbcrConversionFeatures.samplerYcbcrConversion == profilePhysicalDeviceSamplerYcbcrConversionFeatures.samplerYcbcrConversion)
-            && (devicePhysicalDeviceVariablePointersFeatures.variablePointersStorageBuffer == profilePhysicalDeviceVariablePointersFeatures.variablePointersStorageBuffer)
-            && (devicePhysicalDeviceVariablePointersFeatures.variablePointers == profilePhysicalDeviceVariablePointersFeatures.variablePointers);
+        bool featuresSupported = true;
+        featuresSupported = featuresSupported && (devicePhysicalDeviceMultiviewFeatures.multiview == profilePhysicalDeviceMultiviewFeatures.multiview);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.depthBiasClamp == profilePhysicalDeviceFeatures2.features.depthBiasClamp);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.depthClamp == profilePhysicalDeviceFeatures2.features.depthClamp);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.drawIndirectFirstInstance == profilePhysicalDeviceFeatures2.features.drawIndirectFirstInstance);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.dualSrcBlend == profilePhysicalDeviceFeatures2.features.dualSrcBlend);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.fillModeNonSolid == profilePhysicalDeviceFeatures2.features.fillModeNonSolid);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics == profilePhysicalDeviceFeatures2.features.fragmentStoresAndAtomics);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.fullDrawIndexUint32 == profilePhysicalDeviceFeatures2.features.fullDrawIndexUint32);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.imageCubeArray == profilePhysicalDeviceFeatures2.features.imageCubeArray);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.independentBlend == profilePhysicalDeviceFeatures2.features.independentBlend);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.inheritedQueries == profilePhysicalDeviceFeatures2.features.inheritedQueries);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.largePoints == profilePhysicalDeviceFeatures2.features.largePoints);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.multiDrawIndirect == profilePhysicalDeviceFeatures2.features.multiDrawIndirect);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.multiViewport == profilePhysicalDeviceFeatures2.features.multiViewport);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.occlusionQueryPrecise == profilePhysicalDeviceFeatures2.features.occlusionQueryPrecise);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.robustBufferAccess == profilePhysicalDeviceFeatures2.features.robustBufferAccess);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.sampleRateShading == profilePhysicalDeviceFeatures2.features.sampleRateShading);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.samplerAnisotropy == profilePhysicalDeviceFeatures2.features.samplerAnisotropy);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderClipDistance == profilePhysicalDeviceFeatures2.features.shaderClipDistance);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderImageGatherExtended == profilePhysicalDeviceFeatures2.features.shaderImageGatherExtended);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderSampledImageArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderStorageImageArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageImageExtendedFormats == profilePhysicalDeviceFeatures2.features.shaderStorageImageExtendedFormats);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderStorageImageWriteWithoutFormat == profilePhysicalDeviceFeatures2.features.shaderStorageImageWriteWithoutFormat);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderTessellationAndGeometryPointSize == profilePhysicalDeviceFeatures2.features.shaderTessellationAndGeometryPointSize);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing == profilePhysicalDeviceFeatures2.features.shaderUniformBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.tessellationShader == profilePhysicalDeviceFeatures2.features.tessellationShader);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.textureCompressionBC == profilePhysicalDeviceFeatures2.features.textureCompressionBC);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceFeatures2.features.vertexPipelineStoresAndAtomics == profilePhysicalDeviceFeatures2.features.vertexPipelineStoresAndAtomics);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceImagelessFramebufferFeatures.imagelessFramebuffer == profilePhysicalDeviceImagelessFramebufferFeatures.imagelessFramebuffer);
+        featuresSupported = featuresSupported && (devicePhysicalDevice16BitStorageFeatures.storageBuffer16BitAccess == profilePhysicalDevice16BitStorageFeatures.storageBuffer16BitAccess);
+        featuresSupported = featuresSupported && (devicePhysicalDevice16BitStorageFeatures.uniformAndStorageBuffer16BitAccess == profilePhysicalDevice16BitStorageFeatures.uniformAndStorageBuffer16BitAccess);
+        featuresSupported = featuresSupported && (devicePhysicalDevice8BitStorageFeatures.storageBuffer8BitAccess == profilePhysicalDevice8BitStorageFeatures.storageBuffer8BitAccess);
+        featuresSupported = featuresSupported && (devicePhysicalDevice8BitStorageFeatures.storagePushConstant8 == profilePhysicalDevice8BitStorageFeatures.storagePushConstant8);
+        featuresSupported = featuresSupported && (devicePhysicalDevice8BitStorageFeatures.uniformAndStorageBuffer8BitAccess == profilePhysicalDevice8BitStorageFeatures.uniformAndStorageBuffer8BitAccess);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayDynamicIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderStorageTexelBufferArrayDynamicIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderStorageTexelBufferArrayDynamicIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayNonUniformIndexing == profilePhysicalDeviceDescriptorIndexingFeatures.shaderUniformTexelBufferArrayNonUniformIndexing);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageImageUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageImageUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUniformTexelBufferUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUniformTexelBufferUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageTexelBufferUpdateAfterBind == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingStorageTexelBufferUpdateAfterBind);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount == profilePhysicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray == profilePhysicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceHostQueryResetFeatures.hostQueryReset == profilePhysicalDeviceHostQueryResetFeatures.hostQueryReset);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceShaderSubgroupExtendedTypesFeatures.shaderSubgroupExtendedTypes == profilePhysicalDeviceShaderSubgroupExtendedTypesFeatures.shaderSubgroupExtendedTypes);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceUniformBufferStandardLayoutFeatures.uniformBufferStandardLayout == profilePhysicalDeviceUniformBufferStandardLayoutFeatures.uniformBufferStandardLayout);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceShaderDrawParametersFeatures.shaderDrawParameters == profilePhysicalDeviceShaderDrawParametersFeatures.shaderDrawParameters);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceShaderFloat16Int8Features.shaderInt8 == profilePhysicalDeviceShaderFloat16Int8Features.shaderInt8);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceSamplerYcbcrConversionFeatures.samplerYcbcrConversion == profilePhysicalDeviceSamplerYcbcrConversionFeatures.samplerYcbcrConversion);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVariablePointersFeatures.variablePointersStorageBuffer == profilePhysicalDeviceVariablePointersFeatures.variablePointersStorageBuffer);
+        featuresSupported = featuresSupported && (devicePhysicalDeviceVariablePointersFeatures.variablePointers == profilePhysicalDeviceVariablePointersFeatures.variablePointers);;
         if (!featuresSupported) return result;
 
         VkPhysicalDeviceMultiviewProperties devicePhysicalDeviceMultiviewProperties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES };
@@ -2541,131 +2541,131 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         devicePhysicalDeviceProperties2.pNext = &devicePhysicalDeviceMaintenance3Properties;
         vkGetPhysicalDeviceProperties2(physicalDevice, &devicePhysicalDeviceProperties2);
         vpGetProfileStructures(pProfile, &profilePhysicalDeviceMaintenance3Properties);
-        bool propertiesSupported = true
-            && (devicePhysicalDeviceMultiviewProperties.maxMultiviewViewCount >= profilePhysicalDeviceMultiviewProperties.maxMultiviewViewCount)
-            && (devicePhysicalDeviceMultiviewProperties.maxMultiviewInstanceIndex >= profilePhysicalDeviceMultiviewProperties.maxMultiviewInstanceIndex)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension1D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension1D)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension2D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension2D)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension3D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension3D)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers >= profilePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTexelBufferElements >= profilePhysicalDeviceProperties2.properties.limits.maxTexelBufferElements)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxStorageBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxStorageBufferRange)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPushConstantsSize >= profilePhysicalDeviceProperties2.properties.limits.maxPushConstantsSize)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxMemoryAllocationCount >= profilePhysicalDeviceProperties2.properties.limits.maxMemoryAllocationCount)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerAllocationCount >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerAllocationCount)
-            && (devicePhysicalDeviceProperties2.properties.limits.bufferImageGranularity <= profilePhysicalDeviceProperties2.properties.limits.bufferImageGranularity)
-            && (devicePhysicalDeviceProperties2.properties.limits.sparseAddressSpaceSize >= profilePhysicalDeviceProperties2.properties.limits.sparseAddressSpaceSize)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxBoundDescriptorSets >= profilePhysicalDeviceProperties2.properties.limits.maxBoundDescriptorSets)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorInputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorInputAttachments)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageResources >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageResources)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffersDynamic >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffersDynamic)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffersDynamic >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffersDynamic)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetInputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetInputAttachments)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributes >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributes)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputBindings >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputBindings)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributeOffset >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributeOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputBindingStride >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputBindingStride)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxVertexOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxVertexOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationGenerationLevel >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationGenerationLevel)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationPatchSize >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationPatchSize)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexInputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerPatchOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerPatchOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlTotalOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlTotalOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationInputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationOutputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentInputComponents)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentOutputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentOutputAttachments)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentDualSrcAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentDualSrcAttachments)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeSharedMemorySize >= profilePhysicalDeviceProperties2.properties.limits.maxComputeSharedMemorySize)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[2])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2])
-            && (devicePhysicalDeviceProperties2.properties.limits.subPixelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subPixelPrecisionBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDrawIndexedIndexValue >= profilePhysicalDeviceProperties2.properties.limits.maxDrawIndexedIndexValue)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxDrawIndirectCount >= profilePhysicalDeviceProperties2.properties.limits.maxDrawIndirectCount)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerAnisotropy >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerAnisotropy)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxViewports >= profilePhysicalDeviceProperties2.properties.limits.maxViewports)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[0] >= profilePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[1] >= profilePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[0] <= profilePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[1] >= profilePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.minMemoryMapAlignment >= profilePhysicalDeviceProperties2.properties.limits.minMemoryMapAlignment)
-            && (devicePhysicalDeviceProperties2.properties.limits.minTexelBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minTexelBufferOffsetAlignment)
-            && (devicePhysicalDeviceProperties2.properties.limits.minUniformBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minUniformBufferOffsetAlignment)
-            && (devicePhysicalDeviceProperties2.properties.limits.minStorageBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minStorageBufferOffsetAlignment)
-            && (devicePhysicalDeviceProperties2.properties.limits.minTexelOffset <= profilePhysicalDeviceProperties2.properties.limits.minTexelOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTexelOffset >= profilePhysicalDeviceProperties2.properties.limits.maxTexelOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.minTexelGatherOffset <= profilePhysicalDeviceProperties2.properties.limits.minTexelGatherOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxTexelGatherOffset >= profilePhysicalDeviceProperties2.properties.limits.maxTexelGatherOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.minInterpolationOffset <= profilePhysicalDeviceProperties2.properties.limits.minInterpolationOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxInterpolationOffset >= profilePhysicalDeviceProperties2.properties.limits.maxInterpolationOffset)
-            && (devicePhysicalDeviceProperties2.properties.limits.subPixelInterpolationOffsetBits >= profilePhysicalDeviceProperties2.properties.limits.subPixelInterpolationOffsetBits)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferWidth >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferWidth)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferHeight >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferHeight)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferLayers >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferLayers)
-            && ((devicePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxColorAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxColorAttachments)
-            && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts)
-            && ((devicePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts & profilePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxSampleMaskWords >= profilePhysicalDeviceProperties2.properties.limits.maxSampleMaskWords)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxClipDistances >= profilePhysicalDeviceProperties2.properties.limits.maxClipDistances)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxCullDistances >= profilePhysicalDeviceProperties2.properties.limits.maxCullDistances)
-            && (devicePhysicalDeviceProperties2.properties.limits.maxCombinedClipAndCullDistances >= profilePhysicalDeviceProperties2.properties.limits.maxCombinedClipAndCullDistances)
-            && (devicePhysicalDeviceProperties2.properties.limits.discreteQueuePriorities >= profilePhysicalDeviceProperties2.properties.limits.discreteQueuePriorities)
-            && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[0] <= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[1] >= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[0] <= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[0])
-            && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[1] >= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[1])
-            && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity >= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity)
-            && (devicePhysicalDeviceProperties2.properties.limits.lineWidthGranularity >= profilePhysicalDeviceProperties2.properties.limits.lineWidthGranularity)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools >= profilePhysicalDeviceDescriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindUniformBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindUniformBuffers)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageBuffers)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSampledImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSampledImages)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageImages)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindInputAttachments >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindInputAttachments)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageUpdateAfterBindResources >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageUpdateAfterBindResources)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSamplers >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSamplers)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffers)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffers)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSampledImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSampledImages)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageImages)
-            && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindInputAttachments >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindInputAttachments)
-            && (devicePhysicalDeviceDepthStencilResolveProperties.independentResolve == profilePhysicalDeviceDepthStencilResolveProperties.independentResolve)
-            && (devicePhysicalDeviceDepthStencilResolveProperties.independentResolveNone == profilePhysicalDeviceDepthStencilResolveProperties.independentResolveNone)
-            && ((devicePhysicalDeviceDepthStencilResolveProperties.supportedDepthResolveModes & profilePhysicalDeviceDepthStencilResolveProperties.supportedDepthResolveModes) == profilePhysicalDeviceDepthStencilResolveProperties.supportedDepthResolveModes)
-            && ((devicePhysicalDeviceDepthStencilResolveProperties.supportedStencilResolveModes & profilePhysicalDeviceDepthStencilResolveProperties.supportedStencilResolveModes) == profilePhysicalDeviceDepthStencilResolveProperties.supportedStencilResolveModes)
-            && (devicePhysicalDeviceMaintenance3Properties.maxPerSetDescriptors >= profilePhysicalDeviceMaintenance3Properties.maxPerSetDescriptors)
-            && (devicePhysicalDeviceMaintenance3Properties.maxMemoryAllocationSize >= profilePhysicalDeviceMaintenance3Properties.maxMemoryAllocationSize);
+        bool propertiesSupported = true;
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceMultiviewProperties.maxMultiviewViewCount >= profilePhysicalDeviceMultiviewProperties.maxMultiviewViewCount);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceMultiviewProperties.maxMultiviewInstanceIndex >= profilePhysicalDeviceMultiviewProperties.maxMultiviewInstanceIndex);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension1D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension1D);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension2D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension2D);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimension3D >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimension3D);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube >= profilePhysicalDeviceProperties2.properties.limits.maxImageDimensionCube);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers >= profilePhysicalDeviceProperties2.properties.limits.maxImageArrayLayers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTexelBufferElements >= profilePhysicalDeviceProperties2.properties.limits.maxTexelBufferElements);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxUniformBufferRange);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxStorageBufferRange >= profilePhysicalDeviceProperties2.properties.limits.maxStorageBufferRange);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPushConstantsSize >= profilePhysicalDeviceProperties2.properties.limits.maxPushConstantsSize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxMemoryAllocationCount >= profilePhysicalDeviceProperties2.properties.limits.maxMemoryAllocationCount);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerAllocationCount >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerAllocationCount);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.bufferImageGranularity <= profilePhysicalDeviceProperties2.properties.limits.bufferImageGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.sparseAddressSpaceSize >= profilePhysicalDeviceProperties2.properties.limits.sparseAddressSpaceSize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxBoundDescriptorSets >= profilePhysicalDeviceProperties2.properties.limits.maxBoundDescriptorSets);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorInputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageDescriptorInputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxPerStageResources >= profilePhysicalDeviceProperties2.properties.limits.maxPerStageResources);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffersDynamic >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetUniformBuffersDynamic);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffersDynamic >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageBuffersDynamic);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDescriptorSetInputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxDescriptorSetInputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributes >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributes);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputBindings >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputBindings);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributeOffset >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputAttributeOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexInputBindingStride >= profilePhysicalDeviceProperties2.properties.limits.maxVertexInputBindingStride);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxVertexOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxVertexOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationGenerationLevel >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationGenerationLevel);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationPatchSize >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationPatchSize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexInputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerVertexOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerPatchOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlPerPatchOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationControlTotalOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationControlTotalOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationInputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationOutputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxTessellationEvaluationOutputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentInputComponents >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentInputComponents);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentOutputAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentOutputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentDualSrcAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentDualSrcAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources >= profilePhysicalDeviceProperties2.properties.limits.maxFragmentCombinedOutputResources);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeSharedMemorySize >= profilePhysicalDeviceProperties2.properties.limits.maxComputeSharedMemorySize);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupCount[2]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupInvocations);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2] >= profilePhysicalDeviceProperties2.properties.limits.maxComputeWorkGroupSize[2]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.subPixelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subPixelPrecisionBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.subTexelPrecisionBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits >= profilePhysicalDeviceProperties2.properties.limits.mipmapPrecisionBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDrawIndexedIndexValue >= profilePhysicalDeviceProperties2.properties.limits.maxDrawIndexedIndexValue);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxDrawIndirectCount >= profilePhysicalDeviceProperties2.properties.limits.maxDrawIndirectCount);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerLodBias);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSamplerAnisotropy >= profilePhysicalDeviceProperties2.properties.limits.maxSamplerAnisotropy);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxViewports >= profilePhysicalDeviceProperties2.properties.limits.maxViewports);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[0] >= profilePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[1] >= profilePhysicalDeviceProperties2.properties.limits.maxViewportDimensions[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[0] <= profilePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[1] >= profilePhysicalDeviceProperties2.properties.limits.viewportBoundsRange[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minMemoryMapAlignment >= profilePhysicalDeviceProperties2.properties.limits.minMemoryMapAlignment);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minTexelBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minTexelBufferOffsetAlignment);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minUniformBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minUniformBufferOffsetAlignment);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minStorageBufferOffsetAlignment <= profilePhysicalDeviceProperties2.properties.limits.minStorageBufferOffsetAlignment);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minTexelOffset <= profilePhysicalDeviceProperties2.properties.limits.minTexelOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTexelOffset >= profilePhysicalDeviceProperties2.properties.limits.maxTexelOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minTexelGatherOffset <= profilePhysicalDeviceProperties2.properties.limits.minTexelGatherOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxTexelGatherOffset >= profilePhysicalDeviceProperties2.properties.limits.maxTexelGatherOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.minInterpolationOffset <= profilePhysicalDeviceProperties2.properties.limits.minInterpolationOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxInterpolationOffset >= profilePhysicalDeviceProperties2.properties.limits.maxInterpolationOffset);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.subPixelInterpolationOffsetBits >= profilePhysicalDeviceProperties2.properties.limits.subPixelInterpolationOffsetBits);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferWidth >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferWidth);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferHeight >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferHeight);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxFramebufferLayers >= profilePhysicalDeviceProperties2.properties.limits.maxFramebufferLayers);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferColorSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferDepthSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts & profilePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.framebufferStencilSampleCounts);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxColorAttachments >= profilePhysicalDeviceProperties2.properties.limits.maxColorAttachments);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageColorSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageIntegerSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageDepthSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts & profilePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.sampledImageStencilSampleCounts);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts & profilePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts) == profilePhysicalDeviceProperties2.properties.limits.storageImageSampleCounts);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxSampleMaskWords >= profilePhysicalDeviceProperties2.properties.limits.maxSampleMaskWords);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxClipDistances >= profilePhysicalDeviceProperties2.properties.limits.maxClipDistances);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxCullDistances >= profilePhysicalDeviceProperties2.properties.limits.maxCullDistances);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.maxCombinedClipAndCullDistances >= profilePhysicalDeviceProperties2.properties.limits.maxCombinedClipAndCullDistances);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.discreteQueuePriorities >= profilePhysicalDeviceProperties2.properties.limits.discreteQueuePriorities);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[0] <= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeRange[1] >= profilePhysicalDeviceProperties2.properties.limits.pointSizeRange[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[0] <= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[0]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthRange[1] >= profilePhysicalDeviceProperties2.properties.limits.lineWidthRange[1]);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.pointSizeGranularity >= profilePhysicalDeviceProperties2.properties.limits.pointSizeGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceProperties2.properties.limits.lineWidthGranularity >= profilePhysicalDeviceProperties2.properties.limits.lineWidthGranularity);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools >= profilePhysicalDeviceDescriptorIndexingProperties.maxUpdateAfterBindDescriptorsInAllPools);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindUniformBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSampledImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindInputAttachments >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageDescriptorUpdateAfterBindInputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxPerStageUpdateAfterBindResources >= profilePhysicalDeviceDescriptorIndexingProperties.maxPerStageUpdateAfterBindResources);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSamplers >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSamplers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffers >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffers);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSampledImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindSampledImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageImages >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindStorageImages);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindInputAttachments >= profilePhysicalDeviceDescriptorIndexingProperties.maxDescriptorSetUpdateAfterBindInputAttachments);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDepthStencilResolveProperties.independentResolve == profilePhysicalDeviceDepthStencilResolveProperties.independentResolve);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceDepthStencilResolveProperties.independentResolveNone == profilePhysicalDeviceDepthStencilResolveProperties.independentResolveNone);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceDepthStencilResolveProperties.supportedDepthResolveModes & profilePhysicalDeviceDepthStencilResolveProperties.supportedDepthResolveModes) == profilePhysicalDeviceDepthStencilResolveProperties.supportedDepthResolveModes);
+        propertiesSupported = propertiesSupported && ((devicePhysicalDeviceDepthStencilResolveProperties.supportedStencilResolveModes & profilePhysicalDeviceDepthStencilResolveProperties.supportedStencilResolveModes) == profilePhysicalDeviceDepthStencilResolveProperties.supportedStencilResolveModes);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceMaintenance3Properties.maxPerSetDescriptors >= profilePhysicalDeviceMaintenance3Properties.maxPerSetDescriptors);
+        propertiesSupported = propertiesSupported && (devicePhysicalDeviceMaintenance3Properties.maxMemoryAllocationSize >= profilePhysicalDeviceMaintenance3Properties.maxMemoryAllocationSize);;
         if (!propertiesSupported) return result;
 
         uint32_t queueFamilyCount = 0;
