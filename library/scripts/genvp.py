@@ -830,170 +830,171 @@ class VulkanProfilesBuilder():
 
         for name, profile in self.profiles.items():
             uname = name.upper()
-            if profile.fallback:
-                guard = ProfilePlatformGuard(self.registry, profile)
-                gen += guard.begin
-                gen += ('    if (strcmp(pProfile->profileName, {0}_NAME) == 0) {{\n'
-                        '        if ({0}_SPEC_VERSION < pProfile->specVersion) return result;\n'
+            guard = ProfilePlatformGuard(self.registry, profile)
+            gen += guard.begin
+            gen += ('    if (strcmp(pProfile->profileName, {0}_NAME) == 0) {{\n'
+                    '        if ({0}_SPEC_VERSION < pProfile->specVersion) return result;\n'
+                    '\n'
+                    '        VkPhysicalDeviceProperties devProps;\n'
+                    '        vkGetPhysicalDeviceProperties(physicalDevice, &devProps);\n'
+                    '        if (VK_VERSION_PATCH(devProps.apiVersion) < VK_VERSION_PATCH({0}_MIN_API_VERSION)) return result;\n').format(uname)
+
+            # Check extensions
+            # TODO: Eventually we should check instance vs device extensions separately
+            if profile.capabilities.extensions:
+                gen += ('\n'
+                        '        bool extensionsSupported = true;\n'
+                        '        for (uint32_t i = 0; i < _vpArraySize(_{0}_EXTENSIONS); ++i) {{\n'
+                        '            const bool supportedInstanceExt = _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(),\n'
+                        '                                                                _{0}_EXTENSIONS[i].extensionName);\n'
+                        '            const bool supportedDeviceExt = _vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(),\n'
+                        '                                                              _{0}_EXTENSIONS[i].extensionName);\n'
+                        '            if (!supportedInstanceExt && !supportedDeviceExt) {{\n'
+                        '                extensionsSupported = false;\n'
+                        '                break;\n'
+                        '            }}\n'
+                        '        }}\n'
+                        '        if (!extensionsSupported) return result;\n').format(uname)
+
+            # Check features
+            features = profile.capabilities.features
+            if features:
+                pNextDevice = None
+                pNextProfile = None
+                gen += '\n'
+                genDef = ''
+                genCheck = '        bool featuresSupported = true\n'
+                for featureStructName, feature in features.items():
+                    structDef = self.registry.structs.get(featureStructName)
+                    if structDef == None:
+                        Log.f("Feature structure '{0}' does not exist".format(featureStructName))
+
+                    if featureStructName == 'VkPhysicalDeviceFeatures':
+                        # Special case, as it's wrapped into VkPhysicalDeviceFeatures2
+                        featureStructName = 'VkPhysicalDeviceFeatures2'
+                        varAccessSuffix = '.features.'
+                        sType = 'VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2'
+                    else:
+                        varAccessSuffix = '.'
+                        sType = structDef.sType
+
+                    deviceVarName = 'device' + featureStructName[2:]
+                    genDef += '        {0} {1}{{ {2} }};\n'.format(featureStructName, deviceVarName, sType)
+                    if featureStructName != 'VkPhysicalDeviceFeatures2':
+                        if pNextDevice != None:
+                            genDef += '        {0}.pNext = &{1};\n'.format(deviceVarName, pNextDevice)
+                        pNextDevice = deviceVarName
+
+                    profileVarName = 'profile' + featureStructName[2:]
+                    genDef += '        {0} {1}{{ {2} }};\n'.format(featureStructName, profileVarName, sType)
+                    if pNextProfile != None:
+                        genDef += '        {0}.pNext = &{1};\n'.format(profileVarName, pNextProfile)
+                    pNextProfile = profileVarName
+
+                    genCheck += self.gen_compareStructVar('            && {0}\n', structDef, deviceVarName + varAccessSuffix, profileVarName + varAccessSuffix, feature)
+
+                genCheck = genCheck[:-1] + ';\n'
+
+                if not 'VkPhysicalDeviceFeatures' in features and not 'VkPhysicalDeviceFeatures2' in features:
+                    # We have to manually add VkPhysicalDeviceFeatures2 as it's not used in the profile
+                    genDef += '        VkPhysicalDeviceFeatures2 devicePhysicalDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };\n'
+                if pNextDevice != None:
+                    # For vkGetPhysicalDeviceFeatures2 everything has to be chained to VkPhysicalDeviceFeatures2
+                    genDef += '        devicePhysicalDeviceFeatures2.pNext = &{0};\n'.format(pNextDevice)
+
+                gen += genDef
+                gen += '        vkGetPhysicalDeviceFeatures2(physicalDevice, &devicePhysicalDeviceFeatures2);\n'
+                gen += '        vpGetProfileStructures(pProfile, &{0});\n'.format(pNextProfile)
+                gen += genCheck
+                gen += '        if (!featuresSupported) return result;\n'
+
+            # Check properties
+            properties = profile.capabilities.properties
+            if properties:
+                pNextDevice = None
+                pNextProfile = None
+                gen += '\n'
+                genDef = ''
+                genCheck = '        bool propertiesSupported = true\n'
+                for propertyStructName, property in properties.items():
+                    structDef = self.registry.structs.get(propertyStructName)
+                    if structDef == None:
+                        Log.f("Properties structure '{0}' does not exist".format(propertyStructName))
+
+                    if propertyStructName == 'VkPhysicalDeviceProperties':
+                        # Special case, as it's wrapped into VkPhysicalDeviceProperties2
+                        propertyStructName = 'VkPhysicalDeviceProperties2'
+                        varAccessSuffix = '.properties.'
+                        sType = 'VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2'
+                    else:
+                        varAccessSuffix = '.'
+                        sType = structDef.sType
+
+                    deviceVarName = 'device' + propertyStructName[2:]
+                    genDef += '        {0} {1}{{ {2} }};\n'.format(propertyStructName, deviceVarName, sType)
+                    if propertyStructName != 'VkPhysicalDeviceProperties2':
+                        if pNextDevice != None:
+                            genDef += '        {0}.pNext = &{1};\n'.format(deviceVarName, pNextDevice)
+                        pNextDevice = deviceVarName
+
+                    profileVarName = 'profile' + propertyStructName[2:]
+                    genDef += '        {0} {1}{{ {2} }};\n'.format(propertyStructName, profileVarName, sType)
+                    if pNextProfile != None:
+                        genDef += '        {0}.pNext = &{1};\n'.format(profileVarName, pNextProfile)
+                    pNextProfile = profileVarName
+
+                    genCheck += self.gen_compareStructVar('            && {0}\n', structDef, deviceVarName + varAccessSuffix, profileVarName + varAccessSuffix, property)
+
+                genCheck = genCheck[:-1] + ';\n'
+
+                if not 'VkPhysicalDeviceProperties' in properties and not 'VkPhysicalDeviceProperties2' in properties:
+                    # We have to manually add VkPhysicalDeviceProperies2 as it's not used in the profile
+                    genDef += '        VkPhysicalDeviceProperties2 devicePhysicalDeviceProperties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };\n'
+                if pNextDevice != None:
+                    # For vkGetPhysicalDeviceProperties2 everything has to be chained to VkPhysicalDeviceProperties2
+                    genDef += '        devicePhysicalDeviceProperties2.pNext = &{0};\n'.format(pNextDevice)
+
+                gen += genDef
+                gen += '        vkGetPhysicalDeviceProperties2(physicalDevice, &devicePhysicalDeviceProperties2);\n'
+                gen += '        vpGetProfileStructures(pProfile, &{0});\n'.format(pNextProfile)
+                gen += genCheck
+                gen += '        if (!propertiesSupported) return result;\n'
+
+            # Check queue family properties
+            if profile.capabilities.queueFamiliesProperties:
+                gen += ('\n'
+                        '        uint32_t queueFamilyCount = 0;\n'
+                        '        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);\n'
+                        '        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);\n'
+                        '        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());\n'
                         '\n'
-                        '        VkPhysicalDeviceProperties devProps;\n'
-                        '        vkGetPhysicalDeviceProperties(physicalDevice, &devProps);\n'
-                        '        if (VK_VERSION_PATCH(devProps.apiVersion) < VK_VERSION_PATCH({0}_MIN_API_VERSION)) return result;\n').format(uname)
+                        '        bool queueFamiliesSupported = true;\n'
+                        '        for (uint32_t i = 0; i < _vpArraySize(_{0}_QUEUE_FAMILY_PROPERTIES); ++i) {{\n'
+                        '            if (!_vpCheckQueueFamilyProperty(&queueFamilies[0], queueFamilyCount, _{0}_QUEUE_FAMILY_PROPERTIES[i])) {{\n'
+                        '                queueFamiliesSupported = false;\n'
+                        '                break;\n'
+                        '            }}\n'
+                        '        }}\n'
+                        '        if (!queueFamiliesSupported) return result;\n').format(uname)
 
-                # Check extensions
-                # TODO: Eventually we should check instance vs device extensions separately
-                if profile.capabilities.extensions:
-                    gen += ('\n'
-                            '        bool extensionsSupported = true;\n'
-                            '        for (uint32_t i = 0; i < _vpArraySize(_{0}_EXTENSIONS); ++i) {{\n'
-                            '            const bool supportedInstanceExt = _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(),\n'
-                            '                                                                _{0}_EXTENSIONS[i].extensionName);\n'
-                            '            const bool supportedDeviceExt = _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(),\n'
-                            '                                                              _{0}_EXTENSIONS[i].extensionName);\n'
-                            '            if (!supportedInstanceExt && !supportedDeviceExt) {{\n'
-                            '                extensionsSupported = false;\n'
-                            '                break;\n'
-                            '            }}\n'
-                            '        }}\n'
-                            '        if (!extensionsSupported) return result;\n').format(uname)
+            # Check memory types
+            if profile.capabilities.memoryProperties:
+                gen += ('\n'
+                        '        VkPhysicalDeviceMemoryProperties memoryProperties;\n'
+                        '        vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);\n'
+                        '\n'
+                        '        bool memoryTypesSupported = true;\n'
+                        '        for (uint32_t i = 0; i < _vpArraySize(_{0}_MEMORY_TYPES); ++i) {{\n'
+                        '            if (!_vpCheckMemoryProperty(memoryProperties, _{0}_MEMORY_TYPES[i])) {{\n'
+                        '                memoryTypesSupported = false;\n'
+                        '                break;\n'
+                        '            }}\n'
+                        '        }}\n'
+                        '        if (!memoryTypesSupported) return result;\n').format(uname)
 
-                # Check features
-                features = profile.capabilities.features
-                if features:
-                    pNextDevice = None
-                    pNextProfile = None
-                    gen += '\n'
-                    genDef = ''
-                    genCheck = '        bool featuresSupported = true\n'
-                    for featureStructName, feature in features.items():
-                        structDef = self.registry.structs.get(featureStructName)
-                        if structDef == None:
-                            Log.f("Feature structure '{0}' does not exist".format(featureStructName))
+            gen += '    } else\n'
 
-                        if featureStructName == 'VkPhysicalDeviceFeatures':
-                            # Special case, as it's wrapped into VkPhysicalDeviceFeatures2
-                            featureStructName = 'VkPhysicalDeviceFeatures2'
-                            varAccessSuffix = '.features.'
-                            sType = 'VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2'
-                        else:
-                            varAccessSuffix = '.'
-                            sType = structDef.sType
-
-                        deviceVarName = 'device' + featureStructName[2:]
-                        genDef += '        {0} {1}{{ {2} }};\n'.format(featureStructName, deviceVarName, sType)
-                        if pNextDevice != None and featureStructName != 'VkPhysicalDeviceFeatures2':
-                            genDef += '        {0}.pNext = &{1};\n'.format(deviceVarName, pNextDevice)
-                        pNextDevice = deviceVarName
-
-                        profileVarName = 'profile' + featureStructName[2:]
-                        genDef += '        {0} {1}{{ {2} }};\n'.format(featureStructName, profileVarName, sType)
-                        if pNextProfile != None:
-                            genDef += '        {0}.pNext = &{1};\n'.format(profileVarName, pNextProfile)
-                        pNextProfile = profileVarName
-
-                        genCheck += self.gen_compareStructVar('            && {0}\n', structDef, deviceVarName + varAccessSuffix, profileVarName + varAccessSuffix, feature)
-
-                    genCheck = genCheck[:-1] + ';\n'
-
-                    if not 'VkPhysicalDeviceFeatures' in features and not 'VkPhysicalDeviceFeatures2' in features:
-                        # We have to manually add VkPhysicalDeviceFeatures2 as it's not used in the profile
-                        genDef += '        VkPhysicalDeviceFeatures2 devicePhysicalDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };\n'
-                    if pNextDevice != None:
-                        # For vkGetPhysicalDeviceFeatures2 everything has to be chained to VkPhysicalDeviceFeatures2
-                        genDef += '        devicePhysicalDeviceFeatures2.pNext = &{0};\n'.format(pNextDevice)
-
-                    gen += genDef
-                    gen += '        vkGetPhysicalDeviceFeatures2(physicalDevice, &devicePhysicalDeviceFeatures2);\n'
-                    gen += '        vpGetProfileStructures(pProfile, &{0});\n'.format(pNextProfile)
-                    gen += genCheck
-                    gen += '        if (!featuresSupported) return result;\n'
-
-                # Check properties
-                properties = profile.capabilities.properties
-                if properties:
-                    pNextDevice = None
-                    pNextProfile = None
-                    gen += '\n'
-                    genDef = ''
-                    genCheck = '        bool propertiesSupported = true\n'
-                    for propertyStructName, property in properties.items():
-                        structDef = self.registry.structs.get(propertyStructName)
-                        if structDef == None:
-                            Log.f("Properties structure '{0}' does not exist".format(propertyStructName))
-
-                        if propertyStructName == 'VkPhysicalDeviceProperties':
-                            # Special case, as it's wrapped into VkPhysicalDeviceProperties2
-                            propertyStructName = 'VkPhysicalDeviceProperties2'
-                            varAccessSuffix = '.properties.'
-                            sType = 'VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2'
-                        else:
-                            varAccessSuffix = '.'
-                            sType = structDef.sType
-
-                        deviceVarName = 'device' + propertyStructName[2:]
-                        genDef += '        {0} {1}{{ {2} }};\n'.format(propertyStructName, deviceVarName, sType)
-                        if pNextDevice != None and propertyStructName != 'VkPhysicalDeviceProperties2':
-                            genDef += '        {0}.pNext = &{1};\n'.format(deviceVarName, pNextDevice)
-                        pNextDevice = deviceVarName
-
-                        profileVarName = 'profile' + propertyStructName[2:]
-                        genDef += '        {0} {1}{{ {2} }};\n'.format(propertyStructName, profileVarName, sType)
-                        if pNextProfile != None:
-                            genDef += '        {0}.pNext = &{1};\n'.format(profileVarName, pNextProfile)
-                        pNextProfile = profileVarName
-
-                        genCheck += self.gen_compareStructVar('            && {0}\n', structDef, deviceVarName + varAccessSuffix, profileVarName + varAccessSuffix, property)
-
-                    genCheck = genCheck[:-1] + ';\n'
-
-                    if not 'VkPhysicalDeviceProperties' in properties and not 'VkPhysicalDeviceProperties2' in properties:
-                        # We have to manually add VkPhysicalDeviceProperies2 as it's not used in the profile
-                        genDef += '        VkPhysicalDeviceProperties2 devicePhysicalDeviceProperties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };\n'
-                    if pNextDevice != None:
-                        # For vkGetPhysicalDeviceProperties2 everything has to be chained to VkPhysicalDeviceProperties2
-                        genDef += '        devicePhysicalDeviceProperties2.pNext = &{0};\n'.format(pNextDevice)
-
-                    gen += genDef
-                    gen += '        vkGetPhysicalDeviceProperties2(physicalDevice, &devicePhysicalDeviceProperties2);\n'
-                    gen += '        vpGetProfileStructures(pProfile, &{0});\n'.format(pNextProfile)
-                    gen += genCheck
-                    gen += '        if (!propertiesSupported) return result;\n'
-
-                # Check queue family properties
-                if profile.capabilities.queueFamiliesProperties:
-                    gen += ('\n'
-                            '        uint32_t queueFamilyCount = 0;\n'
-                            '        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);\n'
-                            '        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);\n'
-                            '        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());\n'
-                            '\n'
-                            '        bool queueFamiliesSupported = true;\n'
-                            '        for (uint32_t i = 0; i < _vpArraySize(_{0}_QUEUE_FAMILY_PROPERTIES); ++i) {{\n'
-                            '            if (!_vpCheckQueueFamilyProperty(&queueFamilies[0], queueFamilyCount, _{0}_QUEUE_FAMILY_PROPERTIES[i])) {{\n'
-                            '                queueFamiliesSupported = false;\n'
-                            '                break;\n'
-                            '            }}\n'
-                            '        }}\n'
-                            '        if (!queueFamiliesSupported) return result;\n').format(uname)
-
-                # Check memory types
-                if profile.capabilities.memoryProperties:
-                    gen += ('\n'
-                            '        VkPhysicalDeviceMemoryProperties memoryProperties;\n'
-                            '        vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);\n'
-                            '\n'
-                            '        bool memoryTypesSupported = true;\n'
-                            '        for (uint32_t i = 0; i < _vpArraySize(_{0}_MEMORY_TYPES); ++i) {{\n'
-                            '            if (!_vpCheckMemoryProperty(memoryProperties, _{0}_MEMORY_TYPES[i])) {{\n'
-                            '                memoryTypesSupported = false;\n'
-                            '                break;\n'
-                            '            }}\n'
-                            '        }}\n'
-                            '        if (!memoryTypesSupported) return result;\n').format(uname)
-
-                gen += '    } else\n'
-
-                gen += guard.end
+            gen += guard.end
 
         gen += ('    {\n'
                 '        return result;\n'
