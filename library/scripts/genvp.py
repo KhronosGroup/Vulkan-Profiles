@@ -16,7 +16,6 @@
 #
 # Author: Daniel Rakos, RasterGrid
 
-import typing
 import os
 import argparse
 import xml.etree.ElementTree as etree
@@ -259,13 +258,13 @@ class Log():
 
 
 class VulkanPlatform():
-    def __init__(self, data: dict):
+    def __init__(self, data):
         self.name = data.get('name')
         self.protect = data.get('protect')
 
 
 class VulkanStructMember():
-    def __init__(self, name: str, type: str, limittype: str, isArray: bool = False):
+    def __init__(self, name, type, limittype, isArray = False):
         self.name = name
         self.type = type
         self.limittype = limittype
@@ -273,16 +272,16 @@ class VulkanStructMember():
 
 
 class VulkanStruct():
-    def __init__(self, name: str):
+    def __init__(self, name):
         self.name = name
         self.sType = None
         self.extends = []
-        self.members = dict[str, VulkanStructMember]()
+        self.members = dict()
         self.aliases = [ name ]
 
 
 class VulkanExtension():
-    def __init__(self, name: str, upperCaseName: str, type: str, platform: str):
+    def __init__(self, name, upperCaseName, type, platform):
         self.name = name
         self.upperCaseName = upperCaseName
         self.type = type
@@ -290,21 +289,21 @@ class VulkanExtension():
 
 
 class VulkanRegistry():
-    def __init__(self, registryFile: str):
+    def __init__(self, registryFile):
         Log.i("Loading registry file: '{0}'".format(registryFile))
         xml = etree.parse(registryFile)
         self.parsePlatformInfo(xml)
         self.parseExtensionInfo(xml)
         self.parseStructInfo(xml)
 
-    def parsePlatformInfo(self, xml: etree):
-        self.platforms = dict[str, VulkanPlatform]()
+    def parsePlatformInfo(self, xml):
+        self.platforms = dict()
         for plat in xml.findall("./platforms/platform"):
             self.platforms[plat.get('name')] = VulkanPlatform(plat)
 
 
-    def parseStructInfo(self, xml: etree):
-        self.structs = dict[str, VulkanStruct]()
+    def parseStructInfo(self, xml):
+        self.structs = dict()
         for struct in xml.findall("./types/type[@category='struct']"):
             # Define base struct information
             structDef = VulkanStruct(struct.get('name'))
@@ -352,8 +351,8 @@ class VulkanRegistry():
                     Log.f("Failed to find alias '{0}' of struct '{0}'".format(alias, struct.get('name')))
 
 
-    def parseExtensionInfo(self, xml: etree):
-        self.extensions = dict[str, VulkanExtension]()
+    def parseExtensionInfo(self, xml):
+        self.extensions = dict()
         for ext in xml.findall("./extensions/extension"):
             # Only care about enabled extensions
             if ext.get('supported') == "vulkan":
@@ -378,7 +377,7 @@ class VulkanRegistry():
 
 
 class VulkanProfileCapabilities():
-    def __init__(self, data: dict, caps: dict):
+    def __init__(self, data, caps):
         self.extensions = dict()
         self.features = dict()
         self.properties = dict()
@@ -392,7 +391,7 @@ class VulkanProfileCapabilities():
                 Log.f("Capability '{0}' needed by profile '{1}' is missing".format(capName, data['name']))
 
 
-    def mergeCaps(self, caps: dict):
+    def mergeCaps(self, caps):
         self.mergeProfileExtensions(caps)
         self.mergeProfileFeatures(caps)
         self.mergeProfileProperties(caps)
@@ -401,7 +400,7 @@ class VulkanProfileCapabilities():
         self.mergeProfileMemoryProperties(caps)
 
 
-    def mergeProfileCapData(self, dst: dict, src: dict):
+    def mergeProfileCapData(self, dst, src):
         if type(src) != type(dst):
             Log.f("Data type confict during profile capability data merge (src is '{0}', dst is '{1}')".format(type(src), type(dst)))
         elif type(src) == dict:
@@ -424,7 +423,7 @@ class VulkanProfileCapabilities():
             Log.f("Unexpected data type during profile capability data merge (src is '{0}', dst is '{1}')".format(type(src), type(dst)))
 
 
-    def mergeProfileExtensions(self, data: dict):
+    def mergeProfileExtensions(self, data):
         if data.get('extensions') != None:
             for extName, specVer in data['extensions'].items():
                 self.extensions[extName] = {
@@ -432,33 +431,33 @@ class VulkanProfileCapabilities():
                 }
 
 
-    def mergeProfileFeatures(self, data: dict):
+    def mergeProfileFeatures(self, data):
         if data.get('features') != None:
             self.mergeProfileCapData(self.features, data['features'])
 
 
-    def mergeProfileProperties(self, data: dict):
+    def mergeProfileProperties(self, data):
         if data.get('properties') != None:
             self.mergeProfileCapData(self.properties, data['properties'])
 
 
-    def mergeProfileFormats(self, data: dict):
+    def mergeProfileFormats(self, data):
         if data.get('formats') != None:
             self.mergeProfileCapData(self.formats, data['formats'])
 
 
-    def mergeProfileQueueFamiliesProperties(self, data: dict):
+    def mergeProfileQueueFamiliesProperties(self, data):
         if data.get('queueFamiliesProperties') != None:
             self.mergeProfileCapData(self.queueFamiliesProperties, data['queueFamiliesProperties'])
 
 
-    def mergeProfileMemoryProperties(self, data: dict):
+    def mergeProfileMemoryProperties(self, data):
         if data.get('memoryProperties') != None:
             self.mergeProfileCapData(self.memoryProperties, data['memoryProperties'])
 
 
 class VulkanProfile():
-    def __init__(self, registry: VulkanRegistry, name: str, data: dict, caps: dict):
+    def __init__(self, registry, name, data, caps):
         self.name = name
         self.version = data['version']
         self.apiVersion = data['api-version']
@@ -468,7 +467,7 @@ class VulkanProfile():
         self.validateProfileExtensions(registry)
 
 
-    def validateProfileExtensions(self, registry: VulkanRegistry):
+    def validateProfileExtensions(self, registry):
         if self.capabilities.extensions:
             for extName in self.capabilities.extensions.keys():
                 if extName in registry.extensions:
@@ -480,7 +479,7 @@ class VulkanProfile():
 
 
 class VulkanProfiles():
-    def loadFromDir(registry: VulkanRegistry, profilesDir: str) -> dict[str, VulkanProfile]:
+    def loadFromDir(registry, profilesDir):
         profiles = dict()
         dirAbsPath = os.path.abspath(profilesDir)
         filenames = os.listdir(dirAbsPath)
@@ -495,7 +494,7 @@ class VulkanProfiles():
         return profiles
 
 
-    def parseCapabilities(capData: dict) -> dict:
+    def parseCapabilities(capData):
         caps = dict()
         for cap in capData:
             name = cap['name']
@@ -506,7 +505,7 @@ class VulkanProfiles():
         return caps
 
 
-    def parseProfiles(registry: VulkanRegistry, profiles: dict, json: dict, caps: dict):
+    def parseProfiles(registry, profiles, json, caps):
         for data in json:
             name = data['name']
             if not name in profiles:
@@ -517,7 +516,7 @@ class VulkanProfiles():
 
 
 class ProfilePlatformGuard():
-    def __init__(self, registry: VulkanRegistry, profile: VulkanProfile):
+    def __init__(self, registry, profile):
         platform = profile.platform
         if platform != None:
             platformDef = registry.platforms[platform].protect
@@ -529,17 +528,17 @@ class ProfilePlatformGuard():
 
 
 class VulkanProfilesBuilder():
-    def __init__(self, registry: VulkanRegistry, profiles: dict[str, VulkanProfile]):
+    def __init__(self, registry, profiles):
         self.registry = registry
         self.profiles = profiles
 
 
-    def generate(self, outIncDir: str, outSrcDir: str):
+    def generate(self, outIncDir, outSrcDir):
         self.generate_h(outIncDir)
         self.generate_cpp(outSrcDir)
 
 
-    def generate_h(self, outDir: str):
+    def generate_h(self, outDir):
         fileAbsPath = os.path.join(os.path.abspath(outDir), 'vulkan_profiles.h')
         Log.i("Generating '{0}'...".format(fileAbsPath))
         with open(fileAbsPath, 'w') as f:
@@ -549,7 +548,7 @@ class VulkanProfilesBuilder():
             f.write(C_HEADER_POST_DEFS)
 
 
-    def generate_cpp(self, outDir: str):
+    def generate_cpp(self, outDir):
         fileAbsPath = os.path.join(os.path.abspath(outDir), 'vulkan_profiles.cpp')
         Log.i("Generating '{0}'...".format(fileAbsPath))
         with open(fileAbsPath, 'w') as f:
@@ -1154,7 +1153,7 @@ class VulkanProfilesBuilder():
         return gen
 
 
-    def gen_listValue(self, values: list, isEnum = True):
+    def gen_listValue(self, values, isEnum = True):
         gen = ''
         if not isEnum:
             gen += '{ '
@@ -1175,7 +1174,7 @@ class VulkanProfilesBuilder():
         return gen
 
 
-    def gen_assignStructVar(self, structDef: VulkanStruct, var: str, values):
+    def gen_assignStructVar(self, structDef, var, values):
         gen = ''
         for member, value in values.items():
             if member in structDef.members:
@@ -1211,7 +1210,7 @@ class VulkanProfilesBuilder():
         return gen
 
 
-    def gen_compareStructVar(self, fmt, structDef: VulkanStruct, deviceVar: str, profileVar: str, values):
+    def gen_compareStructVar(self, fmt, structDef, deviceVar, profileVar, values):
         gen = ''
         for member, value in values.items():
             if member in structDef.members:
