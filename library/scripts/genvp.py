@@ -295,6 +295,7 @@ class VulkanRegistry():
         self.parsePlatformInfo(xml)
         self.parseExtensionInfo(xml)
         self.parseStructInfo(xml)
+        self.applyWorkarounds()
 
     def parsePlatformInfo(self, xml):
         self.platforms = dict()
@@ -349,6 +350,34 @@ class VulkanRegistry():
                     self.structs[alias].aliases.append(struct.get('name'))
                 else:
                     Log.f("Failed to find alias '{0}' of struct '{0}'".format(alias, struct.get('name')))
+
+
+    def applyWorkarounds(self):
+        # TODO: We currently have to apply workarounds due to "noauto" limit types
+        # This should be solved only if we make modifications to the registry xml
+        self.structs['VkPhysicalDeviceLimits'].members['bufferImageGranularity'].limittype = 'min' # should be maxalign
+        self.structs['VkPhysicalDeviceLimits'].members['subPixelPrecisionBits'].limittype = 'max'
+        self.structs['VkPhysicalDeviceLimits'].members['subTexelPrecisionBits'].limittype = 'max'
+        self.structs['VkPhysicalDeviceLimits'].members['mipmapPrecisionBits'].limittype = 'max'
+        self.structs['VkPhysicalDeviceLimits'].members['viewportSubPixelBits'].limittype = 'max'
+        self.structs['VkPhysicalDeviceLimits'].members['minMemoryMapAlignment'].limittype = 'max' # should be minalign
+        self.structs['VkPhysicalDeviceLimits'].members['minTexelBufferOffsetAlignment'].limittype = 'min' # should be maxalign
+        self.structs['VkPhysicalDeviceLimits'].members['minUniformBufferOffsetAlignment'].limittype = 'min' # should be maxalign
+        self.structs['VkPhysicalDeviceLimits'].members['minStorageBufferOffsetAlignment'].limittype = 'min' # should be maxalign
+        self.structs['VkPhysicalDeviceLimits'].members['subPixelInterpolationOffsetBits'].limittype = 'max'
+        self.structs['VkPhysicalDeviceLimits'].members['timestampPeriod'].limittype = 'IGNORE' # good question what this should be...
+        self.structs['VkPhysicalDeviceLimits'].members['nonCoherentAtomSize'].limittype = 'min' # should be maxalign
+        self.structs['VkPhysicalDeviceLimits'].members['maxColorAttachments'].limittype = 'max' # vk.xml declares this with 'bitmask' limittype for some reason
+        self.structs['VkPhysicalDeviceVulkan11Properties'].members['subgroupSize'].limittype = 'IGNORE' # good question what this should be...
+        self.structs['VkPhysicalDevicePortabilitySubsetPropertiesKHR'].members['minVertexInputBindingStrideAlignment'].limittype = 'min' # should be maxalign
+
+        # TODO: There are also some bugs in the vk.xml, like parameters having "bitmask" limittype but actually VkBool32 type
+        # This is non-sense, so we patch them
+        for structName in self.structs:
+            for memberName in self.structs[structName].members:
+                memberDef = self.structs[structName].members[memberName]
+                if memberDef.limittype == 'bitmask' and memberDef.type == 'VkBool32':
+                    self.structs[structName].members[memberName].limittype = 'noauto'
 
 
     def parseExtensionInfo(self, xml):
@@ -1200,6 +1229,9 @@ class VulkanProfilesBuilder():
         for member, value in values.items():
             if member in structDef.members:
                 limittype = structDef.members[member].limittype
+                if limittype == 'IGNORE':
+                    # Skip this member as we don't know how to validate it
+                    continue
                 if limittype == 'bitmask':
                     # Compare bitmask by checking if device value contains every bit of profile value
                     comparePredFmt = '(({0} & {1}) == {1})'
