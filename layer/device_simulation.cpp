@@ -3753,8 +3753,6 @@ void JsonLoader::GetFeature(const Json::Value &feature) {
         GetValue(feature, &pdd_.physical_device_dynamic_rendering_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentDensityMap2FeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_fragment_density_map_2_features_);
-    } else if (feature_name == "VkPhysicalDeviceFragmentDensityMap2PropertiesEXT") {
-        GetValue(feature, &pdd_.physical_device_fragment_density_map_2_properties_);
     } else if (feature_name == "Vulkan12Features") {
         GetValue(feature, &pdd_.physical_device_vulkan_1_2_features_);
     } else if (feature_name == "VkPhysicalDevicePortabilitySubsetFeaturesKHR") {
@@ -3873,6 +3871,8 @@ void JsonLoader::GetProperty(const Json::Value &prop) {
         GetValue(prop, &pdd_.physical_device_shader_sm_builtins_properties_);
     } else if (property_name == "VkPhysicalDeviceShadingRateImagePropertiesNV") {
         GetValue(prop, &pdd_.physical_device_shading_rate_image_properties_);
+    } else if (property_name == "VkPhysicalDeviceFragmentDensityMap2PropertiesEXT") {
+        GetValue(prop, &pdd_.physical_device_fragment_density_map_2_properties_);
     } else if (property_name == "VkPhysicalDeviceMemoryProperties") {
         GetValue(prop, &pdd_.physical_device_memory_properties_);
     } else if (property_name == "VkSurfaceCapabilitiesKHR") {
