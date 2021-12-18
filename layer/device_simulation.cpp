@@ -1299,123 +1299,6 @@ bool IsFormatSupported(const VkFormatProperties &props) {
     return !(!props.linearTilingFeatures && !props.optimalTilingFeatures && !props.bufferFeatures);
 }
 
-enum Limit {
-    MIN,
-    MAX,
-    RANGE,
-    EQUAL,
-    NEQUAL,
-    ALL,
-    ANY,
-};
-
-enum Type {
-    INT32,
-    UINT32,
-    FLOAT,
-};
-
-struct Value {
-    union {
-        int32_t int_value;
-        uint32_t uint_value;
-        float float_value;
-    };
-};
-
-struct Property {
-    const char *name = "";
-    Limit limit = Limit::MIN;
-    uint32_t dimensions = 1;
-    Type type;
-    Value *values = nullptr;
-
-    Property(const Json::Value &value) {
-        ReadName(value);
-        ReadLimit(value);
-        ReadDimensions(value);
-        values = new Value[dimensions];
-        ReadType(value);
-        ReadValues(value);
-    }
-    ~Property() {
-        if (values) {
-            delete[] values;
-        }
-    }
-
-    void ReadName(const Json::Value &value) {
-        if (value.isMember("name")) {
-            name = value["name"].asCString();
-        }
-    }
-
-    void ReadLimit(const Json::Value &value) {
-        if (value.isMember("limit")) {
-            const auto limitString = value["limit"].asString();
-            if (limitString == "MIN") {
-                limit = Limit::MIN;
-            } else if (limitString == "MAX") {
-                limit = Limit::MAX;
-            } else if (limitString == "RANGE") {
-                limit = Limit::RANGE;
-            } else if (limitString == "EQUAL") {
-                limit = Limit::EQUAL;
-            } else if (limitString == "NEQUAL") {
-                limit = Limit::NEQUAL;
-            } else if (limitString == "ALL") {
-                limit = Limit::ALL;
-            } else if (limitString == "ANY") {
-                limit = Limit::ANY;
-            }
-        }
-    }
-
-    void ReadDimensions(const Json::Value &value) {
-        if (value.isMember("dimensions")) {
-            dimensions = value["dimensions"].asInt();
-        }
-    }
-
-    void ReadType(const Json::Value &value) {
-        if (value.isMember("type")) {
-            if (value["type"].asString() == "int32_t") {
-                type = Type::INT32;
-            } else if (value["type"].asString() == "uint32_t") {
-                type = Type::UINT32;
-            } else if (value["type"].asString() == "float") {
-                type = Type::FLOAT;
-            }
-        }
-    }
-
-    void ReadValues(const Json::Value &value) {
-        if (value.isMember("value")) {
-            if (value["value"].isArray()) {
-                uint32_t i = 0;
-                for (const auto el : value["value"]) {
-                    if (type == Type::INT32) {
-                        values[i].int_value = el.asInt();
-                    } else if (type == Type::UINT32) {
-                        values[i].uint_value = el.asUInt();
-                    } else {
-                        values[i].float_value = el.asFloat();
-                    }
-                    ++i;
-                }
-            } else {
-                if (type == Type::INT32) {
-                    values[0].int_value = value["value"].asInt();
-                } else if (type == Type::UINT32) {
-                    values[0].uint_value = value["value"].asUInt();
-                } else {
-                    values[0].float_value = value["value"].asFloat();
-                }
-            }
-        }
-    }
-};
-
 // PhysicalDeviceData : creates and manages the simulated device configurations //////////////////////////////////////////////////
 
 class PhysicalDeviceData {
@@ -2433,9 +2316,9 @@ class JsonLoader {
     std::vector<Extension> profile_extensions;
 
     SchemaId IdentifySchema(const Json::Value &value);
-    void GetFeature(const Json::Value &feature);
-    void GetProperty(const Json::Value &prop);
-    void GetFormat(const Json::Value &value, ArrayOfVkFormatProperties *dest);
+    void GetFeature(const Json::Value &features, const std::string& feature_name);
+    void GetProperty(const Json::Value &props, const std::string &property_name);
+    void GetFormat(const Json::Value &formats, const std::string& format_name, ArrayOfVkFormatProperties *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStencilResolveProperties *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dest);
@@ -2595,8 +2478,10 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryProperties *dest);
     void GetValue(const Json::Value &parent, VkSurfaceCapabilitiesKHR *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest);
-    void GetValue(const Json::Value &parent, const char *name, VkExtent3D *dest);
+    void GetValue(const Json::Value &parent, const std::string& member, const char *name, VkExtent2D *dest);
+    void GetValue(const Json::Value &parent, const std::string &member, const char *name, VkExtent2D *dest,
+                              std::function<bool(const char *, uint32_t, uint32_t)> warn_func);
+    void GetValue(const Json::Value &parent, const std::string& member, const char *name, VkExtent3D *dest);
     void GetValue(const Json::Value &parent, int index, VkQueueFamilyProperties *dest);
     void GetValue(const Json::Value &parent, int index, DevsimFormatProperties *dest);
     void GetValue(const Json::Value &parent, int index, VkLayerProperties *dest);
@@ -2632,8 +2517,8 @@ class JsonLoader {
         return false;
     }
 
-    // For use as warn_func in GET_VALUE_WARN().  Return true if warning occurred.
-    template <typename T>
+    // For use as warn_func in GET_VALUE_WARN(member, ).  Return true if warning occurred.
+    /*template <typename T>
     static bool PropertyWarnIfGreater(const char *name, const Property &new_value, const T old_value, const uint32_t i = 0) {
         if (new_value.type == Type::UINT32) {
             if (new_value.values[i].uint_value > static_cast<uint32_t>(old_value)) {
@@ -2848,10 +2733,13 @@ class JsonLoader {
 
     static void WriteValue(VkShaderFloatControlsIndependence *dest, const Property &value) { WriteValueInt(dest, value); }
 
-    static void WriteValue(VkSampleCountFlagBits *dest, const Property &value) { WriteValueInt(dest, value); }
+    static void WriteValue(VkSampleCountFlagBits *dest, const Property &value) { WriteValueInt(dest, value); }*/
 
-    void GetValue(const Json::Value &parent, const char *name, float *dest,
+    void GetValue(const Json::Value &parent, const std::string& member, const char *name, float *dest,
                   std::function<bool(const char *, float, float)> warn_func = nullptr) {
+        if (member != name) {
+            return;
+        }
         const Json::Value value = parent[name];
         if (!value.isDouble()) {
             return;
@@ -2863,8 +2751,11 @@ class JsonLoader {
         *dest = new_value;
     }
 
-    void GetValue(const Json::Value &parent, const char *name, int32_t *dest,
+    void GetValue(const Json::Value &parent, const std::string& member, const char *name, int32_t *dest,
                   std::function<bool(const char *, int32_t, int32_t)> warn_func = nullptr) {
+        if (member != name) {
+            return;
+        }
         const Json::Value value = parent[name];
         if (!value.isInt()) {
             return;
@@ -2876,8 +2767,11 @@ class JsonLoader {
         *dest = new_value;
     }
 
-    void GetValue(const Json::Value &parent, const char *name, uint32_t *dest,
+    void GetValue(const Json::Value &parent, const std::string& member, const char *name, uint32_t *dest,
                   std::function<bool(const char *, uint32_t, uint32_t)> warn_func = nullptr) {
+        if (member != name) {
+            return;
+        }
         const Json::Value value = parent[name];
         if (value.isBool()) {
             const bool new_value = value.asBool();
@@ -2895,8 +2789,16 @@ class JsonLoader {
         *dest = new_value;
     }
 
-    void GetValue(const Json::Value &parent, const char *name, uint64_t *dest,
+    void GetValue(const Json::Value &parent, const char *name, uint32_t *dest,
+                  std::function<bool(const char *, uint32_t, uint32_t)> warn_func = nullptr) {
+        GetValue(parent, name, name, dest, warn_func);
+    }
+
+    void GetValue(const Json::Value &parent, const std::string& member, const char *name, uint64_t *dest,
                   std::function<bool(const char *, uint64_t, uint64_t)> warn_func = nullptr) {
+        if (member != name) {
+            return;
+        }
         const Json::Value value = parent[name];
         if (!value.isUInt64()) {
             return;
@@ -2908,8 +2810,16 @@ class JsonLoader {
         *dest = new_value;
     }
 
-    void GetValue(const Json::Value &parent, const char *name, int64_t *dest,
+    void GetValue(const Json::Value &parent, const char *name, uint64_t *dest,
+                  std::function<bool(const char *, uint64_t, uint64_t)> warn_func = nullptr) {
+        GetValue(parent, name, name, dest, warn_func);
+    }
+
+    void GetValue(const Json::Value &parent, const std::string& member, const char *name, int64_t *dest,
                   std::function<bool(const char *, int64_t, int64_t)> warn_func = nullptr) {
+        if (member != name) {
+            return;
+        }
         const Json::Value value = parent[name];
         if (!value.isInt64()) {
             return;
@@ -2921,8 +2831,11 @@ class JsonLoader {
         *dest = new_value;
     }
 
-    void GetValue(const Json::Value &parent, const char *name, uint8_t *dest,
+    void GetValue(const Json::Value &parent, const std::string& member, const char *name, uint8_t *dest,
                   std::function<bool(const char *, uint8_t, uint8_t)> warn_func = nullptr) {
+        if (member != name) {
+            return;
+        }
         const Json::Value value = parent[name];
         if (!value.isUInt()) {
             return;
@@ -2935,8 +2848,11 @@ class JsonLoader {
     }
 
     template <typename T>  // for Vulkan enum types
-    void GetValue(const Json::Value &parent, const char *name, T *dest,
+    void GetValue(const Json::Value &parent, const std::string& member, const char *name, T *dest,
                   std::function<bool(const char *, T, T)> warn_func = nullptr) {
+        if (member != name) {
+            return;
+        }
         const Json::Value value = parent[name];
         if (!value.isInt()) {
             return;
@@ -2946,6 +2862,12 @@ class JsonLoader {
             warn_func(name, new_value, *dest);
         }
         *dest = new_value;
+    }
+
+    template <typename T>  // for Vulkan enum types
+    void GetValue(const Json::Value &parent, const char *name, T *dest,
+                  std::function<bool(const char *, T, T)> warn_func = nullptr) {
+        GetValue(parent, name, name, dest, warn_func);
     }
 
     int GetArray(const Json::Value &parent, const char *name, uint8_t *dest) {
@@ -3516,8 +3438,8 @@ bool JsonLoader::LoadFiles(const char *filename_list) {
     return true;
 }
 
-void JsonLoader::GetFeature(const Json::Value &feature) {
-    const auto feature_name = feature["struct"].asString();
+void JsonLoader::GetFeature(const Json::Value &features, const std::string &feature_name) {
+    const Json::Value& feature = features[feature_name];
 
     if (feature_name == "VkPhysicalDeviceFeatures") {
         GetValue(feature, &pdd_.physical_device_features_);
@@ -3760,8 +3682,8 @@ void JsonLoader::GetFeature(const Json::Value &feature) {
     }
 }
 
-void JsonLoader::GetProperty(const Json::Value &prop) {
-    const auto property_name = prop["struct"].asString();
+void JsonLoader::GetProperty(const Json::Value &props, const std::string& property_name) {
+    const Json::Value& prop = props[property_name];
 
     if (property_name == "VkPhysicalDeviceProperties") {
         GetValue(prop, &pdd_.physical_device_properties_);
@@ -3894,23 +3816,19 @@ void JsonLoader::GetProperty(const Json::Value &prop) {
     }
 }
 
-void JsonLoader::GetFormat(const Json::Value &value, ArrayOfVkFormatProperties *dest) {
-    VkFormat format = StringToFormat(value["value"].asString());
+void JsonLoader::GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest) {
+    VkFormat format = StringToFormat(format_name);
     auto &format_properties = (*dest)[format];
-    const Json::Value& properties = value["properties"];
-    for (const auto &prop : properties) {
-        if (prop["struct"].asString() == "VkFormatProperties2") {
-            const auto &members = prop["members"];
-            for (const auto &feature : members["linearTilingFeatures"]) {
-                format_properties.linearTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
-            }
-            for (const auto &feature : members["optimalTilingFeatures"]) {
-                format_properties.optimalTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
-            }
-            for (const auto &feature : members["bufferFeatures"]) {
-                format_properties.bufferFeatures |= StringToVkFormatFeatureFlags(feature.asString());
-            }
-        }
+    const auto &member = formats[format_name];
+    const auto &props = member["VkFormatProperties"];
+    for (const auto &feature : props["linearTilingFeatures"]) {
+        format_properties.linearTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+    }
+    for (const auto &feature : props["optimalTilingFeatures"]) {
+        format_properties.optimalTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+    }
+    for (const auto &feature : props["bufferFeatures"]) {
+        format_properties.bufferFeatures |= StringToVkFormatFeatureFlags(feature.asString());
     }
 }
 
@@ -3954,20 +3872,20 @@ bool JsonLoader::LoadFile(const char *filename) {
         if (c["name"] == profile_name) {
             const auto &extensions = c["extensions"];
             profile_extensions.reserve(extensions.size());
-            for (const auto &e : extensions) {
-                profile_extensions.push_back({e["extensionName"].asString(), e["specVersion"].asInt()});
+            for (const auto &e : extensions.getMemberNames()) {
+                profile_extensions.push_back({e, extensions[e].asInt()});
             }
             const auto &features = c["features"];
-            for (const auto &feature : features) {
-                GetFeature(feature);
+            for (const auto &feature : features.getMemberNames()) {
+                GetFeature(features, feature);
             }
             const auto &properties = c["properties"];
-            for (const auto &prop : properties) {
-                GetProperty(prop);
+            for (const auto &prop : properties.getMemberNames()) {
+                GetProperty(properties, prop);
             }
             const auto& formats = c["formats"];
-            for (const auto& format : formats) {
-                GetFormat(format, &pdd_.arrayof_format_properties_);
+            for (const auto& format : formats.getMemberNames()) {
+                GetFormat(formats, format, &pdd_.arrayof_format_properties_);
             }
         }
     }
@@ -4007,53 +3925,28 @@ JsonLoader::SchemaId JsonLoader::IdentifySchema(const Json::Value &value) {
 }
 
 // Apply the DRY principle, see https://en.wikipedia.org/wiki/Don%27t_repeat_yourself
-#define GET_VALUE(name) GetValue(value, #name, &dest->name)
-#define GET_ARRAY(name) GetArray(value, #name, dest->name)
-#define GET_VALUE_WARN(name, warn_func) GetValue(value, #name, &dest->name, warn_func)
-
-#define GET_PROPERTY_WARN(prop_name)                           \
-    if (strcmp(p.name, #prop_name) == 0) {                     \
-        if (p.limit == Limit::MIN) {                           \
-            PropertyWarnIfGreater(p.name, p, dest->prop_name); \
-        } else if (p.limit == Limit::MAX) {                    \
-            PropertyWarnIfLesser(p.name, p, dest->prop_name);  \
-        } else if (p.limit == Limit::RANGE) {                  \
-            PropertyWarnIfLesser(p.name, p, dest->prop_name);  \
-            PropertyWarnIfGreater(p.name, p, dest->prop_name); \
-        } else if (p.limit == Limit::EQUAL) {                  \
-            PropertyWarnIfEqual(p.name, p, dest->prop_name);   \
-        } else if (p.limit == Limit::NEQUAL) {                 \
-            PropertyWarnIfNEqual(p.name, p, dest->prop_name);  \
-        }                                                      \
-                                                               \
-        WriteValue(&dest->prop_name, p);                       \
-    }
+#define GET_VALUE(member, name) GetValue(parent, member, #name, &dest->name)
+#define GET_ARRAY(name) GetArray(parent, #name, dest->name)
+#define GET_MEMBER_VALUE(member, name) GetValue(parent, member, #name, &dest->name)
+#define GET_VALUE_WARN(member, name, warn_func) GetValue(parent, member, #name, &dest->name, warn_func)
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProperties)\n");
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(apiVersion);
-        GET_PROPERTY_WARN(driverVersion);
-        GET_PROPERTY_WARN(vendorID);
-        GET_PROPERTY_WARN(deviceID);
-        GET_PROPERTY_WARN(deviceType);
+    GetValue(parent["limits"], &dest->limits);
+    for (const auto &prop : parent) {
+        GET_VALUE("apiVersion", apiVersion);
+        GET_VALUE("driverVersion", driverVersion);
+        GET_VALUE("vendorID", vendorID);
+        GET_VALUE("deviceID", deviceID);
+        GET_VALUE("deviceType", deviceType);
+        GetValue(parent, "deviceType", "deviceType", &dest->deviceType);
         GET_ARRAY(deviceName);         // size < VK_MAX_PHYSICAL_DEVICE_NAME_SIZE
-        GET_ARRAY(pipelineCacheUUID);  // size == VK_UUID_SIZE
+        GET_ARRAY(pipelineCacheUUID);  // size == VK_UUID_SIZE*/
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStencilResolveProperties *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDepthStencilResolveProperties)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4062,22 +3955,15 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStenci
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(supportedDepthResolveModes);
-        GET_PROPERTY_WARN(supportedStencilResolveModes);
-        GET_PROPERTY_WARN(independentResolveNone);
-        GET_PROPERTY_WARN(independentResolve);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE(prop, supportedDepthResolveModes);
+        GET_VALUE(prop, supportedStencilResolveModes);
+        GET_VALUE_WARN(prop, independentResolveNone, WarnIfGreater);
+        GET_VALUE_WARN(prop, independentResolve, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    auto type = value.type();
-    if (value.type() != Json::arrayValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDescriptorIndexingPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4086,41 +3972,35 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxUpdateAfterBindDescriptorsInAllPools);
-        GET_PROPERTY_WARN(maxUpdateAfterBindDescriptorsInAllPools);
-        GET_PROPERTY_WARN(shaderUniformBufferArrayNonUniformIndexingNative);
-        GET_PROPERTY_WARN(shaderSampledImageArrayNonUniformIndexingNative);
-        GET_PROPERTY_WARN(shaderStorageBufferArrayNonUniformIndexingNative);
-        GET_PROPERTY_WARN(shaderStorageImageArrayNonUniformIndexingNative);
-        GET_PROPERTY_WARN(shaderInputAttachmentArrayNonUniformIndexingNative);
-        GET_PROPERTY_WARN(robustBufferAccessUpdateAfterBind);
-        GET_PROPERTY_WARN(quadDivergentImplicitLod);
-        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindSamplers);
-        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindUniformBuffers);
-        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindStorageBuffers);
-        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindSampledImages);
-        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindStorageImages);
-        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindInputAttachments);
-        GET_PROPERTY_WARN(maxPerStageUpdateAfterBindResources);
-        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindSamplers);
-        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindUniformBuffers);
-        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindUniformBuffersDynamic);
-        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindStorageBuffers);
-        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindStorageBuffersDynamic);
-        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindSampledImages);
-        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindStorageImages);
-        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindInputAttachments);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxUpdateAfterBindDescriptorsInAllPools, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxUpdateAfterBindDescriptorsInAllPools, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderUniformBufferArrayNonUniformIndexingNative, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderSampledImageArrayNonUniformIndexingNative, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderStorageBufferArrayNonUniformIndexingNative, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderStorageImageArrayNonUniformIndexingNative, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderInputAttachmentArrayNonUniformIndexingNative, WarnIfGreater);
+        GET_VALUE_WARN(prop, robustBufferAccessUpdateAfterBind, WarnIfGreater);
+        GET_VALUE_WARN(prop, quadDivergentImplicitLod, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorUpdateAfterBindSamplers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorUpdateAfterBindUniformBuffers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorUpdateAfterBindStorageBuffers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorUpdateAfterBindSampledImages, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorUpdateAfterBindStorageImages, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorUpdateAfterBindInputAttachments, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageUpdateAfterBindResources, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindSamplers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindUniformBuffers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindUniformBuffersDynamic, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindStorageBuffers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindStorageBuffersDynamic, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindSampledImages, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindStorageImages, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindInputAttachments, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatControlsPropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFloatControlsPropertiesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4129,34 +4009,28 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatContro
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(denormBehaviorIndependence);
-        GET_PROPERTY_WARN(roundingModeIndependence);
-        GET_PROPERTY_WARN(shaderSignedZeroInfNanPreserveFloat16);
-        GET_PROPERTY_WARN(shaderSignedZeroInfNanPreserveFloat32);
-        GET_PROPERTY_WARN(shaderSignedZeroInfNanPreserveFloat64);
-        GET_PROPERTY_WARN(shaderDenormPreserveFloat16);
-        GET_PROPERTY_WARN(shaderDenormPreserveFloat32);
-        GET_PROPERTY_WARN(shaderDenormPreserveFloat64);
-        GET_PROPERTY_WARN(shaderDenormFlushToZeroFloat16);
-        GET_PROPERTY_WARN(shaderDenormFlushToZeroFloat32);
-        GET_PROPERTY_WARN(shaderDenormFlushToZeroFloat64);
-        GET_PROPERTY_WARN(shaderRoundingModeRTEFloat16);
-        GET_PROPERTY_WARN(shaderRoundingModeRTEFloat32);
-        GET_PROPERTY_WARN(shaderRoundingModeRTEFloat64);
-        GET_PROPERTY_WARN(shaderRoundingModeRTZFloat16);
-        GET_PROPERTY_WARN(shaderRoundingModeRTZFloat32);
-        GET_PROPERTY_WARN(shaderRoundingModeRTZFloat64);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE(prop, denormBehaviorIndependence);
+        GET_VALUE(prop, roundingModeIndependence);
+        GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat16, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat32, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat64, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderDenormPreserveFloat16, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderDenormPreserveFloat32, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderDenormPreserveFloat64, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderDenormFlushToZeroFloat16, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderDenormFlushToZeroFloat32, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderDenormFlushToZeroFloat64, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderRoundingModeRTEFloat16, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderRoundingModeRTEFloat32, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderRoundingModeRTEFloat64, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderRoundingModeRTZFloat16, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderRoundingModeRTZFloat32, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderRoundingModeRTZFloat64, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance3PropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance3PropertiesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4164,19 +4038,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxPerSetDescriptors);
-        GET_PROPERTY_WARN(maxMemoryAllocationSize);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxPerSetDescriptors, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxMemoryAllocationSize, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4FeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance4FeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4184,18 +4052,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maintenance4);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maintenance4, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4PropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance4PropertiesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4203,18 +4065,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxBufferSize);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxBufferSize, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMultiviewPropertiesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4222,11 +4078,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPr
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxMultiviewViewCount);
-        GET_PROPERTY_WARN(maxMultiviewInstanceIndex);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxMultiviewViewCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxMultiviewInstanceIndex, WarnIfGreater);
     }
 }
 
@@ -4295,10 +4149,6 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceToolPropert
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetPropertiesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && emulatePortability.num <= 0) {
         ErrorPrintf(
@@ -4308,10 +4158,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
             kEnvarDevsimEmulatePortability);
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(minVertexInputBindingStrideAlignment);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, minVertexInputBindingStrideAlignment, WarnIfGreater);
     }
 }
 
@@ -4321,14 +4169,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMe
         return;
     }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProtectedMemoryProperties)\n");
-    GET_VALUE_WARN(protectedNoFault, WarnIfLesser);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, protectedNoFault, WarnIfLesser);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4337,19 +4183,14 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilt
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(filterMinmaxSingleComponentFormats);
-        GET_PROPERTY_WARN(filterMinmaxImageComponentMapping);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, filterMinmaxSingleComponentFormats, WarnIfGreater);
+        GET_VALUE_WARN(prop, filterMinmaxImageComponentMapping, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphorePropertiesKHR *dest) {
     const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTimelineSemaphorePropertiesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4358,265 +4199,232 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSem
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxTimelineSemaphoreValueDifference);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxTimelineSemaphoreValueDifference, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
-
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxImageDimension1D);
-        GET_PROPERTY_WARN(maxImageDimension2D);
-        GET_PROPERTY_WARN(maxImageDimension3D);
-        GET_PROPERTY_WARN(maxImageDimensionCube);
-        GET_PROPERTY_WARN(maxImageArrayLayers);
-        GET_PROPERTY_WARN(maxTexelBufferElements);
-        GET_PROPERTY_WARN(maxUniformBufferRange);
-        GET_PROPERTY_WARN(maxStorageBufferRange);
-        GET_PROPERTY_WARN(maxPushConstantsSize);
-        GET_PROPERTY_WARN(maxMemoryAllocationCount);
-        GET_PROPERTY_WARN(maxSamplerAllocationCount);
-        GET_PROPERTY_WARN(bufferImageGranularity);
-        GET_PROPERTY_WARN(sparseAddressSpaceSize);
-        GET_PROPERTY_WARN(maxBoundDescriptorSets);
-        GET_PROPERTY_WARN(maxPerStageDescriptorSamplers);
-        GET_PROPERTY_WARN(maxPerStageDescriptorUniformBuffers);
-        GET_PROPERTY_WARN(maxPerStageDescriptorStorageBuffers);
-        GET_PROPERTY_WARN(maxPerStageDescriptorSampledImages);
-        GET_PROPERTY_WARN(maxPerStageDescriptorStorageImages);
-        GET_PROPERTY_WARN(maxPerStageDescriptorInputAttachments);
-        GET_PROPERTY_WARN(maxPerStageResources);
-        GET_PROPERTY_WARN(maxDescriptorSetSamplers);
-        GET_PROPERTY_WARN(maxDescriptorSetUniformBuffers);
-        GET_PROPERTY_WARN(maxDescriptorSetUniformBuffersDynamic);
-        GET_PROPERTY_WARN(maxDescriptorSetStorageBuffers);
-        GET_PROPERTY_WARN(maxDescriptorSetStorageBuffersDynamic);
-        GET_PROPERTY_WARN(maxDescriptorSetSampledImages);
-        GET_PROPERTY_WARN(maxDescriptorSetStorageImages);
-        GET_PROPERTY_WARN(maxDescriptorSetInputAttachments);
-        GET_PROPERTY_WARN(maxVertexInputAttributes);
-        GET_PROPERTY_WARN(maxVertexInputBindings);
-        GET_PROPERTY_WARN(maxVertexInputAttributeOffset);
-        GET_PROPERTY_WARN(maxVertexInputBindingStride);
-        GET_PROPERTY_WARN(maxVertexOutputComponents);
-        GET_PROPERTY_WARN(maxTessellationGenerationLevel);
-        GET_PROPERTY_WARN(maxTessellationPatchSize);
-        GET_PROPERTY_WARN(maxTessellationControlPerVertexInputComponents);
-        GET_PROPERTY_WARN(maxTessellationControlPerVertexOutputComponents);
-        GET_PROPERTY_WARN(maxTessellationControlPerPatchOutputComponents);
-        GET_PROPERTY_WARN(maxTessellationControlTotalOutputComponents);
-        GET_PROPERTY_WARN(maxTessellationEvaluationInputComponents);
-        GET_PROPERTY_WARN(maxTessellationEvaluationOutputComponents);
-        GET_PROPERTY_WARN(maxGeometryShaderInvocations);
-        GET_PROPERTY_WARN(maxGeometryInputComponents);
-        GET_PROPERTY_WARN(maxGeometryOutputComponents);
-        GET_PROPERTY_WARN(maxGeometryOutputVertices);
-        GET_PROPERTY_WARN(maxGeometryTotalOutputComponents);
-        GET_PROPERTY_WARN(maxFragmentInputComponents);
-        GET_PROPERTY_WARN(maxFragmentOutputAttachments);
-        GET_PROPERTY_WARN(maxFragmentDualSrcAttachments);
-        GET_PROPERTY_WARN(maxFragmentCombinedOutputResources);
-        GET_PROPERTY_WARN(maxComputeSharedMemorySize);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxImageDimension1D, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxImageDimension2D, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxImageDimension3D, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxImageDimensionCube, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxImageArrayLayers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTexelBufferElements, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxUniformBufferRange, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxStorageBufferRange, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPushConstantsSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxMemoryAllocationCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxSamplerAllocationCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, bufferImageGranularity, WarnIfGreater);
+        GET_VALUE_WARN(prop, sparseAddressSpaceSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxBoundDescriptorSets, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorSamplers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorUniformBuffers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorStorageBuffers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorSampledImages, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorStorageImages, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorInputAttachments, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageResources, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetSamplers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetUniformBuffers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetUniformBuffersDynamic, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetStorageBuffers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetStorageBuffersDynamic, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetSampledImages, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetStorageImages, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetInputAttachments, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxVertexInputAttributes, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxVertexInputBindings, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxVertexInputAttributeOffset, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxVertexInputBindingStride, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxVertexOutputComponents, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTessellationGenerationLevel, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTessellationPatchSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTessellationControlPerVertexInputComponents, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTessellationControlPerVertexOutputComponents, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTessellationControlPerPatchOutputComponents, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTessellationControlTotalOutputComponents, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTessellationEvaluationInputComponents, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTessellationEvaluationOutputComponents, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxGeometryShaderInvocations, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxGeometryInputComponents, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxGeometryOutputComponents, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxGeometryOutputVertices, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxGeometryTotalOutputComponents, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxFragmentInputComponents, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxFragmentOutputAttachments, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxFragmentDualSrcAttachments, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxFragmentCombinedOutputResources, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxComputeSharedMemorySize, WarnIfGreater);
         GET_ARRAY(maxComputeWorkGroupCount);  // size == 3
-        GET_PROPERTY_WARN(maxComputeWorkGroupInvocations);
+        GET_VALUE_WARN(prop, maxComputeWorkGroupInvocations, WarnIfGreater);
         GET_ARRAY(maxComputeWorkGroupSize);  // size == 3
-        GET_PROPERTY_WARN(subPixelPrecisionBits);
-        GET_PROPERTY_WARN(subTexelPrecisionBits);
-        GET_PROPERTY_WARN(mipmapPrecisionBits);
-        GET_PROPERTY_WARN(maxDrawIndexedIndexValue);
-        GET_PROPERTY_WARN(maxDrawIndirectCount);
-        GET_PROPERTY_WARN(maxSamplerLodBias);
-        GET_PROPERTY_WARN(maxSamplerAnisotropy);
-        GET_PROPERTY_WARN(maxViewports);
+        GET_VALUE_WARN(prop, subPixelPrecisionBits, WarnIfGreater);
+        GET_VALUE_WARN(prop, subTexelPrecisionBits, WarnIfGreater);
+        GET_VALUE_WARN(prop, mipmapPrecisionBits, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDrawIndexedIndexValue, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDrawIndirectCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxSamplerLodBias, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxSamplerAnisotropy, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxViewports, WarnIfGreater);
         GET_ARRAY(maxViewportDimensions);  // size == 2
         GET_ARRAY(viewportBoundsRange);    // size == 2
-        GET_PROPERTY_WARN(viewportSubPixelBits);
-        GET_PROPERTY_WARN(minMemoryMapAlignment);
-        GET_PROPERTY_WARN(minTexelBufferOffsetAlignment);
-        GET_PROPERTY_WARN(minUniformBufferOffsetAlignment);
-        GET_PROPERTY_WARN(minStorageBufferOffsetAlignment);
-        GET_PROPERTY_WARN(minTexelOffset);
-        GET_PROPERTY_WARN(maxTexelOffset);
-        GET_PROPERTY_WARN(minTexelGatherOffset);
-        GET_PROPERTY_WARN(maxTexelGatherOffset);
-        GET_PROPERTY_WARN(minInterpolationOffset);
-        GET_PROPERTY_WARN(maxInterpolationOffset);
-        GET_PROPERTY_WARN(subPixelInterpolationOffsetBits);
-        GET_PROPERTY_WARN(maxFramebufferWidth);
-        GET_PROPERTY_WARN(maxFramebufferHeight);
-        GET_PROPERTY_WARN(maxFramebufferLayers);
-        GET_PROPERTY_WARN(framebufferColorSampleCounts);
-        GET_PROPERTY_WARN(framebufferDepthSampleCounts);
-        GET_PROPERTY_WARN(framebufferStencilSampleCounts);
-        GET_PROPERTY_WARN(framebufferNoAttachmentsSampleCounts);
-        GET_PROPERTY_WARN(maxColorAttachments);
-        GET_PROPERTY_WARN(sampledImageColorSampleCounts);
-        GET_PROPERTY_WARN(sampledImageIntegerSampleCounts);
-        GET_PROPERTY_WARN(sampledImageDepthSampleCounts);
-        GET_PROPERTY_WARN(sampledImageStencilSampleCounts);
-        GET_PROPERTY_WARN(storageImageSampleCounts);
-        GET_PROPERTY_WARN(maxSampleMaskWords);
-        GET_PROPERTY_WARN(timestampComputeAndGraphics);
-        GET_PROPERTY_WARN(timestampPeriod);
-        GET_PROPERTY_WARN(maxClipDistances);
-        GET_PROPERTY_WARN(maxCullDistances);
-        GET_PROPERTY_WARN(maxCombinedClipAndCullDistances);
-        GET_PROPERTY_WARN(discreteQueuePriorities);
+        GET_VALUE_WARN(prop, viewportSubPixelBits, WarnIfGreater);
+        GET_VALUE_WARN(prop, minMemoryMapAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, minTexelBufferOffsetAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, minUniformBufferOffsetAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, minStorageBufferOffsetAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, minTexelOffset, WarnIfLesser);
+        GET_VALUE_WARN(prop, maxTexelOffset, WarnIfGreater);
+        GET_VALUE_WARN(prop, minTexelGatherOffset, WarnIfLesser);
+        GET_VALUE_WARN(prop, maxTexelGatherOffset, WarnIfGreater);
+        GET_VALUE_WARN(prop, minInterpolationOffset, WarnIfLesser);
+        GET_VALUE_WARN(prop, maxInterpolationOffset, WarnIfGreater);
+        GET_VALUE_WARN(prop, subPixelInterpolationOffsetBits, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxFramebufferWidth, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxFramebufferHeight, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxFramebufferLayers, WarnIfGreater);
+        GET_VALUE_WARN(prop, framebufferColorSampleCounts, WarnIfGreater);
+        GET_VALUE_WARN(prop, framebufferDepthSampleCounts, WarnIfGreater);
+        GET_VALUE_WARN(prop, framebufferStencilSampleCounts, WarnIfGreater);
+        GET_VALUE_WARN(prop, framebufferNoAttachmentsSampleCounts, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxColorAttachments, WarnIfGreater);
+        GET_VALUE_WARN(prop, sampledImageColorSampleCounts, WarnIfGreater);
+        GET_VALUE_WARN(prop, sampledImageIntegerSampleCounts, WarnIfGreater);
+        GET_VALUE_WARN(prop, sampledImageDepthSampleCounts, WarnIfGreater);
+        GET_VALUE_WARN(prop, sampledImageStencilSampleCounts, WarnIfGreater);
+        GET_VALUE_WARN(prop, storageImageSampleCounts, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxSampleMaskWords, WarnIfGreater);
+        GET_VALUE_WARN(prop, timestampComputeAndGraphics, WarnIfGreater);
+        GET_VALUE_WARN(prop, timestampPeriod, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxClipDistances, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxCullDistances, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxCombinedClipAndCullDistances, WarnIfGreater);
+        GET_VALUE_WARN(prop, discreteQueuePriorities, WarnIfGreater);
         GET_ARRAY(pointSizeRange);  // size == 2
         GET_ARRAY(lineWidthRange);  // size == 2
-        GET_PROPERTY_WARN(pointSizeGranularity);
-        GET_PROPERTY_WARN(lineWidthGranularity);
-        GET_PROPERTY_WARN(strictLines);
-        GET_PROPERTY_WARN(standardSampleLocations);
-        GET_PROPERTY_WARN(optimalBufferCopyOffsetAlignment);
-        GET_PROPERTY_WARN(optimalBufferCopyRowPitchAlignment);
-        GET_PROPERTY_WARN(nonCoherentAtomSize);
+        GET_VALUE_WARN(prop, pointSizeGranularity, WarnIfGreater);
+        GET_VALUE_WARN(prop, lineWidthGranularity, WarnIfGreater);
+        GET_VALUE_WARN(prop, strictLines, WarnIfGreater);
+        GET_VALUE_WARN(prop, standardSampleLocations, WarnIfGreater);
+        GET_VALUE_WARN(prop, optimalBufferCopyOffsetAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, optimalBufferCopyRowPitchAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, nonCoherentAtomSize, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSparseProperties *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
-
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(residencyStandard2DBlockShape);
-        GET_PROPERTY_WARN(residencyStandard2DMultisampleBlockShape);
-        GET_PROPERTY_WARN(residencyStandard3DBlockShape);
-        GET_PROPERTY_WARN(residencyAlignedMipSize);
-        GET_PROPERTY_WARN(residencyNonResidentStrict);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, residencyStandard2DBlockShape, WarnIfGreater);
+        GET_VALUE_WARN(prop, residencyStandard2DMultisampleBlockShape, WarnIfGreater);
+        GET_VALUE_WARN(prop, residencyStandard3DBlockShape, WarnIfGreater);
+        GET_VALUE_WARN(prop, residencyAlignedMipSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, residencyNonResidentStrict, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupProperties *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
-
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(subgroupSize);
-        GET_PROPERTY_WARN(supportedStages);
-        GET_PROPERTY_WARN(supportedOperations);
-        GET_PROPERTY_WARN(quadOperationsInAllStages);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, subgroupSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, supportedStages, WarnIfGreater);
+        GET_VALUE_WARN(prop, supportedOperations, WarnIfGreater);
+        GET_VALUE_WARN(prop, quadOperationsInAllStages, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFeatures)\n");
-    GET_VALUE(robustBufferAccess);
-    GET_VALUE(fullDrawIndexUint32);
-    GET_VALUE(imageCubeArray);
-    GET_VALUE(independentBlend);
-    GET_VALUE(geometryShader);
-    GET_VALUE(tessellationShader);
-    GET_VALUE(sampleRateShading);
-    GET_VALUE(dualSrcBlend);
-    GET_VALUE(logicOp);
-    GET_VALUE(multiDrawIndirect);
-    GET_VALUE(drawIndirectFirstInstance);
-    GET_VALUE(depthClamp);
-    GET_VALUE(depthBiasClamp);
-    GET_VALUE(fillModeNonSolid);
-    GET_VALUE(depthBounds);
-    GET_VALUE(wideLines);
-    GET_VALUE(largePoints);
-    GET_VALUE(alphaToOne);
-    GET_VALUE(multiViewport);
-    GET_VALUE(samplerAnisotropy);
-    GET_VALUE(textureCompressionETC2);
-    GET_VALUE(textureCompressionASTC_LDR);
-    GET_VALUE(textureCompressionBC);
-    GET_VALUE(occlusionQueryPrecise);
-    GET_VALUE(pipelineStatisticsQuery);
-    GET_VALUE(vertexPipelineStoresAndAtomics);
-    GET_VALUE(fragmentStoresAndAtomics);
-    GET_VALUE(shaderTessellationAndGeometryPointSize);
-    GET_VALUE(shaderImageGatherExtended);
-    GET_VALUE(shaderStorageImageExtendedFormats);
-    GET_VALUE(shaderStorageImageMultisample);
-    GET_VALUE(shaderStorageImageReadWithoutFormat);
-    GET_VALUE(shaderStorageImageWriteWithoutFormat);
-    GET_VALUE(shaderUniformBufferArrayDynamicIndexing);
-    GET_VALUE(shaderSampledImageArrayDynamicIndexing);
-    GET_VALUE(shaderStorageBufferArrayDynamicIndexing);
-    GET_VALUE(shaderStorageImageArrayDynamicIndexing);
-    GET_VALUE(shaderClipDistance);
-    GET_VALUE(shaderCullDistance);
-    GET_VALUE(shaderFloat64);
-    GET_VALUE(shaderInt64);
-    GET_VALUE(shaderInt16);
-    GET_VALUE(shaderResourceResidency);
-    GET_VALUE(shaderResourceMinLod);
-    GET_VALUE(sparseBinding);
-    GET_VALUE(sparseResidencyBuffer);
-    GET_VALUE(sparseResidencyImage2D);
-    GET_VALUE(sparseResidencyImage3D);
-    GET_VALUE(sparseResidency2Samples);
-    GET_VALUE(sparseResidency4Samples);
-    GET_VALUE(sparseResidency8Samples);
-    GET_VALUE(sparseResidency16Samples);
-    GET_VALUE(sparseResidencyAliased);
-    GET_VALUE(variableMultisampleRate);
-    GET_VALUE(inheritedQueries);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_MEMBER_VALUE(member, robustBufferAccess);
+        GET_MEMBER_VALUE(member, fullDrawIndexUint32);
+        GET_MEMBER_VALUE(member, imageCubeArray);
+        GET_MEMBER_VALUE(member, independentBlend);
+        GET_MEMBER_VALUE(member, geometryShader);
+        GET_MEMBER_VALUE(member, tessellationShader);
+        GET_MEMBER_VALUE(member, sampleRateShading);
+        GET_MEMBER_VALUE(member, dualSrcBlend);
+        GET_MEMBER_VALUE(member, logicOp);
+        GET_MEMBER_VALUE(member, multiDrawIndirect);
+        GET_MEMBER_VALUE(member, drawIndirectFirstInstance);
+        GET_MEMBER_VALUE(member, depthClamp);
+        GET_MEMBER_VALUE(member, depthBiasClamp);
+        GET_MEMBER_VALUE(member, fillModeNonSolid);
+        GET_MEMBER_VALUE(member, depthBounds);
+        GET_MEMBER_VALUE(member, wideLines);
+        GET_MEMBER_VALUE(member, largePoints);
+        GET_MEMBER_VALUE(member, alphaToOne);
+        GET_MEMBER_VALUE(member, multiViewport);
+        GET_MEMBER_VALUE(member, samplerAnisotropy);
+        GET_MEMBER_VALUE(member, textureCompressionETC2);
+        GET_MEMBER_VALUE(member, textureCompressionASTC_LDR);
+        GET_MEMBER_VALUE(member, textureCompressionBC);
+        GET_MEMBER_VALUE(member, occlusionQueryPrecise);
+        GET_MEMBER_VALUE(member, pipelineStatisticsQuery);
+        GET_MEMBER_VALUE(member, vertexPipelineStoresAndAtomics);
+        GET_MEMBER_VALUE(member, fragmentStoresAndAtomics);
+        GET_MEMBER_VALUE(member, shaderTessellationAndGeometryPointSize);
+        GET_MEMBER_VALUE(member, shaderImageGatherExtended);
+        GET_MEMBER_VALUE(member, shaderStorageImageExtendedFormats);
+        GET_MEMBER_VALUE(member, shaderStorageImageMultisample);
+        GET_MEMBER_VALUE(member, shaderStorageImageReadWithoutFormat);
+        GET_MEMBER_VALUE(member, shaderStorageImageWriteWithoutFormat);
+        GET_MEMBER_VALUE(member, shaderUniformBufferArrayDynamicIndexing);
+        GET_MEMBER_VALUE(member, shaderSampledImageArrayDynamicIndexing);
+        GET_MEMBER_VALUE(member, shaderStorageBufferArrayDynamicIndexing);
+        GET_MEMBER_VALUE(member, shaderStorageImageArrayDynamicIndexing);
+        GET_MEMBER_VALUE(member, shaderClipDistance);
+        GET_MEMBER_VALUE(member, shaderCullDistance);
+        GET_MEMBER_VALUE(member, shaderFloat64);
+        GET_MEMBER_VALUE(member, shaderInt64);
+        GET_MEMBER_VALUE(member, shaderInt16);
+        GET_MEMBER_VALUE(member, shaderResourceResidency);
+        GET_MEMBER_VALUE(member, shaderResourceMinLod);
+        GET_MEMBER_VALUE(member, sparseBinding);
+        GET_MEMBER_VALUE(member, sparseResidencyBuffer);
+        GET_MEMBER_VALUE(member, sparseResidencyImage2D);
+        GET_MEMBER_VALUE(member, sparseResidencyImage3D);
+        GET_MEMBER_VALUE(member, sparseResidency2Samples);
+        GET_MEMBER_VALUE(member, sparseResidency4Samples);
+        GET_MEMBER_VALUE(member, sparseResidency8Samples);
+        GET_MEMBER_VALUE(member, sparseResidency16Samples);
+        GET_MEMBER_VALUE(member, sparseResidencyAliased);
+        GET_MEMBER_VALUE(member, variableMultisampleRate);
+        GET_MEMBER_VALUE(member, inheritedQueries);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorageFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevice8BitStorageFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_8BIT_STORAGE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_8bit_storage, but VK_KHR_8bit_storage is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(storageBuffer8BitAccess, WarnIfGreater);
-    GET_VALUE_WARN(uniformAndStorageBuffer8BitAccess, WarnIfGreater);
-    GET_VALUE_WARN(storagePushConstant8, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, storageBuffer8BitAccess, WarnIfGreater);
+        GET_VALUE_WARN(member, uniformAndStorageBuffer8BitAccess, WarnIfGreater);
+        GET_VALUE_WARN(member, storagePushConstant8, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorageFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevice16BitStorageFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_16BIT_STORAGE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_16bit_storage, but VK_KHR_16bit_storage is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(storageBuffer16BitAccess, WarnIfGreater);
-    GET_VALUE_WARN(uniformAndStorageBuffer16BitAccess, WarnIfGreater);
-    GET_VALUE_WARN(storagePushConstant16, WarnIfGreater);
-    GET_VALUE_WARN(storageInputOutput16, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, storageBuffer16BitAccess, WarnIfGreater);
+        GET_VALUE_WARN(member, uniformAndStorageBuffer16BitAccess, WarnIfGreater);
+        GET_VALUE_WARN(member, storagePushConstant16, WarnIfGreater);
+        GET_VALUE_WARN(member, storageInputOutput16, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBufferDeviceAddressFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4624,16 +4432,14 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDevic
             "VK_KHR_buffer_device_address is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(bufferDeviceAddress, WarnIfGreater);
-    GET_VALUE_WARN(bufferDeviceAddressCaptureReplay, WarnIfGreater);
-    GET_VALUE_WARN(bufferDeviceAddressMultiDevice, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, bufferDeviceAddress, WarnIfGreater);
+        GET_VALUE_WARN(member, bufferDeviceAddressCaptureReplay, WarnIfGreater);
+        GET_VALUE_WARN(member, bufferDeviceAddressMultiDevice, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDescriptorIndexingFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4641,33 +4447,31 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
             "VK_EXT_descriptor_indexing is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderInputAttachmentArrayDynamicIndexing, WarnIfGreater);
-    GET_VALUE_WARN(shaderUniformTexelBufferArrayDynamicIndexing, WarnIfGreater);
-    GET_VALUE_WARN(shaderStorageTexelBufferArrayDynamicIndexing, WarnIfGreater);
-    GET_VALUE_WARN(shaderUniformBufferArrayNonUniformIndexing, WarnIfGreater);
-    GET_VALUE_WARN(shaderSampledImageArrayNonUniformIndexing, WarnIfGreater);
-    GET_VALUE_WARN(shaderStorageBufferArrayNonUniformIndexing, WarnIfGreater);
-    GET_VALUE_WARN(shaderStorageImageArrayNonUniformIndexing, WarnIfGreater);
-    GET_VALUE_WARN(shaderInputAttachmentArrayNonUniformIndexing, WarnIfGreater);
-    GET_VALUE_WARN(shaderUniformTexelBufferArrayNonUniformIndexing, WarnIfGreater);
-    GET_VALUE_WARN(shaderStorageTexelBufferArrayNonUniformIndexing, WarnIfGreater);
-    GET_VALUE_WARN(descriptorBindingUniformBufferUpdateAfterBind, WarnIfGreater);
-    GET_VALUE_WARN(descriptorBindingSampledImageUpdateAfterBind, WarnIfGreater);
-    GET_VALUE_WARN(descriptorBindingStorageImageUpdateAfterBind, WarnIfGreater);
-    GET_VALUE_WARN(descriptorBindingStorageBufferUpdateAfterBind, WarnIfGreater);
-    GET_VALUE_WARN(descriptorBindingUniformTexelBufferUpdateAfterBind, WarnIfGreater);
-    GET_VALUE_WARN(descriptorBindingStorageTexelBufferUpdateAfterBind, WarnIfGreater);
-    GET_VALUE_WARN(descriptorBindingUpdateUnusedWhilePending, WarnIfGreater);
-    GET_VALUE_WARN(descriptorBindingPartiallyBound, WarnIfGreater);
-    GET_VALUE_WARN(descriptorBindingVariableDescriptorCount, WarnIfGreater);
-    GET_VALUE_WARN(runtimeDescriptorArray, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderInputAttachmentArrayDynamicIndexing, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderUniformTexelBufferArrayDynamicIndexing, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderStorageTexelBufferArrayDynamicIndexing, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderUniformBufferArrayNonUniformIndexing, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSampledImageArrayNonUniformIndexing, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderStorageBufferArrayNonUniformIndexing, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderStorageImageArrayNonUniformIndexing, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderInputAttachmentArrayNonUniformIndexing, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderUniformTexelBufferArrayNonUniformIndexing, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderStorageTexelBufferArrayNonUniformIndexing, WarnIfGreater);
+        GET_VALUE_WARN(member, descriptorBindingUniformBufferUpdateAfterBind, WarnIfGreater);
+        GET_VALUE_WARN(member, descriptorBindingSampledImageUpdateAfterBind, WarnIfGreater);
+        GET_VALUE_WARN(member, descriptorBindingStorageImageUpdateAfterBind, WarnIfGreater);
+        GET_VALUE_WARN(member, descriptorBindingStorageBufferUpdateAfterBind, WarnIfGreater);
+        GET_VALUE_WARN(member, descriptorBindingUniformTexelBufferUpdateAfterBind, WarnIfGreater);
+        GET_VALUE_WARN(member, descriptorBindingStorageTexelBufferUpdateAfterBind, WarnIfGreater);
+        GET_VALUE_WARN(member, descriptorBindingUpdateUnusedWhilePending, WarnIfGreater);
+        GET_VALUE_WARN(member, descriptorBindingPartiallyBound, WarnIfGreater);
+        GET_VALUE_WARN(member, descriptorBindingVariableDescriptorCount, WarnIfGreater);
+        GET_VALUE_WARN(member, runtimeDescriptorArray, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryResetFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceHostQueryResetFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4675,14 +4479,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryRe
             "VK_EXT_host_query_reset is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(hostQueryReset, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, hostQueryReset, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFramebufferFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceImagelessFramebufferFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4690,30 +4492,26 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFr
             "VK_KHR_imageless_framebuffer is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(imagelessFramebuffer, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, imagelessFramebuffer, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMultiviewFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_multiview, but VK_KHR_multiview is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(multiview, WarnIfGreater);
-    GET_VALUE_WARN(multiviewGeometryShader, WarnIfGreater);
-    GET_VALUE_WARN(multiviewTessellationShader, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, multiview, WarnIfGreater);
+        GET_VALUE_WARN(member, multiviewGeometryShader, WarnIfGreater);
+        GET_VALUE_WARN(member, multiviewTessellationShader, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && emulatePortability.num <= 0) {
         ErrorPrintf(
@@ -4722,37 +4520,33 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
             "VK_KHR_portability_subset, please set environment variable %s to 1.\n",
             kEnvarDevsimEmulatePortability);
     }
-    GET_VALUE_WARN(constantAlphaColorBlendFactors, WarnIfGreater);
-    GET_VALUE_WARN(events, WarnIfGreater);
-    GET_VALUE_WARN(imageViewFormatReinterpretation, WarnIfGreater);
-    GET_VALUE_WARN(imageViewFormatSwizzle, WarnIfGreater);
-    GET_VALUE_WARN(imageView2DOn3DImage, WarnIfGreater);
-    GET_VALUE_WARN(multisampleArrayImage, WarnIfGreater);
-    GET_VALUE_WARN(mutableComparisonSamplers, WarnIfGreater);
-    GET_VALUE_WARN(pointPolygons, WarnIfGreater);
-    GET_VALUE_WARN(samplerMipLodBias, WarnIfGreater);
-    GET_VALUE_WARN(separateStencilMaskRef, WarnIfGreater);
-    GET_VALUE_WARN(shaderSampleRateInterpolationFunctions, WarnIfGreater);
-    GET_VALUE_WARN(tessellationIsolines, WarnIfGreater);
-    GET_VALUE_WARN(tessellationPointMode, WarnIfGreater);
-    GET_VALUE_WARN(triangleFans, WarnIfGreater);
-    GET_VALUE_WARN(vertexAttributeAccessBeyondStride, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, constantAlphaColorBlendFactors, WarnIfGreater);
+        GET_VALUE_WARN(member, events, WarnIfGreater);
+        GET_VALUE_WARN(member, imageViewFormatReinterpretation, WarnIfGreater);
+        GET_VALUE_WARN(member, imageViewFormatSwizzle, WarnIfGreater);
+        GET_VALUE_WARN(member, imageView2DOn3DImage, WarnIfGreater);
+        GET_VALUE_WARN(member, multisampleArrayImage, WarnIfGreater);
+        GET_VALUE_WARN(member, mutableComparisonSamplers, WarnIfGreater);
+        GET_VALUE_WARN(member, pointPolygons, WarnIfGreater);
+        GET_VALUE_WARN(member, samplerMipLodBias, WarnIfGreater);
+        GET_VALUE_WARN(member, separateStencilMaskRef, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSampleRateInterpolationFunctions, WarnIfGreater);
+        GET_VALUE_WARN(member, tessellationIsolines, WarnIfGreater);
+        GET_VALUE_WARN(member, tessellationPointMode, WarnIfGreater);
+        GET_VALUE_WARN(member, triangleFans, WarnIfGreater);
+        GET_VALUE_WARN(member, vertexAttributeAccessBeyondStride, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryFeatures *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProtectedMemoryFeatures)\n");
-    GET_VALUE_WARN(protectedMemory, WarnIfLesser);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, protectedMemory, WarnIfLesser);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4760,14 +4554,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbc
             "VK_KHR_sampler_ycbcr_conversion is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(samplerYcbcrConversion, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, samplerYcbcrConversion, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceScalarBlockLayoutFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4775,14 +4567,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlock
             "VK_EXT_scalar_block_layout is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(scalarBlockLayout, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, scalarBlockLayout, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4790,14 +4580,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDep
             "VK_KHR_separate_depth_stencil_layouts is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(separateDepthStencilLayouts, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, separateDepthStencilLayouts, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicInt64FeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4805,24 +4593,20 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
             "VK_KHR_shader_atomic_int64 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderBufferInt64Atomics, WarnIfGreater);
-    GET_VALUE_WARN(shaderSharedInt64Atomics, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderBufferInt64Atomics, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSharedInt64Atomics, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawParametersFeatures *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicInt64FeaturesKHR)\n");
-    GET_VALUE_WARN(shaderDrawParameters, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderDrawParameters, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderFloat16Int8FeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4830,15 +4614,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat
             "VK_KHR_shader_float16_int8 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderFloat16, WarnIfGreater);
-    GET_VALUE_WARN(shaderInt8, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderFloat16, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderInt8, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFeatures)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4846,23 +4628,19 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgr
             "VK_KHR_shader_subgroup_extended_types is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderSubgroupExtendedTypes, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderSubgroupExtendedTypes, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTimelineSemaphoreFeaturesKHR)\n");
-    GET_VALUE_WARN(timelineSemaphore, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, timelineSemaphore, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4870,29 +4648,25 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBuff
             "VK_KHR_unifrom_buffer_standard_layout is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(uniformBufferStandardLayout, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, uniformBufferStandardLayout, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePointersFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVariablePointersFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_variable_pointers, but VK_KHR_variable_pointers is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(variablePointersStorageBuffer, WarnIfGreater);
-    GET_VALUE_WARN(variablePointers, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, variablePointersStorageBuffer, WarnIfGreater);
+        GET_VALUE_WARN(member, variablePointers, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVulkanMemoryModelFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4900,16 +4674,14 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemor
             "is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(vulkanMemoryModel, WarnIfGreater);
-    GET_VALUE_WARN(vulkanMemoryModelDeviceScope, WarnIfGreater);
-    GET_VALUE_WARN(vulkanMemoryModelAvailabilityVisibilityChains, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, vulkanMemoryModel, WarnIfGreater);
+        GET_VALUE_WARN(member, vulkanMemoryModelDeviceScope, WarnIfGreater);
+        GET_VALUE_WARN(member, vulkanMemoryModelAvailabilityVisibilityChains, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4917,14 +4689,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitial
             "VK_KHR_zero_initialize_workgroup_memory is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderZeroInitializeWorkgroupMemory, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderZeroInitializeWorkgroupMemory, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructureFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceAccelerationStructureFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4932,18 +4702,16 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
             "VK_KHR_acceleration_structure is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(accelerationStructure, WarnIfGreater);
-    GET_VALUE_WARN(accelerationStructureCaptureReplay, WarnIfGreater);
-    GET_VALUE_WARN(accelerationStructureIndirectBuild, WarnIfGreater);
-    GET_VALUE_WARN(accelerationStructureHostCommands, WarnIfGreater);
-    GET_VALUE_WARN(descriptorBindingAccelerationStructureUpdateAfterBind, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, accelerationStructure, WarnIfGreater);
+        GET_VALUE_WARN(member, accelerationStructureCaptureReplay, WarnIfGreater);
+        GET_VALUE_WARN(member, accelerationStructureIndirectBuild, WarnIfGreater);
+        GET_VALUE_WARN(member, accelerationStructureHostCommands, WarnIfGreater);
+        GET_VALUE_WARN(member, descriptorBindingAccelerationStructureUpdateAfterBind, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructurePropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceAccelerationStructurePropertiesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4952,25 +4720,19 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxGeometryCount);
-        GET_PROPERTY_WARN(maxInstanceCount);
-        GET_PROPERTY_WARN(maxPrimitiveCount);
-        GET_PROPERTY_WARN(maxPerStageDescriptorAccelerationStructures);
-        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindAccelerationStructures);
-        GET_PROPERTY_WARN(maxDescriptorSetAccelerationStructures);
-        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindAccelerationStructures);
-        GET_PROPERTY_WARN(minAccelerationStructureScratchOffsetAlignment);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxGeometryCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxInstanceCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPrimitiveCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorAccelerationStructures, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorUpdateAfterBindAccelerationStructures, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetAccelerationStructures, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindAccelerationStructures, WarnIfGreater);
+        GET_VALUE_WARN(prop, minAccelerationStructureScratchOffsetAlignment, WarnIfLesser);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePerformanceQueryFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4978,15 +4740,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
             "VK_KHR_performance_query is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(performanceCounterQueryPools, WarnIfGreater);
-    GET_VALUE_WARN(performanceCounterMultipleQueryPools, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, performanceCounterQueryPools, WarnIfGreater);
+        GET_VALUE_WARN(member, performanceCounterMultipleQueryPools, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryPropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePerformanceQueryPropertiesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -4995,18 +4755,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(allowCommandBufferQueryCopies);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, allowCommandBufferQueryCopies, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5014,14 +4768,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExe
             "VK_KHR_pipeline_executable_properties is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(pipelineExecutableInfo, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, pipelineExecutableInfo, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePresentIdFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PRESENT_ID_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5029,14 +4781,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFe
             "VK_KHR_present_id is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(presentId, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, presentId, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWaitFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePresentWaitFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5044,14 +4794,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWait
             "VK_KHR_present_wait is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(presentWait, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, presentWait, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescriptorPropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePushDescriptorPropertiesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5060,18 +4808,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescrip
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxPushDescriptors);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxPushDescriptors, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayQueryFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5079,14 +4821,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFea
             "VK_KHR_ray_query is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(rayQuery, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, rayQuery, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelineFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPipelineFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5094,18 +4834,16 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
             "VK_KHR_ray_tracing_pipeline is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(rayTracingPipeline, WarnIfGreater);
-    GET_VALUE_WARN(rayTracingPipelineShaderGroupHandleCaptureReplay, WarnIfGreater);
-    GET_VALUE_WARN(rayTracingPipelineShaderGroupHandleCaptureReplayMixed, WarnIfGreater);
-    GET_VALUE_WARN(rayTracingPipelineTraceRaysIndirect, WarnIfGreater);
-    GET_VALUE_WARN(rayTraversalPrimitiveCulling, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, rayTracingPipeline, WarnIfGreater);
+        GET_VALUE_WARN(member, rayTracingPipelineShaderGroupHandleCaptureReplay, WarnIfGreater);
+        GET_VALUE_WARN(member, rayTracingPipelineShaderGroupHandleCaptureReplayMixed, WarnIfGreater);
+        GET_VALUE_WARN(member, rayTracingPipelineTraceRaysIndirect, WarnIfGreater);
+        GET_VALUE_WARN(member, rayTraversalPrimitiveCulling, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelinePropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPipelinePropertiesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5114,25 +4852,19 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(shaderGroupHandleSize);
-        GET_PROPERTY_WARN(maxRayRecursionDepth);
-        GET_PROPERTY_WARN(maxShaderGroupStride);
-        GET_PROPERTY_WARN(shaderGroupBaseAlignment);
-        GET_PROPERTY_WARN(shaderGroupHandleCaptureReplaySize);
-        GET_PROPERTY_WARN(maxRayDispatchInvocationCount);
-        GET_PROPERTY_WARN(shaderGroupHandleAlignment);
-        GET_PROPERTY_WARN(maxRayHitAttributeSize);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, shaderGroupHandleSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxRayRecursionDepth, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxShaderGroupStride, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderGroupBaseAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderGroupHandleCaptureReplaySize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxRayDispatchInvocationCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderGroupHandleAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxRayHitAttributeSize, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClockFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderClockFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5140,15 +4872,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClock
             "VK_KHR_shader_clock is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderSubgroupClock, WarnIfGreater);
-    GET_VALUE_WARN(shaderDeviceClock, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderSubgroupClock, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderDeviceClock, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5156,14 +4886,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
             "VK_KHR_shader_integer_dot_product is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderIntegerDotProduct, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderIntegerDotProduct, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5172,47 +4900,41 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(integerDotProduct8BitUnsignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct8BitSignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct8BitMixedSignednessAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct4x8BitPackedUnsignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct4x8BitPackedSignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct4x8BitPackedMixedSignednessAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct16BitUnsignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct16BitSignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct16BitMixedSignednessAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct32BitUnsignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct32BitSignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct32BitMixedSignednessAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct64BitUnsignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct64BitSignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProduct64BitMixedSignednessAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating8BitUnsignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating8BitSignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating16BitUnsignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating16BitSignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating32BitUnsignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating32BitSignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating64BitUnsignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating64BitSignedAccelerated);
-        GET_PROPERTY_WARN(integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, integerDotProduct8BitUnsignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct8BitSignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct8BitMixedSignednessAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct4x8BitPackedUnsignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct4x8BitPackedSignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct4x8BitPackedMixedSignednessAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct16BitUnsignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct16BitSignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct16BitMixedSignednessAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct32BitUnsignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct32BitSignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct32BitMixedSignednessAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct64BitUnsignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct64BitSignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct64BitMixedSignednessAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating8BitUnsignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating8BitSignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating16BitUnsignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating16BitSignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating32BitUnsignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating32BitSignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitUnsignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitSignedAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5220,14 +4942,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgr
             "VK_KHR_shader_subgroup_uniform_control_flow is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderSubgroupUniformControlFlow, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderSubgroupUniformControlFlow, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5235,14 +4955,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTermi
             "VK_KHR_shader_terminate_invocation is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderTerminateInvocation, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderTerminateInvocation, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchronization2FeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSynchronization2FeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5250,14 +4968,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchroniza
             "VK_KHR_synchronization2 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(synchronization2, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, synchronization2, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5265,17 +4981,15 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMe
             "VK_KHR_workgroup_memory_explicit_layout is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(workgroupMemoryExplicitLayout, WarnIfGreater);
-    GET_VALUE_WARN(workgroupMemoryExplicitLayoutScalarBlockLayout, WarnIfGreater);
-    GET_VALUE_WARN(workgroupMemoryExplicitLayout8BitAccess, WarnIfGreater);
-    GET_VALUE_WARN(workgroupMemoryExplicitLayout16BitAccess, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, workgroupMemoryExplicitLayout, WarnIfGreater);
+        GET_VALUE_WARN(member, workgroupMemoryExplicitLayoutScalarBlockLayout, WarnIfGreater);
+        GET_VALUE_WARN(member, workgroupMemoryExplicitLayout8BitAccess, WarnIfGreater);
+        GET_VALUE_WARN(member, workgroupMemoryExplicitLayout16BitAccess, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444FormatsFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5283,15 +4997,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444Formats
             "VK_EXT_4444_formats is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(formatA4R4G4B4, WarnIfGreater);
-    GET_VALUE_WARN(formatA4B4G4R4, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, formatA4R4G4B4, WarnIfGreater);
+        GET_VALUE_WARN(member, formatA4B4G4R4, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceASTCDecodeFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5299,14 +5011,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeF
             "VK_EXT_astc_decode_mode is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(decodeModeSharedExponent, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, decodeModeSharedExponent, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5314,14 +5024,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
             "VK_EXT_blend_operation_advanced is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(advancedBlendCoherentOperations, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, advancedBlendCoherentOperations, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5330,23 +5038,17 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(advancedBlendMaxColorAttachments);
-        GET_PROPERTY_WARN(advancedBlendIndependentBlend);
-        GET_PROPERTY_WARN(advancedBlendNonPremultipliedSrcColor);
-        GET_PROPERTY_WARN(advancedBlendNonPremultipliedDstColor);
-        GET_PROPERTY_WARN(advancedBlendCorrelatedOverlap);
-        GET_PROPERTY_WARN(advancedBlendAllOperations);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, advancedBlendMaxColorAttachments, WarnIfGreater);
+        GET_VALUE_WARN(prop, advancedBlendIndependentBlend, WarnIfGreater);
+        GET_VALUE_WARN(prop, advancedBlendNonPremultipliedSrcColor, WarnIfGreater);
+        GET_VALUE_WARN(prop, advancedBlendNonPremultipliedDstColor, WarnIfGreater);
+        GET_VALUE_WARN(prop, advancedBlendCorrelatedOverlap, WarnIfGreater);
+        GET_VALUE_WARN(prop, advancedBlendAllOperations, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBorderColorSwizzleFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5354,15 +5056,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColor
             "VK_EXT_border_color_swizzle is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(borderColorSwizzle, WarnIfGreater);
-    GET_VALUE_WARN(borderColorSwizzleFromImage, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, borderColorSwizzle, WarnIfGreater);
+        GET_VALUE_WARN(member, borderColorSwizzleFromImage, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceColorWriteEnableFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5370,14 +5070,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteE
             "VK_EXT_color_write_enable is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(colorWriteEnable, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, colorWriteEnable, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceConditionalRenderingFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5385,15 +5083,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditional
             "VK_EXT_conditional_rendering is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(conditionalRendering, WarnIfGreater);
-    GET_VALUE_WARN(inheritedConditionalRendering, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, conditionalRendering, WarnIfGreater);
+        GET_VALUE_WARN(member, inheritedConditionalRendering, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceConservativeRasterizationPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5402,26 +5098,20 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativ
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(primitiveOverestimationSize);
-        GET_PROPERTY_WARN(maxExtraPrimitiveOverestimationSize);
-        GET_PROPERTY_WARN(extraPrimitiveOverestimationSizeGranularity);
-        GET_PROPERTY_WARN(primitiveUnderestimation);
-        GET_PROPERTY_WARN(conservativePointAndLineRasterization);
-        GET_PROPERTY_WARN(degenerateTrianglesRasterized);
-        GET_PROPERTY_WARN(degenerateLinesRasterized);
-        GET_PROPERTY_WARN(fullyCoveredFragmentShaderInputVariable);
-        GET_PROPERTY_WARN(conservativeRasterizationPostDepthCoverage);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, primitiveOverestimationSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxExtraPrimitiveOverestimationSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, extraPrimitiveOverestimationSizeGranularity, WarnIfGreater);
+        GET_VALUE_WARN(prop, primitiveUnderestimation, WarnIfGreater);
+        GET_VALUE_WARN(prop, conservativePointAndLineRasterization, WarnIfGreater);
+        GET_VALUE_WARN(prop, degenerateTrianglesRasterized, WarnIfGreater);
+        GET_VALUE_WARN(prop, degenerateLinesRasterized, WarnIfGreater);
+        GET_VALUE_WARN(prop, fullyCoveredFragmentShaderInputVariable, WarnIfGreater);
+        GET_VALUE_WARN(prop, conservativeRasterizationPostDepthCoverage, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCustomBorderColorFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5429,15 +5119,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorde
             "VK_EXT_custom_border_color is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(customBorderColors, WarnIfGreater);
-    GET_VALUE_WARN(customBorderColorWithoutFormat, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, customBorderColors, WarnIfGreater);
+        GET_VALUE_WARN(member, customBorderColorWithoutFormat, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCustomBorderColorPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5446,18 +5134,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorde
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxCustomBorderColorSamplers);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxCustomBorderColorSamplers, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDepthClipEnableFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5465,14 +5147,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEn
             "VK_EXT_depth_clip_enable is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(depthClipEnable, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, depthClipEnable, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDeviceMemoryReportFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5480,14 +5160,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemor
             "VK_EXT_device_memory_report is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(deviceMemoryReport, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, deviceMemoryReport, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDiscardRectanglePropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5496,18 +5174,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRect
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxDiscardRectangles);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxDiscardRectangles, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExtendedDynamicStateFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5515,14 +5187,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
             "VK_EXT_extended_dynamic_state is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(extendedDynamicState, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, extendedDynamicState, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExtendedDynamicState2FeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5530,16 +5200,14 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
             "VK_EXT_extended_dynamic_state2 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(extendedDynamicState2, WarnIfGreater);
-    GET_VALUE_WARN(extendedDynamicState2LogicOp, WarnIfGreater);
-    GET_VALUE_WARN(extendedDynamicState2PatchControlPoints, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, extendedDynamicState2, WarnIfGreater);
+        GET_VALUE_WARN(member, extendedDynamicState2LogicOp, WarnIfGreater);
+        GET_VALUE_WARN(member, extendedDynamicState2PatchControlPoints, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryHostPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExternalMemoryHostPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5548,18 +5216,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(minImportedHostPointerAlignment);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, minImportedHostPointerAlignment, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5567,16 +5229,14 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
             "VK_EXT_fragment_density_map is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(fragmentDensityMap, WarnIfGreater);
-    GET_VALUE_WARN(fragmentDensityMapDynamic, WarnIfGreater);
-    GET_VALUE_WARN(fragmentDensityMapNonSubsampledImages, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, fragmentDensityMap, WarnIfGreater);
+        GET_VALUE_WARN(member, fragmentDensityMapDynamic, WarnIfGreater);
+        GET_VALUE_WARN(member, fragmentDensityMapNonSubsampledImages, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5585,20 +5245,14 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(minFragmentDensityTexelSize);
-        GET_PROPERTY_WARN(maxFragmentDensityTexelSize);
-        GET_PROPERTY_WARN(fragmentDensityInvocations);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, minFragmentDensityTexelSize, WarnIfLesser);
+        GET_VALUE_WARN(prop, maxFragmentDensityTexelSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, fragmentDensityInvocations, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5606,16 +5260,14 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
             "VK_EXT_fragment_shader_interlock is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(fragmentShaderSampleInterlock, WarnIfGreater);
-    GET_VALUE_WARN(fragmentShaderPixelInterlock, WarnIfGreater);
-    GET_VALUE_WARN(fragmentShaderShadingRateInterlock, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, fragmentShaderSampleInterlock, WarnIfGreater);
+        GET_VALUE_WARN(member, fragmentShaderPixelInterlock, WarnIfGreater);
+        GET_VALUE_WARN(member, fragmentShaderShadingRateInterlock, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5623,14 +5275,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPrior
             "VK_EXT_global_priority_query is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(globalPriorityQuery, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, globalPriorityQuery, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobustnessFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceImageRobustnessFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5638,14 +5288,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobust
             "VK_EXT_image_robustness is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(robustImageAccess, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, robustImageAccess, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUint8FeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceIndexTypeUint8FeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5653,14 +5301,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUi
             "VK_EXT_index_type_uint8 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(indexTypeUint8, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, indexTypeUint8, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceInlineUniformBlockFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5668,15 +5314,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
             "VK_EXT_inline_uniform_block is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(inlineUniformBlock, WarnIfGreater);
-    GET_VALUE_WARN(descriptorBindingInlineUniformBlockUpdateAfterBind, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, inlineUniformBlock, WarnIfGreater);
+        GET_VALUE_WARN(member, descriptorBindingInlineUniformBlockUpdateAfterBind, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceInlineUniformBlockPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5685,22 +5329,16 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxInlineUniformBlockSize);
-        GET_PROPERTY_WARN(maxPerStageDescriptorInlineUniformBlocks);
-        GET_PROPERTY_WARN(maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks);
-        GET_PROPERTY_WARN(maxDescriptorSetInlineUniformBlocks);
-        GET_PROPERTY_WARN(maxDescriptorSetUpdateAfterBindInlineUniformBlocks);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxInlineUniformBlockSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorInlineUniformBlocks, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetInlineUniformBlocks, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindInlineUniformBlocks, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceLineRasterizationFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5708,19 +5346,17 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
             "VK_EXT_line_rasterization is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(rectangularLines, WarnIfGreater);
-    GET_VALUE_WARN(bresenhamLines, WarnIfGreater);
-    GET_VALUE_WARN(smoothLines, WarnIfGreater);
-    GET_VALUE_WARN(stippledRectangularLines, WarnIfGreater);
-    GET_VALUE_WARN(stippledBresenhamLines, WarnIfGreater);
-    GET_VALUE_WARN(stippledSmoothLines, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, rectangularLines, WarnIfGreater);
+        GET_VALUE_WARN(member, bresenhamLines, WarnIfGreater);
+        GET_VALUE_WARN(member, smoothLines, WarnIfGreater);
+        GET_VALUE_WARN(member, stippledRectangularLines, WarnIfGreater);
+        GET_VALUE_WARN(member, stippledBresenhamLines, WarnIfGreater);
+        GET_VALUE_WARN(member, stippledSmoothLines, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceLineRasterizationPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5729,18 +5365,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(lineSubPixelPrecisionBits);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, lineSubPixelPrecisionBits, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPriorityFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMemoryPriorityFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5748,14 +5378,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPrior
             "VK_EXT_memory_priority is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(memoryPriority, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, memoryPriority, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMultiDrawFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5763,14 +5391,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFe
             "VK_EXT_multi_draw is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(multiDraw, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, multiDraw, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMultiDrawPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5779,18 +5405,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPr
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxMultiDrawCount);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxMultiDrawCount, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5798,14 +5418,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDev
             "VK_EXT_pageable_device_local_memory is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(pageableDeviceLocalMemory, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, pageableDeviceLocalMemory, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5813,14 +5431,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCre
             "VK_EXT_pipeline_creation_cache_control is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(pipelineCreationCacheControl, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, pipelineCreationCacheControl, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5828,15 +5444,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTo
             "VK_EXT_primitive_topology_list_restart is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(primitiveTopologyListRestart, WarnIfGreater);
-    GET_VALUE_WARN(primitiveTopologyPatchListRestart, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, primitiveTopologyListRestart, WarnIfGreater);
+        GET_VALUE_WARN(member, primitiveTopologyPatchListRestart, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateDataFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePrivateDataFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5844,14 +5458,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateData
             "VK_EXT_private_data is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(privateData, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, privateData, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProvokingVertexFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5859,15 +5471,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
             "VK_EXT_provoking_vertex is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(provokingVertexLast, WarnIfGreater);
-    GET_VALUE_WARN(transformFeedbackPreservesProvokingVertex, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, provokingVertexLast, WarnIfGreater);
+        GET_VALUE_WARN(member, transformFeedbackPreservesProvokingVertex, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProvokingVertexPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5876,19 +5486,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(provokingVertexModePerPipeline);
-        GET_PROPERTY_WARN(transformFeedbackPreservesTriangleFanProvokingVertex);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, provokingVertexModePerPipeline, WarnIfGreater);
+        GET_VALUE_WARN(prop, transformFeedbackPreservesTriangleFanProvokingVertex, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5896,14 +5500,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6For
             "VK_EXT_rgba10x6_formats is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(formatRgba10x6WithoutYCbCrSampler, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, formatRgba10x6WithoutYCbCrSampler, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2FeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRobustness2FeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5911,16 +5513,14 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
             "VK_EXT_robustness2 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(robustBufferAccess2, WarnIfGreater);
-    GET_VALUE_WARN(robustImageAccess2, WarnIfGreater);
-    GET_VALUE_WARN(nullDescriptor, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, robustBufferAccess2, WarnIfGreater);
+        GET_VALUE_WARN(member, robustImageAccess2, WarnIfGreater);
+        GET_VALUE_WARN(member, nullDescriptor, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2PropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRobustness2PropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5929,19 +5529,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(robustStorageBufferAccessSizeAlignment);
-        GET_PROPERTY_WARN(robustUniformBufferAccessSizeAlignment);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, robustStorageBufferAccessSizeAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, robustUniformBufferAccessSizeAlignment, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocationsPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSampleLocationsPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5950,22 +5544,16 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocat
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(sampleLocationSampleCounts);
-        GET_PROPERTY_WARN(maxSampleLocationGridSize);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, sampleLocationSampleCounts, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxSampleLocationGridSize, WarnIfGreater);
         GET_ARRAY(sampleLocationCoordinateRange);
-        GET_PROPERTY_WARN(sampleLocationSubPixelBits);
-        GET_PROPERTY_WARN(variableSampleLocations);
+        GET_VALUE_WARN(prop, sampleLocationSubPixelBits, WarnIfGreater);
+        GET_VALUE_WARN(prop, variableSampleLocations, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicFloatFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5973,25 +5561,23 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
             "VK_EXT_shader_atomic_float is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderBufferFloat32Atomics, WarnIfGreater);
-    GET_VALUE_WARN(shaderBufferFloat32AtomicAdd, WarnIfGreater);
-    GET_VALUE_WARN(shaderBufferFloat64Atomics, WarnIfGreater);
-    GET_VALUE_WARN(shaderBufferFloat64AtomicAdd, WarnIfGreater);
-    GET_VALUE_WARN(shaderSharedFloat32Atomics, WarnIfGreater);
-    GET_VALUE_WARN(shaderSharedFloat32AtomicAdd, WarnIfGreater);
-    GET_VALUE_WARN(shaderSharedFloat64Atomics, WarnIfGreater);
-    GET_VALUE_WARN(shaderSharedFloat64AtomicAdd, WarnIfGreater);
-    GET_VALUE_WARN(shaderImageFloat32Atomics, WarnIfGreater);
-    GET_VALUE_WARN(shaderImageFloat32AtomicAdd, WarnIfGreater);
-    GET_VALUE_WARN(sparseImageFloat32Atomics, WarnIfGreater);
-    GET_VALUE_WARN(sparseImageFloat32AtomicAdd, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderBufferFloat32Atomics, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderBufferFloat32AtomicAdd, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderBufferFloat64Atomics, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderBufferFloat64AtomicAdd, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSharedFloat32Atomics, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSharedFloat32AtomicAdd, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSharedFloat64Atomics, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSharedFloat64AtomicAdd, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderImageFloat32Atomics, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderImageFloat32AtomicAdd, WarnIfGreater);
+        GET_VALUE_WARN(member, sparseImageFloat32Atomics, WarnIfGreater);
+        GET_VALUE_WARN(member, sparseImageFloat32AtomicAdd, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -5999,25 +5585,23 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
             "VK_EXT_shader_atomic_float2 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderBufferFloat16Atomics, WarnIfGreater);
-    GET_VALUE_WARN(shaderBufferFloat16AtomicAdd, WarnIfGreater);
-    GET_VALUE_WARN(shaderBufferFloat16AtomicMinMax, WarnIfGreater);
-    GET_VALUE_WARN(shaderBufferFloat32AtomicMinMax, WarnIfGreater);
-    GET_VALUE_WARN(shaderBufferFloat64AtomicMinMax, WarnIfGreater);
-    GET_VALUE_WARN(shaderSharedFloat16Atomics, WarnIfGreater);
-    GET_VALUE_WARN(shaderSharedFloat16AtomicAdd, WarnIfGreater);
-    GET_VALUE_WARN(shaderSharedFloat16AtomicMinMax, WarnIfGreater);
-    GET_VALUE_WARN(shaderSharedFloat32AtomicMinMax, WarnIfGreater);
-    GET_VALUE_WARN(shaderSharedFloat64AtomicMinMax, WarnIfGreater);
-    GET_VALUE_WARN(shaderImageFloat32AtomicMinMax, WarnIfGreater);
-    GET_VALUE_WARN(sparseImageFloat32AtomicMinMax, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderBufferFloat16Atomics, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderBufferFloat16AtomicAdd, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderBufferFloat16AtomicMinMax, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderBufferFloat32AtomicMinMax, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderBufferFloat64AtomicMinMax, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSharedFloat16Atomics, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSharedFloat16AtomicAdd, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSharedFloat16AtomicMinMax, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSharedFloat32AtomicMinMax, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSharedFloat64AtomicMinMax, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderImageFloat32AtomicMinMax, WarnIfGreater);
+        GET_VALUE_WARN(member, sparseImageFloat32AtomicMinMax, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6025,14 +5609,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemot
             "VK_EXT_shader_demote_to_helper_invocation is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderDemoteToHelperInvocation, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderDemoteToHelperInvocation, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6040,15 +5622,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
             "VK_EXT_shader_image_atomic_int64 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderImageInt64Atomics, WarnIfGreater);
-    GET_VALUE_WARN(sparseImageInt64Atomics, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderImageInt64Atomics, WarnIfGreater);
+        GET_VALUE_WARN(member, sparseImageInt64Atomics, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupSizeControlFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6056,15 +5636,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
             "VK_EXT_subgroup_size_control is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(subgroupSizeControl, WarnIfGreater);
-    GET_VALUE_WARN(computeFullSubgroups, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, subgroupSizeControl, WarnIfGreater);
+        GET_VALUE_WARN(member, computeFullSubgroups, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupSizeControlPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6073,21 +5651,15 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(minSubgroupSize);
-        GET_PROPERTY_WARN(maxSubgroupSize);
-        GET_PROPERTY_WARN(maxComputeWorkgroupSubgroups);
-        GET_PROPERTY_WARN(requiredSubgroupSizeStages);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, minSubgroupSize, WarnIfLesser);
+        GET_VALUE_WARN(prop, maxSubgroupSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxComputeWorkgroupSubgroups, WarnIfGreater);
+        GET_VALUE_WARN(prop, requiredSubgroupSizeStages, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6095,14 +5667,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
             "VK_EXT_texel_buffer_alignment is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(texelBufferAlignment, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, texelBufferAlignment, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6111,21 +5681,15 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(storageTexelBufferOffsetAlignmentBytes);
-        GET_PROPERTY_WARN(storageTexelBufferOffsetSingleTexelAlignment);
-        GET_PROPERTY_WARN(uniformTexelBufferOffsetAlignmentBytes);
-        GET_PROPERTY_WARN(uniformTexelBufferOffsetSingleTexelAlignment);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, storageTexelBufferOffsetAlignmentBytes, WarnIfGreater);
+        GET_VALUE_WARN(prop, storageTexelBufferOffsetSingleTexelAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, uniformTexelBufferOffsetAlignmentBytes, WarnIfGreater);
+        GET_VALUE_WARN(prop, uniformTexelBufferOffsetSingleTexelAlignment, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6133,14 +5697,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureComp
             "VK_EXT_texture_compression_astc_hdr is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(textureCompressionASTC_HDR, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, textureCompressionASTC_HDR, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTransformFeedbackFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6148,15 +5710,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
             "VK_EXT_transform_feedback is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(transformFeedback, WarnIfGreater);
-    GET_VALUE_WARN(geometryStreams, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, transformFeedback, WarnIfGreater);
+        GET_VALUE_WARN(member, geometryStreams, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTransformFeedbackPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6165,27 +5725,21 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxTransformFeedbackStreams);
-        GET_PROPERTY_WARN(maxTransformFeedbackBuffers);
-        GET_PROPERTY_WARN(maxTransformFeedbackBufferSize);
-        GET_PROPERTY_WARN(maxTransformFeedbackStreamDataSize);
-        GET_PROPERTY_WARN(maxTransformFeedbackBufferDataSize);
-        GET_PROPERTY_WARN(maxTransformFeedbackBufferDataStride);
-        GET_PROPERTY_WARN(transformFeedbackQueries);
-        GET_PROPERTY_WARN(transformFeedbackStreamsLinesTriangles);
-        GET_PROPERTY_WARN(transformFeedbackRasterizationStreamSelect);
-        GET_PROPERTY_WARN(transformFeedbackDraw);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxTransformFeedbackStreams, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTransformFeedbackBuffers, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTransformFeedbackBufferSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTransformFeedbackStreamDataSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTransformFeedbackBufferDataSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTransformFeedbackBufferDataStride, WarnIfGreater);
+        GET_VALUE_WARN(prop, transformFeedbackQueries, WarnIfGreater);
+        GET_VALUE_WARN(prop, transformFeedbackStreamsLinesTriangles, WarnIfGreater);
+        GET_VALUE_WARN(prop, transformFeedbackRasterizationStreamSelect, WarnIfGreater);
+        GET_VALUE_WARN(prop, transformFeedbackDraw, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6193,15 +5747,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
             "VK_EXT_vertex_attribute_divisor is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(vertexAttributeInstanceRateDivisor, WarnIfGreater);
-    GET_VALUE_WARN(vertexAttributeInstanceRateZeroDivisor, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, vertexAttributeInstanceRateDivisor, WarnIfGreater);
+        GET_VALUE_WARN(member, vertexAttributeInstanceRateZeroDivisor, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6210,18 +5762,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxVertexAttribDivisor);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxVertexAttribDivisor, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6229,14 +5775,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInput
             "VK_EXT_vertex_input_dynamic_state is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(vertexInputDynamicState, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, vertexInputDynamicState, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6244,14 +5788,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane
             "VK_EXT_ycbcr_2plane_444_formats is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(ycbcr2plane444Formats, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, ycbcr2plane444Formats, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceYcbcrImageArraysFeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6259,14 +5801,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageA
             "VK_EXT_ycbcr_image_arrays is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(ycbcrImageArrays, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, ycbcrImageArrays, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6274,16 +5814,14 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
             "VK_KHR_fragment_shading_rate is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(pipelineFragmentShadingRate, WarnIfGreater);
-    GET_VALUE_WARN(primitiveFragmentShadingRate, WarnIfGreater);
-    GET_VALUE_WARN(attachmentFragmentShadingRate, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, pipelineFragmentShadingRate, WarnIfGreater);
+        GET_VALUE_WARN(member, primitiveFragmentShadingRate, WarnIfGreater);
+        GET_VALUE_WARN(member, attachmentFragmentShadingRate, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRatePropertiesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6292,34 +5830,28 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(minFragmentShadingRateAttachmentTexelSize);
-        GET_PROPERTY_WARN(maxFragmentShadingRateAttachmentTexelSize);
-        GET_PROPERTY_WARN(maxFragmentShadingRateAttachmentTexelSizeAspectRatio);
-        GET_PROPERTY_WARN(primitiveFragmentShadingRateWithMultipleViewports);
-        GET_PROPERTY_WARN(layeredShadingRateAttachments);
-        GET_PROPERTY_WARN(fragmentShadingRateNonTrivialCombinerOps);
-        GET_PROPERTY_WARN(maxFragmentSize);
-        GET_PROPERTY_WARN(maxFragmentSizeAspectRatio);
-        GET_PROPERTY_WARN(maxFragmentShadingRateCoverageSamples);
-        GET_PROPERTY_WARN(maxFragmentShadingRateRasterizationSamples);
-        GET_PROPERTY_WARN(fragmentShadingRateWithShaderDepthStencilWrites);
-        GET_PROPERTY_WARN(fragmentShadingRateWithSampleMask);
-        GET_PROPERTY_WARN(fragmentShadingRateWithShaderSampleMask);
-        GET_PROPERTY_WARN(fragmentShadingRateWithConservativeRasterization);
-        GET_PROPERTY_WARN(fragmentShadingRateWithFragmentShaderInterlock);
-        GET_PROPERTY_WARN(fragmentShadingRateWithCustomSampleLocations);
-        GET_PROPERTY_WARN(fragmentShadingRateStrictMultiplyCombiner);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, minFragmentShadingRateAttachmentTexelSize, WarnIfLesser);
+        GET_VALUE_WARN(prop, maxFragmentShadingRateAttachmentTexelSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxFragmentShadingRateAttachmentTexelSizeAspectRatio, WarnIfGreater);
+        GET_VALUE_WARN(prop, primitiveFragmentShadingRateWithMultipleViewports, WarnIfGreater);
+        GET_VALUE_WARN(prop, layeredShadingRateAttachments, WarnIfGreater);
+        GET_VALUE_WARN(prop, fragmentShadingRateNonTrivialCombinerOps, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxFragmentSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxFragmentSizeAspectRatio, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxFragmentShadingRateCoverageSamples, WarnIfGreater);
+        GET_VALUE(prop, maxFragmentShadingRateRasterizationSamples);
+        GET_VALUE_WARN(prop, fragmentShadingRateWithShaderDepthStencilWrites, WarnIfGreater);
+        GET_VALUE_WARN(prop, fragmentShadingRateWithSampleMask, WarnIfGreater);
+        GET_VALUE_WARN(prop, fragmentShadingRateWithShaderSampleMask, WarnIfGreater);
+        GET_VALUE_WARN(prop, fragmentShadingRateWithConservativeRasterization, WarnIfGreater);
+        GET_VALUE_WARN(prop, fragmentShadingRateWithFragmentShaderInterlock, WarnIfGreater);
+        GET_VALUE_WARN(prop, fragmentShadingRateWithCustomSampleLocations, WarnIfGreater);
+        GET_VALUE_WARN(prop, fragmentShadingRateStrictMultiplyCombiner, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMemoryFeaturesAMD *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCoherentMemoryFeaturesAMD)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6327,14 +5859,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMem
             "VK_AMD_device_coherent_memory is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(deviceCoherentMemory, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, deviceCoherentMemory, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCorePropertiesAMD *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderCorePropertiesAMD)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6343,31 +5873,25 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(shaderEngineCount);
-        GET_PROPERTY_WARN(shaderArraysPerEngineCount);
-        GET_PROPERTY_WARN(computeUnitsPerShaderArray);
-        GET_PROPERTY_WARN(simdPerComputeUnit);
-        GET_PROPERTY_WARN(wavefrontsPerSimd);
-        GET_PROPERTY_WARN(wavefrontSize);
-        GET_PROPERTY_WARN(sgprsPerSimd);
-        GET_PROPERTY_WARN(minSgprAllocation);
-        GET_PROPERTY_WARN(maxSgprAllocation);
-        GET_PROPERTY_WARN(sgprAllocationGranularity);
-        GET_PROPERTY_WARN(vgprsPerSimd);
-        GET_PROPERTY_WARN(minVgprAllocation);
-        GET_PROPERTY_WARN(maxVgprAllocation);
-        GET_PROPERTY_WARN(vgprAllocationGranularity);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, shaderEngineCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderArraysPerEngineCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, computeUnitsPerShaderArray, WarnIfGreater);
+        GET_VALUE_WARN(prop, simdPerComputeUnit, WarnIfGreater);
+        GET_VALUE_WARN(prop, wavefrontsPerSimd, WarnIfGreater);
+        GET_VALUE_WARN(prop, wavefrontSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, sgprsPerSimd, WarnIfGreater);
+        GET_VALUE_WARN(prop, minSgprAllocation, WarnIfLesser);
+        GET_VALUE_WARN(prop, maxSgprAllocation, WarnIfGreater);
+        GET_VALUE_WARN(prop, sgprAllocationGranularity, WarnIfGreater);
+        GET_VALUE_WARN(prop, vgprsPerSimd, WarnIfGreater);
+        GET_VALUE_WARN(prop, minVgprAllocation, WarnIfLesser);
+        GET_VALUE_WARN(prop, maxVgprAllocation, WarnIfGreater);
+        GET_VALUE_WARN(prop, vgprAllocationGranularity, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreProperties2AMD *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderCoreProperties2AMD)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6376,19 +5900,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(shaderCoreFeatures);
-        GET_PROPERTY_WARN(activeComputeUnitCount);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, shaderCoreFeatures, WarnIfGreater);
+        GET_VALUE_WARN(prop, activeComputeUnitCount, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceInvocationMaskFeaturesHUAWEI)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6396,14 +5914,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationM
             "VK_HUAWEI_invocation_mask is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(invocationMask, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, invocationMask, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubpassShadingFeaturesHUAWEI)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6411,14 +5927,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
             "VK_HUAWEI_subpass_shading is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(subpassShading, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, subpassShading, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubpassShadingPropertiesHUAWEI)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6427,18 +5941,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxSubpassShadingWorkgroupSizeAspectRatio);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxSubpassShadingWorkgroupSizeAspectRatio, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6446,14 +5954,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
             "VK_INTEL_shader_integer_functions2 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderIntegerFunctions2, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderIntegerFunctions2, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceComputeShaderDerivativesFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6461,15 +5967,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShad
             "VK_NV_compute_shader_derivatives is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(computeDerivativeGroupQuads, WarnIfGreater);
-    GET_VALUE_WARN(computeDerivativeGroupLinear, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, computeDerivativeGroupQuads, WarnIfGreater);
+        GET_VALUE_WARN(member, computeDerivativeGroupLinear, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCooperativeMatrixFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6477,15 +5981,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
             "VK_NV_cooperative_matrix is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(cooperativeMatrix, WarnIfGreater);
-    GET_VALUE_WARN(cooperativeMatrixRobustBufferAccess, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, cooperativeMatrix, WarnIfGreater);
+        GET_VALUE_WARN(member, cooperativeMatrixRobustBufferAccess, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixPropertiesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCooperativeMatrixPropertiesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6494,18 +5996,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(cooperativeMatrixSupportedStages);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, cooperativeMatrixSupportedStages, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampledImageFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCornerSampledImageFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6513,14 +6009,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampl
             "VK_NV_corner_sampled_image is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(cornerSampledImage, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, cornerSampledImage, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageReductionModeFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCoverageReductionModeFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6528,14 +6022,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageRed
             "VK_NV_coverage_reduction_mode is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(coverageReductionMode, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, coverageReductionMode, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_DEDICATED_ALLOCATION_IMAGE_ALIASING_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6543,14 +6035,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAl
             "VK_NV_dedicated_allocation_image_aliasing is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(dedicatedAllocationImageAliasing, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, dedicatedAllocationImageAliasing, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDiagnosticsConfigFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6558,14 +6048,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnostics
             "VK_NV_device_diagnostics_config is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(diagnosticsConfig, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, diagnosticsConfig, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6573,14 +6061,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
             "VK_NV_device_generated_commands is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(deviceGeneratedCommands, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, deviceGeneratedCommands, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6589,26 +6075,20 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxGraphicsShaderGroupCount);
-        GET_PROPERTY_WARN(maxIndirectSequenceCount);
-        GET_PROPERTY_WARN(maxIndirectCommandsTokenCount);
-        GET_PROPERTY_WARN(maxIndirectCommandsStreamCount);
-        GET_PROPERTY_WARN(maxIndirectCommandsTokenOffset);
-        GET_PROPERTY_WARN(maxIndirectCommandsStreamStride);
-        GET_PROPERTY_WARN(minSequencesCountBufferOffsetAlignment);
-        GET_PROPERTY_WARN(minSequencesIndexBufferOffsetAlignment);
-        GET_PROPERTY_WARN(minIndirectCommandsBufferOffsetAlignment);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxGraphicsShaderGroupCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxIndirectSequenceCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxIndirectCommandsTokenCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxIndirectCommandsStreamCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxIndirectCommandsTokenOffset, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxIndirectCommandsStreamStride, WarnIfGreater);
+        GET_VALUE_WARN(prop, minSequencesCountBufferOffsetAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, minSequencesIndexBufferOffsetAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, minIndirectCommandsBufferOffsetAlignment, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExternalMemoryRDMAFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6616,14 +6096,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
             "VK_NV_external_memory_rdma is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(externalMemoryRDMA, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, externalMemoryRDMA, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6631,14 +6109,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
             "VK_NV_fragment_shader_barycentric is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(fragmentShaderBarycentric, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, fragmentShaderBarycentric, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6646,16 +6122,14 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
             "VK_NV_fragment_shading_rate_enums is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(fragmentShadingRateEnums, WarnIfGreater);
-    GET_VALUE_WARN(supersampleFragmentShadingRates, WarnIfGreater);
-    GET_VALUE_WARN(noInvocationFragmentShadingRates, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, fragmentShadingRateEnums, WarnIfGreater);
+        GET_VALUE_WARN(member, supersampleFragmentShadingRates, WarnIfGreater);
+        GET_VALUE_WARN(member, noInvocationFragmentShadingRates, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6664,18 +6138,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxFragmentShadingRateInvocationCount);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE(prop, maxFragmentShadingRateInvocationCount);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedViewportScissorFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceInheritedViewportScissorFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6683,14 +6151,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedVi
             "VK_NV_inherited_viewport_scissor is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(inheritedViewportScissor2D, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, inheritedViewportScissor2D, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6698,15 +6164,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderF
             "VK_NV_mesh_shader is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(taskShader, WarnIfGreater);
-    GET_VALUE_WARN(meshShader, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, taskShader, WarnIfGreater);
+        GET_VALUE_WARN(member, meshShader, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderPropertiesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderPropertiesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6715,30 +6179,24 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderP
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(maxDrawMeshTasksCount);
-        GET_PROPERTY_WARN(maxTaskWorkGroupInvocations);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, maxDrawMeshTasksCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTaskWorkGroupInvocations, WarnIfGreater);
         GET_ARRAY(maxTaskWorkGroupSize);
-        GET_PROPERTY_WARN(maxTaskTotalMemorySize);
-        GET_PROPERTY_WARN(maxTaskOutputCount);
-        GET_PROPERTY_WARN(maxMeshWorkGroupInvocations);
+        GET_VALUE_WARN(prop, maxTaskTotalMemorySize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTaskOutputCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxMeshWorkGroupInvocations, WarnIfGreater);
         GET_ARRAY(maxMeshWorkGroupSize);
-        GET_PROPERTY_WARN(maxMeshTotalMemorySize);
-        GET_PROPERTY_WARN(maxMeshOutputVertices);
-        GET_PROPERTY_WARN(maxMeshOutputPrimitives);
-        GET_PROPERTY_WARN(maxMeshMultiviewViewCount);
-        GET_PROPERTY_WARN(meshOutputPerVertexGranularity);
-        GET_PROPERTY_WARN(meshOutputPerPrimitiveGranularity);
+        GET_VALUE_WARN(prop, maxMeshTotalMemorySize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxMeshOutputVertices, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxMeshOutputPrimitives, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxMeshMultiviewViewCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, meshOutputPerVertexGranularity, WarnIfGreater);
+        GET_VALUE_WARN(prop, meshOutputPerPrimitiveGranularity, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPropertiesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPropertiesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_RAY_TRACING_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6747,25 +6205,19 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(shaderGroupHandleSize);
-        GET_PROPERTY_WARN(maxRecursionDepth);
-        GET_PROPERTY_WARN(maxShaderGroupStride);
-        GET_PROPERTY_WARN(shaderGroupBaseAlignment);
-        GET_PROPERTY_WARN(maxGeometryCount);
-        GET_PROPERTY_WARN(maxInstanceCount);
-        GET_PROPERTY_WARN(maxTriangleCount);
-        GET_PROPERTY_WARN(maxDescriptorSetAccelerationStructures);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, shaderGroupHandleSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxRecursionDepth, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxShaderGroupStride, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderGroupBaseAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxGeometryCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxInstanceCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxTriangleCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetAccelerationStructures, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingMotionBlurFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6773,15 +6225,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingM
             "VK_NV_ray_tracing_motion_blur is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(rayTracingMotionBlur, WarnIfGreater);
-    GET_VALUE_WARN(rayTracingMotionBlurPipelineTraceRaysIndirect, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, rayTracingMotionBlur, WarnIfGreater);
+        GET_VALUE_WARN(member, rayTracingMotionBlurPipelineTraceRaysIndirect, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6789,14 +6239,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentat
             "VK_NV_representative_fragment_test is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(representativeFragmentTest, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, representativeFragmentTest, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveScissorFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExclusiveScissorFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6804,14 +6252,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveSc
             "VK_NV_scissor_exclusive is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(exclusiveScissor, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, exclusiveScissor, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageFootprintFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderImageFootprintFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6819,14 +6265,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
             "VK_NV_shader_image_footprint is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(imageFootprint, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, imageFootprint, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderSMBuiltinsFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6834,14 +6278,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBui
             "VK_NV_shader_sm_builtins is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shaderSMBuiltins, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderSMBuiltins, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsPropertiesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderSMBuiltinsPropertiesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6850,19 +6292,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBui
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(shaderSMCount);
-        GET_PROPERTY_WARN(shaderWarpsPerSM);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, shaderSMCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderWarpsPerSM, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImageFeaturesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShadingRateImageFeaturesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6870,15 +6306,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
             "VK_NV_shading_rate_image is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(shadingRateImage, WarnIfGreater);
-    GET_VALUE_WARN(shadingRateCoarseSampleOrder, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shadingRateImage, WarnIfGreater);
+        GET_VALUE_WARN(member, shadingRateCoarseSampleOrder, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImagePropertiesNV *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShadingRateImagePropertiesNV)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6887,20 +6321,14 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
             "not supported by the device.\n");
     }
 
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(shadingRateTexelSize);
-        GET_PROPERTY_WARN(shadingRatePaletteSize);
-        GET_PROPERTY_WARN(shadingRateMaxCoarseSamples);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, shadingRateTexelSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, shadingRatePaletteSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, shadingRateMaxCoarseSamples, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6908,14 +6336,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDesc
             "VK_VALVE_mutable_descriptor_type is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(mutableDescriptorType, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, mutableDescriptorType, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRenderingFeaturesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDynamicRenderingFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6923,14 +6349,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRend
             "VK_KHR_dynamic_rendering is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(dynamicRendering, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, dynamicRendering, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMap2FeaturesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6938,14 +6362,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
             "VK_EXT_fragment_density_map2 is "
             "not supported by the device.\n");
     }
-    GET_VALUE_WARN(fragmentDensityMapDeferred, WarnIfGreater);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, fragmentDensityMapDeferred, WarnIfGreater);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMap2PropertiesEXT)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6953,29 +6375,56 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
             "VK_EXT_fragment_density_map2 is "
             "not supported by the device.\n");
     }
-    GET_VALUE(subsampledLoads);
-    GET_VALUE(subsampledCoarseReconstructionEarlyAccess);
-    GET_VALUE(maxSubsampledArrayLayers);
-    GET_VALUE(maxDescriptorSetSubsampledSamplers);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE(prop, subsampledLoads);
+        GET_VALUE(prop, subsampledCoarseReconstructionEarlyAccess);
+        GET_VALUE(prop, maxSubsampledArrayLayers);
+        GET_VALUE(prop, maxDescriptorSetSubsampledSamplers);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent2D *dest) {
+void JsonLoader::GetValue(const Json::Value &parent, const std::string &member, const char *name, VkExtent2D *dest) {
+    if (member != name) {
+        return;
+    }
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
         return;
     }
-    GET_VALUE(width);
-    GET_VALUE(height);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE(prop, width);
+        GET_VALUE(prop, height);
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const char *name, VkExtent3D *dest) {
+void JsonLoader::GetValue(const Json::Value &parent, const std::string &member, const char *name, VkExtent2D *dest,
+                          std::function<bool(const char *, uint32_t, uint32_t)> warn_func = nullptr) {
+    if (member != name) {
+        return;
+    }
     const Json::Value value = parent[name];
     if (value.type() != Json::objectValue) {
         return;
     }
-    GET_VALUE(width);
-    GET_VALUE(height);
-    GET_VALUE(depth);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, width, warn_func);
+        GET_VALUE_WARN(prop, height, warn_func);
+    }
+}
+
+void JsonLoader::GetValue(const Json::Value &parent, const std::string &member, const char *name, VkExtent3D *dest) {
+    if (member != name) {
+        return;
+    }
+    const Json::Value value = parent[name];
+    if (value.type() != Json::objectValue) {
+        return;
+    }
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE(prop, width);
+        GET_VALUE(prop, height);
+        GET_VALUE(prop, depth);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, int index, VkQueueFamilyProperties *dest) {
@@ -6983,10 +6432,12 @@ void JsonLoader::GetValue(const Json::Value &parent, int index, VkQueueFamilyPro
     if (value.type() != Json::objectValue) {
         return;
     }
-    GET_VALUE(queueFlags);
-    GET_VALUE(queueCount);
-    GET_VALUE(timestampValidBits);
-    GET_VALUE(minImageTransferGranularity);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE(prop, queueFlags);
+        GET_VALUE(prop, queueCount);
+        GET_VALUE(prop, timestampValidBits);
+        GET_VALUE(prop, minImageTransferGranularity);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, int index, VkMemoryType *dest) {
@@ -6994,8 +6445,10 @@ void JsonLoader::GetValue(const Json::Value &parent, int index, VkMemoryType *de
     if (value.type() != Json::objectValue) {
         return;
     }
-    GET_VALUE(propertyFlags);
-    GET_VALUE(heapIndex);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE(prop, propertyFlags);
+        GET_VALUE(prop, heapIndex);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest) {
@@ -7003,15 +6456,13 @@ void JsonLoader::GetValue(const Json::Value &parent, int index, VkMemoryHeap *de
     if (value.type() != Json::objectValue) {
         return;
     }
-    GET_VALUE_WARN(size, WarnIfGreater);
-    GET_VALUE(flags);
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, size, WarnIfGreater);
+        GET_MEMBER_VALUE(member, flags);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryProperties *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMemoryProperties)\n");
     const int heap_count = GET_ARRAY(memoryHeaps);  // size <= VK_MAX_MEMORY_HEAPS
     if (heap_count >= 0) {
@@ -7030,29 +6481,26 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPrope
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkSurfaceCapabilitiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, minImageCount, WarnIfLesser);
+        GET_VALUE_WARN(member, maxImageCount, WarnIfGreater);
+        GET_VALUE_WARN(member, minImageExtent, WarnIfLesser);
+        GET_VALUE_WARN(member, maxImageExtent, WarnIfGreater);
+        GET_VALUE_WARN(member, maxImageArrayLayers, WarnIfGreater);
+        GET_VALUE(member, supportedTransforms);
+        GET_VALUE(member, supportedCompositeAlpha);
+        GET_VALUE(member, supportedUsageFlags);
     }
-    GET_VALUE_WARN(minImageCount, WarnIfLesser);
-    GET_VALUE_WARN(maxImageCount, WarnIfGreater);
-    GET_VALUE(minImageExtent);
-    GET_VALUE(maxImageExtent);
-    GET_VALUE_WARN(maxImageArrayLayers, WarnIfGreater);
-    GET_VALUE(supportedTransforms);
-    GET_VALUE(supportedCompositeAlpha);
-    GET_VALUE(supportedUsageFlags);
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, int index, DevsimFormatProperties *dest) {
     const Json::Value value = parent[index];
-    if (value.type() != Json::objectValue) {
-        return;
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE(prop, formatID);
+        GET_VALUE(prop, linearTilingFeatures);
+        GET_VALUE(prop, optimalTilingFeatures);
+        GET_VALUE(prop, bufferFeatures);
     }
-    GET_VALUE(formatID);
-    GET_VALUE(linearTilingFeatures);
-    GET_VALUE(optimalTilingFeatures);
-    GET_VALUE(bufferFeatures);
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, int index, VkLayerProperties *dest) {
@@ -7060,10 +6508,12 @@ void JsonLoader::GetValue(const Json::Value &parent, int index, VkLayerPropertie
     if (value.type() != Json::objectValue) {
         return;
     }
-    GET_ARRAY(layerName);  // size < VK_MAX_EXTENSION_NAME_SIZE
-    GET_VALUE(specVersion);
-    GET_VALUE(implementationVersion);
-    GET_ARRAY(description);  // size < VK_MAX_DESCRIPTION_SIZE
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_ARRAY(layerName);  // size < VK_MAX_EXTENSION_NAME_SIZE
+        GET_VALUE(prop, specVersion);
+        GET_VALUE(prop, implementationVersion);
+        GET_ARRAY(description);  // size < VK_MAX_DESCRIPTION_SIZE
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, int index, VkExtensionProperties *dest) {
@@ -7071,8 +6521,10 @@ void JsonLoader::GetValue(const Json::Value &parent, int index, VkExtensionPrope
     if (value.type() != Json::objectValue) {
         return;
     }
-    GET_ARRAY(extensionName);  // size < VK_MAX_EXTENSION_NAME_SIZE
-    GET_VALUE(specVersion);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_ARRAY(extensionName);  // size < VK_MAX_EXTENSION_NAME_SIZE
+        GET_VALUE(prop, specVersion);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, int index, VkSurfaceFormatKHR *dest) {
@@ -7080,8 +6532,10 @@ void JsonLoader::GetValue(const Json::Value &parent, int index, VkSurfaceFormatK
     if (value.type() != Json::objectValue) {
         return;
     }
-    GET_VALUE(format);
-    GET_VALUE(colorSpace);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE(prop, format);
+        GET_VALUE(prop, colorSpace);
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, int index, VkPresentModeKHR *dest) {
@@ -7109,34 +6563,20 @@ void JsonLoader::GetValue(const Json::Value &parent, int index, VkDeviceSize *de
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Properties *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
-
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(framebufferIntegerColorSampleCounts);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, framebufferIntegerColorSampleCounts, WarnIfGreater);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Features *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
-
-    for (const auto &prop : value) {
-        Property p(prop);
-
-        GET_PROPERTY_WARN(samplerMirrorClampToEdge);
-        GET_PROPERTY_WARN(shaderOutputViewportIndex);
-        GET_PROPERTY_WARN(shaderOutputLayer);
-        GET_PROPERTY_WARN(subgroupBroadcastDynamicId);
-        GET_PROPERTY_WARN(drawIndirectCount);
-        GET_PROPERTY_WARN(descriptorIndexing);
-        GET_PROPERTY_WARN(samplerFilterMinmax);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, samplerMirrorClampToEdge, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderOutputViewportIndex, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderOutputLayer, WarnIfGreater);
+        GET_VALUE_WARN(prop, subgroupBroadcastDynamicId, WarnIfGreater);
+        GET_VALUE_WARN(prop, drawIndirectCount, WarnIfGreater);
+        GET_VALUE_WARN(prop, descriptorIndexing, WarnIfGreater);
+        GET_VALUE_WARN(prop, samplerFilterMinmax, WarnIfGreater);
     }
 }
 
@@ -7148,7 +6588,7 @@ void JsonLoader::GetValueGPUinfoCore11(const Json::Value &parent) {
 
     const Json::Value core11_features = core11["features"];
     if (core11_features.type() == Json::objectValue) {
-        GetValue(core11_features, "storageBuffer16BitAccess",
+        GetValue(core11_features, "storageBuffer16BitAccess", "storageBuffer16BitAccess",
                  &pdd_.physical_device_16bit_storage_features_.storageBuffer16BitAccess);
         GetValue(core11_features, "uniformAndStorageBuffer16BitAccess",
                  &pdd_.physical_device_16bit_storage_features_.uniformAndStorageBuffer16BitAccess);
@@ -7303,7 +6743,7 @@ void JsonLoader::GetValueGPUinfoCore12(const Json::Value &parent) {
 
     const Json::Value core12_properties = core12["properties"];
     if (core12_properties.type() == Json::objectValue) {
-        GetValue(core12_properties, "denormBehaviorIndependence",
+        GetValue(core12_properties, "denormBehaviorIndependence", "denormBehaviorIndependence",
                  &pdd_.physical_device_float_controls_properties_.denormBehaviorIndependence);
         GetValue(core12_properties, "roundingModeIndependence",
                  &pdd_.physical_device_float_controls_properties_.roundingModeIndependence);
@@ -7415,7 +6855,7 @@ void JsonLoader::GetValueGPUinfoSurfaceCapabilities(const Json::Value &parent) {
         return;
     }
 
-    GetValue(surface_capabilities, "minImageCount", &pdd_.surface_capabilities_.minImageCount);
+    /*GetValue(surface_capabilities, "minImageCount", &pdd_.surface_capabilities_.minImageCount);
     GetValue(surface_capabilities, "maxImageCount", &pdd_.surface_capabilities_.maxImageCount);
     GetValue(surface_capabilities, "minImageExtent", &pdd_.surface_capabilities_.minImageExtent);
     GetValue(surface_capabilities, "maxImageExtent", &pdd_.surface_capabilities_.maxImageExtent);
@@ -7425,7 +6865,7 @@ void JsonLoader::GetValueGPUinfoSurfaceCapabilities(const Json::Value &parent) {
     GetValue(surface_capabilities, "supportedUsageFlags", &pdd_.surface_capabilities_.supportedUsageFlags);
 
     GetArray(surface_capabilities, "surfaceformats", &pdd_.arrayof_surface_formats_);
-    GetArray(surface_capabilities, "presentmodes", &pdd_.arrayof_present_modes_);
+    GetArray(surface_capabilities, "presentmodes", &pdd_.arrayof_present_modes_);*/
 }
 
 #undef GET_VALUE
