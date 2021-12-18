@@ -4164,13 +4164,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryProperties *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProtectedMemoryProperties)\n");
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, protectedNoFault, WarnIfLesser);
+        GET_VALUE_WARN(member, protectedNoFault, WarnIfGreater);
     }
 }
 
