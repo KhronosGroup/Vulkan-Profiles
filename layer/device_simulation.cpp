@@ -2313,7 +2313,6 @@ class JsonLoader {
     };
 
     std::string profile_name;
-    std::vector<Extension> profile_extensions;
 
     SchemaId IdentifySchema(const Json::Value &value);
     void GetFeature(const Json::Value &features, const std::string& feature_name);
@@ -2973,22 +2972,6 @@ class JsonLoader {
             VkLayerProperties layer_properties = {};
             GetValue(value, i, &layer_properties);
             dest->push_back(layer_properties);
-        }
-        return static_cast<int>(dest->size());
-    }
-
-    int GetArray(const Json::Value &parent, const char *name, ArrayOfVkExtensionProperties *dest) {
-        const Json::Value value = parent[name];
-        if (value.type() != Json::arrayValue) {
-            return -1;
-        }
-        DebugPrintf("\t\tJsonLoader::GetArray(ArrayOfVkExtensionProperties)\n");
-        dest->clear();
-        const int count = static_cast<int>(value.size());
-        for (int i = 0; i < count; ++i) {
-            VkExtensionProperties extension_properties = {};
-            GetValue(value, i, &extension_properties);
-            dest->push_back(extension_properties);
         }
         return static_cast<int>(dest->size());
     }
@@ -3803,8 +3786,6 @@ void JsonLoader::GetProperty(const Json::Value &props, const std::string& proper
         GetArray(prop, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
     } else if (property_name == "ArrayOfVkLayerProperties") {
         GetArray(prop, "ArrayOfVkLayerProperties", &pdd_.arrayof_layer_properties_);
-    } else if (property_name == "ArrayOfVkExtensionProperties") {
-        GetArray(prop, "ArrayOfVkExtensionProperties", &pdd_.arrayof_extension_properties_);
     } else if (property_name == "ArrayOfVkSurfaceFormats") {
         GetArray(prop, "ArrayOfVkSurfaceFormats", &pdd_.arrayof_surface_formats_);
     } else if (property_name == "ArrayOfVkPresentModes") {
@@ -3871,9 +3852,12 @@ bool JsonLoader::LoadFile(const char *filename) {
     for (const auto &c : caps) {
         if (c["name"] == profile_name) {
             const auto &extensions = c["extensions"];
-            profile_extensions.reserve(extensions.size());
+            pdd_.arrayof_extension_properties_.reserve(extensions.size());
             for (const auto &e : extensions.getMemberNames()) {
-                profile_extensions.push_back({e, extensions[e].asInt()});
+                VkExtensionProperties extension;
+                strcpy(extension.extensionName, e.c_str());
+                extension.specVersion = extensions[e].asInt();
+                pdd_.arrayof_extension_properties_.push_back(extension);
             }
             const auto &features = c["features"];
             for (const auto &feature : features.getMemberNames()) {
