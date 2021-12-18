@@ -539,6 +539,12 @@
                 },
                 "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE": {
                     "mutableDescriptorType": true
+                },
+                "VkPhysicalDeviceDynamicRenderingFeaturesKHR": {
+                    "dynamicRendering": true
+                },
+                "VkPhysicalDeviceFragmentDensityMap2FeaturesEXT": {
+                    "fragmentDensityMapDeferred": true
                 }
             },
             "properties": {
