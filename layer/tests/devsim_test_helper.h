@@ -50,6 +50,7 @@ void setDevsimModifyFormatList(ArrayCombinationMode mode);
 void setDevsimModifyFormatProperties(ArrayCombinationMode mode);
 void setDevsimModifySurfaceFormats(ArrayCombinationMode mode);
 void setDevsimModifyPresentModes(ArrayCombinationMode mode);
+void setDevsimProfileName(const std::string& profile);
 
 VkApplicationInfo GetDefaultApplicationInfo();
 

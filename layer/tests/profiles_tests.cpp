@@ -10,8 +10,10 @@ TEST(profiles, TestDesktopPortability2022Limits) {
 
     devsim_test::VulkanInstanceBuilder inst_builder;
 
-    std::vector<std::string> filepaths = {TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_1_1_desktop_portability_2022.json"};
+    std::vector<std::string> filepaths = {TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json"};
     devsim_test::setDevsimFilenames(filepaths);
+    devsim_test::setDevsimProfileName("VP_LUNARG_desktop_portability_2021");
+    devsim_test::setDevsimEmulatePortabilitySubsetExtension(true);
 
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
@@ -101,8 +103,8 @@ TEST(profiles, TestDesktopPortability2022Limits) {
     EXPECT_GE(gpu_props.limits.maxSamplerLodBias, 14.0f);
     EXPECT_GE(gpu_props.limits.maxSamplerAnisotropy, 16.0f);
     EXPECT_GE(gpu_props.limits.maxViewports, 16u);
-    EXPECT_GE(gpu_props.limits.maxViewportDimensions[0], 16384);
-    EXPECT_GE(gpu_props.limits.maxViewportDimensions[1], 16384);
+    EXPECT_GE(gpu_props.limits.maxViewportDimensions[0], 16384u);
+    EXPECT_GE(gpu_props.limits.maxViewportDimensions[1], 16384u);
     EXPECT_LE(gpu_props.limits.viewportBoundsRange[0], -32768.0f);
     EXPECT_GE(gpu_props.limits.viewportBoundsRange[1], 32767.0f);
     EXPECT_GE(gpu_props.limits.minMemoryMapAlignment, 64u);
@@ -177,7 +179,6 @@ TEST(profiles, TestDesktopPortability2022Limits) {
     EXPECT_EQ(gpu_feats.tessellationShader, VK_TRUE);
     EXPECT_EQ(gpu_feats.textureCompressionBC, VK_TRUE);
     EXPECT_EQ(gpu_feats.vertexPipelineStoresAndAtomics, VK_TRUE);
-
 
     vkDestroyInstance(test_inst, nullptr);
 }

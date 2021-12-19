@@ -320,6 +320,7 @@ const char *const kEnvarDevsimModifySurfaceFormats =
 const char *const kEnvarDevsimModifyPresentModes =
     "debug.vulkan.devsim.modifypresentmodes";  // an ArrayCombinationMode value sets how the device and config present modes are
                                                // combined.
+const char *const kEnvarDevsimProfileName = "debug.vulkan.devsim.profilename";  // name of the profile to be used
 #else
 const char *const kEnvarDevsimFilename = "VK_DEVSIM_FILENAME";          // path of the configuration file(s) to load.
 const char *const kEnvarDevsimDebugEnable = "VK_DEVSIM_DEBUG_ENABLE";   // a non-zero integer will enable debugging output.
@@ -342,6 +343,7 @@ const char *const kEnvarDevsimModifySurfaceFormats =
                                          // combined.
 const char *const kEnvarDevsimModifyPresentModes =
     "VK_DEVSIM_MODIFY_PRESENT_MODES";  // an ArrayCombinationMode value sets how the device and config present modes are combined.
+const char *const kEnvarDevsimProfileName = "VK_DEVSIM_PROFILE_NAME"; // name of the profile to be used
 #endif
 
 const char *const kLayerSettingsDevsimFilename = "filename";         // vk_layer_settings.txt equivalent for kEnvarDevsimFilename
@@ -362,6 +364,7 @@ const char *const kLayerSettingsDevsimModifySurfaceFormats =
     "modify_surface_formats";  // an ArrayCombinationMode value sets how the device and config surface format lists are combined.
 const char *const kLayerSettingsDevsimModifyPresentModes =
     "modify_present_modes";  // an ArrayCombinationMode value sets how the device and config present modes are combined.
+const char *const kLayerSettingDevsimProfileName = "profile_name"; // name of the profile to be used
 
 struct ArrayCombinationModeSetting {
     ArrayCombinationMode mode;
@@ -388,6 +391,7 @@ struct ArrayCombinationModeSetting modifyFormatList;
 struct ArrayCombinationModeSetting modifyFormatProperties;
 struct ArrayCombinationModeSetting modifySurfaceFormats;
 struct ArrayCombinationModeSetting modifyPresentModes;
+std::string profile_name = {};
 
 // Various small utility functions ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2387,8 +2391,6 @@ class JsonLoader {
         int specVersion;
     };
 
-    std::string profile_name;
-
     SchemaId IdentifySchema(const Json::Value &value);
     void GetFeature(const Json::Value &features, const std::string& feature_name);
     void GetProperty(const Json::Value &props, const std::string &property_name);
@@ -3484,6 +3486,19 @@ bool JsonLoader::LoadFiles() {
     return LoadFiles(filename_list);
 }
 
+bool IsProfileSelected(std::string filename) {
+    const std::string ext = ".json";
+    if (filename.length() >= ext.length()) {
+        if (filename.substr(filename.length() - ext.length()) == ext) {
+            filename = filename.substr(0, filename.length() - ext.length());
+        }
+    }
+    if (filename.length() > profile_name.length() && filename.substr(filename.length() - profile_name.length()) == profile_name) {
+        return true;
+    }
+    return false;
+}
+
 bool JsonLoader::LoadFiles(const char *filename_list) {
 #if defined(_WIN32)
     const char delimiter = ';';
@@ -3493,8 +3508,11 @@ bool JsonLoader::LoadFiles(const char *filename_list) {
     std::stringstream ss_list(filename_list);
     std::string filename;
 
+    bool no_profile_selected = profile_name.empty();
+    bool first_profile = true;
     while (std::getline(ss_list, filename, delimiter)) {
-        if (!filename.empty()) {
+        if (!filename.empty() && ((no_profile_selected && first_profile) || IsProfileSelected(filename))) {
+            first_profile = false;
             if (!LoadFile(filename.c_str())) {
                 return false;
             }
@@ -3896,8 +3914,6 @@ void JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
 }
 
 bool JsonLoader::LoadFile(const char *filename) {
-    // Todo
-    profile_name = "baseline";
 
     std::ifstream json_file(filename);
     if (!json_file) {
@@ -3931,27 +3947,25 @@ bool JsonLoader::LoadFile(const char *filename) {
 
     const auto &caps = root["capabilities"];
     for (const auto &c : caps) {
-        if (c["name"] == profile_name) {
-            const auto &extensions = c["extensions"];
-            pdd_.arrayof_extension_properties_.reserve(extensions.size());
-            for (const auto &e : extensions.getMemberNames()) {
-                VkExtensionProperties extension;
-                strcpy(extension.extensionName, e.c_str());
-                extension.specVersion = extensions[e].asInt();
-                pdd_.arrayof_extension_properties_.push_back(extension);
-            }
-            const auto &features = c["features"];
-            for (const auto &feature : features.getMemberNames()) {
-                GetFeature(features, feature);
-            }
-            const auto &properties = c["properties"];
-            for (const auto &prop : properties.getMemberNames()) {
-                GetProperty(properties, prop);
-            }
-            const auto& formats = c["formats"];
-            for (const auto& format : formats.getMemberNames()) {
-                GetFormat(formats, format, &pdd_.arrayof_format_properties_);
-            }
+        const auto &extensions = c["extensions"];
+        pdd_.arrayof_extension_properties_.reserve(extensions.size());
+        for (const auto &e : extensions.getMemberNames()) {
+            VkExtensionProperties extension;
+            strcpy(extension.extensionName, e.c_str());
+            extension.specVersion = extensions[e].asInt();
+            pdd_.arrayof_extension_properties_.push_back(extension);
+        }
+        const auto &features = c["features"];
+        for (const auto &feature : features.getMemberNames()) {
+            GetFeature(features, feature);
+        }
+        const auto &properties = c["properties"];
+        for (const auto &prop : properties.getMemberNames()) {
+            GetProperty(properties, prop);
+        }
+        const auto& formats = c["formats"];
+        for (const auto& format : formats.getMemberNames()) {
+            GetFormat(formats, format, &pdd_.arrayof_format_properties_);
         }
     }
 
@@ -7131,6 +7145,19 @@ static void GetDevSimModifyPresentModes() {
     modifyPresentModes.mode = GetArrayCombinationModeValue(modify_present_modes);
 }
 
+static void GetSelectedProfileName() {
+    std::string env_var = GetEnvarValue(kEnvarDevsimProfileName);
+    if (!env_var.empty()) {
+        profile_name = env_var;
+        modifyPresentModes.fromEnvVar = true;
+    }
+
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingDevsimProfileName)) {
+        emulatePortability.fromEnvVar = false;
+        profile_name = vku::GetLayerSettingString(kOurLayerName, kLayerSettingDevsimProfileName);
+    }
+}
+
 // Generic layer dispatch table setup, see [LALI].
 static VkResult LayerSetupCreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
                                          VkInstance *pInstance) {
@@ -7144,6 +7171,7 @@ static VkResult LayerSetupCreateInstance(const VkInstanceCreateInfo *pCreateInfo
     GetDevSimModifyFormatProperties();
     GetDevSimModifySurfaceFormats();
     GetDevSimModifyPresentModes();
+    GetSelectedProfileName();
 
     VkLayerInstanceCreateInfo *chain_info = get_chain_info(pCreateInfo, VK_LAYER_LINK_INFO);
     assert(chain_info->u.pLayerInfo);
