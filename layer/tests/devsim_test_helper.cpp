@@ -88,59 +88,59 @@ void devsim_test::setDevsimFilenames(std::vector<std::string>& filepaths) {
         std::string config_filepath = devsim_test::getAbsolutePath(filepath);
         out << filepath << seperator;
     }
-    devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_FILENAME", out.str().c_str());
+    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_FILENAME", out.str().c_str());
 }
 
 void devsim_test::setDevsimDebugEnable(bool enable) {
     if (enable)
-        devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_DEBUG_ENABLE", "true");
+        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DEBUG_ENABLE", "true");
     else
-        devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_DEBUG_ENABLE", "false");
+        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DEBUG_ENABLE", "false");
 }
 
 void devsim_test::setDevsimExitOnError(bool enable) {
     if (enable)
-        devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_EXIT_ON_ERROR", "true");
+        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EXIT_ON_ERROR", "true");
     else
-        devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_EXIT_ON_ERROR", "false");
+        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EXIT_ON_ERROR", "false");
 }
 
 void devsim_test::setDevsimEmulatePortabilitySubsetExtension(bool enable) {
     if (enable)
-        devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_EMULATE_PORTABILITY", "true");
+        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EMULATE_PORTABILITY", "true");
     else
-        devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_EMULATE_PORTABILITY", "false");
+        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EMULATE_PORTABILITY", "false");
 }
 
 void devsim_test::setDevsimModifyExtensionList(ArrayCombinationMode mode) {
-    devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_MODIFY_EXTENSION_LIST",
+    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_EXTENSION_LIST",
                                        arrayCombinationModeToString(mode).c_str());
 }
 
 void devsim_test::setDevsimModifyMemoryFags(bool enable) {
     if (enable)
-        devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_MODIFY_MEMORY_FLAGS", "true");
+        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS", "true");
     else
-        devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_MODIFY_MEMORY_FLAGS", "false");
+        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS", "false");
 }
 
 void devsim_test::setDevsimModifyFormatList(ArrayCombinationMode mode) {
-    devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_MODIFY_FORMAT_LIST",
+    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_FORMAT_LIST",
                                        arrayCombinationModeToString(mode).c_str());
 }
 
 void devsim_test::setDevsimModifyFormatProperties(ArrayCombinationMode mode) {
-    devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_MODIFY_FORMAT_PROPERTIES",
+    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_FORMAT_PROPERTIES",
                                        arrayCombinationModeToString(mode).c_str());
 }
 
 void devsim_test::setDevsimModifySurfaceFormats(ArrayCombinationMode mode) {
-    devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_MODIFY_SURFACE_FORMAT",
+    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_SURFACE_FORMAT",
                                        arrayCombinationModeToString(mode).c_str());
 }
 
 void devsim_test::setDevsimModifyPresentModes(ArrayCombinationMode mode) {
-    devsim_test::setEnvironmentSetting("VK_LUNARG_DEVICE_SIMULATION_MODIFY_PRESENT_MODES",
+    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_PRESENT_MODES",
                                        arrayCombinationModeToString(mode).c_str());
 }
 
