@@ -20,7 +20,7 @@
  */
 
 /*
- * layersvt/device_simulation.cpp - The VK_LAYER_LUNARG_device_simulation layer.
+ * layersvt/device_simulation.cpp - The VK_LAYER_KHRONOS_profiles layer.
  * This DevSim layer simulates a device by loading a JSON configuration file to override values that would normally be returned
  * from a Vulkan implementation.  Configuration files must validate with the DevSim schema; this layer does not redundantly
  * check for configuration errors that would be caught by schema validation.
@@ -76,10 +76,10 @@ const uint32_t kVersionDevsimImplementation = VK_MAKE_VERSION(kVersionDevsimMajo
 
 // Properties of this layer:
 const VkLayerProperties kLayerProperties[] = {{
-    "VK_LAYER_LUNARG_device_simulation",  // layerName
+    "VK_LAYER_KHRONOS_profiles",  // layerName
     VK_MAKE_VERSION(1, 0, 68),            // specVersion (clamped to final 1.0 spec version)
     kVersionDevsimImplementation,         // implementationVersion
-    "LunarG device simulation layer"      // description
+    "Khronos profiles layer"      // description
 }};
 const uint32_t kLayerPropertiesCount = (sizeof(kLayerProperties) / sizeof(kLayerProperties[0]));
 
@@ -9075,8 +9075,8 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolPropertiesEXT(VkPhysicalDevi
     strcpy(devsim_layer_tool_props.name, "Device Simulation Layer");
     strcpy(devsim_layer_tool_props.version, version_string.c_str());
     devsim_layer_tool_props.purposes = VK_TOOL_PURPOSE_MODIFYING_FEATURES_BIT_EXT;
-    strcpy(devsim_layer_tool_props.description, "LunarG device simulation layer");
-    strcpy(devsim_layer_tool_props.layer, "VK_LAYER_LUNARG_device_simulation");
+    strcpy(devsim_layer_tool_props.description, "Khronos profiles layer");
+    strcpy(devsim_layer_tool_props.layer, "VK_LAYER_KHRONOS_profiles");
 
     auto original_pToolProperties = pToolProperties;
     if (pToolProperties != nullptr) {

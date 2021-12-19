@@ -79,7 +79,7 @@ That allows the Validation layer to see the results of the DevSim layer, and per
 Please report issues to [LunarG's VulkanTools GitHub repository](https://github.com/LunarG/VulkanTools/issues) and include "DevSim" in the title text.
 
 ### Layer name
-`VK_LAYER_LUNARG_device_simulation`
+`VK_LAYER_KHRONOS_profiles`
 
 ### DevSim Layer operation and configuration
 At application startup, during vkCreateInstance(), the DevSim layer initializes its internal tables from the actual physical device in the system, then loads its configuration file, which specifies override values to apply to those internal tables.
@@ -213,88 +213,88 @@ These and other sample files can be found in the [${VulkanTools}/layersvt/device
 
 The DevSim layer provides the ability to emulate the `VK_KHR_portability_subset` extension on devices that do not implement this extension.
 This feature allows users to test their application with limitations found on non-conformant Vulkan implementations.
-To turn on this feature, set the `VK_DEVSIM_EMULATE_PORTABILITY_SUBSET_EXTENSION` environment variable (or the corresponding vk_layer_settings.txt option `lunarg_device_simulation.emulate_portability`) to a positive integer.
+To turn on this feature, set the `VK_DEVSIM_EMULATE_PORTABILITY_SUBSET_EXTENSION` environment variable (or the corresponding vk_layer_settings.txt option `khronos_profiles.emulate_portability`) to a positive integer.
 DevSim config files that use this feature should validate to the portability specific schema https://schema.khronos.org/vulkan/devsim_VK_KHR_portability_subset-provisional-1.json#.
 
 ### DevSim Layer Options
 
 #### Devsim JSON configuration file
-- Environment Variable: `VK_LUNARG_DEVICE_SIMULATION_FILENAME`
-- `vk_layer_settings.txt` Option: `lunarg_device_simulation.filename`
-- Android Option: `debug.vulkan.lunarg_device_simulation.filename`
+- Environment Variable: `VK_KHRONOS_PROFILES_FILENAME`
+- `vk_layer_settings.txt` Option: `khronos_profiles.filename`
+- Android Option: `debug.vulkan.khronos_profiles.filename`
 - Default Value: Not set
 
 Name of one or more configuration file(s) to load. _Added in v1.2.1:_ This variable can have a delimited list of files to be loaded.
 On Windows, the delimiter is `;` else it is `:`. Files are loaded in order.  Later files can override settings from earlier files.
 
 #### Debug Enable
-- Environment Variable: `VK_LUNARG_DEVICE_SIMULATION_DEBUG_ENABLE`
-- `vk_layer_settings.txt` Option: `lunarg_device_simulation.debug_enable`
-- Android Option: `debug.vulkan.lunarg_device_simulation.debug_enable`
+- Environment Variable: `VK_KHRONOS_PROFILES_DEBUG_ENABLE`
+- `vk_layer_settings.txt` Option: `khronos_profiles.debug_enable`
+- Android Option: `debug.vulkan.khronos_profiles.debug_enable`
 - Default Value: false
 
 Enables debug message output.
 
 #### Emulate `VK_KHR_portability_subset`
-- Environment Variable: `VK_LUNARG_DEVICE_SIMULATION_EMULATE_PORTABILITY`
-- `vk_layer_settings.txt` Option: `lunarg_device_simulation.emulate_portability`
-- Android Option: `debug.vulkan.lunarg_device_simulation.emulate_portability`
+- Environment Variable: `VK_KHRONOS_PROFILES_EMULATE_PORTABILITY`
+- `vk_layer_settings.txt` Option: `khronos_profiles.emulate_portability`
+- Android Option: `debug.vulkan.khronos_profiles.emulate_portability`
 - Default Value: false
 
 Enables emulation of the `VK_KHR_portability_subset` extension.
 
 #### Exit on Error
-- Environment Variable: `VK_LUNARG_DEVICE_SIMULATION_EXIT_ON_ERROR`
-- `vk_layer_settings.txt` Option: `lunarg_device_simulation.exit_on_error`
-- Android Option: `debug.vulkan.lunarg_device_simulation.exit_on_error`
+- Environment Variable: `VK_KHRONOS_PROFILES_EXIT_ON_ERROR`
+- `vk_layer_settings.txt` Option: `khronos_profiles.exit_on_error`
+- Android Option: `debug.vulkan.khronos_profiles.exit_on_error`
 - Default Value: false
 
 Enables exit-on-error.
 
 #### Modify Device Extension list
-- Environment Variable: `VK_LUNARG_DEVICE_SIMULATION_MODIFY_EXTENSION_LIST`
-- `vk_layer_settings.txt` Option: `lunarg_device_simulation.modify_extension_list`
-- Android Option: `debug.vulkan.lunarg_device_simulation.modify_extension_list`
+- Environment Variable: `VK_KHRONOS_PROFILES_MODIFY_EXTENSION_LIST`
+- `vk_layer_settings.txt` Option: `khronos_profiles.modify_extension_list`
+- Android Option: `debug.vulkan.khronos_profiles.modify_extension_list`
 - Default Value: none
 
  Enables modification of the device extensions list from the JSON config file. Valid options are "none", "replace", "whitelist", "blacklist", and "intersect".
 
 #### Modify Device Memory Flags
-- Environment Variable: `VK_LUNARG_DEVICE_SIMULATION_MODIFY_MEMORY_FLAGS`
-- `vk_layer_settings.txt` Option: `lunarg_device_simulation.modify_memory_flags`
-- Android Option: `debug.vulkan.lunarg_device_simulation.modify_memory_flags`
+- Environment Variable: `VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS`
+- `vk_layer_settings.txt` Option: `khronos_profiles.modify_memory_flags`
+- Android Option: `debug.vulkan.khronos_profiles.modify_memory_flags`
 - Default Value: false
 
 Enables modification of the device memory heap flags and memory type flags from the JSON config file.
 
 #### Modify Device Format list
-- Environment Variable: `VK_LUNARG_DEVICE_SIMULATION_MODIFY_FORMAT_LIST`
-- `vk_layer_settings.txt` Option: `lunarg_device_simulation.modify_format_list`
-- Android Option: `debug.vulkan.lunarg_device_simulation.modify_format_list`
+- Environment Variable: `VK_KHRONOS_PROFILES_MODIFY_FORMAT_LIST`
+- `vk_layer_settings.txt` Option: `khronos_profiles.modify_format_list`
+- Android Option: `debug.vulkan.khronos_profiles.modify_format_list`
 - Default Value: none
 
 Enables modification of the device format list from the JSON config file. Valid options are "none", "replace", "whitelist", "blacklist", and "intersect".
 
 #### Modify Device Format Properties
-- Environment Variable: `VK_LUNARG_DEVICE_SIMULATION_MODIFY_FORMAT_PROPERTIES`
-- `vk_layer_settings.txt` Option: `lunarg_device_simulation.modify_format_properties`
-- Android Option: `debug.vulkan.lunarg_device_simulation.modify_format_properties`
+- Environment Variable: `VK_KHRONOS_PROFILES_MODIFY_FORMAT_PROPERTIES`
+- `vk_layer_settings.txt` Option: `khronos_profiles.modify_format_properties`
+- Android Option: `debug.vulkan.khronos_profiles.modify_format_properties`
 - Default Value: none
 
 Enables modification of the device format properties from the JSON config file. Valid options are "none", "replace", "whitelist", "blacklist", and "intersect".
 
 #### Modify Device Surface Formats
-- Environment Variable: `VK_LUNARG_DEVICE_SIMULATION_MODIFY_SURFACE_FORMATS`
-- `vk_layer_settings.txt` Option: `lunarg_device_simulation.modify_surface_formats`
-- Android Option: `debug.vulkan.lunarg_device_simulation.modify_surface_formats`
+- Environment Variable: `VK_KHRONOS_PROFILES_MODIFY_SURFACE_FORMATS`
+- `vk_layer_settings.txt` Option: `khronos_profiles.modify_surface_formats`
+- Android Option: `debug.vulkan.khronos_profiles.modify_surface_formats`
 - Default Value: none
 
 Enables modification of the surface format list from the JSON config file. Valid options are "none", "replace", "whitelist", "blacklist", and "intersect".
 
 #### Modify Device Present Modes
-- Environment Variable: `VK_LUNARG_DEVICE_SIMULATION_MODIFY_PRESENT_MODES`
-- `vk_layer_settings.txt` Option: `lunarg_device_simulation.modify_present_modes`
-- Android Option: `debug.vulkan.lunarg_device_simulation.modify_present_modes`
+- Environment Variable: `VK_KHRONOS_PROFILES_MODIFY_PRESENT_MODES`
+- `vk_layer_settings.txt` Option: `khronos_profiles.modify_present_modes`
+- Android Option: `debug.vulkan.khronos_profiles.modify_present_modes`
 - Default Value: none
 
 Enables modification of the surface present mode list from the JSON config file. Valid options are "none", "replace", "whitelist", "blacklist", and "intersect".
@@ -316,7 +316,7 @@ source $VKSDK/setup-env.sh
 
 # Set loader parameters to find and load the DevSim layer from your local VulkanTools build.
 export VK_LAYER_PATH="${VulkanTools}/build/layersvt"
-export VK_INSTANCE_LAYERS="VK_LAYER_LUNARG_device_simulation"
+export VK_INSTANCE_LAYERS="VK_LAYER_KHRONOS_profiles`"
 
 # Specify the simulated device's configuration file.
 export VK_DEVSIM_FILENAME="${VulkanTools}/layersvt/device_simulation_examples/tiny1.json"
