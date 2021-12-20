@@ -6802,29 +6802,33 @@
                         }
                     },
                     "queueFamiliesProperties": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "properties": {
-                            "VkQueueFamilyProperties": {
-                                "$ref": "#/definitions/VkQueueFamilyProperties"
-                            },
-                            "VkQueueFamilyProperties2": {
-                                "$ref": "#/definitions/VkQueueFamilyProperties2"
-                            },
-                            "VkQueueFamilyProperties2KHR": {
-                                "$ref": "#/definitions/VkQueueFamilyProperties2"
-                            },
-                            "VkQueueFamilyGlobalPriorityPropertiesEXT": {
-                                "$ref": "#/definitions/VkQueueFamilyGlobalPriorityPropertiesEXT"
-                            },
-                            "VkVideoQueueFamilyProperties2KHR": {
-                                "$ref": "#/definitions/VkVideoQueueFamilyProperties2KHR"
-                            },
-                            "VkQueueFamilyCheckpointPropertiesNV": {
-                                "$ref": "#/definitions/VkQueueFamilyCheckpointPropertiesNV"
-                            },
-                            "VkQueueFamilyCheckpointProperties2NV": {
-                                "$ref": "#/definitions/VkQueueFamilyCheckpointProperties2NV"
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "VkQueueFamilyProperties": {
+                                    "$ref": "#/definitions/VkQueueFamilyProperties"
+                                },
+                                "VkQueueFamilyProperties2": {
+                                    "$ref": "#/definitions/VkQueueFamilyProperties2"
+                                },
+                                "VkQueueFamilyProperties2KHR": {
+                                    "$ref": "#/definitions/VkQueueFamilyProperties2"
+                                },
+                                "VkQueueFamilyGlobalPriorityPropertiesEXT": {
+                                    "$ref": "#/definitions/VkQueueFamilyGlobalPriorityPropertiesEXT"
+                                },
+                                "VkVideoQueueFamilyProperties2KHR": {
+                                    "$ref": "#/definitions/VkVideoQueueFamilyProperties2KHR"
+                                },
+                                "VkQueueFamilyCheckpointPropertiesNV": {
+                                    "$ref": "#/definitions/VkQueueFamilyCheckpointPropertiesNV"
+                                },
+                                "VkQueueFamilyCheckpointProperties2NV": {
+                                    "$ref": "#/definitions/VkQueueFamilyCheckpointProperties2NV"
+                                }
                             }
                         }
                     }
