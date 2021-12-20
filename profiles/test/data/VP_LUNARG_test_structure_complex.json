@@ -6,7 +6,7 @@
             "features": {},
             "properties": {},
             "formats": {},
-            "queueFamiliesProperties": {}
+            "queueFamiliesProperties": []
         },
         "unused": {
         }

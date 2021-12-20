@@ -3021,36 +3021,38 @@
                     }
                 }
             },
-            "queueFamiliesProperties": {
-                "VkQueueFamilyProperties": {
-                    "queueFlags": [ "VK_QUEUE_GRAPHICS_BIT" ],
-                    "queueCount": 377,
-                    "timestampValidBits": 378,
-                    "minImageTransferGranularity": {
-                        "width": 379,
-                        "height": 380,
-                        "depth": 381
+            "queueFamiliesProperties": [
+                {
+                    "VkQueueFamilyProperties": {
+                        "queueFlags": [ "VK_QUEUE_GRAPHICS_BIT" ],
+                        "queueCount": 377,
+                        "timestampValidBits": 378,
+                        "minImageTransferGranularity": {
+                            "width": 379,
+                            "height": 380,
+                            "depth": 381
+                        }
+                    },
+                    "VkQueueFamilyGlobalPriorityPropertiesEXT": {
+                        "priorities": [
+                            "VK_QUEUE_GLOBAL_PRIORITY_LOW_EXT",
+                            "VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_EXT",
+                            "VK_QUEUE_GLOBAL_PRIORITY_HIGH_EXT",
+                            "VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT"
+                        ]
+                    },
+                    "VkVideoQueueFamilyProperties2KHR": {
+                        "videoCodecOperations": [ "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT" ]
+                    },
+                    "VkQueueFamilyCheckpointProperties2NV": {
+                        "checkpointExecutionStageMask": [
+                            "VK_PIPELINE_STAGE_2_NONE_KHR",
+                            "VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT",
+                            "VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT"
+                        ]
                     }
-                },
-                "VkQueueFamilyGlobalPriorityPropertiesEXT": {
-                    "priorities": [
-                        "VK_QUEUE_GLOBAL_PRIORITY_LOW_EXT",
-                        "VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_EXT",
-                        "VK_QUEUE_GLOBAL_PRIORITY_HIGH_EXT",
-                        "VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT"
-                    ]
-                },
-                "VkVideoQueueFamilyProperties2KHR": {
-                    "videoCodecOperations": [ "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT" ]
-                },
-                "VkQueueFamilyCheckpointProperties2NV": {
-                    "checkpointExecutionStageMask": [
-                        "VK_PIPELINE_STAGE_2_NONE_KHR",
-                        "VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT",
-                        "VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT"
-                    ]
                 }
-            }
+            ]
         },
         "macos-specific": {
             "extensions": {
