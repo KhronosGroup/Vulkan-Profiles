@@ -161,6 +161,13 @@ TEST(test_validate, VP_LUNARG_test_vkqueuefamilyproperties) {
     EXPECT_TRUE(validator.Check(document));
 }
 
+TEST(test_validate, VP_LUNARG_test_api_1_2_198) {
+    JsonValidator validator;
+
+    const Json::Value document = ParseJsonFile("VP_LUNARG_test_api_1_2_198.json");
+    EXPECT_TRUE(validator.Check(document));
+}
+
 TEST(test_validate, VP_LUNARG_desktop_portability_2021) {
     JsonValidator validator;
 

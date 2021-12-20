@@ -3,12 +3,12 @@
     "capabilities": {
         "vulkan11requirements": {
             "features": {
-                "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                "VkPhysicalDeviceMultiviewFeatures": {
                     "multiview": true
                 }
             },
             "properties": {
-                "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                "VkPhysicalDeviceMultiviewProperties": {
                     "maxMultiviewViewCount": 0,
                     "maxMultiviewInstanceIndex": 134217727
                 }
@@ -73,13 +73,12 @@
                 "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
                     "imagelessFramebuffer": true
                 },
-                "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                "VkPhysicalDevice16BitStorageFeatures": {
                     "storageBuffer16BitAccess": true,
                     "uniformAndStorageBuffer16BitAccess": true
                 },
                 "VkPhysicalDevice8BitStorageFeaturesKHR": {
                     "storageBuffer8BitAccess": true,
-                    "storagePushConstant8": true,
                     "uniformAndStorageBuffer8BitAccess": true
                 },
                 "VkPhysicalDeviceDescriptorIndexingFeaturesEXT": {
@@ -116,7 +115,7 @@
                 "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                     "samplerYcbcrConversion": true
                 },
-                "VkPhysicalDeviceVariablePointersFeaturesKHR": {
+                "VkPhysicalDeviceVariablePointersFeatures": {
                     "variablePointersStorageBuffer": true,
                     "variablePointers": true
                 }
@@ -242,7 +241,7 @@
                     "supportedDepthResolveModes": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ],
                     "supportedStencilResolveModes": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ]
                 },
-                "VkPhysicalDeviceMaintenance3PropertiesKHR": {
+                "VkPhysicalDeviceMaintenance3Properties": {
                     "maxPerSetDescriptors": 700,
                     "maxMemoryAllocationSize": 2147483648
                 }
@@ -758,7 +757,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2021-12-08",
+                    "date": "2021-12-20",
                     "author": "Christophe Riccio",
                     "comment": "Initial revision"
                 }
@@ -786,7 +785,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2021-12-08",
+                    "date": "2021-12-20",
                     "author": "Christophe Riccio",
                     "comment": "Initial revision"
                 }
