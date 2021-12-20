@@ -73,13 +73,12 @@
                 "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
                     "imagelessFramebuffer": true
                 },
-                "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                "VkPhysicalDevice16BitStorageFeatures": {
                     "storageBuffer16BitAccess": true,
                     "uniformAndStorageBuffer16BitAccess": true
                 },
                 "VkPhysicalDevice8BitStorageFeaturesKHR": {
                     "storageBuffer8BitAccess": true,
-                    "storagePushConstant8": true,
                     "uniformAndStorageBuffer8BitAccess": true
                 },
                 "VkPhysicalDeviceDescriptorIndexingFeaturesEXT": {
@@ -116,7 +115,7 @@
                 "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                     "samplerYcbcrConversion": true
                 },
-                "VkPhysicalDeviceVariablePointersFeaturesKHR": {
+                "VkPhysicalDeviceVariablePointersFeatures": {
                     "variablePointersStorageBuffer": true,
                     "variablePointers": true
                 }
