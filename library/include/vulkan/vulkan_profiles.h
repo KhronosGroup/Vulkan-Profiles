@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2021-2022 LunarG, Inc.
  *
@@ -199,4 +198,4 @@ VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t
 }
 #endif
 
-#endif//VULKAN_PROFILES_
+#endif //VULKAN_PROFILES_

@@ -22,8 +22,7 @@ import argparse
 import xml.etree.ElementTree as etree
 import json
 
-COPYRIGHT_HEADER = '''
-/**
+COPYRIGHT_HEADER = '''/**
  * Copyright (c) 2021-2022 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
@@ -42,7 +41,7 @@ COPYRIGHT_HEADER = '''
  */
 '''
 
-C_HEADER_PRE_DEFS = '''
+H_HEADER = '''
 #ifndef VULKAN_PROFILES_
 #define VULKAN_PROFILES_ 1
 
@@ -57,7 +56,51 @@ C_HEADER_PRE_DEFS = '''
 #endif
 '''
 
-C_HEADER_POST_DEFS = '''
+H_FOOTER = '''
+#ifdef __cplusplus
+}
+#endif
+
+#endif //VULKAN_PROFILES_
+'''
+
+CPP_HEADER = '''
+#include <vulkan/vulkan_profiles.h>
+#include <stddef.h>
+#include <string.h>
+#include <assert.h>
+#include <stdint.h>
+#include <vector>
+#include <algorithm>
+
+#define _vpArraySize(arr) static_cast<uint32_t>(sizeof(arr) / sizeof(arr[0]))
+'''
+
+HPP_HEADER = '''
+#ifndef VULKAN_PROFILES_
+#define VULKAN_PROFILES_ 1
+
+#define VP_INLINE inline
+
+#include <vulkan/vulkan_core.h>
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+#include <vulkan/vulkan_beta.h>
+#endif
+#include <stddef.h>
+#include <string.h>
+#include <assert.h>
+#include <stdint.h>
+#include <vector>
+#include <algorithm>
+
+#define _vpArraySize(arr) static_cast<uint32_t>(sizeof(arr) / sizeof(arr[0]))
+'''
+
+HPP_FOOTER = '''
+#endif //VULKAN_PROFILES_
+'''
+
+API_DEFS = '''
 #define VP_MAX_PROFILE_NAME_SIZE 256U
 
 typedef struct VpProfileProperties {
@@ -126,27 +169,9 @@ void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat 
 
 // Query the requirements of queue families by a profile
 VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif//VULKAN_PROFILES_
 '''
 
-CPP_IMPL_PREDEFS = '''
-#include <vulkan/vulkan_profiles.h>
-#include <stddef.h>
-#include <string.h>
-#include <assert.h>
-#include <stdint.h>
-#include <vector>
-#include <algorithm>
-
-#define _vpArraySize(arr) static_cast<uint32_t>(sizeof(arr) / sizeof(arr[0]))
-'''
-
-CPP_IMPL_POSTDEFS = '''
+IMPL_BODY = '''
 VP_INLINE bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, size_t supportedSize,
                               const char *requestedExtension) {
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
@@ -233,13 +258,13 @@ VP_INLINE void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t 
     }
 }
 
-VP_INLINE bool _vpHasStructure(const void* pNext, VkStructureType type) {
+VP_INLINE const void* _vpGetStructure(const void* pNext, VkStructureType type) {
     const VkBaseOutStructure *p = static_cast<const VkBaseOutStructure*>(pNext);
     while (p != nullptr) {
-        if (p->sType == type) return true;
+        if (p->sType == type) return p;
         p = p->pNext;
     }
-    return false;
+    return nullptr;
 }
 '''
 
@@ -674,6 +699,7 @@ class VulkanProfilesBuilder():
     def generate(self, outIncDir, outSrcDir):
         self.generate_h(outIncDir)
         self.generate_cpp(outSrcDir)
+        self.generate_hpp(outIncDir)
 
 
     def generate_h(self, outDir):
@@ -681,9 +707,10 @@ class VulkanProfilesBuilder():
         Log.i("Generating '{0}'...".format(fileAbsPath))
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
-            f.write(C_HEADER_PRE_DEFS)
+            f.write(H_HEADER)
             f.write(self.gen_profileDefs())
-            f.write(C_HEADER_POST_DEFS)
+            f.write(API_DEFS)
+            f.write(H_FOOTER)
 
 
     def generate_cpp(self, outDir):
@@ -691,14 +718,14 @@ class VulkanProfilesBuilder():
         Log.i("Generating '{0}'...".format(fileAbsPath))
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
-            f.write(CPP_IMPL_PREDEFS)
+            f.write(CPP_HEADER)
             f.write(self.gen_extensionLists())
             f.write(self.gen_structPropLists())
             f.write(self.gen_formatLists())
             # TODO: Memory types removed for now
             #f.write(self.gen_memoryTypeLists())
             f.write(self.gen_queueFamilyLists())
-            f.write(CPP_IMPL_POSTDEFS)
+            f.write(IMPL_BODY)
             f.write(self.gen_vpGetProfiles())
             f.write(self.gen_vpGetProfileFallbacks())
             f.write(self.gen_vpGetDeviceProfileSupport())
@@ -711,6 +738,36 @@ class VulkanProfilesBuilder():
             # TODO: Memory types removed for now
             #f.write(self.gen_vpGetProfileMemoryTypes())
             f.write(self.gen_vpGetProfileQueueFamilies())
+
+
+    def generate_hpp(self, outDir):
+        fileAbsPath = os.path.join(os.path.abspath(outDir), 'vulkan_profiles.hpp')
+        Log.i("Generating '{0}'...".format(fileAbsPath))
+        with open(fileAbsPath, 'w') as f:
+            f.write(COPYRIGHT_HEADER)
+            f.write(HPP_HEADER)
+            f.write(self.gen_profileDefs())
+            f.write(API_DEFS)
+            f.write(self.gen_extensionLists())
+            f.write(self.gen_structPropLists())
+            f.write(self.gen_formatLists())
+            # TODO: Memory types removed for now
+            #f.write(self.gen_memoryTypeLists())
+            f.write(self.gen_queueFamilyLists())
+            f.write(IMPL_BODY)
+            f.write(self.gen_vpGetProfiles())
+            f.write(self.gen_vpGetProfileFallbacks())
+            f.write(self.gen_vpGetDeviceProfileSupport())
+            f.write(self.gen_vpCreateDevice())
+            f.write(self.gen_vpGetProfileExtensionProperties())
+            f.write(self.gen_vpGetProfileStructures())
+            f.write(self.gen_vpGetProfileStructureProperties())
+            f.write(self.gen_vpGetProfileFormats())
+            f.write(self.gen_vpGetProfileFormatProperties())
+            # TODO: Memory types removed for now
+            #f.write(self.gen_vpGetProfileMemoryTypes())
+            f.write(self.gen_vpGetProfileQueueFamilies())
+            f.write(HPP_FOOTER)
 
 
     def gen_profileDefs(self):
@@ -1230,9 +1287,9 @@ class VulkanProfilesBuilder():
                                      '        if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {{\n'
                                      '            profilePhysicalDeviceFeatures2.features.robustBufferAccess = VK_FALSE;\n'
                                      '        }}\n'
-                                     '        if (!_vpHasStructure(pNext, {0}) && pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {{\n').format(sType)
+                                     '        if (_vpGetStructure(pNext, {0}) == nullptr && pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {{\n').format(sType)
                     else:
-                        genCheck += '        if (!_vpHasStructure(pNext, {0})) {{\n'.format(sType)
+                        genCheck += '        if (_vpGetStructure(pNext, {0}) == nullptr) {{\n'.format(sType)
                     genCheck += ('            {0}.pNext = pNext;\n'
                                  '            pNext = &{0};\n'
                                  '        }}\n').format(profileVarName)

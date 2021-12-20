@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2021-2022 LunarG, Inc.
  *
@@ -1665,13 +1664,13 @@ VP_INLINE void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t 
     }
 }
 
-VP_INLINE bool _vpHasStructure(const void* pNext, VkStructureType type) {
+VP_INLINE const void* _vpGetStructure(const void* pNext, VkStructureType type) {
     const VkBaseOutStructure *p = static_cast<const VkBaseOutStructure*>(pNext);
     while (p != nullptr) {
-        if (p->sType == type) return true;
+        if (p->sType == type) return p;
         p = p->pNext;
     }
-    return false;
+    return nullptr;
 }
 
 VP_INLINE VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
@@ -2732,7 +2731,7 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
             profilePhysicalDeviceFeatures2.features.robustBufferAccess = VK_FALSE;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) && pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) == nullptr && pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {
             profilePhysicalDeviceFeatures2.pNext = pNext;
             pNext = &profilePhysicalDeviceFeatures2;
         }
@@ -2766,19 +2765,19 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
             profilePhysicalDeviceFeatures2.features.robustBufferAccess = VK_FALSE;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) && pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) == nullptr && pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {
             profilePhysicalDeviceFeatures2.pNext = pNext;
             pNext = &profilePhysicalDeviceFeatures2;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES) == nullptr) {
             profilePhysicalDeviceVulkan11Features.pNext = pNext;
             pNext = &profilePhysicalDeviceVulkan11Features;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES) == nullptr) {
             profilePhysicalDeviceVulkan12Features.pNext = pNext;
             pNext = &profilePhysicalDeviceVulkan12Features;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES) == nullptr) {
             profilePhysicalDeviceVulkan13Features.pNext = pNext;
             pNext = &profilePhysicalDeviceVulkan13Features;
         }
@@ -2826,7 +2825,7 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         VkPhysicalDevicePortabilitySubsetFeaturesKHR profilePhysicalDevicePortabilitySubsetFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR };
         profilePhysicalDevicePortabilitySubsetFeaturesKHR.pNext = &profilePhysicalDeviceVariablePointersFeatures;
         vpGetProfileStructures(pCreateInfo->pProfile, &profilePhysicalDevicePortabilitySubsetFeaturesKHR);
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES) == nullptr) {
             profilePhysicalDeviceMultiviewFeatures.pNext = pNext;
             pNext = &profilePhysicalDeviceMultiviewFeatures;
         }
@@ -2836,55 +2835,55 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
             profilePhysicalDeviceFeatures2.features.robustBufferAccess = VK_FALSE;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) && pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) == nullptr && pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {
             profilePhysicalDeviceFeatures2.pNext = pNext;
             pNext = &profilePhysicalDeviceFeatures2;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES_KHR)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES_KHR) == nullptr) {
             profilePhysicalDeviceImagelessFramebufferFeaturesKHR.pNext = pNext;
             pNext = &profilePhysicalDeviceImagelessFramebufferFeaturesKHR;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES) == nullptr) {
             profilePhysicalDevice16BitStorageFeatures.pNext = pNext;
             pNext = &profilePhysicalDevice16BitStorageFeatures;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR) == nullptr) {
             profilePhysicalDevice8BitStorageFeaturesKHR.pNext = pNext;
             pNext = &profilePhysicalDevice8BitStorageFeaturesKHR;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT) == nullptr) {
             profilePhysicalDeviceDescriptorIndexingFeaturesEXT.pNext = pNext;
             pNext = &profilePhysicalDeviceDescriptorIndexingFeaturesEXT;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT) == nullptr) {
             profilePhysicalDeviceHostQueryResetFeaturesEXT.pNext = pNext;
             pNext = &profilePhysicalDeviceHostQueryResetFeaturesEXT;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR) == nullptr) {
             profilePhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR.pNext = pNext;
             pNext = &profilePhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR) == nullptr) {
             profilePhysicalDeviceUniformBufferStandardLayoutFeaturesKHR.pNext = pNext;
             pNext = &profilePhysicalDeviceUniformBufferStandardLayoutFeaturesKHR;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES) == nullptr) {
             profilePhysicalDeviceShaderDrawParametersFeatures.pNext = pNext;
             pNext = &profilePhysicalDeviceShaderDrawParametersFeatures;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR) == nullptr) {
             profilePhysicalDeviceShaderFloat16Int8FeaturesKHR.pNext = pNext;
             pNext = &profilePhysicalDeviceShaderFloat16Int8FeaturesKHR;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR) == nullptr) {
             profilePhysicalDeviceSamplerYcbcrConversionFeaturesKHR.pNext = pNext;
             pNext = &profilePhysicalDeviceSamplerYcbcrConversionFeaturesKHR;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES) == nullptr) {
             profilePhysicalDeviceVariablePointersFeatures.pNext = pNext;
             pNext = &profilePhysicalDeviceVariablePointersFeatures;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR) == nullptr) {
             profilePhysicalDevicePortabilitySubsetFeaturesKHR.pNext = pNext;
             pNext = &profilePhysicalDevicePortabilitySubsetFeaturesKHR;
         }
@@ -2930,7 +2929,7 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         VkPhysicalDeviceVariablePointersFeatures profilePhysicalDeviceVariablePointersFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES };
         profilePhysicalDeviceVariablePointersFeatures.pNext = &profilePhysicalDeviceSamplerYcbcrConversionFeaturesKHR;
         vpGetProfileStructures(pCreateInfo->pProfile, &profilePhysicalDeviceVariablePointersFeatures);
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES) == nullptr) {
             profilePhysicalDeviceMultiviewFeatures.pNext = pNext;
             pNext = &profilePhysicalDeviceMultiviewFeatures;
         }
@@ -2940,51 +2939,51 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
         if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
             profilePhysicalDeviceFeatures2.features.robustBufferAccess = VK_FALSE;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) && pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) == nullptr && pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {
             profilePhysicalDeviceFeatures2.pNext = pNext;
             pNext = &profilePhysicalDeviceFeatures2;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES_KHR)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES_KHR) == nullptr) {
             profilePhysicalDeviceImagelessFramebufferFeaturesKHR.pNext = pNext;
             pNext = &profilePhysicalDeviceImagelessFramebufferFeaturesKHR;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES) == nullptr) {
             profilePhysicalDevice16BitStorageFeatures.pNext = pNext;
             pNext = &profilePhysicalDevice16BitStorageFeatures;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR) == nullptr) {
             profilePhysicalDevice8BitStorageFeaturesKHR.pNext = pNext;
             pNext = &profilePhysicalDevice8BitStorageFeaturesKHR;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT) == nullptr) {
             profilePhysicalDeviceDescriptorIndexingFeaturesEXT.pNext = pNext;
             pNext = &profilePhysicalDeviceDescriptorIndexingFeaturesEXT;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT) == nullptr) {
             profilePhysicalDeviceHostQueryResetFeaturesEXT.pNext = pNext;
             pNext = &profilePhysicalDeviceHostQueryResetFeaturesEXT;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR) == nullptr) {
             profilePhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR.pNext = pNext;
             pNext = &profilePhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR) == nullptr) {
             profilePhysicalDeviceUniformBufferStandardLayoutFeaturesKHR.pNext = pNext;
             pNext = &profilePhysicalDeviceUniformBufferStandardLayoutFeaturesKHR;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES) == nullptr) {
             profilePhysicalDeviceShaderDrawParametersFeatures.pNext = pNext;
             pNext = &profilePhysicalDeviceShaderDrawParametersFeatures;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR) == nullptr) {
             profilePhysicalDeviceShaderFloat16Int8FeaturesKHR.pNext = pNext;
             pNext = &profilePhysicalDeviceShaderFloat16Int8FeaturesKHR;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR) == nullptr) {
             profilePhysicalDeviceSamplerYcbcrConversionFeaturesKHR.pNext = pNext;
             pNext = &profilePhysicalDeviceSamplerYcbcrConversionFeaturesKHR;
         }
-        if (!_vpHasStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES)) {
+        if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES) == nullptr) {
             profilePhysicalDeviceVariablePointersFeatures.pNext = pNext;
             pNext = &profilePhysicalDeviceVariablePointersFeatures;
         }
