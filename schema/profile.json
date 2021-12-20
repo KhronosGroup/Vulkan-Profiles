@@ -6852,11 +6852,6 @@
                         "capabilities"
                     ],
                     "properties": {
-                        "name": {
-                            "description": "The unique identifier of the profile.",
-                            "type": "string",
-                            "pattern": "^VP_[A-Z0-9]+_[A-Za-z0-9_]+"
-                        },
                         "version": {
                             "description": "The revision of the profile.",
                             "type": "integer"
