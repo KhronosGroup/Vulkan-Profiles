@@ -486,7 +486,7 @@ class VulkanProfileCapabilities():
         self.features = dict()
         self.properties = dict()
         self.formats = dict()
-        self.queueFamiliesProperties = dict()
+        self.queueFamiliesProperties = []
         self.memoryProperties = dict()
         for capName in data['capabilities']:
             if capName in caps:
@@ -551,9 +551,8 @@ class VulkanProfileCapabilities():
 
 
     def mergeProfileQueueFamiliesProperties(self, data):
-        # TODO: Queue families should be an array to support multiple queue families
         if data.get('queueFamiliesProperties') != None:
-            self.mergeProfileCapData(self.queueFamiliesProperties, data['queueFamiliesProperties'])
+            self.queueFamiliesProperties.extend(data['queueFamiliesProperties'])
 
 
     def mergeProfileMemoryProperties(self, data):
@@ -608,16 +607,21 @@ class VulkanProfile():
     def validate(self, registry):
         self.validateStructDependencies(registry)
 
+
     def validateStructDependencies(self, registry):
         for feature in self.capabilities.features:
             self.validateStructDependency(feature, registry)
+
         for prop in self.capabilities.properties:
             self.validateStructDependency(prop, registry)
-        # TODO: Queue families should be an array to support multiple queue families
-        for queueFamilyProp in self.capabilities.queueFamiliesProperties:
-            self.validateStructDependency(queueFamilyProp, registry)
+
+        for queueFamilyData in self.capabilities.queueFamiliesProperties:
+            for queueFamilyProp in queueFamilyData:
+                self.validateStructDependency(queueFamilyProp, registry)
+
         for memoryProp in self.capabilities.memoryProperties:
             self.validateStructDependency(memoryProp, registry)
+
 
     def validateStructDependency(self, structName, registry):
         if structName in registry.structs:
@@ -874,23 +878,26 @@ class VulkanProfilesBuilder():
                 gen += ('\n'
                         '#ifdef {0}\n'
                         'static const VkQueueFamilyProperties _{1}_QUEUE_FAMILY_PROPERTIES[] = {{\n').format(name, name.upper())
-                for propStructName, members in profile.capabilities.queueFamiliesProperties.items():
-                    if propStructName != 'VkQueueFamilyProperties':
-                        Log.f("Unsupported memory properties structure '{0}'".format(propStructName))
 
-                    gen += '    {0},\n'.format(
-                        self.gen_listValue(
-                            [
-                                self.gen_listValue(members['queueFlags']),
-                                members['queueCount'],
-                                members['timestampValidBits'],
-                                self.gen_listValue(
-                                    [
-                                        members['minImageTransferGranularity']['width'],
-                                        members['minImageTransferGranularity']['height'],
-                                        members['minImageTransferGranularity']['depth']
-                                    ], False)
-                            ], False))
+                for queueFamilyData in profile.capabilities.queueFamiliesProperties:
+                    for propStructName, members in queueFamilyData.items():
+                        if propStructName != 'VkQueueFamilyProperties':
+                            Log.f("Unsupported memory properties structure '{0}'".format(propStructName))
+
+                        gen += '    {0},\n'.format(
+                            self.gen_listValue(
+                                [
+                                    self.gen_listValue(members['queueFlags']),
+                                    members['queueCount'],
+                                    members['timestampValidBits'],
+                                    self.gen_listValue(
+                                        [
+                                            members['minImageTransferGranularity']['width'],
+                                            members['minImageTransferGranularity']['height'],
+                                            members['minImageTransferGranularity']['depth']
+                                        ], False)
+                                ], False))
+
                 gen += ('};\n'
                         '#endif\n')
         return gen

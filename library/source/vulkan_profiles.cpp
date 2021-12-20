@@ -2205,7 +2205,6 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         featuresSupported = featuresSupported && (devicePhysicalDevice16BitStorageFeatures.storageBuffer16BitAccess == profilePhysicalDevice16BitStorageFeatures.storageBuffer16BitAccess);
         featuresSupported = featuresSupported && (devicePhysicalDevice16BitStorageFeatures.uniformAndStorageBuffer16BitAccess == profilePhysicalDevice16BitStorageFeatures.uniformAndStorageBuffer16BitAccess);
         featuresSupported = featuresSupported && (devicePhysicalDevice8BitStorageFeaturesKHR.storageBuffer8BitAccess == profilePhysicalDevice8BitStorageFeaturesKHR.storageBuffer8BitAccess);
-        featuresSupported = featuresSupported && (devicePhysicalDevice8BitStorageFeaturesKHR.storagePushConstant8 == profilePhysicalDevice8BitStorageFeaturesKHR.storagePushConstant8);
         featuresSupported = featuresSupported && (devicePhysicalDevice8BitStorageFeaturesKHR.uniformAndStorageBuffer8BitAccess == profilePhysicalDevice8BitStorageFeaturesKHR.uniformAndStorageBuffer8BitAccess);
         featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeaturesEXT.shaderUniformTexelBufferArrayDynamicIndexing == profilePhysicalDeviceDescriptorIndexingFeaturesEXT.shaderUniformTexelBufferArrayDynamicIndexing);
         featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeaturesEXT.shaderStorageTexelBufferArrayDynamicIndexing == profilePhysicalDeviceDescriptorIndexingFeaturesEXT.shaderStorageTexelBufferArrayDynamicIndexing);
@@ -2514,7 +2513,6 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
         featuresSupported = featuresSupported && (devicePhysicalDevice16BitStorageFeatures.storageBuffer16BitAccess == profilePhysicalDevice16BitStorageFeatures.storageBuffer16BitAccess);
         featuresSupported = featuresSupported && (devicePhysicalDevice16BitStorageFeatures.uniformAndStorageBuffer16BitAccess == profilePhysicalDevice16BitStorageFeatures.uniformAndStorageBuffer16BitAccess);
         featuresSupported = featuresSupported && (devicePhysicalDevice8BitStorageFeaturesKHR.storageBuffer8BitAccess == profilePhysicalDevice8BitStorageFeaturesKHR.storageBuffer8BitAccess);
-        featuresSupported = featuresSupported && (devicePhysicalDevice8BitStorageFeaturesKHR.storagePushConstant8 == profilePhysicalDevice8BitStorageFeaturesKHR.storagePushConstant8);
         featuresSupported = featuresSupported && (devicePhysicalDevice8BitStorageFeaturesKHR.uniformAndStorageBuffer8BitAccess == profilePhysicalDevice8BitStorageFeaturesKHR.uniformAndStorageBuffer8BitAccess);
         featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeaturesEXT.shaderUniformTexelBufferArrayDynamicIndexing == profilePhysicalDeviceDescriptorIndexingFeaturesEXT.shaderUniformTexelBufferArrayDynamicIndexing);
         featuresSupported = featuresSupported && (devicePhysicalDeviceDescriptorIndexingFeaturesEXT.shaderStorageTexelBufferArrayDynamicIndexing == profilePhysicalDeviceDescriptorIndexingFeaturesEXT.shaderStorageTexelBufferArrayDynamicIndexing);
@@ -3428,7 +3426,6 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR: {
                     VkPhysicalDevice8BitStorageFeaturesKHR* features = reinterpret_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(p);
                     features->storageBuffer8BitAccess = VK_TRUE;
-                    features->storagePushConstant8 = VK_TRUE;
                     features->uniformAndStorageBuffer8BitAccess = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT: {
@@ -3691,7 +3688,6 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR: {
                     VkPhysicalDevice8BitStorageFeaturesKHR* features = reinterpret_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(p);
                     features->storageBuffer8BitAccess = VK_TRUE;
-                    features->storagePushConstant8 = VK_TRUE;
                     features->uniformAndStorageBuffer8BitAccess = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT: {
