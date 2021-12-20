@@ -17,6 +17,7 @@
 # Author: Daniel Rakos, RasterGrid
 
 import os
+import re
 import argparse
 import xml.etree.ElementTree as etree
 import json
@@ -278,14 +279,32 @@ class VulkanStruct():
         self.extends = []
         self.members = dict()
         self.aliases = [ name ]
+        self.definedByVersion = None
+        self.definedByExtensions = []
 
 
-class VulkanExtension():
-    def __init__(self, name, upperCaseName, type, platform):
-        self.name = name
+class VulkanDefinitionScope():
+    def parseAliases(self, xml):
+        self.sTypeAliases = dict()
+        for sTypeAlias in xml.findall("./require/enum[@alias]"):
+            if re.search(r'^VK_STRUCTURE_TYPE_.*', sTypeAlias.get('name')):
+                self.sTypeAliases[sTypeAlias.get('alias')] = sTypeAlias.get('name')
+
+
+class VulkanVersion(VulkanDefinitionScope):
+    def __init__(self, xml):
+        self.name = xml.get('name')
+        self.number = xml.get('number')
+        self.parseAliases(xml)
+
+
+class VulkanExtension(VulkanDefinitionScope):
+    def __init__(self, xml, upperCaseName):
+        self.name = xml.get('name')
         self.upperCaseName = upperCaseName
-        self.type = type
-        self.platform = platform
+        self.type = xml.get('type')
+        self.platform = xml.get('platform')
+        self.parseAliases(xml)
 
 
 class VulkanRegistry():
@@ -293,14 +312,46 @@ class VulkanRegistry():
         Log.i("Loading registry file: '{0}'".format(registryFile))
         xml = etree.parse(registryFile)
         self.parsePlatformInfo(xml)
+        self.parseVersionInfo(xml)
         self.parseExtensionInfo(xml)
         self.parseStructInfo(xml)
+        self.parsePrerequisites(xml)
+        self.parseAliases(xml)
         self.applyWorkarounds()
 
     def parsePlatformInfo(self, xml):
         self.platforms = dict()
         for plat in xml.findall("./platforms/platform"):
             self.platforms[plat.get('name')] = VulkanPlatform(plat)
+
+
+    def parseVersionInfo(self, xml):
+        self.versions = dict()
+        for feature in xml.findall('./feature'):
+            if re.search(r"^[1-9][0-9]*\.[0-9]+$", feature.get('number')):
+                self.versions[feature.get('number')] = VulkanVersion(feature)
+            else:
+                Log.f("Unsupported feature with number '{0}'", feature.get('number'))
+
+
+    def parseExtensionInfo(self, xml):
+        self.extensions = dict()
+        for ext in xml.findall("./extensions/extension"):
+            # Only care about enabled extensions
+            if ext.get('supported') == "vulkan":
+                name = ext.get('name')
+
+                # Find name enum (due to inconsistencies in lower case and upper case names this is non-trivial)
+                foundNameEnum = False
+                matches = ext.findall("./require/enum[@value='\"" + name + "\"']")
+                for match in matches:
+                    if match.get('name').endswith("_EXTENSION_NAME"):
+                        # Add extension definition
+                        self.extensions[name] = VulkanExtension(ext, match.get('name')[:-len("_EXTENSION_NAME")])
+                        foundNameEnum = True
+                        break
+                if not foundNameEnum:
+                    Log.f("Cannot find name enum for extension '{0}'".format(name))
 
 
     def parseStructInfo(self, xml):
@@ -341,15 +392,62 @@ class VulkanRegistry():
             # Store struct definition
             self.structs[struct.get('name')] = structDef
 
-        # Find any aliases and copy the constructed data for them too
+
+    def parsePrerequisites(self, xml):
+        # Check features (i.e. API versions)
+        for feature in xml.findall('./feature'):
+            for requireType in feature.findall('./require/type'):
+                # Add feature as the source of the definition of a struct
+                if requireType.get('name') in self.structs:
+                    self.structs[requireType.get('name')].definedByVersion = feature.get('number')
+
+        # Check extensions
+        for extension in xml.findall('./extensions/extension'):
+            for requireType in extension.findall('./require/type'):
+                # Add extension as the source of the definition of a struct
+                if requireType.get('name') in self.structs:
+                    self.structs[requireType.get('name')].definedByExtensions.append(extension.get('name'))
+
+
+    def parseAliases(self, xml):
+        # Find any struct aliases
         for struct in xml.findall("./types/type[@category='struct']"):
             alias = struct.get('alias')
             if alias != None:
-                if self.structs[alias] != None:
-                    self.structs[struct.get('name')] = self.structs[alias]
-                    self.structs[alias].aliases.append(struct.get('name'))
+                if alias in self.structs:
+                    baseStructDef = self.structs[alias]
+                    aliasStructDef = self.structs[struct.get('name')]
+
+                    # Fill missing struct information for the alias
+                    aliasStructDef.extends = baseStructDef.extends
+                    aliasStructDef.members = baseStructDef.members
+                    aliasStructDef.aliases = baseStructDef.aliases
+                    aliasStructDef.aliases.append(struct.get('name'))
+
+                    if baseStructDef.sType != None:
+                        sTypeAlias = None
+
+                        # First try to find sType alias in core versions
+                        if aliasStructDef.definedByVersion != None:
+                            for version in self.versions:
+                                if version <= aliasStructDef.definedByVersion:
+                                    sTypeAlias = self.versions[version].sTypeAliases.get(baseStructDef.sType)
+                                    if sTypeAlias != None:
+                                        break
+
+                        # Otherwise need to find sType alias in extension
+                        if sTypeAlias == None:
+                            for extName in aliasStructDef.definedByExtensions:
+                                sTypeAlias = self.extensions[extName].sTypeAliases.get(baseStructDef.sType)
+                                if sTypeAlias != None:
+                                    break
+
+                        if sTypeAlias != None:
+                            aliasStructDef.sType = sTypeAlias
+                        else:
+                            Log.f("Could not find sType enum of alias '{0}' of struct '{1}'".format(alias, struct.get('name')))
                 else:
-                    Log.f("Failed to find alias '{0}' of struct '{0}'".format(alias, struct.get('name')))
+                    Log.f("Failed to find alias '{0}' of struct '{1}'".format(alias, struct.get('name')))
 
 
     def applyWorkarounds(self):
@@ -380,31 +478,6 @@ class VulkanRegistry():
                 memberDef = self.structs[structName].members[memberName]
                 if memberDef.limittype == 'bitmask' and memberDef.type == 'VkBool32':
                     self.structs[structName].members[memberName].limittype = 'noauto'
-
-
-    def parseExtensionInfo(self, xml):
-        self.extensions = dict()
-        for ext in xml.findall("./extensions/extension"):
-            # Only care about enabled extensions
-            if ext.get('supported') == "vulkan":
-                name = ext.get('name')
-
-                # Find name enum (due to inconsistencies in lower case and upper case names this is non-trivial)
-                foundNameEnum = False
-                matches = ext.findall("./require/enum[@value='\"" + name + "\"']")
-                for match in matches:
-                    if match.get('name').endswith("_EXTENSION_NAME"):
-                        # Add extension definition
-                        self.extensions[name] = VulkanExtension(
-                            name,
-                            match.get('name')[:-len("_EXTENSION_NAME")],
-                            ext.get('type'),
-                            ext.get('platform')
-                        )
-                        foundNameEnum = True
-                        break
-                if not foundNameEnum:
-                    Log.f("Cannot find name enum for extension '{0}'".format(name))
 
 
 class VulkanProfileCapabilities():
@@ -478,6 +551,7 @@ class VulkanProfileCapabilities():
 
 
     def mergeProfileQueueFamiliesProperties(self, data):
+        # TODO: Queue families should be an array to support multiple queue families
         if data.get('queueFamiliesProperties') != None:
             self.mergeProfileCapData(self.queueFamiliesProperties, data['queueFamiliesProperties'])
 
@@ -494,19 +568,76 @@ class VulkanProfile():
         self.apiVersion = data['api-version']
         self.fallback = data.get('fallback')
         self.platform = None
+        self.requirements = []
         self.capabilities = VulkanProfileCapabilities(data, caps)
-        self.validateProfileExtensions(registry)
+        self.determinePlatform(registry)
+        self.collectCompileTimeRequirements(registry)
+        self.validate(registry)
 
 
-    def validateProfileExtensions(self, registry):
-        if self.capabilities.extensions:
-            for extName in self.capabilities.extensions.keys():
-                if extName in registry.extensions:
-                    platform = registry.extensions[extName].platform
-                    if platform != None:
-                        self.platform = platform
-                else:
-                    Log.f("Extension '{0}' required by profile '{1}' does not exist".format(extName, self.name))
+    def determinePlatform(self, registry):
+        for extName in self.capabilities.extensions:
+            if extName in registry.extensions:
+                platform = registry.extensions[extName].platform
+                if platform != None:
+                    self.platform = platform
+            else:
+                Log.f("Extension '{0}' required by profile '{1}' does not exist".format(extName, self.name))
+
+
+    def collectCompileTimeRequirements(self, registry):
+        # Add API version to the list of requirements
+        match = re.search(r"^([1-9][0-9]*\.[0-9]+)[^0-9].*$", self.apiVersion)
+        if match != None:
+            versionNumber = match.group(1)
+            if versionNumber in registry.versions:
+                self.requirements.append(registry.versions[versionNumber].name)
+            else:
+                Log.f("No version '{0}' found in registry required by profile '{1}'".format(versionNumber, self.name))
+        else:
+            Log.f("Invalid version number '{0}' in profile '{1}'".format(self.apiVersion, self.name))
+
+        # Add any required extension to the list of requirements
+        for extName in self.capabilities.extensions:
+            if extName in registry.extensions:
+                self.requirements.append(extName)
+            else:
+                Log.f("Extension '{0}' required by profile '{1}' does not exist".format(extName, self.name))
+
+
+    def validate(self, registry):
+        self.validateStructDependencies(registry)
+
+    def validateStructDependencies(self, registry):
+        for feature in self.capabilities.features:
+            self.validateStructDependency(feature, registry)
+        for prop in self.capabilities.properties:
+            self.validateStructDependency(prop, registry)
+        # TODO: Queue families should be an array to support multiple queue families
+        for queueFamilyProp in self.capabilities.queueFamiliesProperties:
+            self.validateStructDependency(queueFamilyProp, registry)
+        for memoryProp in self.capabilities.memoryProperties:
+            self.validateStructDependency(memoryProp, registry)
+
+    def validateStructDependency(self, structName, registry):
+        if structName in registry.structs:
+            structDef = registry.structs[structName]
+            depFound = False
+
+            # Check if the required API version defines this struct
+            if structDef.definedByVersion != None and structDef.definedByVersion <= self.apiVersion:
+                depFound = True
+
+            # Check if any required extension defines this struct
+            for definedByExtension in structDef.definedByExtensions:
+                if definedByExtension in self.capabilities.extensions:
+                    depFound = True
+                    break
+
+            if not depFound:
+                Log.f("Unexpected required struct '{0}' in profile '{1}'".format(structName, self.name))
+        else:
+            Log.f("Struct '{0}' in profile '{1}' does not exist in the registry".format(structName, self.name))
 
 
 class VulkanProfiles():
@@ -528,18 +659,6 @@ class VulkanProfiles():
         for name, data in json.items():
             Log.i("Registering profile '{0}'".format(name))
             profiles[name] = VulkanProfile(registry, name, data, caps)
-
-
-class ProfilePlatformGuard():
-    def __init__(self, registry, profile):
-        platform = profile.platform
-        if platform != None:
-            platformDef = registry.platforms[platform].protect
-            self.begin = '#ifdef {0}\n'.format(platformDef)
-            self.end = '#endif\n'
-        else:
-            self.begin = ''
-            self.end = ''
 
 
 class VulkanProfilesBuilder():
@@ -595,10 +714,30 @@ class VulkanProfilesBuilder():
         for name, profile in self.profiles.items():
             uname = name.upper()
             gen += '\n'
+
+            # Add prerequisites
+            if profile.requirements:
+                for i, requirement in enumerate(profile.requirements):
+                    if i == 0:
+                        gen += '#if '
+                    else:
+                        gen += '    '
+
+                    gen += 'defined({0})'.format(requirement)
+
+                    if i < len(profile.requirements) - 1:
+                        gen += ' && \\\n'
+                    else:
+                        gen += '\n'
+
             gen += '#define {0} 1\n'.format(name)
             gen += '#define {0}_NAME "{1}"\n'.format(uname, name)
             gen += '#define {0}_SPEC_VERSION {1}\n'.format(uname, profile.version)
             gen += '#define {0}_MIN_API_VERSION VK_MAKE_VERSION({1})\n'.format(uname, profile.apiVersion.replace(".", ", "))
+
+            if profile.requirements:
+                gen += '#endif\n'
+
         return gen
 
 
@@ -607,15 +746,14 @@ class VulkanProfilesBuilder():
         # TODO: Probably we should separate instance vs device extensions
         for name, profile in self.profiles.items():
             if profile.capabilities.extensions:
-                gen += '\n'
-                guard = ProfilePlatformGuard(self.registry, profile)
-                gen += guard.begin
-                gen += 'static const VkExtensionProperties _{0}_EXTENSIONS[] = {{\n'.format(name.upper())
+                gen += ('\n'
+                        '#ifdef {0}\n'
+                        'static const VkExtensionProperties _{1}_EXTENSIONS[] = {{\n').format(name, name.upper())
                 for extName, ext in profile.capabilities.extensions.items():
                     extInfo = self.registry.extensions[extName]
                     gen += '    VkExtensionProperties{{ {0}_EXTENSION_NAME, {1} }},\n'.format(extInfo.upperCaseName, ext['specVersion'])
-                gen += '};\n'
-                gen += guard.end
+                gen += ('};\n'
+                        '#endif\n')
         return gen
 
 
@@ -625,10 +763,9 @@ class VulkanProfilesBuilder():
             features = profile.capabilities.features
             properties = profile.capabilities.properties
             if features != None or properties != None:
-                gen += '\n'
-                guard = ProfilePlatformGuard(self.registry, profile)
-                gen += guard.begin
-                gen += 'static const VpStructureProperties _{0}_STRUCTURE_PROPERTIES[] = {{\n'.format(name.upper())
+                gen += ('\n'
+                        '#ifdef {0}\n'
+                        'static const VpStructureProperties _{1}_STRUCTURE_PROPERTIES[] = {{\n').format(name, name.upper())
 
                 if features != None:
                     for featureStructName in features:
@@ -666,8 +803,8 @@ class VulkanProfilesBuilder():
 
                         gen += '    {{ {0}, VP_STRUCTURE_PROPERTIES }},\n'.format(structDef.sType)
 
-                gen += '};\n'
-                gen += guard.end
+                gen += ('};\n'
+                        '#endif\n')
         return gen
 
 
@@ -682,10 +819,9 @@ class VulkanProfilesBuilder():
                 '};\n')
         for name, profile in self.profiles.items():
             if profile.capabilities.formats:
-                gen += '\n'
-                guard = ProfilePlatformGuard(self.registry, profile)
-                gen += guard.begin
-                gen += 'static const VpFormatProperties _{0}_FORMATS[] = {{\n'.format(name.upper())
+                gen += ('\n'
+                        '#ifdef {0}\n'
+                        'static const VpFormatProperties _{1}_FORMATS[] = {{\n').format(name, name.upper())
                 for format, props in profile.capabilities.formats.items():
                     for propStructName in props:
                         if propStructName != 'VkFormatProperties':
@@ -702,8 +838,8 @@ class VulkanProfilesBuilder():
                                                 self.gen_listValue(formatProps.get('linearTilingFeatures')),
                                                 self.gen_listValue(formatProps.get('optimalTilingFeatures')),
                                                 self.gen_listValue(formatProps.get('bufferFeatures')))
-                gen += '};\n'
-                gen += guard.end
+                gen += ('};\n'
+                        '#endif\n')
         return gen
 
 
@@ -712,10 +848,9 @@ class VulkanProfilesBuilder():
         # TODO: Make memory properties extensible if necessary
         for name, profile in self.profiles.items():
             if profile.capabilities.memoryProperties:
-                gen += '\n'
-                guard = ProfilePlatformGuard(self.registry, profile)
-                gen += guard.begin
-                gen += 'static const VkMemoryPropertyFlags _{0}_MEMORY_TYPES[] = {{\n'.format(name.upper())
+                gen += ('\n'
+                        '#ifdef {0}\n'
+                        'static const VkMemoryPropertyFlags _{1}_MEMORY_TYPES[] = {{\n').format(name, name.upper())
                 for propStructName, members in profile.capabilities.memoryProperties.items():
                     if propStructName != 'VkPhysicalDeviceMemoryProperties':
                         Log.f("Unsupported memory properties structure '{0}'".format(propStructName))
@@ -726,8 +861,8 @@ class VulkanProfilesBuilder():
                     memoryTypes = members['memoryTypes']
                     for memoryType in memoryTypes:
                         gen += '    {0},\n'.format(self.gen_listValue(memoryType['propertyFlags']))
-                gen += '};\n'
-                gen += guard.end
+                gen += ('};\n'
+                        '#endif\n')
         return gen
 
 
@@ -736,10 +871,9 @@ class VulkanProfilesBuilder():
         # TODO: Make queue family properties extensible
         for name, profile in self.profiles.items():
             if profile.capabilities.queueFamiliesProperties:
-                gen += '\n'
-                guard = ProfilePlatformGuard(self.registry, profile)
-                gen += guard.begin
-                gen += 'static const VkQueueFamilyProperties _{0}_QUEUE_FAMILY_PROPERTIES[] = {{\n'.format(name.upper())
+                gen += ('\n'
+                        '#ifdef {0}\n'
+                        'static const VkQueueFamilyProperties _{1}_QUEUE_FAMILY_PROPERTIES[] = {{\n').format(name, name.upper())
                 for propStructName, members in profile.capabilities.queueFamiliesProperties.items():
                     if propStructName != 'VkQueueFamilyProperties':
                         Log.f("Unsupported memory properties structure '{0}'".format(propStructName))
@@ -757,8 +891,8 @@ class VulkanProfilesBuilder():
                                         members['minImageTransferGranularity']['depth']
                                     ], False)
                             ], False))
-                gen += '};\n'
-                gen += guard.end
+                gen += ('};\n'
+                        '#endif\n')
         return gen
 
 
@@ -769,10 +903,9 @@ class VulkanProfilesBuilder():
                 '    static const VpProfileProperties profiles[] = {\n')
 
         for name, profile in self.profiles.items():
-            guard = ProfilePlatformGuard(self.registry, profile)
-            gen += guard.begin
-            gen += '        {{ {0}_NAME, {0}_SPEC_VERSION }},\n'.format(name.upper())
-            gen += guard.end
+            gen += ('#ifdef {0}\n'
+                    '        {{ {1}_NAME, {1}_SPEC_VERSION }},\n'
+                    '#endif\n').format(name, name.upper())
 
         gen += ('    };\n'
                 '\n'
@@ -801,10 +934,9 @@ class VulkanProfilesBuilder():
         for name, profile in self.profiles.items():
             uname = name.upper()
             if profile.fallback:
-                guard = ProfilePlatformGuard(self.registry, profile)
-                gen += guard.begin
-                gen += ('    if (strcmp(pProfile->profileName, {0}_NAME) == 0) {{\n'
-                        '        static const VpProfileProperties {0}_fallbacks[] = {{\n').format(uname)
+                gen += ('#ifdef {0}\n'
+                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
+                        '        static const VpProfileProperties {1}_fallbacks[] = {{\n').format(name, uname)
                 for fallback in profile.fallback:
                     gen += '            {{ {0}_NAME, {0}_SPEC_VERSION }},\n'.format(fallback.upper())
                 gen += ('        }};\n'
@@ -822,7 +954,7 @@ class VulkanProfilesBuilder():
                         '            }}\n'
                         '        }}\n'
                         '    }} else\n').format(uname)
-                gen += guard.end
+                gen += '#endif\n'
 
         gen += ('    {\n'
                 '        *pPropertyCount = 0;\n'
@@ -861,14 +993,13 @@ class VulkanProfilesBuilder():
 
         for name, profile in self.profiles.items():
             uname = name.upper()
-            guard = ProfilePlatformGuard(self.registry, profile)
-            gen += guard.begin
-            gen += ('    if (strcmp(pProfile->profileName, {0}_NAME) == 0) {{\n'
-                    '        if ({0}_SPEC_VERSION < pProfile->specVersion) return result;\n'
+            gen += ('#ifdef {0}\n'
+                    '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
+                    '        if ({1}_SPEC_VERSION < pProfile->specVersion) return result;\n'
                     '\n'
                     '        VkPhysicalDeviceProperties devProps;\n'
                     '        vkGetPhysicalDeviceProperties(physicalDevice, &devProps);\n'
-                    '        if (VK_VERSION_PATCH(devProps.apiVersion) < VK_VERSION_PATCH({0}_MIN_API_VERSION)) return result;\n').format(uname)
+                    '        if (VK_VERSION_PATCH(devProps.apiVersion) < VK_VERSION_PATCH({1}_MIN_API_VERSION)) return result;\n').format(name, uname)
 
             # Check extensions
             # TODO: Eventually we should check instance vs device extensions separately
@@ -1023,9 +1154,8 @@ class VulkanProfilesBuilder():
                         '        }}\n'
                         '        if (!memoryTypesSupported) return result;\n').format(uname)
 
-            gen += '    } else\n'
-
-            gen += guard.end
+            gen += ('    } else\n'
+                    '#endif\n')
 
         gen += ('    {\n'
                 '        return result;\n'
@@ -1051,16 +1181,15 @@ class VulkanProfilesBuilder():
 
         for name, profile in self.profiles.items():
             uname = name.upper()
-            guard = ProfilePlatformGuard(self.registry, profile)
-            gen += guard.begin
 
             # TODO: Well, this is bogus now, as we add all extensions here even though some may be instance
             # and not device extensions, but we'll keep it as is for now to maintain existing behavior
-            gen += ('    if (strcmp(pCreateInfo->pProfile->profileName, {0}_NAME) == 0) {{\n'
+            gen += ('#ifdef {0}\n'
+                    '    if (strcmp(pCreateInfo->pProfile->profileName, {1}_NAME) == 0) {{\n'
                     '        std::vector<const char*> extensions;\n'
-                    '        _vpGetExtensions(pCreateInfo, _vpArraySize(_{0}_EXTENSIONS), &_{0}_EXTENSIONS[0], extensions);\n'
+                    '        _vpGetExtensions(pCreateInfo, _vpArraySize(_{1}_EXTENSIONS), &_{1}_EXTENSIONS[0], extensions);\n'
                     '\n'
-                    '        void *pNext = const_cast<void*>(pCreateInfo->pCreateInfo->pNext);\n').format(uname)
+                    '        void *pNext = const_cast<void*>(pCreateInfo->pCreateInfo->pNext);\n').format(name, uname)
 
             # Add profile feature structures if they aren't overridden by application
             features = profile.capabilities.features
@@ -1078,7 +1207,6 @@ class VulkanProfilesBuilder():
                         featureStructName = 'VkPhysicalDeviceFeatures2'
                         sType = 'VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2'
                     else:
-                        varAccessSuffix = '.'
                         sType = structDef.sType
 
                     profileVarName = 'profile' + featureStructName[2:]
@@ -1124,8 +1252,8 @@ class VulkanProfilesBuilder():
                         '        }\n')
 
             gen += ('        return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);\n'
-                    '    } else\n')
-            gen += guard.end
+                    '    } else\n'
+                    '#endif\n')
 
         gen += ('    {\n'
                 '        return VK_ERROR_UNKNOWN;\n'
@@ -1141,25 +1269,23 @@ class VulkanProfilesBuilder():
                 '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
-            uname = name.upper()
             if profile.capabilities.extensions:
-                guard = ProfilePlatformGuard(self.registry, profile)
-                gen += guard.begin
-                gen += ('    if (strcmp(pProfile->profileName, {0}_NAME) == 0) {{\n'
+                gen += ('#ifdef {0}\n'
+                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
                         '        if (pProperties == nullptr) {{\n'
-                        '            *pPropertyCount = _vpArraySize(_{0}_EXTENSIONS);\n'
+                        '            *pPropertyCount = _vpArraySize(_{1}_EXTENSIONS);\n'
                         '        }} else {{\n'
-                        '            if (*pPropertyCount < _vpArraySize(_{0}_EXTENSIONS)) {{\n'
+                        '            if (*pPropertyCount < _vpArraySize(_{1}_EXTENSIONS)) {{\n'
                         '                result = VK_INCOMPLETE;\n'
                         '            }} else {{\n'
-                        '                *pPropertyCount = _vpArraySize(_{0}_EXTENSIONS);\n'
+                        '                *pPropertyCount = _vpArraySize(_{1}_EXTENSIONS);\n'
                         '            }}\n'
                         '            for (uint32_t i = 0; i < *pPropertyCount; ++i) {{\n'
-                        '                pProperties[i] = _{0}_EXTENSIONS[i];\n'
+                        '                pProperties[i] = _{1}_EXTENSIONS[i];\n'
                         '            }}\n'
                         '        }}\n'
-                        '    }} else\n').format(uname)
-                gen += guard.end
+                        '    }} else\n'
+                        '#endif\n').format(name, name.upper())
 
         gen += ('    {\n'
                 '        *pPropertyCount = 0;\n'
@@ -1293,11 +1419,10 @@ class VulkanProfilesBuilder():
 
         for name, profile in self.profiles.items():
             uname = name.upper()
-            guard = ProfilePlatformGuard(self.registry, profile)
-            gen += guard.begin
-            gen += ('    if (strcmp(pProfile->profileName, {0}_NAME) == 0) {{\n'
+            gen += ('#ifdef {0}\n'
+                    '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
                     '        while (p != nullptr) {{\n'
-                    '            switch (p->sType) {{\n').format(uname)
+                    '            switch (p->sType) {{\n').format(name, uname)
 
             # Generate feature structure data
             features = profile.capabilities.features
@@ -1347,8 +1472,8 @@ class VulkanProfilesBuilder():
                     '            }\n'
                     '            p = p->pNext;\n'
                     '        }\n'
-                    '    } else\n')
-            gen += guard.end
+                    '    } else\n'
+                    '#endif\n')
 
         gen += ('    {\n'
                 '    }\n'
@@ -1363,25 +1488,23 @@ class VulkanProfilesBuilder():
                 '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
-            uname = name.upper()
             if profile.capabilities.features or profile.capabilities.properties:
-                guard = ProfilePlatformGuard(self.registry, profile)
-                gen += guard.begin
-                gen += ('    if (strcmp(pProfile->profileName, {0}_NAME) == 0) {{\n'
+                gen += ('#ifdef {0}\n'
+                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
                         '        if (pProperties == nullptr) {{\n'
-                        '            *pPropertyCount = _vpArraySize(_{0}_STRUCTURE_PROPERTIES);\n'
+                        '            *pPropertyCount = _vpArraySize(_{1}_STRUCTURE_PROPERTIES);\n'
                         '        }} else {{\n'
-                        '            if (*pPropertyCount < _vpArraySize(_{0}_STRUCTURE_PROPERTIES)) {{\n'
+                        '            if (*pPropertyCount < _vpArraySize(_{1}_STRUCTURE_PROPERTIES)) {{\n'
                         '                result = VK_INCOMPLETE;\n'
                         '            }} else {{\n'
-                        '                *pPropertyCount = _vpArraySize(_{0}_STRUCTURE_PROPERTIES);\n'
+                        '                *pPropertyCount = _vpArraySize(_{1}_STRUCTURE_PROPERTIES);\n'
                         '            }}\n'
                         '            for (uint32_t i = 0; i < *pPropertyCount; ++i) {{\n'
-                        '                pProperties[i] = _{0}_STRUCTURE_PROPERTIES[i];\n'
+                        '                pProperties[i] = _{1}_STRUCTURE_PROPERTIES[i];\n'
                         '            }}\n'
                         '        }}\n'
-                        '    }} else\n').format(uname)
-                gen += guard.end
+                        '    }} else\n'
+                        '#endif\n').format(name, name.upper())
 
         gen += ('    {\n'
                 '        *pPropertyCount = 0;\n'
@@ -1397,25 +1520,23 @@ class VulkanProfilesBuilder():
                 '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
-            uname = name.upper()
             if profile.capabilities.formats:
-                guard = ProfilePlatformGuard(self.registry, profile)
-                gen += guard.begin
-                gen += ('    if (strcmp(pProfile->profileName, {0}_NAME) == 0) {{\n'
+                gen += ('#ifdef {0}\n'
+                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
                         '        if (pFormats == nullptr) {{\n'
-                        '            *pFormatCount = _vpArraySize(_{0}_FORMATS);\n'
+                        '            *pFormatCount = _vpArraySize(_{1}_FORMATS);\n'
                         '        }} else {{\n'
-                        '            if (*pFormatCount < _vpArraySize(_{0}_FORMATS)) {{\n'
+                        '            if (*pFormatCount < _vpArraySize(_{1}_FORMATS)) {{\n'
                         '                result = VK_INCOMPLETE;\n'
                         '            }} else {{\n'
-                        '                *pFormatCount = _vpArraySize(_{0}_FORMATS);\n'
+                        '                *pFormatCount = _vpArraySize(_{1}_FORMATS);\n'
                         '            }}\n'
                         '            for (uint32_t i = 0; i < *pFormatCount; ++i) {{\n'
-                        '                pFormats[i] = _{0}_FORMATS[i].format;\n'
+                        '                pFormats[i] = _{1}_FORMATS[i].format;\n'
                         '            }}\n'
                         '        }}\n'
-                        '    }} else\n').format(uname)
-                gen += guard.end
+                        '    }} else\n'
+                        '#endif\n').format(name, name.upper())
 
         gen += ('    {\n'
                 '        *pFormatCount = 0;\n'
@@ -1432,17 +1553,15 @@ class VulkanProfilesBuilder():
                 '    VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);\n')
 
         for name, profile in self.profiles.items():
-            uname = name.upper()
             if profile.capabilities.formats:
-                guard = ProfilePlatformGuard(self.registry, profile)
-                gen += guard.begin
-                gen += ('    if (strcmp(pProfile->profileName, {0}_NAME) == 0) {{\n'
-                        '        for (uint32_t i = 0; i < _vpArraySize(_{0}_FORMATS); ++i) {{\n'
-                        '            const VpFormatProperties& props = _{0}_FORMATS[i];\n'
+                gen += ('#ifdef {0}\n'
+                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
+                        '        for (uint32_t i = 0; i < _vpArraySize(_{1}_FORMATS); ++i) {{\n'
+                        '            const VpFormatProperties& props = _{1}_FORMATS[i];\n'
                         '            if (props.format != format) continue;\n'
                         '\n'
                         '            while (p != nullptr) {{\n'
-                        '                switch (p->sType) {{\n').format(uname)
+                        '                switch (p->sType) {{\n').format(name, name.upper())
 
                 # TODO: Make format properties extensible
                 formatPropTypes = [
@@ -1472,8 +1591,8 @@ class VulkanProfilesBuilder():
                         '                p = p->pNext;\n'
                         '            }\n'
                         '        }\n'
-                        '    } else\n')
-                gen += guard.end
+                        '    } else\n'
+                        '#endif\n')
 
         gen += ('    {\n'
                 '    }\n'
@@ -1488,25 +1607,23 @@ class VulkanProfilesBuilder():
                 '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
-            uname = name.upper()
             if profile.capabilities.memoryProperties:
-                guard = ProfilePlatformGuard(self.registry, profile)
-                gen += guard.begin
-                gen += ('    if (strcmp(pProfile->profileName, {0}_NAME) == 0) {{\n'
+                gen += ('#ifdef {0}\n'
+                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
                         '        if (pMemoryPropertyFlags == nullptr) {{\n'
-                        '            *pMemoryPropertyFlagsCount = _vpArraySize(_{0}_MEMORY_TYPES);\n'
+                        '            *pMemoryPropertyFlagsCount = _vpArraySize(_{1}_MEMORY_TYPES);\n'
                         '        }} else {{\n'
-                        '            if (*pMemoryPropertyFlagsCount < _vpArraySize(_{0}_MEMORY_TYPES)) {{\n'
+                        '            if (*pMemoryPropertyFlagsCount < _vpArraySize(_{1}_MEMORY_TYPES)) {{\n'
                         '                result = VK_INCOMPLETE;\n'
                         '            }} else {{\n'
-                        '                *pMemoryPropertyFlagsCount = _vpArraySize(_{0}_MEMORY_TYPES);\n'
+                        '                *pMemoryPropertyFlagsCount = _vpArraySize(_{1}_MEMORY_TYPES);\n'
                         '            }}\n'
                         '            for (uint32_t i = 0; i < *pMemoryPropertyFlagsCount; ++i) {{\n'
-                        '                pMemoryPropertyFlags[i] = _{0}_MEMORY_TYPES[i];\n'
+                        '                pMemoryPropertyFlags[i] = _{1}_MEMORY_TYPES[i];\n'
                         '            }}\n'
                         '        }}\n'
-                        '    }} else\n').format(uname)
-                gen += guard.end
+                        '    }} else\n'
+                        '#endif\n').format(name, name.upper())
 
         gen += ('    {\n'
                 '        *pMemoryPropertyFlagsCount = 0;\n'
@@ -1523,25 +1640,23 @@ class VulkanProfilesBuilder():
                 '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
-            uname = name.upper()
             if profile.capabilities.queueFamiliesProperties:
-                guard = ProfilePlatformGuard(self.registry, profile)
-                gen += guard.begin
-                gen += ('    if (strcmp(pProfile->profileName, {0}_NAME) == 0) {{\n'
+                gen += ('#ifdef {0}\n'
+                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
                         '        if (pQueueFamilyProperties == nullptr) {{\n'
-                        '            *pQueueFamilyPropertiesCount = _vpArraySize(_{0}_QUEUE_FAMILY_PROPERTIES);\n'
+                        '            *pQueueFamilyPropertiesCount = _vpArraySize(_{1}_QUEUE_FAMILY_PROPERTIES);\n'
                         '        }} else {{\n'
-                        '            if (*pQueueFamilyPropertiesCount < _vpArraySize(_{0}_QUEUE_FAMILY_PROPERTIES)) {{\n'
+                        '            if (*pQueueFamilyPropertiesCount < _vpArraySize(_{1}_QUEUE_FAMILY_PROPERTIES)) {{\n'
                         '                result = VK_INCOMPLETE;\n'
                         '            }} else {{\n'
-                        '                *pQueueFamilyPropertiesCount = _vpArraySize(_{0}_QUEUE_FAMILY_PROPERTIES);\n'
+                        '                *pQueueFamilyPropertiesCount = _vpArraySize(_{1}_QUEUE_FAMILY_PROPERTIES);\n'
                         '            }}\n'
                         '            for (uint32_t i = 0; i < *pQueueFamilyPropertiesCount; ++i) {{\n'
-                        '                pQueueFamilyProperties[i] = _{0}_QUEUE_FAMILY_PROPERTIES[i];\n'
+                        '                pQueueFamilyProperties[i] = _{1}_QUEUE_FAMILY_PROPERTIES[i];\n'
                         '            }}\n'
                         '        }}\n'
-                        '    }} else\n').format(uname)
-                gen += guard.end
+                        '    }} else\n'
+                        '#endif\n').format(name, name.upper())
 
         gen += ('    {\n'
                 '        *pQueueFamilyPropertiesCount = 0;\n'

@@ -30,25 +30,101 @@
 #include <vulkan/vulkan_beta.h>
 #endif
 
+#if defined(VK_VERSION_1_0) && \
+    defined(VK_KHR_get_physical_device_properties2) && \
+    defined(VK_KHR_surface) && \
+    defined(VK_KHR_get_surface_capabilities2) && \
+    defined(VK_KHR_android_surface) && \
+    defined(VK_EXT_swapchain_colorspace) && \
+    defined(VK_KHR_external_semaphore_capabilities) && \
+    defined(VK_KHR_external_memory_capabilities) && \
+    defined(VK_KHR_external_fence_capabilities) && \
+    defined(VK_KHR_swapchain) && \
+    defined(VK_KHR_maintenance1) && \
+    defined(VK_KHR_incremental_present) && \
+    defined(VK_GOOGLE_display_timing) && \
+    defined(VK_KHR_shader_draw_parameters) && \
+    defined(VK_KHR_descriptor_update_template) && \
+    defined(VK_KHR_get_memory_requirements2) && \
+    defined(VK_KHR_dedicated_allocation) && \
+    defined(VK_KHR_storage_buffer_storage_class) && \
+    defined(VK_KHR_external_semaphore) && \
+    defined(VK_KHR_external_memory) && \
+    defined(VK_KHR_external_semaphore_fd) && \
+    defined(VK_KHR_external_fence) && \
+    defined(VK_KHR_external_fence_fd) && \
+    defined(VK_KHR_variable_pointers) && \
+    defined(VK_KHR_maintenance2)
 #define VP_ANDROID_baseline_2021 1
 #define VP_ANDROID_BASELINE_2021_NAME "VP_ANDROID_baseline_2021"
 #define VP_ANDROID_BASELINE_2021_SPEC_VERSION 1
 #define VP_ANDROID_BASELINE_2021_MIN_API_VERSION VK_MAKE_VERSION(1, 0, 68)
+#endif
 
+#if defined(VK_VERSION_1_3) && \
+    defined(VK_EXT_global_priority)
 #define VP_KHR_roadmap_2022 1
 #define VP_KHR_ROADMAP_2022_NAME "VP_KHR_roadmap_2022"
 #define VP_KHR_ROADMAP_2022_SPEC_VERSION 1
 #define VP_KHR_ROADMAP_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 3, 201)
+#endif
 
+#if defined(VK_VERSION_1_1) && \
+    defined(VK_KHR_8bit_storage) && \
+    defined(VK_KHR_create_renderpass2) && \
+    defined(VK_KHR_depth_stencil_resolve) && \
+    defined(VK_KHR_driver_properties) && \
+    defined(VK_KHR_image_format_list) && \
+    defined(VK_KHR_imageless_framebuffer) && \
+    defined(VK_KHR_sampler_mirror_clamp_to_edge) && \
+    defined(VK_KHR_shader_float16_int8) && \
+    defined(VK_KHR_shader_subgroup_extended_types) && \
+    defined(VK_KHR_timeline_semaphore) && \
+    defined(VK_KHR_uniform_buffer_standard_layout) && \
+    defined(VK_EXT_descriptor_indexing) && \
+    defined(VK_EXT_host_query_reset) && \
+    defined(VK_EXT_scalar_block_layout) && \
+    defined(VK_KHR_sampler_ycbcr_conversion) && \
+    defined(VK_EXT_robustness2) && \
+    defined(VK_EXT_subgroup_size_control) && \
+    defined(VK_EXT_texel_buffer_alignment) && \
+    defined(VK_EXT_vertex_attribute_divisor) && \
+    defined(VK_KHR_swapchain) && \
+    defined(VK_KHR_swapchain_mutable_format) && \
+    defined(VK_KHR_portability_subset)
 #define VP_LUNARG_desktop_portability_2021_subset 1
 #define VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME "VP_LUNARG_desktop_portability_2021_subset"
 #define VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_SPEC_VERSION 1
 #define VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
+#endif
 
+#if defined(VK_VERSION_1_1) && \
+    defined(VK_KHR_8bit_storage) && \
+    defined(VK_KHR_create_renderpass2) && \
+    defined(VK_KHR_depth_stencil_resolve) && \
+    defined(VK_KHR_driver_properties) && \
+    defined(VK_KHR_image_format_list) && \
+    defined(VK_KHR_imageless_framebuffer) && \
+    defined(VK_KHR_sampler_mirror_clamp_to_edge) && \
+    defined(VK_KHR_shader_float16_int8) && \
+    defined(VK_KHR_shader_subgroup_extended_types) && \
+    defined(VK_KHR_timeline_semaphore) && \
+    defined(VK_KHR_uniform_buffer_standard_layout) && \
+    defined(VK_EXT_descriptor_indexing) && \
+    defined(VK_EXT_host_query_reset) && \
+    defined(VK_EXT_scalar_block_layout) && \
+    defined(VK_KHR_sampler_ycbcr_conversion) && \
+    defined(VK_EXT_robustness2) && \
+    defined(VK_EXT_subgroup_size_control) && \
+    defined(VK_EXT_texel_buffer_alignment) && \
+    defined(VK_EXT_vertex_attribute_divisor) && \
+    defined(VK_KHR_swapchain) && \
+    defined(VK_KHR_swapchain_mutable_format)
 #define VP_LUNARG_desktop_portability_2021 1
 #define VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME "VP_LUNARG_desktop_portability_2021"
 #define VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION 1
 #define VP_LUNARG_DESKTOP_PORTABILITY_2021_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 142)
+#endif
 
 #define VP_MAX_PROFILE_NAME_SIZE 256U
 
