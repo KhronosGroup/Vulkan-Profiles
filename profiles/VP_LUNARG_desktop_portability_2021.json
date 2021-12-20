@@ -3,12 +3,12 @@
     "capabilities": {
         "vulkan11requirements": {
             "features": {
-                "VkPhysicalDeviceMultiviewFeatures": {
+                "VkPhysicalDeviceMultiviewFeaturesKHR": {
                     "multiview": true
                 }
             },
             "properties": {
-                "VkPhysicalDeviceMultiviewProperties": {
+                "VkPhysicalDeviceMultiviewPropertiesKHR": {
                     "maxMultiviewViewCount": 0,
                     "maxMultiviewInstanceIndex": 134217727
                 }
@@ -70,19 +70,19 @@
                     "textureCompressionBC": true,
                     "vertexPipelineStoresAndAtomics": true
                 },
-                "VkPhysicalDeviceImagelessFramebufferFeatures": {
+                "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
                     "imagelessFramebuffer": true
                 },
-                "VkPhysicalDevice16BitStorageFeatures": {
+                "VkPhysicalDevice16BitStorageFeaturesKHR": {
                     "storageBuffer16BitAccess": true,
                     "uniformAndStorageBuffer16BitAccess": true
                 },
-                "VkPhysicalDevice8BitStorageFeatures": {
+                "VkPhysicalDevice8BitStorageFeaturesKHR": {
                     "storageBuffer8BitAccess": true,
                     "storagePushConstant8": true,
                     "uniformAndStorageBuffer8BitAccess": true
                 },
-                "VkPhysicalDeviceDescriptorIndexingFeatures": {
+                "VkPhysicalDeviceDescriptorIndexingFeaturesEXT": {
                     "shaderUniformTexelBufferArrayDynamicIndexing": true,
                     "shaderStorageTexelBufferArrayDynamicIndexing": true,
                     "shaderSampledImageArrayNonUniformIndexing": true,
@@ -98,25 +98,25 @@
                     "descriptorBindingVariableDescriptorCount": true,
                     "runtimeDescriptorArray": true
                 },
-                "VkPhysicalDeviceHostQueryResetFeatures": {
+                "VkPhysicalDeviceHostQueryResetFeaturesEXT": {
                     "hostQueryReset": true
                 },
-                "VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures": {
+                "VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR": {
                     "shaderSubgroupExtendedTypes": true
                 },
-                "VkPhysicalDeviceUniformBufferStandardLayoutFeatures": {
+                "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR": {
                     "uniformBufferStandardLayout": true
                 },
                 "VkPhysicalDeviceShaderDrawParametersFeatures": {
                     "shaderDrawParameters": true
                 },
-                "VkPhysicalDeviceShaderFloat16Int8Features": {
+                "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR": {
                     "shaderInt8": true
                 },
-                "VkPhysicalDeviceSamplerYcbcrConversionFeatures": {
+                "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                     "samplerYcbcrConversion": true
                 },
-                "VkPhysicalDeviceVariablePointersFeatures": {
+                "VkPhysicalDeviceVariablePointersFeaturesKHR": {
                     "variablePointersStorageBuffer": true,
                     "variablePointers": true
                 }
@@ -218,7 +218,7 @@
                         "lineWidthGranularity": 0.5
                     }
                 },
-                "VkPhysicalDeviceDescriptorIndexingProperties": {
+                "VkPhysicalDeviceDescriptorIndexingPropertiesEXT": {
                     "maxUpdateAfterBindDescriptorsInAllPools": 1048576,
                     "maxPerStageDescriptorUpdateAfterBindSamplers": 16,
                     "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 15,
@@ -236,13 +236,13 @@
                     "maxDescriptorSetUpdateAfterBindStorageImages": 40,
                     "maxDescriptorSetUpdateAfterBindInputAttachments": 8
                 },
-                "VkPhysicalDeviceDepthStencilResolveProperties": {
+                "VkPhysicalDeviceDepthStencilResolvePropertiesKHR": {
                     "independentResolve": true,
                     "independentResolveNone": true,
                     "supportedDepthResolveModes": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ],
                     "supportedStencilResolveModes": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ]
                 },
-                "VkPhysicalDeviceMaintenance3Properties": {
+                "VkPhysicalDeviceMaintenance3PropertiesKHR": {
                     "maxPerSetDescriptors": 700,
                     "maxMemoryAllocationSize": 2147483648
                 }
