@@ -1755,6 +1755,7 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
     std::vector<VkExtensionProperties> deviceExtensions(deviceExtensionCount);
     result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &deviceExtensionCount, deviceExtensions.data());
     if (result != VK_SUCCESS) return result;
+    if (!_vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(), VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME)) return result;
 
     *pSupported = VK_FALSE;
 

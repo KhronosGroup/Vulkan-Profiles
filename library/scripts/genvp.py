@@ -994,6 +994,7 @@ class VulkanProfilesBuilder():
                 '    std::vector<VkExtensionProperties> deviceExtensions(deviceExtensionCount);\n'
                 '    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &deviceExtensionCount, deviceExtensions.data());\n'
                 '    if (result != VK_SUCCESS) return result;\n'
+                '    if (!_vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(), VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME)) return result;\n'
                 '\n'
                 '    *pSupported = VK_FALSE;\n'
                 '\n')
