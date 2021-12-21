@@ -133,9 +133,24 @@
 #define VP_MAX_PROFILE_NAME_SIZE 256U
 
 typedef struct VpProfileProperties {
-    char profileName[VP_MAX_PROFILE_NAME_SIZE];
-    uint32_t specVersion;
+    char        profileName[VP_MAX_PROFILE_NAME_SIZE];
+    uint32_t    specVersion;
 } VpProfileProperties;
+
+typedef enum VpInstanceCreateFlagBits {
+    VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT = 0x00000001,
+    VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT = 0x00000002,
+    VP_INSTANCE_CREATE_OVERRIDE_API_VERSION_BIT = 0x00000004,
+
+    VP_INSTANCE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VpInstanceCreateFlagBits;
+typedef VkFlags VpInstanceCreateFlags;
+
+typedef struct VpInstanceCreateInfo {
+    const VkInstanceCreateInfo* pCreateInfo;
+    const VpProfileProperties*  pProfile;
+    VpInstanceCreateFlags       flags;
+} VpInstanceCreateInfo;
 
 typedef enum VpDeviceCreateFlagBits {
     VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT = 0x00000001,
@@ -150,9 +165,9 @@ typedef enum VpDeviceCreateFlagBits {
 typedef VkFlags VpDeviceCreateFlags;
 
 typedef struct VpDeviceCreateInfo {
-    const VkDeviceCreateInfo *pCreateInfo;
-    const VpProfileProperties *pProfile;
-    VpDeviceCreateFlags flags;
+    const VkDeviceCreateInfo*   pCreateInfo;
+    const VpProfileProperties*  pProfile;
+    VpDeviceCreateFlags         flags;
 } VpDeviceCreateInfo;
 
 // Query the list of available profiles in the library
@@ -161,17 +176,27 @@ VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties 
 // List the recommended fallback profiles of a profile
 VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
-// Check whether a profile is supported by the physical device
-VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
-                                              VkBool32 *pSupported);
+// Check whether a profile is supported at the instance level
+VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported);
 
-// Create a VkDevice with the profile features and extensions enabled
+// Create a VkInstance with the profile instance extensions enabled
+VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
+                                     const VkAllocationCallbacks *pAllocator, VkInstance *pInstance);
+
+// Check whether a profile is supported by the physical device
+VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile, VkBool32 *pSupported);
+
+// Create a VkDevice with the profile features and device extensions enabled
 VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
                                    const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
 
-// Query the list of extension of a profile
-VPAPI_ATTR VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                    VkExtensionProperties *pProperties);
+// Query the list of instance extensions of a profile
+VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                            VkExtensionProperties *pProperties);
+
+// Query the list of device extensions of a profile
+VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                          VkExtensionProperties *pProperties);
 
 // Fill the pNext Vulkan structures with the requirements of a profile
 VPAPI_ATTR void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext);
@@ -198,94 +223,6 @@ VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile
 
 // Query the requirements of queue families by a profile
 VPAPI_ATTR VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
-
-#ifdef VP_ANDROID_baseline_2021
-static const VkExtensionProperties _VP_ANDROID_BASELINE_2021_EXTENSIONS[] = {
-    VkExtensionProperties{ VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SURFACE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_ANDROID_SURFACE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SWAPCHAIN_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_MAINTENANCE_1_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_INCREMENTAL_PRESENT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_GOOGLE_DISPLAY_TIMING_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_FENCE_FD_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_MAINTENANCE_2_EXTENSION_NAME, 1 },
-};
-#endif
-
-#ifdef VP_KHR_roadmap_2022
-static const VkExtensionProperties _VP_KHR_ROADMAP_2022_EXTENSIONS[] = {
-    VkExtensionProperties{ VK_EXT_GLOBAL_PRIORITY_EXTENSION_NAME, 1 },
-};
-#endif
-
-#ifdef VP_LUNARG_desktop_portability_2021_subset
-static const VkExtensionProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS[] = {
-    VkExtensionProperties{ VK_KHR_8BIT_STORAGE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, 4 },
-    VkExtensionProperties{ VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SWAPCHAIN_EXTENSION_NAME, 70 },
-    VkExtensionProperties{ VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, 1 },
-};
-#endif
-
-#ifdef VP_LUNARG_desktop_portability_2021
-static const VkExtensionProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[] = {
-    VkExtensionProperties{ VK_KHR_8BIT_STORAGE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, 4 },
-    VkExtensionProperties{ VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SWAPCHAIN_EXTENSION_NAME, 70 },
-    VkExtensionProperties{ VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME, 1 },
-};
-#endif
 
 #ifdef VP_ANDROID_baseline_2021
 static const VpStructureProperties _VP_ANDROID_BASELINE_2021_STRUCTURE_PROPERTIES[] = {
@@ -1751,19 +1688,37 @@ static const VkQueueFamilyProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_QUEUE_F
 };
 #endif
 
+
+struct _vpProfileDesc {
+    const char*                     name;
+    uint32_t                        specVersion;
+    uint32_t                        minApiVersion;
+    const VkExtensionProperties*    pInstanceExtensions;
+    uint32_t                        instanceExtensionCount;
+    const VkExtensionProperties*    pDeviceExtensions;
+    uint32_t                        deviceExtensionCount;
+};
+
+VPAPI_ATTR const _vpProfileDesc* _vpGetProfileDesc(const _vpProfileDesc* pProfiles, const char name[VP_MAX_PROFILE_NAME_SIZE]) {
+    while (pProfiles->name != nullptr) {
+        if (strncmp(pProfiles->name, name, VP_MAX_PROFILE_NAME_SIZE) == 0) return pProfiles;
+        pProfiles++;
+    }
+    return nullptr;
+}
+
 VPAPI_ATTR bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, size_t supportedSize,
-                              const char *requestedExtension) {
+                                  const char *requestedExtension, uint32_t expectedVersion = 0) {
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
         if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) {
-            return true;
+            return supportedProperties[i].specVersion > expectedVersion;
         }
     }
-
     return false;
 }
 
 VPAPI_ATTR bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memoryProperties,
-                                      const VkMemoryPropertyFlags &memoryPropertyFlags) {
+                                       const VkMemoryPropertyFlags &memoryPropertyFlags) {
     assert(&memoryProperties != nullptr);
 
     for (uint32_t i = 0, n = memoryProperties.memoryTypeCount; i < n; ++i) {
@@ -1788,8 +1743,8 @@ VPAPI_ATTR bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, c
 }
 
 VPAPI_ATTR bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties,
-                                           uint32_t queueFamilyPropertiesCount,
-                                           const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
+                                            uint32_t queueFamilyPropertiesCount,
+                                            const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
     assert(queueFamilyProperties != nullptr);
 
     for (uint32_t i = 0, n = queueFamilyPropertiesCount; i < n; ++i) {
@@ -1817,8 +1772,28 @@ VPAPI_ATTR bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queue
     return false;
 }
 
-VPAPI_ATTR void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t propertyCount,
-                             const VkExtensionProperties *pProperties, std::vector<const char *> &extensions) {
+VPAPI_ATTR void _vpGetInstanceExtensions(const VpInstanceCreateInfo *pCreateInfo, uint32_t propertyCount,
+                                         const VkExtensionProperties *pProperties, std::vector<const char *> &extensions) {
+    if (pCreateInfo->flags & VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT) {
+        for (int i = 0, n = propertyCount; i < n; ++i) {
+            extensions.push_back(pProperties[i].extensionName);
+        }
+
+        for (uint32_t i = 0; i < pCreateInfo->pCreateInfo->enabledExtensionCount; ++i) {
+            if (_vpCheckExtension(pProperties, propertyCount, pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i])) {
+                continue;
+            }
+            extensions.push_back(pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i]);
+        }
+    } else {  // or VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT
+        for (int i = 0, n = pCreateInfo->pCreateInfo->enabledExtensionCount; i < n; ++i) {
+            extensions.push_back(pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i]);
+        }
+    }
+}
+
+VPAPI_ATTR void _vpGetDeviceExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t propertyCount,
+                                       const VkExtensionProperties *pProperties, std::vector<const char *> &extensions) {
     if (pCreateInfo->flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) {
         for (int i = 0, n = propertyCount; i < n; ++i) {
             extensions.push_back(pProperties[i].extensionName);
@@ -1844,6 +1819,268 @@ VPAPI_ATTR const void* _vpGetStructure(const void* pNext, VkStructureType type) 
         p = p->pNext;
     }
     return nullptr;
+}
+
+#ifdef VP_ANDROID_baseline_2021
+namespace VP_ANDROID_BASELINE_2021 {
+
+static const VkExtensionProperties _instanceExtensions[] = {
+    VkExtensionProperties{ VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SURFACE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_ANDROID_SURFACE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME, 1 },
+};
+
+static const VkExtensionProperties _deviceExtensions[] = {
+    VkExtensionProperties{ VK_KHR_SWAPCHAIN_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_MAINTENANCE_1_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_INCREMENTAL_PRESENT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_GOOGLE_DISPLAY_TIMING_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_FENCE_FD_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_MAINTENANCE_2_EXTENSION_NAME, 1 },
+};
+
+} // namespace VP_ANDROID_BASELINE_2021
+#endif
+
+#ifdef VP_KHR_roadmap_2022
+namespace VP_KHR_ROADMAP_2022 {
+
+static const VkExtensionProperties _deviceExtensions[] = {
+    VkExtensionProperties{ VK_EXT_GLOBAL_PRIORITY_EXTENSION_NAME, 1 },
+};
+
+} // namespace VP_KHR_ROADMAP_2022
+#endif
+
+#ifdef VP_LUNARG_desktop_portability_2021_subset
+namespace VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET {
+
+static const VkExtensionProperties _deviceExtensions[] = {
+    VkExtensionProperties{ VK_KHR_8BIT_STORAGE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, 4 },
+    VkExtensionProperties{ VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SWAPCHAIN_EXTENSION_NAME, 70 },
+    VkExtensionProperties{ VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, 1 },
+};
+
+} // namespace VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET
+#endif
+
+#ifdef VP_LUNARG_desktop_portability_2021
+namespace VP_LUNARG_DESKTOP_PORTABILITY_2021 {
+
+static const VkExtensionProperties _deviceExtensions[] = {
+    VkExtensionProperties{ VK_KHR_8BIT_STORAGE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, 4 },
+    VkExtensionProperties{ VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SWAPCHAIN_EXTENSION_NAME, 70 },
+    VkExtensionProperties{ VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME, 1 },
+};
+
+} // namespace VP_LUNARG_DESKTOP_PORTABILITY_2021
+#endif
+
+static const _vpProfileDesc _vpProfiles[] = {
+#ifdef VP_ANDROID_baseline_2021
+    _vpProfileDesc{
+        VP_ANDROID_BASELINE_2021_NAME,
+        VP_ANDROID_BASELINE_2021_SPEC_VERSION,
+        VP_ANDROID_BASELINE_2021_MIN_API_VERSION,
+        &VP_ANDROID_BASELINE_2021::_instanceExtensions[0], _vpArraySize(VP_ANDROID_BASELINE_2021::_instanceExtensions),
+        &VP_ANDROID_BASELINE_2021::_deviceExtensions[0], _vpArraySize(VP_ANDROID_BASELINE_2021::_deviceExtensions)
+    },
+#endif
+#ifdef VP_KHR_roadmap_2022
+    _vpProfileDesc{
+        VP_KHR_ROADMAP_2022_NAME,
+        VP_KHR_ROADMAP_2022_SPEC_VERSION,
+        VP_KHR_ROADMAP_2022_MIN_API_VERSION,
+        nullptr, 0,
+        &VP_KHR_ROADMAP_2022::_deviceExtensions[0], _vpArraySize(VP_KHR_ROADMAP_2022::_deviceExtensions)
+    },
+#endif
+#ifdef VP_LUNARG_desktop_portability_2021_subset
+    _vpProfileDesc{
+        VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME,
+        VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_SPEC_VERSION,
+        VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_MIN_API_VERSION,
+        nullptr, 0,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_deviceExtensions[0], _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_deviceExtensions)
+    },
+#endif
+#ifdef VP_LUNARG_desktop_portability_2021
+    _vpProfileDesc{
+        VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME,
+        VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION,
+        VP_LUNARG_DESKTOP_PORTABILITY_2021_MIN_API_VERSION,
+        nullptr, 0,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2021::_deviceExtensions[0], _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021::_deviceExtensions)
+    },
+#endif
+    _vpProfileDesc{ nullptr }
+};
+
+VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported) {
+    assert(pProfile != nullptr);
+    assert(pSupported != nullptr);
+    VkResult result = VK_SUCCESS;
+
+    uint32_t apiVersion;
+    vkEnumerateInstanceVersion(&apiVersion);
+
+    uint32_t extCount;
+    result = vkEnumerateInstanceExtensionProperties(pLayerName, &extCount, nullptr);
+    if (result != VK_SUCCESS) return result;
+    std::vector<VkExtensionProperties> ext(extCount);
+    result = vkEnumerateInstanceExtensionProperties(pLayerName, &extCount, ext.data());
+    if (result != VK_SUCCESS) return result;
+
+    *pSupported = VK_FALSE;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pDesc->specVersion < pProfile->specVersion) return result;
+
+    if (VK_VERSION_PATCH(apiVersion) < VK_VERSION_PATCH(pDesc->minApiVersion)) return result;
+
+    for (uint32_t i = 0; i < pDesc->instanceExtensionCount; ++i) {
+        if (!_vpCheckExtension(ext.data(), ext.size(),
+            pDesc->pInstanceExtensions[i].extensionName,
+            pDesc->pInstanceExtensions[i].specVersion)) return result;
+    }
+
+    *pSupported = VK_TRUE;
+    return result;
+}
+
+VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
+                                     const VkAllocationCallbacks *pAllocator, VkInstance *pInstance) {
+    VkInstanceCreateInfo createInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
+    VkApplicationInfo appInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
+    std::vector<const char*> extensions;
+    VkInstanceCreateInfo* pInstanceCreateInfo = nullptr;
+    VkExtensionProperties* pProfileExtensions = nullptr;
+    uint32_t profileExtensionCount = 0;
+
+    if (pCreateInfo != nullptr && pCreateInfo->pCreateInfo != nullptr) {
+        createInfo = *pCreateInfo->pCreateInfo;
+        pInstanceCreateInfo = &createInfo;
+
+        const _vpProfileDesc* pDesc = nullptr;
+        if (pCreateInfo->pProfile != nullptr) {
+            pDesc = _vpGetProfileDesc(_vpProfiles, pCreateInfo->pProfile->profileName);
+            if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+        }
+
+        if (pDesc != nullptr && pDesc->pInstanceExtensions != nullptr) {
+            _vpGetInstanceExtensions(pCreateInfo, pDesc->instanceExtensionCount, pDesc->pInstanceExtensions, extensions);
+            createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+            createInfo.ppEnabledExtensionNames = extensions.data();
+        }
+
+        if (pCreateInfo->flags & VP_INSTANCE_CREATE_OVERRIDE_API_VERSION_BIT) {
+            if (createInfo.pApplicationInfo != nullptr) {
+                appInfo = *createInfo.pApplicationInfo;
+            }
+            createInfo.pApplicationInfo = &appInfo;
+            appInfo.apiVersion = pDesc->minApiVersion;
+        }
+    }
+
+    return vkCreateInstance(pInstanceCreateInfo, pAllocator, pInstance);
+}
+
+VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                            VkExtensionProperties *pProperties) {
+    VkResult result = VK_SUCCESS;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = pDesc->instanceExtensionCount;
+    } else {
+        if (*pPropertyCount < pDesc->instanceExtensionCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = pDesc->instanceExtensionCount;
+        }
+        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+            pProperties[i] = pDesc->pInstanceExtensions[i];
+        }
+    }
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                          VkExtensionProperties *pProperties) {
+    VkResult result = VK_SUCCESS;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = pDesc->deviceExtensionCount;
+    } else {
+        if (*pPropertyCount < pDesc->deviceExtensionCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = pDesc->deviceExtensionCount;
+        }
+        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+            pProperties[i] = pDesc->pDeviceExtensions[i];
+        }
+    }
+    return result;
 }
 
 VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
@@ -1906,28 +2143,22 @@ VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, u
     return result;
 }
 
-VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName,
-                                              const VpProfileProperties *pProfile, VkBool32 *pSupported) {
+VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile, VkBool32 *pSupported) {
     assert(pProfile != nullptr);
     assert(pSupported != nullptr);
     assert(physicalDevice != VK_NULL_HANDLE);
 
     VkResult result = VK_SUCCESS;
 
-    uint32_t instanceExtensionCount;
-    result = vkEnumerateInstanceExtensionProperties(pLayerName, &instanceExtensionCount, nullptr);
+    uint32_t extCount;
+    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, nullptr);
     if (result != VK_SUCCESS) return result;
-    std::vector<VkExtensionProperties> instanceExtensions(instanceExtensionCount);
-    result = vkEnumerateInstanceExtensionProperties(pLayerName, &instanceExtensionCount, instanceExtensions.data());
+    std::vector<VkExtensionProperties> ext(extCount);
+    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, ext.data());
     if (result != VK_SUCCESS) return result;
 
-    uint32_t deviceExtensionCount;
-    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &deviceExtensionCount, nullptr);
-    if (result != VK_SUCCESS) return result;
-    std::vector<VkExtensionProperties> deviceExtensions(deviceExtensionCount);
-    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &deviceExtensionCount, deviceExtensions.data());
-    if (result != VK_SUCCESS) return result;
-    if (!_vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(), VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME)) return result;
+    VkPhysicalDeviceProperties devProps;
+    vkGetPhysicalDeviceProperties(physicalDevice, &devProps);
 
     *pSupported = VK_FALSE;
 
@@ -1935,22 +2166,11 @@ VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, c
     if (strcmp(pProfile->profileName, VP_ANDROID_BASELINE_2021_NAME) == 0) {
         if (VP_ANDROID_BASELINE_2021_SPEC_VERSION < pProfile->specVersion) return result;
 
-        VkPhysicalDeviceProperties devProps;
-        vkGetPhysicalDeviceProperties(physicalDevice, &devProps);
         if (VK_VERSION_PATCH(devProps.apiVersion) < VK_VERSION_PATCH(VP_ANDROID_BASELINE_2021_MIN_API_VERSION)) return result;
 
-        bool extensionsSupported = true;
-        for (uint32_t i = 0; i < _vpArraySize(_VP_ANDROID_BASELINE_2021_EXTENSIONS); ++i) {
-            const bool supportedInstanceExt = _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(),
-                                                                _VP_ANDROID_BASELINE_2021_EXTENSIONS[i].extensionName);
-            const bool supportedDeviceExt = _vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(),
-                                                              _VP_ANDROID_BASELINE_2021_EXTENSIONS[i].extensionName);
-            if (!supportedInstanceExt && !supportedDeviceExt) {
-                extensionsSupported = false;
-                break;
-            }
+        for (uint32_t i = 0; i < _vpArraySize(VP_ANDROID_BASELINE_2021::_deviceExtensions); ++i) {
+            if (!_vpCheckExtension(ext.data(), ext.size(), VP_ANDROID_BASELINE_2021::_deviceExtensions[i].extensionName)) return result;
         }
-        if (!extensionsSupported) return result;
 
         VkPhysicalDeviceFeatures2 devicePhysicalDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
         VkPhysicalDeviceFeatures2 profilePhysicalDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
@@ -2090,22 +2310,11 @@ VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, c
     if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
         if (VP_KHR_ROADMAP_2022_SPEC_VERSION < pProfile->specVersion) return result;
 
-        VkPhysicalDeviceProperties devProps;
-        vkGetPhysicalDeviceProperties(physicalDevice, &devProps);
         if (VK_VERSION_PATCH(devProps.apiVersion) < VK_VERSION_PATCH(VP_KHR_ROADMAP_2022_MIN_API_VERSION)) return result;
 
-        bool extensionsSupported = true;
-        for (uint32_t i = 0; i < _vpArraySize(_VP_KHR_ROADMAP_2022_EXTENSIONS); ++i) {
-            const bool supportedInstanceExt = _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(),
-                                                                _VP_KHR_ROADMAP_2022_EXTENSIONS[i].extensionName);
-            const bool supportedDeviceExt = _vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(),
-                                                              _VP_KHR_ROADMAP_2022_EXTENSIONS[i].extensionName);
-            if (!supportedInstanceExt && !supportedDeviceExt) {
-                extensionsSupported = false;
-                break;
-            }
+        for (uint32_t i = 0; i < _vpArraySize(VP_KHR_ROADMAP_2022::_deviceExtensions); ++i) {
+            if (!_vpCheckExtension(ext.data(), ext.size(), VP_KHR_ROADMAP_2022::_deviceExtensions[i].extensionName)) return result;
         }
-        if (!extensionsSupported) return result;
 
         VkPhysicalDeviceFeatures2 devicePhysicalDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
         VkPhysicalDeviceFeatures2 profilePhysicalDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
@@ -2270,22 +2479,11 @@ VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, c
     if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
         if (VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_SPEC_VERSION < pProfile->specVersion) return result;
 
-        VkPhysicalDeviceProperties devProps;
-        vkGetPhysicalDeviceProperties(physicalDevice, &devProps);
         if (VK_VERSION_PATCH(devProps.apiVersion) < VK_VERSION_PATCH(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_MIN_API_VERSION)) return result;
 
-        bool extensionsSupported = true;
-        for (uint32_t i = 0; i < _vpArraySize(_VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS); ++i) {
-            const bool supportedInstanceExt = _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(),
-                                                                _VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS[i].extensionName);
-            const bool supportedDeviceExt = _vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(),
-                                                              _VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS[i].extensionName);
-            if (!supportedInstanceExt && !supportedDeviceExt) {
-                extensionsSupported = false;
-                break;
-            }
+        for (uint32_t i = 0; i < _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_deviceExtensions); ++i) {
+            if (!_vpCheckExtension(ext.data(), ext.size(), VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_deviceExtensions[i].extensionName)) return result;
         }
-        if (!extensionsSupported) return result;
 
         VkPhysicalDeviceMultiviewFeatures devicePhysicalDeviceMultiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES };
         VkPhysicalDeviceMultiviewFeatures profilePhysicalDeviceMultiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES };
@@ -2582,22 +2780,11 @@ VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, c
     if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
         if (VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION < pProfile->specVersion) return result;
 
-        VkPhysicalDeviceProperties devProps;
-        vkGetPhysicalDeviceProperties(physicalDevice, &devProps);
         if (VK_VERSION_PATCH(devProps.apiVersion) < VK_VERSION_PATCH(VP_LUNARG_DESKTOP_PORTABILITY_2021_MIN_API_VERSION)) return result;
 
-        bool extensionsSupported = true;
-        for (uint32_t i = 0; i < _vpArraySize(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS); ++i) {
-            const bool supportedInstanceExt = _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(),
-                                                                _VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[i].extensionName);
-            const bool supportedDeviceExt = _vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(),
-                                                              _VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[i].extensionName);
-            if (!supportedInstanceExt && !supportedDeviceExt) {
-                extensionsSupported = false;
-                break;
-            }
+        for (uint32_t i = 0; i < _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021::_deviceExtensions); ++i) {
+            if (!_vpCheckExtension(ext.data(), ext.size(), VP_LUNARG_DESKTOP_PORTABILITY_2021::_deviceExtensions[i].extensionName)) return result;
         }
-        if (!extensionsSupported) return result;
 
         VkPhysicalDeviceMultiviewFeatures devicePhysicalDeviceMultiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES };
         VkPhysicalDeviceMultiviewFeatures profilePhysicalDeviceMultiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES };
@@ -2893,7 +3080,7 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
 #ifdef VP_ANDROID_baseline_2021
     if (strcmp(pCreateInfo->pProfile->profileName, VP_ANDROID_BASELINE_2021_NAME) == 0) {
         std::vector<const char*> extensions;
-        _vpGetExtensions(pCreateInfo, _vpArraySize(_VP_ANDROID_BASELINE_2021_EXTENSIONS), &_VP_ANDROID_BASELINE_2021_EXTENSIONS[0], extensions);
+        _vpGetDeviceExtensions(pCreateInfo, _vpArraySize(VP_ANDROID_BASELINE_2021::_deviceExtensions), &VP_ANDROID_BASELINE_2021::_deviceExtensions[0], extensions);
 
         void *pNext = const_cast<void*>(pCreateInfo->pCreateInfo->pNext);
         VkPhysicalDeviceFeatures2 profilePhysicalDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
@@ -2911,6 +3098,7 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
 
         VkDeviceCreateInfo deviceCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
         deviceCreateInfo.pNext = pNext;
+        deviceCreateInfo.flags = pCreateInfo->pCreateInfo->flags;
         deviceCreateInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;
         deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;
         deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
@@ -2921,7 +3109,7 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
 #ifdef VP_KHR_roadmap_2022
     if (strcmp(pCreateInfo->pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
         std::vector<const char*> extensions;
-        _vpGetExtensions(pCreateInfo, _vpArraySize(_VP_KHR_ROADMAP_2022_EXTENSIONS), &_VP_KHR_ROADMAP_2022_EXTENSIONS[0], extensions);
+        _vpGetDeviceExtensions(pCreateInfo, _vpArraySize(VP_KHR_ROADMAP_2022::_deviceExtensions), &VP_KHR_ROADMAP_2022::_deviceExtensions[0], extensions);
 
         void *pNext = const_cast<void*>(pCreateInfo->pCreateInfo->pNext);
         VkPhysicalDeviceFeatures2 profilePhysicalDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
@@ -2960,6 +3148,7 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
 
         VkDeviceCreateInfo deviceCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
         deviceCreateInfo.pNext = pNext;
+        deviceCreateInfo.flags = pCreateInfo->pCreateInfo->flags;
         deviceCreateInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;
         deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;
         deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
@@ -2970,7 +3159,7 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
 #ifdef VP_LUNARG_desktop_portability_2021_subset
     if (strcmp(pCreateInfo->pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
         std::vector<const char*> extensions;
-        _vpGetExtensions(pCreateInfo, _vpArraySize(_VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS), &_VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS[0], extensions);
+        _vpGetDeviceExtensions(pCreateInfo, _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_deviceExtensions), &VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_deviceExtensions[0], extensions);
 
         void *pNext = const_cast<void*>(pCreateInfo->pCreateInfo->pNext);
         VkPhysicalDeviceMultiviewFeatures profilePhysicalDeviceMultiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES };
@@ -3066,6 +3255,7 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
 
         VkDeviceCreateInfo deviceCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
         deviceCreateInfo.pNext = pNext;
+        deviceCreateInfo.flags = pCreateInfo->pCreateInfo->flags;
         deviceCreateInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;
         deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;
         deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
@@ -3076,7 +3266,7 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
 #ifdef VP_LUNARG_desktop_portability_2021
     if (strcmp(pCreateInfo->pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
         std::vector<const char*> extensions;
-        _vpGetExtensions(pCreateInfo, _vpArraySize(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS), &_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[0], extensions);
+        _vpGetDeviceExtensions(pCreateInfo, _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021::_deviceExtensions), &VP_LUNARG_DESKTOP_PORTABILITY_2021::_deviceExtensions[0], extensions);
 
         void *pNext = const_cast<void*>(pCreateInfo->pCreateInfo->pNext);
         VkPhysicalDeviceMultiviewFeatures profilePhysicalDeviceMultiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES };
@@ -3166,6 +3356,7 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
 
         VkDeviceCreateInfo deviceCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
         deviceCreateInfo.pNext = pNext;
+        deviceCreateInfo.flags = pCreateInfo->pCreateInfo->flags;
         deviceCreateInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;
         deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;
         deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
@@ -3176,79 +3367,6 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
     {
         return VK_ERROR_UNKNOWN;
     }
-}
-
-VPAPI_ATTR VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                    VkExtensionProperties *pProperties) {
-    VkResult result = VK_SUCCESS;
-#ifdef VP_ANDROID_baseline_2021
-    if (strcmp(pProfile->profileName, VP_ANDROID_BASELINE_2021_NAME) == 0) {
-        if (pProperties == nullptr) {
-            *pPropertyCount = _vpArraySize(_VP_ANDROID_BASELINE_2021_EXTENSIONS);
-        } else {
-            if (*pPropertyCount < _vpArraySize(_VP_ANDROID_BASELINE_2021_EXTENSIONS)) {
-                result = VK_INCOMPLETE;
-            } else {
-                *pPropertyCount = _vpArraySize(_VP_ANDROID_BASELINE_2021_EXTENSIONS);
-            }
-            for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-                pProperties[i] = _VP_ANDROID_BASELINE_2021_EXTENSIONS[i];
-            }
-        }
-    } else
-#endif
-#ifdef VP_KHR_roadmap_2022
-    if (strcmp(pProfile->profileName, VP_KHR_ROADMAP_2022_NAME) == 0) {
-        if (pProperties == nullptr) {
-            *pPropertyCount = _vpArraySize(_VP_KHR_ROADMAP_2022_EXTENSIONS);
-        } else {
-            if (*pPropertyCount < _vpArraySize(_VP_KHR_ROADMAP_2022_EXTENSIONS)) {
-                result = VK_INCOMPLETE;
-            } else {
-                *pPropertyCount = _vpArraySize(_VP_KHR_ROADMAP_2022_EXTENSIONS);
-            }
-            for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-                pProperties[i] = _VP_KHR_ROADMAP_2022_EXTENSIONS[i];
-            }
-        }
-    } else
-#endif
-#ifdef VP_LUNARG_desktop_portability_2021_subset
-    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
-        if (pProperties == nullptr) {
-            *pPropertyCount = _vpArraySize(_VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS);
-        } else {
-            if (*pPropertyCount < _vpArraySize(_VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS)) {
-                result = VK_INCOMPLETE;
-            } else {
-                *pPropertyCount = _vpArraySize(_VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS);
-            }
-            for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-                pProperties[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_EXTENSIONS[i];
-            }
-        }
-    } else
-#endif
-#ifdef VP_LUNARG_desktop_portability_2021
-    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
-        if (pProperties == nullptr) {
-            *pPropertyCount = _vpArraySize(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS);
-        } else {
-            if (*pPropertyCount < _vpArraySize(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS)) {
-                result = VK_INCOMPLETE;
-            } else {
-                *pPropertyCount = _vpArraySize(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS);
-            }
-            for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-                pProperties[i] = _VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[i];
-            }
-        }
-    } else
-#endif
-    {
-        *pPropertyCount = 0;
-    }
-    return result;
 }
 
 VPAPI_ATTR void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext) {

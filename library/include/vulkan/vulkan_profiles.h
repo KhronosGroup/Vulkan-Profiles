@@ -130,9 +130,24 @@
 #define VP_MAX_PROFILE_NAME_SIZE 256U
 
 typedef struct VpProfileProperties {
-    char profileName[VP_MAX_PROFILE_NAME_SIZE];
-    uint32_t specVersion;
+    char        profileName[VP_MAX_PROFILE_NAME_SIZE];
+    uint32_t    specVersion;
 } VpProfileProperties;
+
+typedef enum VpInstanceCreateFlagBits {
+    VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT = 0x00000001,
+    VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT = 0x00000002,
+    VP_INSTANCE_CREATE_OVERRIDE_API_VERSION_BIT = 0x00000004,
+
+    VP_INSTANCE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VpInstanceCreateFlagBits;
+typedef VkFlags VpInstanceCreateFlags;
+
+typedef struct VpInstanceCreateInfo {
+    const VkInstanceCreateInfo* pCreateInfo;
+    const VpProfileProperties*  pProfile;
+    VpInstanceCreateFlags       flags;
+} VpInstanceCreateInfo;
 
 typedef enum VpDeviceCreateFlagBits {
     VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT = 0x00000001,
@@ -147,9 +162,9 @@ typedef enum VpDeviceCreateFlagBits {
 typedef VkFlags VpDeviceCreateFlags;
 
 typedef struct VpDeviceCreateInfo {
-    const VkDeviceCreateInfo *pCreateInfo;
-    const VpProfileProperties *pProfile;
-    VpDeviceCreateFlags flags;
+    const VkDeviceCreateInfo*   pCreateInfo;
+    const VpProfileProperties*  pProfile;
+    VpDeviceCreateFlags         flags;
 } VpDeviceCreateInfo;
 
 // Query the list of available profiles in the library
@@ -158,17 +173,27 @@ VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties 
 // List the recommended fallback profiles of a profile
 VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
-// Check whether a profile is supported by the physical device
-VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
-                                              VkBool32 *pSupported);
+// Check whether a profile is supported at the instance level
+VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported);
 
-// Create a VkDevice with the profile features and extensions enabled
+// Create a VkInstance with the profile instance extensions enabled
+VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
+                                     const VkAllocationCallbacks *pAllocator, VkInstance *pInstance);
+
+// Check whether a profile is supported by the physical device
+VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile, VkBool32 *pSupported);
+
+// Create a VkDevice with the profile features and device extensions enabled
 VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
                                    const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
 
-// Query the list of extension of a profile
-VPAPI_ATTR VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                    VkExtensionProperties *pProperties);
+// Query the list of instance extensions of a profile
+VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                            VkExtensionProperties *pProperties);
+
+// Query the list of device extensions of a profile
+VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                          VkExtensionProperties *pProperties);
 
 // Fill the pNext Vulkan structures with the requirements of a profile
 VPAPI_ATTR void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext);

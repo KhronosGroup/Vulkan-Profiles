@@ -106,9 +106,24 @@ API_DEFS = '''
 #define VP_MAX_PROFILE_NAME_SIZE 256U
 
 typedef struct VpProfileProperties {
-    char profileName[VP_MAX_PROFILE_NAME_SIZE];
-    uint32_t specVersion;
+    char        profileName[VP_MAX_PROFILE_NAME_SIZE];
+    uint32_t    specVersion;
 } VpProfileProperties;
+
+typedef enum VpInstanceCreateFlagBits {
+    VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT = 0x00000001,
+    VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT = 0x00000002,
+    VP_INSTANCE_CREATE_OVERRIDE_API_VERSION_BIT = 0x00000004,
+
+    VP_INSTANCE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VpInstanceCreateFlagBits;
+typedef VkFlags VpInstanceCreateFlags;
+
+typedef struct VpInstanceCreateInfo {
+    const VkInstanceCreateInfo* pCreateInfo;
+    const VpProfileProperties*  pProfile;
+    VpInstanceCreateFlags       flags;
+} VpInstanceCreateInfo;
 
 typedef enum VpDeviceCreateFlagBits {
     VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT = 0x00000001,
@@ -123,9 +138,9 @@ typedef enum VpDeviceCreateFlagBits {
 typedef VkFlags VpDeviceCreateFlags;
 
 typedef struct VpDeviceCreateInfo {
-    const VkDeviceCreateInfo *pCreateInfo;
-    const VpProfileProperties *pProfile;
-    VpDeviceCreateFlags flags;
+    const VkDeviceCreateInfo*   pCreateInfo;
+    const VpProfileProperties*  pProfile;
+    VpDeviceCreateFlags         flags;
 } VpDeviceCreateInfo;
 
 // Query the list of available profiles in the library
@@ -134,17 +149,27 @@ VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties 
 // List the recommended fallback profiles of a profile
 VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
-// Check whether a profile is supported by the physical device
-VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
-                                              VkBool32 *pSupported);
+// Check whether a profile is supported at the instance level
+VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported);
 
-// Create a VkDevice with the profile features and extensions enabled
+// Create a VkInstance with the profile instance extensions enabled
+VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
+                                     const VkAllocationCallbacks *pAllocator, VkInstance *pInstance);
+
+// Check whether a profile is supported by the physical device
+VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile, VkBool32 *pSupported);
+
+// Create a VkDevice with the profile features and device extensions enabled
 VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
                                    const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
 
-// Query the list of extension of a profile
-VPAPI_ATTR VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                    VkExtensionProperties *pProperties);
+// Query the list of instance extensions of a profile
+VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                            VkExtensionProperties *pProperties);
+
+// Query the list of device extensions of a profile
+VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                          VkExtensionProperties *pProperties);
 
 // Fill the pNext Vulkan structures with the requirements of a profile
 VPAPI_ATTR void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext);
@@ -173,20 +198,37 @@ VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile
 VPAPI_ATTR VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
 '''
 
-IMPL_BODY = '''
+PRIVATE_IMPL_BODY = '''
+struct _vpProfileDesc {
+    const char*                     name;
+    uint32_t                        specVersion;
+    uint32_t                        minApiVersion;
+    const VkExtensionProperties*    pInstanceExtensions;
+    uint32_t                        instanceExtensionCount;
+    const VkExtensionProperties*    pDeviceExtensions;
+    uint32_t                        deviceExtensionCount;
+};
+
+VPAPI_ATTR const _vpProfileDesc* _vpGetProfileDesc(const _vpProfileDesc* pProfiles, const char name[VP_MAX_PROFILE_NAME_SIZE]) {
+    while (pProfiles->name != nullptr) {
+        if (strncmp(pProfiles->name, name, VP_MAX_PROFILE_NAME_SIZE) == 0) return pProfiles;
+        pProfiles++;
+    }
+    return nullptr;
+}
+
 VPAPI_ATTR bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, size_t supportedSize,
-                              const char *requestedExtension) {
+                                  const char *requestedExtension, uint32_t expectedVersion = 0) {
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
         if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) {
-            return true;
+            return supportedProperties[i].specVersion > expectedVersion;
         }
     }
-
     return false;
 }
 
 VPAPI_ATTR bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memoryProperties,
-                                      const VkMemoryPropertyFlags &memoryPropertyFlags) {
+                                       const VkMemoryPropertyFlags &memoryPropertyFlags) {
     assert(&memoryProperties != nullptr);
 
     for (uint32_t i = 0, n = memoryProperties.memoryTypeCount; i < n; ++i) {
@@ -211,8 +253,8 @@ VPAPI_ATTR bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, c
 }
 
 VPAPI_ATTR bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties,
-                                           uint32_t queueFamilyPropertiesCount,
-                                           const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
+                                            uint32_t queueFamilyPropertiesCount,
+                                            const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
     assert(queueFamilyProperties != nullptr);
 
     for (uint32_t i = 0, n = queueFamilyPropertiesCount; i < n; ++i) {
@@ -240,8 +282,28 @@ VPAPI_ATTR bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queue
     return false;
 }
 
-VPAPI_ATTR void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t propertyCount,
-                             const VkExtensionProperties *pProperties, std::vector<const char *> &extensions) {
+VPAPI_ATTR void _vpGetInstanceExtensions(const VpInstanceCreateInfo *pCreateInfo, uint32_t propertyCount,
+                                         const VkExtensionProperties *pProperties, std::vector<const char *> &extensions) {
+    if (pCreateInfo->flags & VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT) {
+        for (int i = 0, n = propertyCount; i < n; ++i) {
+            extensions.push_back(pProperties[i].extensionName);
+        }
+
+        for (uint32_t i = 0; i < pCreateInfo->pCreateInfo->enabledExtensionCount; ++i) {
+            if (_vpCheckExtension(pProperties, propertyCount, pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i])) {
+                continue;
+            }
+            extensions.push_back(pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i]);
+        }
+    } else {  // or VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT
+        for (int i = 0, n = pCreateInfo->pCreateInfo->enabledExtensionCount; i < n; ++i) {
+            extensions.push_back(pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i]);
+        }
+    }
+}
+
+VPAPI_ATTR void _vpGetDeviceExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t propertyCount,
+                                       const VkExtensionProperties *pProperties, std::vector<const char *> &extensions) {
     if (pCreateInfo->flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) {
         for (int i = 0, n = propertyCount; i < n; ++i) {
             extensions.push_back(pProperties[i].extensionName);
@@ -269,6 +331,124 @@ VPAPI_ATTR const void* _vpGetStructure(const void* pNext, VkStructureType type) 
     return nullptr;
 }
 '''
+
+PUBLIC_IMPL_BODY = '''
+VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported) {
+    assert(pProfile != nullptr);
+    assert(pSupported != nullptr);
+    VkResult result = VK_SUCCESS;
+
+    uint32_t apiVersion;
+    vkEnumerateInstanceVersion(&apiVersion);
+
+    uint32_t extCount;
+    result = vkEnumerateInstanceExtensionProperties(pLayerName, &extCount, nullptr);
+    if (result != VK_SUCCESS) return result;
+    std::vector<VkExtensionProperties> ext(extCount);
+    result = vkEnumerateInstanceExtensionProperties(pLayerName, &extCount, ext.data());
+    if (result != VK_SUCCESS) return result;
+
+    *pSupported = VK_FALSE;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pDesc->specVersion < pProfile->specVersion) return result;
+
+    if (VK_VERSION_PATCH(apiVersion) < VK_VERSION_PATCH(pDesc->minApiVersion)) return result;
+
+    for (uint32_t i = 0; i < pDesc->instanceExtensionCount; ++i) {
+        if (!_vpCheckExtension(ext.data(), ext.size(),
+            pDesc->pInstanceExtensions[i].extensionName,
+            pDesc->pInstanceExtensions[i].specVersion)) return result;
+    }
+
+    *pSupported = VK_TRUE;
+    return result;
+}
+
+VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
+                                     const VkAllocationCallbacks *pAllocator, VkInstance *pInstance) {
+    VkInstanceCreateInfo createInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
+    VkApplicationInfo appInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
+    std::vector<const char*> extensions;
+    VkInstanceCreateInfo* pInstanceCreateInfo = nullptr;
+    VkExtensionProperties* pProfileExtensions = nullptr;
+    uint32_t profileExtensionCount = 0;
+
+    if (pCreateInfo != nullptr && pCreateInfo->pCreateInfo != nullptr) {
+        createInfo = *pCreateInfo->pCreateInfo;
+        pInstanceCreateInfo = &createInfo;
+
+        const _vpProfileDesc* pDesc = nullptr;
+        if (pCreateInfo->pProfile != nullptr) {
+            pDesc = _vpGetProfileDesc(_vpProfiles, pCreateInfo->pProfile->profileName);
+            if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+        }
+
+        if (pDesc != nullptr && pDesc->pInstanceExtensions != nullptr) {
+            _vpGetInstanceExtensions(pCreateInfo, pDesc->instanceExtensionCount, pDesc->pInstanceExtensions, extensions);
+            createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+            createInfo.ppEnabledExtensionNames = extensions.data();
+        }
+
+        if (pCreateInfo->flags & VP_INSTANCE_CREATE_OVERRIDE_API_VERSION_BIT) {
+            if (createInfo.pApplicationInfo != nullptr) {
+                appInfo = *createInfo.pApplicationInfo;
+            }
+            createInfo.pApplicationInfo = &appInfo;
+            appInfo.apiVersion = pDesc->minApiVersion;
+        }
+    }
+
+    return vkCreateInstance(pInstanceCreateInfo, pAllocator, pInstance);
+}
+
+VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                            VkExtensionProperties *pProperties) {
+    VkResult result = VK_SUCCESS;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = pDesc->instanceExtensionCount;
+    } else {
+        if (*pPropertyCount < pDesc->instanceExtensionCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = pDesc->instanceExtensionCount;
+        }
+        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+            pProperties[i] = pDesc->pInstanceExtensions[i];
+        }
+    }
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                          VkExtensionProperties *pProperties) {
+    VkResult result = VK_SUCCESS;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = pDesc->deviceExtensionCount;
+    } else {
+        if (*pPropertyCount < pDesc->deviceExtensionCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = pDesc->deviceExtensionCount;
+        }
+        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+            pProperties[i] = pDesc->pDeviceExtensions[i];
+        }
+    }
+    return result;
+}
+'''
+
 
 class Log():
     def f(msg):
@@ -508,8 +688,10 @@ class VulkanRegistry():
 
 
 class VulkanProfileCapabilities():
-    def __init__(self, data, caps):
+    def __init__(self, registry, data, caps):
         self.extensions = dict()
+        self.instanceExtensions = dict()
+        self.deviceExtensions = dict()
         self.features = dict()
         self.properties = dict()
         self.formats = dict()
@@ -517,13 +699,13 @@ class VulkanProfileCapabilities():
         self.memoryProperties = dict()
         for capName in data['capabilities']:
             if capName in caps:
-                self.mergeCaps(caps[capName])
+                self.mergeCaps(registry, caps[capName])
             else:
                 Log.f("Capability '{0}' needed by profile '{1}' is missing".format(capName, data['name']))
 
 
-    def mergeCaps(self, caps):
-        self.mergeProfileExtensions(caps)
+    def mergeCaps(self, registry, caps):
+        self.mergeProfileExtensions(registry, caps)
         self.mergeProfileFeatures(caps)
         self.mergeProfileProperties(caps)
         self.mergeProfileFormats(caps)
@@ -554,10 +736,20 @@ class VulkanProfileCapabilities():
             Log.f("Unexpected data type during profile capability data merge (src is '{0}', dst is '{1}')".format(type(src), type(dst)))
 
 
-    def mergeProfileExtensions(self, data):
+    def mergeProfileExtensions(self, registry, data):
         if data.get('extensions') != None:
             for extName, specVer in data['extensions'].items():
-                self.extensions[extName] = specVer
+                extInfo = registry.extensions.get(extName)
+                if extInfo != None:
+                    self.extensions[extName] = specVer
+                    if extInfo.type == 'instance':
+                        self.instanceExtensions[extName] = specVer
+                    elif extInfo.type == 'device':
+                        self.deviceExtensions[extName] = specVer
+                    else:
+                        Log.f("Extension '{0}' has invalid type '{1}'".format(extName, extInfo.type))
+                else:
+                    Log.f("Extension '{0}' does not exist".format(extName))
 
 
     def mergeProfileFeatures(self, data):
@@ -591,22 +783,10 @@ class VulkanProfile():
         self.version = data['version']
         self.apiVersion = data['api-version']
         self.fallback = data.get('fallback')
-        self.platform = None
         self.requirements = []
-        self.capabilities = VulkanProfileCapabilities(data, caps)
-        self.determinePlatform(registry)
+        self.capabilities = VulkanProfileCapabilities(registry, data, caps)
         self.collectCompileTimeRequirements(registry)
         self.validate(registry)
-
-
-    def determinePlatform(self, registry):
-        for extName in self.capabilities.extensions:
-            if extName in registry.extensions:
-                platform = registry.extensions[extName].platform
-                if platform != None:
-                    self.platform = platform
-            else:
-                Log.f("Extension '{0}' required by profile '{1}' does not exist".format(extName, self.name))
 
 
     def collectCompileTimeRequirements(self, registry):
@@ -670,25 +850,28 @@ class VulkanProfile():
 
 
     def generatePrivateData(self, registry):
+        uname = self.name.upper()
         gen = '\n'
         gen += ('#ifdef {0}\n'
-                'namespace {0} {{\n').format(self.name)
+                'namespace {1} {{\n').format(self.name, uname)
         gen += self.gen_extensionData(registry, 'instance')
         gen += self.gen_extensionData(registry, 'device')
         gen += ('\n'
                 '}} // namespace {0}\n'
-                '#endif\n').format(self.name)
+                '#endif\n').format(uname)
         return gen
 
     def gen_extensionData(self, registry, type):
+        foundExt = False
         gen = '\n'
-        gen += 'static const VkExtensionProperties s_{0}Extensions[] = {{\n'.format(type)
+        gen += 'static const VkExtensionProperties _{0}Extensions[] = {{\n'.format(type)
         for extName, specVer in self.capabilities.extensions.items():
             extInfo = registry.extensions[extName]
             if extInfo.type == type:
                 gen += '    VkExtensionProperties{{ {0}_EXTENSION_NAME, {1} }},\n'.format(extInfo.upperCaseName, specVer)
+                foundExt = True
         gen += '};\n'
-        return gen
+        return gen if foundExt else ''
 
 
 class VulkanProfiles():
@@ -741,25 +924,13 @@ class VulkanProfilesBuilder():
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
             f.write(CPP_HEADER)
-            f.write(self.gen_extensionLists())
             f.write(self.gen_structPropLists())
             f.write(self.gen_formatLists())
             # TODO: Memory types removed for now
             #f.write(self.gen_memoryTypeLists())
             f.write(self.gen_queueFamilyLists())
-            f.write(IMPL_BODY)
-            f.write(self.gen_vpGetProfiles())
-            f.write(self.gen_vpGetProfileFallbacks())
-            f.write(self.gen_vpGetDeviceProfileSupport())
-            f.write(self.gen_vpCreateDevice())
-            f.write(self.gen_vpGetProfileExtensionProperties())
-            f.write(self.gen_vpGetProfileStructures())
-            f.write(self.gen_vpGetProfileStructureProperties())
-            f.write(self.gen_vpGetProfileFormats())
-            f.write(self.gen_vpGetProfileFormatProperties())
-            # TODO: Memory types removed for now
-            #f.write(self.gen_vpGetProfileMemoryTypes())
-            f.write(self.gen_vpGetProfileQueueFamilies())
+            f.write(self.gen_privateImpl())
+            f.write(self.gen_publicImpl())
 
 
     def generate_hpp(self, outDir):
@@ -770,25 +941,13 @@ class VulkanProfilesBuilder():
             f.write(HPP_HEADER)
             f.write(self.gen_profileDefs())
             f.write(API_DEFS)
-            f.write(self.gen_extensionLists())
             f.write(self.gen_structPropLists())
             f.write(self.gen_formatLists())
             # TODO: Memory types removed for now
             #f.write(self.gen_memoryTypeLists())
             f.write(self.gen_queueFamilyLists())
-            f.write(IMPL_BODY)
-            f.write(self.gen_vpGetProfiles())
-            f.write(self.gen_vpGetProfileFallbacks())
-            f.write(self.gen_vpGetDeviceProfileSupport())
-            f.write(self.gen_vpCreateDevice())
-            f.write(self.gen_vpGetProfileExtensionProperties())
-            f.write(self.gen_vpGetProfileStructures())
-            f.write(self.gen_vpGetProfileStructureProperties())
-            f.write(self.gen_vpGetProfileFormats())
-            f.write(self.gen_vpGetProfileFormatProperties())
-            # TODO: Memory types removed for now
-            #f.write(self.gen_vpGetProfileMemoryTypes())
-            f.write(self.gen_vpGetProfileQueueFamilies())
+            f.write(self.gen_privateImpl())
+            f.write(self.gen_publicImpl())
             f.write(HPP_FOOTER)
 
 
@@ -824,19 +983,64 @@ class VulkanProfilesBuilder():
         return gen
 
 
-    def gen_extensionLists(self):
+    def gen_privateImpl(self):
+        gen = '\n'
+        gen += PRIVATE_IMPL_BODY
+        gen += self.gen_privateData()
+        gen += self.gen_profileDesc()
+        return gen
+
+
+    def gen_privateData(self):
         gen = ''
-        # TODO: Probably we should separate instance vs device extensions
+        for profile in self.profiles.values():
+            gen += profile.generatePrivateData(self.registry)
+        return gen
+
+
+    def gen_profileDesc(self):
+        gen = '\n'
+        gen += 'static const _vpProfileDesc _vpProfiles[] = {\n'
+
         for name, profile in self.profiles.items():
-            if profile.capabilities.extensions:
-                gen += ('\n'
-                        '#ifdef {0}\n'
-                        'static const VkExtensionProperties _{1}_EXTENSIONS[] = {{\n').format(name, name.upper())
-                for extName, specVer in profile.capabilities.extensions.items():
-                    extInfo = self.registry.extensions[extName]
-                    gen += '    VkExtensionProperties{{ {0}_EXTENSION_NAME, {1} }},\n'.format(extInfo.upperCaseName, specVer)
-                gen += ('};\n'
-                        '#endif\n')
+            uname = name.upper()
+            gen += ('#ifdef {0}\n'
+                    '    _vpProfileDesc{{\n'
+                    '        {1}_NAME,\n'
+                    '        {1}_SPEC_VERSION,\n'
+                    '        {1}_MIN_API_VERSION,\n').format(name, uname)
+
+            if profile.capabilities.instanceExtensions:
+                gen += '        &{0}::_instanceExtensions[0], _vpArraySize({0}::_instanceExtensions),\n'.format(uname)
+            else:
+                gen += '        nullptr, 0,\n'
+
+            if profile.capabilities.deviceExtensions:
+                gen += '        &{0}::_deviceExtensions[0], _vpArraySize({0}::_deviceExtensions)\n'.format(uname)
+            else:
+                gen += '        nullptr, 0\n'
+
+            gen += ('    },\n'
+                    '#endif\n')
+
+        gen += ('    _vpProfileDesc{ nullptr }\n'
+                '};\n')
+        return gen
+
+
+    def gen_publicImpl(self):
+        gen = PUBLIC_IMPL_BODY
+        gen += self.gen_vpGetProfiles()
+        gen += self.gen_vpGetProfileFallbacks()
+        gen += self.gen_vpGetDeviceProfileSupport()
+        gen += self.gen_vpCreateDevice()
+        gen += self.gen_vpGetProfileStructures()
+        gen += self.gen_vpGetProfileStructureProperties()
+        gen += self.gen_vpGetProfileFormats()
+        gen += self.gen_vpGetProfileFormatProperties()
+        # TODO: Memory types removed for now
+        #gen += self.gen_vpGetProfileMemoryTypes()
+        gen += self.gen_vpGetProfileQueueFamilies()
         return gen
 
 
@@ -1052,28 +1256,22 @@ class VulkanProfilesBuilder():
 
     def gen_vpGetDeviceProfileSupport(self):
         gen = '\n'
-        gen += ('VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName,\n'
-                '                                              const VpProfileProperties *pProfile, VkBool32 *pSupported) {\n'
+        gen += ('VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile, VkBool32 *pSupported) {\n'
                 '    assert(pProfile != nullptr);\n'
                 '    assert(pSupported != nullptr);\n'
                 '    assert(physicalDevice != VK_NULL_HANDLE);\n'
                 '\n'
                 '    VkResult result = VK_SUCCESS;\n'
                 '\n'
-                '    uint32_t instanceExtensionCount;\n'
-                '    result = vkEnumerateInstanceExtensionProperties(pLayerName, &instanceExtensionCount, nullptr);\n'
+                '    uint32_t extCount;\n'
+                '    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, nullptr);\n'
                 '    if (result != VK_SUCCESS) return result;\n'
-                '    std::vector<VkExtensionProperties> instanceExtensions(instanceExtensionCount);\n'
-                '    result = vkEnumerateInstanceExtensionProperties(pLayerName, &instanceExtensionCount, instanceExtensions.data());\n'
+                '    std::vector<VkExtensionProperties> ext(extCount);\n'
+                '    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, ext.data());\n'
                 '    if (result != VK_SUCCESS) return result;\n'
                 '\n'
-                '    uint32_t deviceExtensionCount;\n'
-                '    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &deviceExtensionCount, nullptr);\n'
-                '    if (result != VK_SUCCESS) return result;\n'
-                '    std::vector<VkExtensionProperties> deviceExtensions(deviceExtensionCount);\n'
-                '    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &deviceExtensionCount, deviceExtensions.data());\n'
-                '    if (result != VK_SUCCESS) return result;\n'
-                '    if (!_vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(), VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME)) return result;\n'
+                '    VkPhysicalDeviceProperties devProps;\n'
+                '    vkGetPhysicalDeviceProperties(physicalDevice, &devProps);\n'
                 '\n'
                 '    *pSupported = VK_FALSE;\n'
                 '\n')
@@ -1084,26 +1282,13 @@ class VulkanProfilesBuilder():
                     '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
                     '        if ({1}_SPEC_VERSION < pProfile->specVersion) return result;\n'
                     '\n'
-                    '        VkPhysicalDeviceProperties devProps;\n'
-                    '        vkGetPhysicalDeviceProperties(physicalDevice, &devProps);\n'
                     '        if (VK_VERSION_PATCH(devProps.apiVersion) < VK_VERSION_PATCH({1}_MIN_API_VERSION)) return result;\n').format(name, uname)
 
-            # Check extensions
-            # TODO: Eventually we should check instance vs device extensions separately
-            if profile.capabilities.extensions:
+            if profile.capabilities.deviceExtensions:
                 gen += ('\n'
-                        '        bool extensionsSupported = true;\n'
-                        '        for (uint32_t i = 0; i < _vpArraySize(_{0}_EXTENSIONS); ++i) {{\n'
-                        '            const bool supportedInstanceExt = _vpCheckExtension(instanceExtensions.data(), instanceExtensions.size(),\n'
-                        '                                                                _{0}_EXTENSIONS[i].extensionName);\n'
-                        '            const bool supportedDeviceExt = _vpCheckExtension(deviceExtensions.data(), deviceExtensions.size(),\n'
-                        '                                                              _{0}_EXTENSIONS[i].extensionName);\n'
-                        '            if (!supportedInstanceExt && !supportedDeviceExt) {{\n'
-                        '                extensionsSupported = false;\n'
-                        '                break;\n'
-                        '            }}\n'
-                        '        }}\n'
-                        '        if (!extensionsSupported) return result;\n').format(uname)
+                        '        for (uint32_t i = 0; i < _vpArraySize({0}::_deviceExtensions); ++i) {{\n'
+                        '            if (!_vpCheckExtension(ext.data(), ext.size(), {0}::_deviceExtensions[i].extensionName)) return result;\n'
+                        '        }}\n').format(uname)
 
             # Check features
             features = profile.capabilities.features
@@ -1274,7 +1459,7 @@ class VulkanProfilesBuilder():
             gen += ('#ifdef {0}\n'
                     '    if (strcmp(pCreateInfo->pProfile->profileName, {1}_NAME) == 0) {{\n'
                     '        std::vector<const char*> extensions;\n'
-                    '        _vpGetExtensions(pCreateInfo, _vpArraySize(_{1}_EXTENSIONS), &_{1}_EXTENSIONS[0], extensions);\n'
+                    '        _vpGetDeviceExtensions(pCreateInfo, _vpArraySize({1}::_deviceExtensions), &{1}::_deviceExtensions[0], extensions);\n'
                     '\n'
                     '        void *pNext = const_cast<void*>(pCreateInfo->pCreateInfo->pNext);\n').format(name, uname)
 
@@ -1327,6 +1512,7 @@ class VulkanProfilesBuilder():
             gen += ('\n'
                     '        VkDeviceCreateInfo deviceCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };\n'
                     '        deviceCreateInfo.pNext = pNext;\n'
+                    '        deviceCreateInfo.flags = pCreateInfo->pCreateInfo->flags;\n'
                     '        deviceCreateInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;\n'
                     '        deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;\n'
                     '        deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());\n'
@@ -1349,39 +1535,6 @@ class VulkanProfilesBuilder():
         gen += ('    {\n'
                 '        return VK_ERROR_UNKNOWN;\n'
                 '    }\n'
-                '}\n')
-        return gen
-
-    def gen_vpGetProfileExtensionProperties(self):
-        gen = '\n'
-        # TODO: We should probably have separate APIs for device vs instance extensions
-        gen += ('VPAPI_ATTR VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,\n'
-                '                                                    VkExtensionProperties *pProperties) {\n'
-                '    VkResult result = VK_SUCCESS;\n')
-
-        for name, profile in self.profiles.items():
-            if profile.capabilities.extensions:
-                gen += ('#ifdef {0}\n'
-                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
-                        '        if (pProperties == nullptr) {{\n'
-                        '            *pPropertyCount = _vpArraySize(_{1}_EXTENSIONS);\n'
-                        '        }} else {{\n'
-                        '            if (*pPropertyCount < _vpArraySize(_{1}_EXTENSIONS)) {{\n'
-                        '                result = VK_INCOMPLETE;\n'
-                        '            }} else {{\n'
-                        '                *pPropertyCount = _vpArraySize(_{1}_EXTENSIONS);\n'
-                        '            }}\n'
-                        '            for (uint32_t i = 0; i < *pPropertyCount; ++i) {{\n'
-                        '                pProperties[i] = _{1}_EXTENSIONS[i];\n'
-                        '            }}\n'
-                        '        }}\n'
-                        '    }} else\n'
-                        '#endif\n').format(name, name.upper())
-
-        gen += ('    {\n'
-                '        *pPropertyCount = 0;\n'
-                '    }\n'
-                '    return result;\n'
                 '}\n')
         return gen
 
