@@ -2777,6 +2777,9 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
             profilePhysicalDeviceVulkan12Features.pNext = pNext;
             pNext = &profilePhysicalDeviceVulkan12Features;
         }
+        if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT) {
+            profilePhysicalDeviceVulkan13Features.robustImageAccess = VK_FALSE;
+        }
         if (_vpGetStructure(pNext, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES) == nullptr) {
             profilePhysicalDeviceVulkan13Features.pNext = pNext;
             pNext = &profilePhysicalDeviceVulkan13Features;

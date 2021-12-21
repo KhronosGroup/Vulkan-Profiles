@@ -1289,6 +1289,10 @@ class VulkanProfilesBuilder():
                                      '        }}\n'
                                      '        if (_vpGetStructure(pNext, {0}) == nullptr && pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {{\n').format(sType)
                     else:
+                        if featureStructName == 'VkPhysicalDeviceVulkan13Features':
+                            genCheck += ('        if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT) {\n'
+                                         '            profilePhysicalDeviceVulkan13Features.robustImageAccess = VK_FALSE;\n'
+                                         '        }\n')
                         genCheck += '        if (_vpGetStructure(pNext, {0}) == nullptr) {{\n'.format(sType)
                     genCheck += ('            {0}.pNext = pNext;\n'
                                  '            pNext = &{0};\n'
