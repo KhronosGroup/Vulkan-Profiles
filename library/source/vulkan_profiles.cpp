@@ -1743,7 +1743,7 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
     }
 }
 
-VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName,
+VP_INLINE VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName,
                                              const VpProfileProperties *pProfile, VkBool32 *pSupported) {
     assert(pProfile != nullptr);
     assert(pSupported != nullptr);

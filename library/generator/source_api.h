@@ -47,14 +47,13 @@ typedef struct VpInstanceCreateInfo {
     const VkInstanceCreateInfo *pCreateInfo;
     const VpProfileProperties *pProfile;
     VpInstanceCreateFlags flags;
-} VpDeviceCreateInfo;
+} VpInstanceCreateInfo;
 
 // UNIMPLEMENTED YET. Create a VkInstance with the profile features and extensions enabled
-VkResult vpCreateInstance(VkPhysicalDevice physicalDevice, const VpInstanceCreateInfo *pCreateInfo,
-                          const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
+VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkInstance *pInstance);
 
 // Check whether a profile is supported by the physical device
-VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
+VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
                                    VkBool32 *pSupported);
 
 typedef enum VpDeviceCreateFlagBits {
