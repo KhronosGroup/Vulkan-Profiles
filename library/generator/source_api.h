@@ -32,6 +32,31 @@ typedef struct VpProfileProperties {
     uint32_t specVersion;
 } VpProfileProperties;
 
+// UNIMPLEMENTED YET. Check whether a profile is supported by the Vulkan instance
+VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported);
+
+typedef enum VpInstanceCreateFlagBits {
+    VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT = 0x00000004,
+    VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT = 0x00000008,
+
+    VP_INSTANCE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VpInstanceCreateFlagBits;
+typedef VkFlags VpInstanceCreateFlags;
+
+typedef struct VpInstanceCreateInfo {
+    const VkInstanceCreateInfo *pCreateInfo;
+    const VpProfileProperties *pProfile;
+    VpInstanceCreateFlags flags;
+} VpDeviceCreateInfo;
+
+// UNIMPLEMENTED YET. Create a VkInstance with the profile features and extensions enabled
+VkResult vpCreateInstance(VkPhysicalDevice physicalDevice, const VpInstanceCreateInfo *pCreateInfo,
+                          const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
+
+// Check whether a profile is supported by the physical device
+VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
+                                   VkBool32 *pSupported);
+
 typedef enum VpDeviceCreateFlagBits {
     VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT = 0x00000001,
     VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT = 0x00000002,
@@ -50,19 +75,15 @@ typedef struct VpDeviceCreateInfo {
     VpDeviceCreateFlags flags;
 } VpDeviceCreateInfo;
 
+// Create a VkDevice with the profile features and extensions enabled
+VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
+                        const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
+
 // Query the list of available profiles in the library
 VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // List the recommended fallback profiles of a profile
 VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
-
-// Check whether a profile is supported by the physical device
-VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
-                                   VkBool32 *pSupported);
-
-// Create a VkDevice with the profile features and extensions enabled
-VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
-                        const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
 
 // Query the list of device extension of a profile
 VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
@@ -92,7 +113,7 @@ VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, 
 
 // Query the list of query family structure types specified by the profile
 VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                           VkStructureType *pProperties);
+                                               VkStructureType *pProperties);
 
 // Query the list of formats with specified requirements by a profile
 VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkFormat *pProperties);
@@ -100,10 +121,6 @@ VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pPro
 // Query the requirements of a format for a profile
 void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
-// Query the list of format structure types specified by the profile
+// UNIMPLEMENTED YET. Query the list of format structure types specified by the profile
 VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, VkFormat format, uint32_t *pPropertyCount,
-                                           VkStructureType *pProperties);
-
-
-
-
+                                          VkStructureType *pProperties);
