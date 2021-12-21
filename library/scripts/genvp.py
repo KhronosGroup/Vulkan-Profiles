@@ -200,8 +200,7 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfil
 
 PRIVATE_IMPL_BODY = '''
 struct _vpProfileDesc {
-    const char*                     name;
-    uint32_t                        specVersion;
+    VpProfileProperties             props;
     uint32_t                        minApiVersion;
     const VkExtensionProperties*    pInstanceExtensions;
     uint32_t                        instanceExtensionCount;
@@ -209,10 +208,10 @@ struct _vpProfileDesc {
     uint32_t                        deviceExtensionCount;
 };
 
-VPAPI_ATTR const _vpProfileDesc* _vpGetProfileDesc(const _vpProfileDesc* pProfiles, const char name[VP_MAX_PROFILE_NAME_SIZE]) {
-    while (pProfiles->name != nullptr) {
-        if (strncmp(pProfiles->name, name, VP_MAX_PROFILE_NAME_SIZE) == 0) return pProfiles;
-        pProfiles++;
+VPAPI_ATTR const _vpProfileDesc* _vpGetProfileDesc(const _vpProfileDesc* pProfiles, uint32_t profileCount,
+                                                   const char profileName[VP_MAX_PROFILE_NAME_SIZE]) {
+    for (uint32_t i = 0; i < profileCount; ++i) {
+        if (strncmp(pProfiles[i].props.profileName, profileName, VP_MAX_PROFILE_NAME_SIZE) == 0) return &pProfiles[i];
     }
     return nullptr;
 }
@@ -333,6 +332,25 @@ VPAPI_ATTR const void* _vpGetStructure(const void* pNext, VkStructureType type) 
 '''
 
 PUBLIC_IMPL_BODY = '''
+VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
+    VkResult result = VK_SUCCESS;
+    const uint32_t profileCount = _vpArraySize(_vpProfiles);
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = profileCount;
+    } else {
+        if (*pPropertyCount < profileCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = profileCount;
+        }
+        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+            pProperties[i] = _vpProfiles[i].props;
+        }
+    }
+    return result;
+}
+
 VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported) {
     assert(pProfile != nullptr);
     assert(pSupported != nullptr);
@@ -350,10 +368,10 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
 
     *pSupported = VK_FALSE;
 
-    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, pProfile->profileName);
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
-    if (pDesc->specVersion < pProfile->specVersion) return result;
+    if (pDesc->props.specVersion < pProfile->specVersion) return result;
 
     if (VK_VERSION_PATCH(apiVersion) < VK_VERSION_PATCH(pDesc->minApiVersion)) return result;
 
@@ -382,7 +400,7 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
 
         const _vpProfileDesc* pDesc = nullptr;
         if (pCreateInfo->pProfile != nullptr) {
-            pDesc = _vpGetProfileDesc(_vpProfiles, pCreateInfo->pProfile->profileName);
+            pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pCreateInfo->pProfile->profileName);
             if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
         }
 
@@ -408,7 +426,7 @@ VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfilePrope
                                                             VkExtensionProperties *pProperties) {
     VkResult result = VK_SUCCESS;
 
-    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, pProfile->profileName);
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     if (pProperties == nullptr) {
@@ -430,7 +448,7 @@ VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfilePropert
                                                           VkExtensionProperties *pProperties) {
     VkResult result = VK_SUCCESS;
 
-    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, pProfile->profileName);
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     if (pProperties == nullptr) {
@@ -1006,8 +1024,7 @@ class VulkanProfilesBuilder():
             uname = name.upper()
             gen += ('#ifdef {0}\n'
                     '    _vpProfileDesc{{\n'
-                    '        {1}_NAME,\n'
-                    '        {1}_SPEC_VERSION,\n'
+                    '        VpProfileProperties{{ {1}_NAME, {1}_SPEC_VERSION }},\n'
                     '        {1}_MIN_API_VERSION,\n').format(name, uname)
 
             if profile.capabilities.instanceExtensions:
@@ -1023,14 +1040,12 @@ class VulkanProfilesBuilder():
             gen += ('    },\n'
                     '#endif\n')
 
-        gen += ('    _vpProfileDesc{ nullptr }\n'
-                '};\n')
+        gen += '};\n'
         return gen
 
 
     def gen_publicImpl(self):
         gen = PUBLIC_IMPL_BODY
-        gen += self.gen_vpGetProfiles()
         gen += self.gen_vpGetProfileFallbacks()
         gen += self.gen_vpGetDeviceProfileSupport()
         gen += self.gen_vpCreateDevice()
@@ -1183,36 +1198,6 @@ class VulkanProfilesBuilder():
 
                 gen += ('};\n'
                         '#endif\n')
-        return gen
-
-
-    def gen_vpGetProfiles(self):
-        gen = '\n'
-        gen += ('VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {\n'
-                '    VkResult result = VK_SUCCESS;\n'
-                '    static const VpProfileProperties profiles[] = {\n')
-
-        for name, profile in self.profiles.items():
-            gen += ('#ifdef {0}\n'
-                    '        {{ {1}_NAME, {1}_SPEC_VERSION }},\n'
-                    '#endif\n').format(name, name.upper())
-
-        gen += ('    };\n'
-                '\n'
-                '    if (pProperties == nullptr) {\n'
-                '        *pPropertyCount = _vpArraySize(profiles);\n'
-                '    } else {\n'
-                '        if (*pPropertyCount < _vpArraySize(profiles)) {\n'
-                '            result = VK_INCOMPLETE;\n'
-                '        } else {\n'
-                '            *pPropertyCount = _vpArraySize(profiles);\n'
-                '        }\n'
-                '        for (uint32_t i = 0; i < *pPropertyCount; ++i) {\n'
-                '            pProperties[i] = profiles[i];\n'
-                '        }\n'
-                '    }\n'
-                '    return result;\n'
-                '}\n')
         return gen
 
 
