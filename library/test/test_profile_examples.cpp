@@ -76,13 +76,13 @@ TEST(test_profile, example_individual_override_features) {
     // This structure is not part of the profile, so it will remains unchanged by vpGetProfileStructures
     VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceSubgroupFeatures = {};
     deviceSubgroupFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
-    vpGetProfileStructures(&profile, &deviceSubgroupFeatures);
+    vpGetProfileFeatures(&profile, &deviceSubgroupFeatures);
     deviceSubgroupFeatures.subgroupSizeControl = VK_TRUE;
 
     // This structure is not part of the profile, so it will be updated by vpGetProfileStructures
     VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
     deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-    vpGetProfileStructures(&profile, &deviceFeatures2);
+    vpGetProfileFeatures(&profile, &deviceFeatures2);
     deviceFeatures2.pNext = &deviceSubgroupFeatures;
     deviceFeatures2.features.robustBufferAccess = VK_FALSE;
 
@@ -121,7 +121,7 @@ TEST(test_profile, example_collective_override_features) {
     deviceFeatures2.pNext = &deviceSubgroupFeatures;
 
     // Load the profile definition
-    vpGetProfileStructures(&profile, &deviceFeatures2);
+    vpGetProfileFeatures(&profile, &deviceFeatures2);
 
     deviceSubgroupFeatures.subgroupSizeControl = VK_TRUE;
     deviceFeatures2.features.robustBufferAccess = VK_FALSE;

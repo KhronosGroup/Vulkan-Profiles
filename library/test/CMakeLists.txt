@@ -23,7 +23,7 @@ endfunction(add_unit_test)
 
 add_unit_test(test_api_create_device)
 add_unit_test(test_api_get_profiles_beta)
-add_unit_test(test_api_get_profile_extensions)
+add_unit_test(test_api_get_profile_device_extensions)
 add_unit_test(test_api_get_profile_fallbacks)
 add_unit_test(test_api_get_profile_formats)
 add_unit_test(test_api_get_profile_queue_families)

@@ -92,26 +92,19 @@ VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *
 VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
                         const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
 
-// Query the list of extension of a profile
-VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+// Query the list of device extension of a profile
+VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                      VkExtensionProperties *pProperties);
 
-// Fill the pNext Vulkan structures with the requirements of a profile
-void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext);
+// Query the list of device extension of a profile
+VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                               VkExtensionProperties *pProperties);
 
-typedef enum VpStructureArea {
-    VP_STRUCTURE_FEATURES = 0,  // A Vulkan structure specified to expose features
-    VP_STRUCTURE_PROPERTIES     // A Vulkan structure specified to expose properties
-} VpStructureArea;
+// Fill the property structures with the requirements of a profile
+void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext);
 
-typedef struct VpStructureProperties {
-    VkStructureType type;
-    VpStructureArea area;
-} VpStructureProperties;
-
-// Query the list of structures used to specify requirements of a profile
-VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                     VpStructureProperties *pProperties);
+// Fill the feature structures with the requirements of a profile
+void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
 
 // Query the list of formats with specified requirements by a profile
 VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkFormat *pProperties);
@@ -123,6 +116,13 @@ void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat 
 VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                    VkQueueFamilyProperties2KHR *pProperties);
 
+// Query the list of property structure types specified by the profile
+VP_INLINE VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                      VkStructureType *pProperties);
+
+// Query the list of feature structure types specified by the profile
+VP_INLINE VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                      VkStructureType *pProperties);
 
 #ifdef __cplusplus
 }
