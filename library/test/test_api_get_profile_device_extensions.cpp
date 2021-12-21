@@ -25,7 +25,7 @@
 #include <vulkan/vulkan_profiles.h>
 #endif
 
-TEST(api_get_profile_extension_properties, full) {
+TEST(api_get_profile_device_extension_properties, full) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     uint32_t propertyCount = 0;
@@ -47,7 +47,7 @@ TEST(api_get_profile_extension_properties, full) {
     EXPECT_STREQ(VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, properties[4].extensionName);
 }
 
-TEST(api_get_profile_extension_properties, partial) {
+TEST(api_get_profile_device_extension_properties, partial) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
     uint32_t propertyCount = 0;

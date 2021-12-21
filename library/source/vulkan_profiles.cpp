@@ -3193,11 +3193,7 @@ VP_INLINE VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperti
 
 VP_INLINE VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                                          VkExtensionProperties *pProperties) {
-    if (pProperties == nullptr) {
-        *pPropertyCount = 0;
-
-        return VK_SUCCESS;
-    }
+    *pPropertyCount = 0;
 
     return VK_SUCCESS;
 }
