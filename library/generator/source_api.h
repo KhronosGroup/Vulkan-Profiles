@@ -66,17 +66,33 @@ VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInf
 
 // Query the list of device extension of a profile
 VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                     VkExtensionProperties *pProperties);
+                                               VkExtensionProperties *pProperties);
 
 // Query the list of device extension of a profile
 VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                               VkExtensionProperties *pProperties);
+                                                 VkExtensionProperties *pProperties);
+
+// Fill the feature structures with the requirements of a profile
+void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
+
+// Query the list of feature structure types specified by the profile
+VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                           VkStructureType *pProperties);
 
 // Fill the property structures with the requirements of a profile
 void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext);
 
-// Fill the feature structures with the requirements of a profile
-void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
+// Query the list of property structure types specified by the profile
+VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                            VkStructureType *pProperties);
+
+// Query the requirements of queue families by a profile
+VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                           VkQueueFamilyProperties2KHR *pProperties);
+
+// Query the list of query family structure types specified by the profile
+VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                           VkStructureType *pProperties);
 
 // Query the list of formats with specified requirements by a profile
 VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkFormat *pProperties);
@@ -84,14 +100,10 @@ VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pPro
 // Query the requirements of a format for a profile
 void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
-// Query the requirements of queue families by a profile
-VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                   VkQueueFamilyProperties2KHR *pProperties);
+// Query the list of format structure types specified by the profile
+VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, VkFormat format, uint32_t *pPropertyCount,
+                                           VkStructureType *pProperties);
 
-// Query the list of property structure types specified by the profile
-VP_INLINE VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                      VkStructureType *pProperties);
 
-// Query the list of feature structure types specified by the profile
-VP_INLINE VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                      VkStructureType *pProperties);
+
+

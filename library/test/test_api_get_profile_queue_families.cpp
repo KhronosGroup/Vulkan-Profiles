@@ -55,3 +55,20 @@ TEST(api_get_profile_queue_families, unspecified) {
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(0, count);
 }
+
+TEST(api_get_profile_queue_families, list) {
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+
+    uint32_t propertyCount = 0;
+    VkResult result0 = vpGetProfileQueueFamilyStructureTypes(&profile, &propertyCount, nullptr);
+    EXPECT_EQ(VK_SUCCESS, result0);
+    EXPECT_EQ(1, propertyCount);
+
+    std::vector<VkStructureType> properties(propertyCount);
+
+    propertyCount = 0;
+    VkResult result1 = vpGetProfileQueueFamilyStructureTypes(&profile, &propertyCount, &properties[0]);
+    EXPECT_EQ(VK_INCOMPLETE, result1);
+    EXPECT_EQ(0, propertyCount);
+}
+
