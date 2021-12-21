@@ -46,25 +46,26 @@ VP_INLINE bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, co
 
 VP_INLINE bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties,
                                         std::size_t queueFamilyPropertiesCount,
-                                        const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
+                                           const VkQueueFamilyProperties2KHR &profileQueueFamilyPropertie) {
     assert(queueFamilyProperties != nullptr);
 
     for (std::size_t i = 0, n = queueFamilyPropertiesCount; i < n; ++i) {
-        if (queueFamilyProperties[i].queueCount < profileQueueFamilyPropertie.queueCount) {
+        if (queueFamilyProperties[i].queueCount < profileQueueFamilyPropertie.queueFamilyProperties.queueCount) {
             continue;
-        } else if (queueFamilyProperties[i].timestampValidBits < profileQueueFamilyPropertie.timestampValidBits) {
+        } else if (queueFamilyProperties[i].timestampValidBits <
+                   profileQueueFamilyPropertie.queueFamilyProperties.timestampValidBits) {
             continue;
         } else if (queueFamilyProperties[i].minImageTransferGranularity.width >
-                   profileQueueFamilyPropertie.minImageTransferGranularity.width) {
+                   profileQueueFamilyPropertie.queueFamilyProperties.minImageTransferGranularity.width) {
             continue;
         } else if (queueFamilyProperties[i].minImageTransferGranularity.height >
-                   profileQueueFamilyPropertie.minImageTransferGranularity.height) {
+                   profileQueueFamilyPropertie.queueFamilyProperties.minImageTransferGranularity.height) {
             continue;
         } else if (queueFamilyProperties[i].minImageTransferGranularity.depth >
-                   profileQueueFamilyPropertie.minImageTransferGranularity.depth) {
+                   profileQueueFamilyPropertie.queueFamilyProperties.minImageTransferGranularity.depth) {
             continue;
-        } else if ((queueFamilyProperties[i].queueFlags & profileQueueFamilyPropertie.queueFlags) !=
-                   profileQueueFamilyPropertie.queueFlags) {
+        } else if ((queueFamilyProperties[i].queueFlags & profileQueueFamilyPropertie.queueFamilyProperties.queueFlags) !=
+                   profileQueueFamilyPropertie.queueFamilyProperties.queueFlags) {
             continue;
         }
 

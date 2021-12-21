@@ -194,27 +194,38 @@ TEST(test_library_util, CheckQueueFamilyProperty) {
     vkGetPhysicalDeviceQueueFamilyProperties(scaffold.physicalDevice, &queueFamilyCount, queueFamily.data());
 
     {
-        static const VkQueueFamilyProperties test_data[] = {
-            {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT, 1, 36, {1, 1, 1}}};
+        static const VkQueueFamilyProperties2KHR test_data[] = {
+            {VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR,
+             nullptr,
+             {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT,
+              1,
+              36,
+              {1, 1, 1}}}};
         EXPECT_TRUE(_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
     }
 
     // Check unsupported flag
     {
-        static const VkQueueFamilyProperties test_data[] = {
-            {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | (1 << 29), 1, 36, {1, 1, 1}}};
+        static const VkQueueFamilyProperties2KHR test_data[] = {
+            {VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR,
+             nullptr,
+             {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | (1 << 29), 1, 36, {1, 1, 1}}}};
         EXPECT_TRUE(!_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
     }
 
     // Check unsupported timestampValidBits
     {
-        static const VkQueueFamilyProperties test_data[] = {{VK_QUEUE_GRAPHICS_BIT, 1, 4894042, {1, 1, 1}}};
+        static const VkQueueFamilyProperties2KHR test_data[] = {
+            {VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR, nullptr, {VK_QUEUE_GRAPHICS_BIT, 1, 4894042, {1, 1, 1}}}};
+
         EXPECT_TRUE(!_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
     }
 
     // Check unsupported queue count
     {
-        static const VkQueueFamilyProperties test_data[] = {{VK_QUEUE_GRAPHICS_BIT, 46848646, 32, {1, 1, 1}}};
+        static const VkQueueFamilyProperties2KHR test_data[] = {
+            {VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR, nullptr, {VK_QUEUE_GRAPHICS_BIT, 46848646, 32, {1, 1, 1}}}};
+
         EXPECT_TRUE(!_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
     }
 }
@@ -227,7 +238,7 @@ TEST(test_library_util, CheckMemoryProperty) {
 
     EXPECT_TRUE(_vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
     EXPECT_TRUE(_vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                                            VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+                                                             VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
 
     EXPECT_TRUE(!_vpCheckMemoryProperty(memoryProperties, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | (1 << 29)));
 }
@@ -308,9 +319,9 @@ TEST(test_library_util, _vpGetExtensions) {
         profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
 
         std::vector<const char *> extensions;
-        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS),
-                         &_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[0], extensions);
-        EXPECT_EQ(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS), extensions.size());
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS[0], extensions);
+        EXPECT_EQ(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS), extensions.size());
     }
 
     {
@@ -319,9 +330,9 @@ TEST(test_library_util, _vpGetExtensions) {
         profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
 
         std::vector<const char *> extensions;
-        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS),
-                         &_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[0], extensions);
-        EXPECT_EQ(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS) + 2, extensions.size());
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS[0], extensions);
+        EXPECT_EQ(_vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS) + 2, extensions.size());
     }
 
     {
@@ -330,8 +341,8 @@ TEST(test_library_util, _vpGetExtensions) {
         profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
         std::vector<const char *> extensions;
-        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS),
-                         &_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[0], extensions);
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS[0], extensions);
         EXPECT_EQ(_vpCountOf(EXTENSIONS), extensions.size());
     }
 
@@ -341,8 +352,8 @@ TEST(test_library_util, _vpGetExtensions) {
         profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
         std::vector<const char *> extensions;
-        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS),
-                         &_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[0], extensions);
+        _vpGetExtensions(&profileInfo, _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS),
+                         &_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS[0], extensions);
         EXPECT_EQ(0, extensions.size());
     }
 }
@@ -358,8 +369,8 @@ TEST(test_library_util, check_extension_not_found) {
     info.ppEnabledExtensionNames = EXTENSIONS;
 
     for (std::size_t i = 0, n = info.enabledExtensionCount; i < n; ++i) {
-        EXPECT_FALSE(_vpCheckExtension(&_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[0],
-                                       _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS),
+        EXPECT_FALSE(_vpCheckExtension(&_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS[0],
+                                       _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS),
                                        info.ppEnabledExtensionNames[i]));
     }
 }
@@ -375,7 +386,8 @@ TEST(test_library_util, check_extension_found) {
     info.ppEnabledExtensionNames = EXTENSIONS;
 
     for (std::size_t i = 0, n = info.enabledExtensionCount; i < n; ++i) {
-        EXPECT_TRUE(_vpCheckExtension(&_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS[0],
-                                      _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_EXTENSIONS), info.ppEnabledExtensionNames[i]));
+        EXPECT_TRUE(_vpCheckExtension(&_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS[0],
+                                      _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_DEVICE_EXTENSIONS),
+                                      info.ppEnabledExtensionNames[i]));
     }
 }

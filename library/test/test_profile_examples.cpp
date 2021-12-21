@@ -34,7 +34,7 @@ TEST(test_profile, example_add_features_add_extensions) {
     VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
     static const char* extensions[] = {VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, VK_KHR_MAINTENANCE3_EXTENSION_NAME};
@@ -70,19 +70,19 @@ TEST(test_profile, example_individual_override_features) {
     VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
     // This structure is not part of the profile, so it will remains unchanged by vpGetProfileStructures
     VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceSubgroupFeatures = {};
     deviceSubgroupFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
-    vpGetProfileStructures(&profile, &deviceSubgroupFeatures);
+    vpGetProfileFeatures(&profile, &deviceSubgroupFeatures);
     deviceSubgroupFeatures.subgroupSizeControl = VK_TRUE;
 
     // This structure is not part of the profile, so it will be updated by vpGetProfileStructures
     VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
     deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-    vpGetProfileStructures(&profile, &deviceFeatures2);
+    vpGetProfileFeatures(&profile, &deviceFeatures2);
     deviceFeatures2.pNext = &deviceSubgroupFeatures;
     deviceFeatures2.features.robustBufferAccess = VK_FALSE;
 
@@ -108,7 +108,7 @@ TEST(test_profile, example_collective_override_features) {
     VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
     // This structure is not part of the profile, so it will remains unchanged by vpGetProfileStructures
@@ -121,7 +121,7 @@ TEST(test_profile, example_collective_override_features) {
     deviceFeatures2.pNext = &deviceSubgroupFeatures;
 
     // Load the profile definition
-    vpGetProfileStructures(&profile, &deviceFeatures2);
+    vpGetProfileFeatures(&profile, &deviceFeatures2);
 
     deviceSubgroupFeatures.subgroupSizeControl = VK_TRUE;
     deviceFeatures2.features.robustBufferAccess = VK_FALSE;
@@ -148,7 +148,7 @@ TEST(test_profile, example_flag_disable_robust_access) {
     VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
     // Regardness of robustBufferAccess = VK_TRUE, because of VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT is set
