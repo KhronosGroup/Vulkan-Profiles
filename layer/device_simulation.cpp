@@ -1254,6 +1254,81 @@ std::string vkFormatToString(VkFormat fmt) {
     }
 }
 
+static inline uint32_t VkStringToUint(const std::string &input_value) {
+    static const std::unordered_map<std::string, uint32_t> map = {
+        // VkSampleCountFlagBits
+        {"VK_SAMPLE_COUNT_1_BIT", VK_SAMPLE_COUNT_1_BIT},
+        {"VK_SAMPLE_COUNT_2_BIT", VK_SAMPLE_COUNT_2_BIT},
+        {"VK_SAMPLE_COUNT_4_BIT", VK_SAMPLE_COUNT_4_BIT},
+        {"VK_SAMPLE_COUNT_8_BIT", VK_SAMPLE_COUNT_8_BIT},
+        {"VK_SAMPLE_COUNT_16_BIT", VK_SAMPLE_COUNT_16_BIT},
+        {"VK_SAMPLE_COUNT_32_BIT", VK_SAMPLE_COUNT_32_BIT},
+        {"VK_SAMPLE_COUNT_64_BIT", VK_SAMPLE_COUNT_64_BIT},
+        // VkResolveModeFlagBits
+        {"VK_RESOLVE_MODE_NONE", VK_RESOLVE_MODE_NONE},
+        {"VK_RESOLVE_MODE_SAMPLE_ZERO_BIT", VK_RESOLVE_MODE_SAMPLE_ZERO_BIT},
+        {"VK_RESOLVE_MODE_AVERAGE_BIT", VK_RESOLVE_MODE_AVERAGE_BIT},
+        {"VK_RESOLVE_MODE_MIN_BIT", VK_RESOLVE_MODE_MIN_BIT},
+        {"VK_RESOLVE_MODE_MAX_BIT", VK_RESOLVE_MODE_MAX_BIT},
+        {"VK_RESOLVE_MODE_NONE_KHR", VK_RESOLVE_MODE_NONE_KHR},
+        {"VK_RESOLVE_MODE_SAMPLE_ZERO_BIT_KHR", VK_RESOLVE_MODE_SAMPLE_ZERO_BIT_KHR},
+        {"VK_RESOLVE_MODE_AVERAGE_BIT_KHR", VK_RESOLVE_MODE_AVERAGE_BIT_KHR},
+        {"VK_RESOLVE_MODE_MIN_BIT_KHR", VK_RESOLVE_MODE_MIN_BIT_KHR},
+        {"VK_RESOLVE_MODE_MAX_BIT_KHR", VK_RESOLVE_MODE_MAX_BIT_KHR},
+        // VkShaderStageFlagBits
+        {"VK_SHADER_STAGE_VERTEX_BIT", VK_SHADER_STAGE_VERTEX_BIT},
+        {"VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT", VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT},
+        {"VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT", VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT},
+        {"VK_SHADER_STAGE_GEOMETRY_BIT", VK_SHADER_STAGE_GEOMETRY_BIT},
+        {"VK_SHADER_STAGE_FRAGMENT_BIT", VK_SHADER_STAGE_FRAGMENT_BIT},
+        {"VK_SHADER_STAGE_COMPUTE_BIT", VK_SHADER_STAGE_COMPUTE_BIT},
+        {"VK_SHADER_STAGE_ALL_GRAPHICS", VK_SHADER_STAGE_ALL_GRAPHICS},
+        {"VK_SHADER_STAGE_ALL", VK_SHADER_STAGE_ALL},
+        {"VK_SHADER_STAGE_RAYGEN_BIT_KHR", VK_SHADER_STAGE_RAYGEN_BIT_KHR},
+        {"VK_SHADER_STAGE_ANY_HIT_BIT_KHR", VK_SHADER_STAGE_ANY_HIT_BIT_KHR},
+        {"VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR", VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR},
+        {"VK_SHADER_STAGE_MISS_BIT_KHR", VK_SHADER_STAGE_MISS_BIT_KHR},
+        {"VK_SHADER_STAGE_INTERSECTION_BIT_KHR", VK_SHADER_STAGE_INTERSECTION_BIT_KHR},
+        {"VK_SHADER_STAGE_CALLABLE_BIT_KHR", VK_SHADER_STAGE_CALLABLE_BIT_KHR},
+        {"VK_SHADER_STAGE_TASK_BIT_NV", VK_SHADER_STAGE_TASK_BIT_NV},
+        {"VK_SHADER_STAGE_MESH_BIT_NV", VK_SHADER_STAGE_MESH_BIT_NV},
+        {"VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI", VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI},
+        {"VK_SHADER_STAGE_RAYGEN_BIT_NV", VK_SHADER_STAGE_RAYGEN_BIT_NV},
+        {"VK_SHADER_STAGE_ANY_HIT_BIT_NV", VK_SHADER_STAGE_ANY_HIT_BIT_NV},
+        {"VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV", VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV},
+        {"VK_SHADER_STAGE_MISS_BIT_NV", VK_SHADER_STAGE_MISS_BIT_NV},
+        {"VK_SHADER_STAGE_INTERSECTION_BIT_NV", VK_SHADER_STAGE_INTERSECTION_BIT_NV},
+        {"VK_SHADER_STAGE_CALLABLE_BIT_NV", VK_SHADER_STAGE_CALLABLE_BIT_NV},
+        // VkSubgroupFeatureFlagBits
+        {"VK_SUBGROUP_FEATURE_BASIC_BIT", VK_SUBGROUP_FEATURE_BASIC_BIT},
+        {"VK_SUBGROUP_FEATURE_VOTE_BIT", VK_SUBGROUP_FEATURE_VOTE_BIT},
+        {"VK_SUBGROUP_FEATURE_ARITHMETIC_BIT", VK_SUBGROUP_FEATURE_ARITHMETIC_BIT},
+        {"VK_SUBGROUP_FEATURE_BALLOT_BIT", VK_SUBGROUP_FEATURE_BALLOT_BIT},
+        {"VK_SUBGROUP_FEATURE_SHUFFLE_BIT", VK_SUBGROUP_FEATURE_SHUFFLE_BIT},
+        {"VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT", VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT},
+        {"VK_SUBGROUP_FEATURE_CLUSTERED_BIT", VK_SUBGROUP_FEATURE_CLUSTERED_BIT},
+        {"VK_SUBGROUP_FEATURE_QUAD_BIT", VK_SUBGROUP_FEATURE_QUAD_BIT},
+        {"VK_SUBGROUP_FEATURE_PARTITIONED_BIT_NV", VK_SUBGROUP_FEATURE_PARTITIONED_BIT_NV},
+        // VkShaderFloatControlsIndependence
+        {"VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY", VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY},
+        {"VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL", VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL},
+        {"VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE", VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE},
+        {"VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY_KHR", VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY_KHR},
+        {"VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR", VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR},
+        {"VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE_KHR", VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE_KHR},
+        // VkPointClippingBehavior
+        {"VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES", VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES},
+        {"VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY", VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY},
+        {"VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES_KHR", VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES_KHR},
+        {"VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY_KHR", VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY_KHR},
+    };
+    auto it = map.find(input_value);
+    if (it != map.end()) {
+        return it->second;
+    }
+    return 0;
+}
+
 // Get all elements from a vkEnumerate*() lambda into a std::vector.
 template <typename T>
 VkResult EnumerateAll(std::vector<T> *vect, std::function<VkResult(uint32_t *, T *)> func) {
@@ -2778,14 +2853,21 @@ class JsonLoader {
                 warn_func(name, new_value, *dest);
             }
             *dest = static_cast<uint32_t>(new_value);
-        } else if (!value.isUInt()) {
-            return;
+        } else if (value.isArray()) {
+            uint32_t sum_bits = 0;
+            for (const auto& entry : value) {
+                if (entry.isString()) {
+                    sum_bits |= VkStringToUint(entry.asString());
+                }
+            }
+            *dest = sum_bits;
+        } else if (value.isUInt()) {
+            const uint32_t new_value = value.asUInt();
+            if (warn_func) {
+                warn_func(name, new_value, *dest);
+            }
+            *dest = new_value;
         }
-        const uint32_t new_value = value.asUInt();
-        if (warn_func) {
-            warn_func(name, new_value, *dest);
-        }
-        *dest = new_value;
     }
 
     void GetValue(const Json::Value &parent, const char *name, uint32_t *dest,
@@ -3848,7 +3930,6 @@ bool JsonLoader::LoadFile(const char *filename) {
     }
 
     const auto &caps = root["capabilities"];
-    pdd_.physical_device_imageless_framebuffer_features_ = {};
     for (const auto &c : caps) {
         if (c["name"] == profile_name) {
             const auto &extensions = c["extensions"];
