@@ -2501,8 +2501,8 @@ VP_INLINE void vpGetProfileFormatProperties(const VpProfileProperties *pProfile,
     }
 }
 
-VP_INLINE VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
-                                             VkQueueFamilyProperties *pQueueFamilyProperties) {
+VP_INLINE VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
+                                                     VkQueueFamilyProperties2KHR *pQueueFamilyProperties) {
     if (pQueueFamilyProperties == nullptr) {
         if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
             *pQueueFamilyPropertiesCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_QUEUE_FAMILY_PROPERTIES);

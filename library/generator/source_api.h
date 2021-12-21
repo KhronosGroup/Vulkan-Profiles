@@ -92,6 +92,6 @@ VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pPro
 void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
 // Query the requirements of queue families by a profile
-VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                   VkQueueFamilyProperties *pProperties);
+VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                   VkQueueFamilyProperties2KHR *pProperties);
 

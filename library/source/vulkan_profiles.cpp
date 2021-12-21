@@ -144,8 +144,10 @@ static const VpStructureProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_ST
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, VP_STRUCTURE_PROPERTIES}};
 #endif
 
-static const VkQueueFamilyProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_QUEUE_FAMILY_PROPERTIES[] = {
-    {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT, 1, 36, {1, 1, 1}}};
+static const VkQueueFamilyProperties2KHR _VP_LUNARG_DESKTOP_PORTABILITY_2021_QUEUE_FAMILY_PROPERTIES[] = {{
+    VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR,
+    nullptr,
+    VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT, 1, 36, {1, 1, 1}}};
 
 struct VpFormatProperties {
     VkFormat format;
@@ -742,25 +744,26 @@ VP_INLINE bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, co
 
 VP_INLINE bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties,
                                         std::size_t queueFamilyPropertiesCount,
-                                        const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
+                                           const VkQueueFamilyProperties2KHR &profileQueueFamilyPropertie) {
     assert(queueFamilyProperties != nullptr);
 
     for (std::size_t i = 0, n = queueFamilyPropertiesCount; i < n; ++i) {
-        if (queueFamilyProperties[i].queueCount < profileQueueFamilyPropertie.queueCount) {
+        if (queueFamilyProperties[i].queueCount < profileQueueFamilyPropertie.queueFamilyProperties.queueCount) {
             continue;
-        } else if (queueFamilyProperties[i].timestampValidBits < profileQueueFamilyPropertie.timestampValidBits) {
+        } else if (queueFamilyProperties[i].timestampValidBits <
+                   profileQueueFamilyPropertie.queueFamilyProperties.timestampValidBits) {
             continue;
         } else if (queueFamilyProperties[i].minImageTransferGranularity.width >
-                   profileQueueFamilyPropertie.minImageTransferGranularity.width) {
+                   profileQueueFamilyPropertie.queueFamilyProperties.minImageTransferGranularity.width) {
             continue;
         } else if (queueFamilyProperties[i].minImageTransferGranularity.height >
-                   profileQueueFamilyPropertie.minImageTransferGranularity.height) {
+                   profileQueueFamilyPropertie.queueFamilyProperties.minImageTransferGranularity.height) {
             continue;
         } else if (queueFamilyProperties[i].minImageTransferGranularity.depth >
-                   profileQueueFamilyPropertie.minImageTransferGranularity.depth) {
+                   profileQueueFamilyPropertie.queueFamilyProperties.minImageTransferGranularity.depth) {
             continue;
-        } else if ((queueFamilyProperties[i].queueFlags & profileQueueFamilyPropertie.queueFlags) !=
-                   profileQueueFamilyPropertie.queueFlags) {
+        } else if ((queueFamilyProperties[i].queueFlags & profileQueueFamilyPropertie.queueFamilyProperties.queueFlags) !=
+                   profileQueueFamilyPropertie.queueFamilyProperties.queueFlags) {
             continue;
         }
 
@@ -3311,8 +3314,8 @@ VP_INLINE void vpGetProfileFormatProperties(const VpProfileProperties *pProfile,
     }
 }
 
-VP_INLINE VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
-                                             VkQueueFamilyProperties *pQueueFamilyProperties) {
+VP_INLINE VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
+                                                     VkQueueFamilyProperties2KHR *pQueueFamilyProperties) {
     if (pQueueFamilyProperties == nullptr) {
         if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME) == 0) {
             *pQueueFamilyPropertiesCount = _vpCountOf(_VP_LUNARG_DESKTOP_PORTABILITY_2021_QUEUE_FAMILY_PROPERTIES);

@@ -194,27 +194,39 @@ TEST(test_library_util, CheckQueueFamilyProperty) {
     vkGetPhysicalDeviceQueueFamilyProperties(scaffold.physicalDevice, &queueFamilyCount, queueFamily.data());
 
     {
-        static const VkQueueFamilyProperties test_data[] = {
-            {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT, 1, 36, {1, 1, 1}}};
+        static const VkQueueFamilyProperties2KHR test_data[] = {
+            {VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR,
+             nullptr,
+             {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT,
+              1,
+              36,
+              {1, 1, 1}}}};
         EXPECT_TRUE(_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
     }
 
     // Check unsupported flag
     {
-        static const VkQueueFamilyProperties test_data[] = {
-            {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | (1 << 29), 1, 36, {1, 1, 1}}};
+        static const VkQueueFamilyProperties2KHR test_data[] = {
+            {VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR,
+             nullptr,
+             {VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | (1 << 29), 1, 36, {1, 1, 1}}}};
         EXPECT_TRUE(!_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
     }
 
     // Check unsupported timestampValidBits
     {
-        static const VkQueueFamilyProperties test_data[] = {{VK_QUEUE_GRAPHICS_BIT, 1, 4894042, {1, 1, 1}}};
+        static const VkQueueFamilyProperties2KHR test_data[] = {
+            {VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR,
+             nullptr, {VK_QUEUE_GRAPHICS_BIT, 1, 4894042, {1, 1, 1}}}};
+
         EXPECT_TRUE(!_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
     }
 
     // Check unsupported queue count
     {
-        static const VkQueueFamilyProperties test_data[] = {{VK_QUEUE_GRAPHICS_BIT, 46848646, 32, {1, 1, 1}}};
+        static const VkQueueFamilyProperties2KHR test_data[] = {
+            {VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR, nullptr, {VK_QUEUE_GRAPHICS_BIT, 46848646, 32, {1, 1, 1}}}};
+
         EXPECT_TRUE(!_vpCheckQueueFamilyProperty(&queueFamily[0], queueFamilyCount, test_data[0]));
     }
 }
