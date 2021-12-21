@@ -208,6 +208,8 @@ struct _vpProfileDesc {
     uint32_t                        deviceExtensionCount;
     const VpProfileProperties*      pFallbacks;
     uint32_t                        fallbackCount;
+    const VpStructureProperties*    pStructProps;
+    uint32_t                        structPropCount;
 };
 
 VPAPI_ATTR const _vpProfileDesc* _vpGetProfileDesc(const _vpProfileDesc* pProfiles, uint32_t profileCount,
@@ -484,6 +486,28 @@ VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfilePropert
         }
         for (uint32_t i = 0; i < *pPropertyCount; ++i) {
             pProperties[i] = pDesc->pDeviceExtensions[i];
+        }
+    }
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                    VpStructureProperties *pProperties) {
+    VkResult result = VK_SUCCESS;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = pDesc->structPropCount;
+    } else {
+        if (*pPropertyCount < pDesc->structPropCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = pDesc->structPropCount;
+        }
+        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+            pProperties[i] = pDesc->pStructProps[i];
         }
     }
     return result;
@@ -890,7 +914,7 @@ class VulkanProfile():
             Log.f("Struct '{0}' in profile '{1}' does not exist in the registry".format(structName, self.name))
 
 
-    def generatePrivateData(self, registry):
+    def generatePrivateImpl(self, registry):
         uname = self.name.upper()
         gen = '\n'
         gen += ('#ifdef {0}\n'
@@ -898,6 +922,7 @@ class VulkanProfile():
         gen += self.gen_extensionData(registry, 'instance')
         gen += self.gen_extensionData(registry, 'device')
         gen += self.gen_fallbackData()
+        gen += self.gen_structPropData(registry)
         gen += ('\n'
                 '}} // namespace {0}\n'
                 '#endif\n').format(uname)
@@ -923,6 +948,54 @@ class VulkanProfile():
                     'static const VpProfileProperties _fallbacks[] = {\n')
             for fallback in self.fallback:
                 gen += '    {{ {0}_NAME, {0}_SPEC_VERSION }},\n'.format(fallback.upper())
+            gen += '};\n'
+        return gen
+
+
+    def gen_structPropData(self, registry):
+        gen = ''
+        features = self.capabilities.features
+        properties = self.capabilities.properties
+        if features or properties:
+            gen += ('\n'
+                    'static const VpStructureProperties _structProps[] = {\n')
+
+            if features:
+                for featureStructName in features:
+                    if featureStructName == 'VkPhysicalDeviceFeatures':
+                        # Special case, as it's wrapped into VkPhysicalDeviceFeatures2
+                        featureStructName = 'VkPhysicalDeviceFeatures2'
+
+                    structDef = registry.structs.get(featureStructName)
+                    if structDef == None:
+                        Log.f("Feature structure '{0}' does not exist".format(featureStructName))
+
+                    if structDef.sType == None:
+                        Log.f("Feature structure '{0}' is not chainable".format(featureStructName))
+
+                    if not 'VkPhysicalDeviceFeatures2' in structDef.extends + [ structDef.name ]:
+                        Log.f("Feature structure '{0}' does not extend VkPhysicalDeviceFeatures2".format(featureStructName))
+
+                    gen += '    {{ {0}, VP_STRUCTURE_FEATURES }},\n'.format(structDef.sType)
+
+            if properties:
+                for propertyStructName in properties:
+                    if propertyStructName == 'VkPhysicalDeviceProperties':
+                        # Special case, as it's wrapped into VkPhysicalDeviceProperties2
+                        propertyStructName = 'VkPhysicalDeviceProperties2'
+
+                    structDef = registry.structs.get(propertyStructName)
+                    if structDef == None:
+                        Log.f("Properties structure '{0}' does not exist".format(propertyStructName))
+
+                    if structDef.sType == None:
+                        Log.f("Properties structure '{0}' is not chainable".format(propertyStructName))
+
+                    if not 'VkPhysicalDeviceProperties2' in [ structDef.name ] + structDef.extends:
+                        Log.f("Properties structure '{0}' does not extend VkPhysicalDeviceProperties2".format(propertyStructName))
+
+                    gen += '    {{ {0}, VP_STRUCTURE_PROPERTIES }},\n'.format(structDef.sType)
+
             gen += '};\n'
         return gen
 
@@ -977,7 +1050,6 @@ class VulkanProfilesBuilder():
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
             f.write(CPP_HEADER)
-            f.write(self.gen_structPropLists())
             f.write(self.gen_formatLists())
             # TODO: Memory types removed for now
             #f.write(self.gen_memoryTypeLists())
@@ -994,7 +1066,6 @@ class VulkanProfilesBuilder():
             f.write(HPP_HEADER)
             f.write(self.gen_profileDefs())
             f.write(API_DEFS)
-            f.write(self.gen_structPropLists())
             f.write(self.gen_formatLists())
             # TODO: Memory types removed for now
             #f.write(self.gen_memoryTypeLists())
@@ -1039,19 +1110,19 @@ class VulkanProfilesBuilder():
     def gen_privateImpl(self):
         gen = '\n'
         gen += PRIVATE_IMPL_BODY
-        gen += self.gen_privateData()
-        gen += self.gen_profileDesc()
+        gen += self.gen_profilePrivateImpl()
+        gen += self.gen_profileDescTable()
         return gen
 
 
-    def gen_privateData(self):
+    def gen_profilePrivateImpl(self):
         gen = ''
         for profile in self.profiles.values():
-            gen += profile.generatePrivateData(self.registry)
+            gen += profile.generatePrivateImpl(self.registry)
         return gen
 
 
-    def gen_profileDesc(self):
+    def gen_profileDescTable(self):
         gen = '\n'
         gen += 'static const _vpProfileDesc _vpProfiles[] = {\n'
 
@@ -1073,7 +1144,12 @@ class VulkanProfilesBuilder():
                 gen += '        nullptr, 0,\n'
 
             if profile.fallback:
-                gen += '        &{0}::_fallbacks[0], _vpArraySize({0}::_fallbacks)\n'.format(uname)
+                gen += '        &{0}::_fallbacks[0], _vpArraySize({0}::_fallbacks),\n'.format(uname)
+            else:
+                gen += '        nullptr, 0,\n'
+
+            if profile.capabilities.features or profile.capabilities.properties:
+                gen += '        &{0}::_structProps[0], _vpArraySize({0}::_structProps)\n'.format(uname)
             else:
                 gen += '        nullptr, 0\n'
 
@@ -1089,63 +1165,11 @@ class VulkanProfilesBuilder():
         gen += self.gen_vpGetDeviceProfileSupport()
         gen += self.gen_vpCreateDevice()
         gen += self.gen_vpGetProfileStructures()
-        gen += self.gen_vpGetProfileStructureProperties()
         gen += self.gen_vpGetProfileFormats()
         gen += self.gen_vpGetProfileFormatProperties()
         # TODO: Memory types removed for now
         #gen += self.gen_vpGetProfileMemoryTypes()
         gen += self.gen_vpGetProfileQueueFamilies()
-        return gen
-
-
-    def gen_structPropLists(self):
-        gen = ''
-        for name, profile in self.profiles.items():
-            features = profile.capabilities.features
-            properties = profile.capabilities.properties
-            if features != None or properties != None:
-                gen += ('\n'
-                        '#ifdef {0}\n'
-                        'static const VpStructureProperties _{1}_STRUCTURE_PROPERTIES[] = {{\n').format(name, name.upper())
-
-                if features != None:
-                    for featureStructName in features:
-                        if featureStructName == 'VkPhysicalDeviceFeatures':
-                            # Special case, as it's wrapped into VkPhysicalDeviceFeatures2
-                            featureStructName = 'VkPhysicalDeviceFeatures2'
-
-                        structDef = self.registry.structs.get(featureStructName)
-                        if structDef == None:
-                            Log.f("Feature structure '{0}' does not exist".format(featureStructName))
-
-                        if structDef.sType == None:
-                            Log.f("Feature structure '{0}' is not chainable".format(featureStructName))
-
-                        if not 'VkPhysicalDeviceFeatures2' in structDef.extends + [ structDef.name ]:
-                            Log.f("Feature structure '{0}' does not extend VkPhysicalDeviceFeatures2".format(featureStructName))
-
-                        gen += '    {{ {0}, VP_STRUCTURE_FEATURES }},\n'.format(structDef.sType)
-
-                if properties != None:
-                    for propertyStructName in properties:
-                        if propertyStructName == 'VkPhysicalDeviceProperties':
-                            # Special case, as it's wrapped into VkPhysicalDeviceProperties2
-                            propertyStructName = 'VkPhysicalDeviceProperties2'
-
-                        structDef = self.registry.structs.get(propertyStructName)
-                        if structDef == None:
-                            Log.f("Properties structure '{0}' does not exist".format(propertyStructName))
-
-                        if structDef.sType == None:
-                            Log.f("Properties structure '{0}' is not chainable".format(propertyStructName))
-
-                        if not 'VkPhysicalDeviceProperties2' in [ structDef.name ] + structDef.extends:
-                            Log.f("Properties structure '{0}' does not extend VkPhysicalDeviceProperties2".format(propertyStructName))
-
-                        gen += '    {{ {0}, VP_STRUCTURE_PROPERTIES }},\n'.format(structDef.sType)
-
-                gen += ('};\n'
-                        '#endif\n')
         return gen
 
 
@@ -1707,39 +1731,6 @@ class VulkanProfilesBuilder():
 
         gen += ('    {\n'
                 '    }\n'
-                '}\n')
-        return gen
-
-
-    def gen_vpGetProfileStructureProperties(self):
-        gen = '\n'
-        gen += ('VPAPI_ATTR VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,\n'
-                '                                                    VpStructureProperties *pProperties) {\n'
-                '    VkResult result = VK_SUCCESS;\n')
-
-        for name, profile in self.profiles.items():
-            if profile.capabilities.features or profile.capabilities.properties:
-                gen += ('#ifdef {0}\n'
-                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
-                        '        if (pProperties == nullptr) {{\n'
-                        '            *pPropertyCount = _vpArraySize(_{1}_STRUCTURE_PROPERTIES);\n'
-                        '        }} else {{\n'
-                        '            if (*pPropertyCount < _vpArraySize(_{1}_STRUCTURE_PROPERTIES)) {{\n'
-                        '                result = VK_INCOMPLETE;\n'
-                        '            }} else {{\n'
-                        '                *pPropertyCount = _vpArraySize(_{1}_STRUCTURE_PROPERTIES);\n'
-                        '            }}\n'
-                        '            for (uint32_t i = 0; i < *pPropertyCount; ++i) {{\n'
-                        '                pProperties[i] = _{1}_STRUCTURE_PROPERTIES[i];\n'
-                        '            }}\n'
-                        '        }}\n'
-                        '    }} else\n'
-                        '#endif\n').format(name, name.upper())
-
-        gen += ('    {\n'
-                '        *pPropertyCount = 0;\n'
-                '    }\n'
-                '    return result;\n'
                 '}\n')
         return gen
 
