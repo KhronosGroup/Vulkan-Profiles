@@ -12,7 +12,6 @@ TEST(profiles, TestDesktopPortability2022Limits) {
 
     std::vector<std::string> filepaths = {TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_1_1_desktop_portability_2022.json"};
     devsim_test::setDevsimFilenames(filepaths);
-    devsim_test::setDevsimExitOnError(true);
 
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
