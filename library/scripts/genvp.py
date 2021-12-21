@@ -45,14 +45,16 @@ H_HEADER = '''
 #ifndef VULKAN_PROFILES_
 #define VULKAN_PROFILES_ 1
 
-#define VP_INLINE
+#define VPAPI_ATTR
 
 #ifdef __cplusplus
     extern "C" {
 #endif
+
 #include <vulkan/vulkan_core.h>
 #ifdef VK_ENABLE_BETA_EXTENSIONS
 #include <vulkan/vulkan_beta.h>
+
 #endif
 '''
 
@@ -80,7 +82,7 @@ HPP_HEADER = '''
 #ifndef VULKAN_PROFILES_
 #define VULKAN_PROFILES_ 1
 
-#define VP_INLINE inline
+#define VPAPI_ATTR inline
 
 #include <vulkan/vulkan_core.h>
 #ifdef VK_ENABLE_BETA_EXTENSIONS
@@ -127,25 +129,25 @@ typedef struct VpDeviceCreateInfo {
 } VpDeviceCreateInfo;
 
 // Query the list of available profiles in the library
-VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // List the recommended fallback profiles of a profile
-VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // Check whether a profile is supported by the physical device
-VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
-                                   VkBool32 *pSupported);
+VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
+                                              VkBool32 *pSupported);
 
 // Create a VkDevice with the profile features and extensions enabled
-VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
-                        const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
+VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
+                                   const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
 
 // Query the list of extension of a profile
-VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                         VkExtensionProperties *pProperties);
+VPAPI_ATTR VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                    VkExtensionProperties *pProperties);
 
 // Fill the pNext Vulkan structures with the requirements of a profile
-void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext);
+VPAPI_ATTR void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext);
 
 typedef enum VpStructureArea {
     VP_STRUCTURE_FEATURES = 0,  // A Vulkan structure specified to expose features
@@ -158,21 +160,21 @@ typedef struct VpStructureProperties {
 } VpStructureProperties;
 
 // Query the list of structures used to specify requirements of a profile
-VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                         VpStructureProperties *pProperties);
+VPAPI_ATTR VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                    VpStructureProperties *pProperties);
 
 // Query the list of formats with specified requirements by a profile
-VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
+VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
 
 // Query the requirements of a format for a profile
-void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
+VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
 // Query the requirements of queue families by a profile
-VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
+VPAPI_ATTR VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
 '''
 
 IMPL_BODY = '''
-VP_INLINE bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, size_t supportedSize,
+VPAPI_ATTR bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, size_t supportedSize,
                               const char *requestedExtension) {
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
         if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) {
@@ -183,7 +185,7 @@ VP_INLINE bool _vpCheckExtension(const VkExtensionProperties *supportedPropertie
     return false;
 }
 
-VP_INLINE bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memoryProperties,
+VPAPI_ATTR bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memoryProperties,
                                       const VkMemoryPropertyFlags &memoryPropertyFlags) {
     assert(&memoryProperties != nullptr);
 
@@ -194,7 +196,7 @@ VP_INLINE bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &me
     return false;
 }
 
-VP_INLINE bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const VpFormatProperties &profileProps) {
+VPAPI_ATTR bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const VpFormatProperties &profileProps) {
     if ((deviceProps->formatProperties.linearTilingFeatures & profileProps.linearTilingFeatures) !=
         profileProps.linearTilingFeatures) {
         return false;
@@ -208,7 +210,7 @@ VP_INLINE bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, co
     return true;
 }
 
-VP_INLINE bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties,
+VPAPI_ATTR bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties,
                                            uint32_t queueFamilyPropertiesCount,
                                            const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
     assert(queueFamilyProperties != nullptr);
@@ -238,7 +240,7 @@ VP_INLINE bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueF
     return false;
 }
 
-VP_INLINE void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t propertyCount,
+VPAPI_ATTR void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t propertyCount,
                              const VkExtensionProperties *pProperties, std::vector<const char *> &extensions) {
     if (pCreateInfo->flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) {
         for (int i = 0, n = propertyCount; i < n; ++i) {
@@ -258,7 +260,7 @@ VP_INLINE void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t 
     }
 }
 
-VP_INLINE const void* _vpGetStructure(const void* pNext, VkStructureType type) {
+VPAPI_ATTR const void* _vpGetStructure(const void* pNext, VkStructureType type) {
     const VkBaseOutStructure *p = static_cast<const VkBaseOutStructure*>(pNext);
     while (p != nullptr) {
         if (p->sType == type) return p;
@@ -555,9 +557,7 @@ class VulkanProfileCapabilities():
     def mergeProfileExtensions(self, data):
         if data.get('extensions') != None:
             for extName, specVer in data['extensions'].items():
-                self.extensions[extName] = {
-                    'specVersion': specVer
-                }
+                self.extensions[extName] = specVer
 
 
     def mergeProfileFeatures(self, data):
@@ -667,6 +667,28 @@ class VulkanProfile():
                 Log.f("Unexpected required struct '{0}' in profile '{1}'".format(structName, self.name))
         else:
             Log.f("Struct '{0}' in profile '{1}' does not exist in the registry".format(structName, self.name))
+
+
+    def generatePrivateData(self, registry):
+        gen = '\n'
+        gen += ('#ifdef {0}\n'
+                'namespace {0} {{\n').format(self.name)
+        gen += self.gen_extensionData(registry, 'instance')
+        gen += self.gen_extensionData(registry, 'device')
+        gen += ('\n'
+                '}} // namespace {0}\n'
+                '#endif\n').format(self.name)
+        return gen
+
+    def gen_extensionData(self, registry, type):
+        gen = '\n'
+        gen += 'static const VkExtensionProperties s_{0}Extensions[] = {{\n'.format(type)
+        for extName, specVer in self.capabilities.extensions.items():
+            extInfo = registry.extensions[extName]
+            if extInfo.type == type:
+                gen += '    VkExtensionProperties{{ {0}_EXTENSION_NAME, {1} }},\n'.format(extInfo.upperCaseName, specVer)
+        gen += '};\n'
+        return gen
 
 
 class VulkanProfiles():
@@ -810,9 +832,9 @@ class VulkanProfilesBuilder():
                 gen += ('\n'
                         '#ifdef {0}\n'
                         'static const VkExtensionProperties _{1}_EXTENSIONS[] = {{\n').format(name, name.upper())
-                for extName, ext in profile.capabilities.extensions.items():
+                for extName, specVer in profile.capabilities.extensions.items():
                     extInfo = self.registry.extensions[extName]
-                    gen += '    VkExtensionProperties{{ {0}_EXTENSION_NAME, {1} }},\n'.format(extInfo.upperCaseName, ext['specVersion'])
+                    gen += '    VkExtensionProperties{{ {0}_EXTENSION_NAME, {1} }},\n'.format(extInfo.upperCaseName, specVer)
                 gen += ('};\n'
                         '#endif\n')
         return gen
@@ -962,7 +984,7 @@ class VulkanProfilesBuilder():
 
     def gen_vpGetProfiles(self):
         gen = '\n'
-        gen += ('VP_INLINE VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {\n'
+        gen += ('VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {\n'
                 '    VkResult result = VK_SUCCESS;\n'
                 '    static const VpProfileProperties profiles[] = {\n')
 
@@ -992,7 +1014,7 @@ class VulkanProfilesBuilder():
 
     def gen_vpGetProfileFallbacks(self):
         gen = '\n'
-        gen += ('VP_INLINE VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {\n'
+        gen += ('VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {\n'
                 '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
@@ -1030,8 +1052,8 @@ class VulkanProfilesBuilder():
 
     def gen_vpGetDeviceProfileSupport(self):
         gen = '\n'
-        gen += ('VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName,\n'
-                '                                             const VpProfileProperties *pProfile, VkBool32 *pSupported) {\n'
+        gen += ('VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName,\n'
+                '                                              const VpProfileProperties *pProfile, VkBool32 *pSupported) {\n'
                 '    assert(pProfile != nullptr);\n'
                 '    assert(pSupported != nullptr);\n'
                 '    assert(physicalDevice != VK_NULL_HANDLE);\n'
@@ -1234,8 +1256,8 @@ class VulkanProfilesBuilder():
 
     def gen_vpCreateDevice(self):
         gen = '\n'
-        gen += ('VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,\n'
-                '                                  const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {\n'
+        gen += ('VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,\n'
+                '                                   const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {\n'
                 '    assert(pCreateInfo != nullptr);\n'
                 '\n'
                 '    if (physicalDevice == VK_NULL_HANDLE || pCreateInfo == nullptr || pDevice == nullptr) {\n'
@@ -1333,8 +1355,8 @@ class VulkanProfilesBuilder():
     def gen_vpGetProfileExtensionProperties(self):
         gen = '\n'
         # TODO: We should probably have separate APIs for device vs instance extensions
-        gen += ('VP_INLINE VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,\n'
-                '                                                   VkExtensionProperties *pProperties) {\n'
+        gen += ('VPAPI_ATTR VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,\n'
+                '                                                    VkExtensionProperties *pProperties) {\n'
                 '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
@@ -1482,7 +1504,7 @@ class VulkanProfilesBuilder():
 
     def gen_vpGetProfileStructures(self):
         gen = '\n'
-        gen += ('VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext) {\n'
+        gen += ('VPAPI_ATTR void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext) {\n'
                 '    if (pProfile == nullptr || pNext == nullptr) return;\n'
                 '    VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);\n')
 
@@ -1552,8 +1574,8 @@ class VulkanProfilesBuilder():
 
     def gen_vpGetProfileStructureProperties(self):
         gen = '\n'
-        gen += ('VP_INLINE VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,\n'
-                '                                                   VpStructureProperties *pProperties) {\n'
+        gen += ('VPAPI_ATTR VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,\n'
+                '                                                    VpStructureProperties *pProperties) {\n'
                 '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
@@ -1585,7 +1607,7 @@ class VulkanProfilesBuilder():
 
     def gen_vpGetProfileFormats(self):
         gen = '\n'
-        gen += ('VP_INLINE VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats) {\n'
+        gen += ('VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats) {\n'
                 '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
@@ -1617,7 +1639,7 @@ class VulkanProfilesBuilder():
 
     def gen_vpGetProfileFormatProperties(self):
         gen = '\n'
-        gen += ('VP_INLINE void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext) {\n'
+        gen += ('VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext) {\n'
                 '    if (pProfile == nullptr || pNext == nullptr) return;\n'
                 '    VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);\n')
 
@@ -1671,8 +1693,8 @@ class VulkanProfilesBuilder():
 
     def gen_vpGetProfileMemoryTypes(self):
         gen = '\n'
-        gen += ('VP_INLINE VkResult vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryPropertyFlagsCount,\n'
-                '                                           VkMemoryPropertyFlags *pMemoryPropertyFlags) {\n'
+        gen += ('VPAPI_ATTR VkResult vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryPropertyFlagsCount,\n'
+                '                                            VkMemoryPropertyFlags *pMemoryPropertyFlags) {\n'
                 '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():
@@ -1704,8 +1726,8 @@ class VulkanProfilesBuilder():
 
     def gen_vpGetProfileQueueFamilies(self):
         gen = '\n'
-        gen += ('VP_INLINE VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,\n'
-                '                                             VkQueueFamilyProperties *pQueueFamilyProperties) {\n'
+        gen += ('VPAPI_ATTR VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,\n'
+                '                                              VkQueueFamilyProperties *pQueueFamilyProperties) {\n'
                 '    VkResult result = VK_SUCCESS;\n')
 
         for name, profile in self.profiles.items():

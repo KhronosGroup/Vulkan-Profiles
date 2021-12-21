@@ -1578,7 +1578,7 @@ static const VkQueueFamilyProperties _VP_LUNARG_DESKTOP_PORTABILITY_2021_QUEUE_F
 };
 #endif
 
-VP_INLINE bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, size_t supportedSize,
+VPAPI_ATTR bool _vpCheckExtension(const VkExtensionProperties *supportedProperties, size_t supportedSize,
                               const char *requestedExtension) {
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
         if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) {
@@ -1589,7 +1589,7 @@ VP_INLINE bool _vpCheckExtension(const VkExtensionProperties *supportedPropertie
     return false;
 }
 
-VP_INLINE bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memoryProperties,
+VPAPI_ATTR bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memoryProperties,
                                       const VkMemoryPropertyFlags &memoryPropertyFlags) {
     assert(&memoryProperties != nullptr);
 
@@ -1600,7 +1600,7 @@ VP_INLINE bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &me
     return false;
 }
 
-VP_INLINE bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const VpFormatProperties &profileProps) {
+VPAPI_ATTR bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const VpFormatProperties &profileProps) {
     if ((deviceProps->formatProperties.linearTilingFeatures & profileProps.linearTilingFeatures) !=
         profileProps.linearTilingFeatures) {
         return false;
@@ -1614,7 +1614,7 @@ VP_INLINE bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, co
     return true;
 }
 
-VP_INLINE bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties,
+VPAPI_ATTR bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties,
                                            uint32_t queueFamilyPropertiesCount,
                                            const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
     assert(queueFamilyProperties != nullptr);
@@ -1644,7 +1644,7 @@ VP_INLINE bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueF
     return false;
 }
 
-VP_INLINE void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t propertyCount,
+VPAPI_ATTR void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t propertyCount,
                              const VkExtensionProperties *pProperties, std::vector<const char *> &extensions) {
     if (pCreateInfo->flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) {
         for (int i = 0, n = propertyCount; i < n; ++i) {
@@ -1664,7 +1664,7 @@ VP_INLINE void _vpGetExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t 
     }
 }
 
-VP_INLINE const void* _vpGetStructure(const void* pNext, VkStructureType type) {
+VPAPI_ATTR const void* _vpGetStructure(const void* pNext, VkStructureType type) {
     const VkBaseOutStructure *p = static_cast<const VkBaseOutStructure*>(pNext);
     while (p != nullptr) {
         if (p->sType == type) return p;
@@ -1673,7 +1673,7 @@ VP_INLINE const void* _vpGetStructure(const void* pNext, VkStructureType type) {
     return nullptr;
 }
 
-VP_INLINE VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
+VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
     VkResult result = VK_SUCCESS;
     static const VpProfileProperties profiles[] = {
 #ifdef VP_ANDROID_baseline_2021
@@ -1705,7 +1705,7 @@ VP_INLINE VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *
     return result;
 }
 
-VP_INLINE VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
+VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
     VkResult result = VK_SUCCESS;
 #ifdef VP_LUNARG_desktop_portability_2021_subset
     if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
@@ -1733,8 +1733,8 @@ VP_INLINE VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, ui
     return result;
 }
 
-VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName,
-                                             const VpProfileProperties *pProfile, VkBool32 *pSupported) {
+VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName,
+                                              const VpProfileProperties *pProfile, VkBool32 *pSupported) {
     assert(pProfile != nullptr);
     assert(pSupported != nullptr);
     assert(physicalDevice != VK_NULL_HANDLE);
@@ -2708,8 +2708,8 @@ VP_INLINE VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, co
     return result;
 }
 
-VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
-                                  const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {
+VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
+                                   const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {
     assert(pCreateInfo != nullptr);
 
     if (physicalDevice == VK_NULL_HANDLE || pCreateInfo == nullptr || pDevice == nullptr) {
@@ -3005,8 +3005,8 @@ VP_INLINE VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevic
     }
 }
 
-VP_INLINE VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                   VkExtensionProperties *pProperties) {
+VPAPI_ATTR VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                    VkExtensionProperties *pProperties) {
     VkResult result = VK_SUCCESS;
 #ifdef VP_ANDROID_baseline_2021
     if (strcmp(pProfile->profileName, VP_ANDROID_BASELINE_2021_NAME) == 0) {
@@ -3078,7 +3078,7 @@ VP_INLINE VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pP
     return result;
 }
 
-VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext) {
+VPAPI_ATTR void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext) {
     if (pProfile == nullptr || pNext == nullptr) return;
     VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
 #ifdef VP_ANDROID_baseline_2021
@@ -3889,8 +3889,8 @@ VP_INLINE void vpGetProfileStructures(const VpProfileProperties *pProfile, void 
     }
 }
 
-VP_INLINE VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                   VpStructureProperties *pProperties) {
+VPAPI_ATTR VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                    VpStructureProperties *pProperties) {
     VkResult result = VK_SUCCESS;
 #ifdef VP_ANDROID_baseline_2021
     if (strcmp(pProfile->profileName, VP_ANDROID_BASELINE_2021_NAME) == 0) {
@@ -3962,7 +3962,7 @@ VP_INLINE VkResult vpGetProfileStructureProperties(const VpProfileProperties *pP
     return result;
 }
 
-VP_INLINE VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats) {
+VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats) {
     VkResult result = VK_SUCCESS;
 #ifdef VP_ANDROID_baseline_2021
     if (strcmp(pProfile->profileName, VP_ANDROID_BASELINE_2021_NAME) == 0) {
@@ -4018,7 +4018,7 @@ VP_INLINE VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint
     return result;
 }
 
-VP_INLINE void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext) {
+VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext) {
     if (pProfile == nullptr || pNext == nullptr) return;
     VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
 #ifdef VP_ANDROID_baseline_2021
@@ -4106,8 +4106,8 @@ VP_INLINE void vpGetProfileFormatProperties(const VpProfileProperties *pProfile,
     }
 }
 
-VP_INLINE VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
-                                             VkQueueFamilyProperties *pQueueFamilyProperties) {
+VPAPI_ATTR VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,
+                                              VkQueueFamilyProperties *pQueueFamilyProperties) {
     VkResult result = VK_SUCCESS;
 #ifdef VP_LUNARG_desktop_portability_2021_subset
     if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {

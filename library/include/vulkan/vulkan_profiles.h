@@ -19,14 +19,16 @@
 #ifndef VULKAN_PROFILES_
 #define VULKAN_PROFILES_ 1
 
-#define VP_INLINE
+#define VPAPI_ATTR
 
 #ifdef __cplusplus
     extern "C" {
 #endif
+
 #include <vulkan/vulkan_core.h>
 #ifdef VK_ENABLE_BETA_EXTENSIONS
 #include <vulkan/vulkan_beta.h>
+
 #endif
 
 #if defined(VK_VERSION_1_0) && \
@@ -151,25 +153,25 @@ typedef struct VpDeviceCreateInfo {
 } VpDeviceCreateInfo;
 
 // Query the list of available profiles in the library
-VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // List the recommended fallback profiles of a profile
-VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // Check whether a profile is supported by the physical device
-VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
-                                   VkBool32 *pSupported);
+VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const char *pLayerName, const VpProfileProperties *pProfile,
+                                              VkBool32 *pSupported);
 
 // Create a VkDevice with the profile features and extensions enabled
-VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
-                        const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
+VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
+                                   const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
 
 // Query the list of extension of a profile
-VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                         VkExtensionProperties *pProperties);
+VPAPI_ATTR VkResult vpGetProfileExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                    VkExtensionProperties *pProperties);
 
 // Fill the pNext Vulkan structures with the requirements of a profile
-void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext);
+VPAPI_ATTR void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext);
 
 typedef enum VpStructureArea {
     VP_STRUCTURE_FEATURES = 0,  // A Vulkan structure specified to expose features
@@ -182,17 +184,17 @@ typedef struct VpStructureProperties {
 } VpStructureProperties;
 
 // Query the list of structures used to specify requirements of a profile
-VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                         VpStructureProperties *pProperties);
+VPAPI_ATTR VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                    VpStructureProperties *pProperties);
 
 // Query the list of formats with specified requirements by a profile
-VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
+VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
 
 // Query the requirements of a format for a profile
-void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
+VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
 // Query the requirements of queue families by a profile
-VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
+VPAPI_ATTR VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
 
 #ifdef __cplusplus
 }
