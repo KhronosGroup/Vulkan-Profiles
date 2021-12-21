@@ -206,6 +206,8 @@ struct _vpProfileDesc {
     uint32_t                        instanceExtensionCount;
     const VkExtensionProperties*    pDeviceExtensions;
     uint32_t                        deviceExtensionCount;
+    const VpProfileProperties*      pFallbacks;
+    uint32_t                        fallbackCount;
 };
 
 VPAPI_ATTR const _vpProfileDesc* _vpGetProfileDesc(const _vpProfileDesc* pProfiles, uint32_t profileCount,
@@ -346,6 +348,27 @@ VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties 
         }
         for (uint32_t i = 0; i < *pPropertyCount; ++i) {
             pProperties[i] = _vpProfiles[i].props;
+        }
+    }
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
+    VkResult result = VK_SUCCESS;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = pDesc->fallbackCount;
+    } else {
+        if (*pPropertyCount < pDesc->fallbackCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = pDesc->fallbackCount;
+        }
+        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+            pProperties[i] = pDesc->pFallbacks[i];
         }
     }
     return result;
@@ -874,6 +897,7 @@ class VulkanProfile():
                 'namespace {1} {{\n').format(self.name, uname)
         gen += self.gen_extensionData(registry, 'instance')
         gen += self.gen_extensionData(registry, 'device')
+        gen += self.gen_fallbackData()
         gen += ('\n'
                 '}} // namespace {0}\n'
                 '#endif\n').format(uname)
@@ -890,6 +914,17 @@ class VulkanProfile():
                 foundExt = True
         gen += '};\n'
         return gen if foundExt else ''
+
+
+    def gen_fallbackData(self):
+        gen = ''
+        if self.fallback:
+            gen += ('\n'
+                    'static const VpProfileProperties _fallbacks[] = {\n')
+            for fallback in self.fallback:
+                gen += '    {{ {0}_NAME, {0}_SPEC_VERSION }},\n'.format(fallback.upper())
+            gen += '};\n'
+        return gen
 
 
 class VulkanProfiles():
@@ -1033,7 +1068,12 @@ class VulkanProfilesBuilder():
                 gen += '        nullptr, 0,\n'
 
             if profile.capabilities.deviceExtensions:
-                gen += '        &{0}::_deviceExtensions[0], _vpArraySize({0}::_deviceExtensions)\n'.format(uname)
+                gen += '        &{0}::_deviceExtensions[0], _vpArraySize({0}::_deviceExtensions),\n'.format(uname)
+            else:
+                gen += '        nullptr, 0,\n'
+
+            if profile.fallback:
+                gen += '        &{0}::_fallbacks[0], _vpArraySize({0}::_fallbacks)\n'.format(uname)
             else:
                 gen += '        nullptr, 0\n'
 
@@ -1046,7 +1086,6 @@ class VulkanProfilesBuilder():
 
     def gen_publicImpl(self):
         gen = PUBLIC_IMPL_BODY
-        gen += self.gen_vpGetProfileFallbacks()
         gen += self.gen_vpGetDeviceProfileSupport()
         gen += self.gen_vpCreateDevice()
         gen += self.gen_vpGetProfileStructures()
@@ -1198,44 +1237,6 @@ class VulkanProfilesBuilder():
 
                 gen += ('};\n'
                         '#endif\n')
-        return gen
-
-
-    def gen_vpGetProfileFallbacks(self):
-        gen = '\n'
-        gen += ('VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {\n'
-                '    VkResult result = VK_SUCCESS;\n')
-
-        for name, profile in self.profiles.items():
-            uname = name.upper()
-            if profile.fallback:
-                gen += ('#ifdef {0}\n'
-                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
-                        '        static const VpProfileProperties {1}_fallbacks[] = {{\n').format(name, uname)
-                for fallback in profile.fallback:
-                    gen += '            {{ {0}_NAME, {0}_SPEC_VERSION }},\n'.format(fallback.upper())
-                gen += ('        }};\n'
-                        '\n'
-                        '        if (pProperties == nullptr) {{\n'
-                        '            *pPropertyCount = _vpArraySize({0}_fallbacks);\n'
-                        '        }} else {{\n'
-                        '            if (*pPropertyCount < _vpArraySize({0}_fallbacks)) {{\n'
-                        '                result = VK_INCOMPLETE;\n'
-                        '            }} else {{\n'
-                        '                *pPropertyCount = _vpArraySize({0}_fallbacks);\n'
-                        '            }}\n'
-                        '            for (uint32_t i = 0; i < *pPropertyCount; ++i) {{\n'
-                        '                pProperties[i] = {0}_fallbacks[i];\n'
-                        '            }}\n'
-                        '        }}\n'
-                        '    }} else\n').format(uname)
-                gen += '#endif\n'
-
-        gen += ('    {\n'
-                '        *pPropertyCount = 0;\n'
-                '    }\n'
-                '    return result;\n'
-                '}\n')
         return gen
 
 

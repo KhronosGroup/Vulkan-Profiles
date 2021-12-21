@@ -1696,6 +1696,8 @@ struct _vpProfileDesc {
     uint32_t                        instanceExtensionCount;
     const VkExtensionProperties*    pDeviceExtensions;
     uint32_t                        deviceExtensionCount;
+    const VpProfileProperties*      pFallbacks;
+    uint32_t                        fallbackCount;
 };
 
 VPAPI_ATTR const _vpProfileDesc* _vpGetProfileDesc(const _vpProfileDesc* pProfiles, uint32_t profileCount,
@@ -1894,6 +1896,10 @@ static const VkExtensionProperties _deviceExtensions[] = {
     VkExtensionProperties{ VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, 1 },
 };
 
+static const VpProfileProperties _fallbacks[] = {
+    { VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION },
+};
+
 } // namespace VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET
 #endif
 
@@ -1933,7 +1939,8 @@ static const _vpProfileDesc _vpProfiles[] = {
         VpProfileProperties{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION },
         VP_ANDROID_BASELINE_2021_MIN_API_VERSION,
         &VP_ANDROID_BASELINE_2021::_instanceExtensions[0], _vpArraySize(VP_ANDROID_BASELINE_2021::_instanceExtensions),
-        &VP_ANDROID_BASELINE_2021::_deviceExtensions[0], _vpArraySize(VP_ANDROID_BASELINE_2021::_deviceExtensions)
+        &VP_ANDROID_BASELINE_2021::_deviceExtensions[0], _vpArraySize(VP_ANDROID_BASELINE_2021::_deviceExtensions),
+        nullptr, 0
     },
 #endif
 #ifdef VP_KHR_roadmap_2022
@@ -1941,7 +1948,8 @@ static const _vpProfileDesc _vpProfiles[] = {
         VpProfileProperties{ VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION },
         VP_KHR_ROADMAP_2022_MIN_API_VERSION,
         nullptr, 0,
-        &VP_KHR_ROADMAP_2022::_deviceExtensions[0], _vpArraySize(VP_KHR_ROADMAP_2022::_deviceExtensions)
+        &VP_KHR_ROADMAP_2022::_deviceExtensions[0], _vpArraySize(VP_KHR_ROADMAP_2022::_deviceExtensions),
+        nullptr, 0
     },
 #endif
 #ifdef VP_LUNARG_desktop_portability_2021_subset
@@ -1949,7 +1957,8 @@ static const _vpProfileDesc _vpProfiles[] = {
         VpProfileProperties{ VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_SPEC_VERSION },
         VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_MIN_API_VERSION,
         nullptr, 0,
-        &VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_deviceExtensions[0], _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_deviceExtensions)
+        &VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_deviceExtensions[0], _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_deviceExtensions),
+        &VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_fallbacks[0], _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_fallbacks)
     },
 #endif
 #ifdef VP_LUNARG_desktop_portability_2021
@@ -1957,7 +1966,8 @@ static const _vpProfileDesc _vpProfiles[] = {
         VpProfileProperties{ VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION },
         VP_LUNARG_DESKTOP_PORTABILITY_2021_MIN_API_VERSION,
         nullptr, 0,
-        &VP_LUNARG_DESKTOP_PORTABILITY_2021::_deviceExtensions[0], _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021::_deviceExtensions)
+        &VP_LUNARG_DESKTOP_PORTABILITY_2021::_deviceExtensions[0], _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021::_deviceExtensions),
+        nullptr, 0
     },
 #endif
 };
@@ -1976,6 +1986,27 @@ VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties 
         }
         for (uint32_t i = 0; i < *pPropertyCount; ++i) {
             pProperties[i] = _vpProfiles[i].props;
+        }
+    }
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
+    VkResult result = VK_SUCCESS;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = pDesc->fallbackCount;
+    } else {
+        if (*pPropertyCount < pDesc->fallbackCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = pDesc->fallbackCount;
+        }
+        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+            pProperties[i] = pDesc->pFallbacks[i];
         }
     }
     return result;
@@ -2092,34 +2123,6 @@ VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfilePropert
         for (uint32_t i = 0; i < *pPropertyCount; ++i) {
             pProperties[i] = pDesc->pDeviceExtensions[i];
         }
-    }
-    return result;
-}
-
-VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
-    VkResult result = VK_SUCCESS;
-#ifdef VP_LUNARG_desktop_portability_2021_subset
-    if (strcmp(pProfile->profileName, VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME) == 0) {
-        static const VpProfileProperties VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_fallbacks[] = {
-            { VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION },
-        };
-
-        if (pProperties == nullptr) {
-            *pPropertyCount = _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_fallbacks);
-        } else {
-            if (*pPropertyCount < _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_fallbacks)) {
-                result = VK_INCOMPLETE;
-            } else {
-                *pPropertyCount = _vpArraySize(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_fallbacks);
-            }
-            for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-                pProperties[i] = VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_fallbacks[i];
-            }
-        }
-    } else
-#endif
-    {
-        *pPropertyCount = 0;
     }
     return result;
 }
