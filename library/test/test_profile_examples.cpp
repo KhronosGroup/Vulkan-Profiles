@@ -34,7 +34,7 @@ TEST(test_profile, example_add_features_add_extensions) {
     VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
     static const char* extensions[] = {VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, VK_KHR_MAINTENANCE3_EXTENSION_NAME};
@@ -70,7 +70,7 @@ TEST(test_profile, example_individual_override_features) {
     VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
     // This structure is not part of the profile, so it will remains unchanged by vpGetProfileStructures
@@ -108,7 +108,7 @@ TEST(test_profile, example_collective_override_features) {
     VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
     // This structure is not part of the profile, so it will remains unchanged by vpGetProfileStructures
@@ -148,7 +148,7 @@ TEST(test_profile, example_flag_disable_robust_access) {
     VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, nullptr, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
     // Regardness of robustBufferAccess = VK_TRUE, because of VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT is set

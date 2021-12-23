@@ -113,7 +113,6 @@ typedef struct VpProfileProperties {
 typedef enum VpInstanceCreateFlagBits {
     VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT = 0x00000001,
     VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT = 0x00000002,
-    VP_INSTANCE_CREATE_OVERRIDE_API_VERSION_BIT = 0x00000004,
 
     VP_INSTANCE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
 } VpInstanceCreateFlagBits;
@@ -157,7 +156,7 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
                                      const VkAllocationCallbacks *pAllocator, VkInstance *pInstance);
 
 // Check whether a profile is supported by the physical device
-VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile, VkBool32 *pSupported);
+VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile, VkBool32 *pSupported);
 
 // Create a VkDevice with the profile features and device extensions enabled
 VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
@@ -171,22 +170,27 @@ VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfilePrope
 VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                                           VkExtensionProperties *pProperties);
 
-// Fill the pNext Vulkan structures with the requirements of a profile
-VPAPI_ATTR void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext);
+// Fill the feature structures with the requirements of a profile
+VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
 
-typedef enum VpStructureArea {
-    VP_STRUCTURE_FEATURES = 0,  // A Vulkan structure specified to expose features
-    VP_STRUCTURE_PROPERTIES     // A Vulkan structure specified to expose properties
-} VpStructureArea;
+// Query the list of feature structure types specified by the profile
+VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                      VkStructureType *pProperties);
 
-typedef struct VpStructureProperties {
-    VkStructureType type;
-    VpStructureArea area;
-} VpStructureProperties;
+// Fill the property structures with the requirements of a profile
+VPAPI_ATTR void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext);
 
-// Query the list of structures used to specify requirements of a profile
-VPAPI_ATTR VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                    VpStructureProperties *pProperties);
+// Query the list of property structure types specified by the profile
+VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                       VkStructureType *pProperties);
+
+// Query the requirements of queue families by a profile
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                      VkQueueFamilyProperties2KHR *pProperties);
+
+// Query the list of query family structure types specified by the profile
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                          VkStructureType *pProperties);
 
 // Query the list of formats with specified requirements by a profile
 VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
@@ -194,22 +198,66 @@ VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uin
 // Query the requirements of a format for a profile
 VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
-// Query the requirements of queue families by a profile
-VPAPI_ATTR VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties *pProperties);
+// Query the list of format structure types specified by the profile
+VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, VkFormat format, uint32_t *pPropertyCount,
+                                                     VkStructureType *pProperties);
 '''
 
 PRIVATE_IMPL_BODY = '''
+using _pfnvpStructFiller = void(*)(VkBaseOutStructure* p);
+using _pfnvpStructComparator = bool(*)(VkBaseOutStructure* p);
+
+struct _vpFeatureDesc {
+    _pfnvpStructFiller              pfnFiller;
+    _pfnvpStructComparator          pfnComparator;
+};
+
+struct _vpPropertyDesc {
+    _pfnvpStructFiller              pfnFiller;
+    _pfnvpStructComparator          pfnComparator;
+};
+
+struct _vpQueueFamilyDesc {
+    _pfnvpStructFiller              pfnFiller;
+    _pfnvpStructComparator          pfnComparator;
+};
+
+struct _vpFormatDesc {
+    VkFormat                        format;
+    _pfnvpStructFiller              pfnFiller;
+    _pfnvpStructComparator          pfnComparator;
+};
+
 struct _vpProfileDesc {
     VpProfileProperties             props;
     uint32_t                        minApiVersion;
+
     const VkExtensionProperties*    pInstanceExtensions;
     uint32_t                        instanceExtensionCount;
+
     const VkExtensionProperties*    pDeviceExtensions;
     uint32_t                        deviceExtensionCount;
+
     const VpProfileProperties*      pFallbacks;
     uint32_t                        fallbackCount;
-    const VpStructureProperties*    pStructProps;
-    uint32_t                        structPropCount;
+
+    const VkStructureType*          pFeatureStructTypes;
+    uint32_t                        featureStructTypeCount;
+    _vpFeatureDesc                  feature;
+
+    const VkStructureType*          pPropertyStructTypes;
+    uint32_t                        propertyStructTypeCount;
+    _vpPropertyDesc                 property;
+
+    const VkStructureType*          pQueueFamilyStructTypes;
+    uint32_t                        queueFamilyStructTypeCount;
+    const _vpQueueFamilyDesc*       pQueueFamilies;
+    uint32_t                        queueFamilyCount;
+
+    const VkStructureType*          pFormatStructTypes;
+    uint32_t                        formatStructTypeCount;
+    const _vpFormatDesc*            pFormats;
+    uint32_t                        formatCount;
 };
 
 VPAPI_ATTR const _vpProfileDesc* _vpGetProfileDesc(const _vpProfileDesc* pProfiles, uint32_t profileCount,
@@ -227,61 +275,6 @@ VPAPI_ATTR bool _vpCheckExtension(const VkExtensionProperties *supportedProperti
             return supportedProperties[i].specVersion > expectedVersion;
         }
     }
-    return false;
-}
-
-VPAPI_ATTR bool _vpCheckMemoryProperty(const VkPhysicalDeviceMemoryProperties &memoryProperties,
-                                       const VkMemoryPropertyFlags &memoryPropertyFlags) {
-    assert(&memoryProperties != nullptr);
-
-    for (uint32_t i = 0, n = memoryProperties.memoryTypeCount; i < n; ++i) {
-        if ((memoryProperties.memoryTypes[i].propertyFlags & memoryPropertyFlags) == memoryPropertyFlags) return true;
-    }
-
-    return false;
-}
-
-VPAPI_ATTR bool _vpCheckFormatProperty(const VkFormatProperties2 *deviceProps, const VpFormatProperties &profileProps) {
-    if ((deviceProps->formatProperties.linearTilingFeatures & profileProps.linearTilingFeatures) !=
-        profileProps.linearTilingFeatures) {
-        return false;
-    } else if ((deviceProps->formatProperties.optimalTilingFeatures & profileProps.optimalTilingFeatures) !=
-               profileProps.optimalTilingFeatures) {
-        return false;
-    } else if ((deviceProps->formatProperties.bufferFeatures & profileProps.bufferFeatures) != profileProps.bufferFeatures) {
-        return false;
-    }
-
-    return true;
-}
-
-VPAPI_ATTR bool _vpCheckQueueFamilyProperty(const VkQueueFamilyProperties *queueFamilyProperties,
-                                            uint32_t queueFamilyPropertiesCount,
-                                            const VkQueueFamilyProperties &profileQueueFamilyPropertie) {
-    assert(queueFamilyProperties != nullptr);
-
-    for (uint32_t i = 0, n = queueFamilyPropertiesCount; i < n; ++i) {
-        if (queueFamilyProperties[i].queueCount < profileQueueFamilyPropertie.queueCount) {
-            continue;
-        } else if (queueFamilyProperties[i].timestampValidBits < profileQueueFamilyPropertie.timestampValidBits) {
-            continue;
-        } else if (queueFamilyProperties[i].minImageTransferGranularity.width >
-                   profileQueueFamilyPropertie.minImageTransferGranularity.width) {
-            continue;
-        } else if (queueFamilyProperties[i].minImageTransferGranularity.height >
-                   profileQueueFamilyPropertie.minImageTransferGranularity.height) {
-            continue;
-        } else if (queueFamilyProperties[i].minImageTransferGranularity.depth >
-                   profileQueueFamilyPropertie.minImageTransferGranularity.depth) {
-            continue;
-        } else if ((queueFamilyProperties[i].queueFlags & profileQueueFamilyPropertie.queueFlags) !=
-                   profileQueueFamilyPropertie.queueFlags) {
-            continue;
-        }
-
-        return true;
-    }
-
     return false;
 }
 
@@ -327,6 +320,15 @@ VPAPI_ATTR void _vpGetDeviceExtensions(const VpDeviceCreateInfo *pCreateInfo, ui
 
 VPAPI_ATTR const void* _vpGetStructure(const void* pNext, VkStructureType type) {
     const VkBaseOutStructure *p = static_cast<const VkBaseOutStructure*>(pNext);
+    while (p != nullptr) {
+        if (p->sType == type) return p;
+        p = p->pNext;
+    }
+    return nullptr;
+}
+
+VPAPI_ATTR void* _vpGetStructure(void* pNext, VkStructureType type) {
+    VkBaseOutStructure *p = static_cast<VkBaseOutStructure*>(pNext);
     while (p != nullptr) {
         if (p->sType == type) return p;
         p = p->pNext;
@@ -435,12 +437,9 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
             createInfo.ppEnabledExtensionNames = extensions.data();
         }
 
-        if (pCreateInfo->flags & VP_INSTANCE_CREATE_OVERRIDE_API_VERSION_BIT) {
-            if (createInfo.pApplicationInfo != nullptr) {
-                appInfo = *createInfo.pApplicationInfo;
-            }
-            createInfo.pApplicationInfo = &appInfo;
+        if (createInfo.pApplicationInfo == nullptr) {
             appInfo.apiVersion = pDesc->minApiVersion;
+            createInfo.pApplicationInfo = &appInfo;
         }
     }
 
@@ -491,23 +490,204 @@ VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfilePropert
     return result;
 }
 
-VPAPI_ATTR VkResult vpGetProfileStructureProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                    VpStructureProperties *pProperties) {
+VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext)
+{
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
+    if (pDesc != nullptr && pDesc->feature.pfnFiller != nullptr) {
+        VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(pNext);
+        while (p != nullptr) {
+            pDesc->feature.pfnFiller(p);
+            p = p->pNext;
+        }
+    }
+}
+
+VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                      VkStructureType *pProperties)
+{
     VkResult result = VK_SUCCESS;
 
     const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     if (pProperties == nullptr) {
-        *pPropertyCount = pDesc->structPropCount;
+        *pPropertyCount = pDesc->featureStructTypeCount;
     } else {
-        if (*pPropertyCount < pDesc->structPropCount) {
+        if (*pPropertyCount < pDesc->featureStructTypeCount) {
             result = VK_INCOMPLETE;
         } else {
-            *pPropertyCount = pDesc->structPropCount;
+            *pPropertyCount = pDesc->featureStructTypeCount;
         }
         for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-            pProperties[i] = pDesc->pStructProps[i];
+            pProperties[i] = pDesc->pFeatureStructTypes[i];
+        }
+    }
+    return result;
+}
+
+VPAPI_ATTR void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext)
+{
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
+    if (pDesc != nullptr && pDesc->property.pfnFiller != nullptr) {
+        VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(pNext);
+        while (p != nullptr) {
+            pDesc->property.pfnFiller(p);
+            p = p->pNext;
+        }
+    }
+}
+
+VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                       VkStructureType *pProperties)
+{
+    VkResult result = VK_SUCCESS;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = pDesc->propertyStructTypeCount;
+    } else {
+        if (*pPropertyCount < pDesc->propertyStructTypeCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = pDesc->propertyStructTypeCount;
+        }
+        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+            pProperties[i] = pDesc->pPropertyStructTypes[i];
+        }
+    }
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                      VkQueueFamilyProperties2KHR *pProperties)
+{
+    VkResult result = VK_SUCCESS;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = pDesc->queueFamilyCount;
+    } else {
+        if (*pPropertyCount < pDesc->queueFamilyCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = pDesc->queueFamilyCount;
+        }
+        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+            VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(&pProperties[i]);
+            while (p != nullptr) {
+                pDesc->pQueueFamilies[i].pfnFiller(p);
+                p = p->pNext;
+            }
+        }
+    }
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+                                                          VkStructureType *pProperties)
+{
+    VkResult result = VK_SUCCESS;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = pDesc->queueFamilyStructTypeCount;
+    } else {
+        if (*pPropertyCount < pDesc->queueFamilyStructTypeCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = pDesc->queueFamilyStructTypeCount;
+        }
+        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+            pProperties[i] = pDesc->pQueueFamilyStructTypes[i];
+        }
+    }
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats)
+{
+    VkResult result = VK_SUCCESS;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pFormats == nullptr) {
+        *pFormatCount = pDesc->formatCount;
+    } else {
+        if (*pFormatCount < pDesc->formatCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pFormatCount = pDesc->formatCount;
+        }
+        for (uint32_t i = 0; i < *pFormatCount; ++i) {
+            pFormats[i] = pDesc->pFormats[i].format;
+        }
+    }
+    return result;
+}
+
+VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext)
+{
+    VkResult result = VK_SUCCESS;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
+    if (pDesc == nullptr) return;
+
+    for (uint32_t i = 0; i < pDesc->formatCount; ++i) {
+        if (pDesc->pFormats[i].format == format) {
+            VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(pNext);
+            while (p != nullptr) {
+                pDesc->pFormats[i].pfnFiller(p);
+                p = p->pNext;
+            }
+#if defined(VK_VERSION_1_3) || defined(VK_KHR_format_feature_flags2)
+            VkFormatProperties2KHR* fp2 = static_cast<VkFormatProperties2KHR*>(
+                _vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR));
+            VkFormatProperties3KHR* fp3 = static_cast<VkFormatProperties3KHR*>(
+                _vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR));
+            if (fp3 != nullptr) {
+                VkFormatProperties2KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
+                pDesc->pFormats[i].pfnFiller(reinterpret_cast<VkBaseOutStructure*>(&fp));
+                fp3->linearTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->linearTilingFeatures | fp.formatProperties.linearTilingFeatures);
+                fp3->optimalTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->optimalTilingFeatures | fp.formatProperties.optimalTilingFeatures);
+                fp3->bufferFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->bufferFeatures | fp.formatProperties.bufferFeatures);
+            }
+            if (fp2 != nullptr) {
+                VkFormatProperties3KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR };
+                pDesc->pFormats[i].pfnFiller(reinterpret_cast<VkBaseOutStructure*>(&fp));
+                fp2->formatProperties.linearTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.linearTilingFeatures | fp.linearTilingFeatures);
+                fp2->formatProperties.optimalTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.optimalTilingFeatures | fp.optimalTilingFeatures);
+                fp2->formatProperties.bufferFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.bufferFeatures | fp.bufferFeatures);
+            }
+#endif
+        }
+    }
+}
+
+VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, VkFormat format, uint32_t *pPropertyCount,
+                                                     VkStructureType *pProperties)
+{
+    VkResult result = VK_SUCCESS;
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = pDesc->formatStructTypeCount;
+    } else {
+        if (*pPropertyCount < pDesc->formatStructTypeCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = pDesc->formatStructTypeCount;
+        }
+        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+            pProperties[i] = pDesc->pFormatStructTypes[i];
         }
     }
     return result;
@@ -752,6 +932,17 @@ class VulkanRegistry():
                     self.structs[structName].members[memberName].limittype = 'noauto'
 
 
+    def getChainableStructDef(self, name, extends):
+        structDef = self.structs.get(name)
+        if structDef == None:
+            Log.f("Structure '{0}' does not exist".format(name))
+        if structDef.sType == None:
+            Log.f("Structure '{0}' is not chainable".format(name))
+        if not extends in structDef.extends + [ name ]:
+            Log.f("Structure '{0}' does not extend '{1}'".format(name, extends))
+        return structDef
+
+
 class VulkanProfileCapabilities():
     def __init__(self, registry, data, caps):
         self.extensions = dict()
@@ -842,25 +1033,90 @@ class VulkanProfileCapabilities():
             self.mergeProfileCapData(self.memoryProperties, data['memoryProperties'])
 
 
+class VulkanProfileStructs():
+    def __init__(self, registry, caps):
+        # Feature struct types
+        self.feature = []
+        for name in caps.features:
+            if name == 'VkPhysicalDeviceFeatures':
+                # Special case, as it's wrapped in VkPhysicalDeviceFeatures2
+                self.feature.append(registry.structs['VkPhysicalDeviceFeatures2'])
+            else:
+                self.feature.append(registry.getChainableStructDef(name, 'VkPhysicalDeviceFeatures2'))
+        self.eliminateAliases(self.feature)
+
+        # Property struct types
+        self.property = []
+        for name in caps.properties:
+            if name == 'VkPhysicalDeviceProperties':
+                # Special case, as it's wrapped in VkPhysicalDeviceProperties2
+                self.property.append(registry.structs['VkPhysicalDeviceProperties2'])
+            else:
+                self.property.append(registry.getChainableStructDef(name, 'VkPhysicalDeviceProperties2'))
+        self.eliminateAliases(self.property)
+
+        # Queue family struct types
+        self.queueFamily = []
+        queueFamilyStructs = dict()
+        for queueFamilyProps in caps.queueFamiliesProperties:
+            queueFamilyStructs.update(queueFamilyProps)
+        for name in queueFamilyStructs:
+            if name == 'VkQueueFamilyProperties':
+                # Special case, as it's wrapped in VkQueueFamilyProperties2
+                self.queueFamily.append(registry.structs['VkQueueFamilyProperties2'])
+            else:
+                self.queueFamily.append(registry.getChainableStructDef(name, 'VkQueueFamilyProperties2'))
+        self.eliminateAliases(self.queueFamily)
+
+        # Format struct types
+        self.format = []
+        formatStructs = dict()
+        for formatProps in caps.formats.values():
+            formatStructs.update(formatProps)
+        for name in formatStructs:
+            if name == 'VkFormatProperties':
+                # Special case, as it's wrapped in VkFormatProperties2 or VkFormatProperties3
+                self.format.append(registry.structs['VkFormatProperties2'])
+                self.format.append(registry.structs['VkFormatProperties3'])
+            else:
+                self.format.append(registry.getChainableStructDef(name, 'VkFormatProperties2'))
+        self.eliminateAliases(self.format)
+
+
+    def eliminateAliases(self, structs):
+        structNames = []
+        duplicates = []
+        # Collect duplicates
+        for structDef in structs:
+            if structDef.name in structNames:
+                duplicates.append(structDef)
+            structNames.append(structDef.aliases)
+        # Remove duplicates
+        for duplicate in duplicates:
+            structs.remove(duplicate)
+
+
 class VulkanProfile():
     def __init__(self, registry, name, data, caps):
+        self.registry = registry
         self.name = name
         self.version = data['version']
         self.apiVersion = data['api-version']
         self.fallback = data.get('fallback')
         self.requirements = []
         self.capabilities = VulkanProfileCapabilities(registry, data, caps)
-        self.collectCompileTimeRequirements(registry)
-        self.validate(registry)
+        self.structs = VulkanProfileStructs(registry, self.capabilities)
+        self.collectCompileTimeRequirements()
+        self.validate()
 
 
-    def collectCompileTimeRequirements(self, registry):
+    def collectCompileTimeRequirements(self):
         # Add API version to the list of requirements
         match = re.search(r"^([1-9][0-9]*\.[0-9]+)[^0-9].*$", self.apiVersion)
         if match != None:
             versionNumber = match.group(1)
-            if versionNumber in registry.versions:
-                self.requirements.append(registry.versions[versionNumber].name)
+            if versionNumber in self.registry.versions:
+                self.requirements.append(self.registry.versions[versionNumber].name)
             else:
                 Log.f("No version '{0}' found in registry required by profile '{1}'".format(versionNumber, self.name))
         else:
@@ -868,34 +1124,34 @@ class VulkanProfile():
 
         # Add any required extension to the list of requirements
         for extName in self.capabilities.extensions:
-            if extName in registry.extensions:
+            if extName in self.registry.extensions:
                 self.requirements.append(extName)
             else:
                 Log.f("Extension '{0}' required by profile '{1}' does not exist".format(extName, self.name))
 
 
-    def validate(self, registry):
-        self.validateStructDependencies(registry)
+    def validate(self):
+        self.validateStructDependencies()
 
 
-    def validateStructDependencies(self, registry):
+    def validateStructDependencies(self):
         for feature in self.capabilities.features:
-            self.validateStructDependency(feature, registry)
+            self.validateStructDependency(feature)
 
         for prop in self.capabilities.properties:
-            self.validateStructDependency(prop, registry)
+            self.validateStructDependency(prop)
 
         for queueFamilyData in self.capabilities.queueFamiliesProperties:
             for queueFamilyProp in queueFamilyData:
-                self.validateStructDependency(queueFamilyProp, registry)
+                self.validateStructDependency(queueFamilyProp)
 
         for memoryProp in self.capabilities.memoryProperties:
-            self.validateStructDependency(memoryProp, registry)
+            self.validateStructDependency(memoryProp)
 
 
-    def validateStructDependency(self, structName, registry):
-        if structName in registry.structs:
-            structDef = registry.structs[structName]
+    def validateStructDependency(self, structName):
+        if structName in self.registry.structs:
+            structDef = self.registry.structs[structName]
             depFound = False
 
             # Check if the required API version defines this struct
@@ -914,26 +1170,27 @@ class VulkanProfile():
             Log.f("Struct '{0}' in profile '{1}' does not exist in the registry".format(structName, self.name))
 
 
-    def generatePrivateImpl(self, registry):
+    def generatePrivateImpl(self):
         uname = self.name.upper()
         gen = '\n'
         gen += ('#ifdef {0}\n'
                 'namespace {1} {{\n').format(self.name, uname)
-        gen += self.gen_extensionData(registry, 'instance')
-        gen += self.gen_extensionData(registry, 'device')
+        gen += self.gen_extensionData('instance')
+        gen += self.gen_extensionData('device')
         gen += self.gen_fallbackData()
-        gen += self.gen_structPropData(registry)
+        gen += self.gen_structTypeData()
+        gen += self.gen_structDesc()
         gen += ('\n'
                 '}} // namespace {0}\n'
                 '#endif\n').format(uname)
         return gen
 
-    def gen_extensionData(self, registry, type):
+    def gen_extensionData(self, type):
         foundExt = False
         gen = '\n'
         gen += 'static const VkExtensionProperties _{0}Extensions[] = {{\n'.format(type)
         for extName, specVer in self.capabilities.extensions.items():
-            extInfo = registry.extensions[extName]
+            extInfo = self.registry.extensions[extName]
             if extInfo.type == type:
                 gen += '    VkExtensionProperties{{ {0}_EXTENSION_NAME, {1} }},\n'.format(extInfo.upperCaseName, specVer)
                 foundExt = True
@@ -952,51 +1209,271 @@ class VulkanProfile():
         return gen
 
 
-    def gen_structPropData(self, registry):
+    def gen_structTypeData(self, structDefs = None, name = None):
         gen = ''
-        features = self.capabilities.features
-        properties = self.capabilities.properties
-        if features or properties:
+        if structDefs == None:
+            gen += self.gen_structTypeData(self.structs.feature, 'feature')
+            gen += self.gen_structTypeData(self.structs.property, 'property')
+            gen += self.gen_structTypeData(self.structs.queueFamily, 'queueFamily')
+            gen += self.gen_structTypeData(self.structs.format, 'format')
+        else:
+            if structDefs:
+                gen += ('\n'
+                        'static const VkStructureType _{0}StructTypes[] = {{\n').format(name)
+                for structDef in structDefs:
+                    gen += '    {{ {0} }},\n'.format(structDef.sType)
+                gen += '};\n'
+        return gen
+
+
+    def gen_listValue(self, values, isEnum = True):
+        gen = ''
+        if isEnum:
+            gen += '('
+        else:
+            gen += '{ '
+
+        separator = ''
+        if values != None and len(values) > 0:
+            for value in values:
+                gen += separator + str(value)
+                if isEnum:
+                    separator = ' | '
+                else:
+                    separator = ', '
+        elif isEnum:
+            gen += '0'
+
+        if isEnum:
+            gen += ')'
+        else:
+            gen += ' }'
+        return gen
+
+
+    def gen_structFill(self, fmt, structDef, var, values):
+        gen = ''
+        for member, value in values.items():
+            if member in structDef.members:
+                if type(value) == dict:
+                    # Nested structure
+                    memberDef = self.registry.structs.get(structDef.members[member].type)
+                    if memberDef != None:
+                        gen += self.gen_structFill(fmt, memberDef, var + member + '.', value)
+                    else:
+                        Log.f("Member '{0}' in structure '{1}' is not a struct".format(member, structDef.name))
+
+                elif type(value) == list:
+                    # Some sort of list (enums or integer/float list for structure initialization)
+                    if len(value) == 0:
+                        # If list is empty then ignore
+                        continue
+                    if structDef.members[member].isArray:
+                        # If it's an array we have to generate per-element assignment code
+                        for i, v in enumerate(value):
+                            gen += fmt.format('{0}{1}[{2}] = {3}'.format(var, member, i, v))
+                    else:
+                        # For enums and struct initialization, most of the code can be shared
+                        genAssign = '{0}{1} = '.format(var, member)
+                        isEnum = isinstance(value[0], str)
+                        genAssign += '{0}'.format(self.gen_listValue(value, isEnum))
+                        gen += fmt.format(genAssign)
+
+                elif type(value) == bool:
+                    # Boolean
+                    gen += fmt.format('{0}{1} = {2}'.format(var, member, 'VK_TRUE' if value else 'VK_FALSE'))
+
+                else:
+                    # Everything else
+                    gen += fmt.format('{0}{1} = {2}'.format(var, member, value))
+            else:
+                Log.f("No member '{0}' in structure '{1}'".format(member, structDef.name))
+        return gen
+
+
+    def gen_structCompare(self, fmt, structDef, var, values):
+        gen = ''
+        for member, value in values.items():
+            if member in structDef.members:
+                limittype = structDef.members[member].limittype
+                if limittype == 'IGNORE':
+                    # Skip this member as we don't know how to validate it
+                    continue
+                if limittype == 'bitmask':
+                    # Compare bitmask by checking if device value contains every bit of profile value
+                    comparePredFmt = '(({0} & {1}) == {1})'
+                elif limittype == 'max':
+                    # Compare max limit by checking if device value is greater than or equal to profile value
+                    comparePredFmt = '({0} >= {1})'
+                elif limittype == 'min':
+                    # Compare min limit by checking if device value is less than or equal to profile value
+                    comparePredFmt = '({0} <= {1})'
+                elif limittype == 'range':
+                    # Compare range limit by checking if device range is larger than or equal to profile range
+                    comparePredFmt = [ '({0} <= {1})', '({0} >= {1})' ]
+                elif limittype is None or limittype == 'noauto' or limittype == 'struct':
+                    # Compare everything else with equality
+                    comparePredFmt = '({0} == {1})'
+                else:
+                    Log.f("Unsupported limittype '{0}' in member '{1}' of structure '{2}'".format(limittype, member, structDef.name))
+
+                if type(value) == dict:
+                    # Nested structure
+                    memberDef = self.registry.structs.get(structDef.members[member].type)
+                    if memberDef != None:
+                        gen += self.gen_structCompare(fmt, memberDef, var + member + '.', value)
+                    else:
+                        Log.f("Member '{0}' in structure '{1}' is not a struct".format(member, structDef.name))
+
+                elif type(value) == list:
+                    # Some sort of list (enums or integer/float list for structure initialization)
+                    if len(value) == 0:
+                        # If list is empty then ignore
+                        continue
+                    if structDef.members[member].isArray:
+                        # If it's an array we have to generate per-element comparison code
+                        for i in range(len(value)):
+                            if limittype == 'range':
+                                gen += fmt.format(comparePredFmt[i].format('{0}{1}[{2}]'.format(var, member, i), value[i]))
+                            else:
+                                gen += fmt.format(comparePredFmt.format('{0}{1}[{2}]'.format(var, member, i), value[i]))
+                    else:
+                        # Enum flags and basic structs can be compared directly
+                        isEnum = isinstance(value[0], str)
+                        gen += fmt.format(comparePredFmt.format('{0}{1}'.format(var, member), self.gen_listValue(value, isEnum)))
+
+                elif type(value) == bool:
+                    # Boolean
+                    gen += fmt.format(comparePredFmt.format('{0}{1}'.format(var, member), 'VK_TRUE' if value else 'VK_FALSE'))
+
+                else:
+                    # Everything else
+                    gen += fmt.format(comparePredFmt.format('{0}{1}'.format(var, member), value))
+            else:
+                Log.f("No member '{0}' in structure '{1}'".format(member, structDef.name))
+        return gen
+
+
+    def gen_structFunc(self, structDefs, caps, func, fmt):
+        gen = ''
+
+        hasData = False
+
+        gen += ('            switch (p->sType) {\n')
+
+        for structDef in structDefs:
+            paramList = []
+
+            # Fill VkPhysicalDeviceFeatures into VkPhysicalDeviceFeatures2
+            if structDef.name == 'VkPhysicalDeviceFeatures2':
+                innerCap = caps.get('VkPhysicalDeviceFeatures')
+                if innerCap:
+                    paramList.append((self.registry.structs['VkPhysicalDeviceFeatures'], 's->features.', innerCap))
+
+            # Fill VkPhysicalDeviceProperties into VkPhysicalDeviceProperties2
+            if structDef.name == 'VkPhysicalDeviceProperties2':
+                innerCap = caps.get('VkPhysicalDeviceProperties')
+                if innerCap:
+                    paramList.append((self.registry.structs['VkPhysicalDeviceProperties'], 's->properties.', innerCap))
+
+            # Fill VkQueueFamilyProperties into VkQueueFamilyProperties2
+            if structDef.name == 'VkQueueFamilyProperties2':
+                innerCap = caps.get('VkQueueFamilyProperties')
+                if innerCap:
+                    paramList.append((self.registry.structs['VkQueueFamilyProperties'], 's->queueFamilyProperties.', innerCap))
+
+            # Fill VkFormatProperties into VkFormatProperties2
+            if structDef.name == 'VkFormatProperties2':
+                innerCap = caps.get('VkFormatProperties')
+                if innerCap:
+                    paramList.append((self.registry.structs['VkFormatProperties'], 's->formatProperties.', innerCap))
+
+            # Fill all other structures directly
+            if structDef.name in caps:
+                paramList.append((structDef, 's->', caps[structDef.name]))
+
+            if paramList:
+                gen += '                case {0}: {{\n'.format(structDef.sType)
+                gen += '                    {0}* s = reinterpret_cast<{0}*>(p);\n'.format(structDef.name)
+                for params in paramList:
+                    genAssign = func('                    ' + fmt, params[0], params[1], params[2])
+                    if genAssign != '':
+                        hasData = True
+                        gen += genAssign
+                gen += '                } break;\n'
+
+        gen += ('                default: break;\n'
+                '            }\n')
+        return gen if hasData else ''
+
+
+    def gen_structDesc(self):
+        gen = ''
+
+        fillFmt = '{0};\n'
+        cmpFmt = 'ret = ret && {0};\n'
+
+        # Feature descriptor
+        gen += ('\n'
+                'static const _vpFeatureDesc _featureDesc = {\n'
+                '    [](VkBaseOutStructure* p) {\n')
+        gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structFill, fillFmt)
+        gen += ('    },\n'
+                '    [](VkBaseOutStructure* p) -> bool {\n'
+                '        bool ret = true;\n')
+        gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structCompare, cmpFmt)
+        gen += ('        return ret;\n'
+                '    }\n'
+                '};\n')
+
+        # Property descriptor
+        gen += ('\n'
+                'static const _vpPropertyDesc _propertyDesc = {\n'
+                '    [](VkBaseOutStructure* p) {\n')
+        gen += self.gen_structFunc(self.structs.property, self.capabilities.properties, self.gen_structFill, fillFmt)
+        gen += ('    },\n'
+                '    [](VkBaseOutStructure* p) -> bool {\n'
+                '        bool ret = true;\n')
+        gen += self.gen_structFunc(self.structs.property, self.capabilities.properties, self.gen_structCompare, cmpFmt)
+        gen += ('        return ret;\n'
+                '    }\n'
+                '};\n')
+
+        # Queue family descriptor
+        if self.structs.queueFamily:
             gen += ('\n'
-                    'static const VpStructureProperties _structProps[] = {\n')
+                    'static const _vpQueueFamilyDesc _queueFamilyDesc[] = {\n')
+            for queueFamilyCaps in self.capabilities.queueFamiliesProperties:
+                gen += ('    {\n'
+                        '        [](VkBaseOutStructure* p) {\n')
+                gen += self.gen_structFunc(self.structs.queueFamily, queueFamilyCaps, self.gen_structFill, fillFmt)
+                gen += ('        },\n'
+                        '        [](VkBaseOutStructure* p) -> bool {\n'
+                        '            bool ret = true;\n')
+                gen += self.gen_structFunc(self.structs.queueFamily, queueFamilyCaps, self.gen_structCompare, cmpFmt)
+                gen += ('            return ret;\n'
+                        '        }\n'
+                        '    },\n')
+            gen += ('};\n')
 
-            if features:
-                for featureStructName in features:
-                    if featureStructName == 'VkPhysicalDeviceFeatures':
-                        # Special case, as it's wrapped into VkPhysicalDeviceFeatures2
-                        featureStructName = 'VkPhysicalDeviceFeatures2'
-
-                    structDef = registry.structs.get(featureStructName)
-                    if structDef == None:
-                        Log.f("Feature structure '{0}' does not exist".format(featureStructName))
-
-                    if structDef.sType == None:
-                        Log.f("Feature structure '{0}' is not chainable".format(featureStructName))
-
-                    if not 'VkPhysicalDeviceFeatures2' in structDef.extends + [ structDef.name ]:
-                        Log.f("Feature structure '{0}' does not extend VkPhysicalDeviceFeatures2".format(featureStructName))
-
-                    gen += '    {{ {0}, VP_STRUCTURE_FEATURES }},\n'.format(structDef.sType)
-
-            if properties:
-                for propertyStructName in properties:
-                    if propertyStructName == 'VkPhysicalDeviceProperties':
-                        # Special case, as it's wrapped into VkPhysicalDeviceProperties2
-                        propertyStructName = 'VkPhysicalDeviceProperties2'
-
-                    structDef = registry.structs.get(propertyStructName)
-                    if structDef == None:
-                        Log.f("Properties structure '{0}' does not exist".format(propertyStructName))
-
-                    if structDef.sType == None:
-                        Log.f("Properties structure '{0}' is not chainable".format(propertyStructName))
-
-                    if not 'VkPhysicalDeviceProperties2' in [ structDef.name ] + structDef.extends:
-                        Log.f("Properties structure '{0}' does not extend VkPhysicalDeviceProperties2".format(propertyStructName))
-
-                    gen += '    {{ {0}, VP_STRUCTURE_PROPERTIES }},\n'.format(structDef.sType)
-
+        # Format descriptor
+        if self.structs.format:
+            gen += ('\n'
+                    'static const _vpFormatDesc _formatDesc[] = {\n')
+            for formatName, formatCaps in self.capabilities.formats.items():
+                gen += ('    {{\n'
+                        '        {0},\n'
+                        '        [](VkBaseOutStructure* p) {{\n').format(formatName)
+                gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structFill, fillFmt)
+                gen += ('        },\n'
+                        '        [](VkBaseOutStructure* p) -> bool {\n'
+                        '            bool ret = true;\n')
+                gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structCompare, cmpFmt)
+                gen += ('            return ret;\n'
+                        '        }\n'
+                        '    },\n')
             gen += '};\n'
+
         return gen
 
 
@@ -1050,10 +1527,6 @@ class VulkanProfilesBuilder():
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
             f.write(CPP_HEADER)
-            f.write(self.gen_formatLists())
-            # TODO: Memory types removed for now
-            #f.write(self.gen_memoryTypeLists())
-            f.write(self.gen_queueFamilyLists())
             f.write(self.gen_privateImpl())
             f.write(self.gen_publicImpl())
 
@@ -1066,10 +1539,6 @@ class VulkanProfilesBuilder():
             f.write(HPP_HEADER)
             f.write(self.gen_profileDefs())
             f.write(API_DEFS)
-            f.write(self.gen_formatLists())
-            # TODO: Memory types removed for now
-            #f.write(self.gen_memoryTypeLists())
-            f.write(self.gen_queueFamilyLists())
             f.write(self.gen_privateImpl())
             f.write(self.gen_publicImpl())
             f.write(HPP_FOOTER)
@@ -1118,8 +1587,15 @@ class VulkanProfilesBuilder():
     def gen_profilePrivateImpl(self):
         gen = ''
         for profile in self.profiles.values():
-            gen += profile.generatePrivateImpl(self.registry)
+            gen += profile.generatePrivateImpl()
         return gen
+
+
+    def gen_dataArrayInfo(self, condition, name):
+        if condition:
+            return '        &{0}[0], _vpArraySize({0}),\n'.format(name)
+        else:
+            return '        nullptr, 0,\n'
 
 
     def gen_profileDescTable(self):
@@ -1133,25 +1609,17 @@ class VulkanProfilesBuilder():
                     '        VpProfileProperties{{ {1}_NAME, {1}_SPEC_VERSION }},\n'
                     '        {1}_MIN_API_VERSION,\n').format(name, uname)
 
-            if profile.capabilities.instanceExtensions:
-                gen += '        &{0}::_instanceExtensions[0], _vpArraySize({0}::_instanceExtensions),\n'.format(uname)
-            else:
-                gen += '        nullptr, 0,\n'
-
-            if profile.capabilities.deviceExtensions:
-                gen += '        &{0}::_deviceExtensions[0], _vpArraySize({0}::_deviceExtensions),\n'.format(uname)
-            else:
-                gen += '        nullptr, 0,\n'
-
-            if profile.fallback:
-                gen += '        &{0}::_fallbacks[0], _vpArraySize({0}::_fallbacks),\n'.format(uname)
-            else:
-                gen += '        nullptr, 0,\n'
-
-            if profile.capabilities.features or profile.capabilities.properties:
-                gen += '        &{0}::_structProps[0], _vpArraySize({0}::_structProps)\n'.format(uname)
-            else:
-                gen += '        nullptr, 0\n'
+            gen += self.gen_dataArrayInfo(profile.capabilities.instanceExtensions, '{0}::_instanceExtensions'.format(uname))
+            gen += self.gen_dataArrayInfo(profile.capabilities.deviceExtensions, '{0}::_deviceExtensions'.format(uname))
+            gen += self.gen_dataArrayInfo(profile.fallback, '{0}::_fallbacks'.format(uname))
+            gen += self.gen_dataArrayInfo(profile.structs.feature, '{0}::_featureStructTypes'.format(uname))
+            gen += '        {0}::_featureDesc,\n'.format(uname)
+            gen += self.gen_dataArrayInfo(profile.structs.property, '{0}::_propertyStructTypes'.format(uname))
+            gen += '        {0}::_propertyDesc,\n'.format(uname)
+            gen += self.gen_dataArrayInfo(profile.structs.queueFamily, '{0}::_queueFamilyStructTypes'.format(uname))
+            gen += self.gen_dataArrayInfo(profile.structs.queueFamily, '{0}::_queueFamilyDesc'.format(uname))
+            gen += self.gen_dataArrayInfo(profile.structs.format, '{0}::_formatStructTypes'.format(uname))
+            gen += self.gen_dataArrayInfo(profile.structs.format, '{0}::_formatDesc'.format(uname))
 
             gen += ('    },\n'
                     '#endif\n')
@@ -1162,111 +1630,14 @@ class VulkanProfilesBuilder():
 
     def gen_publicImpl(self):
         gen = PUBLIC_IMPL_BODY
-        gen += self.gen_vpGetDeviceProfileSupport()
+        gen += self.gen_vpGetPhysicalDeviceProfileSupport()
         gen += self.gen_vpCreateDevice()
-        gen += self.gen_vpGetProfileStructures()
-        gen += self.gen_vpGetProfileFormats()
-        gen += self.gen_vpGetProfileFormatProperties()
-        # TODO: Memory types removed for now
-        #gen += self.gen_vpGetProfileMemoryTypes()
-        gen += self.gen_vpGetProfileQueueFamilies()
         return gen
 
 
-    def gen_formatLists(self):
+    def gen_vpGetPhysicalDeviceProfileSupport(self):
         gen = '\n'
-        # TODO: Make format properties extensible
-        gen += ('struct VpFormatProperties {\n'
-                '    VkFormat format;\n'
-                '    VkFlags64 linearTilingFeatures;\n'
-                '    VkFlags64 optimalTilingFeatures;\n'
-                '    VkFlags64 bufferFeatures;\n'
-                '};\n')
-        for name, profile in self.profiles.items():
-            if profile.capabilities.formats:
-                gen += ('\n'
-                        '#ifdef {0}\n'
-                        'static const VpFormatProperties _{1}_FORMATS[] = {{\n').format(name, name.upper())
-                for format, props in profile.capabilities.formats.items():
-                    for propStructName in props:
-                        if propStructName != 'VkFormatProperties':
-                            Log.f("Unsupported format properties structure '{0}'".format(propStructName))
-
-                    formatProps = props['VkFormatProperties']
-
-                    gen += ('    {{\n'
-                            '        {0},\n'
-                            '        {1},\n'
-                            '        {2},\n'
-                            '        {3},\n'
-                            '    }},\n').format(format,
-                                                self.gen_listValue(formatProps.get('linearTilingFeatures')),
-                                                self.gen_listValue(formatProps.get('optimalTilingFeatures')),
-                                                self.gen_listValue(formatProps.get('bufferFeatures')))
-                gen += ('};\n'
-                        '#endif\n')
-        return gen
-
-
-    def gen_memoryTypeLists(self):
-        gen = ''
-        # TODO: Make memory properties extensible if necessary
-        for name, profile in self.profiles.items():
-            if profile.capabilities.memoryProperties:
-                gen += ('\n'
-                        '#ifdef {0}\n'
-                        'static const VkMemoryPropertyFlags _{1}_MEMORY_TYPES[] = {{\n').format(name, name.upper())
-                for propStructName, members in profile.capabilities.memoryProperties.items():
-                    if propStructName != 'VkPhysicalDeviceMemoryProperties':
-                        Log.f("Unsupported memory properties structure '{0}'".format(propStructName))
-                    for member in members:
-                        if member != 'memoryTypes':
-                            Log.f("Unsupported memory properties struct member '{0}'".format(member))
-
-                    memoryTypes = members['memoryTypes']
-                    for memoryType in memoryTypes:
-                        gen += '    {0},\n'.format(self.gen_listValue(memoryType['propertyFlags']))
-                gen += ('};\n'
-                        '#endif\n')
-        return gen
-
-
-    def gen_queueFamilyLists(self):
-        gen = ''
-        # TODO: Make queue family properties extensible
-        for name, profile in self.profiles.items():
-            if profile.capabilities.queueFamiliesProperties:
-                gen += ('\n'
-                        '#ifdef {0}\n'
-                        'static const VkQueueFamilyProperties _{1}_QUEUE_FAMILY_PROPERTIES[] = {{\n').format(name, name.upper())
-
-                for queueFamilyData in profile.capabilities.queueFamiliesProperties:
-                    for propStructName, members in queueFamilyData.items():
-                        if propStructName != 'VkQueueFamilyProperties':
-                            Log.f("Unsupported memory properties structure '{0}'".format(propStructName))
-
-                        gen += '    {0},\n'.format(
-                            self.gen_listValue(
-                                [
-                                    self.gen_listValue(members['queueFlags']),
-                                    members['queueCount'],
-                                    members['timestampValidBits'],
-                                    self.gen_listValue(
-                                        [
-                                            members['minImageTransferGranularity']['width'],
-                                            members['minImageTransferGranularity']['height'],
-                                            members['minImageTransferGranularity']['depth']
-                                        ], False)
-                                ], False))
-
-                gen += ('};\n'
-                        '#endif\n')
-        return gen
-
-
-    def gen_vpGetDeviceProfileSupport(self):
-        gen = '\n'
-        gen += ('VPAPI_ATTR VkResult vpGetDeviceProfileSupport(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile, VkBool32 *pSupported) {\n'
+        gen += ('VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile, VkBool32 *pSupported) {\n'
                 '    assert(pProfile != nullptr);\n'
                 '    assert(pSupported != nullptr);\n'
                 '    assert(physicalDevice != VK_NULL_HANDLE);\n'
@@ -1303,11 +1674,8 @@ class VulkanProfilesBuilder():
             # Check features
             features = profile.capabilities.features
             if features:
-                pNextDevice = None
-                pNextProfile = None
+                pNext = None
                 gen += '\n'
-                genDef = ''
-                genCheck = '        bool featuresSupported = true;\n'
                 for featureStructName, feature in features.items():
                     structDef = self.registry.structs.get(featureStructName)
                     if structDef == None:
@@ -1322,44 +1690,28 @@ class VulkanProfilesBuilder():
                         varAccessSuffix = '.'
                         sType = structDef.sType
 
-                    deviceVarName = 'device' + featureStructName[2:]
-                    genDef += '        {0} {1}{{ {2} }};\n'.format(featureStructName, deviceVarName, sType)
+                    varName = featureStructName[2].lower() + featureStructName[3:]
+                    gen += '        {0} {1}{{ {2} }};\n'.format(featureStructName, varName, sType)
                     if featureStructName != 'VkPhysicalDeviceFeatures2':
-                        if pNextDevice != None:
-                            genDef += '        {0}.pNext = &{1};\n'.format(deviceVarName, pNextDevice)
-                        pNextDevice = deviceVarName
-
-                    profileVarName = 'profile' + featureStructName[2:]
-                    genDef += '        {0} {1}{{ {2} }};\n'.format(featureStructName, profileVarName, sType)
-                    if pNextProfile != None:
-                        genDef += '        {0}.pNext = &{1};\n'.format(profileVarName, pNextProfile)
-                    pNextProfile = profileVarName
-
-                    genCheck += self.gen_compareStructVar('        featuresSupported = featuresSupported && {0};\n', structDef, deviceVarName + varAccessSuffix, profileVarName + varAccessSuffix, feature)
-
-                genCheck = genCheck[:-1] + ';\n'
+                        if pNext != None:
+                            gen += '        {0}.pNext = &{1};\n'.format(varName, pNext)
+                        pNext = varName
 
                 if not 'VkPhysicalDeviceFeatures' in features and not 'VkPhysicalDeviceFeatures2' in features:
                     # We have to manually add VkPhysicalDeviceFeatures2 as it's not used in the profile
-                    genDef += '        VkPhysicalDeviceFeatures2 devicePhysicalDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };\n'
-                if pNextDevice != None:
+                    gen += '        VkPhysicalDeviceFeatures2 physicalDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };\n'
+                if pNext != None:
                     # For vkGetPhysicalDeviceFeatures2 everything has to be chained to VkPhysicalDeviceFeatures2
-                    genDef += '        devicePhysicalDeviceFeatures2.pNext = &{0};\n'.format(pNextDevice)
+                    gen += '        physicalDeviceFeatures2.pNext = &{0};\n'.format(pNext)
 
-                gen += genDef
-                gen += '        vkGetPhysicalDeviceFeatures2(physicalDevice, &devicePhysicalDeviceFeatures2);\n'
-                gen += '        vpGetProfileStructures(pProfile, &{0});\n'.format(pNextProfile)
-                gen += genCheck
-                gen += '        if (!featuresSupported) return result;\n'
+                gen += '        vkGetPhysicalDeviceFeatures2(physicalDevice, &physicalDeviceFeatures2);\n'
+                gen += '        if (!{0}::_featureDesc.pfnComparator(reinterpret_cast<VkBaseOutStructure*>(&physicalDeviceFeatures2))) return result;\n'.format(uname)
 
             # Check properties
             properties = profile.capabilities.properties
             if properties:
-                pNextDevice = None
-                pNextProfile = None
+                pNext = None
                 gen += '\n'
-                genDef = ''
-                genCheck = '        bool propertiesSupported = true;\n'
                 for propertyStructName, property in properties.items():
                     structDef = self.registry.structs.get(propertyStructName)
                     if structDef == None:
@@ -1374,67 +1726,32 @@ class VulkanProfilesBuilder():
                         varAccessSuffix = '.'
                         sType = structDef.sType
 
-                    deviceVarName = 'device' + propertyStructName[2:]
-                    genDef += '        {0} {1}{{ {2} }};\n'.format(propertyStructName, deviceVarName, sType)
+                    varName = propertyStructName[2].lower() + propertyStructName[3:]
+                    gen += '        {0} {1}{{ {2} }};\n'.format(propertyStructName, varName, sType)
                     if propertyStructName != 'VkPhysicalDeviceProperties2':
-                        if pNextDevice != None:
-                            genDef += '        {0}.pNext = &{1};\n'.format(deviceVarName, pNextDevice)
-                        pNextDevice = deviceVarName
-
-                    profileVarName = 'profile' + propertyStructName[2:]
-                    genDef += '        {0} {1}{{ {2} }};\n'.format(propertyStructName, profileVarName, sType)
-                    if pNextProfile != None:
-                        genDef += '        {0}.pNext = &{1};\n'.format(profileVarName, pNextProfile)
-                    pNextProfile = profileVarName
-
-                    genCheck += self.gen_compareStructVar('        propertiesSupported = propertiesSupported && {0};\n', structDef, deviceVarName + varAccessSuffix, profileVarName + varAccessSuffix, property)
-
-                genCheck = genCheck[:-1] + ';\n'
+                        if pNext != None:
+                            gen += '        {0}.pNext = &{1};\n'.format(varName, pNext)
+                        pNext = varName
 
                 if not 'VkPhysicalDeviceProperties' in properties and not 'VkPhysicalDeviceProperties2' in properties:
                     # We have to manually add VkPhysicalDeviceProperies2 as it's not used in the profile
-                    genDef += '        VkPhysicalDeviceProperties2 devicePhysicalDeviceProperties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };\n'
-                if pNextDevice != None:
+                    gen += '        VkPhysicalDeviceProperties2 physicalDeviceProperties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };\n'
+                if pNext != None:
                     # For vkGetPhysicalDeviceProperties2 everything has to be chained to VkPhysicalDeviceProperties2
-                    genDef += '        devicePhysicalDeviceProperties2.pNext = &{0};\n'.format(pNextDevice)
+                    gen += '        physicalDeviceProperties2.pNext = &{0};\n'.format(pNext)
 
-                gen += genDef
-                gen += '        vkGetPhysicalDeviceProperties2(physicalDevice, &devicePhysicalDeviceProperties2);\n'
-                gen += '        vpGetProfileStructures(pProfile, &{0});\n'.format(pNextProfile)
-                gen += genCheck
-                gen += '        if (!propertiesSupported) return result;\n'
+                gen += '        vkGetPhysicalDeviceProperties2(physicalDevice, &physicalDeviceProperties2);\n'
+                gen += '        if (!{0}::_propertyDesc.pfnComparator(reinterpret_cast<VkBaseOutStructure*>(&physicalDeviceProperties2))) return result;\n'.format(uname)
 
             # Check queue family properties
             if profile.capabilities.queueFamiliesProperties:
-                gen += ('\n'
-                        '        uint32_t queueFamilyCount = 0;\n'
-                        '        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);\n'
-                        '        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);\n'
-                        '        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());\n'
-                        '\n'
-                        '        bool queueFamiliesSupported = true;\n'
-                        '        for (uint32_t i = 0; i < _vpArraySize(_{0}_QUEUE_FAMILY_PROPERTIES); ++i) {{\n'
-                        '            if (!_vpCheckQueueFamilyProperty(&queueFamilies[0], queueFamilyCount, _{0}_QUEUE_FAMILY_PROPERTIES[i])) {{\n'
-                        '                queueFamiliesSupported = false;\n'
-                        '                break;\n'
-                        '            }}\n'
-                        '        }}\n'
-                        '        if (!queueFamiliesSupported) return result;\n').format(uname)
+                # TODO: Complete this once this function is generalized
+                pass
 
-            # Check memory types
-            if profile.capabilities.memoryProperties:
-                gen += ('\n'
-                        '        VkPhysicalDeviceMemoryProperties memoryProperties;\n'
-                        '        vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);\n'
-                        '\n'
-                        '        bool memoryTypesSupported = true;\n'
-                        '        for (uint32_t i = 0; i < _vpArraySize(_{0}_MEMORY_TYPES); ++i) {{\n'
-                        '            if (!_vpCheckMemoryProperty(memoryProperties, _{0}_MEMORY_TYPES[i])) {{\n'
-                        '                memoryTypesSupported = false;\n'
-                        '                break;\n'
-                        '            }}\n'
-                        '        }}\n'
-                        '        if (!memoryTypesSupported) return result;\n').format(uname)
+            # Check formats
+            if profile.capabilities.formats:
+                # TODO: Complete this once this function is generalized
+                pass
 
             gen += ('    } else\n'
                     '#endif\n')
@@ -1516,7 +1833,7 @@ class VulkanProfilesBuilder():
                                  '        }}\n').format(profileVarName)
 
                 gen += genDef
-                gen += '        vpGetProfileStructures(pCreateInfo->pProfile, &{0});\n'.format(pNext)
+                gen += '        vpGetProfileFeatures(pCreateInfo->pProfile, &{0});\n'.format(pNext)
                 gen += genCheck
 
             gen += ('\n'
@@ -1545,344 +1862,6 @@ class VulkanProfilesBuilder():
         gen += ('    {\n'
                 '        return VK_ERROR_UNKNOWN;\n'
                 '    }\n'
-                '}\n')
-        return gen
-
-
-    def gen_listValue(self, values, isEnum = True):
-        gen = ''
-        if not isEnum:
-            gen += '{ '
-
-        separator = ''
-        if values != None and len(values) > 0:
-            for value in values:
-                gen += separator + str(value)
-                if isEnum:
-                    separator = ' | '
-                else:
-                    separator = ', '
-        elif isEnum:
-            gen += '0'
-
-        if not isEnum:
-            gen += ' }'
-        return gen
-
-
-    def gen_assignStructVar(self, structDef, var, values):
-        gen = ''
-        for member, value in values.items():
-            if member in structDef.members:
-                if type(value) == dict:
-                    # Nested structure
-                    memberDef = self.registry.structs.get(structDef.members[member].type)
-                    if memberDef != None:
-                        gen += self.gen_assignStructVar(memberDef, var + member + '.', value)
-                    else:
-                        Log.f("Member '{0}' in structure '{1}' is not a struct".format(member, structDef.name))
-
-                elif type(value) == list:
-                    # Some sort of list (enums or integer/float list for structure initialization)
-                    if structDef.members[member].isArray:
-                        # If it's an array we have to generate per-element assignment code
-                        for i, v in enumerate(value):
-                            gen += '{0}{1}[{2}] = {3};\n'.format(var, member, i, v)
-                    else:
-                        # For enums and struct initialization, most of the code can be shared
-                        gen += '{0}{1} = '.format(var, member)
-                        isEnum = isinstance(value[0], str)
-                        gen += '{0};\n'.format(self.gen_listValue(value, isEnum))
-
-                elif type(value) == bool:
-                    # Boolean
-                    gen += '{0}{1} = {2};\n'.format(var, member, 'VK_TRUE' if value else 'VK_FALSE')
-
-                else:
-                    # Everything else
-                    gen += '{0}{1} = {2};\n'.format(var, member, value)
-            else:
-                Log.f("No member '{0}' in structure '{1}'".format(member, structDef.name))
-        return gen
-
-
-    def gen_compareStructVar(self, fmt, structDef, deviceVar, profileVar, values):
-        gen = ''
-        for member, value in values.items():
-            if member in structDef.members:
-                limittype = structDef.members[member].limittype
-                if limittype == 'IGNORE':
-                    # Skip this member as we don't know how to validate it
-                    continue
-                if limittype == 'bitmask':
-                    # Compare bitmask by checking if device value contains every bit of profile value
-                    comparePredFmt = '(({0} & {1}) == {1})'
-                elif limittype == 'max':
-                    # Compare max limit by checking if device value is greater than or equal to profile value
-                    comparePredFmt = '({0} >= {1})'
-                elif limittype == 'min':
-                    # Compare min limit by checking if device value is less than or equal to profile value
-                    comparePredFmt = '({0} <= {1})'
-                elif limittype == 'range':
-                    # Compare range limit by checking if device range is larger than or equal to profile range
-                    comparePredFmt = [ '({0} <= {1})', '({0} >= {1})' ]
-                elif limittype is None or limittype == 'noauto' or limittype == 'struct':
-                    # Compare everything else with equality
-                    comparePredFmt = '({0} == {1})'
-                else:
-                    Log.f("Unsupported limittype '{0}' in member '{1}' of structure '{2}'".format(limittype, member, structDef.name))
-
-                if type(value) == dict:
-                    # Nested structure
-                    memberDef = self.registry.structs.get(structDef.members[member].type)
-                    if memberDef != None:
-                        gen += self.gen_compareStructVar(fmt, memberDef, deviceVar + member + '.', profileVar + member + '.', value)
-                    else:
-                        Log.f("Member '{0}' in structure '{1}' is not a struct".format(member, structDef.name))
-
-                elif type(value) == list:
-                    # Some sort of list (enums or integer/float list for structure initialization)
-                    if structDef.members[member].isArray:
-                        # If it's an array we have to generate per-element comparison code
-                        for i in range(len(value)):
-                            if limittype == 'range':
-                                gen += fmt.format(comparePredFmt[i].format('{0}{1}[{2}]'.format(deviceVar, member, i),
-                                                                           '{0}{1}[{2}]'.format(profileVar, member, i)))
-                            else:
-                                gen += fmt.format(comparePredFmt.format('{0}{1}[{2}]'.format(deviceVar, member, i),
-                                                                        '{0}{1}[{2}]'.format(profileVar, member, i)))
-                    else:
-                        # Enum flags and basic structs can be compared directly
-                        gen += fmt.format(comparePredFmt.format('{0}{1}'.format(deviceVar, member),
-                                                                '{0}{1}'.format(profileVar, member)))
-
-                else:
-                    # Everything else
-                    gen += fmt.format(comparePredFmt.format('{0}{1}'.format(deviceVar, member),
-                                                            '{0}{1}'.format(profileVar, member)))
-            else:
-                Log.f("No member '{0}' in structure '{1}'".format(member, structDef.name))
-        return gen
-
-
-    def gen_vpGetProfileStructures(self):
-        gen = '\n'
-        gen += ('VPAPI_ATTR void vpGetProfileStructures(const VpProfileProperties *pProfile, void *pNext) {\n'
-                '    if (pProfile == nullptr || pNext == nullptr) return;\n'
-                '    VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);\n')
-
-        for name, profile in self.profiles.items():
-            uname = name.upper()
-            gen += ('#ifdef {0}\n'
-                    '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
-                    '        while (p != nullptr) {{\n'
-                    '            switch (p->sType) {{\n').format(name, uname)
-
-            # Generate feature structure data
-            features = profile.capabilities.features
-            if features:
-                for featureStructName in features:
-                    structDef = self.registry.structs.get(featureStructName)
-                    if structDef == None:
-                        Log.f("Feature structure '{0}' does not exist".format(featureStructName))
-
-                    if featureStructName == 'VkPhysicalDeviceFeatures':
-                        # Special case, as it's wrapped into VkPhysicalDeviceFeatures2
-                        gen += ('                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {\n'
-                                '                    VkPhysicalDeviceFeatures2* wrap = reinterpret_cast<VkPhysicalDeviceFeatures2*>(p);\n'
-                                '                    VkPhysicalDeviceFeatures* features = &wrap->features;\n')
-                    elif structDef.sType:
-                        gen += '                case {0}: {{\n'.format(structDef.sType)
-                        gen += '                    {0}* features = reinterpret_cast<{0}*>(p);\n'.format(featureStructName)
-                    else:
-                        Log.f("Feature structure '{0}' is not chainable".format(featureStructName))
-
-                    gen += self.gen_assignStructVar(structDef, '                    features->', features[featureStructName])
-                    gen += '                } break;\n'
-
-            # Generate property structure data
-            properties = profile.capabilities.properties
-            if properties:
-                for propertyStructName in properties:
-                    structDef = self.registry.structs.get(propertyStructName)
-                    if structDef == None:
-                        Log.f("Properties structure '{0}' does not exist".format(propertyStructName))
-
-                    if propertyStructName == 'VkPhysicalDeviceProperties':
-                        # Special case, as it's wrapped into VkPhysicalDeviceProperties2
-                        gen += ('                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {\n'
-                                '                    VkPhysicalDeviceProperties2* wrap = reinterpret_cast<VkPhysicalDeviceProperties2*>(p);\n'
-                                '                    VkPhysicalDeviceProperties* props = &wrap->properties;\n')
-                    elif structDef.sType:
-                        gen += '                case {0}: {{\n'.format(structDef.sType)
-                        gen += '                    {0}* props = reinterpret_cast<{0}*>(p);\n'.format(propertyStructName)
-                    else:
-                        Log.f("Properties structure '{0}' is not chainable".format(propertyStructName))
-
-                    gen += self.gen_assignStructVar(structDef, '                    props->', properties[propertyStructName])
-                    gen += '                } break;\n'
-
-            gen += ('                default: break;\n'
-                    '            }\n'
-                    '            p = p->pNext;\n'
-                    '        }\n'
-                    '    } else\n'
-                    '#endif\n')
-
-        gen += ('    {\n'
-                '    }\n'
-                '}\n')
-        return gen
-
-
-    def gen_vpGetProfileFormats(self):
-        gen = '\n'
-        gen += ('VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats) {\n'
-                '    VkResult result = VK_SUCCESS;\n')
-
-        for name, profile in self.profiles.items():
-            if profile.capabilities.formats:
-                gen += ('#ifdef {0}\n'
-                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
-                        '        if (pFormats == nullptr) {{\n'
-                        '            *pFormatCount = _vpArraySize(_{1}_FORMATS);\n'
-                        '        }} else {{\n'
-                        '            if (*pFormatCount < _vpArraySize(_{1}_FORMATS)) {{\n'
-                        '                result = VK_INCOMPLETE;\n'
-                        '            }} else {{\n'
-                        '                *pFormatCount = _vpArraySize(_{1}_FORMATS);\n'
-                        '            }}\n'
-                        '            for (uint32_t i = 0; i < *pFormatCount; ++i) {{\n'
-                        '                pFormats[i] = _{1}_FORMATS[i].format;\n'
-                        '            }}\n'
-                        '        }}\n'
-                        '    }} else\n'
-                        '#endif\n').format(name, name.upper())
-
-        gen += ('    {\n'
-                '        *pFormatCount = 0;\n'
-                '    }\n'
-                '    return result;\n'
-                '}\n')
-        return gen
-
-
-    def gen_vpGetProfileFormatProperties(self):
-        gen = '\n'
-        gen += ('VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext) {\n'
-                '    if (pProfile == nullptr || pNext == nullptr) return;\n'
-                '    VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);\n')
-
-        for name, profile in self.profiles.items():
-            if profile.capabilities.formats:
-                gen += ('#ifdef {0}\n'
-                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
-                        '        for (uint32_t i = 0; i < _vpArraySize(_{1}_FORMATS); ++i) {{\n'
-                        '            const VpFormatProperties& props = _{1}_FORMATS[i];\n'
-                        '            if (props.format != format) continue;\n'
-                        '\n'
-                        '            while (p != nullptr) {{\n'
-                        '                switch (p->sType) {{\n').format(name, name.upper())
-
-                # TODO: Make format properties extensible
-                formatPropTypes = [
-                    {
-                        'sType': 'VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2',
-                        'varDecl': 'VkFormatProperties2* pProps = reinterpret_cast<VkFormatProperties2*>(p);',
-                        'varRef': 'pProps->formatProperties.',
-                        'valCast': 'static_cast<VkFormatFeatureFlags>'
-                    },
-                    {
-                        'sType': 'VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR',
-                        'varDecl': 'VkFormatProperties3KHR* pProps = reinterpret_cast<VkFormatProperties3KHR*>(p);',
-                        'varRef': 'pProps->',
-                        'valCast': ''
-                    }
-                ]
-                for types in formatPropTypes:
-                    gen += ('                    case {0}: {{\n'
-                            '                        {1};\n'
-                            '                        {2}linearTilingFeatures = {3}(props.linearTilingFeatures);\n'
-                            '                        {2}optimalTilingFeatures = {3}(props.optimalTilingFeatures);\n'
-                            '                        {2}bufferFeatures = {3}(props.bufferFeatures);\n'
-                            '                    }} break;\n').format(types['sType'], types['varDecl'], types['varRef'], types['valCast'])
-
-                gen += ('                    default: break;\n'
-                        '                }\n'
-                        '                p = p->pNext;\n'
-                        '            }\n'
-                        '        }\n'
-                        '    } else\n'
-                        '#endif\n')
-
-        gen += ('    {\n'
-                '    }\n'
-                '}\n')
-        return gen
-
-
-    def gen_vpGetProfileMemoryTypes(self):
-        gen = '\n'
-        gen += ('VPAPI_ATTR VkResult vpGetProfileMemoryTypes(const VpProfileProperties *pProfile, uint32_t *pMemoryPropertyFlagsCount,\n'
-                '                                            VkMemoryPropertyFlags *pMemoryPropertyFlags) {\n'
-                '    VkResult result = VK_SUCCESS;\n')
-
-        for name, profile in self.profiles.items():
-            if profile.capabilities.memoryProperties:
-                gen += ('#ifdef {0}\n'
-                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
-                        '        if (pMemoryPropertyFlags == nullptr) {{\n'
-                        '            *pMemoryPropertyFlagsCount = _vpArraySize(_{1}_MEMORY_TYPES);\n'
-                        '        }} else {{\n'
-                        '            if (*pMemoryPropertyFlagsCount < _vpArraySize(_{1}_MEMORY_TYPES)) {{\n'
-                        '                result = VK_INCOMPLETE;\n'
-                        '            }} else {{\n'
-                        '                *pMemoryPropertyFlagsCount = _vpArraySize(_{1}_MEMORY_TYPES);\n'
-                        '            }}\n'
-                        '            for (uint32_t i = 0; i < *pMemoryPropertyFlagsCount; ++i) {{\n'
-                        '                pMemoryPropertyFlags[i] = _{1}_MEMORY_TYPES[i];\n'
-                        '            }}\n'
-                        '        }}\n'
-                        '    }} else\n'
-                        '#endif\n').format(name, name.upper())
-
-        gen += ('    {\n'
-                '        *pMemoryPropertyFlagsCount = 0;\n'
-                '    }\n'
-                '    return result;\n'
-                '}\n')
-        return gen
-
-
-    def gen_vpGetProfileQueueFamilies(self):
-        gen = '\n'
-        gen += ('VPAPI_ATTR VkResult vpGetProfileQueueFamilies(const VpProfileProperties *pProfile, uint32_t *pQueueFamilyPropertiesCount,\n'
-                '                                              VkQueueFamilyProperties *pQueueFamilyProperties) {\n'
-                '    VkResult result = VK_SUCCESS;\n')
-
-        for name, profile in self.profiles.items():
-            if profile.capabilities.queueFamiliesProperties:
-                gen += ('#ifdef {0}\n'
-                        '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
-                        '        if (pQueueFamilyProperties == nullptr) {{\n'
-                        '            *pQueueFamilyPropertiesCount = _vpArraySize(_{1}_QUEUE_FAMILY_PROPERTIES);\n'
-                        '        }} else {{\n'
-                        '            if (*pQueueFamilyPropertiesCount < _vpArraySize(_{1}_QUEUE_FAMILY_PROPERTIES)) {{\n'
-                        '                result = VK_INCOMPLETE;\n'
-                        '            }} else {{\n'
-                        '                *pQueueFamilyPropertiesCount = _vpArraySize(_{1}_QUEUE_FAMILY_PROPERTIES);\n'
-                        '            }}\n'
-                        '            for (uint32_t i = 0; i < *pQueueFamilyPropertiesCount; ++i) {{\n'
-                        '                pQueueFamilyProperties[i] = _{1}_QUEUE_FAMILY_PROPERTIES[i];\n'
-                        '            }}\n'
-                        '        }}\n'
-                        '    }} else\n'
-                        '#endif\n').format(name, name.upper())
-
-        gen += ('    {\n'
-                '        *pQueueFamilyPropertiesCount = 0;\n'
-                '    }\n'
-                '    return result;\n'
                 '}\n')
         return gen
 

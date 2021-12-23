@@ -33,7 +33,7 @@ TEST(api_get_profile_queue_families, full) {
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(1, count);
 
-    std::vector<VkQueueFamilyProperties2KHR> data(count);
+    std::vector<VkQueueFamilyProperties2KHR> data(count, { VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR });
     VkResult result1 = vpGetProfileQueueFamilyProperties(&profile, &count, &data[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(1, count);
