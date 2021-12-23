@@ -117,7 +117,7 @@ void devsim_test::setDevsimModifyExtensionList(ArrayCombinationMode mode) {
                                        arrayCombinationModeToString(mode).c_str());
 }
 
-void devsim_test::setDevsimModifyMemoryFags(bool enable) {
+void devsim_test::setDevsimModifyMemoryFlags(bool enable) {
     if (enable)
         devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS", "true");
     else
