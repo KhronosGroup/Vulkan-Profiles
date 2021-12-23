@@ -45,7 +45,7 @@ void setDevsimDebugEnable(bool enable);
 void setDevsimExitOnError(bool enable);
 void setDevsimEmulatePortabilitySubsetExtension(bool enable);
 void setDevsimModifyExtensionList(ArrayCombinationMode mode);
-void setDevsimModifyMemoryFags(bool enable);
+void setDevsimModifyMemoryFlags(bool enable);
 void setDevsimModifyFormatList(ArrayCombinationMode mode);
 void setDevsimModifyFormatProperties(ArrayCombinationMode mode);
 void setDevsimModifySurfaceFormats(ArrayCombinationMode mode);

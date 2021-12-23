@@ -108,73 +108,73 @@ enum SetCombinationMode {
 // Environment variables defined by this layer ///////////////////////////////////////////////////////////////////////////////////
 
 #if defined(__ANDROID__)
-const char *const kEnvarDevsimFilename = "debug.vulkan.devsim.filepath";        // path of the configuration file(s) to load.
-const char *const kEnvarDevsimDebugEnable = "debug.vulkan.devsim.debugenable";  // a non-zero integer will enable debugging output.
-const char *const kEnvarDevsimExitOnError = "debug.vulkan.devsim.exitonerror";  // a non-zero integer will enable exit-on-error.
-const char *const kEnvarDevsimEmulatePortability =
-    "debug.vulkan.devsim.emulateportability";  // a non-zero integer will enable emulation of the VK_KHR_portability_subset
+const char *const kEnvarProfilesFilename = "debug.vulkan.profiles.filepath";        // path of the configuration file(s) to load.
+const char *const kEnvarProfilesDebugEnable = "debug.vulkan.profiles.debugenable";  // a non-zero integer will enable debugging output.
+const char *const kEnvarProfilesExitOnError = "debug.vulkan.profiles.exitonerror";  // a non-zero integer will enable exit-on-error.
+const char *const kEnvarProfilesEmulatePortability =
+    "debug.vulkan.profiles.emulateportability";  // a non-zero integer will enable emulation of the VK_KHR_portability_subset
                                                // extension.
-const char *const kEnvarDevsimModifyExtensionList =
-    "debug.vulkan.devsim.modifyextensionlist";  // a non-zero integer will enable modifying device extensions list.
-const char *const kEnvarDevsimModifyMemoryFlags =
-    "debug.vulkan.devsim.modifymemoryflags";  // a non-zero integer will enable modifying device memory flags.
-const char *const kEnvarDevsimModifyFormatList =
-    "debug.vulkan.devsim.modifyformatlist";  // an ArrayCombinationMode value sets how the device and config format lists are
+const char *const kEnvarProfilesModifyExtensionList =
+    "debug.vulkan.profiles.modifyextensionlist";  // a non-zero integer will enable modifying device extensions list.
+const char *const kEnvarProfilesModifyMemoryFlags =
+    "debug.vulkan.Profiles.modifymemoryflags";  // a non-zero integer will enable modifying device memory flags.
+const char *const kEnvarProfilesModifyFormatList =
+    "debug.vulkan.Profiles.modifyformatlist";  // an ArrayCombinationMode value sets how the device and config format lists are
                                              // combined.
-const char *const kEnvarDevsimModifyFormatProperties =
-    "debug.vulkan.devsim.modifyformatproperties";  // an ArrayCombinationMode value sets how the device and config format properties
+const char *const kEnvarProfilesModifyFormatProperties =
+    "debug.vulkan.Profiles.modifyformatproperties";  // an ArrayCombinationMode value sets how the device and config format properties
                                                    // are combined.
-const char *const kEnvarDevsimModifySurfaceFormats =
-    "debug.vulkan.devsim.modifysurfaceformats";  // an ArrayCombinationMode value sets how the device and config surface format
+const char *const kEnvarProfilesModifySurfaceFormats =
+    "debug.vulkan.Profiles.modifysurfaceformats";  // an ArrayCombinationMode value sets how the device and config surface format
                                                  // lists are combined.
-const char *const kEnvarDevsimModifyPresentModes =
-    "debug.vulkan.devsim.modifypresentmodes";  // an ArrayCombinationMode value sets how the device and config present modes are
+const char *const kEnvarProfilesModifyPresentModes =
+    "debug.vulkan.Profiles.modifypresentmodes";  // an ArrayCombinationMode value sets how the device and config present modes are
                                                // combined.
-const char *const kEnvarDevsimProfileName = "debug.vulkan.devsim.profilename";  // name of the profile to be used
+const char *const kEnvarProfilesProfileName = "debug.vulkan.profiles.profilename";  // name of the profile to be used
 #else
-const char *const kEnvarDevsimFilename = "VK_DEVSIM_FILENAME";          // path of the configuration file(s) to load.
-const char *const kEnvarDevsimDebugEnable = "VK_DEVSIM_DEBUG_ENABLE";   // a non-zero integer will enable debugging output.
-const char *const kEnvarDevsimExitOnError = "VK_DEVSIM_EXIT_ON_ERROR";  // a non-zero integer will enable exit-on-error.
-const char *const kEnvarDevsimEmulatePortability =
-    "VK_DEVSIM_EMULATE_PORTABILITY_SUBSET_EXTENSION";  // a non-zero integer will enable emulation of the VK_KHR_portability_subset
+const char *const kEnvarProfilesFilename = "VK_KHRONOS_PROFILES_FILENAME";          // path of the configuration file(s) to load.
+const char *const kEnvarProfilesDebugEnable = "VK_KHRONOS_PROFILES_DEBUG_ENABLE";   // a non-zero integer will enable debugging output.
+const char *const kEnvarProfilesExitOnError = "VK_KHRONOS_PROFILES_EXIT_ON_ERROR";  // a non-zero integer will enable exit-on-error.
+const char *const kEnvarProfilesEmulatePortability =
+    "VK_KHRONOS_PROFILES_EMULATE_PORTABILITY_SUBSET_EXTENSION";  // a non-zero integer will enable emulation of the VK_KHR_portability_subset
                                                        // extension.
-const char *const kEnvarDevsimModifyExtensionList =
-    "VK_DEVSIM_MODIFY_EXTENSION_LIST";  // an ArrayCombinationMode value sets how the device and config extension lists are
+const char *const kEnvarProfilesModifyExtensionList =
+    "VK_KHRONOS_PROFILES_MODIFY_EXTENSION_LIST";  // an ArrayCombinationMode value sets how the device and config extension lists are
                                         // combined.
-const char *const kEnvarDevsimModifyMemoryFlags =
-    "VK_DEVSIM_MODIFY_MEMORY_FLAGS";  // a non-zero integer will enable modifying device memory flags.
-const char *const kEnvarDevsimModifyFormatList =
-    "VK_DEVSIM_MODIFY_FORMAT_LIST";  // an ArrayCombinationMode value sets how the device and config format lists are combined.
-const char *const kEnvarDevsimModifyFormatProperties =
-    "VK_DEVSIM_MODIFY_FORMAT_PROPERTIES";  // an ArrayCombinationMode value sets how the device and config format properties are
+const char *const kEnvarProfilesModifyMemoryFlags =
+    "VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS";  // a non-zero integer will enable modifying device memory flags.
+const char *const kEnvarProfilesModifyFormatList =
+    "VK_KHRONOS_PROFILES_MODIFY_FORMAT_LIST";  // an ArrayCombinationMode value sets how the device and config format lists are combined.
+const char *const kEnvarProfilesModifyFormatProperties =
+    "VK_KHRONOS_PROFILES_MODIFY_FORMAT_PROPERTIES";  // an ArrayCombinationMode value sets how the device and config format properties are
                                            // combined.
-const char *const kEnvarDevsimModifySurfaceFormats =
-    "VK_DEVSIM_MODIFY_SURFACE_FORMATS";  // an ArrayCombinationMode value sets how the device and config surface format lists are
+const char *const kEnvarProfilesModifySurfaceFormats =
+    "VK_KHRONOS_PROFILES_MODIFY_SURFACE_FORMATS";  // an ArrayCombinationMode value sets how the device and config surface format lists are
                                          // combined.
-const char *const kEnvarDevsimModifyPresentModes =
-    "VK_DEVSIM_MODIFY_PRESENT_MODES";  // an ArrayCombinationMode value sets how the device and config present modes are combined.
-const char *const kEnvarDevsimProfileName = "VK_DEVSIM_PROFILE_NAME"; // name of the profile to be used
+const char *const kEnvarProfilesModifyPresentModes =
+    "VK_KHRONOS_PROFILES_MODIFY_PRESENT_MODES";  // an ArrayCombinationMode value sets how the device and config present modes are combined.
+const char *const kEnvarProfilesProfileName = "VK_KHRONOS_PROFILES_PROFILE_NAME";  // name of the profile to be used
 #endif
 
-const char *const kLayerSettingsDevsimFilename = "filename";         // vk_layer_settings.txt equivalent for kEnvarDevsimFilename
-const char *const kLayerSettingsDevsimDebugEnable = "debug_enable";  // vk_layer_settings.txt equivalent for kEnvarDevsimDebugEnable
-const char *const kLayerSettingsDevsimExitOnError =
-    "exit_on_error";  // vk_layer_settings.txt equivalent for kEnvarDevsimExitOnError
-const char *const kLayerSettingsDevsimEmulatePortability =
-    "emulate_portability";  // vk_layer_settings.txt equivalent for kEnvarDevsimEmulatePortability
-const char *const kLayerSettingsDevsimModifyExtensionList =
-    "modify_extension_list";  // vk_layer_settings.txt equivalent for kEnvarDevsimModifyExtensionList
-const char *const kLayerSettingsDevsimModifyMemoryFlags =
-    "modify_memory_flags";  // vk_layer_settings.txt equivalent for kEnvarDevsimModifyMemoryFlags
-const char *const kLayerSettingsDevsimModifyFormatList =
+const char *const kLayerSettingsProfilesFilename = "filename";         // vk_layer_settings.txt equivalent for kEnvarProfilesFilename
+const char *const kLayerSettingsProfilesDebugEnable = "debug_enable";  // vk_layer_settings.txt equivalent for kEnvarProfilesDebugEnable
+const char *const kLayerSettingsProfilesExitOnError =
+    "exit_on_error";  // vk_layer_settings.txt equivalent for kEnvarProfilesExitOnError
+const char *const kLayerSettingsProfilesEmulatePortability =
+    "emulate_portability";  // vk_layer_settings.txt equivalent for kEnvarProfilesEmulatePortability
+const char *const kLayerSettingsProfilesModifyExtensionList =
+    "modify_extension_list";  // vk_layer_settings.txt equivalent for kEnvarProfilesModifyExtensionList
+const char *const kLayerSettingsProfilesModifyMemoryFlags =
+    "modify_memory_flags";  // vk_layer_settings.txt equivalent for kEnvarProfilesModifyMemoryFlags
+const char *const kLayerSettingsProfilesModifyFormatList =
     "modify_format_list";  // an SetCombinationMode value sets how the device and config format lists are combined.
-const char *const kLayerSettingsDevsimModifyFormatProperties =
+const char *const kLayerSettingsProfilesModifyFormatProperties =
     "modify_format_properties";  // an SetCombinationMode value sets how the device and config format properties are combined.
-const char *const kLayerSettingsDevsimModifySurfaceFormats =
+const char *const kLayerSettingsProfilesModifySurfaceFormats =
     "modify_surface_formats";  // an SetCombinationMode value sets how the device and config surface format lists are combined.
-const char *const kLayerSettingsDevsimModifyPresentModes =
+const char *const kLayerSettingsProfilesModifyPresentModes =
     "modify_present_modes";  // an SetCombinationMode value sets how the device and config present modes are combined.
-const char *const kLayerSettingDevsimProfileName = "profile_name"; // name of the profile to be used
+const char *const kLayerSettingProfilesProfileName = "profile_name";  // name of the profile to be used
 
 struct SetCombinationModeSetting {
     SetCombinationMode mode;
@@ -226,7 +226,7 @@ std::string AndroidGetEnv(const char *key) {
 
     // Only if the value is set will we get a string back
     if (android_env.length() > 0) {
-        __android_log_print(ANDROID_LOG_INFO, "devsim", "Vulkan device simulation layer %s: %s", command.c_str(),
+        __android_log_print(ANDROID_LOG_INFO, "profiles", "Vulkan device simulation layer %s: %s", command.c_str(),
                             android_env.c_str());
         android_env.erase(android_env.find_last_not_of(" \n\r\t") + 1);
         return android_env;
@@ -269,13 +269,13 @@ void AndroidPrintf(VkLogLevel level, const char *fmt, va_list args) {
     vsnprintf(message, requiredLength, fmt, args);
     switch (level) {
         case VK_LOG_DEBUG:
-            __android_log_print(ANDROID_LOG_DEBUG, "devsim", "%s", message);
+            __android_log_print(ANDROID_LOG_DEBUG, "profiles", "%s", message);
             break;
         case VK_LOG_ERROR:
-            __android_log_print(ANDROID_LOG_ERROR, "devsim", "%s", message);
+            __android_log_print(ANDROID_LOG_ERROR, "profiles", "%s", message);
             break;
         default:
-            __android_log_print(ANDROID_LOG_INFO, "devsim", "%s", message);
+            __android_log_print(ANDROID_LOG_INFO, "profiles", "%s", message);
             break;
     }
     free(message);
@@ -285,7 +285,7 @@ void AndroidPrintf(VkLogLevel level, const char *fmt, va_list args) {
 void DebugPrintf(const char *fmt, ...) {
     if (debugLevel.num > 0) {
 #if !defined(__ANDROID__)
-        printf("\tDEBUG devsim ");
+        printf("\tDEBUG profiles ");
 #endif
         va_list args;
         va_start(args, fmt);
@@ -300,7 +300,7 @@ void DebugPrintf(const char *fmt, ...) {
 
 void ErrorPrintf(const char *fmt, ...) {
 #if !defined(__ANDROID__)
-    fprintf(stderr, "\tERROR devsim ");
+    fprintf(stderr, "\tERROR profiles ");
 #endif
     va_list args;
     va_start(args, fmt);
@@ -312,9 +312,9 @@ void ErrorPrintf(const char *fmt, ...) {
     va_end(args);
     if (errorLevel.num > 0) {
 #if defined(__ANDROID__)
-        __android_log_print(ANDROID_LOG_ERROR, "devsim", "devsim exiting on error as requested");
+        __android_log_print(ANDROID_LOG_ERROR, "profiles", "profiles exiting on error as requested");
 #else
-        fprintf(stderr, "\ndevsim exiting on error as requested\n\n");
+        fprintf(stderr, "\nprofiles exiting on error as requested\n\n");
 #endif
         exit(1);
     }
@@ -1173,9 +1173,9 @@ typedef std::vector<VkDeviceSize> ArrayOfVkDeviceSize;
 
 // FormatProperties utilities ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// This is the JSON representation of VkFormat property data, as defined by the Devsim schema.
+// This is the JSON representation of VkFormat property data, as defined by the Profiles schema.
 // It will be split to create a VkFormat value and a VkFormatProperties structure after loading from JSON.
-struct DevsimFormatProperties {
+struct ProfilesFormatProperties {
     VkFormat formatID;
     VkFormatFeatureFlags linearTilingFeatures;
     VkFormatFeatureFlags optimalTilingFeatures;
@@ -2113,7 +2113,7 @@ class PhysicalDeviceData {
 
 PhysicalDeviceData::Map PhysicalDeviceData::map_;
 
-// Loader for DevSim JSON configuration files ////////////////////////////////////////////////////////////////////////////////////
+// Loader for Profiles JSON configuration files ////////////////////////////////////////////////////////////////////////////////////
 
 class JsonLoader {
    public:
@@ -2155,8 +2155,8 @@ class JsonLoader {
         kDevsimUniformBufferStandardLayoutKHR,
         kDevsimVariablePointersKHR,
         kDevsimVulkanMemoryModelKHR,
-        kDevsimProfiles_1_3_200,
-        kDevsimProfiles_1_3_201
+        kProfiles_1_3_200,
+        kProfiles_1_3_201
     };
 
     struct Extension {
@@ -2332,7 +2332,7 @@ class JsonLoader {
                               std::function<bool(const char *, uint32_t, uint32_t)> warn_func);
     void GetValue(const Json::Value &parent, const std::string& member, const char *name, VkExtent3D *dest);
     void GetValue(const Json::Value &parent, int index, VkQueueFamilyProperties *dest);
-    void GetValue(const Json::Value &parent, int index, DevsimFormatProperties *dest);
+    void GetValue(const Json::Value &parent, int index, ProfilesFormatProperties *dest);
     void GetValue(const Json::Value &parent, int index, VkLayerProperties *dest);
     void GetValue(const Json::Value &parent, int index, VkExtensionProperties *dest);
     void GetValue(const Json::Value &parent, int index, VkSurfaceFormatKHR *dest);
@@ -3028,15 +3028,15 @@ static inline VkFormatFeatureFlags StringToVkFormatFeatureFlags(const std::strin
 
 bool JsonLoader::LoadFiles() {
     if (inputFilename.str.empty()) {
-        ErrorPrintf("envar %s and %s in vk_layer_settings.txt are unset\n", kEnvarDevsimFilename, kLayerSettingsDevsimFilename);
+        ErrorPrintf("envar %s and %s in vk_layer_settings.txt are unset\n", kEnvarProfilesFilename, kLayerSettingsProfilesFilename);
         return false;
     }
 
     const char *filename_list = inputFilename.str.c_str();
     if (inputFilename.fromEnvVar) {
-        DebugPrintf("envar %s = \"%s\"\n", kEnvarDevsimFilename, filename_list);
+        DebugPrintf("envar %s = \"%s\"\n", kEnvarProfilesFilename, filename_list);
     } else {
-        DebugPrintf("vk_layer_settings.txt setting %s = \"%s\"\n", kLayerSettingsDevsimFilename, filename_list);
+        DebugPrintf("vk_layer_settings.txt setting %s = \"%s\"\n", kLayerSettingsProfilesFilename, filename_list);
     }
     return LoadFiles(filename_list);
 }
@@ -3545,9 +3545,9 @@ JsonLoader::SchemaId JsonLoader::IdentifySchema(const Json::Value &value) {
     SchemaId schema_id = SchemaId::kUnknown;
     const char *schema_string = value.asCString();
     if (strcmp(schema_string, "https://schema.khronos.org/vulkan/profiles-1.3.200.json#") == 0) {
-        schema_id = SchemaId::kDevsimProfiles_1_3_200;
+        schema_id = SchemaId::kProfiles_1_3_200;
     } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/profiles-1.3.201.json#") == 0) {
-        schema_id = SchemaId::kDevsimProfiles_1_3_201;
+        schema_id = SchemaId::kProfiles_1_3_201;
     }
 
     if (schema_id != SchemaId::kUnknown) {
@@ -3789,7 +3789,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
             "JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
             "not supported by the device and emulation is not turned on.\nIf you wish to emulate "
             "VK_KHR_portability_subset, please set environment variable %s to 1.\n",
-            kEnvarDevsimEmulatePortability);
+            kEnvarProfilesEmulatePortability);
     }
 
     for (const auto &prop : parent.getMemberNames()) {
@@ -4148,7 +4148,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
             "JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
             "not supported by the device and emulation is not turned on.\nIf you wish to emulate "
             "VK_KHR_portability_subset, please set environment variable %s to 1.\n",
-            kEnvarDevsimEmulatePortability);
+            kEnvarProfilesEmulatePortability);
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, constantAlphaColorBlendFactors, WarnIfGreater);
@@ -6123,7 +6123,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkSurfaceCapabilitiesKHR *d
     }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, int index, DevsimFormatProperties *dest) {
+void JsonLoader::GetValue(const Json::Value &parent, int index, ProfilesFormatProperties *dest) {
     const Json::Value value = parent[index];
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE(prop, formatID);
@@ -6505,16 +6505,16 @@ void JsonLoader::GetValueGPUinfoSurfaceCapabilities(const Json::Value &parent) {
 
 // Fill the inputFilename variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
-static void GetDevSimFilename() {
-    std::string env_var = GetEnvarValue(kEnvarDevsimFilename);
+static void GetProfilesFilename() {
+    std::string env_var = GetEnvarValue(kEnvarProfilesFilename);
     if (!env_var.empty()) {
         inputFilename.str = env_var;
         inputFilename.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDevsimFilename)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesFilename)) {
         inputFilename.fromEnvVar = false;
-        inputFilename.str = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDevsimFilename);
+        inputFilename.str = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfilesFilename);
     }
 }
 
@@ -6553,61 +6553,61 @@ static SetCombinationMode GetSetCombinationModeValue(const std::string &value) {
 }
 // Fill the debugLevel variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
-static void GetDevSimDebugLevel() {
-    std::string env_var = GetEnvarValue(kEnvarDevsimDebugEnable);
+static void GetProfilesDebugLevel() {
+    std::string env_var = GetEnvarValue(kEnvarProfilesDebugEnable);
     if (!env_var.empty()) {
         debugLevel.fromEnvVar = true;
         debugLevel.num = GetBooleanValue(env_var);
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDevsimDebugEnable)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesDebugEnable)) {
         debugLevel.fromEnvVar = false;
-        debugLevel.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDevsimDebugEnable);
+        debugLevel.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsProfilesDebugEnable);
     }
 }
 
 // Fill the errorLevel variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
-static void GetDevSimErrorLevel() {
-    std::string env_var = GetEnvarValue(kEnvarDevsimExitOnError);
+static void GetProfilesErrorLevel() {
+    std::string env_var = GetEnvarValue(kEnvarProfilesExitOnError);
     if (!env_var.empty()) {
         errorLevel.num = GetBooleanValue(env_var);
         errorLevel.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDevsimExitOnError)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesExitOnError)) {
         errorLevel.fromEnvVar = false;
-        errorLevel.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDevsimExitOnError);
+        errorLevel.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsProfilesExitOnError);
     }
 }
 
 // Fill the emulatePortability variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
-static void GetDevSimEmulatePortability() {
-    std::string env_var = GetEnvarValue(kEnvarDevsimEmulatePortability);
+static void GetProfilesEmulatePortability() {
+    std::string env_var = GetEnvarValue(kEnvarProfilesEmulatePortability);
     if (!env_var.empty()) {
         emulatePortability.num = GetBooleanValue(env_var);
         emulatePortability.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDevsimEmulatePortability)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesEmulatePortability)) {
         emulatePortability.fromEnvVar = false;
-        emulatePortability.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDevsimEmulatePortability);
+        emulatePortability.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsProfilesEmulatePortability);
     }
 }
 
 // Fill the modifyExtensionList variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
-static void GetDevSimModifyExtensionList() {
+static void GetProfilesModifyExtensionList() {
     std::string modify_extension_list = "";
-    std::string env_var = GetEnvarValue(kEnvarDevsimModifyExtensionList);
+    std::string env_var = GetEnvarValue(kEnvarProfilesModifyExtensionList);
     if (!env_var.empty()) {
         modify_extension_list = env_var;
         modifyExtensionList.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDevsimModifyExtensionList)) {
-        modify_extension_list = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDevsimModifyExtensionList);
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesModifyExtensionList)) {
+        modify_extension_list = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfilesModifyExtensionList);
         modifyExtensionList.fromEnvVar = false;
     }
     modifyExtensionList.mode = GetSetCombinationModeValue(modify_extension_list);
@@ -6615,114 +6615,114 @@ static void GetDevSimModifyExtensionList() {
 
 // Fill the modifyMemoryFlags variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
-static void GetDevSimModifyMemoryFlags() {
-    std::string env_var = GetEnvarValue(kEnvarDevsimModifyMemoryFlags);
+static void GetProfilesModifyMemoryFlags() {
+    std::string env_var = GetEnvarValue(kEnvarProfilesModifyMemoryFlags);
     if (!env_var.empty()) {
         modifyMemoryFlags.num = GetBooleanValue(env_var);
         modifyMemoryFlags.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDevsimModifyMemoryFlags)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesModifyMemoryFlags)) {
         modifyMemoryFlags.fromEnvVar = false;
-        modifyMemoryFlags.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDevsimModifyMemoryFlags);
+        modifyMemoryFlags.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsProfilesModifyMemoryFlags);
     }
 }
 
 // Fill the modifyFormatList variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
-static void GetDevSimModifyFormatList() {
+static void GetProfilesModifyFormatList() {
     std::string modify_format_list = "";
-    std::string env_var = GetEnvarValue(kEnvarDevsimModifyFormatList);
+    std::string env_var = GetEnvarValue(kEnvarProfilesModifyFormatList);
     if (!env_var.empty()) {
         modify_format_list = env_var;
         modifyFormatList.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDevsimModifyFormatList)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesModifyFormatList)) {
         modifyFormatList.fromEnvVar = false;
-        modify_format_list = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDevsimModifyFormatList);
+        modify_format_list = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfilesModifyFormatList);
     }
     modifyFormatList.mode = GetSetCombinationModeValue(modify_format_list);
 }
 
 // Fill the modifyFormatProperties variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
-static void GetDevSimModifyFormatProperties() {
+static void GetProfilesModifyFormatProperties() {
     std::string modify_format_properties = "";
-    std::string env_var = GetEnvarValue(kEnvarDevsimModifyFormatProperties);
+    std::string env_var = GetEnvarValue(kEnvarProfilesModifyFormatProperties);
     if (!env_var.empty()) {
         modify_format_properties = env_var;
         modifyFormatProperties.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDevsimModifyFormatProperties)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesModifyFormatProperties)) {
         modifyFormatProperties.fromEnvVar = false;
-        modify_format_properties = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDevsimModifyFormatProperties);
+        modify_format_properties = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfilesModifyFormatProperties);
     }
     modifyFormatProperties.mode = GetSetCombinationModeValue(modify_format_properties);
 }
 
 // Fill the modifySurfaceFormats variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
-static void GetDevSimModifySurfaceFormats() {
+static void GetProfilesModifySurfaceFormats() {
     std::string modify_surface_formats = "";
-    std::string env_var = GetEnvarValue(kEnvarDevsimModifySurfaceFormats);
+    std::string env_var = GetEnvarValue(kEnvarProfilesModifySurfaceFormats);
     if (!env_var.empty()) {
         modify_surface_formats = env_var;
         modifySurfaceFormats.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDevsimModifySurfaceFormats)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesModifySurfaceFormats)) {
         modifySurfaceFormats.fromEnvVar = false;
-        modify_surface_formats = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDevsimModifySurfaceFormats);
+        modify_surface_formats = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfilesModifySurfaceFormats);
     }
     modifySurfaceFormats.mode = GetSetCombinationModeValue(modify_surface_formats);
 }
 
 // Fill the modifyPresentModes variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
-static void GetDevSimModifyPresentModes() {
+static void GetProfilesModifyPresentModes() {
     std::string modify_present_modes = "";
-    std::string env_var = GetEnvarValue(kEnvarDevsimModifyPresentModes);
+    std::string env_var = GetEnvarValue(kEnvarProfilesModifyPresentModes);
     if (!env_var.empty()) {
         modify_present_modes = env_var;
         modifyPresentModes.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDevsimModifyPresentModes)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesModifyPresentModes)) {
         modifyPresentModes.fromEnvVar = false;
-        modify_present_modes = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDevsimModifyPresentModes);
+        modify_present_modes = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfilesModifyPresentModes);
     }
     modifyPresentModes.mode = GetSetCombinationModeValue(modify_present_modes);
 }
 
-static void GetSelectedProfileName() {
-    std::string env_var = GetEnvarValue(kEnvarDevsimProfileName);
+static void GetProfileName() {
+    std::string env_var = GetEnvarValue(kEnvarProfilesProfileName);
     if (!env_var.empty()) {
         profile_name = env_var;
         modifyPresentModes.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingDevsimProfileName)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingProfilesProfileName)) {
         emulatePortability.fromEnvVar = false;
-        profile_name = vku::GetLayerSettingString(kOurLayerName, kLayerSettingDevsimProfileName);
+        profile_name = vku::GetLayerSettingString(kOurLayerName, kLayerSettingProfilesProfileName);
     }
 }
 
 // Generic layer dispatch table setup, see [LALI].
 static VkResult LayerSetupCreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
                                          VkInstance *pInstance) {
-    GetDevSimEmulatePortability();
-    GetDevSimFilename();
-    GetDevSimDebugLevel();
-    GetDevSimErrorLevel();
-    GetDevSimModifyExtensionList();
-    GetDevSimModifyMemoryFlags();
-    GetDevSimModifyFormatList();
-    GetDevSimModifyFormatProperties();
-    GetDevSimModifySurfaceFormats();
-    GetDevSimModifyPresentModes();
-    GetSelectedProfileName();
+    GetProfilesEmulatePortability();
+    GetProfilesFilename();
+    GetProfilesDebugLevel();
+    GetProfilesErrorLevel();
+    GetProfilesModifyExtensionList();
+    GetProfilesModifyMemoryFlags();
+    GetProfilesModifyFormatList();
+    GetProfilesModifyFormatProperties();
+    GetProfilesModifySurfaceFormats();
+    GetProfilesModifyPresentModes();
+    GetProfileName();
 
     VkLayerInstanceCreateInfo *chain_info = get_chain_info(pCreateInfo, VK_LAYER_LINK_INFO);
     assert(chain_info->u.pLayerInfo);
