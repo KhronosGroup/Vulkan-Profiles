@@ -99,12 +99,10 @@ const std::array<VkExtensionProperties, 2> kDeviceExtensionProperties = {
      {VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, VK_KHR_PORTABILITY_SUBSET_SPEC_VERSION}}};
 const uint32_t kDeviceExtensionPropertiesCount = static_cast<uint32_t>(kDeviceExtensionProperties.size());
 
-enum ArrayCombinationMode {
-    ARRAY_COMBINATION_MODE_NONE,
-    ARRAY_COMBINATION_MODE_REPLACE,
-    ARRAY_COMBINATION_MODE_WHITELIST,
-    ARRAY_COMBINATION_MODE_BLACKLIST,
-    ARRAY_COMBINATION_MODE_INTERSECT
+enum SetCombinationMode {
+    SET_CHECK_SUPPORT,
+    SET_FROM_PROFILE,
+    SET_FROM_DEVICE
 };
 
 // Environment variables defined by this layer ///////////////////////////////////////////////////////////////////////////////////
@@ -169,17 +167,17 @@ const char *const kLayerSettingsDevsimModifyExtensionList =
 const char *const kLayerSettingsDevsimModifyMemoryFlags =
     "modify_memory_flags";  // vk_layer_settings.txt equivalent for kEnvarDevsimModifyMemoryFlags
 const char *const kLayerSettingsDevsimModifyFormatList =
-    "modify_format_list";  // an ArrayCombinationMode value sets how the device and config format lists are combined.
+    "modify_format_list";  // an SetCombinationMode value sets how the device and config format lists are combined.
 const char *const kLayerSettingsDevsimModifyFormatProperties =
-    "modify_format_properties";  // an ArrayCombinationMode value sets how the device and config format properties are combined.
+    "modify_format_properties";  // an SetCombinationMode value sets how the device and config format properties are combined.
 const char *const kLayerSettingsDevsimModifySurfaceFormats =
-    "modify_surface_formats";  // an ArrayCombinationMode value sets how the device and config surface format lists are combined.
+    "modify_surface_formats";  // an SetCombinationMode value sets how the device and config surface format lists are combined.
 const char *const kLayerSettingsDevsimModifyPresentModes =
-    "modify_present_modes";  // an ArrayCombinationMode value sets how the device and config present modes are combined.
+    "modify_present_modes";  // an SetCombinationMode value sets how the device and config present modes are combined.
 const char *const kLayerSettingDevsimProfileName = "profile_name"; // name of the profile to be used
 
-struct ArrayCombinationModeSetting {
-    ArrayCombinationMode mode;
+struct SetCombinationModeSetting {
+    SetCombinationMode mode;
     bool fromEnvVar;
 };
 
@@ -197,12 +195,12 @@ struct StringSetting inputFilename;
 struct IntSetting debugLevel;
 struct IntSetting errorLevel;
 struct IntSetting emulatePortability;
-struct ArrayCombinationModeSetting modifyExtensionList;
+struct SetCombinationModeSetting modifyExtensionList;
 struct IntSetting modifyMemoryFlags;
-struct ArrayCombinationModeSetting modifyFormatList;
-struct ArrayCombinationModeSetting modifyFormatProperties;
-struct ArrayCombinationModeSetting modifySurfaceFormats;
-struct ArrayCombinationModeSetting modifyPresentModes;
+struct SetCombinationModeSetting modifyFormatList;
+struct SetCombinationModeSetting modifyFormatProperties;
+struct SetCombinationModeSetting modifySurfaceFormats;
+struct SetCombinationModeSetting modifyPresentModes;
 std::string profile_name = {};
 
 // Various small utility functions ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1254,49 +1252,12 @@ class PhysicalDeviceData {
 
     uint32_t combineExtensionLists() {
         switch (extension_list_combination_mode_) {
-            case ARRAY_COMBINATION_MODE_NONE:
+            case SET_CHECK_SUPPORT:
+            case SET_FROM_DEVICE:
                 simulation_extensions_ = device_extensions_;
                 break;
-            case ARRAY_COMBINATION_MODE_REPLACE:
+            case SET_FROM_PROFILE:
                 simulation_extensions_ = arrayof_extension_properties_;
-                break;
-            case ARRAY_COMBINATION_MODE_WHITELIST:
-                for (VkExtensionProperties dev_props : device_extensions_) {
-                    for (VkExtensionProperties file_props : arrayof_extension_properties_) {
-                        if (strncmp(dev_props.extensionName, file_props.extensionName, VK_MAX_EXTENSION_NAME_SIZE) == 0) {
-                            simulation_extensions_.push_back(dev_props);
-                            break;
-                        }
-                    }
-                }
-                break;
-            case ARRAY_COMBINATION_MODE_BLACKLIST:
-                for (VkExtensionProperties dev_props : device_extensions_) {
-                    bool black_listed = false;
-                    for (VkExtensionProperties file_props : arrayof_extension_properties_) {
-                        if (strncmp(dev_props.extensionName, file_props.extensionName, VK_MAX_EXTENSION_NAME_SIZE) == 0) {
-                            black_listed = true;
-                            break;
-                        }
-                    }
-                    if (!black_listed) simulation_extensions_.push_back(dev_props);
-                }
-                break;
-            case ARRAY_COMBINATION_MODE_INTERSECT:
-                for (VkExtensionProperties dev_props : device_extensions_) {
-                    simulation_extensions_.push_back(dev_props);
-                }
-
-                for (VkExtensionProperties file_props : arrayof_extension_properties_) {
-                    bool intersection = false;
-                    for (VkExtensionProperties dev_props : device_extensions_) {
-                        if (strncmp(dev_props.extensionName, file_props.extensionName, VK_MAX_EXTENSION_NAME_SIZE) == 0) {
-                            intersection = true;
-                            break;
-                        }
-                    }
-                    if (!intersection) simulation_extensions_.push_back(file_props);
-                }
                 break;
             default:
                 simulation_extensions_ = device_extensions_;
@@ -1309,11 +1270,11 @@ class PhysicalDeviceData {
 
     ArrayOfVkExtensionProperties device_extensions_;
 
-    ArrayCombinationMode extension_list_combination_mode_;
+    SetCombinationMode extension_list_combination_mode_;
     ArrayOfVkExtensionProperties simulation_extensions_;
 
-    ArrayCombinationMode format_list_combination_mode_;
-    ArrayCombinationMode format_properties_combination_mode_;
+    SetCombinationMode format_list_combination_mode_;
+    SetCombinationMode format_properties_combination_mode_;
 
     VkPhysicalDeviceProperties physical_device_properties_;
     VkPhysicalDeviceFeatures physical_device_features_;
@@ -1710,10 +1671,10 @@ class PhysicalDeviceData {
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
     PhysicalDeviceData(VkInstance instance) : instance_(instance) {
-        extension_list_combination_mode_ = ARRAY_COMBINATION_MODE_NONE;
+        extension_list_combination_mode_ = SET_CHECK_SUPPORT;
 
-        format_list_combination_mode_ = ARRAY_COMBINATION_MODE_NONE;
-        format_properties_combination_mode_ = ARRAY_COMBINATION_MODE_NONE;
+        format_list_combination_mode_ = SET_CHECK_SUPPORT;
+        format_properties_combination_mode_ = SET_CHECK_SUPPORT;
 
         physical_device_properties_ = {};
         physical_device_features_ = {};
@@ -6575,24 +6536,20 @@ static int GetBooleanValue(const std::string &value) {
 #endif
 }
 
-static ArrayCombinationMode GetArrayCombinationModeValue(const std::string &value) {
+static SetCombinationMode GetSetCombinationModeValue(const std::string &value) {
     std::string temp = value;
     std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
 
     if (value.empty())
-        return ARRAY_COMBINATION_MODE_NONE;
-    else if (temp == "none" || temp == "0")
-        return ARRAY_COMBINATION_MODE_NONE;
-    else if (temp == "replace" || temp == "1")
-        return ARRAY_COMBINATION_MODE_REPLACE;
-    else if (temp == "whitelist" || temp == "2")
-        return ARRAY_COMBINATION_MODE_WHITELIST;
-    else if (temp == "blacklist" || temp == "3")
-        return ARRAY_COMBINATION_MODE_BLACKLIST;
-    else if (temp == "intersect" || temp == "4")
-        return ARRAY_COMBINATION_MODE_INTERSECT;
+        return SET_CHECK_SUPPORT;
+    else if (temp == "check_support" || temp == "0")
+        return SET_CHECK_SUPPORT;
+    else if (temp == "from_profile" || temp == "1")
+        return SET_FROM_PROFILE;
+    else if (temp == "from_device" || temp == "2")
+        return SET_FROM_DEVICE;
     else
-        return ARRAY_COMBINATION_MODE_NONE;
+        return SET_CHECK_SUPPORT;
 }
 // Fill the debugLevel variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
@@ -6653,7 +6610,7 @@ static void GetDevSimModifyExtensionList() {
         modify_extension_list = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDevsimModifyExtensionList);
         modifyExtensionList.fromEnvVar = false;
     }
-    modifyExtensionList.mode = GetArrayCombinationModeValue(modify_extension_list);
+    modifyExtensionList.mode = GetSetCombinationModeValue(modify_extension_list);
 }
 
 // Fill the modifyMemoryFlags variable with a value from either vk_layer_settings.txt or environment variables.
@@ -6685,7 +6642,7 @@ static void GetDevSimModifyFormatList() {
         modifyFormatList.fromEnvVar = false;
         modify_format_list = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDevsimModifyFormatList);
     }
-    modifyFormatList.mode = GetArrayCombinationModeValue(modify_format_list);
+    modifyFormatList.mode = GetSetCombinationModeValue(modify_format_list);
 }
 
 // Fill the modifyFormatProperties variable with a value from either vk_layer_settings.txt or environment variables.
@@ -6702,7 +6659,7 @@ static void GetDevSimModifyFormatProperties() {
         modifyFormatProperties.fromEnvVar = false;
         modify_format_properties = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDevsimModifyFormatProperties);
     }
-    modifyFormatProperties.mode = GetArrayCombinationModeValue(modify_format_properties);
+    modifyFormatProperties.mode = GetSetCombinationModeValue(modify_format_properties);
 }
 
 // Fill the modifySurfaceFormats variable with a value from either vk_layer_settings.txt or environment variables.
@@ -6719,7 +6676,7 @@ static void GetDevSimModifySurfaceFormats() {
         modifySurfaceFormats.fromEnvVar = false;
         modify_surface_formats = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDevsimModifySurfaceFormats);
     }
-    modifySurfaceFormats.mode = GetArrayCombinationModeValue(modify_surface_formats);
+    modifySurfaceFormats.mode = GetSetCombinationModeValue(modify_surface_formats);
 }
 
 // Fill the modifyPresentModes variable with a value from either vk_layer_settings.txt or environment variables.
@@ -6736,7 +6693,7 @@ static void GetDevSimModifyPresentModes() {
         modifyPresentModes.fromEnvVar = false;
         modify_present_modes = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDevsimModifyPresentModes);
     }
-    modifyPresentModes.mode = GetArrayCombinationModeValue(modify_present_modes);
+    modifyPresentModes.mode = GetSetCombinationModeValue(modify_present_modes);
 }
 
 static void GetSelectedProfileName() {
@@ -8199,7 +8156,8 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
             result = EnumerateProperties(kDeviceExtensionPropertiesCount, kDeviceExtensionProperties.data(), pCount, pProperties);
         else
             result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
-    } else if (src_count == 0 || pdd->extension_list_combination_mode_ == ARRAY_COMBINATION_MODE_NONE) {
+    } else if (src_count == 0 || (pdd->extension_list_combination_mode_ == SET_CHECK_SUPPORT ||
+                                  pdd->extension_list_combination_mode_ == SET_FROM_DEVICE)) {
         result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
     } else {
         result = EnumerateProperties(src_count, pdd->simulation_extensions_.data(), pCount, pProperties);
@@ -8328,22 +8286,13 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
         const auto iter = pdd->arrayof_format_properties_.find(format);
 
         switch (pdd->format_list_combination_mode_) {
-            case ARRAY_COMBINATION_MODE_NONE:
+            case SET_CHECK_SUPPORT:
+            case SET_FROM_DEVICE:
                 *pFormatProperties = device_format;
                 break;
-            case ARRAY_COMBINATION_MODE_REPLACE:
+            case SET_FROM_PROFILE:
                 *pFormatProperties = (iter != pdd->arrayof_format_properties_.end()) ? iter->second : VkFormatProperties{};
                 break;
-            case ARRAY_COMBINATION_MODE_WHITELIST:
-                *pFormatProperties = (iter != pdd->arrayof_format_properties_.end()) ? device_format : VkFormatProperties{};
-                break;
-            case ARRAY_COMBINATION_MODE_BLACKLIST:
-                *pFormatProperties = (iter != pdd->arrayof_format_properties_.end()) ? VkFormatProperties{} : device_format;
-                break;
-            case ARRAY_COMBINATION_MODE_INTERSECT:
-                *pFormatProperties = IsFormatSupported(device_format)                  ? device_format
-                                     : (iter != pdd->arrayof_format_properties_.end()) ? iter->second
-                                                                                       : VkFormatProperties{};
                 break;
             default:
                 *pFormatProperties = device_format;
@@ -8351,36 +8300,12 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
 
         if (IsFormatSupported(*pFormatProperties) && iter != pdd->arrayof_format_properties_.end()) {
             switch (pdd->format_properties_combination_mode_) {
-                case ARRAY_COMBINATION_MODE_NONE:
+                case SET_CHECK_SUPPORT:
+                case SET_FROM_DEVICE:
                     *pFormatProperties = device_format;
                     break;
-                case ARRAY_COMBINATION_MODE_REPLACE:
+                case SET_FROM_PROFILE:
                     *pFormatProperties = iter->second;
-                    break;
-                case ARRAY_COMBINATION_MODE_WHITELIST:
-                    (*pFormatProperties).optimalTilingFeatures =
-                        device_format.optimalTilingFeatures & iter->second.optimalTilingFeatures;
-                    (*pFormatProperties).linearTilingFeatures =
-                        device_format.linearTilingFeatures & iter->second.linearTilingFeatures;
-                    (*pFormatProperties).bufferFeatures = device_format.bufferFeatures & iter->second.bufferFeatures;
-                    break;
-                case ARRAY_COMBINATION_MODE_BLACKLIST:
-                    (*pFormatProperties).optimalTilingFeatures =
-                        device_format.optimalTilingFeatures ^ iter->second.optimalTilingFeatures;
-                    (*pFormatProperties).linearTilingFeatures =
-                        device_format.linearTilingFeatures ^ iter->second.linearTilingFeatures;
-                    (*pFormatProperties).bufferFeatures = device_format.bufferFeatures ^ iter->second.bufferFeatures;
-
-                    (*pFormatProperties).optimalTilingFeatures &= device_format.optimalTilingFeatures;
-                    (*pFormatProperties).linearTilingFeatures &= device_format.linearTilingFeatures;
-                    (*pFormatProperties).bufferFeatures &= device_format.bufferFeatures;
-                    break;
-                case ARRAY_COMBINATION_MODE_INTERSECT:
-                    (*pFormatProperties).optimalTilingFeatures =
-                        device_format.optimalTilingFeatures | iter->second.optimalTilingFeatures;
-                    (*pFormatProperties).linearTilingFeatures =
-                        device_format.linearTilingFeatures | iter->second.linearTilingFeatures;
-                    (*pFormatProperties).bufferFeatures = device_format.bufferFeatures | iter->second.bufferFeatures;
                     break;
                 default:
                     *pFormatProperties = device_format;
@@ -8415,7 +8340,8 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties(VkPhysical
 
     // Are there JSON overrides, or should we call down to return the original values?
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    if (pdd->format_list_combination_mode_ == ARRAY_COMBINATION_MODE_NONE) {
+    if (pdd->format_list_combination_mode_ ==
+        (pdd->extension_list_combination_mode_ == SET_CHECK_SUPPORT || pdd->extension_list_combination_mode_ == SET_FROM_DEVICE)) {
         return dt->GetPhysicalDeviceImageFormatProperties(physicalDevice, format, type, tiling, usage, flags,
                                                           pImageFormatProperties);
     }
@@ -8514,55 +8440,12 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormatsKHR(VkPhysicalDevi
         std::vector<VkSurfaceFormatKHR> simulation_surface_formats;
 
         switch (modifySurfaceFormats.mode) {
-            case ARRAY_COMBINATION_MODE_NONE:
+            case SET_CHECK_SUPPORT:
+            case SET_FROM_DEVICE:
                 return dt->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, pSurfaceFormatCount, pSurfaceFormats);
                 break;
-            case ARRAY_COMBINATION_MODE_REPLACE:
+            case SET_FROM_PROFILE:
                 return EnumerateProperties(src_count, pdd->arrayof_surface_formats_.data(), pSurfaceFormatCount, pSurfaceFormats);
-                break;
-            case ARRAY_COMBINATION_MODE_WHITELIST:
-                for (VkSurfaceFormatKHR &dev_surf_form : device_surface_formats) {
-                    for (VkSurfaceFormatKHR &file_surf_form : pdd->arrayof_surface_formats_) {
-                        if (dev_surf_form.format == file_surf_form.format &&
-                            dev_surf_form.colorSpace == file_surf_form.colorSpace) {
-                            simulation_surface_formats.push_back(dev_surf_form);
-                            break;
-                        }
-                    }
-                }
-                break;
-            case ARRAY_COMBINATION_MODE_BLACKLIST:
-                for (VkSurfaceFormatKHR &dev_surf_form : device_surface_formats) {
-                    bool blacklisted = false;
-                    for (VkSurfaceFormatKHR &file_surf_form : pdd->arrayof_surface_formats_) {
-                        if (dev_surf_form.format == file_surf_form.format &&
-                            dev_surf_form.colorSpace == file_surf_form.colorSpace) {
-                            blacklisted = true;
-                            break;
-                        }
-                    }
-                    if (!blacklisted) {
-                        simulation_surface_formats.push_back(dev_surf_form);
-                    }
-                }
-                break;
-            case ARRAY_COMBINATION_MODE_INTERSECT:
-                for (VkSurfaceFormatKHR &dev_surf_form : device_surface_formats) {
-                    simulation_surface_formats.push_back(dev_surf_form);
-                }
-                for (VkSurfaceFormatKHR &file_surf_form : pdd->arrayof_surface_formats_) {
-                    bool blacklisted = false;
-                    for (VkSurfaceFormatKHR &sim_surf_form : simulation_surface_formats) {
-                        if (sim_surf_form.format == file_surf_form.format &&
-                            sim_surf_form.colorSpace == file_surf_form.colorSpace) {
-                            blacklisted = true;
-                            break;
-                        }
-                    }
-                    if (!blacklisted) {
-                        simulation_surface_formats.push_back(file_surf_form);
-                    }
-                }
                 break;
             default:
                 return dt->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, pSurfaceFormatCount, pSurfaceFormats);
@@ -8599,11 +8482,12 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormats2KHR(VkPhysicalDev
     std::vector<VkSurfaceFormatKHR> simulation_surface_formats;
 
     switch (modifySurfaceFormats.mode) {
-        case ARRAY_COMBINATION_MODE_NONE:
+        case SET_CHECK_SUPPORT:
+        case SET_FROM_DEVICE:
             result = dt->GetPhysicalDeviceSurfaceFormats2KHR(physicalDevice, pSurfaceInfo, pSurfaceFormatCount, pSurfaceFormats);
             return result;
             break;
-        case ARRAY_COMBINATION_MODE_REPLACE:
+        case SET_FROM_PROFILE:
             if (!pSurfaceFormats) {
                 *pSurfaceFormatCount = src_count;
                 return result;
@@ -8621,47 +8505,6 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormats2KHR(VkPhysicalDev
             }
 
             return result;
-            break;
-        case ARRAY_COMBINATION_MODE_WHITELIST:
-            for (VkSurfaceFormatKHR &dev_surf_form : device_surface_formats) {
-                for (VkSurfaceFormatKHR &file_surf_form : pdd->arrayof_surface_formats_) {
-                    if (dev_surf_form.format == file_surf_form.format && dev_surf_form.colorSpace == file_surf_form.colorSpace) {
-                        simulation_surface_formats.push_back(dev_surf_form);
-                        break;
-                    }
-                }
-            }
-            break;
-        case ARRAY_COMBINATION_MODE_BLACKLIST:
-            for (VkSurfaceFormatKHR &dev_surf_form : device_surface_formats) {
-                bool blacklisted = false;
-                for (VkSurfaceFormatKHR &file_surf_form : pdd->arrayof_surface_formats_) {
-                    if (dev_surf_form.format == file_surf_form.format && dev_surf_form.colorSpace == file_surf_form.colorSpace) {
-                        blacklisted = true;
-                        break;
-                    }
-                }
-                if (!blacklisted) {
-                    simulation_surface_formats.push_back(dev_surf_form);
-                }
-            }
-            break;
-        case ARRAY_COMBINATION_MODE_INTERSECT:
-            for (VkSurfaceFormatKHR &dev_surf_form : device_surface_formats) {
-                simulation_surface_formats.push_back(dev_surf_form);
-            }
-            for (VkSurfaceFormatKHR &file_surf_form : pdd->arrayof_surface_formats_) {
-                bool blacklisted = false;
-                for (VkSurfaceFormatKHR &sim_surf_form : simulation_surface_formats) {
-                    if (sim_surf_form.format == file_surf_form.format && sim_surf_form.colorSpace == file_surf_form.colorSpace) {
-                        blacklisted = true;
-                        break;
-                    }
-                }
-                if (!blacklisted) {
-                    simulation_surface_formats.push_back(file_surf_form);
-                }
-            }
             break;
         default:
             result = dt->GetPhysicalDeviceSurfaceFormats2KHR(physicalDevice, pSurfaceInfo, pSurfaceFormatCount, pSurfaceFormats);
@@ -8708,54 +8551,14 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfacePresentModesKHR(VkPhysica
     std::vector<VkPresentModeKHR> simulation_present_modes;
 
     switch (modifyPresentModes.mode) {
-        case ARRAY_COMBINATION_MODE_NONE:
+        case SET_CHECK_SUPPORT:
+        case SET_FROM_DEVICE:
             result = dt->GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, pPresentModeCount, pPresentModes);
             return result;
             break;
-        case ARRAY_COMBINATION_MODE_REPLACE:
+        case SET_FROM_PROFILE:
             result = EnumerateProperties(src_count, pdd->arrayof_present_modes_.data(), pPresentModeCount, pPresentModes);
             return result;
-            break;
-        case ARRAY_COMBINATION_MODE_WHITELIST:
-            for (VkPresentModeKHR &dev_present_mode : device_present_modes) {
-                for (VkPresentModeKHR &file_present_mode : pdd->arrayof_present_modes_) {
-                    if (dev_present_mode == file_present_mode) {
-                        simulation_present_modes.push_back(dev_present_mode);
-                        break;
-                    }
-                }
-            }
-            break;
-        case ARRAY_COMBINATION_MODE_BLACKLIST:
-            for (VkPresentModeKHR &dev_present_mode : device_present_modes) {
-                bool blacklist = false;
-                for (VkPresentModeKHR &file_present_mode : pdd->arrayof_present_modes_) {
-                    if (dev_present_mode == file_present_mode) {
-                        blacklist = true;
-                        break;
-                    }
-                }
-                if (!blacklist) {
-                    simulation_present_modes.push_back(dev_present_mode);
-                }
-            }
-            break;
-        case ARRAY_COMBINATION_MODE_INTERSECT:
-            for (VkPresentModeKHR &dev_present_mode : device_present_modes) {
-                simulation_present_modes.push_back(dev_present_mode);
-            }
-            for (VkPresentModeKHR &file_present_mode : pdd->arrayof_present_modes_) {
-                bool blacklist = false;
-                for (VkPresentModeKHR &sim_present_mode : simulation_present_modes) {
-                    if (sim_present_mode == file_present_mode) {
-                        blacklist = true;
-                        break;
-                    }
-                }
-                if (!blacklist) {
-                    simulation_present_modes.push_back(file_present_mode);
-                }
-            }
             break;
         default:
             result = dt->GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, pPresentModeCount, pPresentModes);
