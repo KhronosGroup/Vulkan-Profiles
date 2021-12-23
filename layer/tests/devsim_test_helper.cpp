@@ -144,6 +144,10 @@ void devsim_test::setDevsimModifyPresentModes(ArrayCombinationMode mode) {
                                        arrayCombinationModeToString(mode).c_str());
 }
 
+void devsim_test::setDevsimProfileName(const std::string& profile) {
+    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_PROFILE_NAME", profile.c_str());
+}
+
 VkApplicationInfo devsim_test::GetDefaultApplicationInfo() {
     VkApplicationInfo out{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
     out.apiVersion = VK_API_VERSION_1_0;
