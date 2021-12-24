@@ -25,9 +25,9 @@
 #include <Windows.h>
 #endif
 
-#include "devsim_test_helper.h"
+#include "profiles_test_helper.h"
 
-void devsim_test::setEnvironmentSetting(std::string setting, const char* val) {
+void profiles_test::setEnvironmentSetting(std::string setting, const char* val) {
 #ifdef _WIN32
     _putenv_s(setting.c_str(), val);
 #else
@@ -35,7 +35,7 @@ void devsim_test::setEnvironmentSetting(std::string setting, const char* val) {
 #endif
 }
 
-void devsim_test::unsetEnvironmentSetting(std::string setting) {
+void profiles_test::unsetEnvironmentSetting(std::string setting) {
 #ifdef _WIN32
     _putenv_s(setting.c_str(), "");
 #else
@@ -43,7 +43,7 @@ void devsim_test::unsetEnvironmentSetting(std::string setting) {
 #endif
 }
 
-std::string devsim_test::getAbsolutePath(std::string filepath) {
+std::string profiles_test::getAbsolutePath(std::string filepath) {
     std::string out;
 #ifdef _WIN32
     char abs_path[_MAX_PATH];
@@ -57,13 +57,13 @@ std::string devsim_test::getAbsolutePath(std::string filepath) {
     return out;
 }
 
-std::string devsim_test::setCombinationModeToString(SetCombinationMode mode) {
+std::string profiles_test::setCombinationModeToString(SetCombinationMode mode) {
     switch (mode) {
-        case SET_CHECK_SUPPORT:
+        case SetCombinationMode::SET_CHECK_SUPPORT:
             return "check_support";
-        case SET_FROM_PROFILE:
+        case SetCombinationMode::SET_FROM_PROFILE:
             return "from_profile";
-        case SET_FROM_DEVICE:
+        case SetCombinationMode::SET_FROM_DEVICE:
             return "from_device";
         default:
             break;
@@ -72,7 +72,7 @@ std::string devsim_test::setCombinationModeToString(SetCombinationMode mode) {
     return "check_support";
 }
 
-void devsim_test::setDevsimFilenames(std::vector<std::string>& filepaths) {
+void profiles_test::setDevsimFilenames(std::vector<std::string>& filepaths) {
     std::stringstream out;
 #ifdef _WIN32
     char seperator = ';';
@@ -81,70 +81,70 @@ void devsim_test::setDevsimFilenames(std::vector<std::string>& filepaths) {
 #endif // _WIN32
 
     for (std::string& filepath : filepaths) {
-        std::string config_filepath = devsim_test::getAbsolutePath(filepath);
+        std::string config_filepath = profiles_test::getAbsolutePath(filepath);
         out << filepath << seperator;
     }
-    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_FILENAME", out.str().c_str());
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_FILENAME", out.str().c_str());
 }
 
-void devsim_test::setDevsimDebugEnable(bool enable) {
+void profiles_test::setDevsimDebugEnable(bool enable) {
     if (enable)
-        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DEBUG_ENABLE", "true");
+        profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DEBUG_ENABLE", "true");
     else
-        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DEBUG_ENABLE", "false");
+        profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DEBUG_ENABLE", "false");
 }
 
-void devsim_test::setDevsimExitOnError(bool enable) {
+void profiles_test::setDevsimExitOnError(bool enable) {
     if (enable)
-        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EXIT_ON_ERROR", "true");
+        profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EXIT_ON_ERROR", "true");
     else
-        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EXIT_ON_ERROR", "false");
+        profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EXIT_ON_ERROR", "false");
 }
 
-void devsim_test::setDevsimEmulatePortabilitySubsetExtension(bool enable) {
+void profiles_test::setDevsimEmulatePortabilitySubsetExtension(bool enable) {
     if (enable)
-        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EMULATE_PORTABILITY", "true");
+        profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EMULATE_PORTABILITY", "true");
     else
-        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EMULATE_PORTABILITY", "false");
+        profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EMULATE_PORTABILITY", "false");
 }
 
-void devsim_test::setDevsimModifyExtensionList(SetCombinationMode mode) {
-    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_EXTENSION_LIST",
+void profiles_test::setDevsimModifyExtensionList(SetCombinationMode mode) {
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_EXTENSION_LIST",
                                        setCombinationModeToString(mode).c_str());
 }
 
-void devsim_test::setDevsimModifyMemoryFlags(bool enable) {
+void profiles_test::setDevsimModifyMemoryFlags(bool enable) {
     if (enable)
-        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS", "true");
+        profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS", "true");
     else
-        devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS", "false");
+        profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS", "false");
 }
 
-void devsim_test::setDevsimModifyFormatList(SetCombinationMode mode) {
-    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_FORMAT_LIST",
+void profiles_test::setDevsimModifyFormatList(SetCombinationMode mode) {
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_FORMAT_LIST",
                                        setCombinationModeToString(mode).c_str());
 }
 
-void devsim_test::setDevsimModifyFormatProperties(SetCombinationMode mode) {
-    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_FORMAT_PROPERTIES",
+void profiles_test::setDevsimModifyFormatProperties(SetCombinationMode mode) {
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_FORMAT_PROPERTIES",
                                        setCombinationModeToString(mode).c_str());
 }
 
-void devsim_test::setDevsimModifySurfaceFormats(SetCombinationMode mode) {
-    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_SURFACE_FORMAT",
+void profiles_test::setDevsimModifySurfaceFormats(SetCombinationMode mode) {
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_SURFACE_FORMAT",
                                        setCombinationModeToString(mode).c_str());
 }
 
-void devsim_test::setDevsimModifyPresentModes(SetCombinationMode mode) {
-    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_PRESENT_MODES",
+void profiles_test::setDevsimModifyPresentModes(SetCombinationMode mode) {
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_PRESENT_MODES",
                                        setCombinationModeToString(mode).c_str());
 }
 
-void devsim_test::setDevsimProfileName(const std::string& profile) {
-    devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_PROFILE_NAME", profile.c_str());
+void profiles_test::setDevsimProfileName(const std::string& profile) {
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_PROFILE_NAME", profile.c_str());
 }
 
-VkApplicationInfo devsim_test::GetDefaultApplicationInfo() {
+VkApplicationInfo profiles_test::GetDefaultApplicationInfo() {
     VkApplicationInfo out{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
     out.apiVersion = VK_API_VERSION_1_0;
     out.applicationVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
@@ -155,7 +155,7 @@ VkApplicationInfo devsim_test::GetDefaultApplicationInfo() {
     return out;
 }
 
-VkResult devsim_test::VulkanInstanceBuilder::makeInstance() {
+VkResult profiles_test::VulkanInstanceBuilder::makeInstance() {
     _inst_create_info.pApplicationInfo = &_app_info;
     _inst_create_info.enabledLayerCount = static_cast<uint32_t>(_layer_names.size());
     _inst_create_info.ppEnabledLayerNames = _layer_names.data();
@@ -165,7 +165,7 @@ VkResult devsim_test::VulkanInstanceBuilder::makeInstance() {
     return vkCreateInstance(&_inst_create_info, nullptr, &_instance);
 }
 
-void devsim_test::VulkanInstanceBuilder::reset() {
+void profiles_test::VulkanInstanceBuilder::reset() {
     _app_info = GetDefaultApplicationInfo();
     _inst_create_info = { VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
     _instance = VK_NULL_HANDLE;

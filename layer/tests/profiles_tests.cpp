@@ -3,17 +3,17 @@
 #include <vulkan/vulkan_core.h>
 
 #include <gtest/gtest.h>
-#include "devsim_test_helper.h"
+#include "profiles_test_helper.h"
 
 TEST(profiles, TestDesktopPortability2022Limits) {
     VkResult err = VK_SUCCESS;
 
-    devsim_test::VulkanInstanceBuilder inst_builder;
+    profiles_test::VulkanInstanceBuilder inst_builder;
 
     std::vector<std::string> filepaths = {TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json"};
-    devsim_test::setDevsimFilenames(filepaths);
-    devsim_test::setDevsimProfileName("VP_LUNARG_desktop_portability_2021");
-    devsim_test::setDevsimEmulatePortabilitySubsetExtension(true);
+    profiles_test::setDevsimFilenames(filepaths);
+    profiles_test::setDevsimProfileName("VP_LUNARG_desktop_portability_2021");
+    profiles_test::setDevsimEmulatePortabilitySubsetExtension(true);
 
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
