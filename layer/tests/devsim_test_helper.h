@@ -30,26 +30,20 @@ void unsetEnvironmentSetting(std::string setting);
 
 std::string getAbsolutePath(std::string filepath);
 
-enum ArrayCombinationMode {
-    ARRAY_COMBINATION_MODE_NONE,
-    ARRAY_COMBINATION_MODE_REPLACE,
-    ARRAY_COMBINATION_MODE_WHITELIST,
-    ARRAY_COMBINATION_MODE_BLACKLIST,
-    ARRAY_COMBINATION_MODE_INTERSECT
-};
+enum SetCombinationMode { SET_CHECK_SUPPORT, SET_FROM_PROFILE, SET_FROM_DEVICE };
 
-std::string arrayCombinationModeToString(ArrayCombinationMode mode);
+std::string setCombinationModeToString(SetCombinationMode mode);
 
 void setDevsimFilenames(std::vector<std::string>& filepaths);
 void setDevsimDebugEnable(bool enable);
 void setDevsimExitOnError(bool enable);
 void setDevsimEmulatePortabilitySubsetExtension(bool enable);
-void setDevsimModifyExtensionList(ArrayCombinationMode mode);
+void setDevsimModifyExtensionList(SetCombinationMode mode);
 void setDevsimModifyMemoryFlags(bool enable);
-void setDevsimModifyFormatList(ArrayCombinationMode mode);
-void setDevsimModifyFormatProperties(ArrayCombinationMode mode);
-void setDevsimModifySurfaceFormats(ArrayCombinationMode mode);
-void setDevsimModifyPresentModes(ArrayCombinationMode mode);
+void setDevsimModifyFormatList(SetCombinationMode mode);
+void setDevsimModifyFormatProperties(SetCombinationMode mode);
+void setDevsimModifySurfaceFormats(SetCombinationMode mode);
+void setDevsimModifyPresentModes(SetCombinationMode mode);
 void setDevsimProfileName(const std::string& profile);
 
 VkApplicationInfo GetDefaultApplicationInfo();
