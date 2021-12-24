@@ -3500,6 +3500,10 @@ bool JsonLoader::LoadFile(const char *filename) {
         return result;
     }
 
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE) {
+        pdd_.simulation_extensions_.clear();
+    }
+
     const auto &caps = root["capabilities"];
     for (const auto &c : caps) {
         const auto &extensions = c["extensions"];
@@ -3509,6 +3513,9 @@ bool JsonLoader::LoadFile(const char *filename) {
             strcpy(extension.extensionName, e.c_str());
             extension.specVersion = extensions[e].asInt();
             pdd_.arrayof_extension_properties_.push_back(extension);
+            if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE) {
+                pdd_.simulation_extensions_.push_back(extension);
+            }
         }
         const auto &features = c["features"];
         for (const auto &feature : features.getMemberNames()) {
@@ -3582,7 +3589,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProperties 
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStencilResolveProperties *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDepthStencilResolveProperties)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_depth_stencil_resolve, but "
             "VK_KHR_depth_stencil_resolve is "
@@ -3599,7 +3606,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStenci
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDescriptorIndexingPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_descriptor_indexing, but "
             "VK_EXT_descriptor_indexing is "
@@ -3636,7 +3643,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatControlsPropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFloatControlsPropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_shader_float_controls, but "
             "VK_KHR_shader_float_controls is "
@@ -3666,7 +3673,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatContro
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance3PropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance3PropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_maintenance3, but VK_KHR_maintenance3 is "
             "not supported by the device.\n");
@@ -3680,7 +3687,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4FeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance4FeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_maintenance4, but VK_KHR_maintenance4 is "
             "not supported by the device.\n");
@@ -3693,7 +3700,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4PropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance4PropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_maintenance4, but VK_KHR_maintenance4 is "
             "not supported by the device.\n");
@@ -3706,7 +3713,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMultiviewPropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_multiview, but VK_KHR_multiview is "
             "not supported by the device.\n");
@@ -3784,7 +3791,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceToolPropert
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetPropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && emulatePortability.num <= 0) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && emulatePortability.num <= 0) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
             "not supported by the device and emulation is not turned on.\nIf you wish to emulate "
@@ -3806,7 +3813,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_sampler_filter_minmax, but "
             "VK_EXT_sampler_filter_minmax is "
@@ -3822,7 +3829,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilt
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphorePropertiesKHR *dest) {
     const Json::Value value = parent["members"];
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTimelineSemaphorePropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_timeline_semaphore, but "
             "VK_KHR_timeline_semaphore is "
@@ -4027,7 +4034,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *d
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorageFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevice8BitStorageFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_8BIT_STORAGE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_8BIT_STORAGE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_8bit_storage, but VK_KHR_8bit_storage is "
             "not supported by the device.\n");
@@ -4041,7 +4048,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorage
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorageFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevice16BitStorageFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_16BIT_STORAGE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_16BIT_STORAGE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_16bit_storage, but VK_KHR_16bit_storage is "
             "not supported by the device.\n");
@@ -4056,7 +4063,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorag
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBufferDeviceAddressFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_buffer_device_address, but "
             "VK_KHR_buffer_device_address is "
@@ -4071,7 +4078,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDevic
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDescriptorIndexingFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_descriptor_indexing, but "
             "VK_EXT_descriptor_indexing is "
@@ -4103,7 +4110,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryResetFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceHostQueryResetFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_host_query_reset, but "
             "VK_EXT_host_query_reset is "
@@ -4116,7 +4123,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryRe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFramebufferFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceImagelessFramebufferFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_imageless_framebuffer, but "
             "VK_KHR_imageless_framebuffer is "
@@ -4129,7 +4136,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFr
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMultiviewFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_multiview, but VK_KHR_multiview is "
             "not supported by the device.\n");
@@ -4143,7 +4150,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && emulatePortability.num <= 0) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && emulatePortability.num <= 0) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
             "not supported by the device and emulation is not turned on.\nIf you wish to emulate "
@@ -4178,7 +4185,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_sampler_ycbcr_conversion, but "
             "VK_KHR_sampler_ycbcr_conversion is "
@@ -4191,7 +4198,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbc
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceScalarBlockLayoutFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_scalar_block_layout, but "
             "VK_EXT_scalar_block_layout is "
@@ -4204,7 +4211,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlock
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_separate_depth_stencil_layouts, but "
             "VK_KHR_separate_depth_stencil_layouts is "
@@ -4217,7 +4224,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDep
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicInt64FeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_shader_atomic_int64, but "
             "VK_KHR_shader_atomic_int64 is "
@@ -4238,7 +4245,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderFloat16Int8FeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_shader_float16_int8, but "
             "VK_KHR_shader_float16_int8 is "
@@ -4252,7 +4259,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFeatures)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_shader_subgroup_extended_types, but "
             "VK_KHR_shader_subgroup_extended_types is "
@@ -4272,7 +4279,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSem
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_uniform_buffer_standard_layout, but"
             "VK_KHR_unifrom_buffer_standard_layout is "
@@ -4285,7 +4292,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBuff
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePointersFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVariablePointersFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_variable_pointers, but VK_KHR_variable_pointers is "
             "not supported by the device.\n");
@@ -4298,7 +4305,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePoi
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVulkanMemoryModelFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_vulkan_memory_model, but VK_KHR_vulkan_memory_model "
             "is "
@@ -4313,7 +4320,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemor
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_zero_initialize_workgroup_memory, but "
             "VK_KHR_zero_initialize_workgroup_memory is "
@@ -4326,7 +4333,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitial
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructureFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceAccelerationStructureFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_acceleration_structure, but "
             "VK_KHR_acceleration_structure is "
@@ -4343,7 +4350,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructurePropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceAccelerationStructurePropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_acceleration_structure, but "
             "VK_KHR_acceleration_structure is "
@@ -4364,7 +4371,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePerformanceQueryFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_performance_query, but "
             "VK_KHR_performance_query is "
@@ -4378,7 +4385,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryPropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePerformanceQueryPropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_performance_query, but "
             "VK_KHR_performance_query is "
@@ -4392,7 +4399,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_pipeline_executable_properties, but "
             "VK_KHR_pipeline_executable_properties is "
@@ -4405,7 +4412,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePresentIdFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PRESENT_ID_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PRESENT_ID_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_present_id, but "
             "VK_KHR_present_id is "
@@ -4418,7 +4425,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWaitFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePresentWaitFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_present_wait, but "
             "VK_KHR_present_wait is "
@@ -4431,7 +4438,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWait
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescriptorPropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePushDescriptorPropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_push_descriptor, but "
             "VK_KHR_push_descriptor is "
@@ -4445,7 +4452,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescrip
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayQueryFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_ray_query, but "
             "VK_KHR_ray_query is "
@@ -4458,7 +4465,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFea
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelineFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPipelineFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_ray_tracing_pipeline, but "
             "VK_KHR_ray_tracing_pipeline is "
@@ -4475,7 +4482,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelinePropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPipelinePropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_ray_tracing_pipeline, but "
             "VK_KHR_ray_tracing_pipeline is "
@@ -4496,7 +4503,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClockFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderClockFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_shader_clock, but "
             "VK_KHR_shader_clock is "
@@ -4510,7 +4517,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClock
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_shader_integer_dot_product, but "
             "VK_KHR_shader_integer_dot_product is "
@@ -4523,7 +4530,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_shader_integer_dot_product, but "
             "VK_KHR_shader_integer_dot_product is "
@@ -4566,7 +4573,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_shader_subgroup_uniform_control_flow, but "
             "VK_KHR_shader_subgroup_uniform_control_flow is "
@@ -4579,7 +4586,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgr
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_shader_terminate_invocation, but "
             "VK_KHR_shader_terminate_invocation is "
@@ -4592,7 +4599,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTermi
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchronization2FeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSynchronization2FeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_synchronization2, but "
             "VK_KHR_synchronization2 is "
@@ -4605,7 +4612,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchroniza
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_workgroup_memory_explicit_layout, but "
             "VK_KHR_workgroup_memory_explicit_layout is "
@@ -4621,7 +4628,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444FormatsFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_4444_formats, but "
             "VK_EXT_4444_formats is "
@@ -4635,7 +4642,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444Formats
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceASTCDecodeFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_astc_decode_mode, but "
             "VK_EXT_astc_decode_mode is "
@@ -4648,7 +4655,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeF
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_blend_operation_advanced, but "
             "VK_EXT_blend_operation_advanced is "
@@ -4661,7 +4668,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_blend_operation_advanced, but "
             "VK_EXT_blend_operation_advanced is "
@@ -4680,7 +4687,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBorderColorSwizzleFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_border_color_swizzle, but "
             "VK_EXT_border_color_swizzle is "
@@ -4694,7 +4701,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColor
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceColorWriteEnableFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_color_write_enable, but "
             "VK_EXT_color_write_enable is "
@@ -4707,7 +4714,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteE
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceConditionalRenderingFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_conditional_rendering, but "
             "VK_EXT_conditional_rendering is "
@@ -4721,7 +4728,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditional
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceConservativeRasterizationPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_conservative_rasterization, but "
             "VK_EXT_conservative_rasterization is "
@@ -4743,7 +4750,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativ
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCustomBorderColorFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_custom_border_color, but "
             "VK_EXT_custom_border_color is "
@@ -4757,7 +4764,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorde
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCustomBorderColorPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_custom_border_color, but "
             "VK_EXT_custom_border_color is "
@@ -4771,7 +4778,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorde
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDepthClipEnableFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_depth_clip_enable, but "
             "VK_EXT_depth_clip_enable is "
@@ -4784,7 +4791,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEn
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDeviceMemoryReportFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_device_memory_report, but "
             "VK_EXT_device_memory_report is "
@@ -4797,7 +4804,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemor
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDiscardRectanglePropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_discard_rectangles, but "
             "VK_EXT_discard_rectangles is "
@@ -4811,7 +4818,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRect
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExtendedDynamicStateFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_extended_dynamic_state, but "
             "VK_EXT_extended_dynamic_state is "
@@ -4824,7 +4831,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExtendedDynamicState2FeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_extended_dynamic_state2, but "
             "VK_EXT_extended_dynamic_state2 is "
@@ -4839,7 +4846,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryHostPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExternalMemoryHostPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_external_memory_host, but "
             "VK_EXT_external_memory_host is "
@@ -4853,7 +4860,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_fragment_density_map, but "
             "VK_EXT_fragment_density_map is "
@@ -4868,7 +4875,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_fragment_density_map, but "
             "VK_EXT_fragment_density_map is "
@@ -4884,7 +4891,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_fragment_shader_interlock, but "
             "VK_EXT_fragment_shader_interlock is "
@@ -4899,7 +4906,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_global_priority_query, but "
             "VK_EXT_global_priority_query is "
@@ -4912,7 +4919,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPrior
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobustnessFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceImageRobustnessFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_image_robustness, but "
             "VK_EXT_image_robustness is "
@@ -4925,7 +4932,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobust
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUint8FeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceIndexTypeUint8FeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_index_type_uint8, but "
             "VK_EXT_index_type_uint8 is "
@@ -4938,7 +4945,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUi
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceInlineUniformBlockFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_inline_uniform_block, but "
             "VK_EXT_inline_uniform_block is "
@@ -4952,7 +4959,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceInlineUniformBlockPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_inline_uniform_block, but "
             "VK_EXT_inline_uniform_block is "
@@ -4970,7 +4977,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceLineRasterizationFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_line_rasterization, but "
             "VK_EXT_line_rasterization is "
@@ -4988,7 +4995,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceLineRasterizationPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_line_rasterization, but "
             "VK_EXT_line_rasterization is "
@@ -5002,7 +5009,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPriorityFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMemoryPriorityFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_memory_priority, but "
             "VK_EXT_memory_priority is "
@@ -5015,7 +5022,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPrior
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMultiDrawFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_multi_draw, but "
             "VK_EXT_multi_draw is "
@@ -5028,7 +5035,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMultiDrawPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_multi_draw, but "
             "VK_EXT_multi_draw is "
@@ -5042,7 +5049,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPr
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_pageable_device_local_memory, but "
             "VK_EXT_pageable_device_local_memory is "
@@ -5055,7 +5062,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDev
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_pipeline_creation_cache_control, but "
             "VK_EXT_pipeline_creation_cache_control is "
@@ -5068,7 +5075,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCre
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_primitive_topology_list_restart, but "
             "VK_EXT_primitive_topology_list_restart is "
@@ -5082,7 +5089,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTo
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateDataFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePrivateDataFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_private_data, but "
             "VK_EXT_private_data is "
@@ -5095,7 +5102,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateData
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProvokingVertexFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_provoking_vertex, but "
             "VK_EXT_provoking_vertex is "
@@ -5109,7 +5116,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProvokingVertexPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_provoking_vertex, but "
             "VK_EXT_provoking_vertex is "
@@ -5124,7 +5131,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_rgba10x6_formats, but "
             "VK_EXT_rgba10x6_formats is "
@@ -5137,7 +5144,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6For
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2FeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRobustness2FeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_robustness2, but "
             "VK_EXT_robustness2 is "
@@ -5152,7 +5159,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2PropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRobustness2PropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_robustness2, but "
             "VK_EXT_robustness2 is "
@@ -5167,7 +5174,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocationsPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSampleLocationsPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_sample_locations, but "
             "VK_EXT_sample_locations is "
@@ -5185,7 +5192,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocat
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicFloatFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_shader_atomic_float, but "
             "VK_EXT_shader_atomic_float is "
@@ -5209,7 +5216,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_shader_atomic_float2, but "
             "VK_EXT_shader_atomic_float2 is "
@@ -5233,7 +5240,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_shader_demote_to_helper_invocation, but "
             "VK_EXT_shader_demote_to_helper_invocation is "
@@ -5246,7 +5253,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemot
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_shader_image_atomic_int64, but "
             "VK_EXT_shader_image_atomic_int64 is "
@@ -5260,7 +5267,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupSizeControlFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_subgroup_size_control, but "
             "VK_EXT_subgroup_size_control is "
@@ -5274,7 +5281,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupSizeControlPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_subgroup_size_control, but "
             "VK_EXT_subgroup_size_control is "
@@ -5291,7 +5298,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_texel_buffer_alignment, but "
             "VK_EXT_texel_buffer_alignment is "
@@ -5304,7 +5311,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_texel_buffer_alignment, but "
             "VK_EXT_texel_buffer_alignment is "
@@ -5321,7 +5328,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_texture_compression_astc_hdr, but "
             "VK_EXT_texture_compression_astc_hdr is "
@@ -5334,7 +5341,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureComp
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTransformFeedbackFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_transform_feedback, but "
             "VK_EXT_transform_feedback is "
@@ -5348,7 +5355,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTransformFeedbackPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_transform_feedback, but "
             "VK_EXT_transform_feedback is "
@@ -5371,7 +5378,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_vertex_attribute_divisor, but "
             "VK_EXT_vertex_attribute_divisor is "
@@ -5385,7 +5392,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_vertex_attribute_divisor, but "
             "VK_EXT_vertex_attribute_divisor is "
@@ -5399,7 +5406,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_vertex_input_dynamic_state, but "
             "VK_EXT_vertex_input_dynamic_state is "
@@ -5412,7 +5419,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInput
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_ycbcr_2plane_444_formats, but "
             "VK_EXT_ycbcr_2plane_444_formats is "
@@ -5425,7 +5432,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceYcbcrImageArraysFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_ycbcr_image_arrays, but "
             "VK_EXT_ycbcr_image_arrays is "
@@ -5438,7 +5445,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageA
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_fragment_shading_rate, but "
             "VK_KHR_fragment_shading_rate is "
@@ -5453,7 +5460,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRatePropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_fragment_shading_rate, but "
             "VK_KHR_fragment_shading_rate is "
@@ -5483,7 +5490,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMemoryFeaturesAMD *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCoherentMemoryFeaturesAMD)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_AMD_device_coherent_memory, but "
             "VK_AMD_device_coherent_memory is "
@@ -5496,7 +5503,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMem
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCorePropertiesAMD *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderCorePropertiesAMD)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_AMD_shader_core_properties, but "
             "VK_AMD_shader_core_properties is "
@@ -5523,7 +5530,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreProperties2AMD *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderCoreProperties2AMD)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_AMD_shader_core_properties2, but "
             "VK_AMD_shader_core_properties2 is "
@@ -5538,7 +5545,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceInvocationMaskFeaturesHUAWEI)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_HUAWEI_invocation_mask, but "
             "VK_HUAWEI_invocation_mask is "
@@ -5551,7 +5558,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationM
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubpassShadingFeaturesHUAWEI)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_HUAWEI_subpass_shading, but "
             "VK_HUAWEI_subpass_shading is "
@@ -5564,7 +5571,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubpassShadingPropertiesHUAWEI)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_HUAWEI_subpass_shading, but "
             "VK_HUAWEI_subpass_shading is "
@@ -5578,7 +5585,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_INTEL_shader_integer_functions2, but "
             "VK_INTEL_shader_integer_functions2 is "
@@ -5591,7 +5598,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceComputeShaderDerivativesFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_compute_shader_derivatives, but "
             "VK_NV_compute_shader_derivatives is "
@@ -5605,7 +5612,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShad
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCooperativeMatrixFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_cooperative_matrix, but "
             "VK_NV_cooperative_matrix is "
@@ -5619,7 +5626,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixPropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCooperativeMatrixPropertiesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_cooperative_matrix, but "
             "VK_NV_cooperative_matrix is "
@@ -5633,7 +5640,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampledImageFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCornerSampledImageFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_corner_sampled_image, but "
             "VK_NV_corner_sampled_image is "
@@ -5646,7 +5653,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampl
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageReductionModeFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCoverageReductionModeFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_coverage_reduction_mode, but "
             "VK_NV_coverage_reduction_mode is "
@@ -5659,7 +5666,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageRed
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_DEDICATED_ALLOCATION_IMAGE_ALIASING_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_DEDICATED_ALLOCATION_IMAGE_ALIASING_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_dedicated_allocation_image_aliasing, but "
             "VK_NV_dedicated_allocation_image_aliasing is "
@@ -5672,7 +5679,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAl
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDiagnosticsConfigFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_device_diagnostics_config, but "
             "VK_NV_device_diagnostics_config is "
@@ -5685,7 +5692,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnostics
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_device_generated_commands, but "
             "VK_NV_device_generated_commands is "
@@ -5698,7 +5705,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_device_generated_commands, but "
             "VK_NV_device_generated_commands is "
@@ -5720,7 +5727,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExternalMemoryRDMAFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_external_memory_rdma, but "
             "VK_NV_external_memory_rdma is "
@@ -5733,7 +5740,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_fragment_shader_barycentric, but "
             "VK_NV_fragment_shader_barycentric is "
@@ -5746,7 +5753,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_fragment_shading_rate_enums, but "
             "VK_NV_fragment_shading_rate_enums is "
@@ -5761,7 +5768,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_fragment_shading_rate_enums, but "
             "VK_NV_fragment_shading_rate_enums is "
@@ -5775,7 +5782,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedViewportScissorFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceInheritedViewportScissorFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_inherited_viewport_scissor, but "
             "VK_NV_inherited_viewport_scissor is "
@@ -5788,7 +5795,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedVi
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_mesh_shader, but "
             "VK_NV_mesh_shader is "
@@ -5802,7 +5809,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderF
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderPropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderPropertiesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_mesh_shader, but "
             "VK_NV_mesh_shader is "
@@ -5828,7 +5835,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPropertiesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_RAY_TRACING_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_RAY_TRACING_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_ray_tracing, but "
             "VK_NV_ray_tracing is "
@@ -5849,7 +5856,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingMotionBlurFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_ray_tracing_motion_blur, but "
             "VK_NV_ray_tracing_motion_blur is "
@@ -5863,7 +5870,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingM
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_representative_fragment_test, but "
             "VK_NV_representative_fragment_test is "
@@ -5876,7 +5883,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentat
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveScissorFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExclusiveScissorFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_scissor_exclusive, but "
             "VK_NV_scissor_exclusive is "
@@ -5889,7 +5896,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveSc
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageFootprintFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderImageFootprintFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_shader_image_footprint, but "
             "VK_NV_shader_image_footprint is "
@@ -5902,7 +5909,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderSMBuiltinsFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_shader_sm_builtins, but "
             "VK_NV_shader_sm_builtins is "
@@ -5915,7 +5922,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBui
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsPropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderSMBuiltinsPropertiesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_shader_sm_builtins, but "
             "VK_NV_shader_sm_builtins is "
@@ -5930,7 +5937,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBui
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImageFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShadingRateImageFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_shading_rate_image, but "
             "VK_NV_shading_rate_image is "
@@ -5944,7 +5951,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImagePropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShadingRateImagePropertiesNV)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_NV_shading_rate_image, but "
             "VK_NV_shading_rate_image is "
@@ -5960,7 +5967,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_VALVE_mutable_descriptor_type, but "
             "VK_VALVE_mutable_descriptor_type is "
@@ -5973,7 +5980,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDesc
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRenderingFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDynamicRenderingFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_dynamic_rendering, but "
             "VK_KHR_dynamic_rendering is "
@@ -5986,7 +5993,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRend
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMap2FeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_fragment_density_map2, but "
             "VK_EXT_fragment_density_map2 is "
@@ -5999,7 +6006,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMap2PropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
+    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_EXT_fragment_density_map2, but "
             "VK_EXT_fragment_density_map2 is "
@@ -6816,7 +6823,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
         switch (structure->sType) {
             // VK_KHR_portability_subset is a special case since it can also be emulated by the DevSim layer.
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) ||
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) ||
                     emulatePortability.num > 0) {
                     VkPhysicalDevicePortabilitySubsetPropertiesKHR *psp = (VkPhysicalDevicePortabilitySubsetPropertiesKHR *)place;
                     void *pNext = psp->pNext;
@@ -6825,7 +6832,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR:
-                if ((PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) ||
+                if ((PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) ||
                      emulatePortability.num > 0)) {
                     VkPhysicalDevicePortabilitySubsetFeaturesKHR *psf = (VkPhysicalDevicePortabilitySubsetFeaturesKHR *)place;
                     void *pNext = psf->pNext;
@@ -6834,7 +6841,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_8BIT_STORAGE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_8BIT_STORAGE_EXTENSION_NAME)) {
                     VkPhysicalDevice8BitStorageFeaturesKHR *ebsf = (VkPhysicalDevice8BitStorageFeaturesKHR *)place;
                     void *pNext = ebsf->pNext;
                     *ebsf = physicalDeviceData->physical_device_8bit_storage_features_;
@@ -6842,7 +6849,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_16BIT_STORAGE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_16BIT_STORAGE_EXTENSION_NAME)) {
                     VkPhysicalDevice16BitStorageFeaturesKHR *sbsf = (VkPhysicalDevice16BitStorageFeaturesKHR *)place;
                     void *pNext = sbsf->pNext;
                     *sbsf = physicalDeviceData->physical_device_16bit_storage_features_;
@@ -6850,7 +6857,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
                     VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *bdaf = (VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *)place;
                     void *pNext = bdaf->pNext;
                     *bdaf = physicalDeviceData->physical_device_buffer_device_address_features_;
@@ -6858,7 +6865,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)) {
                     VkPhysicalDeviceDepthStencilResolvePropertiesKHR *dsrp =
                         (VkPhysicalDeviceDepthStencilResolvePropertiesKHR *)place;
                     void *pNext = dsrp->pNext;
@@ -6867,7 +6874,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
                     VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dip = (VkPhysicalDeviceDescriptorIndexingPropertiesEXT *)place;
                     void *pNext = dip->pNext;
                     *dip = physicalDeviceData->physical_device_descriptor_indexing_properties_;
@@ -6875,7 +6882,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
                     VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dif = (VkPhysicalDeviceDescriptorIndexingFeaturesEXT *)place;
                     void *pNext = dif->pNext;
                     *dif = physicalDeviceData->physical_device_descriptor_indexing_features_;
@@ -6883,7 +6890,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME)) {
                     VkPhysicalDeviceHostQueryResetFeaturesEXT *hqrf = (VkPhysicalDeviceHostQueryResetFeaturesEXT *)place;
                     void *pNext = hqrf->pNext;
                     *hqrf = physicalDeviceData->physical_device_host_query_reset_features_;
@@ -6891,7 +6898,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME)) {
                     VkPhysicalDeviceImagelessFramebufferFeaturesKHR *iff = (VkPhysicalDeviceImagelessFramebufferFeaturesKHR *)place;
                     void *pNext = iff->pNext;
                     *iff = physicalDeviceData->physical_device_imageless_framebuffer_features_;
@@ -6899,7 +6906,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_MAINTENANCE2_EXTENSION_NAME)) {
                     VkPhysicalDevicePointClippingPropertiesKHR *pcp = (VkPhysicalDevicePointClippingPropertiesKHR *)place;
                     void *pNext = pcp->pNext;
                     *pcp = physicalDeviceData->physical_device_point_clipping_properties_;
@@ -6907,7 +6914,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
                     VkPhysicalDeviceMaintenance3PropertiesKHR *pcp = (VkPhysicalDeviceMaintenance3PropertiesKHR *)place;
                     void *pNext = pcp->pNext;
                     *pcp = physicalDeviceData->physical_device_maintenance_3_properties_;
@@ -6915,7 +6922,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
                     VkPhysicalDeviceMaintenance4FeaturesKHR *m4f = (VkPhysicalDeviceMaintenance4FeaturesKHR *)place;
                     void *pNext = m4f->pNext;
                     *m4f = physicalDeviceData->physical_device_maintenance_4_features_;
@@ -6923,7 +6930,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
                     VkPhysicalDeviceMaintenance4PropertiesKHR *m4p = (VkPhysicalDeviceMaintenance4PropertiesKHR *)place;
                     void *pNext = m4p->pNext;
                     *m4p = physicalDeviceData->physical_device_maintenance_4_properties_;
@@ -6931,7 +6938,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
                     VkPhysicalDeviceMultiviewPropertiesKHR *mp = (VkPhysicalDeviceMultiviewPropertiesKHR *)place;
                     void *pNext = mp->pNext;
                     *mp = physicalDeviceData->physical_device_multiview_properties_;
@@ -6939,7 +6946,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
                     VkPhysicalDeviceMultiviewFeaturesKHR *mf = (VkPhysicalDeviceMultiviewFeaturesKHR *)place;
                     void *pNext = mf->pNext;
                     *mf = physicalDeviceData->physical_device_multiview_features_;
@@ -6947,7 +6954,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_FILTER_MINMAX_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME)) {
                     VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *sfmp =
                         (VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *)place;
                     void *pNext = sfmp->pNext;
@@ -6956,7 +6963,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME)) {
                     VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *sycf =
                         (VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *)place;
                     void *pNext = sycf->pNext;
@@ -6965,7 +6972,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
                     VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *sblf = (VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *)place;
                     void *pNext = sblf->pNext;
                     *sblf = physicalDeviceData->physical_device_scalar_block_layout_features_;
@@ -6973,7 +6980,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SEPARATE_DEPTH_STENCIL_LAYOUTS_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME)) {
                     VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *sdslf =
                         (VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *)place;
                     void *pNext = sdslf->pNext;
@@ -6982,7 +6989,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_INT64_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *saisf = (VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *)place;
                     void *pNext = saisf->pNext;
                     *saisf = physicalDeviceData->physical_device_shader_atomic_int64_features_;
@@ -6990,7 +6997,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
                     VkPhysicalDeviceFloatControlsPropertiesKHR *fcp = (VkPhysicalDeviceFloatControlsPropertiesKHR *)place;
                     void *pNext = fcp->pNext;
                     *fcp = physicalDeviceData->physical_device_float_controls_properties_;
@@ -6998,7 +7005,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *sfsief = (VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *)place;
                     void *pNext = sfsief->pNext;
                     *sfsief = physicalDeviceData->physical_device_shader_float16_int8_features_;
@@ -7006,7 +7013,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *ssetf =
                         (VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *)place;
                     void *pNext = ssetf->pNext;
@@ -7015,7 +7022,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
                     VkPhysicalDeviceTimelineSemaphorePropertiesKHR *tsp = (VkPhysicalDeviceTimelineSemaphorePropertiesKHR *)place;
                     void *pNext = tsp->pNext;
                     *tsp = physicalDeviceData->physical_device_timeline_semaphore_properties_;
@@ -7023,7 +7030,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
                     VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *tsf = (VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *)place;
                     void *pNext = tsf->pNext;
                     *tsf = physicalDeviceData->physical_device_timeline_semaphore_features_;
@@ -7031,7 +7038,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME)) {
                     VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *ubslf =
                         (VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *)place;
                     void *pNext = ubslf->pNext;
@@ -7040,7 +7047,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
                     VkPhysicalDeviceVariablePointersFeaturesKHR *vpf = (VkPhysicalDeviceVariablePointersFeaturesKHR *)place;
                     void *pNext = vpf->pNext;
                     *vpf = physicalDeviceData->physical_device_variable_pointers_features_;
@@ -7048,7 +7055,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME)) {
                     VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *vmmf = (VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *)place;
                     void *pNext = vmmf->pNext;
                     *vmmf = physicalDeviceData->physical_device_vulkan_memory_model_features_;
@@ -7056,7 +7063,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
                     VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *ziwmf =
                         (VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *)place;
                     void *pNext = ziwmf->pNext;
@@ -7065,7 +7072,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
                     VkPhysicalDeviceAccelerationStructureFeaturesKHR *asf =
                         (VkPhysicalDeviceAccelerationStructureFeaturesKHR *)place;
                     void *pNext = asf->pNext;
@@ -7074,7 +7081,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
                     VkPhysicalDeviceAccelerationStructurePropertiesKHR *asp =
                         (VkPhysicalDeviceAccelerationStructurePropertiesKHR *)place;
                     void *pNext = asp->pNext;
@@ -7083,7 +7090,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PERFORMANCE_QUERY_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
                     VkPhysicalDevicePerformanceQueryFeaturesKHR *pqf = (VkPhysicalDevicePerformanceQueryFeaturesKHR *)place;
                     void *pNext = pqf->pNext;
                     *pqf = physicalDeviceData->physical_device_performance_query_features_;
@@ -7091,7 +7098,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PERFORMANCE_QUERY_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
                     VkPhysicalDevicePerformanceQueryPropertiesKHR *pqp = (VkPhysicalDevicePerformanceQueryPropertiesKHR *)place;
                     void *pNext = pqp->pNext;
                     *pqp = physicalDeviceData->physical_device_performance_query_properties_;
@@ -7099,7 +7106,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
                     VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *pepf =
                         (VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *)place;
                     void *pNext = pepf->pNext;
@@ -7108,7 +7115,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_ID_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PRESENT_ID_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PRESENT_ID_EXTENSION_NAME)) {
                     VkPhysicalDevicePresentIdFeaturesKHR *pidf = (VkPhysicalDevicePresentIdFeaturesKHR *)place;
                     void *pNext = pidf->pNext;
                     *pidf = physicalDeviceData->physical_device_present_id_features_;
@@ -7116,7 +7123,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_WAIT_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
                     VkPhysicalDevicePresentWaitFeaturesKHR *pwf = (VkPhysicalDevicePresentWaitFeaturesKHR *)place;
                     void *pNext = pwf->pNext;
                     *pwf = physicalDeviceData->physical_device_present_wait_features_;
@@ -7124,7 +7131,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
                     VkPhysicalDevicePushDescriptorPropertiesKHR *pdp = (VkPhysicalDevicePushDescriptorPropertiesKHR *)place;
                     void *pNext = pdp->pNext;
                     *pdp = physicalDeviceData->physical_device_push_descriptor_properites_;
@@ -7132,7 +7139,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
                     VkPhysicalDeviceRayQueryFeaturesKHR *rqf = (VkPhysicalDeviceRayQueryFeaturesKHR *)place;
                     void *pNext = rqf->pNext;
                     *rqf = physicalDeviceData->physical_device_ray_query_features_;
@@ -7140,7 +7147,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
                     VkPhysicalDeviceRayTracingPipelineFeaturesKHR *rtpf = (VkPhysicalDeviceRayTracingPipelineFeaturesKHR *)place;
                     void *pNext = rtpf->pNext;
                     *rtpf = physicalDeviceData->physical_device_ray_tracing_pipeline_features_;
@@ -7148,7 +7155,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
                     VkPhysicalDeviceRayTracingPipelinePropertiesKHR *rtpp =
                         (VkPhysicalDeviceRayTracingPipelinePropertiesKHR *)place;
                     void *pNext = rtpp->pNext;
@@ -7157,7 +7164,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderClockFeaturesKHR *scf = (VkPhysicalDeviceShaderClockFeaturesKHR *)place;
                     void *pNext = scf->pNext;
                     *scf = physicalDeviceData->physical_device_shader_clock_features_;
@@ -7165,7 +7172,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_INTEGER_DOT_PRODUCT_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *sidpf =
                         (VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *)place;
                     void *pNext = sidpf->pNext;
@@ -7174,7 +7181,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_INTEGER_DOT_PRODUCT_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *sidpp =
                         (VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *)place;
                     void *pNext = sidpp->pNext;
@@ -7183,7 +7190,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData,
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData,
                                                      VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *ssucff =
                         (VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *)place;
@@ -7193,7 +7200,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *stif =
                         (VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *)place;
                     void *pNext = stif->pNext;
@@ -7202,7 +7209,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
                     VkPhysicalDeviceSynchronization2FeaturesKHR *s2f = (VkPhysicalDeviceSynchronization2FeaturesKHR *)place;
                     void *pNext = s2f->pNext;
                     *s2f = physicalDeviceData->physical_device_synchronization2_features_;
@@ -7210,7 +7217,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME)) {
                     VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *wmelf =
                         (VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *)place;
                     void *pNext = wmelf->pNext;
@@ -7219,7 +7226,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_4444_FORMATS_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
                     VkPhysicalDevice4444FormatsFeaturesEXT *ff = (VkPhysicalDevice4444FormatsFeaturesEXT *)place;
                     void *pNext = ff->pNext;
                     *ff = physicalDeviceData->physical_device_4444_formats_features_;
@@ -7227,7 +7234,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ASTC_DECODE_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME)) {
                     VkPhysicalDeviceASTCDecodeFeaturesEXT *astcdf = (VkPhysicalDeviceASTCDecodeFeaturesEXT *)place;
                     void *pNext = astcdf->pNext;
                     *astcdf = physicalDeviceData->physical_device_astc_decode_features_;
@@ -7235,7 +7242,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
                     VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *boaf =
                         (VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *)place;
                     void *pNext = boaf->pNext;
@@ -7244,7 +7251,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
                     VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *boap =
                         (VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *)place;
                     void *pNext = boap->pNext;
@@ -7253,7 +7260,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BORDER_COLOR_SWIZZLE_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
                     VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *bcsf = (VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *)place;
                     void *pNext = bcsf->pNext;
                     *bcsf = physicalDeviceData->physical_device_border_color_swizzle_features_;
@@ -7261,7 +7268,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COLOR_WRITE_ENABLE_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME)) {
                     VkPhysicalDeviceColorWriteEnableFeaturesEXT *cwef = (VkPhysicalDeviceColorWriteEnableFeaturesEXT *)place;
                     void *pNext = cwef->pNext;
                     *cwef = physicalDeviceData->physical_device_color_write_enable_features_;
@@ -7269,7 +7276,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONDITIONAL_RENDERING_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
                     VkPhysicalDeviceConditionalRenderingFeaturesEXT *crf = (VkPhysicalDeviceConditionalRenderingFeaturesEXT *)place;
                     void *pNext = crf->pNext;
                     *crf = physicalDeviceData->physical_device_conditional_rendering_features_;
@@ -7277,7 +7284,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONSERVATIVE_RASTERIZATION_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
                     VkPhysicalDeviceConservativeRasterizationPropertiesEXT *crp =
                         (VkPhysicalDeviceConservativeRasterizationPropertiesEXT *)place;
                     void *pNext = crp->pNext;
@@ -7286,7 +7293,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
                     VkPhysicalDeviceCustomBorderColorFeaturesEXT *cbcf = (VkPhysicalDeviceCustomBorderColorFeaturesEXT *)place;
                     void *pNext = cbcf->pNext;
                     *cbcf = physicalDeviceData->physical_device_custom_border_color_features_;
@@ -7294,7 +7301,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
                     VkPhysicalDeviceCustomBorderColorPropertiesEXT *cbcp = (VkPhysicalDeviceCustomBorderColorPropertiesEXT *)place;
                     void *pNext = cbcp->pNext;
                     *cbcp = physicalDeviceData->physical_device_custom_border_color_properties_;
@@ -7302,7 +7309,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
                     VkPhysicalDeviceDepthClipEnableFeaturesEXT *dcef = (VkPhysicalDeviceDepthClipEnableFeaturesEXT *)place;
                     void *pNext = dcef->pNext;
                     *dcef = physicalDeviceData->physical_device_depth_clip_enable_features_ext_;
@@ -7310,7 +7317,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_MEMORY_REPORT_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME)) {
                     VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dmrf = (VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *)place;
                     void *pNext = dmrf->pNext;
                     *dmrf = physicalDeviceData->physical_device_device_memory_report_features_;
@@ -7318,7 +7325,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DISCARD_RECTANGLE_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
                     VkPhysicalDeviceDiscardRectanglePropertiesEXT *drp = (VkPhysicalDeviceDiscardRectanglePropertiesEXT *)place;
                     void *pNext = drp->pNext;
                     *drp = physicalDeviceData->physical_device_discard_rectangle_properties_;
@@ -7326,7 +7333,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
                     VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *edsf =
                         (VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *)place;
                     void *pNext = edsf->pNext;
@@ -7335,7 +7342,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
                     VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *eds2f =
                         (VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *)place;
                     void *pNext = eds2f->pNext;
@@ -7344,7 +7351,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME)) {
                     VkPhysicalDeviceExternalMemoryHostPropertiesEXT *emhp =
                         (VkPhysicalDeviceExternalMemoryHostPropertiesEXT *)place;
                     void *pNext = emhp->pNext;
@@ -7353,7 +7360,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentDensityMapFeaturesEXT *fdmf = (VkPhysicalDeviceFragmentDensityMapFeaturesEXT *)place;
                     void *pNext = fdmf->pNext;
                     *fdmf = physicalDeviceData->physical_device_fragment_density_map_features_;
@@ -7361,7 +7368,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentDensityMapPropertiesEXT *fdmp =
                         (VkPhysicalDeviceFragmentDensityMapPropertiesEXT *)place;
                     void *pNext = fdmp->pNext;
@@ -7370,7 +7377,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *fsif =
                         (VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *)place;
                     void *pNext = fsif->pNext;
@@ -7379,7 +7386,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
                     VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *gpqf = (VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *)place;
                     void *pNext = gpqf->pNext;
                     *gpqf = physicalDeviceData->physical_device_global_priority_query_features_;
@@ -7387,7 +7394,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
                     VkPhysicalDeviceImageRobustnessFeaturesEXT *irf = (VkPhysicalDeviceImageRobustnessFeaturesEXT *)place;
                     void *pNext = irf->pNext;
                     *irf = physicalDeviceData->physical_device_image_robustness_features_;
@@ -7395,7 +7402,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INDEX_TYPE_UINT8_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME)) {
                     VkPhysicalDeviceIndexTypeUint8FeaturesEXT *itu8f = (VkPhysicalDeviceIndexTypeUint8FeaturesEXT *)place;
                     void *pNext = itu8f->pNext;
                     *itu8f = physicalDeviceData->physical_device_index_type_uint8_features_;
@@ -7403,7 +7410,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
                     VkPhysicalDeviceInlineUniformBlockFeaturesEXT *iubf = (VkPhysicalDeviceInlineUniformBlockFeaturesEXT *)place;
                     void *pNext = iubf->pNext;
                     *iubf = physicalDeviceData->physical_device_inline_uniform_block_features_;
@@ -7411,7 +7418,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
                     VkPhysicalDeviceInlineUniformBlockPropertiesEXT *iubp =
                         (VkPhysicalDeviceInlineUniformBlockPropertiesEXT *)place;
                     void *pNext = iubp->pNext;
@@ -7420,7 +7427,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
                     VkPhysicalDeviceLineRasterizationFeaturesEXT *lrf = (VkPhysicalDeviceLineRasterizationFeaturesEXT *)place;
                     void *pNext = lrf->pNext;
                     *lrf = physicalDeviceData->physical_device_line_rasterization_features_;
@@ -7428,7 +7435,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
                     VkPhysicalDeviceLineRasterizationPropertiesEXT *lrp = (VkPhysicalDeviceLineRasterizationPropertiesEXT *)place;
                     void *pNext = lrp->pNext;
                     *lrp = physicalDeviceData->physical_device_line_rasterization_properties_;
@@ -7436,7 +7443,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PRIORITY_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME)) {
                     VkPhysicalDeviceMemoryPriorityFeaturesEXT *mpf = (VkPhysicalDeviceMemoryPriorityFeaturesEXT *)place;
                     void *pNext = mpf->pNext;
                     *mpf = physicalDeviceData->physical_device_memory_priority_features_;
@@ -7444,7 +7451,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
                     VkPhysicalDeviceMultiDrawFeaturesEXT *mdf = (VkPhysicalDeviceMultiDrawFeaturesEXT *)place;
                     void *pNext = mdf->pNext;
                     *mdf = physicalDeviceData->physical_device_multi_draw_features_;
@@ -7452,7 +7459,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
                     VkPhysicalDeviceMultiDrawPropertiesEXT *mdp = (VkPhysicalDeviceMultiDrawPropertiesEXT *)place;
                     void *pNext = mdp->pNext;
                     *mdp = physicalDeviceData->physical_device_multi_draw_properties_;
@@ -7460,7 +7467,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PAGEABLE_DEVICE_LOCAL_MEMORY_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
                     VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *pdlmf =
                         (VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *)place;
                     void *pNext = pdlmf->pNext;
@@ -7469,7 +7476,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
                     VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *pcccf =
                         (VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *)place;
                     void *pNext = pcccf->pNext;
@@ -7478,7 +7485,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIMITIVE_TOPOLOGY_LIST_RESTART_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME)) {
                     VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *ptlrf =
                         (VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *)place;
                     void *pNext = ptlrf->pNext;
@@ -7487,7 +7494,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
                     VkPhysicalDevicePrivateDataFeaturesEXT *pdf = (VkPhysicalDevicePrivateDataFeaturesEXT *)place;
                     void *pNext = pdf->pNext;
                     *pdf = physicalDeviceData->physical_device_private_data_features_;
@@ -7495,7 +7502,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROVOKING_VERTEX_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
                     VkPhysicalDeviceProvokingVertexFeaturesEXT *pvf = (VkPhysicalDeviceProvokingVertexFeaturesEXT *)place;
                     void *pNext = pvf->pNext;
                     *pvf = physicalDeviceData->physical_device_provoking_vertex_features_;
@@ -7503,7 +7510,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROVOKING_VERTEX_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
                     VkPhysicalDeviceProvokingVertexPropertiesEXT *pvp = (VkPhysicalDeviceProvokingVertexPropertiesEXT *)place;
                     void *pNext = pvp->pNext;
                     *pvp = physicalDeviceData->physical_device_provoking_vertex_properties_;
@@ -7511,7 +7518,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RGBA10X6_FORMATS_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME)) {
                     VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *rgba10x6ff = (VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *)place;
                     void *pNext = rgba10x6ff->pNext;
                     *rgba10x6ff = physicalDeviceData->physical_device_rgba10x6_formats_features_;
@@ -7519,7 +7526,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
                     VkPhysicalDeviceRobustness2FeaturesEXT *r2f = (VkPhysicalDeviceRobustness2FeaturesEXT *)place;
                     void *pNext = r2f->pNext;
                     *r2f = physicalDeviceData->physical_device_robustness_2_features_;
@@ -7527,7 +7534,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
                     VkPhysicalDeviceRobustness2PropertiesEXT *r2p = (VkPhysicalDeviceRobustness2PropertiesEXT *)place;
                     void *pNext = r2p->pNext;
                     *r2p = physicalDeviceData->physical_device_robustness_2_properties_;
@@ -7535,7 +7542,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLE_LOCATIONS_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME)) {
                     VkPhysicalDeviceSampleLocationsPropertiesEXT *slp = (VkPhysicalDeviceSampleLocationsPropertiesEXT *)place;
                     void *pNext = slp->pNext;
                     *slp = physicalDeviceData->physical_device_sample_locations_properties_;
@@ -7543,7 +7550,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *saff = (VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *)place;
                     void *pNext = saff->pNext;
                     *saff = physicalDeviceData->physical_device_shader_atomic_float_features_;
@@ -7551,7 +7558,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT_2_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *saf2f = (VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *)place;
                     void *pNext = saf2f->pNext;
                     *saf2f = physicalDeviceData->physical_device_shader_atomic_float2_features_;
@@ -7559,7 +7566,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData,
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData,
                                                      VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *sdthif =
                         (VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *)place;
@@ -7569,7 +7576,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_IMAGE_ATOMIC_INT64_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *siai64f =
                         (VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *)place;
                     void *pNext = siai64f->pNext;
@@ -7578,7 +7585,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
                     VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *sscf = (VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *)place;
                     void *pNext = sscf->pNext;
                     *sscf = physicalDeviceData->physical_device_subgroup_size_control_features_;
@@ -7586,7 +7593,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
                     VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *sscp =
                         (VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *)place;
                     void *pNext = sscp->pNext;
@@ -7595,7 +7602,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
                     VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *tbaf =
                         (VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *)place;
                     void *pNext = tbaf->pNext;
@@ -7604,7 +7611,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
                     VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *tbap =
                         (VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *)place;
                     void *pNext = tbap->pNext;
@@ -7613,7 +7620,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXTURE_COMPRESSION_ASTC_HDR_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
                     VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *tcastchdrf =
                         (VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *)place;
                     void *pNext = tcastchdrf->pNext;
@@ -7622,7 +7629,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
                     VkPhysicalDeviceTransformFeedbackFeaturesEXT *tff = (VkPhysicalDeviceTransformFeedbackFeaturesEXT *)place;
                     void *pNext = tff->pNext;
                     *tff = physicalDeviceData->physical_device_transform_feedback_features_;
@@ -7630,7 +7637,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
                     VkPhysicalDeviceTransformFeedbackPropertiesEXT *tfp = (VkPhysicalDeviceTransformFeedbackPropertiesEXT *)place;
                     void *pNext = tfp->pNext;
                     *tfp = physicalDeviceData->physical_device_transform_feedback_properties_;
@@ -7638,7 +7645,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
                     VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *vadf =
                         (VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *)place;
                     void *pNext = vadf->pNext;
@@ -7647,7 +7654,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
                     VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *vadp =
                         (VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *)place;
                     void *pNext = vadp->pNext;
@@ -7656,7 +7663,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_INPUT_DYNAMIC_STATE_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME)) {
                     VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *vidsf =
                         (VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *)place;
                     void *pNext = vidsf->pNext;
@@ -7665,7 +7672,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_2_PLANE_444_FORMATS_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
                     VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *y2pff =
                         (VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *)place;
                     void *pNext = y2pff->pNext;
@@ -7674,7 +7681,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_IMAGE_ARRAYS_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
                     VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *yiaf = (VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *)place;
                     void *pNext = yiaf->pNext;
                     *yiaf = physicalDeviceData->physical_device_ycbcr_image_arrays_features_;
@@ -7682,7 +7689,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentShadingRateFeaturesKHR *fsrf = (VkPhysicalDeviceFragmentShadingRateFeaturesKHR *)place;
                     void *pNext = fsrf->pNext;
                     *fsrf = physicalDeviceData->physical_device_fragment_shading_rate_features_;
@@ -7690,7 +7697,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentShadingRatePropertiesKHR *fsrp =
                         (VkPhysicalDeviceFragmentShadingRatePropertiesKHR *)place;
                     void *pNext = fsrp->pNext;
@@ -7699,7 +7706,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
                     VkPhysicalDeviceCoherentMemoryFeaturesAMD *cmf = (VkPhysicalDeviceCoherentMemoryFeaturesAMD *)place;
                     void *pNext = cmf->pNext;
                     *cmf = physicalDeviceData->physical_device_coherent_memory_features_;
@@ -7707,7 +7714,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_PROPERTIES_AMD:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderCorePropertiesAMD *scp = (VkPhysicalDeviceShaderCorePropertiesAMD *)place;
                     void *pNext = scp->pNext;
                     *scp = physicalDeviceData->physical_device_shader_core_properties_;
@@ -7715,7 +7722,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_PROPERTIES_2_AMD:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderCoreProperties2AMD *scp2 = (VkPhysicalDeviceShaderCoreProperties2AMD *)place;
                     void *pNext = scp2->pNext;
                     *scp2 = physicalDeviceData->physical_device_shader_core_properties_2_;
@@ -7723,7 +7730,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INVOCATION_MASK_FEATURES_HUAWEI:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
                     VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *imf = (VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *)place;
                     void *pNext = imf->pNext;
                     *imf = physicalDeviceData->physical_device_invocation_mask_features_;
@@ -7731,7 +7738,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBPASS_SHADING_FEATURES_HUAWEI:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
                     VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *shf = (VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *)place;
                     void *pNext = shf->pNext;
                     *shf = physicalDeviceData->physical_device_subpass_shading_features_;
@@ -7739,7 +7746,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBPASS_SHADING_PROPERTIES_HUAWEI:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
                     VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *shp = (VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *)place;
                     void *pNext = shp->pNext;
                     *shp = physicalDeviceData->physical_device_subpass_shading_properties_;
@@ -7747,7 +7754,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_INTEGER_FUNCTIONS_2_FEATURES_INTEL:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *sif2f =
                         (VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *)place;
                     void *pNext = sif2f->pNext;
@@ -7756,7 +7763,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COMPUTE_SHADER_DERIVATIVES_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
                     VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *csdf =
                         (VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *)place;
                     void *pNext = csdf->pNext;
@@ -7765,7 +7772,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
                     VkPhysicalDeviceCooperativeMatrixFeaturesNV *cmf = (VkPhysicalDeviceCooperativeMatrixFeaturesNV *)place;
                     void *pNext = cmf->pNext;
                     *cmf = physicalDeviceData->physical_device_cooperative_matrix_features_;
@@ -7773,7 +7780,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_PROPERTIES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
                     VkPhysicalDeviceCooperativeMatrixPropertiesNV *cmp = (VkPhysicalDeviceCooperativeMatrixPropertiesNV *)place;
                     void *pNext = cmp->pNext;
                     *cmp = physicalDeviceData->physical_device_cooperative_matrix_properties_;
@@ -7781,7 +7788,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CORNER_SAMPLED_IMAGE_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
                     VkPhysicalDeviceCornerSampledImageFeaturesNV *csif = (VkPhysicalDeviceCornerSampledImageFeaturesNV *)place;
                     void *pNext = csif->pNext;
                     *csif = physicalDeviceData->physical_device_corner_sampled_image_features_;
@@ -7789,7 +7796,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COVERAGE_REDUCTION_MODE_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME)) {
                     VkPhysicalDeviceCoverageReductionModeFeaturesNV *crmf =
                         (VkPhysicalDeviceCoverageReductionModeFeaturesNV *)place;
                     void *pNext = crmf->pNext;
@@ -7798,7 +7805,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEDICATED_ALLOCATION_IMAGE_ALIASING_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData,
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData,
                                                      VK_NV_DEDICATED_ALLOCATION_IMAGE_ALIASING_EXTENSION_NAME)) {
                     VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *daiaf =
                         (VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *)place;
@@ -7808,7 +7815,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DIAGNOSTICS_CONFIG_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
                     VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dcf = (VkPhysicalDeviceDiagnosticsConfigFeaturesNV *)place;
                     void *pNext = dcf->pNext;
                     *dcf = physicalDeviceData->physical_device_diagnostics_config_features_;
@@ -7816,7 +7823,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
                     VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dgcf =
                         (VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *)place;
                     void *pNext = dgcf->pNext;
@@ -7825,7 +7832,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_PROPERTIES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
                     VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dgcp =
                         (VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *)place;
                     void *pNext = dgcp->pNext;
@@ -7834,7 +7841,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_RDMA_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME)) {
                     VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *emrf = (VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *)place;
                     void *pNext = emrf->pNext;
                     *emrf = physicalDeviceData->physical_device_external_memory_rdma_features_;
@@ -7842,7 +7849,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_BARYCENTRIC_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *fsbf =
                         (VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *)place;
                     void *pNext = fsbf->pNext;
@@ -7851,7 +7858,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_ENUMS_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *fsref =
                         (VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *)place;
                     void *pNext = fsref->pNext;
@@ -7860,7 +7867,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_ENUMS_PROPERTIES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *fsrep =
                         (VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *)place;
                     void *pNext = fsrep->pNext;
@@ -7869,7 +7876,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INHERITED_VIEWPORT_SCISSOR_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME)) {
                     VkPhysicalDeviceInheritedViewportScissorFeaturesNV *ivsf =
                         (VkPhysicalDeviceInheritedViewportScissorFeaturesNV *)place;
                     void *pNext = ivsf->pNext;
@@ -7878,7 +7885,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
                     VkPhysicalDeviceMeshShaderFeaturesNV *msf = (VkPhysicalDeviceMeshShaderFeaturesNV *)place;
                     void *pNext = msf->pNext;
                     *msf = physicalDeviceData->physical_device_mesh_shader_features_;
@@ -7886,7 +7893,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
                     VkPhysicalDeviceMeshShaderPropertiesNV *msp = (VkPhysicalDeviceMeshShaderPropertiesNV *)place;
                     void *pNext = msp->pNext;
                     *msp = physicalDeviceData->physical_device_mesh_shader_properties_;
@@ -7894,7 +7901,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PROPERTIES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_RAY_TRACING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_RAY_TRACING_EXTENSION_NAME)) {
                     VkPhysicalDeviceRayTracingPropertiesNV *rtp = (VkPhysicalDeviceRayTracingPropertiesNV *)place;
                     void *pNext = rtp->pNext;
                     *rtp = physicalDeviceData->physical_device_ray_tracing_properties_;
@@ -7902,7 +7909,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_MOTION_BLUR_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
                     VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *rtmbf = (VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *)place;
                     void *pNext = rtmbf->pNext;
                     *rtmbf = physicalDeviceData->physical_device_ray_tracing_motiuon_blur_features_;
@@ -7910,7 +7917,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_REPRESENTATIVE_FRAGMENT_TEST_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME)) {
                     VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV *rftf =
                         (VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV *)place;
                     void *pNext = rftf->pNext;
@@ -7919,7 +7926,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXCLUSIVE_SCISSOR_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME)) {
                     VkPhysicalDeviceExclusiveScissorFeaturesNV *esf = (VkPhysicalDeviceExclusiveScissorFeaturesNV *)place;
                     void *pNext = esf->pNext;
                     *esf = physicalDeviceData->physical_device_exclusive_scissor_features_;
@@ -7927,7 +7934,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_IMAGE_FOOTPRINT_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderImageFootprintFeaturesNV *siff = (VkPhysicalDeviceShaderImageFootprintFeaturesNV *)place;
                     void *pNext = siff->pNext;
                     *siff = physicalDeviceData->physical_device_shader_image_footprint_features_;
@@ -7935,7 +7942,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SM_BUILTINS_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderSMBuiltinsFeaturesNV *ssmbf = (VkPhysicalDeviceShaderSMBuiltinsFeaturesNV *)place;
                     void *pNext = ssmbf->pNext;
                     *ssmbf = physicalDeviceData->physical_device_shader_sm_builtins_features_;
@@ -7943,7 +7950,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SM_BUILTINS_PROPERTIES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderSMBuiltinsPropertiesNV *ssmbp = (VkPhysicalDeviceShaderSMBuiltinsPropertiesNV *)place;
                     void *pNext = ssmbp->pNext;
                     *ssmbp = physicalDeviceData->physical_device_shader_sm_builtins_properties_;
@@ -7951,7 +7958,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_FEATURES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
                     VkPhysicalDeviceShadingRateImageFeaturesNV *srif = (VkPhysicalDeviceShadingRateImageFeaturesNV *)place;
                     void *pNext = srif->pNext;
                     *srif = physicalDeviceData->physical_device_shading_rate_image_features_;
@@ -7959,7 +7966,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_PROPERTIES_NV:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
                     VkPhysicalDeviceShadingRateImagePropertiesNV *srip = (VkPhysicalDeviceShadingRateImagePropertiesNV *)place;
                     void *pNext = srip->pNext;
                     *srip = physicalDeviceData->physical_device_shading_rate_image_properties_;
@@ -7967,7 +7974,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MUTABLE_DESCRIPTOR_TYPE_FEATURES_VALVE:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME)) {
                     VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *mdtf =
                         (VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *)place;
                     void *pNext = mdtf->pNext;
@@ -7976,7 +7983,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
                     VkPhysicalDeviceDynamicRenderingFeaturesKHR *drf = (VkPhysicalDeviceDynamicRenderingFeaturesKHR *)place;
                     void *pNext = drf->pNext;
                     *drf = physicalDeviceData->physical_device_dynamic_rendering_features_;
@@ -7984,7 +7991,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_FEATURES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *fdm2f = (VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *)place;
                     void *pNext = fdm2f->pNext;
                     *fdm2f = physicalDeviceData->physical_device_fragment_density_map_2_features_;
@@ -7992,7 +7999,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_PROPERTIES_EXT:
-                if (PhysicalDeviceData::HasExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *fdm2p =
                         (VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *)place;
                     void *pNext = fdm2p->pNext;
@@ -8841,6 +8848,8 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 return dt->EnumerateDeviceExtensionProperties(physical_device, nullptr, count, results);
             });
 
+            pdd.simulation_extensions_ = pdd.device_extensions_;
+
             dt->GetPhysicalDeviceProperties(physical_device, &pdd.physical_device_properties_);
             bool api_version_above_1_1 = pdd.physical_device_properties_.apiVersion >= VK_API_VERSION_1_1;
             bool api_version_above_1_2 = pdd.physical_device_properties_.apiVersion >= VK_API_VERSION_1_2;
@@ -8851,7 +8860,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 VkPhysicalDeviceFeatures2KHR feature_chain = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR};
                 VkPhysicalDeviceMemoryProperties2KHR memory_chain = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2_KHR};
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
                     property_chain.pNext = &(pdd.physical_device_portability_subset_properties_);
                     feature_chain.pNext = &(pdd.physical_device_portability_subset_features_);
                 } else if (emulatePortability.num > 0) {
@@ -8877,31 +8886,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                         VK_TRUE};
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_8BIT_STORAGE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_8BIT_STORAGE_EXTENSION_NAME)) {
                     pdd.physical_device_8bit_storage_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_8bit_storage_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_16BIT_STORAGE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_16BIT_STORAGE_EXTENSION_NAME)) {
                     pdd.physical_device_16bit_storage_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_16bit_storage_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
                     pdd.physical_device_buffer_device_address_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_buffer_device_address_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)) {
                     pdd.physical_device_depth_stencil_resolve_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_depth_stencil_resolve_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
                     pdd.physical_device_descriptor_indexing_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_descriptor_indexing_properties_);
@@ -8911,31 +8920,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_descriptor_indexing_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME)) {
                     pdd.physical_device_host_query_reset_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_host_query_reset_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME)) {
                     pdd.physical_device_imageless_framebuffer_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_imageless_framebuffer_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_MAINTENANCE2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_MAINTENANCE2_EXTENSION_NAME)) {
                     pdd.physical_device_point_clipping_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_point_clipping_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
                     pdd.physical_device_maintenance_3_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_maintenance_3_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
                     pdd.physical_device_maintenance_4_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_maintenance_4_features_);
@@ -8945,7 +8954,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_maintenance_4_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
                     pdd.physical_device_multiview_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_multiview_properties_);
@@ -8955,55 +8964,55 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_multiview_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME)) {
                     pdd.physical_device_sampler_filter_minmax_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_sampler_filter_minmax_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME)) {
                     pdd.physical_device_sampler_ycbcr_conversion_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_sampler_ycbcr_conversion_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
                     pdd.physical_device_scalar_block_layout_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_scalar_block_layout_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME)) {
                     pdd.physical_device_separate_depth_stencil_layouts_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_separate_depth_stencil_layouts_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME)) {
                     pdd.physical_device_shader_atomic_int64_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_atomic_int64_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
                     pdd.physical_device_float_controls_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_float_controls_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)) {
                     pdd.physical_device_shader_float16_int8_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_float16_int8_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
                     pdd.physical_device_shader_subgroup_extended_types_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_subgroup_extended_types_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
                     pdd.physical_device_timeline_semaphore_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_timeline_semaphore_properties_);
@@ -9013,31 +9022,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_timeline_semaphore_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME)) {
                     pdd.physical_device_uniform_buffer_standard_layout_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_uniform_buffer_standard_layout_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
                     pdd.physical_device_variable_pointers_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_variable_pointers_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME)) {
                     pdd.physical_device_vulkan_memory_model_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_vulkan_memory_model_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
                     pdd.physical_device_zero_initialize_workgroup_memory_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_zero_initialize_workgroup_memory_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
                     pdd.physical_device_acceleration_structure_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_acceleration_structure_features_);
@@ -9047,7 +9056,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_acceleration_structure_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
                     pdd.physical_device_performance_query_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_performance_query_features_);
@@ -9057,37 +9066,37 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_performance_query_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
                     pdd.physical_device_pipeline_executable_properties_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_pipeline_executable_properties_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_PRESENT_ID_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_PRESENT_ID_EXTENSION_NAME)) {
                     pdd.physical_device_present_id_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_present_id_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
                     pdd.physical_device_present_wait_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_present_wait_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
                     pdd.physical_device_push_descriptor_properites_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_push_descriptor_properites_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
                     pdd.physical_device_ray_query_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_ray_query_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
                     pdd.physical_device_ray_tracing_pipeline_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_ray_tracing_pipeline_features_);
@@ -9097,13 +9106,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_ray_tracing_pipeline_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
                     pdd.physical_device_shader_clock_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_clock_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
                     pdd.physical_device_shader_integer_dot_product_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_integer_dot_product_features_);
@@ -9113,43 +9122,43 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_shader_integer_dot_products_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
                     pdd.physical_device_shader_subgroup_uniform_control_flow_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_subgroup_uniform_control_flow_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
                     pdd.physical_device_shader_terminate_invocation_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_terminate_invocation_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)) {
                     pdd.physical_device_synchronization2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_synchronization2_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME)) {
                     pdd.physical_device_workgroup_memory_explicit_layout_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_workgroup_memory_explicit_layout_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
                     pdd.physical_device_4444_formats_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_4444_formats_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME)) {
                     pdd.physical_device_astc_decode_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_astc_decode_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
                     pdd.physical_device_blend_operation_advanced_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_blend_operation_advanced_features_);
@@ -9159,31 +9168,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_blend_operation_advanced_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
                     pdd.physical_device_border_color_swizzle_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_border_color_swizzle_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME)) {
                     pdd.physical_device_color_write_enable_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_color_write_enable_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
                     pdd.physical_device_conditional_rendering_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_conditional_rendering_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
                     pdd.physical_device_conservative_rasterization_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_conservative_rasterization_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
                     pdd.physical_device_custom_border_color_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_custom_border_color_features_);
@@ -9193,43 +9202,43 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_custom_border_color_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
                     pdd.physical_device_depth_clip_enable_features_ext_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_depth_clip_enable_features_ext_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME)) {
                     pdd.physical_device_device_memory_report_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_device_memory_report_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
                     pdd.physical_device_discard_rectangle_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_discard_rectangle_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
                     pdd.physical_device_extended_dynamic_state_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_extended_dynamic_state_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
                     pdd.physical_device_extended_dynamic_state2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_extended_dynamic_state2_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME)) {
                     pdd.physical_device_external_memory_host_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_external_memory_host_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
                     pdd.physical_device_fragment_density_map_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_fragment_density_map_features_);
@@ -9239,31 +9248,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_fragment_density_map_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
                     pdd.physical_device_fragment_shader_interlock_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_fragment_shader_interlock_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
                     pdd.physical_device_global_priority_query_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_global_priority_query_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
                     pdd.physical_device_image_robustness_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_image_robustness_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME)) {
                     pdd.physical_device_index_type_uint8_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_index_type_uint8_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
                     pdd.physical_device_inline_uniform_block_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_inline_uniform_block_features_);
@@ -9273,7 +9282,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_inline_uniform_block_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
                     pdd.physical_device_line_rasterization_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_line_rasterization_features_);
@@ -9283,13 +9292,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_line_rasterization_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME)) {
                     pdd.physical_device_memory_priority_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_memory_priority_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
                     pdd.physical_device_multi_draw_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_multi_draw_features_);
@@ -9299,31 +9308,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_multi_draw_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
                     pdd.physical_device_pageable_device_local_memory_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_pageable_device_local_memory_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
                     pdd.physical_device_pipeline_creation_cache_control_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_pipeline_creation_cache_control_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME)) {
                     pdd.physical_device_primitive_topology_list_restart_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_primitive_topology_list_restart_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
                     pdd.physical_device_private_data_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_private_data_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
                     pdd.physical_device_provoking_vertex_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_provoking_vertex_features_);
@@ -9333,13 +9342,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_provoking_vertex_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME)) {
                     pdd.physical_device_rgba10x6_formats_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_rgba10x6_formats_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
                     pdd.physical_device_robustness_2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_robustness_2_features_);
@@ -9349,37 +9358,37 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_robustness_2_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME)) {
                     pdd.physical_device_sample_locations_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_sample_locations_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME)) {
                     pdd.physical_device_shader_atomic_float_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_atomic_float_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
                     pdd.physical_device_shader_atomic_float2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_atomic_float2_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME)) {
                     pdd.physical_device_shader_demote_to_helper_invocation_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_demote_to_helper_invocation_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME)) {
                     pdd.physical_device_shader_image_atomic_int64_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_image_atomic_int64_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
                     pdd.physical_device_subgroup_size_control_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_subgroup_size_control_features_);
@@ -9389,7 +9398,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_subgroup_size_control_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
                     pdd.physical_device_texel_buffer_alignment_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_texel_buffer_alignment_features_);
@@ -9399,13 +9408,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_texel_buffer_alignment_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
                     pdd.physical_device_texture_compression_astc_hdr_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_texture_compression_astc_hdr_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
                     pdd.physical_device_transform_feedback_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_transform_feedback_features_);
@@ -9415,7 +9424,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_transform_feedback_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
                     pdd.physical_device_vertex_attribute_divisor_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_vertex_attribute_divisor_features_);
@@ -9425,25 +9434,25 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_vertex_attirbute_divisor_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME)) {
                     pdd.physical_device_vertex_input_dynamic_state_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_vertex_input_dynamic_state_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
                     pdd.physical_device_ycbcr_2plane_444_formats_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_ycbcr_2plane_444_formats_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
                     pdd.physical_device_ycbcr_image_arrays_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_ycbcr_image_arrays_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
                     pdd.physical_device_fragment_shading_rate_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_fragment_shading_rate_features_);
@@ -9453,31 +9462,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_fragment_shading_rate_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
                     pdd.physical_device_coherent_memory_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_coherent_memory_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
                     pdd.physical_device_shader_core_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_shader_core_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME)) {
                     pdd.physical_device_shader_core_properties_2_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_shader_core_properties_2_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
                     pdd.physical_device_invocation_mask_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_invocation_mask_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
                     pdd.physical_device_subpass_shading_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_subpass_shading_features_);
@@ -9487,19 +9496,19 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_subpass_shading_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME)) {
                     pdd.physical_device_shader_integer_functions_2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_integer_functions_2_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
                     pdd.physical_device_compute_shader_derivatives_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_compute_shader_derivatives_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
                     pdd.physical_device_cooperative_matrix_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_cooperative_matrix_features_);
@@ -9509,31 +9518,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_cooperative_matrix_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
                     pdd.physical_device_corner_sampled_image_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_corner_sampled_image_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME)) {
                     pdd.physical_device_coverage_reduction_mode_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_coverage_reduction_mode_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_DEDICATED_ALLOCATION_IMAGE_ALIASING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_DEDICATED_ALLOCATION_IMAGE_ALIASING_EXTENSION_NAME)) {
                     pdd.physical_device_dedicated_allocation_image_aliasing_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_dedicated_allocation_image_aliasing_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
                     pdd.physical_device_diagnostics_config_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_diagnostics_config_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
                     pdd.physical_device_device_generated_commands_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_device_generated_commands_features_);
@@ -9543,19 +9552,19 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_device_generated_commands_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME)) {
                     pdd.physical_device_external_memory_rdma_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_external_memory_rdma_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
                     pdd.physical_device_fragment_shader_barycentric_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_fragment_shader_barycentric_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
                     pdd.physical_device_fragment_shading_rate_enums_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_fragment_shading_rate_enums_features_);
@@ -9565,13 +9574,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_fragment_shading_rate_enums_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME)) {
                     pdd.physical_device_inherited_viewport_scissor_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_inherited_viewport_scissor_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
                     pdd.physical_device_mesh_shader_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_mesh_shader_features_);
@@ -9581,37 +9590,37 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_mesh_shader_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_RAY_TRACING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_RAY_TRACING_EXTENSION_NAME)) {
                     pdd.physical_device_ray_tracing_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_ray_tracing_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
                     pdd.physical_device_ray_tracing_motiuon_blur_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_ray_tracing_motiuon_blur_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME)) {
                     pdd.physical_device_representative_fragment_test_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_representative_fragment_test_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME)) {
                     pdd.physical_device_exclusive_scissor_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_exclusive_scissor_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
                     pdd.physical_device_shader_image_footprint_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_image_footprint_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
                     pdd.physical_device_shader_sm_builtins_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_sm_builtins_features_);
@@ -9621,7 +9630,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_shader_sm_builtins_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
                     pdd.physical_device_shading_rate_image_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shading_rate_image_features_);
@@ -9631,19 +9640,19 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_shading_rate_image_properties_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME)) {
                     pdd.physical_device_mutable_descriptor_type_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_mutable_descriptor_type_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
                     pdd.physical_device_dynamic_rendering_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_dynamic_rendering_features_);
                 }
 
-                if (PhysicalDeviceData::HasExtension(physical_device, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
                     pdd.physical_device_fragment_density_map_2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_fragment_density_map_2_features_);
