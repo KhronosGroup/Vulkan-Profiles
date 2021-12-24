@@ -57,23 +57,19 @@ std::string devsim_test::getAbsolutePath(std::string filepath) {
     return out;
 }
 
-std::string devsim_test::arrayCombinationModeToString(ArrayCombinationMode mode) {
+std::string devsim_test::setCombinationModeToString(SetCombinationMode mode) {
     switch (mode) {
-    case ARRAY_COMBINATION_MODE_NONE:
-        return "none";
-    case ARRAY_COMBINATION_MODE_REPLACE:
-        return "replace";
-    case ARRAY_COMBINATION_MODE_WHITELIST:
-        return "whitelist";
-    case ARRAY_COMBINATION_MODE_BLACKLIST:
-        return "blacklist";
-    case ARRAY_COMBINATION_MODE_INTERSECT:
-        return "intersect";
-    default:
-        break;
+        case SET_CHECK_SUPPORT:
+            return "check_support";
+        case SET_FROM_PROFILE:
+            return "from_profile";
+        case SET_FROM_DEVICE:
+            return "from_device";
+        default:
+            break;
     }
 
-    return "none";
+    return "check_support";
 }
 
 void devsim_test::setDevsimFilenames(std::vector<std::string>& filepaths) {
@@ -112,9 +108,9 @@ void devsim_test::setDevsimEmulatePortabilitySubsetExtension(bool enable) {
         devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EMULATE_PORTABILITY", "false");
 }
 
-void devsim_test::setDevsimModifyExtensionList(ArrayCombinationMode mode) {
+void devsim_test::setDevsimModifyExtensionList(SetCombinationMode mode) {
     devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_EXTENSION_LIST",
-                                       arrayCombinationModeToString(mode).c_str());
+                                       setCombinationModeToString(mode).c_str());
 }
 
 void devsim_test::setDevsimModifyMemoryFlags(bool enable) {
@@ -124,24 +120,24 @@ void devsim_test::setDevsimModifyMemoryFlags(bool enable) {
         devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS", "false");
 }
 
-void devsim_test::setDevsimModifyFormatList(ArrayCombinationMode mode) {
+void devsim_test::setDevsimModifyFormatList(SetCombinationMode mode) {
     devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_FORMAT_LIST",
-                                       arrayCombinationModeToString(mode).c_str());
+                                       setCombinationModeToString(mode).c_str());
 }
 
-void devsim_test::setDevsimModifyFormatProperties(ArrayCombinationMode mode) {
+void devsim_test::setDevsimModifyFormatProperties(SetCombinationMode mode) {
     devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_FORMAT_PROPERTIES",
-                                       arrayCombinationModeToString(mode).c_str());
+                                       setCombinationModeToString(mode).c_str());
 }
 
-void devsim_test::setDevsimModifySurfaceFormats(ArrayCombinationMode mode) {
+void devsim_test::setDevsimModifySurfaceFormats(SetCombinationMode mode) {
     devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_SURFACE_FORMAT",
-                                       arrayCombinationModeToString(mode).c_str());
+                                       setCombinationModeToString(mode).c_str());
 }
 
-void devsim_test::setDevsimModifyPresentModes(ArrayCombinationMode mode) {
+void devsim_test::setDevsimModifyPresentModes(SetCombinationMode mode) {
     devsim_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_PRESENT_MODES",
-                                       arrayCombinationModeToString(mode).c_str());
+                                       setCombinationModeToString(mode).c_str());
 }
 
 void devsim_test::setDevsimProfileName(const std::string& profile) {
