@@ -23,7 +23,7 @@
 
 #include <vulkan/vulkan.h>
 
-namespace devsim_test {
+namespace profiles_test {
 
 void setEnvironmentSetting(std::string setting, const char* val);
 void unsetEnvironmentSetting(std::string setting);
