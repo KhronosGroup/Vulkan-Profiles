@@ -2486,20 +2486,27 @@ class JsonLoader {
     }
 
     template <typename T>  // for Vulkan enum types
-    void GetValue(const Json::Value &parent, const std::string& member, const char *name, T *dest,
+    void GetValue(const Json::Value &parent, const std::string &member, const char *name, T *dest,
                   std::function<bool(const char *, T, T)> warn_func = nullptr) {
         if (member != name) {
             return;
         }
         const Json::Value value = parent[name];
-        if (!value.isInt()) {
-            return;
+        if (value.isArray()) {
+            uint32_t sum_bits = {};
+            for (const auto &entry : value) {
+                if (entry.isString()) {
+                    sum_bits |= VkStringToUint(entry.asString());
+                }
+            }
+            *dest = static_cast<T>(sum_bits);
+        } else if (value.isInt()) {
+            const T new_value = static_cast<T>(value.asInt());
+            if (warn_func) {
+                warn_func(name, new_value, *dest);
+            }
+            *dest = new_value;
         }
-        const T new_value = static_cast<T>(value.asInt());
-        if (warn_func) {
-            warn_func(name, new_value, *dest);
-        }
-        *dest = new_value;
     }
 
     template <typename T>  // for Vulkan enum types
@@ -6034,13 +6041,13 @@ void JsonLoader::GetValue(const Json::Value &parent, const std::string &member, 
     }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const std::string &member, const char *name, VkExtent2D *dest,
+void JsonLoader::GetValue(const Json::Value &pparent, const std::string &member, const char *name, VkExtent2D *dest,
                           std::function<bool(const char *, uint32_t, uint32_t)> warn_func = nullptr) {
     if (member != name) {
         return;
     }
-    const Json::Value value = parent[name];
-    if (value.type() != Json::objectValue) {
+    const Json::Value parent = pparent[name];
+    if (parent.type() != Json::objectValue) {
         return;
     }
     for (const auto &prop : parent.getMemberNames()) {
@@ -6049,12 +6056,12 @@ void JsonLoader::GetValue(const Json::Value &parent, const std::string &member, 
     }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, const std::string &member, const char *name, VkExtent3D *dest) {
+void JsonLoader::GetValue(const Json::Value &pparent, const std::string &member, const char *name, VkExtent3D *dest) {
     if (member != name) {
         return;
     }
-    const Json::Value value = parent[name];
-    if (value.type() != Json::objectValue) {
+    const Json::Value parent = pparent[name];
+    if (parent.type() != Json::objectValue) {
         return;
     }
     for (const auto &prop : parent.getMemberNames()) {
