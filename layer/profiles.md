@@ -11,51 +11,90 @@
 
 ## Overview
 
-### Extend your Vulkan test coverage with the LunarG Device Simulation Layer
-The LunarG Device Simulation layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device. It can be applied without modifying any application binaries, and in a fully automated fashion. The Device Simulation layer (aka DevSim) is a Vulkan layer that can override the values returned by your application’s queries of the GPU. DevSim uses a JSON text configuration file to make your application see a different driver/GPU than is actually in your system. This capability is useful to verify that your application both a) properly queries the limits from Vulkan, and b) obeys those limits.
+### Extend your Vulkan test coverage with the Khronos Profiles Layer
+The Khronos Profiles Layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device. It can be applied without modifying any application binaries, and in a fully automated fashion. The Profiles layer is a Vulkan layer that can override the values returned by your application’s queries of the GPU. Profiles layer uses a JSON text configuration file to make your application see a different driver/GPU than is actually in your system. This capability is useful to verify that your application both a) properly queries the limits from Vulkan, and b) obeys those limits.
 
-The DevSim layer library is available pre-built in the Vulkan SDK, and continues to evolve. DevSim works for all Vulkan platforms (Linux, Windows, macOS, and Android), and is open-source software hosted on GitHub.The DevSim layer can be enabled and configured using the [Vulkan Configurator](https://vulkan.lunarg.com/doc/sdk/latest/windows/vkconfig.html) included with the Vulkan SDK.
+The Profiles layer library is available pre-built in the Vulkan SDK, and continues to evolve. Profiles layer works for all Vulkan platforms (Linux, Windows, macOS, and Android), and is open-source software hosted on GitHub. The Profiles layer can be enabled and configured using the [Vulkan Configurator](https://vulkan.lunarg.com/doc/sdk/latest/windows/vkconfig.html) included with the Vulkan SDK.
 
-The role of DevSim is to "simulate" a less-capable Vulkan implementation by constraining the features and resources of a more-capable implementation. Note that the actual device in your machine should be more capable than that which you are simulating. DevSim does not add capabilities to your existing Vulkan implementation by "emulating" additional capabilities with software; e.g. DevSim cannot add geometry shader capability to an actual device that doesn’t already provide it. Also, DevSim does not "enforce" the features being simulated. For enforcement, you would continue to use the Validation Layers as usual, in conjunction with DevSim.
+The role of the Profiles layer is to "simulate" a less-capable Vulkan implementation by constraining the features and resources of a more-capable implementation. Note that the actual device in your machine should be more capable than that which you are simulating. Profiles layer does not add capabilities to your existing Vulkan implementation by "emulating" additional capabilities with software; e.g. Profiles layer cannot add geometry shader capability to an actual device that doesn’t already provide it. Also, Profiles layer does not "enforce" the features being simulated. For enforcement, you would continue to use the Validation Layers as usual, in conjunction with Profiles layer.
 
-### Using DevSim
-DevSim supports a flexible configuration file format using JSON syntax. The configuration file format is defined by a formal JSON schema available on the Khronos website, so any configuration file may be verified to be correct using freely available JSON validators. Browsing through the schema file, you can see the extent of parameters that are available for your configuration. As a convenience, DevSim supports loading multiple JSON files, so your configuration data can be split among separate files for modularity as desired.
+### Using Profiles layer
+Profiles layer supports a flexible configuration file format using JSON syntax. The configuration file format is defined by a formal JSON schema available on the Khronos website, so any configuration file may be verified to be correct using freely available JSON validators. Browsing through the schema file, you can see the extent of parameters that are available for your configuration. As a convenience, Profiles layer supports loading multiple JSON files, so your configuration data can be split among separate files for modularity as desired.
 
 ### Android
 To enable, use a setting with the path of configuration file to load:
 ```
-adb shell settings put global debug.vulkan.devsim.filepath <path/to/DevSim/JSON/configuration/file>
+adb shell settings put global debug.vulkan.profiles.filepath <path/to/profiles/JSON/configuration/file>
 ```
-Example of a DevSim JSON configuration file: [tiny1.json](https://github.com/LunarG/VulkanTools/blob/master/layersvt/device_simulation_examples/tiny1.json)
+Example of a Profiles layer JSON configuration file: [tiny1.json](https://github.com/LunarG/VulkanTools/blob/master/layersvt/device_simulation_examples/tiny1.json)
 
 Optional: use settings to enable debugging output and exit-on-error:
 ```
-adb shell settings put global debug.vulkan.devsim.debugenable 1
-adb shell settings put global debug.vulkan.devsim.exitonerror 1
+adb shell settings put global debug.vulkan.profiles.debugenable 1
+adb shell settings put global debug.vulkan.profiles.exitonerror 1
 ```
 
-### How DevSim Works
-DevSim builds its internal data tables by querying the capabilities of the underlying actual device, then applying each of the configuration files “on top of” those tables. Therefore you only need to specify the features you wish to modify from the actual device; tweaking a single feature is easy. Here’s an example of  a valid configuration file for changing only the maximum permitted viewport size:
+### How Profiles layer Works
+Profiles layer builds its internal data tables by querying the capabilities of the underlying actual device, then applying each of the configuration files “on top of” those tables. Therefore you only need to specify the features you wish to modify from the actual device; tweaking a single feature is easy. Here’s an example of  a valid configuration file for changing only the maximum permitted viewport size:
 
 ```json
 {
-   "$schema": "https://schema.khronos.org/vulkan/devsim_1_0_0.json#",
-   "VkPhysicalDeviceProperties": {
-       "limits": { "maxViewportDimensions": [1024, 1024] }
-   }
+    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
+    "capabilities": {
+        "baseline": {
+            "extensions": {},
+            "features": {},
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxViewportDimensions": [ 169, 170 ],
+					}
+				}
+			},
+            "formats": {},
+            "queueFamiliesProperties": []
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_test_structure_complex": {
+            "version": 1,
+            "api-version": "1.2.198",
+            "label": "LunarG Profiles Structure Complex unit test",
+            "description": "For schema unit test on C.I.",
+            "contributors": {
+                "Christophe Riccio": {
+                    "company": "LunarG",
+                    "email": "christophe@lunarg.com",
+                    "github": "christophe-lunarg",
+                    "contact": true
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2021-12-08",
+                    "author": "Christophe Riccio",
+                    "comment": "Initial revision"
+                }
+            ],
+            "capabilities": [
+                "baseline"
+            ]
+        }
+    }
 }
 ```
 
 ### Simulating Entire Real-World Devices
-If you instead wish to simulate entire real-world devices, LunarG has collaborated with the [Vulkan Hardware Database](https://vulkan.gpuinfo.org/) to make their data compatible with the DevSim schema. You can download device configurations from the website in JSON format, and use those configuration files directly with DevSim.
+If you instead wish to simulate entire real-world devices, LunarG has collaborated with the [Vulkan Hardware Database](https://vulkan.gpuinfo.org/) to make their data compatible with the Profiles schema. You can download device configurations from the website in JSON format, and use those configuration files directly with Profiles layer.
 
 # Technical Details
 
-The Device Simulation Layer is a Vulkan layer that can modify the results of Vulkan PhysicalDevice queries based on a JSON configuration file, thus simulating some of the capabilities of device by overriding the capabilities of the actual device under test.
+The Profiles Layer is a Vulkan layer that can modify the results of Vulkan PhysicalDevice queries based on a JSON configuration file, thus simulating some of the capabilities of device by overriding the capabilities of the actual device under test.
 
 Please note that this device simulation layer "simulates", rather than "emulates", another device.
 By that we mean that the layer cannot add emulated capabilities that do not already exist in the system's underlying actual device;
-DevSim will not enable a less-capable device to emulate a more-capable device.
+Profiles layer will not enable a less-capable device to emulate a more-capable device.
 This layer enables a more-capable device to simulate a less-capable device by removing some of the capabilities reported by queries;
 you can change or reduce what is already present in the underlying actual implementation.
 
@@ -66,30 +105,30 @@ That could include:
 * Verifying all necessary capabilities are reported present, rather than assuming they are available.
 * Exercising fall-back code paths, if optional capabilities are not available.
 
-The DevSim layer does not enforce the capabilities returned by queries.
+The Profiles layer does not enforce the capabilities returned by queries.
 The application is still responsible for querying and complying with the capabilities reported.
-If an application erroneously attempts to overcommit a resource, or use a disabled feature, the DevSim layer will not generate errors.
+If an application erroneously attempts to overcommit a resource, or use a disabled feature, the Profiles layer will not generate errors.
 To detect such errors, use the Vulkan Validation layers, as with any non-simulated device.
 
-The DevSim layer will work with other Vulkan layers, such as Validation.
-When configuring the order of the layers list, the DevSim layer should be "last";
+The Profiles layer will work with other Vulkan layers, such as Validation.
+When configuring the order of the layers list, the Profiles layer should be "last";
 i.e.: closest to the driver, farthest from the application.
-That allows the Validation layer to see the results of the DevSim layer, and permit Validation to enforce the simulated capabilities.
+That allows the Validation layer to see the results of the Profiles layer, and permit Validation to enforce the simulated capabilities.
 
-Please report issues to [LunarG's VulkanTools GitHub repository](https://github.com/LunarG/VulkanTools/issues) and include "DevSim" in the title text.
+Please report issues to [LunarG's VulkanTools GitHub repository](https://github.com/LunarG/VulkanTools/issues) and include "Profiles" in the title text.
 
 ### Layer name
 `VK_LAYER_KHRONOS_profiles`
 
-### DevSim Layer operation and configuration
-At application startup, during vkCreateInstance(), the DevSim layer initializes its internal tables from the actual physical device in the system, then loads its configuration file, which specifies override values to apply to those internal tables.
+### Profiles Layer operation and configuration
+At application startup, during vkCreateInstance(), the Profiles layer initializes its internal tables from the actual physical device in the system, then loads its configuration file, which specifies override values to apply to those internal tables.
 
 How the JSON configuration values are applied depends on whether the top-level section begins with "ArrayOf" or not.
 * If the section is not an array, values are applied if they appear in the JSON; if a value is not present in the JSON, the previous value is not modified.
 Therefore not every parameter needs to be specified, only a sparse set of values that need to be changed.
 * If the section defines an array (i.e.: begins with "ArrayOf"), then all previous contents of that array are cleared, and the JSON must specify all values of each desired array element.
 
-JSON file formats consumed by the DevSim layer are specified by one of the JSON schemas in the table below.
+JSON file formats consumed by the Profiles layer are specified by one of the JSON schemas in the table below.
 
 | Schema Use | Canonical URI |
 |:----------:|:-------------:|
@@ -160,34 +199,63 @@ The top-level sections of such configuration files are processed as follows:
 * `ArrayOfVkExtensionProperties` - Optional.  If present, all values of all elements must be specified. Modifies the list returned by `vkEnumerateDeviceExtensionProperties`.
 * `Vulkan12Features` - Optional.  Only values specified in the JSON will be modified.
 * `Vulkan12Properties` - Optional.  Only values specified in the JSON will be modified.
-* The remaining top-level sections of the schema are not yet supported by DevSim.
+* The remaining top-level sections of the schema are not yet supported by Profiles layer.
 
 The schema permits additional top-level sections to be optionally included in configuration files;
-any additional top-level sections will be ignored by DevSim.
+any additional top-level sections will be ignored by Profiles layer.
 
 The schemas define basic range checking for common Vulkan data types, but they cannot detect whether a particular configuration makes no sense.
 If a configuration defines capabilities beyond what the actual device is natively capable of providing, the results are undefined.
-DevSim has some simple checking of configuration values and writes debug messages (if enabled) for values that are incompatible with the capabilities of the actual device.
+Profiles layer has some simple checking of configuration values and writes debug messages (if enabled) for values that are incompatible with the capabilities of the actual device.
 
-This version of DevSim currently supports Vulkan v1.2 and below.
-If the application requests an unsupported version of the Vulkan API, DevSim will emit an error message.
-If you wish DevSim to terminate on errors, set the `VK_DEVSIM_EXIT_ON_ERROR` environment variable (see below).
+This version of Profiles layer currently supports Vulkan v1.3 and below.
+If the application requests an unsupported version of the Vulkan API, Profiles layer will emit an error message.
 
-### Example of a DevSim JSON configuration file
+### Example of a Profiles JSON configuration file
 ```json
 {
-    "$schema": "https://schema.khronos.org/vulkan/devsim_1_0_0.json#",
-    "comments": {
-        "info": "You may add whatever you wish to this comments section",
-        "filename": "layersvt/device_simulation_examples/tiny1.json",
-        "desc": "A tiny and valid DevSim JSON config file",
-        "author": "mikew@lunarg.com"
+    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
+    "capabilities": {
+        "baseline": {
+            "extensions": {},
+            "features": {},
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+						"maxViewports": 1,
+						"maxViewportDimensions": [1024, 1024]
+					}
+				}
+			},
+            "formats": {},
+            "queueFamiliesProperties": []
+        }
     },
-    "VkPhysicalDeviceProperties": {
-        "deviceName": "override viewport capabilties",
-        "limits": {
-            "maxViewports": 1,
-            "maxViewportDimensions": [1024, 1024]
+    "profiles": {
+        "VP_LUNARG_test_structure_complex": {
+            "version": 1,
+            "api-version": "1.2.198",
+            "label": "LunarG Profiles Structure Complex unit test",
+            "description": "For schema unit test on C.I.",
+            "contributors": {
+                "Christophe Riccio": {
+                    "company": "LunarG",
+                    "email": "christophe@lunarg.com",
+                    "github": "christophe-lunarg",
+                    "contact": true
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2021-12-08",
+                    "author": "Christophe Riccio",
+                    "comment": "Initial revision"
+                }
+            ],
+            "capabilities": [
+                "baseline"
+            ]
         }
     }
 }
@@ -257,7 +325,7 @@ Enables exit-on-error.
 - Android Option: `debug.vulkan.khronos_profiles.modify_extension_list`
 - Default Value: none
 
- Enables modification of the device extensions list from the JSON config file. Valid options are "none", "replace", "whitelist", "blacklist", and "intersect".
+ Enables modification of the device extensions list from the JSON config file. Valid options are "check_support", "from_profile", and "from_device".
 
 #### Modify Device Memory Flags
 - Environment Variable: `VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS`
@@ -273,7 +341,7 @@ Enables modification of the device memory heap flags and memory type flags from 
 - Android Option: `debug.vulkan.khronos_profiles.modify_format_list`
 - Default Value: none
 
-Enables modification of the device format list from the JSON config file. Valid options are "none", "replace", "whitelist", "blacklist", and "intersect".
+Enables modification of the device format list from the JSON config file. Valid options are "check_support", "from_profile", and "from_device".
 
 #### Modify Device Format Properties
 - Environment Variable: `VK_KHRONOS_PROFILES_MODIFY_FORMAT_PROPERTIES`
@@ -281,7 +349,7 @@ Enables modification of the device format list from the JSON config file. Valid 
 - Android Option: `debug.vulkan.khronos_profiles.modify_format_properties`
 - Default Value: none
 
-Enables modification of the device format properties from the JSON config file. Valid options are "none", "replace", "whitelist", "blacklist", and "intersect".
+Enables modification of the device format properties from the JSON config file. Valid options are "check_support", "from_profile", and "from_device".
 
 #### Modify Device Surface Formats
 - Environment Variable: `VK_KHRONOS_PROFILES_MODIFY_SURFACE_FORMATS`
@@ -289,7 +357,7 @@ Enables modification of the device format properties from the JSON config file. 
 - Android Option: `debug.vulkan.khronos_profiles.modify_surface_formats`
 - Default Value: none
 
-Enables modification of the surface format list from the JSON config file. Valid options are "none", "replace", "whitelist", "blacklist", and "intersect".
+Enables modification of the surface format list from the JSON config file. Valid options are "check_support", "from_profile", and "from_device".
 
 #### Modify Device Present Modes
 - Environment Variable: `VK_KHRONOS_PROFILES_MODIFY_PRESENT_MODES`
@@ -297,24 +365,22 @@ Enables modification of the surface format list from the JSON config file. Valid
 - Android Option: `debug.vulkan.khronos_profiles.modify_present_modes`
 - Default Value: none
 
-Enables modification of the surface present mode list from the JSON config file. Valid options are "none", "replace", "whitelist", "blacklist", and "intersect".
+Enables modification of the surface present mode list from the JSON config file. Valid options are "check_support", "from_profile", and "from_device".
 
 **Note:** Environment variables take precedence over `vk_layer_settings.txt` options.
 
 #### Array Combination Mode Options Descriptions
 
-* none: Turns off modification of the device's properties list. Uses the device's real properties list.
-* replace: Fully replaces the device's properties list with the properties list provided by the DevSim configuration file.
-* whitelist: Includes properties from the devsim configuration file only if they are supported by the device.
-* blacklist: Removes properties from the device's properties list if they are included in the devsim configuration file's properties list.
-* intersect: Adds the list of properties from the devsim configuration file to the device's properties list while avoiding repeats.
+* check_support: Checks if the device supports the specified profile.
+* from_profile: Fully replaces the device's properties list with the properties list provided by the profiles configuration file.
+* from_device: Turns off modification of the device's properties list. Uses the device's real properties list.
 
 ### Example using the DevSim layer using Linux environment variables
 ```bash
 # Configure bash to find the Vulkan SDK.
 source $VKSDK/setup-env.sh
 
-# Set loader parameters to find and load the DevSim layer from your local VulkanTools build.
+# Set loader parameters to find and load the Profiles layer from your local VulkanTools build.
 export VK_LAYER_PATH="${VulkanTools}/build/layersvt"
 export VK_INSTANCE_LAYERS="VK_LAYER_KHRONOS_profiles`"
 
@@ -323,12 +389,12 @@ export VK_DEVSIM_FILENAME="${VulkanTools}/layersvt/device_simulation_examples/ti
 # A list of files could look like:
 # export VK_DEVSIM_FILENAME="/home/foo/first.json:/home/foo/second.json"
 
-# Enable verbose messages from the DevSim layer.
+# Enable verbose messages from the Profiles layer.
 export VK_DEVSIM_DEBUG_ENABLE="1"
 
-# Run a Vulkan application through the DevSim layer.
+# Run a Vulkan application through the Profiles layer.
 vulkaninfo
-# Compare the results with that app running without the DevSim layer.
+# Compare the results with that app running without the Profiles layer.
 ```
 See also
 * [${VulkanTools}/tests/devsim_layer_test.sh](https://github.com/LunarG/VulkanTools/blob/master/tests/devsim_layer_test.sh) - a test runner script.
@@ -337,7 +403,7 @@ See also
 ### Device configuration data from vulkan.gpuinfo.org
 A large and growing database of device capabilities is available at https://vulkan.gpuinfo.org/
 
-That device data can be downloaded in JSON format, compatible with the DevSim JSON schema.
+That device data can be downloaded in JSON format, compatible with the Profiles JSON schema.
 
 A JSON index of the available device records can be queried with https://vulkan.gpuinfo.org/api/v2/devsim/getreportlist.php
 
@@ -347,16 +413,16 @@ As mentioned above, attempting to use a configuration file that does not fit wit
 Downloaded device records should be reviewed to determine that their capabilities can be simulated by the underlying device.
 
 ### Device configuration data from the local system
-Vulkan Info can write its output in a format compatible the DevSim JSON schema,
+Vulkan Info can write its output in a format compatible the Profiles JSON schema,
 so the configuration of the local system can be captured.
-Use `vulkaninfo -j` to generate output in JSON format and redirect to a file, which can be consumed directly by DevSim.
+Use `vulkaninfo -j` to generate output in JSON format and redirect to a file, which can be consumed directly by Profiles layer.
 See the Vulkan Info documentation for further details.
 
 ### Device configuration data from an iOS device
 Vulkan Info can be built and run for iOS using the source and XCode project available from the [Vulkan-Tools repository](https://github.com/KhronosGroup/Vulkan-Tools/tree/master/vulkaninfo). For details on running and extracting the json files see the [Vulkan Info documentation](https://vulkan.lunarg.com/doc/sdk/latest/mac/vulkaninfo.html). An [Apple Developer Program](https://developer.apple.com/programs/) membership is required to deploy Vulkan Info to an iOS hardware device.
 
 ### JSON validation
-The DevSim layer itself does very little sanity-checking of the configuration file, so those files should be validated to the schema using a separate tool, such as the following web-based validators.
+The Profiles layer itself does very little sanity-checking of the configuration file, so those files should be validated to the schema using a separate tool, such as the following web-based validators.
 1. http://www.jsonschemavalidator.net/
 2. https://json-schema-validator.herokuapp.com/
 3. https://jsonschemalint.com/#/version/draft-04/markup/json/
