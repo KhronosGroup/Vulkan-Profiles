@@ -110,7 +110,6 @@ enum SetCombinationMode {
 #if defined(__ANDROID__)
 const char *const kEnvarProfilesFilename = "debug.vulkan.profiles.filepath";        // path of the configuration file(s) to load.
 const char *const kEnvarProfilesDebugEnable = "debug.vulkan.profiles.debugenable";  // a non-zero integer will enable debugging output.
-const char *const kEnvarProfilesExitOnError = "debug.vulkan.profiles.exitonerror";  // a non-zero integer will enable exit-on-error.
 const char *const kEnvarProfilesEmulatePortability =
     "debug.vulkan.profiles.emulateportability";  // a non-zero integer will enable emulation of the VK_KHR_portability_subset
                                                // extension.
@@ -134,7 +133,6 @@ const char *const kEnvarProfilesProfileName = "debug.vulkan.profiles.profilename
 #else
 const char *const kEnvarProfilesFilename = "VK_KHRONOS_PROFILES_FILENAME";          // path of the configuration file(s) to load.
 const char *const kEnvarProfilesDebugEnable = "VK_KHRONOS_PROFILES_DEBUG_ENABLE";   // a non-zero integer will enable debugging output.
-const char *const kEnvarProfilesExitOnError = "VK_KHRONOS_PROFILES_EXIT_ON_ERROR";  // a non-zero integer will enable exit-on-error.
 const char *const kEnvarProfilesEmulatePortability =
     "VK_KHRONOS_PROFILES_EMULATE_PORTABILITY_SUBSET_EXTENSION";  // a non-zero integer will enable emulation of the VK_KHR_portability_subset
                                                        // extension.
@@ -158,8 +156,6 @@ const char *const kEnvarProfilesProfileName = "VK_KHRONOS_PROFILES_PROFILE_NAME"
 
 const char *const kLayerSettingsProfilesFilename = "filename";         // vk_layer_settings.txt equivalent for kEnvarProfilesFilename
 const char *const kLayerSettingsProfilesDebugEnable = "debug_enable";  // vk_layer_settings.txt equivalent for kEnvarProfilesDebugEnable
-const char *const kLayerSettingsProfilesExitOnError =
-    "exit_on_error";  // vk_layer_settings.txt equivalent for kEnvarProfilesExitOnError
 const char *const kLayerSettingsProfilesEmulatePortability =
     "emulate_portability";  // vk_layer_settings.txt equivalent for kEnvarProfilesEmulatePortability
 const char *const kLayerSettingsProfilesModifyExtensionList =
@@ -193,7 +189,6 @@ struct StringSetting {
 
 struct StringSetting inputFilename;
 struct IntSetting debugLevel;
-struct IntSetting errorLevel;
 struct IntSetting emulatePortability;
 struct SetCombinationModeSetting modifyExtensionList;
 struct IntSetting modifyMemoryFlags;
@@ -310,14 +305,6 @@ void ErrorPrintf(const char *fmt, ...) {
     vfprintf(stderr, fmt, args);
 #endif
     va_end(args);
-    if (errorLevel.num > 0) {
-#if defined(__ANDROID__)
-        __android_log_print(ANDROID_LOG_ERROR, "profiles", "profiles exiting on error as requested");
-#else
-        fprintf(stderr, "\nprofiles exiting on error as requested\n\n");
-#endif
-        exit(1);
-    }
 }
 
 std::string vkFormatToString(VkFormat fmt) {
@@ -6581,21 +6568,6 @@ static void GetProfilesDebugLevel() {
     }
 }
 
-// Fill the errorLevel variable with a value from either vk_layer_settings.txt or environment variables.
-// Environment variables get priority.
-static void GetProfilesErrorLevel() {
-    std::string env_var = GetEnvarValue(kEnvarProfilesExitOnError);
-    if (!env_var.empty()) {
-        errorLevel.num = GetBooleanValue(env_var);
-        errorLevel.fromEnvVar = true;
-    }
-
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesExitOnError)) {
-        errorLevel.fromEnvVar = false;
-        errorLevel.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsProfilesExitOnError);
-    }
-}
-
 // Fill the emulatePortability variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
 static void GetProfilesEmulatePortability() {
@@ -6730,7 +6702,6 @@ static VkResult LayerSetupCreateInstance(const VkInstanceCreateInfo *pCreateInfo
     GetProfilesEmulatePortability();
     GetProfilesFilename();
     GetProfilesDebugLevel();
-    GetProfilesErrorLevel();
     GetProfilesModifyExtensionList();
     GetProfilesModifyMemoryFlags();
     GetProfilesModifyFormatList();

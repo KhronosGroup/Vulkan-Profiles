@@ -36,7 +36,6 @@ std::string setCombinationModeToString(SetCombinationMode mode);
 
 void setProfilesFilenames(std::vector<std::string>& filepaths);
 void setProfilesDebugEnable(bool enable);
-void setProfilesExitOnError(bool enable);
 void setProfilesEmulatePortabilitySubsetExtension(bool enable);
 void setProfilesModifyExtensionList(SetCombinationMode mode);
 void setProfilesModifyMemoryFlags(bool enable);
