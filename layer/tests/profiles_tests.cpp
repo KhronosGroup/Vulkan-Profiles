@@ -191,13 +191,13 @@ TEST(profiles, TestSelectingProfile) {
     std::vector<std::string> filepaths = {TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json",
                                           TEST_SOURCE_PATH "/../../profiles/VP_KHR_roadmap_2022.json",
                                           TEST_SOURCE_PATH "/../../profiles/VP_ANDROID_baseline_2021.json"};
-    profiles_test::setDevsimFilenames(filepaths);
-    profiles_test::setDevsimEmulatePortabilitySubsetExtension(true);
+    profiles_test::setProfilesFilenames(filepaths);
+    profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
 
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
     {
-        profiles_test::setDevsimProfileName("VP_LUNARG_desktop_portability_2021");
+        profiles_test::setProfilesProfileName("VP_LUNARG_desktop_portability_2021");
 
         err = inst_builder.makeInstance();
         ASSERT_EQ(err, VK_SUCCESS);
@@ -358,7 +358,7 @@ TEST(profiles, TestSelectingProfile) {
     }
 
     {
-        profiles_test::setDevsimProfileName("VP_KHR_roadmap_2022");
+        profiles_test::setProfilesProfileName("VP_KHR_roadmap_2022");
 
         err = inst_builder.makeInstance();
         ASSERT_EQ(err, VK_SUCCESS);
@@ -429,7 +429,7 @@ TEST(profiles, TestSelectingProfile) {
     }
 
     {
-        profiles_test::setDevsimProfileName("VP_ANDROID_baseline_2021");
+        profiles_test::setProfilesProfileName("VP_ANDROID_baseline_2021");
 
         err = inst_builder.makeInstance();
         ASSERT_EQ(err, VK_SUCCESS);
