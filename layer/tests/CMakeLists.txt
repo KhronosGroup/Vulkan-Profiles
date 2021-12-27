@@ -9,7 +9,14 @@ function(ProfilesTest NAME)
     file(GLOB FILES_JSON ./*.json)
 
     add_executable(${TEST_NAME} ${TEST_FILE} ${FILES_JSON} profiles_test_helper.h profiles_test_helper.cpp ${jsoncpp_SOURCE_DIR}/dist/jsoncpp.cpp)
-    target_link_libraries(${TEST_NAME} gtest gtest_main Vulkan::Vulkan)
+    target_link_libraries(${TEST_NAME} gtest gtest_main)
+    if(ANDROID)
+        # Android executables generally need these libraries.
+        target_link_libraries(${TEST_NAME} log android dl vulkan)
+    else()
+        # Everyone else links to the built loader.
+        target_link_libraries(${TEST_NAME} Vulkan::Vulkan)
+    endif()
     target_compile_definitions(${TEST_NAME} PUBLIC TEST_SOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
