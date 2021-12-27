@@ -72,7 +72,7 @@ std::string profiles_test::setCombinationModeToString(SetCombinationMode mode) {
     return "check_support";
 }
 
-void profiles_test::setDevsimFilenames(std::vector<std::string>& filepaths) {
+void profiles_test::setProfilesFilenames(std::vector<std::string>& filepaths) {
     std::stringstream out;
 #ifdef _WIN32
     char seperator = ';';
@@ -87,60 +87,60 @@ void profiles_test::setDevsimFilenames(std::vector<std::string>& filepaths) {
     profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_FILENAME", out.str().c_str());
 }
 
-void profiles_test::setDevsimDebugEnable(bool enable) {
+void profiles_test::setProfilesDebugEnable(bool enable) {
     if (enable)
         profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DEBUG_ENABLE", "true");
     else
         profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DEBUG_ENABLE", "false");
 }
 
-void profiles_test::setDevsimExitOnError(bool enable) {
+void profiles_test::setProfilesExitOnError(bool enable) {
     if (enable)
         profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EXIT_ON_ERROR", "true");
     else
         profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EXIT_ON_ERROR", "false");
 }
 
-void profiles_test::setDevsimEmulatePortabilitySubsetExtension(bool enable) {
+void profiles_test::setProfilesEmulatePortabilitySubsetExtension(bool enable) {
     if (enable)
         profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EMULATE_PORTABILITY", "true");
     else
         profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EMULATE_PORTABILITY", "false");
 }
 
-void profiles_test::setDevsimModifyExtensionList(SetCombinationMode mode) {
+void profiles_test::setProfilesModifyExtensionList(SetCombinationMode mode) {
     profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_EXTENSION_LIST",
                                        setCombinationModeToString(mode).c_str());
 }
 
-void profiles_test::setDevsimModifyMemoryFlags(bool enable) {
+void profiles_test::setProfilesModifyMemoryFlags(bool enable) {
     if (enable)
         profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS", "true");
     else
         profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS", "false");
 }
 
-void profiles_test::setDevsimModifyFormatList(SetCombinationMode mode) {
+void profiles_test::setProfilesModifyFormatList(SetCombinationMode mode) {
     profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_FORMAT_LIST",
                                        setCombinationModeToString(mode).c_str());
 }
 
-void profiles_test::setDevsimModifyFormatProperties(SetCombinationMode mode) {
+void profiles_test::setProfilesModifyFormatProperties(SetCombinationMode mode) {
     profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_FORMAT_PROPERTIES",
                                        setCombinationModeToString(mode).c_str());
 }
 
-void profiles_test::setDevsimModifySurfaceFormats(SetCombinationMode mode) {
+void profiles_test::setProfilesModifySurfaceFormats(SetCombinationMode mode) {
     profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_SURFACE_FORMAT",
                                        setCombinationModeToString(mode).c_str());
 }
 
-void profiles_test::setDevsimModifyPresentModes(SetCombinationMode mode) {
+void profiles_test::setProfilesModifyPresentModes(SetCombinationMode mode) {
     profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_PRESENT_MODES",
                                        setCombinationModeToString(mode).c_str());
 }
 
-void profiles_test::setDevsimProfileName(const std::string& profile) {
+void profiles_test::setProfilesProfileName(const std::string& profile) {
     profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_PROFILE_NAME", profile.c_str());
 }
 
@@ -148,9 +148,9 @@ VkApplicationInfo profiles_test::GetDefaultApplicationInfo() {
     VkApplicationInfo out{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
     out.apiVersion = VK_API_VERSION_1_0;
     out.applicationVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
-    out.pApplicationName = "devsim_tests";
+    out.pApplicationName = "profiles_tests";
     out.engineVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
-    out.pEngineName = "devsim_tests";
+    out.pEngineName = "profiles_tests";
 
     return out;
 }

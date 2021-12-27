@@ -11,9 +11,9 @@ TEST(profiles, TestDesktopPortability2022Limits) {
     profiles_test::VulkanInstanceBuilder inst_builder;
 
     std::vector<std::string> filepaths = {TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json"};
-    profiles_test::setDevsimFilenames(filepaths);
-    profiles_test::setDevsimProfileName("VP_LUNARG_desktop_portability_2021");
-    profiles_test::setDevsimEmulatePortabilitySubsetExtension(true);
+    profiles_test::setProfilesFilenames(filepaths);
+    profiles_test::setProfilesProfileName("VP_LUNARG_desktop_portability_2021");
+    profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
 
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 

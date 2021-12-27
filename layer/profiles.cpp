@@ -21,8 +21,8 @@
 
 /*
  * layersvt/device_simulation.cpp - The VK_LAYER_KHRONOS_profiles layer.
- * This DevSim layer simulates a device by loading a JSON configuration file to override values that would normally be returned
- * from a Vulkan implementation.  Configuration files must validate with the DevSim schema; this layer does not redundantly
+ * This Profiles layer simulates a device by loading a JSON configuration file to override values that would normally be returned
+ * from a Vulkan implementation.  Configuration files must validate with the Profiles schema; this layer does not redundantly
  * check for configuration errors that would be caught by schema validation.
  * See JsonLoader::IdentifySchema() for the URIs of supported schemas.
  *
@@ -69,16 +69,16 @@ namespace {
 // When updating the version, be sure to make corresponding changes to the layer manifest file at
 // layersvt/VkLayer_device_simulation.json.in
 
-const uint32_t kVersionDevsimMajor = 1;
-const uint32_t kVersionDevsimMinor = 9;
-const uint32_t kVersionDevsimPatch = 1;
-const uint32_t kVersionDevsimImplementation = VK_MAKE_VERSION(kVersionDevsimMajor, kVersionDevsimMinor, kVersionDevsimPatch);
+const uint32_t kVersionProfilesMajor = 1;
+const uint32_t kVersionProfilesMinor = 9;
+const uint32_t kVersionProfilesPatch = 1;
+const uint32_t kVersionProfilesImplementation = VK_MAKE_VERSION(kVersionProfilesMajor, kVersionProfilesMinor, kVersionProfilesPatch);
 
 // Properties of this layer:
 const VkLayerProperties kLayerProperties[] = {{
     "VK_LAYER_KHRONOS_profiles",  // layerName
     VK_MAKE_VERSION(1, 0, 68),            // specVersion (clamped to final 1.0 spec version)
-    kVersionDevsimImplementation,         // implementationVersion
+    kVersionProfilesImplementation,         // implementationVersion
     "Khronos profiles layer"      // description
 }};
 const uint32_t kLayerPropertiesCount = (sizeof(kLayerProperties) / sizeof(kLayerProperties[0]));
@@ -6759,7 +6759,7 @@ static VkResult LayerSetupCreateInstance(const VkInstanceCreateInfo *pCreateInfo
 VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
                                               VkInstance *pInstance) {
     DebugPrintf("CreateInstance ========================================\n");
-    DebugPrintf("%s version %d.%d.%d\n", kOurLayerName, kVersionDevsimMajor, kVersionDevsimMinor, kVersionDevsimPatch);
+    DebugPrintf("%s version %d.%d.%d\n", kOurLayerName, kVersionProfilesMajor, kVersionProfilesMinor, kVersionProfilesPatch);
     DebugPrintf("JsonCpp version %s\n", JSONCPP_VERSION_STRING);
 
     const VkApplicationInfo *app_info = pCreateInfo->pApplicationInfo;
@@ -6829,7 +6829,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
         // fill the struct with any override data provided by the PhysicalDeviceData object.
 
         switch (structure->sType) {
-            // VK_KHR_portability_subset is a special case since it can also be emulated by the DevSim layer.
+            // VK_KHR_portability_subset is a special case since it can also be emulated by the Profiles layer.
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) ||
                     emulatePortability.num > 0) {
@@ -8587,21 +8587,21 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfacePresentModesKHR(VkPhysica
 VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolPropertiesEXT(VkPhysicalDevice physicalDevice, uint32_t *pToolCount,
                                                                   VkPhysicalDeviceToolPropertiesEXT *pToolProperties) {
     std::stringstream version_stream;
-    version_stream << kVersionDevsimMajor << "." << kVersionDevsimMinor << "." << kVersionDevsimPatch;
+    version_stream << kVersionProfilesMajor << "." << kVersionProfilesMinor << "." << kVersionProfilesPatch;
     std::string version_string(version_stream.str());
 
-    static VkPhysicalDeviceToolPropertiesEXT devsim_layer_tool_props = {};
-    devsim_layer_tool_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TOOL_PROPERTIES_EXT;
-    devsim_layer_tool_props.pNext = nullptr;
-    strcpy(devsim_layer_tool_props.name, "Device Simulation Layer");
-    strcpy(devsim_layer_tool_props.version, version_string.c_str());
-    devsim_layer_tool_props.purposes = VK_TOOL_PURPOSE_MODIFYING_FEATURES_BIT_EXT;
-    strcpy(devsim_layer_tool_props.description, "Khronos profiles layer");
-    strcpy(devsim_layer_tool_props.layer, "VK_LAYER_KHRONOS_profiles");
+    static VkPhysicalDeviceToolPropertiesEXT profiles_layer_tool_props = {};
+    profiles_layer_tool_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TOOL_PROPERTIES_EXT;
+    profiles_layer_tool_props.pNext = nullptr;
+    strcpy(profiles_layer_tool_props.name, "Profiles Layer");
+    strcpy(profiles_layer_tool_props.version, version_string.c_str());
+    profiles_layer_tool_props.purposes = VK_TOOL_PURPOSE_MODIFYING_FEATURES_BIT_EXT;
+    strcpy(profiles_layer_tool_props.description, "Khronos profiles layer");
+    strcpy(profiles_layer_tool_props.layer, "VK_LAYER_KHRONOS_profiles");
 
     auto original_pToolProperties = pToolProperties;
     if (pToolProperties != nullptr) {
-        *pToolProperties = devsim_layer_tool_props;
+        *pToolProperties = profiles_layer_tool_props;
         pToolProperties = ((*pToolCount > 1) ? &pToolProperties[1] : nullptr);
         (*pToolCount)--;
     }
@@ -8830,7 +8830,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
     VkResult result = dt->EnumeratePhysicalDevices(instance, pPhysicalDeviceCount, pPhysicalDevices);
 
     // HACK!! epd_count is used to ensure the following code only gets called _after_ vkCreateInstance finishes *in the "vkcube +
-    // devsim" use case*
+    // profiles" use case*
     if (pPhysicalDevices && (VK_SUCCESS == result)) {
         std::vector<VkPhysicalDevice> physical_devices;
         result = EnumerateAll<VkPhysicalDevice>(&physical_devices, [&](uint32_t *count, VkPhysicalDevice *results) {
