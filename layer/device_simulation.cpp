@@ -3073,7 +3073,8 @@ bool JsonLoader::LoadFiles(const char *filename_list) {
     bool no_profile_selected = profile_name.empty();
     bool first_profile = true;
     while (std::getline(ss_list, filename, delimiter)) {
-        if (!filename.empty() && ((no_profile_selected && first_profile) || IsProfileSelected(filename))) {
+        if (!filename.empty() &&
+            ((no_profile_selected && first_profile) || (!no_profile_selected && IsProfileSelected(filename)))) {
             first_profile = false;
             if (!LoadFile(filename.c_str())) {
                 return false;
