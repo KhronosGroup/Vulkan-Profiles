@@ -34,17 +34,17 @@ enum SetCombinationMode { SET_CHECK_SUPPORT, SET_FROM_PROFILE, SET_FROM_DEVICE }
 
 std::string setCombinationModeToString(SetCombinationMode mode);
 
-void setDevsimFilenames(std::vector<std::string>& filepaths);
-void setDevsimDebugEnable(bool enable);
-void setDevsimExitOnError(bool enable);
-void setDevsimEmulatePortabilitySubsetExtension(bool enable);
-void setDevsimModifyExtensionList(SetCombinationMode mode);
-void setDevsimModifyMemoryFlags(bool enable);
-void setDevsimModifyFormatList(SetCombinationMode mode);
-void setDevsimModifyFormatProperties(SetCombinationMode mode);
-void setDevsimModifySurfaceFormats(SetCombinationMode mode);
-void setDevsimModifyPresentModes(SetCombinationMode mode);
-void setDevsimProfileName(const std::string& profile);
+void setProfilesFilenames(std::vector<std::string>& filepaths);
+void setProfilesDebugEnable(bool enable);
+void setProfilesExitOnError(bool enable);
+void setProfilesEmulatePortabilitySubsetExtension(bool enable);
+void setProfilesModifyExtensionList(SetCombinationMode mode);
+void setProfilesModifyMemoryFlags(bool enable);
+void setProfilesModifyFormatList(SetCombinationMode mode);
+void setProfilesModifyFormatProperties(SetCombinationMode mode);
+void setProfilesModifySurfaceFormats(SetCombinationMode mode);
+void setProfilesModifyPresentModes(SetCombinationMode mode);
+void setProfilesProfileName(const std::string& profile);
 
 VkApplicationInfo GetDefaultApplicationInfo();
 

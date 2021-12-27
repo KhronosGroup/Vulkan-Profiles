@@ -73,7 +73,7 @@ else()
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wpointer-arith")
 endif()
 
-add_vk_layer(profiles device_simulation.cpp vk_layer_table.cpp ${jsoncpp_SOURCE_DIR}/dist/jsoncpp.cpp ${jsoncpp_SOURCE_DIR}/include/json/json.h)
+add_vk_layer(profiles profiles.cpp vk_layer_table.cpp ${jsoncpp_SOURCE_DIR}/dist/jsoncpp.cpp ${jsoncpp_SOURCE_DIR}/include/json/json.h)
 
 # json file creation
 

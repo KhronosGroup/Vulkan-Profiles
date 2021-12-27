@@ -6,9 +6,9 @@
         "library_path": "@RELATIVE_LAYER_BINARY@",
         "api_version": "@VK_VERSION@",
         "implementation_version": "1.6.0",
-        "description": "LunarG device simulation layer",
-        "introduction": "The LunarG Device Simulation layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device.",
-        "url": "https://vulkan.lunarg.com/doc/sdk/latest/windows/device_simulation_layer.html",
+        "description": "LunarG Profiles layer",
+        "introduction": "The LunarG Profiles layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device.",
+        "url": "https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles.html",
         "device_extensions": [
             {
                 "name": "VK_EXT_tooling_info",
@@ -220,16 +220,16 @@
             "settings": [
                 {
                     "key": "filename",
-                    "env": "VK_DEVSIM_FILENAME",
-                    "label": "Devsim JSON configuration file",
-                    "description": "Path of a devsim configuration file to load.",
+                    "env": "VK_PROFILES_FILENAME",
+                    "label": "Profiles JSON configuration file",
+                    "description": "Path of a profiles configuration file to load.",
                     "type": "LOAD_FILE",
                     "filter": "*.json",
                     "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/portability_desktop_1_0.json"
                 },
                 {
                     "key": "debug_enable",
-                    "env": "VK_DEVSIM_DEBUG_ENABLE",
+                    "env": "VK_PROFILES_DEBUG_ENABLE",
                     "label": "Debug Enable",
                     "description": "Enables debug message output.",
                     "type": "BOOL",
@@ -237,7 +237,7 @@
                 },
                 {
                     "key": "emulate_portability",
-                    "env": "VK_DEVSIM_EMULATE_PORTABILITY_SUBSET_EXTENSION",
+                    "env": "VK_PROFILES_EMULATE_PORTABILITY_SUBSET_EXTENSION",
                     "label": "Emulate VK_KHR_portability_subset",
                     "description": "Emulate that VK_KHR_portability_subset extension is supported by the device.",
                     "platforms": [
@@ -249,7 +249,7 @@
                 },
                 {
                     "key": "exit_on_error",
-                    "env": "VK_DEVSIM_EXIT_ON_ERROR",
+                    "env": "VK_PROFILES_EXIT_ON_ERROR",
                     "label": "Exit on Error",
                     "description": "Enables exit-on-error.",
                     "type": "BOOL",
@@ -257,7 +257,7 @@
                 },
                 {
                     "key": "modify_extension_list",
-                    "env": "VK_DEVSIM_MODIFY_EXTENSION_LIST",
+                    "env": "VK_PROFILES_MODIFY_EXTENSION_LIST",
                     "label": "Modify Device Extension list",
                     "description": "Modify the device extensions list from the layer JSON config file.",
                     "type": "ENUM",
@@ -270,29 +270,29 @@
                         {
                             "key": "replace",
                             "label": "Replace",
-                            "description": "Fully replaces the device's extension list with the extension list provided by the devsim configuration file."
+                            "description": "Fully replaces the device's extension list with the extension list provided by the profiles configuration file."
                         },
                         {
                             "key": "whitelist",
                             "label": "Whitelist",
-                            "description": "Includes extensions from the devsim configuration file only if they are supported by the device."
+                            "description": "Includes extensions from the profiles configuration file only if they are supported by the device."
                         },
                         {
                             "key": "blacklist",
                             "label": "Blacklist",
-                            "description": "Removes extensions from the device's extension list if they are included in the devsim configuration file's extension list."
+                            "description": "Removes extensions from the device's extension list if they are included in the profiles configuration file's extension list."
                         },
                         {
                             "key": "intersect",
                             "label": "Intersect",
-                            "description": "Adds the list of extensions from the devsim configuration file to the device's extension list while avoiding repeats."
+                            "description": "Adds the list of extensions from the profiles configuration file to the device's extension list while avoiding repeats."
                         }
                     ],
                     "default": "none"
                 },
                 {
                     "key": "modify_memory_flags",
-                    "env": "VK_DEVSIM_MODIFY_MEMORY_FLAGS",
+                    "env": "VK_PROFILES_MODIFY_MEMORY_FLAGS",
                     "label": "Modify Device Memory Flags",
                     "description": "Modify the device memory heap flags and memory type flags from the JSON config file.",
                     "type": "BOOL",
@@ -300,7 +300,7 @@
                 },
                 {
                     "key": "modify_format_list",
-                    "env": "VK_DEVSIM_MODIFY_FORMAT_LIST",
+                    "env": "VK_PROFILES_MODIFY_FORMAT_LIST",
                     "label": "Modify Device Format list",
                     "description": "Modify the device format list from the layer JSON config file.",
                     "type": "ENUM",
@@ -313,29 +313,29 @@
                         {
                             "key": "replace",
                             "label": "Replace",
-                            "description": "Fully replaces the device's format list with the format list provided by the devsim configuration file."
+                            "description": "Fully replaces the device's format list with the format list provided by the profiles configuration file."
                         },
                         {
                             "key": "whitelist",
                             "label": "Whitelist",
-                            "description": "Includes formats from the devsim configuration file only if they are supported by the device."
+                            "description": "Includes formats from the profiles configuration file only if they are supported by the device."
                         },
                         {
                             "key": "blacklist",
                             "label": "Blacklist",
-                            "description": "Removes formats from the device's format list if they are included in the devsim configuration file's format list."
+                            "description": "Removes formats from the device's format list if they are included in the profiles configuration file's format list."
                         },
                         {
                             "key": "intersect",
                             "label": "Intersect",
-                            "description": "Adds the list of formats from the devsim configuration file to the device's format list while avoiding repeats."
+                            "description": "Adds the list of formats from the profiles configuration file to the device's format list while avoiding repeats."
                         }
                     ],
                     "default": "none"
                 },
                 {
                     "key": "modify_format_properties",
-                    "env": "VK_DEVSIM_MODIFY_FORMAT_PROPERTIES",
+                    "env": "VK_PROFILES_MODIFY_FORMAT_PROPERTIES",
                     "label": "Modify Device Format Properties",
                     "description": "Modify the device format properties from the layer JSON config file.",
                     "type": "ENUM",
@@ -348,29 +348,29 @@
                         {
                             "key": "replace",
                             "label": "Replace",
-                            "description": "Fully replaces the device's format properties with the properties provided by the devsim configuration file for each format."
+                            "description": "Fully replaces the device's format properties with the properties provided by the profiles configuration file for each format."
                         },
                         {
                             "key": "whitelist",
                             "label": "Whitelist",
-                            "description": "Includes properties for each format from the devsim configuration file only if they are supported by the device."
+                            "description": "Includes properties for each format from the profiles configuration file only if they are supported by the device."
                         },
                         {
                             "key": "blacklist",
                             "label": "Blacklist",
-                            "description": "Removes properties from the device's formats if they are included in the devsim configuration file for that format."
+                            "description": "Removes properties from the device's formats if they are included in the profiles configuration file for that format."
                         },
                         {
                             "key": "intersect",
                             "label": "Intersect",
-                            "description": "Adds the properties from the devsim configuration file to the device's format while avoiding repeats."
+                            "description": "Adds the properties from the profiles configuration file to the device's format while avoiding repeats."
                         }
                     ],
                     "default": "none"
                 },
                 {
                     "key": "modify_surface_formats",
-                    "env": "VK_DEVSIM_MODIFY_SURFACE_FORMATS",
+                    "env": "VK_PROFILES_MODIFY_SURFACE_FORMATS",
                     "label": "Modify Device Surface Formats",
                     "description": "Modify the device surface formats from the layer JSON config file.",
                     "type": "ENUM",
@@ -383,29 +383,29 @@
                         {
                             "key": "replace",
                             "label": "Replace",
-                            "description": "Fully replaces the device's surface formats with those provided by the devsim configuration file."
+                            "description": "Fully replaces the device's surface formats with those provided by the profiles configuration file."
                         },
                         {
                             "key": "whitelist",
                             "label": "Whitelist",
-                            "description": "Includes surface format from the devsim configuration file only if they are supported by the device."
+                            "description": "Includes surface format from the profiles configuration file only if they are supported by the device."
                         },
                         {
                             "key": "blacklist",
                             "label": "Blacklist",
-                            "description": "Removes device's surface formats if they are included in the devsim configuration file."
+                            "description": "Removes device's surface formats if they are included in the profiles configuration file."
                         },
                         {
                             "key": "intersect",
                             "label": "Intersect",
-                            "description": "Adds the surface formats from the devsim configuration file to the device's surface formats while avoiding repeats."
+                            "description": "Adds the surface formats from the profiles configuration file to the device's surface formats while avoiding repeats."
                         }
                     ],
                     "default": "none"
                 },
                 {
                     "key": "modify_present_modes",
-                    "env": "VK_DEVSIM_MODIFY_PRESENT_MODES",
+                    "env": "VK_PROFILES_MODIFY_PRESENT_MODES",
                     "label": "Modify Device Present Modes",
                     "description": "Modify the device present mode list from the layer JSON config file.",
                     "type": "ENUM",
@@ -418,22 +418,22 @@
                         {
                             "key": "replace",
                             "label": "Replace",
-                            "description": "Fully replaces the device's present mode list with the list provided by the devsim configuration file."
+                            "description": "Fully replaces the device's present mode list with the list provided by the profiles configuration file."
                         },
                         {
                             "key": "whitelist",
                             "label": "Whitelist",
-                            "description": "Includes present modes from the devsim configuration file only if they are supported by the device."
+                            "description": "Includes present modes from the profiles configuration file only if they are supported by the device."
                         },
                         {
                             "key": "blacklist",
                             "label": "Blacklist",
-                            "description": "Removes present modes from the device's list if they are included in the devsim configuration file."
+                            "description": "Removes present modes from the device's list if they are included in the profiles configuration file."
                         },
                         {
                             "key": "intersect",
                             "label": "Intersect",
-                            "description": "Adds the present modes from the devsim configuration file to the device's list while avoiding repeats."
+                            "description": "Adds the present modes from the profiles configuration file to the device's list while avoiding repeats."
                         }
                     ],
                     "default": "none"
