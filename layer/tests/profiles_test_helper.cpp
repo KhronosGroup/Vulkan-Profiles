@@ -27,6 +27,11 @@
 
 #include "profiles_test_helper.h"
 
+// On Android, VK_MAKE_API_VERSION doesn't yet exist.
+#ifndef VK_MAKE_API_VERSION
+#define VK_MAKE_API_VERSION(variant, major, minor, patch) VK_MAKE_VERSION(major, minor, patch)
+#endif
+
 void profiles_test::setEnvironmentSetting(std::string setting, const char* val) {
 #ifdef _WIN32
     _putenv_s(setting.c_str(), val);
