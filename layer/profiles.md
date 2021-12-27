@@ -28,10 +28,9 @@ adb shell settings put global debug.vulkan.profiles.filepath <path/to/profiles/J
 ```
 Example of a Profiles layer JSON configuration file: [tiny1.json](https://github.com/LunarG/VulkanTools/blob/master/layersvt/device_simulation_examples/tiny1.json)
 
-Optional: use settings to enable debugging output and exit-on-error:
+Optional: use settings to enable debugging output
 ```
 adb shell settings put global debug.vulkan.profiles.debugenable 1
-adb shell settings put global debug.vulkan.profiles.exitonerror 1
 ```
 
 ### How Profiles layer Works
@@ -310,14 +309,6 @@ Enables debug message output.
 - Default Value: false
 
 Enables emulation of the `VK_KHR_portability_subset` extension.
-
-#### Exit on Error
-- Environment Variable: `VK_KHRONOS_PROFILES_EXIT_ON_ERROR`
-- `vk_layer_settings.txt` Option: `khronos_profiles.exit_on_error`
-- Android Option: `debug.vulkan.khronos_profiles.exit_on_error`
-- Default Value: false
-
-Enables exit-on-error.
 
 #### Modify Device Extension list
 - Environment Variable: `VK_KHRONOS_PROFILES_MODIFY_EXTENSION_LIST`

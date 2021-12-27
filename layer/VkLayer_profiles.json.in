@@ -248,14 +248,6 @@
                     "default": true
                 },
                 {
-                    "key": "exit_on_error",
-                    "env": "VK_PROFILES_EXIT_ON_ERROR",
-                    "label": "Exit on Error",
-                    "description": "Enables exit-on-error.",
-                    "type": "BOOL",
-                    "default": false
-                },
-                {
                     "key": "modify_extension_list",
                     "env": "VK_PROFILES_MODIFY_EXTENSION_LIST",
                     "label": "Modify Device Extension list",

@@ -99,13 +99,6 @@ void profiles_test::setProfilesDebugEnable(bool enable) {
         profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DEBUG_ENABLE", "false");
 }
 
-void profiles_test::setProfilesExitOnError(bool enable) {
-    if (enable)
-        profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EXIT_ON_ERROR", "true");
-    else
-        profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EXIT_ON_ERROR", "false");
-}
-
 void profiles_test::setProfilesEmulatePortabilitySubsetExtension(bool enable) {
     if (enable)
         profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EMULATE_PORTABILITY", "true");
