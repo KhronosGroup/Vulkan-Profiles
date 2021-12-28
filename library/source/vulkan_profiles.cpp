@@ -209,7 +209,7 @@ static const _vpFeatureDesc _featureDesc = {
     [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {
-                    VkPhysicalDeviceFeatures2* s = reinterpret_cast<VkPhysicalDeviceFeatures2*>(p);
+                    VkPhysicalDeviceFeatures2* s = static_cast<VkPhysicalDeviceFeatures2*>(static_cast<void*>(p));
                     s->features.robustBufferAccess = VK_TRUE;
                     s->features.depthBiasClamp = VK_TRUE;
                     s->features.fragmentStoresAndAtomics = VK_TRUE;
@@ -234,7 +234,7 @@ static const _vpFeatureDesc _featureDesc = {
         bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {
-                    VkPhysicalDeviceFeatures2* s = reinterpret_cast<VkPhysicalDeviceFeatures2*>(p);
+                    VkPhysicalDeviceFeatures2* s = static_cast<VkPhysicalDeviceFeatures2*>(static_cast<void*>(p));
                     ret = ret && (s->features.robustBufferAccess == VK_TRUE);
                     ret = ret && (s->features.depthBiasClamp == VK_TRUE);
                     ret = ret && (s->features.fragmentStoresAndAtomics == VK_TRUE);
@@ -262,7 +262,7 @@ static const _vpPropertyDesc _propertyDesc = {
     [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
-                    VkPhysicalDeviceProperties2* s = reinterpret_cast<VkPhysicalDeviceProperties2*>(p);
+                    VkPhysicalDeviceProperties2* s = static_cast<VkPhysicalDeviceProperties2*>(static_cast<void*>(p));
                     s->properties.limits.maxImageDimension1D = 16384;
                     s->properties.limits.maxImageDimension2D = 8192;
                     s->properties.limits.maxImageDimension3D = 4096;
@@ -375,7 +375,7 @@ static const _vpPropertyDesc _propertyDesc = {
         bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
-                    VkPhysicalDeviceProperties2* s = reinterpret_cast<VkPhysicalDeviceProperties2*>(p);
+                    VkPhysicalDeviceProperties2* s = static_cast<VkPhysicalDeviceProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->properties.limits.maxImageDimension1D >= 16384);
                     ret = ret && (s->properties.limits.maxImageDimension2D >= 8192);
                     ret = ret && (s->properties.limits.maxImageDimension3D >= 4096);
@@ -1390,7 +1390,7 @@ static const _vpFeatureDesc _featureDesc = {
     [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {
-                    VkPhysicalDeviceFeatures2* s = reinterpret_cast<VkPhysicalDeviceFeatures2*>(p);
+                    VkPhysicalDeviceFeatures2* s = static_cast<VkPhysicalDeviceFeatures2*>(static_cast<void*>(p));
                     s->features.robustBufferAccess = VK_TRUE;
                     s->features.fullDrawIndexUint32 = VK_TRUE;
                     s->features.imageCubeArray = VK_TRUE;
@@ -1409,12 +1409,12 @@ static const _vpFeatureDesc _featureDesc = {
                     s->features.shaderStorageImageArrayDynamicIndexing = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES: {
-                    VkPhysicalDeviceVulkan11Features* s = reinterpret_cast<VkPhysicalDeviceVulkan11Features*>(p);
+                    VkPhysicalDeviceVulkan11Features* s = static_cast<VkPhysicalDeviceVulkan11Features*>(static_cast<void*>(p));
                     s->multiview = VK_TRUE;
                     s->samplerYcbcrConversion = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES: {
-                    VkPhysicalDeviceVulkan12Features* s = reinterpret_cast<VkPhysicalDeviceVulkan12Features*>(p);
+                    VkPhysicalDeviceVulkan12Features* s = static_cast<VkPhysicalDeviceVulkan12Features*>(static_cast<void*>(p));
                     s->uniformBufferStandardLayout = VK_TRUE;
                     s->subgroupBroadcastDynamicId = VK_TRUE;
                     s->imagelessFramebuffer = VK_TRUE;
@@ -1449,7 +1449,7 @@ static const _vpFeatureDesc _featureDesc = {
                     s->scalarBlockLayout = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES: {
-                    VkPhysicalDeviceVulkan13Features* s = reinterpret_cast<VkPhysicalDeviceVulkan13Features*>(p);
+                    VkPhysicalDeviceVulkan13Features* s = static_cast<VkPhysicalDeviceVulkan13Features*>(static_cast<void*>(p));
                     s->robustImageAccess = VK_TRUE;
                     s->shaderTerminateInvocation = VK_TRUE;
                     s->shaderZeroInitializeWorkgroupMemory = VK_TRUE;
@@ -1470,7 +1470,7 @@ static const _vpFeatureDesc _featureDesc = {
         bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {
-                    VkPhysicalDeviceFeatures2* s = reinterpret_cast<VkPhysicalDeviceFeatures2*>(p);
+                    VkPhysicalDeviceFeatures2* s = static_cast<VkPhysicalDeviceFeatures2*>(static_cast<void*>(p));
                     ret = ret && (s->features.robustBufferAccess == VK_TRUE);
                     ret = ret && (s->features.fullDrawIndexUint32 == VK_TRUE);
                     ret = ret && (s->features.imageCubeArray == VK_TRUE);
@@ -1489,12 +1489,12 @@ static const _vpFeatureDesc _featureDesc = {
                     ret = ret && (s->features.shaderStorageImageArrayDynamicIndexing == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES: {
-                    VkPhysicalDeviceVulkan11Features* s = reinterpret_cast<VkPhysicalDeviceVulkan11Features*>(p);
+                    VkPhysicalDeviceVulkan11Features* s = static_cast<VkPhysicalDeviceVulkan11Features*>(static_cast<void*>(p));
                     ret = ret && (s->multiview == VK_TRUE);
                     ret = ret && (s->samplerYcbcrConversion == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES: {
-                    VkPhysicalDeviceVulkan12Features* s = reinterpret_cast<VkPhysicalDeviceVulkan12Features*>(p);
+                    VkPhysicalDeviceVulkan12Features* s = static_cast<VkPhysicalDeviceVulkan12Features*>(static_cast<void*>(p));
                     ret = ret && (s->uniformBufferStandardLayout == VK_TRUE);
                     ret = ret && (s->subgroupBroadcastDynamicId == VK_TRUE);
                     ret = ret && (s->imagelessFramebuffer == VK_TRUE);
@@ -1529,7 +1529,7 @@ static const _vpFeatureDesc _featureDesc = {
                     ret = ret && (s->scalarBlockLayout == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES: {
-                    VkPhysicalDeviceVulkan13Features* s = reinterpret_cast<VkPhysicalDeviceVulkan13Features*>(p);
+                    VkPhysicalDeviceVulkan13Features* s = static_cast<VkPhysicalDeviceVulkan13Features*>(static_cast<void*>(p));
                     ret = ret && (s->robustImageAccess == VK_TRUE);
                     ret = ret && (s->shaderTerminateInvocation == VK_TRUE);
                     ret = ret && (s->shaderZeroInitializeWorkgroupMemory == VK_TRUE);
@@ -1553,7 +1553,7 @@ static const _vpPropertyDesc _propertyDesc = {
     [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES: {
-                    VkPhysicalDeviceVulkan11Properties* s = reinterpret_cast<VkPhysicalDeviceVulkan11Properties*>(p);
+                    VkPhysicalDeviceVulkan11Properties* s = static_cast<VkPhysicalDeviceVulkan11Properties*>(static_cast<void*>(p));
                     s->maxMultiviewViewCount = 6;
                     s->maxMultiviewInstanceIndex = 134217727;
                     s->subgroupSize = 4;
@@ -1561,7 +1561,7 @@ static const _vpPropertyDesc _propertyDesc = {
                     s->subgroupSupportedOperations = (VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT | VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT | VK_SUBGROUP_FEATURE_QUAD_BIT);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES: {
-                    VkPhysicalDeviceVulkan12Properties* s = reinterpret_cast<VkPhysicalDeviceVulkan12Properties*>(p);
+                    VkPhysicalDeviceVulkan12Properties* s = static_cast<VkPhysicalDeviceVulkan12Properties*>(static_cast<void*>(p));
                     s->maxTimelineSemaphoreValueDifference = 2147483647;
                     s->shaderSignedZeroInfNanPreserveFloat16 = VK_TRUE;
                     s->shaderSignedZeroInfNanPreserveFloat32 = VK_TRUE;
@@ -1582,7 +1582,7 @@ static const _vpPropertyDesc _propertyDesc = {
                     s->maxDescriptorSetUpdateAfterBindInputAttachments = 7;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES: {
-                    VkPhysicalDeviceVulkan13Properties* s = reinterpret_cast<VkPhysicalDeviceVulkan13Properties*>(p);
+                    VkPhysicalDeviceVulkan13Properties* s = static_cast<VkPhysicalDeviceVulkan13Properties*>(static_cast<void*>(p));
                     s->maxBufferSize = 1073741824;
                     s->maxInlineUniformBlockSize = 256;
                     s->maxPerStageDescriptorInlineUniformBlocks = 4;
@@ -1592,7 +1592,7 @@ static const _vpPropertyDesc _propertyDesc = {
                     s->maxInlineUniformTotalSize = 4;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
-                    VkPhysicalDeviceProperties2* s = reinterpret_cast<VkPhysicalDeviceProperties2*>(p);
+                    VkPhysicalDeviceProperties2* s = static_cast<VkPhysicalDeviceProperties2*>(static_cast<void*>(p));
                     s->properties.limits.maxImageDimension1D = 8192;
                     s->properties.limits.maxImageDimension2D = 8192;
                     s->properties.limits.maxImageDimensionCube = 8192;
@@ -1630,14 +1630,14 @@ static const _vpPropertyDesc _propertyDesc = {
         bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES: {
-                    VkPhysicalDeviceVulkan11Properties* s = reinterpret_cast<VkPhysicalDeviceVulkan11Properties*>(p);
+                    VkPhysicalDeviceVulkan11Properties* s = static_cast<VkPhysicalDeviceVulkan11Properties*>(static_cast<void*>(p));
                     ret = ret && (s->maxMultiviewViewCount >= 6);
                     ret = ret && (s->maxMultiviewInstanceIndex >= 134217727);
                     ret = ret && ((s->subgroupSupportedStages & (VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)) == (VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT));
                     ret = ret && ((s->subgroupSupportedOperations & (VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT | VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT | VK_SUBGROUP_FEATURE_QUAD_BIT)) == (VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT | VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT | VK_SUBGROUP_FEATURE_QUAD_BIT));
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES: {
-                    VkPhysicalDeviceVulkan12Properties* s = reinterpret_cast<VkPhysicalDeviceVulkan12Properties*>(p);
+                    VkPhysicalDeviceVulkan12Properties* s = static_cast<VkPhysicalDeviceVulkan12Properties*>(static_cast<void*>(p));
                     ret = ret && (s->maxTimelineSemaphoreValueDifference >= 2147483647);
                     ret = ret && (s->shaderSignedZeroInfNanPreserveFloat16 == VK_TRUE);
                     ret = ret && (s->shaderSignedZeroInfNanPreserveFloat32 == VK_TRUE);
@@ -1658,7 +1658,7 @@ static const _vpPropertyDesc _propertyDesc = {
                     ret = ret && (s->maxDescriptorSetUpdateAfterBindInputAttachments >= 7);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES: {
-                    VkPhysicalDeviceVulkan13Properties* s = reinterpret_cast<VkPhysicalDeviceVulkan13Properties*>(p);
+                    VkPhysicalDeviceVulkan13Properties* s = static_cast<VkPhysicalDeviceVulkan13Properties*>(static_cast<void*>(p));
                     ret = ret && (s->maxBufferSize >= 1073741824);
                     ret = ret && (s->maxInlineUniformBlockSize >= 256);
                     ret = ret && (s->maxPerStageDescriptorInlineUniformBlocks >= 4);
@@ -1668,7 +1668,7 @@ static const _vpPropertyDesc _propertyDesc = {
                     ret = ret && (s->maxInlineUniformTotalSize >= 4);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
-                    VkPhysicalDeviceProperties2* s = reinterpret_cast<VkPhysicalDeviceProperties2*>(p);
+                    VkPhysicalDeviceProperties2* s = static_cast<VkPhysicalDeviceProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->properties.limits.maxImageDimension1D >= 8192);
                     ret = ret && (s->properties.limits.maxImageDimension2D >= 8192);
                     ret = ret && (s->properties.limits.maxImageDimensionCube >= 8192);
@@ -1779,11 +1779,11 @@ static const _vpFeatureDesc _featureDesc = {
     [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES: {
-                    VkPhysicalDeviceMultiviewFeatures* s = reinterpret_cast<VkPhysicalDeviceMultiviewFeatures*>(p);
+                    VkPhysicalDeviceMultiviewFeatures* s = static_cast<VkPhysicalDeviceMultiviewFeatures*>(static_cast<void*>(p));
                     s->multiview = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {
-                    VkPhysicalDeviceFeatures2* s = reinterpret_cast<VkPhysicalDeviceFeatures2*>(p);
+                    VkPhysicalDeviceFeatures2* s = static_cast<VkPhysicalDeviceFeatures2*>(static_cast<void*>(p));
                     s->features.depthBiasClamp = VK_TRUE;
                     s->features.depthClamp = VK_TRUE;
                     s->features.drawIndirectFirstInstance = VK_TRUE;
@@ -1815,21 +1815,21 @@ static const _vpFeatureDesc _featureDesc = {
                     s->features.vertexPipelineStoresAndAtomics = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES_KHR: {
-                    VkPhysicalDeviceImagelessFramebufferFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceImagelessFramebufferFeaturesKHR*>(p);
+                    VkPhysicalDeviceImagelessFramebufferFeaturesKHR* s = static_cast<VkPhysicalDeviceImagelessFramebufferFeaturesKHR*>(static_cast<void*>(p));
                     s->imagelessFramebuffer = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES: {
-                    VkPhysicalDevice16BitStorageFeatures* s = reinterpret_cast<VkPhysicalDevice16BitStorageFeatures*>(p);
+                    VkPhysicalDevice16BitStorageFeatures* s = static_cast<VkPhysicalDevice16BitStorageFeatures*>(static_cast<void*>(p));
                     s->storageBuffer16BitAccess = VK_TRUE;
                     s->uniformAndStorageBuffer16BitAccess = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR: {
-                    VkPhysicalDevice8BitStorageFeaturesKHR* s = reinterpret_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(p);
+                    VkPhysicalDevice8BitStorageFeaturesKHR* s = static_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(static_cast<void*>(p));
                     s->storageBuffer8BitAccess = VK_TRUE;
                     s->uniformAndStorageBuffer8BitAccess = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT: {
-                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT* s = reinterpret_cast<VkPhysicalDeviceDescriptorIndexingFeaturesEXT*>(p);
+                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT* s = static_cast<VkPhysicalDeviceDescriptorIndexingFeaturesEXT*>(static_cast<void*>(p));
                     s->shaderUniformTexelBufferArrayDynamicIndexing = VK_TRUE;
                     s->shaderStorageTexelBufferArrayDynamicIndexing = VK_TRUE;
                     s->shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
@@ -1846,36 +1846,36 @@ static const _vpFeatureDesc _featureDesc = {
                     s->runtimeDescriptorArray = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT: {
-                    VkPhysicalDeviceHostQueryResetFeaturesEXT* s = reinterpret_cast<VkPhysicalDeviceHostQueryResetFeaturesEXT*>(p);
+                    VkPhysicalDeviceHostQueryResetFeaturesEXT* s = static_cast<VkPhysicalDeviceHostQueryResetFeaturesEXT*>(static_cast<void*>(p));
                     s->hostQueryReset = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR: {
-                    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR*>(p);
+                    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR* s = static_cast<VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR*>(static_cast<void*>(p));
                     s->shaderSubgroupExtendedTypes = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR: {
-                    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR*>(p);
+                    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR* s = static_cast<VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR*>(static_cast<void*>(p));
                     s->uniformBufferStandardLayout = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES: {
-                    VkPhysicalDeviceShaderDrawParametersFeatures* s = reinterpret_cast<VkPhysicalDeviceShaderDrawParametersFeatures*>(p);
+                    VkPhysicalDeviceShaderDrawParametersFeatures* s = static_cast<VkPhysicalDeviceShaderDrawParametersFeatures*>(static_cast<void*>(p));
                     s->shaderDrawParameters = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR: {
-                    VkPhysicalDeviceShaderFloat16Int8FeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceShaderFloat16Int8FeaturesKHR*>(p);
+                    VkPhysicalDeviceShaderFloat16Int8FeaturesKHR* s = static_cast<VkPhysicalDeviceShaderFloat16Int8FeaturesKHR*>(static_cast<void*>(p));
                     s->shaderInt8 = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR: {
-                    VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR*>(p);
+                    VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR* s = static_cast<VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR*>(static_cast<void*>(p));
                     s->samplerYcbcrConversion = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES: {
-                    VkPhysicalDeviceVariablePointersFeatures* s = reinterpret_cast<VkPhysicalDeviceVariablePointersFeatures*>(p);
+                    VkPhysicalDeviceVariablePointersFeatures* s = static_cast<VkPhysicalDeviceVariablePointersFeatures*>(static_cast<void*>(p));
                     s->variablePointersStorageBuffer = VK_TRUE;
                     s->variablePointers = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR: {
-                    VkPhysicalDevicePortabilitySubsetFeaturesKHR* s = reinterpret_cast<VkPhysicalDevicePortabilitySubsetFeaturesKHR*>(p);
+                    VkPhysicalDevicePortabilitySubsetFeaturesKHR* s = static_cast<VkPhysicalDevicePortabilitySubsetFeaturesKHR*>(static_cast<void*>(p));
                     s->vertexAttributeAccessBeyondStride = VK_TRUE;
                     s->separateStencilMaskRef = VK_TRUE;
                     s->mutableComparisonSamplers = VK_TRUE;
@@ -1892,11 +1892,11 @@ static const _vpFeatureDesc _featureDesc = {
         bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES: {
-                    VkPhysicalDeviceMultiviewFeatures* s = reinterpret_cast<VkPhysicalDeviceMultiviewFeatures*>(p);
+                    VkPhysicalDeviceMultiviewFeatures* s = static_cast<VkPhysicalDeviceMultiviewFeatures*>(static_cast<void*>(p));
                     ret = ret && (s->multiview == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {
-                    VkPhysicalDeviceFeatures2* s = reinterpret_cast<VkPhysicalDeviceFeatures2*>(p);
+                    VkPhysicalDeviceFeatures2* s = static_cast<VkPhysicalDeviceFeatures2*>(static_cast<void*>(p));
                     ret = ret && (s->features.depthBiasClamp == VK_TRUE);
                     ret = ret && (s->features.depthClamp == VK_TRUE);
                     ret = ret && (s->features.drawIndirectFirstInstance == VK_TRUE);
@@ -1928,21 +1928,21 @@ static const _vpFeatureDesc _featureDesc = {
                     ret = ret && (s->features.vertexPipelineStoresAndAtomics == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES_KHR: {
-                    VkPhysicalDeviceImagelessFramebufferFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceImagelessFramebufferFeaturesKHR*>(p);
+                    VkPhysicalDeviceImagelessFramebufferFeaturesKHR* s = static_cast<VkPhysicalDeviceImagelessFramebufferFeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->imagelessFramebuffer == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES: {
-                    VkPhysicalDevice16BitStorageFeatures* s = reinterpret_cast<VkPhysicalDevice16BitStorageFeatures*>(p);
+                    VkPhysicalDevice16BitStorageFeatures* s = static_cast<VkPhysicalDevice16BitStorageFeatures*>(static_cast<void*>(p));
                     ret = ret && (s->storageBuffer16BitAccess == VK_TRUE);
                     ret = ret && (s->uniformAndStorageBuffer16BitAccess == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR: {
-                    VkPhysicalDevice8BitStorageFeaturesKHR* s = reinterpret_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(p);
+                    VkPhysicalDevice8BitStorageFeaturesKHR* s = static_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->storageBuffer8BitAccess == VK_TRUE);
                     ret = ret && (s->uniformAndStorageBuffer8BitAccess == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT: {
-                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT* s = reinterpret_cast<VkPhysicalDeviceDescriptorIndexingFeaturesEXT*>(p);
+                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT* s = static_cast<VkPhysicalDeviceDescriptorIndexingFeaturesEXT*>(static_cast<void*>(p));
                     ret = ret && (s->shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE);
                     ret = ret && (s->shaderStorageTexelBufferArrayDynamicIndexing == VK_TRUE);
                     ret = ret && (s->shaderSampledImageArrayNonUniformIndexing == VK_TRUE);
@@ -1959,36 +1959,36 @@ static const _vpFeatureDesc _featureDesc = {
                     ret = ret && (s->runtimeDescriptorArray == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT: {
-                    VkPhysicalDeviceHostQueryResetFeaturesEXT* s = reinterpret_cast<VkPhysicalDeviceHostQueryResetFeaturesEXT*>(p);
+                    VkPhysicalDeviceHostQueryResetFeaturesEXT* s = static_cast<VkPhysicalDeviceHostQueryResetFeaturesEXT*>(static_cast<void*>(p));
                     ret = ret && (s->hostQueryReset == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR: {
-                    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR*>(p);
+                    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR* s = static_cast<VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->shaderSubgroupExtendedTypes == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR: {
-                    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR*>(p);
+                    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR* s = static_cast<VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->uniformBufferStandardLayout == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES: {
-                    VkPhysicalDeviceShaderDrawParametersFeatures* s = reinterpret_cast<VkPhysicalDeviceShaderDrawParametersFeatures*>(p);
+                    VkPhysicalDeviceShaderDrawParametersFeatures* s = static_cast<VkPhysicalDeviceShaderDrawParametersFeatures*>(static_cast<void*>(p));
                     ret = ret && (s->shaderDrawParameters == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR: {
-                    VkPhysicalDeviceShaderFloat16Int8FeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceShaderFloat16Int8FeaturesKHR*>(p);
+                    VkPhysicalDeviceShaderFloat16Int8FeaturesKHR* s = static_cast<VkPhysicalDeviceShaderFloat16Int8FeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->shaderInt8 == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR: {
-                    VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR*>(p);
+                    VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR* s = static_cast<VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->samplerYcbcrConversion == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES: {
-                    VkPhysicalDeviceVariablePointersFeatures* s = reinterpret_cast<VkPhysicalDeviceVariablePointersFeatures*>(p);
+                    VkPhysicalDeviceVariablePointersFeatures* s = static_cast<VkPhysicalDeviceVariablePointersFeatures*>(static_cast<void*>(p));
                     ret = ret && (s->variablePointersStorageBuffer == VK_TRUE);
                     ret = ret && (s->variablePointers == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR: {
-                    VkPhysicalDevicePortabilitySubsetFeaturesKHR* s = reinterpret_cast<VkPhysicalDevicePortabilitySubsetFeaturesKHR*>(p);
+                    VkPhysicalDevicePortabilitySubsetFeaturesKHR* s = static_cast<VkPhysicalDevicePortabilitySubsetFeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->vertexAttributeAccessBeyondStride == VK_TRUE);
                     ret = ret && (s->separateStencilMaskRef == VK_TRUE);
                     ret = ret && (s->mutableComparisonSamplers == VK_TRUE);
@@ -2008,12 +2008,12 @@ static const _vpPropertyDesc _propertyDesc = {
     [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES: {
-                    VkPhysicalDeviceMultiviewProperties* s = reinterpret_cast<VkPhysicalDeviceMultiviewProperties*>(p);
+                    VkPhysicalDeviceMultiviewProperties* s = static_cast<VkPhysicalDeviceMultiviewProperties*>(static_cast<void*>(p));
                     s->maxMultiviewViewCount = 6;
                     s->maxMultiviewInstanceIndex = 134217727;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
-                    VkPhysicalDeviceProperties2* s = reinterpret_cast<VkPhysicalDeviceProperties2*>(p);
+                    VkPhysicalDeviceProperties2* s = static_cast<VkPhysicalDeviceProperties2*>(static_cast<void*>(p));
                     s->properties.limits.maxImageDimension1D = 16384;
                     s->properties.limits.maxImageDimension2D = 16384;
                     s->properties.limits.maxImageDimension3D = 2048;
@@ -2116,7 +2116,7 @@ static const _vpPropertyDesc _propertyDesc = {
                     s->properties.limits.lineWidthGranularity = 0.5;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT: {
-                    VkPhysicalDeviceDescriptorIndexingPropertiesEXT* s = reinterpret_cast<VkPhysicalDeviceDescriptorIndexingPropertiesEXT*>(p);
+                    VkPhysicalDeviceDescriptorIndexingPropertiesEXT* s = static_cast<VkPhysicalDeviceDescriptorIndexingPropertiesEXT*>(static_cast<void*>(p));
                     s->maxUpdateAfterBindDescriptorsInAllPools = 1048576;
                     s->maxPerStageDescriptorUpdateAfterBindSamplers = 16;
                     s->maxPerStageDescriptorUpdateAfterBindUniformBuffers = 15;
@@ -2135,19 +2135,19 @@ static const _vpPropertyDesc _propertyDesc = {
                     s->maxDescriptorSetUpdateAfterBindInputAttachments = 8;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR: {
-                    VkPhysicalDeviceDepthStencilResolvePropertiesKHR* s = reinterpret_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(p);
+                    VkPhysicalDeviceDepthStencilResolvePropertiesKHR* s = static_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(static_cast<void*>(p));
                     s->independentResolve = VK_TRUE;
                     s->independentResolveNone = VK_TRUE;
                     s->supportedDepthResolveModes = (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT);
                     s->supportedStencilResolveModes = (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES: {
-                    VkPhysicalDeviceMaintenance3Properties* s = reinterpret_cast<VkPhysicalDeviceMaintenance3Properties*>(p);
+                    VkPhysicalDeviceMaintenance3Properties* s = static_cast<VkPhysicalDeviceMaintenance3Properties*>(static_cast<void*>(p));
                     s->maxPerSetDescriptors = 700;
                     s->maxMemoryAllocationSize = 2147483648;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR: {
-                    VkPhysicalDevicePortabilitySubsetPropertiesKHR* s = reinterpret_cast<VkPhysicalDevicePortabilitySubsetPropertiesKHR*>(p);
+                    VkPhysicalDevicePortabilitySubsetPropertiesKHR* s = static_cast<VkPhysicalDevicePortabilitySubsetPropertiesKHR*>(static_cast<void*>(p));
                     s->minVertexInputBindingStrideAlignment = 4;
                 } break;
                 default: break;
@@ -2157,12 +2157,12 @@ static const _vpPropertyDesc _propertyDesc = {
         bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES: {
-                    VkPhysicalDeviceMultiviewProperties* s = reinterpret_cast<VkPhysicalDeviceMultiviewProperties*>(p);
+                    VkPhysicalDeviceMultiviewProperties* s = static_cast<VkPhysicalDeviceMultiviewProperties*>(static_cast<void*>(p));
                     ret = ret && (s->maxMultiviewViewCount >= 6);
                     ret = ret && (s->maxMultiviewInstanceIndex >= 134217727);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
-                    VkPhysicalDeviceProperties2* s = reinterpret_cast<VkPhysicalDeviceProperties2*>(p);
+                    VkPhysicalDeviceProperties2* s = static_cast<VkPhysicalDeviceProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->properties.limits.maxImageDimension1D >= 16384);
                     ret = ret && (s->properties.limits.maxImageDimension2D >= 16384);
                     ret = ret && (s->properties.limits.maxImageDimension3D >= 2048);
@@ -2265,7 +2265,7 @@ static const _vpPropertyDesc _propertyDesc = {
                     ret = ret && (s->properties.limits.lineWidthGranularity <= 0.5);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT: {
-                    VkPhysicalDeviceDescriptorIndexingPropertiesEXT* s = reinterpret_cast<VkPhysicalDeviceDescriptorIndexingPropertiesEXT*>(p);
+                    VkPhysicalDeviceDescriptorIndexingPropertiesEXT* s = static_cast<VkPhysicalDeviceDescriptorIndexingPropertiesEXT*>(static_cast<void*>(p));
                     ret = ret && (s->maxUpdateAfterBindDescriptorsInAllPools >= 1048576);
                     ret = ret && (s->maxPerStageDescriptorUpdateAfterBindSamplers >= 16);
                     ret = ret && (s->maxPerStageDescriptorUpdateAfterBindUniformBuffers >= 15);
@@ -2284,19 +2284,19 @@ static const _vpPropertyDesc _propertyDesc = {
                     ret = ret && (s->maxDescriptorSetUpdateAfterBindInputAttachments >= 8);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR: {
-                    VkPhysicalDeviceDepthStencilResolvePropertiesKHR* s = reinterpret_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(p);
+                    VkPhysicalDeviceDepthStencilResolvePropertiesKHR* s = static_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->independentResolve == VK_TRUE);
                     ret = ret && (s->independentResolveNone == VK_TRUE);
                     ret = ret && ((s->supportedDepthResolveModes & (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT)) == (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT));
                     ret = ret && ((s->supportedStencilResolveModes & (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT)) == (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT));
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES: {
-                    VkPhysicalDeviceMaintenance3Properties* s = reinterpret_cast<VkPhysicalDeviceMaintenance3Properties*>(p);
+                    VkPhysicalDeviceMaintenance3Properties* s = static_cast<VkPhysicalDeviceMaintenance3Properties*>(static_cast<void*>(p));
                     ret = ret && (s->maxPerSetDescriptors >= 700);
                     ret = ret && (s->maxMemoryAllocationSize >= 2147483648);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR: {
-                    VkPhysicalDevicePortabilitySubsetPropertiesKHR* s = reinterpret_cast<VkPhysicalDevicePortabilitySubsetPropertiesKHR*>(p);
+                    VkPhysicalDevicePortabilitySubsetPropertiesKHR* s = static_cast<VkPhysicalDevicePortabilitySubsetPropertiesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->minVertexInputBindingStrideAlignment <= 4);
                 } break;
                 default: break;
@@ -2310,7 +2310,7 @@ static const _vpQueueFamilyDesc _queueFamilyDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2: {
-                    VkQueueFamilyProperties2* s = reinterpret_cast<VkQueueFamilyProperties2*>(p);
+                    VkQueueFamilyProperties2* s = static_cast<VkQueueFamilyProperties2*>(static_cast<void*>(p));
                     s->queueFamilyProperties.queueFlags = (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT);
                     s->queueFamilyProperties.queueCount = 1;
                     s->queueFamilyProperties.timestampValidBits = 36;
@@ -2325,7 +2325,7 @@ static const _vpQueueFamilyDesc _queueFamilyDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2: {
-                    VkQueueFamilyProperties2* s = reinterpret_cast<VkQueueFamilyProperties2*>(p);
+                    VkQueueFamilyProperties2* s = static_cast<VkQueueFamilyProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->queueFamilyProperties.queueFlags == (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT));
                     ret = ret && (s->queueFamilyProperties.queueCount == 1);
                     ret = ret && (s->queueFamilyProperties.timestampValidBits == 36);
@@ -2346,7 +2346,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2358,7 +2358,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2373,7 +2373,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2385,7 +2385,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2400,7 +2400,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2412,7 +2412,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2427,7 +2427,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2439,7 +2439,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2454,7 +2454,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2466,7 +2466,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2481,7 +2481,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2493,7 +2493,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2508,7 +2508,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2520,7 +2520,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2535,7 +2535,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2547,7 +2547,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2562,7 +2562,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2574,7 +2574,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2589,7 +2589,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2601,7 +2601,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2616,7 +2616,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2628,7 +2628,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2643,7 +2643,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2655,7 +2655,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2670,7 +2670,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
@@ -2681,7 +2681,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
@@ -2695,7 +2695,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2707,7 +2707,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2722,7 +2722,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2734,7 +2734,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2749,7 +2749,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
@@ -2760,7 +2760,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
@@ -2774,7 +2774,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
@@ -2785,7 +2785,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
@@ -2799,7 +2799,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
@@ -2810,7 +2810,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
@@ -2824,7 +2824,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2836,7 +2836,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2851,7 +2851,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT);
@@ -2863,7 +2863,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT));
@@ -2878,7 +2878,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2890,7 +2890,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2905,7 +2905,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2917,7 +2917,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2932,7 +2932,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2944,7 +2944,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2959,7 +2959,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2971,7 +2971,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -2986,7 +2986,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -2998,7 +2998,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3013,7 +3013,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3025,7 +3025,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3040,7 +3040,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3052,7 +3052,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3067,7 +3067,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3079,7 +3079,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3094,7 +3094,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3106,7 +3106,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3121,7 +3121,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3133,7 +3133,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3148,7 +3148,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3160,7 +3160,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3175,7 +3175,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3187,7 +3187,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3202,7 +3202,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3214,7 +3214,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3229,7 +3229,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3241,7 +3241,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3256,7 +3256,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT);
@@ -3268,7 +3268,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT));
@@ -3283,7 +3283,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3295,7 +3295,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3310,7 +3310,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3322,7 +3322,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3337,7 +3337,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3349,7 +3349,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3364,7 +3364,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3376,7 +3376,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3391,7 +3391,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3403,7 +3403,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3418,7 +3418,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3430,7 +3430,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3445,7 +3445,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3457,7 +3457,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3472,7 +3472,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3484,7 +3484,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3499,7 +3499,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -3511,7 +3511,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -3526,7 +3526,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT);
@@ -3538,7 +3538,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT));
@@ -3553,7 +3553,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT);
@@ -3565,7 +3565,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT));
@@ -3580,7 +3580,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3590,7 +3590,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3603,7 +3603,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3613,7 +3613,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3626,7 +3626,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3636,7 +3636,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3649,7 +3649,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3659,7 +3659,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3672,7 +3672,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3682,7 +3682,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3695,7 +3695,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3705,7 +3705,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3718,7 +3718,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3728,7 +3728,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3741,7 +3741,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3751,7 +3751,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3764,7 +3764,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3774,7 +3774,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3787,7 +3787,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3797,7 +3797,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3810,7 +3810,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3820,7 +3820,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3833,7 +3833,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3843,7 +3843,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3856,7 +3856,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3866,7 +3866,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3879,7 +3879,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3889,7 +3889,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3902,7 +3902,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3912,7 +3912,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3925,7 +3925,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3935,7 +3935,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3948,7 +3948,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3958,7 +3958,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3971,7 +3971,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -3981,7 +3981,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -3994,7 +3994,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -4004,7 +4004,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -4081,11 +4081,11 @@ static const _vpFeatureDesc _featureDesc = {
     [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES: {
-                    VkPhysicalDeviceMultiviewFeatures* s = reinterpret_cast<VkPhysicalDeviceMultiviewFeatures*>(p);
+                    VkPhysicalDeviceMultiviewFeatures* s = static_cast<VkPhysicalDeviceMultiviewFeatures*>(static_cast<void*>(p));
                     s->multiview = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {
-                    VkPhysicalDeviceFeatures2* s = reinterpret_cast<VkPhysicalDeviceFeatures2*>(p);
+                    VkPhysicalDeviceFeatures2* s = static_cast<VkPhysicalDeviceFeatures2*>(static_cast<void*>(p));
                     s->features.depthBiasClamp = VK_TRUE;
                     s->features.depthClamp = VK_TRUE;
                     s->features.drawIndirectFirstInstance = VK_TRUE;
@@ -4117,21 +4117,21 @@ static const _vpFeatureDesc _featureDesc = {
                     s->features.vertexPipelineStoresAndAtomics = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES_KHR: {
-                    VkPhysicalDeviceImagelessFramebufferFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceImagelessFramebufferFeaturesKHR*>(p);
+                    VkPhysicalDeviceImagelessFramebufferFeaturesKHR* s = static_cast<VkPhysicalDeviceImagelessFramebufferFeaturesKHR*>(static_cast<void*>(p));
                     s->imagelessFramebuffer = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES: {
-                    VkPhysicalDevice16BitStorageFeatures* s = reinterpret_cast<VkPhysicalDevice16BitStorageFeatures*>(p);
+                    VkPhysicalDevice16BitStorageFeatures* s = static_cast<VkPhysicalDevice16BitStorageFeatures*>(static_cast<void*>(p));
                     s->storageBuffer16BitAccess = VK_TRUE;
                     s->uniformAndStorageBuffer16BitAccess = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR: {
-                    VkPhysicalDevice8BitStorageFeaturesKHR* s = reinterpret_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(p);
+                    VkPhysicalDevice8BitStorageFeaturesKHR* s = static_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(static_cast<void*>(p));
                     s->storageBuffer8BitAccess = VK_TRUE;
                     s->uniformAndStorageBuffer8BitAccess = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT: {
-                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT* s = reinterpret_cast<VkPhysicalDeviceDescriptorIndexingFeaturesEXT*>(p);
+                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT* s = static_cast<VkPhysicalDeviceDescriptorIndexingFeaturesEXT*>(static_cast<void*>(p));
                     s->shaderUniformTexelBufferArrayDynamicIndexing = VK_TRUE;
                     s->shaderStorageTexelBufferArrayDynamicIndexing = VK_TRUE;
                     s->shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
@@ -4148,31 +4148,31 @@ static const _vpFeatureDesc _featureDesc = {
                     s->runtimeDescriptorArray = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT: {
-                    VkPhysicalDeviceHostQueryResetFeaturesEXT* s = reinterpret_cast<VkPhysicalDeviceHostQueryResetFeaturesEXT*>(p);
+                    VkPhysicalDeviceHostQueryResetFeaturesEXT* s = static_cast<VkPhysicalDeviceHostQueryResetFeaturesEXT*>(static_cast<void*>(p));
                     s->hostQueryReset = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR: {
-                    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR*>(p);
+                    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR* s = static_cast<VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR*>(static_cast<void*>(p));
                     s->shaderSubgroupExtendedTypes = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR: {
-                    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR*>(p);
+                    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR* s = static_cast<VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR*>(static_cast<void*>(p));
                     s->uniformBufferStandardLayout = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES: {
-                    VkPhysicalDeviceShaderDrawParametersFeatures* s = reinterpret_cast<VkPhysicalDeviceShaderDrawParametersFeatures*>(p);
+                    VkPhysicalDeviceShaderDrawParametersFeatures* s = static_cast<VkPhysicalDeviceShaderDrawParametersFeatures*>(static_cast<void*>(p));
                     s->shaderDrawParameters = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR: {
-                    VkPhysicalDeviceShaderFloat16Int8FeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceShaderFloat16Int8FeaturesKHR*>(p);
+                    VkPhysicalDeviceShaderFloat16Int8FeaturesKHR* s = static_cast<VkPhysicalDeviceShaderFloat16Int8FeaturesKHR*>(static_cast<void*>(p));
                     s->shaderInt8 = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR: {
-                    VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR*>(p);
+                    VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR* s = static_cast<VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR*>(static_cast<void*>(p));
                     s->samplerYcbcrConversion = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES: {
-                    VkPhysicalDeviceVariablePointersFeatures* s = reinterpret_cast<VkPhysicalDeviceVariablePointersFeatures*>(p);
+                    VkPhysicalDeviceVariablePointersFeatures* s = static_cast<VkPhysicalDeviceVariablePointersFeatures*>(static_cast<void*>(p));
                     s->variablePointersStorageBuffer = VK_TRUE;
                     s->variablePointers = VK_TRUE;
                 } break;
@@ -4183,11 +4183,11 @@ static const _vpFeatureDesc _featureDesc = {
         bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES: {
-                    VkPhysicalDeviceMultiviewFeatures* s = reinterpret_cast<VkPhysicalDeviceMultiviewFeatures*>(p);
+                    VkPhysicalDeviceMultiviewFeatures* s = static_cast<VkPhysicalDeviceMultiviewFeatures*>(static_cast<void*>(p));
                     ret = ret && (s->multiview == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: {
-                    VkPhysicalDeviceFeatures2* s = reinterpret_cast<VkPhysicalDeviceFeatures2*>(p);
+                    VkPhysicalDeviceFeatures2* s = static_cast<VkPhysicalDeviceFeatures2*>(static_cast<void*>(p));
                     ret = ret && (s->features.depthBiasClamp == VK_TRUE);
                     ret = ret && (s->features.depthClamp == VK_TRUE);
                     ret = ret && (s->features.drawIndirectFirstInstance == VK_TRUE);
@@ -4219,21 +4219,21 @@ static const _vpFeatureDesc _featureDesc = {
                     ret = ret && (s->features.vertexPipelineStoresAndAtomics == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES_KHR: {
-                    VkPhysicalDeviceImagelessFramebufferFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceImagelessFramebufferFeaturesKHR*>(p);
+                    VkPhysicalDeviceImagelessFramebufferFeaturesKHR* s = static_cast<VkPhysicalDeviceImagelessFramebufferFeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->imagelessFramebuffer == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES: {
-                    VkPhysicalDevice16BitStorageFeatures* s = reinterpret_cast<VkPhysicalDevice16BitStorageFeatures*>(p);
+                    VkPhysicalDevice16BitStorageFeatures* s = static_cast<VkPhysicalDevice16BitStorageFeatures*>(static_cast<void*>(p));
                     ret = ret && (s->storageBuffer16BitAccess == VK_TRUE);
                     ret = ret && (s->uniformAndStorageBuffer16BitAccess == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR: {
-                    VkPhysicalDevice8BitStorageFeaturesKHR* s = reinterpret_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(p);
+                    VkPhysicalDevice8BitStorageFeaturesKHR* s = static_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->storageBuffer8BitAccess == VK_TRUE);
                     ret = ret && (s->uniformAndStorageBuffer8BitAccess == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT: {
-                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT* s = reinterpret_cast<VkPhysicalDeviceDescriptorIndexingFeaturesEXT*>(p);
+                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT* s = static_cast<VkPhysicalDeviceDescriptorIndexingFeaturesEXT*>(static_cast<void*>(p));
                     ret = ret && (s->shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE);
                     ret = ret && (s->shaderStorageTexelBufferArrayDynamicIndexing == VK_TRUE);
                     ret = ret && (s->shaderSampledImageArrayNonUniformIndexing == VK_TRUE);
@@ -4250,31 +4250,31 @@ static const _vpFeatureDesc _featureDesc = {
                     ret = ret && (s->runtimeDescriptorArray == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT: {
-                    VkPhysicalDeviceHostQueryResetFeaturesEXT* s = reinterpret_cast<VkPhysicalDeviceHostQueryResetFeaturesEXT*>(p);
+                    VkPhysicalDeviceHostQueryResetFeaturesEXT* s = static_cast<VkPhysicalDeviceHostQueryResetFeaturesEXT*>(static_cast<void*>(p));
                     ret = ret && (s->hostQueryReset == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR: {
-                    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR*>(p);
+                    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR* s = static_cast<VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->shaderSubgroupExtendedTypes == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR: {
-                    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR*>(p);
+                    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR* s = static_cast<VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->uniformBufferStandardLayout == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES: {
-                    VkPhysicalDeviceShaderDrawParametersFeatures* s = reinterpret_cast<VkPhysicalDeviceShaderDrawParametersFeatures*>(p);
+                    VkPhysicalDeviceShaderDrawParametersFeatures* s = static_cast<VkPhysicalDeviceShaderDrawParametersFeatures*>(static_cast<void*>(p));
                     ret = ret && (s->shaderDrawParameters == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR: {
-                    VkPhysicalDeviceShaderFloat16Int8FeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceShaderFloat16Int8FeaturesKHR*>(p);
+                    VkPhysicalDeviceShaderFloat16Int8FeaturesKHR* s = static_cast<VkPhysicalDeviceShaderFloat16Int8FeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->shaderInt8 == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR: {
-                    VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR* s = reinterpret_cast<VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR*>(p);
+                    VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR* s = static_cast<VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->samplerYcbcrConversion == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES: {
-                    VkPhysicalDeviceVariablePointersFeatures* s = reinterpret_cast<VkPhysicalDeviceVariablePointersFeatures*>(p);
+                    VkPhysicalDeviceVariablePointersFeatures* s = static_cast<VkPhysicalDeviceVariablePointersFeatures*>(static_cast<void*>(p));
                     ret = ret && (s->variablePointersStorageBuffer == VK_TRUE);
                     ret = ret && (s->variablePointers == VK_TRUE);
                 } break;
@@ -4288,12 +4288,12 @@ static const _vpPropertyDesc _propertyDesc = {
     [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES: {
-                    VkPhysicalDeviceMultiviewProperties* s = reinterpret_cast<VkPhysicalDeviceMultiviewProperties*>(p);
+                    VkPhysicalDeviceMultiviewProperties* s = static_cast<VkPhysicalDeviceMultiviewProperties*>(static_cast<void*>(p));
                     s->maxMultiviewViewCount = 6;
                     s->maxMultiviewInstanceIndex = 134217727;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
-                    VkPhysicalDeviceProperties2* s = reinterpret_cast<VkPhysicalDeviceProperties2*>(p);
+                    VkPhysicalDeviceProperties2* s = static_cast<VkPhysicalDeviceProperties2*>(static_cast<void*>(p));
                     s->properties.limits.maxImageDimension1D = 16384;
                     s->properties.limits.maxImageDimension2D = 16384;
                     s->properties.limits.maxImageDimension3D = 2048;
@@ -4396,7 +4396,7 @@ static const _vpPropertyDesc _propertyDesc = {
                     s->properties.limits.lineWidthGranularity = 0.5;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT: {
-                    VkPhysicalDeviceDescriptorIndexingPropertiesEXT* s = reinterpret_cast<VkPhysicalDeviceDescriptorIndexingPropertiesEXT*>(p);
+                    VkPhysicalDeviceDescriptorIndexingPropertiesEXT* s = static_cast<VkPhysicalDeviceDescriptorIndexingPropertiesEXT*>(static_cast<void*>(p));
                     s->maxUpdateAfterBindDescriptorsInAllPools = 1048576;
                     s->maxPerStageDescriptorUpdateAfterBindSamplers = 16;
                     s->maxPerStageDescriptorUpdateAfterBindUniformBuffers = 15;
@@ -4415,14 +4415,14 @@ static const _vpPropertyDesc _propertyDesc = {
                     s->maxDescriptorSetUpdateAfterBindInputAttachments = 8;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR: {
-                    VkPhysicalDeviceDepthStencilResolvePropertiesKHR* s = reinterpret_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(p);
+                    VkPhysicalDeviceDepthStencilResolvePropertiesKHR* s = static_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(static_cast<void*>(p));
                     s->independentResolve = VK_TRUE;
                     s->independentResolveNone = VK_TRUE;
                     s->supportedDepthResolveModes = (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT);
                     s->supportedStencilResolveModes = (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES: {
-                    VkPhysicalDeviceMaintenance3Properties* s = reinterpret_cast<VkPhysicalDeviceMaintenance3Properties*>(p);
+                    VkPhysicalDeviceMaintenance3Properties* s = static_cast<VkPhysicalDeviceMaintenance3Properties*>(static_cast<void*>(p));
                     s->maxPerSetDescriptors = 700;
                     s->maxMemoryAllocationSize = 2147483648;
                 } break;
@@ -4433,12 +4433,12 @@ static const _vpPropertyDesc _propertyDesc = {
         bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES: {
-                    VkPhysicalDeviceMultiviewProperties* s = reinterpret_cast<VkPhysicalDeviceMultiviewProperties*>(p);
+                    VkPhysicalDeviceMultiviewProperties* s = static_cast<VkPhysicalDeviceMultiviewProperties*>(static_cast<void*>(p));
                     ret = ret && (s->maxMultiviewViewCount >= 6);
                     ret = ret && (s->maxMultiviewInstanceIndex >= 134217727);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: {
-                    VkPhysicalDeviceProperties2* s = reinterpret_cast<VkPhysicalDeviceProperties2*>(p);
+                    VkPhysicalDeviceProperties2* s = static_cast<VkPhysicalDeviceProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->properties.limits.maxImageDimension1D >= 16384);
                     ret = ret && (s->properties.limits.maxImageDimension2D >= 16384);
                     ret = ret && (s->properties.limits.maxImageDimension3D >= 2048);
@@ -4541,7 +4541,7 @@ static const _vpPropertyDesc _propertyDesc = {
                     ret = ret && (s->properties.limits.lineWidthGranularity <= 0.5);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT: {
-                    VkPhysicalDeviceDescriptorIndexingPropertiesEXT* s = reinterpret_cast<VkPhysicalDeviceDescriptorIndexingPropertiesEXT*>(p);
+                    VkPhysicalDeviceDescriptorIndexingPropertiesEXT* s = static_cast<VkPhysicalDeviceDescriptorIndexingPropertiesEXT*>(static_cast<void*>(p));
                     ret = ret && (s->maxUpdateAfterBindDescriptorsInAllPools >= 1048576);
                     ret = ret && (s->maxPerStageDescriptorUpdateAfterBindSamplers >= 16);
                     ret = ret && (s->maxPerStageDescriptorUpdateAfterBindUniformBuffers >= 15);
@@ -4560,14 +4560,14 @@ static const _vpPropertyDesc _propertyDesc = {
                     ret = ret && (s->maxDescriptorSetUpdateAfterBindInputAttachments >= 8);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR: {
-                    VkPhysicalDeviceDepthStencilResolvePropertiesKHR* s = reinterpret_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(p);
+                    VkPhysicalDeviceDepthStencilResolvePropertiesKHR* s = static_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->independentResolve == VK_TRUE);
                     ret = ret && (s->independentResolveNone == VK_TRUE);
                     ret = ret && ((s->supportedDepthResolveModes & (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT)) == (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT));
                     ret = ret && ((s->supportedStencilResolveModes & (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT)) == (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT));
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES: {
-                    VkPhysicalDeviceMaintenance3Properties* s = reinterpret_cast<VkPhysicalDeviceMaintenance3Properties*>(p);
+                    VkPhysicalDeviceMaintenance3Properties* s = static_cast<VkPhysicalDeviceMaintenance3Properties*>(static_cast<void*>(p));
                     ret = ret && (s->maxPerSetDescriptors >= 700);
                     ret = ret && (s->maxMemoryAllocationSize >= 2147483648);
                 } break;
@@ -4582,7 +4582,7 @@ static const _vpQueueFamilyDesc _queueFamilyDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2: {
-                    VkQueueFamilyProperties2* s = reinterpret_cast<VkQueueFamilyProperties2*>(p);
+                    VkQueueFamilyProperties2* s = static_cast<VkQueueFamilyProperties2*>(static_cast<void*>(p));
                     s->queueFamilyProperties.queueFlags = (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT);
                     s->queueFamilyProperties.queueCount = 1;
                     s->queueFamilyProperties.timestampValidBits = 36;
@@ -4597,7 +4597,7 @@ static const _vpQueueFamilyDesc _queueFamilyDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2: {
-                    VkQueueFamilyProperties2* s = reinterpret_cast<VkQueueFamilyProperties2*>(p);
+                    VkQueueFamilyProperties2* s = static_cast<VkQueueFamilyProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->queueFamilyProperties.queueFlags == (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT));
                     ret = ret && (s->queueFamilyProperties.queueCount == 1);
                     ret = ret && (s->queueFamilyProperties.timestampValidBits == 36);
@@ -4618,7 +4618,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -4630,7 +4630,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -4645,7 +4645,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -4657,7 +4657,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -4672,7 +4672,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -4684,7 +4684,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -4699,7 +4699,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -4711,7 +4711,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -4726,7 +4726,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -4738,7 +4738,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -4753,7 +4753,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -4765,7 +4765,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -4780,7 +4780,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -4792,7 +4792,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -4807,7 +4807,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -4819,7 +4819,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -4834,7 +4834,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -4846,7 +4846,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -4861,7 +4861,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -4873,7 +4873,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -4888,7 +4888,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -4900,7 +4900,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -4915,7 +4915,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -4927,7 +4927,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -4942,7 +4942,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
@@ -4953,7 +4953,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
@@ -4967,7 +4967,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -4979,7 +4979,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -4994,7 +4994,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5006,7 +5006,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5021,7 +5021,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
@@ -5032,7 +5032,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
@@ -5046,7 +5046,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
@@ -5057,7 +5057,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
@@ -5071,7 +5071,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
@@ -5082,7 +5082,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
@@ -5096,7 +5096,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5108,7 +5108,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5123,7 +5123,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT);
@@ -5135,7 +5135,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT));
@@ -5150,7 +5150,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5162,7 +5162,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5177,7 +5177,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5189,7 +5189,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5204,7 +5204,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5216,7 +5216,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5231,7 +5231,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5243,7 +5243,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5258,7 +5258,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5270,7 +5270,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5285,7 +5285,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5297,7 +5297,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5312,7 +5312,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5324,7 +5324,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5339,7 +5339,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5351,7 +5351,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5366,7 +5366,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5378,7 +5378,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5393,7 +5393,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5405,7 +5405,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5420,7 +5420,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5432,7 +5432,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5447,7 +5447,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5459,7 +5459,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5474,7 +5474,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5486,7 +5486,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5501,7 +5501,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5513,7 +5513,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5528,7 +5528,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT);
@@ -5540,7 +5540,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT));
@@ -5555,7 +5555,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5567,7 +5567,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5582,7 +5582,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5594,7 +5594,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5609,7 +5609,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5621,7 +5621,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5636,7 +5636,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5648,7 +5648,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5663,7 +5663,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5675,7 +5675,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5690,7 +5690,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5702,7 +5702,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5717,7 +5717,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5729,7 +5729,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5744,7 +5744,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5756,7 +5756,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5771,7 +5771,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
@@ -5783,7 +5783,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT));
@@ -5798,7 +5798,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT);
@@ -5810,7 +5810,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT));
@@ -5825,7 +5825,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.linearTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                     s->formatProperties.bufferFeatures = (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT);
@@ -5837,7 +5837,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.linearTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                     ret = ret && (s->formatProperties.bufferFeatures == (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT));
@@ -5852,7 +5852,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -5862,7 +5862,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -5875,7 +5875,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -5885,7 +5885,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -5898,7 +5898,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -5908,7 +5908,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -5921,7 +5921,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -5931,7 +5931,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -5944,7 +5944,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -5954,7 +5954,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -5967,7 +5967,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -5977,7 +5977,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -5990,7 +5990,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -6000,7 +6000,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -6013,7 +6013,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -6023,7 +6023,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -6036,7 +6036,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -6046,7 +6046,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -6059,7 +6059,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -6069,7 +6069,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -6082,7 +6082,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -6092,7 +6092,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -6105,7 +6105,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -6115,7 +6115,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -6128,7 +6128,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -6138,7 +6138,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -6151,7 +6151,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -6161,7 +6161,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -6174,7 +6174,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -6184,7 +6184,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -6197,7 +6197,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -6207,7 +6207,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -6220,7 +6220,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -6230,7 +6230,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -6243,7 +6243,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -6253,7 +6253,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -6266,7 +6266,7 @@ static const _vpFormatDesc _formatDesc[] = {
         [](VkBaseOutStructure* p) {
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     s->formatProperties.optimalTilingFeatures = (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
                 } break;
                 default: break;
@@ -6276,7 +6276,7 @@ static const _vpFormatDesc _formatDesc[] = {
             bool ret = true;
             switch (p->sType) {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2: {
-                    VkFormatProperties2* s = reinterpret_cast<VkFormatProperties2*>(p);
+                    VkFormatProperties2* s = static_cast<VkFormatProperties2*>(static_cast<void*>(p));
                     ret = ret && (s->formatProperties.optimalTilingFeatures == (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT));
                 } break;
                 default: break;
@@ -6516,7 +6516,7 @@ VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *
 {
     const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
     if (pDesc != nullptr && pDesc->feature.pfnFiller != nullptr) {
-        VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(pNext);
+        VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
         while (p != nullptr) {
             pDesc->feature.pfnFiller(p);
             p = p->pNext;
@@ -6551,7 +6551,7 @@ VPAPI_ATTR void vpGetProfileProperties(const VpProfileProperties *pProfile, void
 {
     const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
     if (pDesc != nullptr && pDesc->property.pfnFiller != nullptr) {
-        VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(pNext);
+        VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
         while (p != nullptr) {
             pDesc->property.pfnFiller(p);
             p = p->pNext;
@@ -6599,7 +6599,7 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties 
             *pPropertyCount = pDesc->queueFamilyCount;
         }
         for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-            VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(&pProperties[i]);
+            VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProperties[i]));
             while (p != nullptr) {
                 pDesc->pQueueFamilies[i].pfnFiller(p);
                 p = p->pNext;
@@ -6663,7 +6663,7 @@ VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile
 
     for (uint32_t i = 0; i < pDesc->formatCount; ++i) {
         if (pDesc->pFormats[i].format == format) {
-            VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(pNext);
+            VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pNext));
             while (p != nullptr) {
                 pDesc->pFormats[i].pfnFiller(p);
                 p = p->pNext;
@@ -6675,14 +6675,14 @@ VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile
                 _vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR));
             if (fp3 != nullptr) {
                 VkFormatProperties2KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-                pDesc->pFormats[i].pfnFiller(reinterpret_cast<VkBaseOutStructure*>(&fp));
+                pDesc->pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
                 fp3->linearTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->linearTilingFeatures | fp.formatProperties.linearTilingFeatures);
                 fp3->optimalTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->optimalTilingFeatures | fp.formatProperties.optimalTilingFeatures);
                 fp3->bufferFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->bufferFeatures | fp.formatProperties.bufferFeatures);
             }
             if (fp2 != nullptr) {
                 VkFormatProperties3KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR };
-                pDesc->pFormats[i].pfnFiller(reinterpret_cast<VkBaseOutStructure*>(&fp));
+                pDesc->pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
                 fp2->formatProperties.linearTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.linearTilingFeatures | fp.linearTilingFeatures);
                 fp2->formatProperties.optimalTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.optimalTilingFeatures | fp.optimalTilingFeatures);
                 fp2->formatProperties.bufferFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.bufferFeatures | fp.bufferFeatures);
@@ -6746,11 +6746,11 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
 
         VkPhysicalDeviceFeatures2 physicalDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
         vkGetPhysicalDeviceFeatures2(physicalDevice, &physicalDeviceFeatures2);
-        if (!VP_ANDROID_BASELINE_2021::_featureDesc.pfnComparator(reinterpret_cast<VkBaseOutStructure*>(&physicalDeviceFeatures2))) return result;
+        if (!VP_ANDROID_BASELINE_2021::_featureDesc.pfnComparator(static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceFeatures2)))) return result;
 
         VkPhysicalDeviceProperties2 physicalDeviceProperties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };
         vkGetPhysicalDeviceProperties2(physicalDevice, &physicalDeviceProperties2);
-        if (!VP_ANDROID_BASELINE_2021::_propertyDesc.pfnComparator(reinterpret_cast<VkBaseOutStructure*>(&physicalDeviceProperties2))) return result;
+        if (!VP_ANDROID_BASELINE_2021::_propertyDesc.pfnComparator(static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceProperties2)))) return result;
     } else
 #endif
 #ifdef VP_KHR_roadmap_2022
@@ -6771,7 +6771,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
         physicalDeviceVulkan13Features.pNext = &physicalDeviceVulkan12Features;
         physicalDeviceFeatures2.pNext = &physicalDeviceVulkan13Features;
         vkGetPhysicalDeviceFeatures2(physicalDevice, &physicalDeviceFeatures2);
-        if (!VP_KHR_ROADMAP_2022::_featureDesc.pfnComparator(reinterpret_cast<VkBaseOutStructure*>(&physicalDeviceFeatures2))) return result;
+        if (!VP_KHR_ROADMAP_2022::_featureDesc.pfnComparator(static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceFeatures2)))) return result;
 
         VkPhysicalDeviceVulkan11Properties physicalDeviceVulkan11Properties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES };
         VkPhysicalDeviceVulkan12Properties physicalDeviceVulkan12Properties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES };
@@ -6781,7 +6781,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
         VkPhysicalDeviceProperties2 physicalDeviceProperties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };
         physicalDeviceProperties2.pNext = &physicalDeviceVulkan13Properties;
         vkGetPhysicalDeviceProperties2(physicalDevice, &physicalDeviceProperties2);
-        if (!VP_KHR_ROADMAP_2022::_propertyDesc.pfnComparator(reinterpret_cast<VkBaseOutStructure*>(&physicalDeviceProperties2))) return result;
+        if (!VP_KHR_ROADMAP_2022::_propertyDesc.pfnComparator(static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceProperties2)))) return result;
     } else
 #endif
 #ifdef VP_LUNARG_desktop_portability_2021_subset
@@ -6822,7 +6822,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
         physicalDevicePortabilitySubsetFeaturesKHR.pNext = &physicalDeviceVariablePointersFeatures;
         physicalDeviceFeatures2.pNext = &physicalDevicePortabilitySubsetFeaturesKHR;
         vkGetPhysicalDeviceFeatures2(physicalDevice, &physicalDeviceFeatures2);
-        if (!VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_featureDesc.pfnComparator(reinterpret_cast<VkBaseOutStructure*>(&physicalDeviceFeatures2))) return result;
+        if (!VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_featureDesc.pfnComparator(static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceFeatures2)))) return result;
 
         VkPhysicalDeviceMultiviewProperties physicalDeviceMultiviewProperties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES };
         VkPhysicalDeviceProperties2 physicalDeviceProperties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };
@@ -6836,7 +6836,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
         physicalDevicePortabilitySubsetPropertiesKHR.pNext = &physicalDeviceMaintenance3Properties;
         physicalDeviceProperties2.pNext = &physicalDevicePortabilitySubsetPropertiesKHR;
         vkGetPhysicalDeviceProperties2(physicalDevice, &physicalDeviceProperties2);
-        if (!VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_propertyDesc.pfnComparator(reinterpret_cast<VkBaseOutStructure*>(&physicalDeviceProperties2))) return result;
+        if (!VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::_propertyDesc.pfnComparator(static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceProperties2)))) return result;
     } else
 #endif
 #ifdef VP_LUNARG_desktop_portability_2021
@@ -6875,7 +6875,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
         physicalDeviceVariablePointersFeatures.pNext = &physicalDeviceSamplerYcbcrConversionFeaturesKHR;
         physicalDeviceFeatures2.pNext = &physicalDeviceVariablePointersFeatures;
         vkGetPhysicalDeviceFeatures2(physicalDevice, &physicalDeviceFeatures2);
-        if (!VP_LUNARG_DESKTOP_PORTABILITY_2021::_featureDesc.pfnComparator(reinterpret_cast<VkBaseOutStructure*>(&physicalDeviceFeatures2))) return result;
+        if (!VP_LUNARG_DESKTOP_PORTABILITY_2021::_featureDesc.pfnComparator(static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceFeatures2)))) return result;
 
         VkPhysicalDeviceMultiviewProperties physicalDeviceMultiviewProperties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES };
         VkPhysicalDeviceProperties2 physicalDeviceProperties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };
@@ -6887,7 +6887,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
         physicalDeviceMaintenance3Properties.pNext = &physicalDeviceDepthStencilResolvePropertiesKHR;
         physicalDeviceProperties2.pNext = &physicalDeviceMaintenance3Properties;
         vkGetPhysicalDeviceProperties2(physicalDevice, &physicalDeviceProperties2);
-        if (!VP_LUNARG_DESKTOP_PORTABILITY_2021::_propertyDesc.pfnComparator(reinterpret_cast<VkBaseOutStructure*>(&physicalDeviceProperties2))) return result;
+        if (!VP_LUNARG_DESKTOP_PORTABILITY_2021::_propertyDesc.pfnComparator(static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceProperties2)))) return result;
     } else
 #endif
     {

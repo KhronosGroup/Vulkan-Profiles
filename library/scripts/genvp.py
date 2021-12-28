@@ -494,7 +494,7 @@ VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *
 {
     const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
     if (pDesc != nullptr && pDesc->feature.pfnFiller != nullptr) {
-        VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(pNext);
+        VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
         while (p != nullptr) {
             pDesc->feature.pfnFiller(p);
             p = p->pNext;
@@ -529,7 +529,7 @@ VPAPI_ATTR void vpGetProfileProperties(const VpProfileProperties *pProfile, void
 {
     const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
     if (pDesc != nullptr && pDesc->property.pfnFiller != nullptr) {
-        VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(pNext);
+        VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
         while (p != nullptr) {
             pDesc->property.pfnFiller(p);
             p = p->pNext;
@@ -577,7 +577,7 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties 
             *pPropertyCount = pDesc->queueFamilyCount;
         }
         for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-            VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(&pProperties[i]);
+            VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProperties[i]));
             while (p != nullptr) {
                 pDesc->pQueueFamilies[i].pfnFiller(p);
                 p = p->pNext;
@@ -641,7 +641,7 @@ VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile
 
     for (uint32_t i = 0; i < pDesc->formatCount; ++i) {
         if (pDesc->pFormats[i].format == format) {
-            VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(pNext);
+            VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pNext));
             while (p != nullptr) {
                 pDesc->pFormats[i].pfnFiller(p);
                 p = p->pNext;
@@ -653,14 +653,14 @@ VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile
                 _vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR));
             if (fp3 != nullptr) {
                 VkFormatProperties2KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-                pDesc->pFormats[i].pfnFiller(reinterpret_cast<VkBaseOutStructure*>(&fp));
+                pDesc->pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
                 fp3->linearTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->linearTilingFeatures | fp.formatProperties.linearTilingFeatures);
                 fp3->optimalTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->optimalTilingFeatures | fp.formatProperties.optimalTilingFeatures);
                 fp3->bufferFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->bufferFeatures | fp.formatProperties.bufferFeatures);
             }
             if (fp2 != nullptr) {
                 VkFormatProperties3KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR };
-                pDesc->pFormats[i].pfnFiller(reinterpret_cast<VkBaseOutStructure*>(&fp));
+                pDesc->pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
                 fp2->formatProperties.linearTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.linearTilingFeatures | fp.linearTilingFeatures);
                 fp2->formatProperties.optimalTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.optimalTilingFeatures | fp.optimalTilingFeatures);
                 fp2->formatProperties.bufferFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.bufferFeatures | fp.bufferFeatures);
@@ -1394,7 +1394,7 @@ class VulkanProfile():
 
             if paramList:
                 gen += '                case {0}: {{\n'.format(structDef.sType)
-                gen += '                    {0}* s = reinterpret_cast<{0}*>(p);\n'.format(structDef.name)
+                gen += '                    {0}* s = static_cast<{0}*>(static_cast<void*>(p));\n'.format(structDef.name)
                 for params in paramList:
                     genAssign = func('                    ' + fmt, params[0], params[1], params[2])
                     if genAssign != '':
@@ -1705,7 +1705,7 @@ class VulkanProfilesBuilder():
                     gen += '        physicalDeviceFeatures2.pNext = &{0};\n'.format(pNext)
 
                 gen += '        vkGetPhysicalDeviceFeatures2(physicalDevice, &physicalDeviceFeatures2);\n'
-                gen += '        if (!{0}::_featureDesc.pfnComparator(reinterpret_cast<VkBaseOutStructure*>(&physicalDeviceFeatures2))) return result;\n'.format(uname)
+                gen += '        if (!{0}::_featureDesc.pfnComparator(static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceFeatures2)))) return result;\n'.format(uname)
 
             # Check properties
             properties = profile.capabilities.properties
@@ -1741,7 +1741,7 @@ class VulkanProfilesBuilder():
                     gen += '        physicalDeviceProperties2.pNext = &{0};\n'.format(pNext)
 
                 gen += '        vkGetPhysicalDeviceProperties2(physicalDevice, &physicalDeviceProperties2);\n'
-                gen += '        if (!{0}::_propertyDesc.pfnComparator(reinterpret_cast<VkBaseOutStructure*>(&physicalDeviceProperties2))) return result;\n'.format(uname)
+                gen += '        if (!{0}::_propertyDesc.pfnComparator(static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceProperties2)))) return result;\n'.format(uname)
 
             # Check queue family properties
             if profile.capabilities.queueFamiliesProperties:
