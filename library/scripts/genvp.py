@@ -610,6 +610,113 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
     return result;
 }
 
+VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
+                                   const VkAllocationCallbacks *pAllocator, VkDevice *pDevice)
+{
+    assert(pCreateInfo != nullptr);
+
+    if (physicalDevice == VK_NULL_HANDLE || pCreateInfo == nullptr || pDevice == nullptr) {
+        return vkCreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : pCreateInfo->pCreateInfo, pAllocator, pDevice);
+    }
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pCreateInfo->pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    struct UserData {
+        VkPhysicalDevice                physicalDevice;
+        const _vpProfileDesc*           pDesc;
+        const VpDeviceCreateInfo*       pCreateInfo;
+        const VkAllocationCallbacks*    pAllocator;
+        VkDevice*                       pDevice;
+        VkResult                        result;
+    } userData{ physicalDevice, pDesc, pCreateInfo, pAllocator, pDevice };
+
+    VkPhysicalDeviceFeatures2 features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
+    pDesc->chainers.pfnFeature(static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData,
+        [](VkBaseOutStructure* p, void* pUser) {
+            UserData* pUserData = static_cast<UserData*>(pUser);
+            const _vpProfileDesc* pDesc = pUserData->pDesc;
+            const VpDeviceCreateInfo* pCreateInfo = pUserData->pCreateInfo;
+
+            std::vector<const char*> extensions;
+            _vpGetDeviceExtensions(pCreateInfo, pDesc->deviceExtensionCount, pDesc->pDeviceExtensions, extensions);
+
+            VkBaseOutStructure profileStructList;
+            profileStructList.pNext = p;
+            VkPhysicalDeviceFeatures2* pFeatures = static_cast<VkPhysicalDeviceFeatures2*>(static_cast<void*>(p));
+            if (pDesc->feature.pfnFiller != nullptr) {
+                while (p != nullptr) {
+                    pDesc->feature.pfnFiller(p);
+                    p = p->pNext;
+                }
+            }
+
+            if (pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr) {
+                pFeatures->features = *pCreateInfo->pCreateInfo->pEnabledFeatures;
+            }
+
+            if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
+                pFeatures->features.robustBufferAccess = VK_FALSE;
+            }
+
+#ifdef VK_EXT_robustness2
+            VkPhysicalDeviceRobustness2FeaturesEXT* pRobustness2FeaturesEXT = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(
+                _vpGetStructure(pFeatures, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT));
+            if (pRobustness2FeaturesEXT != nullptr) {
+                if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
+                    pRobustness2FeaturesEXT->robustBufferAccess2 = VK_FALSE;
+                }
+                if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT) {
+                    pRobustness2FeaturesEXT->robustImageAccess2 = VK_FALSE;
+                }
+            }
+#endif
+
+#ifdef VK_EXT_image_robustness
+            VkPhysicalDeviceImageRobustnessFeaturesEXT* pImageRobustnessFeaturesEXT = static_cast<VkPhysicalDeviceImageRobustnessFeaturesEXT*>(
+                _vpGetStructure(pFeatures, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT));
+            if (pImageRobustnessFeaturesEXT != nullptr && (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT)) {
+                pImageRobustnessFeaturesEXT->robustImageAccess = VK_FALSE;
+            }
+#endif
+
+#ifdef VK_VERSION_1_3
+            VkPhysicalDeviceVulkan13Features* pVulkan13Features = static_cast<VkPhysicalDeviceVulkan13Features*>(
+                _vpGetStructure(pFeatures, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES));
+            if (pVulkan13Features != nullptr && (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT)) {
+                pVulkan13Features->robustImageAccess = VK_FALSE;
+            }
+#endif
+
+            VkBaseOutStructure* pNext = static_cast<VkBaseOutStructure*>(const_cast<void*>(pCreateInfo->pCreateInfo->pNext));
+            for (uint32_t i = 0; i < pDesc->featureStructTypeCount; ++i) {
+                const void* pRequested = _vpGetStructure(pNext, pDesc->pFeatureStructTypes[i]);
+                if (pRequested == nullptr) {
+                    VkBaseOutStructure* pPrevStruct = &profileStructList;
+                    VkBaseOutStructure* pCurrStruct = pPrevStruct->pNext;
+                    while (pCurrStruct->sType != pDesc->pFeatureStructTypes[i]) {
+                        pPrevStruct = pCurrStruct;
+                        pCurrStruct = pCurrStruct->pNext;
+                    }
+                    pPrevStruct->pNext = pCurrStruct->pNext;
+                    pCurrStruct->pNext = pNext;
+                    pNext = pCurrStruct;
+                }
+            }
+
+            VkDeviceCreateInfo createInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
+            createInfo.pNext = pNext;
+            createInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;
+            createInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;
+            createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+            createInfo.ppEnabledExtensionNames = extensions.data();
+            pUserData->result = vkCreateDevice(pUserData->physicalDevice, &createInfo, pUserData->pAllocator, pUserData->pDevice);
+        }
+    );
+
+    return userData.result;
+}
+
 VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                                             VkExtensionProperties *pProperties) {
     VkResult result = VK_SUCCESS;
@@ -1840,107 +1947,6 @@ class VulkanProfilesBuilder():
 
     def gen_publicImpl(self):
         gen = PUBLIC_IMPL_BODY
-        gen += self.gen_vpCreateDevice()
-        return gen
-
-
-    def gen_vpCreateDevice(self):
-        gen = '\n'
-        gen += ('VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,\n'
-                '                                   const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {\n'
-                '    assert(pCreateInfo != nullptr);\n'
-                '\n'
-                '    if (physicalDevice == VK_NULL_HANDLE || pCreateInfo == nullptr || pDevice == nullptr) {\n'
-                '        return vkCreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : pCreateInfo->pCreateInfo, pAllocator, pDevice);\n'
-                '    } else if (pCreateInfo->pProfile == nullptr || strcmp(pCreateInfo->pProfile->profileName, "") == 0) {\n'
-                '        return vkCreateDevice(physicalDevice, pCreateInfo->pCreateInfo, pAllocator, pDevice);\n'
-                '    } else\n')
-
-        for name, profile in self.profiles.items():
-            uname = name.upper()
-
-            # TODO: Well, this is bogus now, as we add all extensions here even though some may be instance
-            # and not device extensions, but we'll keep it as is for now to maintain existing behavior
-            gen += ('#ifdef {0}\n'
-                    '    if (strcmp(pCreateInfo->pProfile->profileName, {1}_NAME) == 0) {{\n'
-                    '        std::vector<const char*> extensions;\n'
-                    '        _vpGetDeviceExtensions(pCreateInfo, _vpArraySize({1}::_deviceExtensions), &{1}::_deviceExtensions[0], extensions);\n'
-                    '\n'
-                    '        void *pNext = const_cast<void*>(pCreateInfo->pCreateInfo->pNext);\n').format(name, uname)
-
-            # Add profile feature structures if they aren't overridden by application
-            features = profile.capabilities.features
-            if features:
-                genDef = ''
-                genCheck = ''
-                pNext = None
-                for featureStructName, feature in features.items():
-                    structDef = self.registry.structs.get(featureStructName)
-                    if structDef == None:
-                        Log.f("Feature structure '{0}' does not exist".format(featureStructName))
-
-                    if featureStructName == 'VkPhysicalDeviceFeatures':
-                        # Special case, as it's wrapped into VkPhysicalDeviceFeatures2
-                        featureStructName = 'VkPhysicalDeviceFeatures2'
-                        sType = 'VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2'
-                    else:
-                        sType = structDef.sType
-
-                    profileVarName = 'profile' + featureStructName[2:]
-                    genDef += '        {0} {1}{{ {2} }};\n'.format(featureStructName, profileVarName, sType)
-                    if pNext != None:
-                        genDef += '        {0}.pNext = &{1};\n'.format(profileVarName, pNext)
-                    pNext = profileVarName
-
-                    if featureStructName == 'VkPhysicalDeviceFeatures2':
-                        genCheck += ('        if (pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr) {{\n'
-                                     '            profilePhysicalDeviceFeatures2.features = *pCreateInfo->pCreateInfo->pEnabledFeatures;\n'
-                                     '        }}\n'
-                                     '        if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {{\n'
-                                     '            profilePhysicalDeviceFeatures2.features.robustBufferAccess = VK_FALSE;\n'
-                                     '        }}\n'
-                                     '        if (_vpGetStructure(pNext, {0}) == nullptr && pCreateInfo->pCreateInfo->pEnabledFeatures == nullptr) {{\n').format(sType)
-                    else:
-                        if featureStructName == 'VkPhysicalDeviceVulkan13Features':
-                            genCheck += ('        if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT) {\n'
-                                         '            profilePhysicalDeviceVulkan13Features.robustImageAccess = VK_FALSE;\n'
-                                         '        }\n')
-                        genCheck += '        if (_vpGetStructure(pNext, {0}) == nullptr) {{\n'.format(sType)
-                    genCheck += ('            {0}.pNext = pNext;\n'
-                                 '            pNext = &{0};\n'
-                                 '        }}\n').format(profileVarName)
-
-                gen += genDef
-                gen += '        vpGetProfileFeatures(pCreateInfo->pProfile, &{0});\n'.format(pNext)
-                gen += genCheck
-
-            gen += ('\n'
-                    '        VkDeviceCreateInfo deviceCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };\n'
-                    '        deviceCreateInfo.pNext = pNext;\n'
-                    '        deviceCreateInfo.flags = pCreateInfo->pCreateInfo->flags;\n'
-                    '        deviceCreateInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;\n'
-                    '        deviceCreateInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;\n'
-                    '        deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());\n'
-                    '        deviceCreateInfo.ppEnabledExtensionNames = extensions.data();\n')
-
-            if not 'VkPhysicalDeviceFeatures' in features and not 'VkPhysicalDeviceFeatures2' in features:
-                gen += ('        VkPhysicalDeviceFeatures enabledFeatures;\n'
-                        '        if (pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr) {\n'
-                        '            enabledFeatures = *pCreateInfo->pCreateInfo->pEnabledFeatures;\n'
-                        '            if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {\n'
-                        '                enabledFeatures.robustBufferAccess = VK_FALSE;\n'
-                        '            }\n'
-                        '            deviceCreateInfo.pEnabledFeatures = &enabledFeatures;\n'
-                        '        }\n')
-
-            gen += ('        return vkCreateDevice(physicalDevice, &deviceCreateInfo, pAllocator, pDevice);\n'
-                    '    } else\n'
-                    '#endif\n')
-
-        gen += ('    {\n'
-                '        return VK_ERROR_UNKNOWN;\n'
-                '    }\n'
-                '}\n')
         return gen
 
 
