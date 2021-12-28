@@ -206,15 +206,19 @@ VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *
 PRIVATE_IMPL_BODY = '''
 using _pfnvpStructFiller = void(*)(VkBaseOutStructure* p);
 using _pfnvpStructComparator = bool(*)(VkBaseOutStructure* p);
+using _pfnvpStructChainerCb =  void(*)(VkBaseOutStructure* p, void* pUser);
+using _pfnvpStructChainer = void(*)(VkBaseOutStructure* p, void* pUser, _pfnvpStructChainerCb pfnCb);
 
 struct _vpFeatureDesc {
     _pfnvpStructFiller              pfnFiller;
     _pfnvpStructComparator          pfnComparator;
+    _pfnvpStructChainer             pfnChainer;
 };
 
 struct _vpPropertyDesc {
     _pfnvpStructFiller              pfnFiller;
     _pfnvpStructComparator          pfnComparator;
+    _pfnvpStructChainer             pfnChainer;
 };
 
 struct _vpQueueFamilyDesc {
@@ -226,6 +230,13 @@ struct _vpFormatDesc {
     VkFormat                        format;
     _pfnvpStructFiller              pfnFiller;
     _pfnvpStructComparator          pfnComparator;
+};
+
+struct _vpStructChainerDesc {
+    _pfnvpStructChainer             pfnFeature;
+    _pfnvpStructChainer             pfnProperty;
+    _pfnvpStructChainer             pfnQueueFamily;
+    _pfnvpStructChainer             pfnFormat;
 };
 
 struct _vpProfileDesc {
@@ -258,6 +269,8 @@ struct _vpProfileDesc {
     uint32_t                        formatStructTypeCount;
     const _vpFormatDesc*            pFormats;
     uint32_t                        formatCount;
+
+    _vpStructChainerDesc            chainers;
 };
 
 VPAPI_ATTR const _vpProfileDesc* _vpGetProfileDesc(const _vpProfileDesc* pProfiles, uint32_t profileCount,
@@ -272,7 +285,9 @@ VPAPI_ATTR bool _vpCheckExtension(const VkExtensionProperties *supportedProperti
                                   const char *requestedExtension, uint32_t expectedVersion = 0) {
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
         if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) {
-            return supportedProperties[i].specVersion > expectedVersion;
+            return true;
+            // Drivers don't actually update their spec version, so we cannot rely on this
+            // return supportedProperties[i].specVersion >= expectedVersion;
         }
     }
     return false;
@@ -388,24 +403,34 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
 
     uint32_t extCount;
     result = vkEnumerateInstanceExtensionProperties(pLayerName, &extCount, nullptr);
-    if (result != VK_SUCCESS) return result;
+    if (result != VK_SUCCESS) {
+        return result;
+    }
     std::vector<VkExtensionProperties> ext(extCount);
     result = vkEnumerateInstanceExtensionProperties(pLayerName, &extCount, ext.data());
-    if (result != VK_SUCCESS) return result;
-
-    *pSupported = VK_FALSE;
+    if (result != VK_SUCCESS) {
+        return result;
+    }
 
     const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
-    if (pDesc->props.specVersion < pProfile->specVersion) return result;
+    *pSupported = VK_FALSE;
 
-    if (VK_VERSION_PATCH(apiVersion) < VK_VERSION_PATCH(pDesc->minApiVersion)) return result;
+    if (pDesc->props.specVersion < pProfile->specVersion) {
+        return result;
+    }
+
+    if (VK_VERSION_PATCH(apiVersion) < VK_VERSION_PATCH(pDesc->minApiVersion)) {
+        return result;
+    }
 
     for (uint32_t i = 0; i < pDesc->instanceExtensionCount; ++i) {
         if (!_vpCheckExtension(ext.data(), ext.size(),
             pDesc->pInstanceExtensions[i].extensionName,
-            pDesc->pInstanceExtensions[i].specVersion)) return result;
+            pDesc->pInstanceExtensions[i].specVersion)) {
+            return result;
+        }
     }
 
     *pSupported = VK_TRUE;
@@ -444,6 +469,145 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
     }
 
     return vkCreateInstance(pInstanceCreateInfo, pAllocator, pInstance);
+}
+
+VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile, VkBool32 *pSupported)
+{
+    assert(pProfile != nullptr);
+    assert(pSupported != nullptr);
+    assert(physicalDevice != VK_NULL_HANDLE);
+    VkResult result = VK_SUCCESS;
+
+    uint32_t extCount;
+    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, nullptr);
+    if (result != VK_SUCCESS) {
+        return result;
+    }
+    std::vector<VkExtensionProperties> ext(extCount);
+    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, ext.data());
+    if (result != VK_SUCCESS) {
+        return result;
+    }
+
+    const _vpProfileDesc* pDesc = _vpGetProfileDesc(_vpProfiles, _vpArraySize(_vpProfiles), pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    *pSupported = VK_FALSE;
+
+    if (pDesc->props.specVersion < pProfile->specVersion) {
+        return result;
+    }
+
+    {
+        VkPhysicalDeviceProperties props;
+        vkGetPhysicalDeviceProperties(physicalDevice, &props);
+        if (VK_VERSION_PATCH(props.apiVersion) < VK_VERSION_PATCH(pDesc->minApiVersion)) {
+            return result;
+        }
+    }
+
+    for (uint32_t i = 0; i < pDesc->deviceExtensionCount; ++i) {
+        if (!_vpCheckExtension(ext.data(), ext.size(),
+            pDesc->pDeviceExtensions[i].extensionName,
+            pDesc->pDeviceExtensions[i].specVersion)) {
+            return result;
+        }
+    }
+
+    struct UserData {
+        VkPhysicalDevice        physicalDevice;
+        const _vpProfileDesc*   pDesc;
+        uint32_t                index;
+        uint32_t                count;
+        _pfnvpStructChainerCb   pfnCb;
+        bool                    supported;
+    } userData{ physicalDevice, pDesc };
+
+    {
+        VkPhysicalDeviceFeatures2 features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
+        pDesc->chainers.pfnFeature(static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData,
+            [](VkBaseOutStructure* p, void* pUser) {
+                UserData* pUserData = static_cast<UserData*>(pUser);
+                vkGetPhysicalDeviceFeatures2(pUserData->physicalDevice,
+                                             static_cast<VkPhysicalDeviceFeatures2*>(static_cast<void*>(p)));
+                pUserData->supported = pUserData->pDesc->feature.pfnComparator(p);
+            }
+        );
+        if (!userData.supported) {
+            return result;
+        }
+    }
+
+    {
+        VkPhysicalDeviceProperties2 props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };
+        pDesc->chainers.pfnProperty(static_cast<VkBaseOutStructure*>(static_cast<void*>(&props)), &userData,
+            [](VkBaseOutStructure* p, void* pUser) {
+                UserData* pUserData = static_cast<UserData*>(pUser);
+                vkGetPhysicalDeviceProperties2(pUserData->physicalDevice,
+                                               static_cast<VkPhysicalDeviceProperties2*>(static_cast<void*>(p)));
+                pUserData->supported = pUserData->pDesc->property.pfnComparator(p);
+            }
+        );
+        if (!userData.supported) {
+            return result;
+        }
+    }
+
+    for (uint32_t i = 0; i < pDesc->formatCount; ++i) {
+        userData.index = i;
+        VkFormatProperties2 props{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2 };
+        pDesc->chainers.pfnFormat(static_cast<VkBaseOutStructure*>(static_cast<void*>(&props)), &userData,
+            [](VkBaseOutStructure* p, void* pUser) {
+                UserData* pUserData = static_cast<UserData*>(pUser);
+                vkGetPhysicalDeviceFormatProperties2(pUserData->physicalDevice,
+                                                     pUserData->pDesc->pFormats[pUserData->index].format,
+                                                     static_cast<VkFormatProperties2*>(static_cast<void*>(p)));
+                pUserData->supported = pUserData->pDesc->pFormats[pUserData->index].pfnComparator(p);
+            }
+        );
+        if (!userData.supported) {
+            return result;
+        }
+    }
+
+    {
+        vkGetPhysicalDeviceQueueFamilyProperties2(physicalDevice, &userData.count, nullptr);
+        std::vector<VkQueueFamilyProperties2> props(userData.count, { VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2 });
+        userData.index = 0;
+
+        _pfnvpStructChainerCb callback = [](VkBaseOutStructure* p, void* pUser) {
+            UserData* pUserData = static_cast<UserData*>(pUser);
+            if (++pUserData->index < pUserData->count) {
+                pUserData->pDesc->chainers.pfnQueueFamily(++p, pUser, pUserData->pfnCb);
+            } else {
+                p -= pUserData->count - 1;
+                vkGetPhysicalDeviceQueueFamilyProperties2(pUserData->physicalDevice,
+                                                          &pUserData->count,
+                                                          static_cast<VkQueueFamilyProperties2*>(static_cast<void*>(p)));
+                for (uint32_t i = 0; i < pUserData->pDesc->queueFamilyCount; ++i) {
+                    pUserData->supported = false;
+                    for (uint32_t j = 0; j < pUserData->count; ++j) {
+                        if (pUserData->pDesc->pQueueFamilies[i].pfnComparator(&p[j])) {
+                            pUserData->supported = true;
+                            break;
+                        }
+                    }
+                    if (!pUserData->supported) {
+                        return;
+                    }
+                }
+            }
+        };
+        userData.pfnCb = callback;
+
+        pDesc->chainers.pfnQueueFamily(static_cast<VkBaseOutStructure*>(static_cast<void*>(props.data())), &userData, callback);
+        if (!userData.supported) {
+            return result;
+        }
+    }
+
+    *pSupported = VK_TRUE;
+    return result;
 }
 
 VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
@@ -931,6 +1095,18 @@ class VulkanRegistry():
                 if memberDef.limittype == 'bitmask' and memberDef.type == 'VkBool32':
                     self.structs[structName].members[memberName].limittype = 'noauto'
 
+        # TODO: The registry xml is also missing limittype definitions for format and queue family properties
+        # For now we just add the important ones, this needs a larger overhaul in the vk.xml
+        self.structs['VkFormatProperties'].members['linearTilingFeatures'].limittype = 'bitmask'
+        self.structs['VkFormatProperties'].members['optimalTilingFeatures'].limittype = 'bitmask'
+        self.structs['VkFormatProperties'].members['bufferFeatures'].limittype = 'bitmask'
+        self.structs['VkFormatProperties3'].members['linearTilingFeatures'].limittype = 'bitmask'
+        self.structs['VkFormatProperties3'].members['optimalTilingFeatures'].limittype = 'bitmask'
+        self.structs['VkFormatProperties3'].members['bufferFeatures'].limittype = 'bitmask'
+        self.structs['VkQueueFamilyProperties'].members['queueCount'].limittype = 'max'
+        self.structs['VkQueueFamilyProperties'].members['timestampValidBits'].limittype = 'max'
+        self.structs['VkQueueFamilyProperties'].members['minImageTransferGranularity'].limittype = 'min' # should be maxmul
+
 
     def getChainableStructDef(self, name, extends):
         structDef = self.structs.get(name)
@@ -1274,8 +1450,12 @@ class VulkanProfile():
                             gen += fmt.format('{0}{1}[{2}] = {3}'.format(var, member, i, v))
                     else:
                         # For enums and struct initialization, most of the code can be shared
-                        genAssign = '{0}{1} = '.format(var, member)
                         isEnum = isinstance(value[0], str)
+                        if isEnum:
+                            # For enums we only add bits
+                            genAssign = '{0}{1} |= '.format(var, member)
+                        else:
+                            genAssign = '{0}{1} = '.format(var, member)
                         genAssign += '{0}'.format(self.gen_listValue(value, isEnum))
                         gen += fmt.format(genAssign)
 
@@ -1291,11 +1471,14 @@ class VulkanProfile():
         return gen
 
 
-    def gen_structCompare(self, fmt, structDef, var, values):
+    def gen_structCompare(self, fmt, structDef, var, values, parentLimittype = None):
         gen = ''
         for member, value in values.items():
             if member in structDef.members:
                 limittype = structDef.members[member].limittype
+                if limittype == None:
+                    # Use parent's limit type
+                    limittype = parentLimittype
                 if limittype == 'IGNORE':
                     # Skip this member as we don't know how to validate it
                     continue
@@ -1321,7 +1504,7 @@ class VulkanProfile():
                     # Nested structure
                     memberDef = self.registry.structs.get(structDef.members[member].type)
                     if memberDef != None:
-                        gen += self.gen_structCompare(fmt, memberDef, var + member + '.', value)
+                        gen += self.gen_structCompare(fmt, memberDef, var + member + '.', value, limittype)
                     else:
                         Log.f("Member '{0}' in structure '{1}' is not a struct".format(member, structDef.name))
 
@@ -1407,6 +1590,23 @@ class VulkanProfile():
         return gen if hasData else ''
 
 
+    def gen_structChainerFunc(self, structDefs, baseStruct):
+        gen = '    [](VkBaseOutStructure* p, void* pUser, _pfnvpStructChainerCb pfnCb) {\n'
+        if structDefs:
+            pNext = 'nullptr'
+            for structDef in structDefs:
+                if structDef.name != baseStruct:
+                    varName = structDef.name[2].lower() + structDef.name[3:]
+                    gen += '        {0} {1}{{ {2}, {3} }};\n'.format(structDef.name, varName, structDef.sType, pNext)
+                    pNext = '&' + varName
+            gen += '        p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>({0}));\n'.format(pNext)
+
+        gen += ('        pfnCb(p, pUser);\n'
+                '    },\n')
+        return gen
+
+
+
     def gen_structDesc(self):
         gen = ''
 
@@ -1473,6 +1673,15 @@ class VulkanProfile():
                         '        }\n'
                         '    },\n')
             gen += '};\n'
+
+        # Structure chaining descriptors
+        gen += ('\n'
+                'static const _vpStructChainerDesc _chainerDesc = {\n')
+        gen += self.gen_structChainerFunc(self.structs.feature, 'VkPhysicalDeviceFeatures2')
+        gen += self.gen_structChainerFunc(self.structs.property, 'VkPhysicalDeviceProperties2')
+        gen += self.gen_structChainerFunc(self.structs.queueFamily, 'VkQueueFamilyProperties2')
+        gen += self.gen_structChainerFunc(self.structs.format, 'VkFormatProperties2')
+        gen += '};\n'
 
         return gen
 
@@ -1620,6 +1829,7 @@ class VulkanProfilesBuilder():
             gen += self.gen_dataArrayInfo(profile.structs.queueFamily, '{0}::_queueFamilyDesc'.format(uname))
             gen += self.gen_dataArrayInfo(profile.structs.format, '{0}::_formatStructTypes'.format(uname))
             gen += self.gen_dataArrayInfo(profile.structs.format, '{0}::_formatDesc'.format(uname))
+            gen += '        {0}::_chainerDesc,\n'.format(uname)
 
             gen += ('    },\n'
                     '#endif\n')
@@ -1630,139 +1840,7 @@ class VulkanProfilesBuilder():
 
     def gen_publicImpl(self):
         gen = PUBLIC_IMPL_BODY
-        gen += self.gen_vpGetPhysicalDeviceProfileSupport()
         gen += self.gen_vpCreateDevice()
-        return gen
-
-
-    def gen_vpGetPhysicalDeviceProfileSupport(self):
-        gen = '\n'
-        gen += ('VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile, VkBool32 *pSupported) {\n'
-                '    assert(pProfile != nullptr);\n'
-                '    assert(pSupported != nullptr);\n'
-                '    assert(physicalDevice != VK_NULL_HANDLE);\n'
-                '\n'
-                '    VkResult result = VK_SUCCESS;\n'
-                '\n'
-                '    uint32_t extCount;\n'
-                '    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, nullptr);\n'
-                '    if (result != VK_SUCCESS) return result;\n'
-                '    std::vector<VkExtensionProperties> ext(extCount);\n'
-                '    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, ext.data());\n'
-                '    if (result != VK_SUCCESS) return result;\n'
-                '\n'
-                '    VkPhysicalDeviceProperties devProps;\n'
-                '    vkGetPhysicalDeviceProperties(physicalDevice, &devProps);\n'
-                '\n'
-                '    *pSupported = VK_FALSE;\n'
-                '\n')
-
-        for name, profile in self.profiles.items():
-            uname = name.upper()
-            gen += ('#ifdef {0}\n'
-                    '    if (strcmp(pProfile->profileName, {1}_NAME) == 0) {{\n'
-                    '        if ({1}_SPEC_VERSION < pProfile->specVersion) return result;\n'
-                    '\n'
-                    '        if (VK_VERSION_PATCH(devProps.apiVersion) < VK_VERSION_PATCH({1}_MIN_API_VERSION)) return result;\n').format(name, uname)
-
-            if profile.capabilities.deviceExtensions:
-                gen += ('\n'
-                        '        for (uint32_t i = 0; i < _vpArraySize({0}::_deviceExtensions); ++i) {{\n'
-                        '            if (!_vpCheckExtension(ext.data(), ext.size(), {0}::_deviceExtensions[i].extensionName)) return result;\n'
-                        '        }}\n').format(uname)
-
-            # Check features
-            features = profile.capabilities.features
-            if features:
-                pNext = None
-                gen += '\n'
-                for featureStructName, feature in features.items():
-                    structDef = self.registry.structs.get(featureStructName)
-                    if structDef == None:
-                        Log.f("Feature structure '{0}' does not exist".format(featureStructName))
-
-                    if featureStructName == 'VkPhysicalDeviceFeatures':
-                        # Special case, as it's wrapped into VkPhysicalDeviceFeatures2
-                        featureStructName = 'VkPhysicalDeviceFeatures2'
-                        varAccessSuffix = '.features.'
-                        sType = 'VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2'
-                    else:
-                        varAccessSuffix = '.'
-                        sType = structDef.sType
-
-                    varName = featureStructName[2].lower() + featureStructName[3:]
-                    gen += '        {0} {1}{{ {2} }};\n'.format(featureStructName, varName, sType)
-                    if featureStructName != 'VkPhysicalDeviceFeatures2':
-                        if pNext != None:
-                            gen += '        {0}.pNext = &{1};\n'.format(varName, pNext)
-                        pNext = varName
-
-                if not 'VkPhysicalDeviceFeatures' in features and not 'VkPhysicalDeviceFeatures2' in features:
-                    # We have to manually add VkPhysicalDeviceFeatures2 as it's not used in the profile
-                    gen += '        VkPhysicalDeviceFeatures2 physicalDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };\n'
-                if pNext != None:
-                    # For vkGetPhysicalDeviceFeatures2 everything has to be chained to VkPhysicalDeviceFeatures2
-                    gen += '        physicalDeviceFeatures2.pNext = &{0};\n'.format(pNext)
-
-                gen += '        vkGetPhysicalDeviceFeatures2(physicalDevice, &physicalDeviceFeatures2);\n'
-                gen += '        if (!{0}::_featureDesc.pfnComparator(static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceFeatures2)))) return result;\n'.format(uname)
-
-            # Check properties
-            properties = profile.capabilities.properties
-            if properties:
-                pNext = None
-                gen += '\n'
-                for propertyStructName, property in properties.items():
-                    structDef = self.registry.structs.get(propertyStructName)
-                    if structDef == None:
-                        Log.f("Properties structure '{0}' does not exist".format(propertyStructName))
-
-                    if propertyStructName == 'VkPhysicalDeviceProperties':
-                        # Special case, as it's wrapped into VkPhysicalDeviceProperties2
-                        propertyStructName = 'VkPhysicalDeviceProperties2'
-                        varAccessSuffix = '.properties.'
-                        sType = 'VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2'
-                    else:
-                        varAccessSuffix = '.'
-                        sType = structDef.sType
-
-                    varName = propertyStructName[2].lower() + propertyStructName[3:]
-                    gen += '        {0} {1}{{ {2} }};\n'.format(propertyStructName, varName, sType)
-                    if propertyStructName != 'VkPhysicalDeviceProperties2':
-                        if pNext != None:
-                            gen += '        {0}.pNext = &{1};\n'.format(varName, pNext)
-                        pNext = varName
-
-                if not 'VkPhysicalDeviceProperties' in properties and not 'VkPhysicalDeviceProperties2' in properties:
-                    # We have to manually add VkPhysicalDeviceProperies2 as it's not used in the profile
-                    gen += '        VkPhysicalDeviceProperties2 physicalDeviceProperties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };\n'
-                if pNext != None:
-                    # For vkGetPhysicalDeviceProperties2 everything has to be chained to VkPhysicalDeviceProperties2
-                    gen += '        physicalDeviceProperties2.pNext = &{0};\n'.format(pNext)
-
-                gen += '        vkGetPhysicalDeviceProperties2(physicalDevice, &physicalDeviceProperties2);\n'
-                gen += '        if (!{0}::_propertyDesc.pfnComparator(static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceProperties2)))) return result;\n'.format(uname)
-
-            # Check queue family properties
-            if profile.capabilities.queueFamiliesProperties:
-                # TODO: Complete this once this function is generalized
-                pass
-
-            # Check formats
-            if profile.capabilities.formats:
-                # TODO: Complete this once this function is generalized
-                pass
-
-            gen += ('    } else\n'
-                    '#endif\n')
-
-        gen += ('    {\n'
-                '        return result;\n'
-                '    }\n'
-                '\n'
-                '    *pSupported = VK_TRUE;\n'
-                '    return result;\n'
-                '}\n')
         return gen
 
 

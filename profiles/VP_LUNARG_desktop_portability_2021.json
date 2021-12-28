@@ -21,7 +21,7 @@
                 "VK_KHR_depth_stencil_resolve": 1,
                 "VK_KHR_driver_properties": 1,
                 "VK_KHR_image_format_list": 1,
-                "VK_KHR_imageless_framebuffer": 4,
+                "VK_KHR_imageless_framebuffer": 1,
                 "VK_KHR_sampler_mirror_clamp_to_edge": 1,
                 "VK_KHR_shader_float16_int8": 1,
                 "VK_KHR_shader_subgroup_extended_types": 1,
@@ -489,7 +489,7 @@
                     "VkFormatProperties": {
                         "linearTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT" ],
                         "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT" ],
-                        "bufferFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT" ]
+                        "bufferFeatures": []
                     }
                 },
                 "VK_FORMAT_R32_UINT": {
