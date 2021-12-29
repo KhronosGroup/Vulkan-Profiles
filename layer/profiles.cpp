@@ -1205,8 +1205,6 @@ class PhysicalDeviceData {
         return (iter != map_.end()) ? &iter->second : nullptr;
     }
 
-    static bool HasExtension(VkPhysicalDevice pd, const char *extension_name) { return HasExtension(Find(pd), extension_name); }
-
     static bool HasExtension(PhysicalDeviceData *pdd, const char *extension_name) {
         for (const auto &ext_prop : pdd->device_extensions_) {
             if (strncmp(extension_name, ext_prop.extensionName, VK_MAX_EXTENSION_NAME_SIZE) == 0) {
@@ -2313,6 +2311,15 @@ class JsonLoader {
         if (new_value > old_value) {
             DebugPrintf("WARN \"%s\" JSON value (%" PRIu64 ") is greater than existing value (%" PRIu64 ")\n", name, new_value,
                         old_value);
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfNotEqual(const char *name, const bool new_value, const bool old_value) {
+        if (new_value != old_value) {
+            DebugPrintf("WARN \"%s\" JSON value (%s) is greater than existing value (%s)\n", name, new_value ? "true" : "false",
+                        old_value ? "true" : "false");
             return true;
         }
         return false;
@@ -3568,8 +3575,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStenci
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE(prop, supportedDepthResolveModes);
         GET_VALUE(prop, supportedStencilResolveModes);
-        GET_VALUE_WARN(prop, independentResolveNone, WarnIfGreater);
-        GET_VALUE_WARN(prop, independentResolve, WarnIfGreater);
+        GET_VALUE_WARN(prop, independentResolveNone, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, independentResolve, WarnIfNotEqual);
     }
 }
 
@@ -3585,13 +3592,13 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxUpdateAfterBindDescriptorsInAllPools, WarnIfGreater);
         GET_VALUE_WARN(prop, maxUpdateAfterBindDescriptorsInAllPools, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderUniformBufferArrayNonUniformIndexingNative, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderSampledImageArrayNonUniformIndexingNative, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderStorageBufferArrayNonUniformIndexingNative, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderStorageImageArrayNonUniformIndexingNative, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderInputAttachmentArrayNonUniformIndexingNative, WarnIfGreater);
-        GET_VALUE_WARN(prop, robustBufferAccessUpdateAfterBind, WarnIfGreater);
-        GET_VALUE_WARN(prop, quadDivergentImplicitLod, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderUniformBufferArrayNonUniformIndexingNative, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderSampledImageArrayNonUniformIndexingNative, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderStorageBufferArrayNonUniformIndexingNative, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderStorageImageArrayNonUniformIndexingNative, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderInputAttachmentArrayNonUniformIndexingNative, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, robustBufferAccessUpdateAfterBind, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, quadDivergentImplicitLod, WarnIfNotEqual);
         GET_VALUE_WARN(prop, maxPerStageDescriptorUpdateAfterBindSamplers, WarnIfGreater);
         GET_VALUE_WARN(prop, maxPerStageDescriptorUpdateAfterBindUniformBuffers, WarnIfGreater);
         GET_VALUE_WARN(prop, maxPerStageDescriptorUpdateAfterBindStorageBuffers, WarnIfGreater);
@@ -3622,21 +3629,21 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatContro
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE(prop, denormBehaviorIndependence);
         GET_VALUE(prop, roundingModeIndependence);
-        GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat16, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat32, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat64, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderDenormPreserveFloat16, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderDenormPreserveFloat32, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderDenormPreserveFloat64, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderDenormFlushToZeroFloat16, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderDenormFlushToZeroFloat32, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderDenormFlushToZeroFloat64, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderRoundingModeRTEFloat16, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderRoundingModeRTEFloat32, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderRoundingModeRTEFloat64, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderRoundingModeRTZFloat16, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderRoundingModeRTZFloat32, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderRoundingModeRTZFloat64, WarnIfGreater);
+        GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat16, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat32, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat64, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderDenormPreserveFloat16, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderDenormPreserveFloat32, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderDenormPreserveFloat64, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderDenormFlushToZeroFloat16, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderDenormFlushToZeroFloat32, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderDenormFlushToZeroFloat64, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderRoundingModeRTEFloat16, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderRoundingModeRTEFloat32, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderRoundingModeRTEFloat64, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderRoundingModeRTZFloat16, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderRoundingModeRTZFloat32, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderRoundingModeRTZFloat64, WarnIfNotEqual);
     }
 }
 
@@ -3663,7 +3670,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
     }
 
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE_WARN(prop, maintenance4, WarnIfGreater);
+        GET_VALUE_WARN(prop, maintenance4, WarnIfNotEqual);
     }
 }
 
@@ -3776,7 +3783,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryProperties *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProtectedMemoryProperties)\n");
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, protectedNoFault, WarnIfGreater);
+        GET_VALUE_WARN(member, protectedNoFault, WarnIfNotEqual);
     }
 }
 
@@ -3790,8 +3797,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilt
     }
 
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE_WARN(prop, filterMinmaxSingleComponentFormats, WarnIfGreater);
-        GET_VALUE_WARN(prop, filterMinmaxImageComponentMapping, WarnIfGreater);
+        GET_VALUE_WARN(prop, filterMinmaxSingleComponentFormats, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, filterMinmaxImageComponentMapping, WarnIfNotEqual);
     }
 }
 
@@ -3903,7 +3910,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_VALUE_WARN(prop, sampledImageStencilSampleCounts, WarnIfGreater);
         GET_VALUE_WARN(prop, storageImageSampleCounts, WarnIfGreater);
         GET_VALUE_WARN(prop, maxSampleMaskWords, WarnIfGreater);
-        GET_VALUE_WARN(prop, timestampComputeAndGraphics, WarnIfGreater);
+        GET_VALUE_WARN(prop, timestampComputeAndGraphics, WarnIfNotEqual);
         GET_VALUE_WARN(prop, timestampPeriod, WarnIfGreater);
         GET_VALUE_WARN(prop, maxClipDistances, WarnIfGreater);
         GET_VALUE_WARN(prop, maxCullDistances, WarnIfGreater);
@@ -3913,8 +3920,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_ARRAY(lineWidthRange);  // size == 2
         GET_VALUE_WARN(prop, pointSizeGranularity, WarnIfGreater);
         GET_VALUE_WARN(prop, lineWidthGranularity, WarnIfGreater);
-        GET_VALUE_WARN(prop, strictLines, WarnIfGreater);
-        GET_VALUE_WARN(prop, standardSampleLocations, WarnIfGreater);
+        GET_VALUE_WARN(prop, strictLines, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, standardSampleLocations, WarnIfNotEqual);
         GET_VALUE_WARN(prop, optimalBufferCopyOffsetAlignment, WarnIfGreater);
         GET_VALUE_WARN(prop, optimalBufferCopyRowPitchAlignment, WarnIfGreater);
         GET_VALUE_WARN(prop, nonCoherentAtomSize, WarnIfGreater);
@@ -3923,11 +3930,11 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSparseProperties *dest) {
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE_WARN(prop, residencyStandard2DBlockShape, WarnIfGreater);
-        GET_VALUE_WARN(prop, residencyStandard2DMultisampleBlockShape, WarnIfGreater);
-        GET_VALUE_WARN(prop, residencyStandard3DBlockShape, WarnIfGreater);
-        GET_VALUE_WARN(prop, residencyAlignedMipSize, WarnIfGreater);
-        GET_VALUE_WARN(prop, residencyNonResidentStrict, WarnIfGreater);
+        GET_VALUE_WARN(prop, residencyStandard2DBlockShape, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, residencyStandard2DMultisampleBlockShape, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, residencyStandard3DBlockShape, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, residencyAlignedMipSize, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, residencyNonResidentStrict, WarnIfNotEqual);
     }
 }
 
@@ -3936,7 +3943,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupPro
         GET_VALUE_WARN(prop, subgroupSize, WarnIfGreater);
         GET_VALUE_WARN(prop, supportedStages, WarnIfGreater);
         GET_VALUE_WARN(prop, supportedOperations, WarnIfGreater);
-        GET_VALUE_WARN(prop, quadOperationsInAllStages, WarnIfGreater);
+        GET_VALUE_WARN(prop, quadOperationsInAllStages, WarnIfNotEqual);
     }
 }
 
@@ -4009,9 +4016,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorage
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, storageBuffer8BitAccess, WarnIfGreater);
-        GET_VALUE_WARN(member, uniformAndStorageBuffer8BitAccess, WarnIfGreater);
-        GET_VALUE_WARN(member, storagePushConstant8, WarnIfGreater);
+        GET_VALUE_WARN(member, storageBuffer8BitAccess, WarnIfNotEqual);
+        GET_VALUE_WARN(member, uniformAndStorageBuffer8BitAccess, WarnIfNotEqual);
+        GET_VALUE_WARN(member, storagePushConstant8, WarnIfNotEqual);
     }
 }
 
@@ -4023,10 +4030,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorag
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, storageBuffer16BitAccess, WarnIfGreater);
-        GET_VALUE_WARN(member, uniformAndStorageBuffer16BitAccess, WarnIfGreater);
-        GET_VALUE_WARN(member, storagePushConstant16, WarnIfGreater);
-        GET_VALUE_WARN(member, storageInputOutput16, WarnIfGreater);
+        GET_VALUE_WARN(member, storageBuffer16BitAccess, WarnIfNotEqual);
+        GET_VALUE_WARN(member, uniformAndStorageBuffer16BitAccess, WarnIfNotEqual);
+        GET_VALUE_WARN(member, storagePushConstant16, WarnIfNotEqual);
+        GET_VALUE_WARN(member, storageInputOutput16, WarnIfNotEqual);
     }
 }
 
@@ -4039,9 +4046,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDevic
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, bufferDeviceAddress, WarnIfGreater);
-        GET_VALUE_WARN(member, bufferDeviceAddressCaptureReplay, WarnIfGreater);
-        GET_VALUE_WARN(member, bufferDeviceAddressMultiDevice, WarnIfGreater);
+        GET_VALUE_WARN(member, bufferDeviceAddress, WarnIfNotEqual);
+        GET_VALUE_WARN(member, bufferDeviceAddressCaptureReplay, WarnIfNotEqual);
+        GET_VALUE_WARN(member, bufferDeviceAddressMultiDevice, WarnIfNotEqual);
     }
 }
 
@@ -4054,26 +4061,26 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderInputAttachmentArrayDynamicIndexing, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderUniformTexelBufferArrayDynamicIndexing, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderStorageTexelBufferArrayDynamicIndexing, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderUniformBufferArrayNonUniformIndexing, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderSampledImageArrayNonUniformIndexing, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderStorageBufferArrayNonUniformIndexing, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderStorageImageArrayNonUniformIndexing, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderInputAttachmentArrayNonUniformIndexing, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderUniformTexelBufferArrayNonUniformIndexing, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderStorageTexelBufferArrayNonUniformIndexing, WarnIfGreater);
-        GET_VALUE_WARN(member, descriptorBindingUniformBufferUpdateAfterBind, WarnIfGreater);
-        GET_VALUE_WARN(member, descriptorBindingSampledImageUpdateAfterBind, WarnIfGreater);
-        GET_VALUE_WARN(member, descriptorBindingStorageImageUpdateAfterBind, WarnIfGreater);
-        GET_VALUE_WARN(member, descriptorBindingStorageBufferUpdateAfterBind, WarnIfGreater);
-        GET_VALUE_WARN(member, descriptorBindingUniformTexelBufferUpdateAfterBind, WarnIfGreater);
-        GET_VALUE_WARN(member, descriptorBindingStorageTexelBufferUpdateAfterBind, WarnIfGreater);
-        GET_VALUE_WARN(member, descriptorBindingUpdateUnusedWhilePending, WarnIfGreater);
-        GET_VALUE_WARN(member, descriptorBindingPartiallyBound, WarnIfGreater);
-        GET_VALUE_WARN(member, descriptorBindingVariableDescriptorCount, WarnIfGreater);
-        GET_VALUE_WARN(member, runtimeDescriptorArray, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderInputAttachmentArrayDynamicIndexing, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderUniformTexelBufferArrayDynamicIndexing, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderStorageTexelBufferArrayDynamicIndexing, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderUniformBufferArrayNonUniformIndexing, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderSampledImageArrayNonUniformIndexing, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderStorageBufferArrayNonUniformIndexing, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderStorageImageArrayNonUniformIndexing, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderInputAttachmentArrayNonUniformIndexing, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderUniformTexelBufferArrayNonUniformIndexing, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderStorageTexelBufferArrayNonUniformIndexing, WarnIfNotEqual);
+        GET_VALUE_WARN(member, descriptorBindingUniformBufferUpdateAfterBind, WarnIfNotEqual);
+        GET_VALUE_WARN(member, descriptorBindingSampledImageUpdateAfterBind, WarnIfNotEqual);
+        GET_VALUE_WARN(member, descriptorBindingStorageImageUpdateAfterBind, WarnIfNotEqual);
+        GET_VALUE_WARN(member, descriptorBindingStorageBufferUpdateAfterBind, WarnIfNotEqual);
+        GET_VALUE_WARN(member, descriptorBindingUniformTexelBufferUpdateAfterBind, WarnIfNotEqual);
+        GET_VALUE_WARN(member, descriptorBindingStorageTexelBufferUpdateAfterBind, WarnIfNotEqual);
+        GET_VALUE_WARN(member, descriptorBindingUpdateUnusedWhilePending, WarnIfNotEqual);
+        GET_VALUE_WARN(member, descriptorBindingPartiallyBound, WarnIfNotEqual);
+        GET_VALUE_WARN(member, descriptorBindingVariableDescriptorCount, WarnIfNotEqual);
+        GET_VALUE_WARN(member, runtimeDescriptorArray, WarnIfNotEqual);
     }
 }
 
@@ -4086,7 +4093,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryRe
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, hostQueryReset, WarnIfGreater);
+        GET_VALUE_WARN(member, hostQueryReset, WarnIfNotEqual);
     }
 }
 
@@ -4099,7 +4106,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFr
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, imagelessFramebuffer, WarnIfGreater);
+        GET_VALUE_WARN(member, imagelessFramebuffer, WarnIfNotEqual);
     }
 }
 
@@ -4111,9 +4118,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFe
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, multiview, WarnIfGreater);
-        GET_VALUE_WARN(member, multiviewGeometryShader, WarnIfGreater);
-        GET_VALUE_WARN(member, multiviewTessellationShader, WarnIfGreater);
+        GET_VALUE_WARN(member, multiview, WarnIfNotEqual);
+        GET_VALUE_WARN(member, multiviewGeometryShader, WarnIfNotEqual);
+        GET_VALUE_WARN(member, multiviewTessellationShader, WarnIfNotEqual);
     }
 }
 
@@ -4127,28 +4134,28 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
             kEnvarProfilesEmulatePortability);
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, constantAlphaColorBlendFactors, WarnIfGreater);
-        GET_VALUE_WARN(member, events, WarnIfGreater);
-        GET_VALUE_WARN(member, imageViewFormatReinterpretation, WarnIfGreater);
-        GET_VALUE_WARN(member, imageViewFormatSwizzle, WarnIfGreater);
-        GET_VALUE_WARN(member, imageView2DOn3DImage, WarnIfGreater);
-        GET_VALUE_WARN(member, multisampleArrayImage, WarnIfGreater);
-        GET_VALUE_WARN(member, mutableComparisonSamplers, WarnIfGreater);
-        GET_VALUE_WARN(member, pointPolygons, WarnIfGreater);
-        GET_VALUE_WARN(member, samplerMipLodBias, WarnIfGreater);
-        GET_VALUE_WARN(member, separateStencilMaskRef, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderSampleRateInterpolationFunctions, WarnIfGreater);
-        GET_VALUE_WARN(member, tessellationIsolines, WarnIfGreater);
-        GET_VALUE_WARN(member, tessellationPointMode, WarnIfGreater);
-        GET_VALUE_WARN(member, triangleFans, WarnIfGreater);
-        GET_VALUE_WARN(member, vertexAttributeAccessBeyondStride, WarnIfGreater);
+        GET_VALUE_WARN(member, constantAlphaColorBlendFactors, WarnIfNotEqual);
+        GET_VALUE_WARN(member, events, WarnIfNotEqual);
+        GET_VALUE_WARN(member, imageViewFormatReinterpretation, WarnIfNotEqual);
+        GET_VALUE_WARN(member, imageViewFormatSwizzle, WarnIfNotEqual);
+        GET_VALUE_WARN(member, imageView2DOn3DImage, WarnIfNotEqual);
+        GET_VALUE_WARN(member, multisampleArrayImage, WarnIfNotEqual);
+        GET_VALUE_WARN(member, mutableComparisonSamplers, WarnIfNotEqual);
+        GET_VALUE_WARN(member, pointPolygons, WarnIfNotEqual);
+        GET_VALUE_WARN(member, samplerMipLodBias, WarnIfNotEqual);
+        GET_VALUE_WARN(member, separateStencilMaskRef, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderSampleRateInterpolationFunctions, WarnIfNotEqual);
+        GET_VALUE_WARN(member, tessellationIsolines, WarnIfNotEqual);
+        GET_VALUE_WARN(member, tessellationPointMode, WarnIfNotEqual);
+        GET_VALUE_WARN(member, triangleFans, WarnIfNotEqual);
+        GET_VALUE_WARN(member, vertexAttributeAccessBeyondStride, WarnIfNotEqual);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryFeatures *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProtectedMemoryFeatures)\n");
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, protectedMemory, WarnIfLesser);
+        GET_VALUE_WARN(member, protectedMemory, WarnIfNotEqual);
     }
 }
 
@@ -4161,7 +4168,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbc
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, samplerYcbcrConversion, WarnIfGreater);
+        GET_VALUE_WARN(member, samplerYcbcrConversion, WarnIfNotEqual);
     }
 }
 
@@ -4174,7 +4181,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlock
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, scalarBlockLayout, WarnIfGreater);
+        GET_VALUE_WARN(member, scalarBlockLayout, WarnIfNotEqual);
     }
 }
 
@@ -4187,7 +4194,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDep
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, separateDepthStencilLayouts, WarnIfGreater);
+        GET_VALUE_WARN(member, separateDepthStencilLayouts, WarnIfNotEqual);
     }
 }
 
@@ -4200,15 +4207,15 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderBufferInt64Atomics, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderSharedInt64Atomics, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderBufferInt64Atomics, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderSharedInt64Atomics, WarnIfNotEqual);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawParametersFeatures *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicInt64FeaturesKHR)\n");
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderDrawParameters, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderDrawParameters, WarnIfNotEqual);
     }
 }
 
@@ -4221,8 +4228,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderFloat16, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderInt8, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderFloat16, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderInt8, WarnIfNotEqual);
     }
 }
 
@@ -4235,14 +4242,14 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgr
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderSubgroupExtendedTypes, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSubgroupExtendedTypes, WarnIfNotEqual);
     }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTimelineSemaphoreFeaturesKHR)\n");
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, timelineSemaphore, WarnIfGreater);
+        GET_VALUE_WARN(member, timelineSemaphore, WarnIfNotEqual);
     }
 }
 
@@ -4255,7 +4262,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBuff
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, uniformBufferStandardLayout, WarnIfGreater);
+        GET_VALUE_WARN(member, uniformBufferStandardLayout, WarnIfNotEqual);
     }
 }
 
@@ -4267,8 +4274,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePoi
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, variablePointersStorageBuffer, WarnIfGreater);
-        GET_VALUE_WARN(member, variablePointers, WarnIfGreater);
+        GET_VALUE_WARN(member, variablePointersStorageBuffer, WarnIfNotEqual);
+        GET_VALUE_WARN(member, variablePointers, WarnIfNotEqual);
     }
 }
 
@@ -4281,9 +4288,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemor
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, vulkanMemoryModel, WarnIfGreater);
-        GET_VALUE_WARN(member, vulkanMemoryModelDeviceScope, WarnIfGreater);
-        GET_VALUE_WARN(member, vulkanMemoryModelAvailabilityVisibilityChains, WarnIfGreater);
+        GET_VALUE_WARN(member, vulkanMemoryModel, WarnIfNotEqual);
+        GET_VALUE_WARN(member, vulkanMemoryModelDeviceScope, WarnIfNotEqual);
+        GET_VALUE_WARN(member, vulkanMemoryModelAvailabilityVisibilityChains, WarnIfNotEqual);
     }
 }
 
@@ -4296,7 +4303,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitial
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderZeroInitializeWorkgroupMemory, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderZeroInitializeWorkgroupMemory, WarnIfNotEqual);
     }
 }
 
@@ -4309,11 +4316,11 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, accelerationStructure, WarnIfGreater);
-        GET_VALUE_WARN(member, accelerationStructureCaptureReplay, WarnIfGreater);
-        GET_VALUE_WARN(member, accelerationStructureIndirectBuild, WarnIfGreater);
-        GET_VALUE_WARN(member, accelerationStructureHostCommands, WarnIfGreater);
-        GET_VALUE_WARN(member, descriptorBindingAccelerationStructureUpdateAfterBind, WarnIfGreater);
+        GET_VALUE_WARN(member, accelerationStructure, WarnIfNotEqual);
+        GET_VALUE_WARN(member, accelerationStructureCaptureReplay, WarnIfNotEqual);
+        GET_VALUE_WARN(member, accelerationStructureIndirectBuild, WarnIfNotEqual);
+        GET_VALUE_WARN(member, accelerationStructureHostCommands, WarnIfNotEqual);
+        GET_VALUE_WARN(member, descriptorBindingAccelerationStructureUpdateAfterBind, WarnIfNotEqual);
     }
 }
 
@@ -4347,8 +4354,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, performanceCounterQueryPools, WarnIfGreater);
-        GET_VALUE_WARN(member, performanceCounterMultipleQueryPools, WarnIfGreater);
+        GET_VALUE_WARN(member, performanceCounterQueryPools, WarnIfNotEqual);
+        GET_VALUE_WARN(member, performanceCounterMultipleQueryPools, WarnIfNotEqual);
     }
 }
 
@@ -4362,7 +4369,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
     }
 
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE_WARN(prop, allowCommandBufferQueryCopies, WarnIfGreater);
+        GET_VALUE_WARN(prop, allowCommandBufferQueryCopies, WarnIfNotEqual);
     }
 }
 
@@ -4375,7 +4382,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExe
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, pipelineExecutableInfo, WarnIfGreater);
+        GET_VALUE_WARN(member, pipelineExecutableInfo, WarnIfNotEqual);
     }
 }
 
@@ -4388,7 +4395,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFe
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, presentId, WarnIfGreater);
+        GET_VALUE_WARN(member, presentId, WarnIfNotEqual);
     }
 }
 
@@ -4401,7 +4408,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWait
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, presentWait, WarnIfGreater);
+        GET_VALUE_WARN(member, presentWait, WarnIfNotEqual);
     }
 }
 
@@ -4428,7 +4435,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFea
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, rayQuery, WarnIfGreater);
+        GET_VALUE_WARN(member, rayQuery, WarnIfNotEqual);
     }
 }
 
@@ -4441,11 +4448,11 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, rayTracingPipeline, WarnIfGreater);
-        GET_VALUE_WARN(member, rayTracingPipelineShaderGroupHandleCaptureReplay, WarnIfGreater);
-        GET_VALUE_WARN(member, rayTracingPipelineShaderGroupHandleCaptureReplayMixed, WarnIfGreater);
-        GET_VALUE_WARN(member, rayTracingPipelineTraceRaysIndirect, WarnIfGreater);
-        GET_VALUE_WARN(member, rayTraversalPrimitiveCulling, WarnIfGreater);
+        GET_VALUE_WARN(member, rayTracingPipeline, WarnIfNotEqual);
+        GET_VALUE_WARN(member, rayTracingPipelineShaderGroupHandleCaptureReplay, WarnIfNotEqual);
+        GET_VALUE_WARN(member, rayTracingPipelineShaderGroupHandleCaptureReplayMixed, WarnIfNotEqual);
+        GET_VALUE_WARN(member, rayTracingPipelineTraceRaysIndirect, WarnIfNotEqual);
+        GET_VALUE_WARN(member, rayTraversalPrimitiveCulling, WarnIfNotEqual);
     }
 }
 
@@ -4479,8 +4486,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClock
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderSubgroupClock, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderDeviceClock, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSubgroupClock, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderDeviceClock, WarnIfNotEqual);
     }
 }
 
@@ -4493,7 +4500,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderIntegerDotProduct, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderIntegerDotProduct, WarnIfNotEqual);
     }
 }
 
@@ -4507,36 +4514,36 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
     }
 
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE_WARN(prop, integerDotProduct8BitUnsignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct8BitSignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct8BitMixedSignednessAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct4x8BitPackedUnsignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct4x8BitPackedSignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct4x8BitPackedMixedSignednessAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct16BitUnsignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct16BitSignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct16BitMixedSignednessAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct32BitUnsignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct32BitSignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct32BitMixedSignednessAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct64BitUnsignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct64BitSignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProduct64BitMixedSignednessAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating8BitUnsignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating8BitSignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating16BitUnsignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating16BitSignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating32BitUnsignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating32BitSignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitUnsignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitSignedAccelerated, WarnIfGreater);
-        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct8BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct8BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct8BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct4x8BitPackedUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct4x8BitPackedSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct4x8BitPackedMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct16BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct16BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct16BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct32BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct32BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct32BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct64BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct64BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct64BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating8BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating8BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating16BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating16BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating32BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating32BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated, WarnIfNotEqual);
     }
 }
 
@@ -4549,7 +4556,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgr
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderSubgroupUniformControlFlow, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSubgroupUniformControlFlow, WarnIfNotEqual);
     }
 }
 
@@ -4562,7 +4569,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTermi
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderTerminateInvocation, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderTerminateInvocation, WarnIfNotEqual);
     }
 }
 
@@ -4575,7 +4582,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchroniza
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, synchronization2, WarnIfGreater);
+        GET_VALUE_WARN(member, synchronization2, WarnIfNotEqual);
     }
 }
 
@@ -4588,10 +4595,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMe
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, workgroupMemoryExplicitLayout, WarnIfGreater);
-        GET_VALUE_WARN(member, workgroupMemoryExplicitLayoutScalarBlockLayout, WarnIfGreater);
-        GET_VALUE_WARN(member, workgroupMemoryExplicitLayout8BitAccess, WarnIfGreater);
-        GET_VALUE_WARN(member, workgroupMemoryExplicitLayout16BitAccess, WarnIfGreater);
+        GET_VALUE_WARN(member, workgroupMemoryExplicitLayout, WarnIfNotEqual);
+        GET_VALUE_WARN(member, workgroupMemoryExplicitLayoutScalarBlockLayout, WarnIfNotEqual);
+        GET_VALUE_WARN(member, workgroupMemoryExplicitLayout8BitAccess, WarnIfNotEqual);
+        GET_VALUE_WARN(member, workgroupMemoryExplicitLayout16BitAccess, WarnIfNotEqual);
     }
 }
 
@@ -4604,8 +4611,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444Formats
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, formatA4R4G4B4, WarnIfGreater);
-        GET_VALUE_WARN(member, formatA4B4G4R4, WarnIfGreater);
+        GET_VALUE_WARN(member, formatA4R4G4B4, WarnIfNotEqual);
+        GET_VALUE_WARN(member, formatA4B4G4R4, WarnIfNotEqual);
     }
 }
 
@@ -4618,7 +4625,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeF
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, decodeModeSharedExponent, WarnIfGreater);
+        GET_VALUE_WARN(member, decodeModeSharedExponent, WarnIfNotEqual);
     }
 }
 
@@ -4631,7 +4638,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, advancedBlendCoherentOperations, WarnIfGreater);
+        GET_VALUE_WARN(member, advancedBlendCoherentOperations, WarnIfNotEqual);
     }
 }
 
@@ -4646,11 +4653,11 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
 
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, advancedBlendMaxColorAttachments, WarnIfGreater);
-        GET_VALUE_WARN(prop, advancedBlendIndependentBlend, WarnIfGreater);
-        GET_VALUE_WARN(prop, advancedBlendNonPremultipliedSrcColor, WarnIfGreater);
-        GET_VALUE_WARN(prop, advancedBlendNonPremultipliedDstColor, WarnIfGreater);
-        GET_VALUE_WARN(prop, advancedBlendCorrelatedOverlap, WarnIfGreater);
-        GET_VALUE_WARN(prop, advancedBlendAllOperations, WarnIfGreater);
+        GET_VALUE_WARN(prop, advancedBlendIndependentBlend, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, advancedBlendNonPremultipliedSrcColor, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, advancedBlendNonPremultipliedDstColor, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, advancedBlendCorrelatedOverlap, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, advancedBlendAllOperations, WarnIfNotEqual);
     }
 }
 
@@ -4663,8 +4670,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColor
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, borderColorSwizzle, WarnIfGreater);
-        GET_VALUE_WARN(member, borderColorSwizzleFromImage, WarnIfGreater);
+        GET_VALUE_WARN(member, borderColorSwizzle, WarnIfNotEqual);
+        GET_VALUE_WARN(member, borderColorSwizzleFromImage, WarnIfNotEqual);
     }
 }
 
@@ -4677,7 +4684,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteE
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, colorWriteEnable, WarnIfGreater);
+        GET_VALUE_WARN(member, colorWriteEnable, WarnIfNotEqual);
     }
 }
 
@@ -4690,8 +4697,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditional
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, conditionalRendering, WarnIfGreater);
-        GET_VALUE_WARN(member, inheritedConditionalRendering, WarnIfGreater);
+        GET_VALUE_WARN(member, conditionalRendering, WarnIfNotEqual);
+        GET_VALUE_WARN(member, inheritedConditionalRendering, WarnIfNotEqual);
     }
 }
 
@@ -4708,12 +4715,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativ
         GET_VALUE_WARN(prop, primitiveOverestimationSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxExtraPrimitiveOverestimationSize, WarnIfGreater);
         GET_VALUE_WARN(prop, extraPrimitiveOverestimationSizeGranularity, WarnIfGreater);
-        GET_VALUE_WARN(prop, primitiveUnderestimation, WarnIfGreater);
-        GET_VALUE_WARN(prop, conservativePointAndLineRasterization, WarnIfGreater);
-        GET_VALUE_WARN(prop, degenerateTrianglesRasterized, WarnIfGreater);
-        GET_VALUE_WARN(prop, degenerateLinesRasterized, WarnIfGreater);
-        GET_VALUE_WARN(prop, fullyCoveredFragmentShaderInputVariable, WarnIfGreater);
-        GET_VALUE_WARN(prop, conservativeRasterizationPostDepthCoverage, WarnIfGreater);
+        GET_VALUE_WARN(prop, primitiveUnderestimation, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, conservativePointAndLineRasterization, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, degenerateTrianglesRasterized, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, degenerateLinesRasterized, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, fullyCoveredFragmentShaderInputVariable, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, conservativeRasterizationPostDepthCoverage, WarnIfNotEqual);
     }
 }
 
@@ -4726,8 +4733,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorde
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, customBorderColors, WarnIfGreater);
-        GET_VALUE_WARN(member, customBorderColorWithoutFormat, WarnIfGreater);
+        GET_VALUE_WARN(member, customBorderColors, WarnIfNotEqual);
+        GET_VALUE_WARN(member, customBorderColorWithoutFormat, WarnIfNotEqual);
     }
 }
 
@@ -4754,7 +4761,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEn
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, depthClipEnable, WarnIfGreater);
+        GET_VALUE_WARN(member, depthClipEnable, WarnIfNotEqual);
     }
 }
 
@@ -4767,7 +4774,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemor
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, deviceMemoryReport, WarnIfGreater);
+        GET_VALUE_WARN(member, deviceMemoryReport, WarnIfNotEqual);
     }
 }
 
@@ -4794,7 +4801,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, extendedDynamicState, WarnIfGreater);
+        GET_VALUE_WARN(member, extendedDynamicState, WarnIfNotEqual);
     }
 }
 
@@ -4807,9 +4814,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, extendedDynamicState2, WarnIfGreater);
-        GET_VALUE_WARN(member, extendedDynamicState2LogicOp, WarnIfGreater);
-        GET_VALUE_WARN(member, extendedDynamicState2PatchControlPoints, WarnIfGreater);
+        GET_VALUE_WARN(member, extendedDynamicState2, WarnIfNotEqual);
+        GET_VALUE_WARN(member, extendedDynamicState2LogicOp, WarnIfNotEqual);
+        GET_VALUE_WARN(member, extendedDynamicState2PatchControlPoints, WarnIfNotEqual);
     }
 }
 
@@ -4836,9 +4843,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, fragmentDensityMap, WarnIfGreater);
-        GET_VALUE_WARN(member, fragmentDensityMapDynamic, WarnIfGreater);
-        GET_VALUE_WARN(member, fragmentDensityMapNonSubsampledImages, WarnIfGreater);
+        GET_VALUE_WARN(member, fragmentDensityMap, WarnIfNotEqual);
+        GET_VALUE_WARN(member, fragmentDensityMapDynamic, WarnIfNotEqual);
+        GET_VALUE_WARN(member, fragmentDensityMapNonSubsampledImages, WarnIfNotEqual);
     }
 }
 
@@ -4854,7 +4861,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, minFragmentDensityTexelSize, WarnIfLesser);
         GET_VALUE_WARN(prop, maxFragmentDensityTexelSize, WarnIfGreater);
-        GET_VALUE_WARN(prop, fragmentDensityInvocations, WarnIfGreater);
+        GET_VALUE_WARN(prop, fragmentDensityInvocations, WarnIfNotEqual);
     }
 }
 
@@ -4867,9 +4874,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, fragmentShaderSampleInterlock, WarnIfGreater);
-        GET_VALUE_WARN(member, fragmentShaderPixelInterlock, WarnIfGreater);
-        GET_VALUE_WARN(member, fragmentShaderShadingRateInterlock, WarnIfGreater);
+        GET_VALUE_WARN(member, fragmentShaderSampleInterlock, WarnIfNotEqual);
+        GET_VALUE_WARN(member, fragmentShaderPixelInterlock, WarnIfNotEqual);
+        GET_VALUE_WARN(member, fragmentShaderShadingRateInterlock, WarnIfNotEqual);
     }
 }
 
@@ -4882,7 +4889,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPrior
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, globalPriorityQuery, WarnIfGreater);
+        GET_VALUE_WARN(member, globalPriorityQuery, WarnIfNotEqual);
     }
 }
 
@@ -4895,7 +4902,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobust
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, robustImageAccess, WarnIfGreater);
+        GET_VALUE_WARN(member, robustImageAccess, WarnIfNotEqual);
     }
 }
 
@@ -4908,7 +4915,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUi
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, indexTypeUint8, WarnIfGreater);
+        GET_VALUE_WARN(member, indexTypeUint8, WarnIfNotEqual);
     }
 }
 
@@ -4921,8 +4928,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, inlineUniformBlock, WarnIfGreater);
-        GET_VALUE_WARN(member, descriptorBindingInlineUniformBlockUpdateAfterBind, WarnIfGreater);
+        GET_VALUE_WARN(member, inlineUniformBlock, WarnIfNotEqual);
+        GET_VALUE_WARN(member, descriptorBindingInlineUniformBlockUpdateAfterBind, WarnIfNotEqual);
     }
 }
 
@@ -4953,12 +4960,12 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, rectangularLines, WarnIfGreater);
-        GET_VALUE_WARN(member, bresenhamLines, WarnIfGreater);
-        GET_VALUE_WARN(member, smoothLines, WarnIfGreater);
-        GET_VALUE_WARN(member, stippledRectangularLines, WarnIfGreater);
-        GET_VALUE_WARN(member, stippledBresenhamLines, WarnIfGreater);
-        GET_VALUE_WARN(member, stippledSmoothLines, WarnIfGreater);
+        GET_VALUE_WARN(member, rectangularLines, WarnIfNotEqual);
+        GET_VALUE_WARN(member, bresenhamLines, WarnIfNotEqual);
+        GET_VALUE_WARN(member, smoothLines, WarnIfNotEqual);
+        GET_VALUE_WARN(member, stippledRectangularLines, WarnIfNotEqual);
+        GET_VALUE_WARN(member, stippledBresenhamLines, WarnIfNotEqual);
+        GET_VALUE_WARN(member, stippledSmoothLines, WarnIfNotEqual);
     }
 }
 
@@ -4985,7 +4992,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPrior
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, memoryPriority, WarnIfGreater);
+        GET_VALUE_WARN(member, memoryPriority, WarnIfNotEqual);
     }
 }
 
@@ -4998,7 +5005,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFe
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, multiDraw, WarnIfGreater);
+        GET_VALUE_WARN(member, multiDraw, WarnIfNotEqual);
     }
 }
 
@@ -5025,7 +5032,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDev
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, pageableDeviceLocalMemory, WarnIfGreater);
+        GET_VALUE_WARN(member, pageableDeviceLocalMemory, WarnIfNotEqual);
     }
 }
 
@@ -5038,7 +5045,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCre
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, pipelineCreationCacheControl, WarnIfGreater);
+        GET_VALUE_WARN(member, pipelineCreationCacheControl, WarnIfNotEqual);
     }
 }
 
@@ -5051,8 +5058,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTo
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, primitiveTopologyListRestart, WarnIfGreater);
-        GET_VALUE_WARN(member, primitiveTopologyPatchListRestart, WarnIfGreater);
+        GET_VALUE_WARN(member, primitiveTopologyListRestart, WarnIfNotEqual);
+        GET_VALUE_WARN(member, primitiveTopologyPatchListRestart, WarnIfNotEqual);
     }
 }
 
@@ -5065,7 +5072,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateData
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, privateData, WarnIfGreater);
+        GET_VALUE_WARN(member, privateData, WarnIfNotEqual);
     }
 }
 
@@ -5078,8 +5085,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, provokingVertexLast, WarnIfGreater);
-        GET_VALUE_WARN(member, transformFeedbackPreservesProvokingVertex, WarnIfGreater);
+        GET_VALUE_WARN(member, provokingVertexLast, WarnIfNotEqual);
+        GET_VALUE_WARN(member, transformFeedbackPreservesProvokingVertex, WarnIfNotEqual);
     }
 }
 
@@ -5093,8 +5100,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
     }
 
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE_WARN(prop, provokingVertexModePerPipeline, WarnIfGreater);
-        GET_VALUE_WARN(prop, transformFeedbackPreservesTriangleFanProvokingVertex, WarnIfGreater);
+        GET_VALUE_WARN(prop, provokingVertexModePerPipeline, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, transformFeedbackPreservesTriangleFanProvokingVertex, WarnIfNotEqual);
     }
 }
 
@@ -5107,7 +5114,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6For
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, formatRgba10x6WithoutYCbCrSampler, WarnIfGreater);
+        GET_VALUE_WARN(member, formatRgba10x6WithoutYCbCrSampler, WarnIfNotEqual);
     }
 }
 
@@ -5120,9 +5127,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, robustBufferAccess2, WarnIfGreater);
-        GET_VALUE_WARN(member, robustImageAccess2, WarnIfGreater);
-        GET_VALUE_WARN(member, nullDescriptor, WarnIfGreater);
+        GET_VALUE_WARN(member, robustBufferAccess2, WarnIfNotEqual);
+        GET_VALUE_WARN(member, robustImageAccess2, WarnIfNotEqual);
+        GET_VALUE_WARN(member, nullDescriptor, WarnIfNotEqual);
     }
 }
 
@@ -5155,7 +5162,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocat
         GET_VALUE_WARN(prop, maxSampleLocationGridSize, WarnIfGreater);
         GET_ARRAY(sampleLocationCoordinateRange);
         GET_VALUE_WARN(prop, sampleLocationSubPixelBits, WarnIfGreater);
-        GET_VALUE_WARN(prop, variableSampleLocations, WarnIfGreater);
+        GET_VALUE_WARN(prop, variableSampleLocations, WarnIfNotEqual);
     }
 }
 
@@ -5168,18 +5175,18 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderBufferFloat32Atomics, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderBufferFloat32AtomicAdd, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderBufferFloat64Atomics, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderBufferFloat64AtomicAdd, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderSharedFloat32Atomics, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderSharedFloat32AtomicAdd, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderSharedFloat64Atomics, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderSharedFloat64AtomicAdd, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderImageFloat32Atomics, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderImageFloat32AtomicAdd, WarnIfGreater);
-        GET_VALUE_WARN(member, sparseImageFloat32Atomics, WarnIfGreater);
-        GET_VALUE_WARN(member, sparseImageFloat32AtomicAdd, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderBufferFloat32Atomics, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderBufferFloat32AtomicAdd, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderBufferFloat64Atomics, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderBufferFloat64AtomicAdd, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderSharedFloat32Atomics, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderSharedFloat32AtomicAdd, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderSharedFloat64Atomics, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderSharedFloat64AtomicAdd, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderImageFloat32Atomics, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderImageFloat32AtomicAdd, WarnIfNotEqual);
+        GET_VALUE_WARN(member, sparseImageFloat32Atomics, WarnIfNotEqual);
+        GET_VALUE_WARN(member, sparseImageFloat32AtomicAdd, WarnIfNotEqual);
     }
 }
 
@@ -5192,18 +5199,18 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderBufferFloat16Atomics, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderBufferFloat16AtomicAdd, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderBufferFloat16AtomicMinMax, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderBufferFloat32AtomicMinMax, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderBufferFloat64AtomicMinMax, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderSharedFloat16Atomics, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderSharedFloat16AtomicAdd, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderSharedFloat16AtomicMinMax, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderSharedFloat32AtomicMinMax, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderSharedFloat64AtomicMinMax, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderImageFloat32AtomicMinMax, WarnIfGreater);
-        GET_VALUE_WARN(member, sparseImageFloat32AtomicMinMax, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderBufferFloat16Atomics, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderBufferFloat16AtomicAdd, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderBufferFloat16AtomicMinMax, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderBufferFloat32AtomicMinMax, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderBufferFloat64AtomicMinMax, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderSharedFloat16Atomics, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderSharedFloat16AtomicAdd, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderSharedFloat16AtomicMinMax, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderSharedFloat32AtomicMinMax, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderSharedFloat64AtomicMinMax, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shaderImageFloat32AtomicMinMax, WarnIfNotEqual);
+        GET_VALUE_WARN(member, sparseImageFloat32AtomicMinMax, WarnIfNotEqual);
     }
 }
 
@@ -5216,7 +5223,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemot
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderDemoteToHelperInvocation, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderDemoteToHelperInvocation, WarnIfNotEqual);
     }
 }
 
@@ -5229,8 +5236,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderImageInt64Atomics, WarnIfGreater);
-        GET_VALUE_WARN(member, sparseImageInt64Atomics, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderImageInt64Atomics, WarnIfNotEqual);
+        GET_VALUE_WARN(member, sparseImageInt64Atomics, WarnIfNotEqual);
     }
 }
 
@@ -5243,8 +5250,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, subgroupSizeControl, WarnIfGreater);
-        GET_VALUE_WARN(member, computeFullSubgroups, WarnIfGreater);
+        GET_VALUE_WARN(member, subgroupSizeControl, WarnIfNotEqual);
+        GET_VALUE_WARN(member, computeFullSubgroups, WarnIfNotEqual);
     }
 }
 
@@ -5274,7 +5281,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, texelBufferAlignment, WarnIfGreater);
+        GET_VALUE_WARN(member, texelBufferAlignment, WarnIfNotEqual);
     }
 }
 
@@ -5289,9 +5296,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
 
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, storageTexelBufferOffsetAlignmentBytes, WarnIfGreater);
-        GET_VALUE_WARN(prop, storageTexelBufferOffsetSingleTexelAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, storageTexelBufferOffsetSingleTexelAlignment, WarnIfNotEqual);
         GET_VALUE_WARN(prop, uniformTexelBufferOffsetAlignmentBytes, WarnIfGreater);
-        GET_VALUE_WARN(prop, uniformTexelBufferOffsetSingleTexelAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, uniformTexelBufferOffsetSingleTexelAlignment, WarnIfNotEqual);
     }
 }
 
@@ -5304,7 +5311,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureComp
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, textureCompressionASTC_HDR, WarnIfGreater);
+        GET_VALUE_WARN(member, textureCompressionASTC_HDR, WarnIfNotEqual);
     }
 }
 
@@ -5317,8 +5324,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, transformFeedback, WarnIfGreater);
-        GET_VALUE_WARN(member, geometryStreams, WarnIfGreater);
+        GET_VALUE_WARN(member, transformFeedback, WarnIfNotEqual);
+        GET_VALUE_WARN(member, geometryStreams, WarnIfNotEqual);
     }
 }
 
@@ -5338,10 +5345,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
         GET_VALUE_WARN(prop, maxTransformFeedbackStreamDataSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxTransformFeedbackBufferDataSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxTransformFeedbackBufferDataStride, WarnIfGreater);
-        GET_VALUE_WARN(prop, transformFeedbackQueries, WarnIfGreater);
-        GET_VALUE_WARN(prop, transformFeedbackStreamsLinesTriangles, WarnIfGreater);
-        GET_VALUE_WARN(prop, transformFeedbackRasterizationStreamSelect, WarnIfGreater);
-        GET_VALUE_WARN(prop, transformFeedbackDraw, WarnIfGreater);
+        GET_VALUE_WARN(prop, transformFeedbackQueries, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, transformFeedbackStreamsLinesTriangles, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, transformFeedbackRasterizationStreamSelect, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, transformFeedbackDraw, WarnIfNotEqual);
     }
 }
 
@@ -5354,8 +5361,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, vertexAttributeInstanceRateDivisor, WarnIfGreater);
-        GET_VALUE_WARN(member, vertexAttributeInstanceRateZeroDivisor, WarnIfGreater);
+        GET_VALUE_WARN(member, vertexAttributeInstanceRateDivisor, WarnIfNotEqual);
+        GET_VALUE_WARN(member, vertexAttributeInstanceRateZeroDivisor, WarnIfNotEqual);
     }
 }
 
@@ -5382,7 +5389,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInput
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, vertexInputDynamicState, WarnIfGreater);
+        GET_VALUE_WARN(member, vertexInputDynamicState, WarnIfNotEqual);
     }
 }
 
@@ -5395,7 +5402,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, ycbcr2plane444Formats, WarnIfGreater);
+        GET_VALUE_WARN(member, ycbcr2plane444Formats, WarnIfNotEqual);
     }
 }
 
@@ -5408,7 +5415,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageA
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, ycbcrImageArrays, WarnIfGreater);
+        GET_VALUE_WARN(member, ycbcrImageArrays, WarnIfNotEqual);
     }
 }
 
@@ -5421,9 +5428,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, pipelineFragmentShadingRate, WarnIfGreater);
-        GET_VALUE_WARN(member, primitiveFragmentShadingRate, WarnIfGreater);
-        GET_VALUE_WARN(member, attachmentFragmentShadingRate, WarnIfGreater);
+        GET_VALUE_WARN(member, pipelineFragmentShadingRate, WarnIfNotEqual);
+        GET_VALUE_WARN(member, primitiveFragmentShadingRate, WarnIfNotEqual);
+        GET_VALUE_WARN(member, attachmentFragmentShadingRate, WarnIfNotEqual);
     }
 }
 
@@ -5440,20 +5447,20 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
         GET_VALUE_WARN(prop, minFragmentShadingRateAttachmentTexelSize, WarnIfLesser);
         GET_VALUE_WARN(prop, maxFragmentShadingRateAttachmentTexelSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxFragmentShadingRateAttachmentTexelSizeAspectRatio, WarnIfGreater);
-        GET_VALUE_WARN(prop, primitiveFragmentShadingRateWithMultipleViewports, WarnIfGreater);
-        GET_VALUE_WARN(prop, layeredShadingRateAttachments, WarnIfGreater);
-        GET_VALUE_WARN(prop, fragmentShadingRateNonTrivialCombinerOps, WarnIfGreater);
+        GET_VALUE_WARN(prop, primitiveFragmentShadingRateWithMultipleViewports, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, layeredShadingRateAttachments, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, fragmentShadingRateNonTrivialCombinerOps, WarnIfNotEqual);
         GET_VALUE_WARN(prop, maxFragmentSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxFragmentSizeAspectRatio, WarnIfGreater);
         GET_VALUE_WARN(prop, maxFragmentShadingRateCoverageSamples, WarnIfGreater);
         GET_VALUE(prop, maxFragmentShadingRateRasterizationSamples);
-        GET_VALUE_WARN(prop, fragmentShadingRateWithShaderDepthStencilWrites, WarnIfGreater);
-        GET_VALUE_WARN(prop, fragmentShadingRateWithSampleMask, WarnIfGreater);
+        GET_VALUE_WARN(prop, fragmentShadingRateWithShaderDepthStencilWrites, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, fragmentShadingRateWithSampleMask, WarnIfNotEqual);
         GET_VALUE_WARN(prop, fragmentShadingRateWithShaderSampleMask, WarnIfGreater);
-        GET_VALUE_WARN(prop, fragmentShadingRateWithConservativeRasterization, WarnIfGreater);
-        GET_VALUE_WARN(prop, fragmentShadingRateWithFragmentShaderInterlock, WarnIfGreater);
-        GET_VALUE_WARN(prop, fragmentShadingRateWithCustomSampleLocations, WarnIfGreater);
-        GET_VALUE_WARN(prop, fragmentShadingRateStrictMultiplyCombiner, WarnIfGreater);
+        GET_VALUE_WARN(prop, fragmentShadingRateWithConservativeRasterization, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, fragmentShadingRateWithFragmentShaderInterlock, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, fragmentShadingRateWithCustomSampleLocations, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, fragmentShadingRateStrictMultiplyCombiner, WarnIfNotEqual);
     }
 }
 
@@ -5466,7 +5473,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMem
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, deviceCoherentMemory, WarnIfGreater);
+        GET_VALUE_WARN(member, deviceCoherentMemory, WarnIfNotEqual);
     }
 }
 
@@ -5521,7 +5528,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationM
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, invocationMask, WarnIfGreater);
+        GET_VALUE_WARN(member, invocationMask, WarnIfNotEqual);
     }
 }
 
@@ -5534,7 +5541,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, subpassShading, WarnIfGreater);
+        GET_VALUE_WARN(member, subpassShading, WarnIfNotEqual);
     }
 }
 
@@ -5548,7 +5555,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
     }
 
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE_WARN(prop, maxSubpassShadingWorkgroupSizeAspectRatio, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxSubpassShadingWorkgroupSizeAspectRatio, WarnIfNotEqual);
     }
 }
 
@@ -5561,7 +5568,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderIntegerFunctions2, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderIntegerFunctions2, WarnIfNotEqual);
     }
 }
 
@@ -5574,8 +5581,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShad
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, computeDerivativeGroupQuads, WarnIfGreater);
-        GET_VALUE_WARN(member, computeDerivativeGroupLinear, WarnIfGreater);
+        GET_VALUE_WARN(member, computeDerivativeGroupQuads, WarnIfNotEqual);
+        GET_VALUE_WARN(member, computeDerivativeGroupLinear, WarnIfNotEqual);
     }
 }
 
@@ -5588,8 +5595,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, cooperativeMatrix, WarnIfGreater);
-        GET_VALUE_WARN(member, cooperativeMatrixRobustBufferAccess, WarnIfGreater);
+        GET_VALUE_WARN(member, cooperativeMatrix, WarnIfNotEqual);
+        GET_VALUE_WARN(member, cooperativeMatrixRobustBufferAccess, WarnIfNotEqual);
     }
 }
 
@@ -5616,7 +5623,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampl
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, cornerSampledImage, WarnIfGreater);
+        GET_VALUE_WARN(member, cornerSampledImage, WarnIfNotEqual);
     }
 }
 
@@ -5629,7 +5636,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageRed
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, coverageReductionMode, WarnIfGreater);
+        GET_VALUE_WARN(member, coverageReductionMode, WarnIfNotEqual);
     }
 }
 
@@ -5642,7 +5649,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAl
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, dedicatedAllocationImageAliasing, WarnIfGreater);
+        GET_VALUE_WARN(member, dedicatedAllocationImageAliasing, WarnIfNotEqual);
     }
 }
 
@@ -5655,7 +5662,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnostics
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, diagnosticsConfig, WarnIfGreater);
+        GET_VALUE_WARN(member, diagnosticsConfig, WarnIfNotEqual);
     }
 }
 
@@ -5668,7 +5675,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, deviceGeneratedCommands, WarnIfGreater);
+        GET_VALUE_WARN(member, deviceGeneratedCommands, WarnIfNotEqual);
     }
 }
 
@@ -5703,7 +5710,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, externalMemoryRDMA, WarnIfGreater);
+        GET_VALUE_WARN(member, externalMemoryRDMA, WarnIfNotEqual);
     }
 }
 
@@ -5716,7 +5723,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, fragmentShaderBarycentric, WarnIfGreater);
+        GET_VALUE_WARN(member, fragmentShaderBarycentric, WarnIfNotEqual);
     }
 }
 
@@ -5729,9 +5736,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, fragmentShadingRateEnums, WarnIfGreater);
-        GET_VALUE_WARN(member, supersampleFragmentShadingRates, WarnIfGreater);
-        GET_VALUE_WARN(member, noInvocationFragmentShadingRates, WarnIfGreater);
+        GET_VALUE_WARN(member, fragmentShadingRateEnums, WarnIfNotEqual);
+        GET_VALUE_WARN(member, supersampleFragmentShadingRates, WarnIfNotEqual);
+        GET_VALUE_WARN(member, noInvocationFragmentShadingRates, WarnIfNotEqual);
     }
 }
 
@@ -5758,7 +5765,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedVi
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, inheritedViewportScissor2D, WarnIfGreater);
+        GET_VALUE_WARN(member, inheritedViewportScissor2D, WarnIfNotEqual);
     }
 }
 
@@ -5771,8 +5778,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderF
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, taskShader, WarnIfGreater);
-        GET_VALUE_WARN(member, meshShader, WarnIfGreater);
+        GET_VALUE_WARN(member, taskShader, WarnIfNotEqual);
+        GET_VALUE_WARN(member, meshShader, WarnIfNotEqual);
     }
 }
 
@@ -5832,8 +5839,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingM
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, rayTracingMotionBlur, WarnIfGreater);
-        GET_VALUE_WARN(member, rayTracingMotionBlurPipelineTraceRaysIndirect, WarnIfGreater);
+        GET_VALUE_WARN(member, rayTracingMotionBlur, WarnIfNotEqual);
+        GET_VALUE_WARN(member, rayTracingMotionBlurPipelineTraceRaysIndirect, WarnIfNotEqual);
     }
 }
 
@@ -5846,7 +5853,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentat
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, representativeFragmentTest, WarnIfGreater);
+        GET_VALUE_WARN(member, representativeFragmentTest, WarnIfNotEqual);
     }
 }
 
@@ -5859,7 +5866,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveSc
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, exclusiveScissor, WarnIfGreater);
+        GET_VALUE_WARN(member, exclusiveScissor, WarnIfNotEqual);
     }
 }
 
@@ -5872,7 +5879,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, imageFootprint, WarnIfGreater);
+        GET_VALUE_WARN(member, imageFootprint, WarnIfNotEqual);
     }
 }
 
@@ -5885,7 +5892,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBui
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderSMBuiltins, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderSMBuiltins, WarnIfNotEqual);
     }
 }
 
@@ -5913,8 +5920,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shadingRateImage, WarnIfGreater);
-        GET_VALUE_WARN(member, shadingRateCoarseSampleOrder, WarnIfGreater);
+        GET_VALUE_WARN(member, shadingRateImage, WarnIfNotEqual);
+        GET_VALUE_WARN(member, shadingRateCoarseSampleOrder, WarnIfNotEqual);
     }
 }
 
@@ -5943,7 +5950,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDesc
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, mutableDescriptorType, WarnIfGreater);
+        GET_VALUE_WARN(member, mutableDescriptorType, WarnIfNotEqual);
     }
 }
 
@@ -5956,7 +5963,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRend
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, dynamicRendering, WarnIfGreater);
+        GET_VALUE_WARN(member, dynamicRendering, WarnIfNotEqual);
     }
 }
 
@@ -5969,7 +5976,7 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
             "not supported by the device.\n");
     }
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, fragmentDensityMapDeferred, WarnIfGreater);
+        GET_VALUE_WARN(member, fragmentDensityMapDeferred, WarnIfNotEqual);
     }
 }
 
@@ -5982,8 +5989,8 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
             "not supported by the device.\n");
     }
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE(prop, subsampledLoads);
-        GET_VALUE(prop, subsampledCoarseReconstructionEarlyAccess);
+        GET_VALUE_WARN(prop, subsampledLoads, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, subsampledCoarseReconstructionEarlyAccess, WarnIfNotEqual);
         GET_VALUE(prop, maxSubsampledArrayLayers);
         GET_VALUE(prop, maxDescriptorSetSubsampledSamplers);
     }
