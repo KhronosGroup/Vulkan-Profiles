@@ -278,14 +278,14 @@ These and other sample files can be found in the [${VulkanTools}/layersvt/device
 
 ### `VK_KHR_portability_subset` Emulation
 
-The DevSim layer provides the ability to emulate the `VK_KHR_portability_subset` extension on devices that do not implement this extension.
+The Profiles layer provides the ability to emulate the `VK_KHR_portability_subset` extension on devices that do not implement this extension.
 This feature allows users to test their application with limitations found on non-conformant Vulkan implementations.
 To turn on this feature, set the `VK_KHRONOS_PROFILES_EMULATE_PORTABILITY_SUBSET_EXTENSION` environment variable (or the corresponding vk_layer_settings.txt option `khronos_profiles.emulate_portability`) to a positive integer.
-DevSim config files that use this feature should validate to the portability specific schema https://schema.khronos.org/vulkan/devsim_VK_KHR_portability_subset-provisional-1.json#.
+Profiles config files that use this feature should validate to the portability specific schema https://schema.khronos.org/vulkan/devsim_VK_KHR_portability_subset-provisional-1.json#.
 
-### DevSim Layer Options
+### Profiles Layer Options
 
-#### Devsim JSON configuration file
+#### Profiles JSON configuration file
 - Environment Variable: `VK_KHRONOS_PROFILES_FILENAME`
 - `vk_layer_settings.txt` Option: `khronos_profiles.filename`
 - Android Option: `debug.vulkan.khronos_profiles.filename`
@@ -363,10 +363,10 @@ Enables modification of the surface present mode list from the JSON config file.
 #### Array Combination Mode Options Descriptions
 
 * check_support: Checks if the device supports the specified profile.
-* from_profile: Fully replaces the device's properties list with the properties list provided by the profiles configuration file.
-* from_device: Turns off modification of the device's properties list. Uses the device's real properties list.
+* from_profile: Fully replaces the device's capabilities with the capabilities provided by the profiles configuration file.
+* from_device: Turns off modification of the device's capabilities. Uses the device's real capabilities.
 
-### Example using the DevSim layer using Linux environment variables
+### Example using the Profiles layer using Linux environment variables
 ```bash
 # Configure bash to find the Vulkan SDK.
 source $VKSDK/setup-env.sh
@@ -398,7 +398,7 @@ That device data can be downloaded in JSON format, compatible with the Profiles 
 
 A JSON index of the available device records can be queried with https://vulkan.gpuinfo.org/api/v2/devsim/getreportlist.php
 
-That index includes URLs to download the specific device records in DevSim-compatible format, for example https://vulkan.gpuinfo.org/api/v2/devsim/getreport.php?id=1456
+That index includes URLs to download the specific device records in Profiles-compatible format, for example https://vulkan.gpuinfo.org/api/v2/devsim/getreport.php?id=1456
 
 As mentioned above, attempting to use a configuration file that does not fit within the capabilities of the underlying device may produce undefined results.
 Downloaded device records should be reviewed to determine that their capabilities can be simulated by the underlying device.

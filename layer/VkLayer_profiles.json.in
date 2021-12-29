@@ -32,7 +32,7 @@
                         },
                         {
                             "key": "modify_extension_list",
-                            "value": "whitelist"
+                            "value": "from_profile"
                         },
                         {
                             "key": "filename",
@@ -52,7 +52,7 @@
                         },
                         {
                             "key": "modify_extension_list",
-                            "value": "whitelist"
+                            "value": "from_profile"
                         },
                         {
                             "key": "filename",
@@ -116,7 +116,7 @@
                     "settings": [
                         {
                             "key": "modify_extension_list",
-                            "value": "replace"
+                            "value": "from_profile"
                         },
                         {
                             "key": "filename",
@@ -132,7 +132,7 @@
                     "settings": [
                         {
                             "key": "modify_extension_list",
-                            "value": "replace"
+                            "value": "from_profile"
                         },
                         {
                             "key": "filename",
@@ -148,7 +148,7 @@
                     "settings": [
                         {
                             "key": "modify_extension_list",
-                            "value": "replace"
+                            "value": "from_profile"
                         },
                         {
                             "key": "filename",
@@ -168,7 +168,7 @@
                         },
                         {
                             "key": "modify_extension_list",
-                            "value": "replace"
+                            "value": "from_profile"
                         },
                         {
                             "key": "filename",
@@ -188,7 +188,7 @@
                         },
                         {
                             "key": "modify_extension_list",
-                            "value": "replace"
+                            "value": "from_profile"
                         },
                         {
                             "key": "filename",
@@ -208,7 +208,7 @@
                         },
                         {
                             "key": "modify_extension_list",
-                            "value": "replace"
+                            "value": "from_profile"
                         },
                         {
                             "key": "filename",
@@ -255,32 +255,22 @@
                     "type": "ENUM",
                     "flags": [
                         {
-                            "key": "none",
-                            "label": "None",
-                            "description": "Turns off modification of the device's extension list. Uses the device's real extension list."
+                            "key": "check_support",
+                            "label": "Check support",
+                            "description": "Checks if the device supports the extensions from the specified profile."
                         },
                         {
-                            "key": "replace",
-                            "label": "Replace",
+                            "key": "from_profile",
+                            "label": "From profile",
                             "description": "Fully replaces the device's extension list with the extension list provided by the profiles configuration file."
                         },
                         {
-                            "key": "whitelist",
-                            "label": "Whitelist",
-                            "description": "Includes extensions from the profiles configuration file only if they are supported by the device."
-                        },
-                        {
-                            "key": "blacklist",
-                            "label": "Blacklist",
-                            "description": "Removes extensions from the device's extension list if they are included in the profiles configuration file's extension list."
-                        },
-                        {
-                            "key": "intersect",
-                            "label": "Intersect",
-                            "description": "Adds the list of extensions from the profiles configuration file to the device's extension list while avoiding repeats."
+                            "key": "from_device",
+                            "label": "From device",
+                            "description": "Turns off modification of the device's extensions list. Uses the device's real extensions list."
                         }
                     ],
-                    "default": "none"
+                    "default": "check_support"
                 },
                 {
                     "key": "modify_memory_flags",
@@ -298,32 +288,22 @@
                     "type": "ENUM",
                     "flags": [
                         {
-                            "key": "none",
-                            "label": "None",
-                            "description": "Turns off modification of the device's format list. Uses the device's real format list."
+                            "key": "check_support",
+                            "label": "Check support",
+                            "description": "Checks if the device supports the format list from the specified profile."
                         },
                         {
-                            "key": "replace",
-                            "label": "Replace",
+                            "key": "from_profile",
+                            "label": "From profile",
                             "description": "Fully replaces the device's format list with the format list provided by the profiles configuration file."
                         },
                         {
-                            "key": "whitelist",
-                            "label": "Whitelist",
-                            "description": "Includes formats from the profiles configuration file only if they are supported by the device."
-                        },
-                        {
-                            "key": "blacklist",
-                            "label": "Blacklist",
-                            "description": "Removes formats from the device's format list if they are included in the profiles configuration file's format list."
-                        },
-                        {
-                            "key": "intersect",
-                            "label": "Intersect",
-                            "description": "Adds the list of formats from the profiles configuration file to the device's format list while avoiding repeats."
+                            "key": "from_device",
+                            "label": "From device",
+                            "description": "Turns off modification of the device's format list. Uses the device's real format list."
                         }
                     ],
-                    "default": "none"
+                    "default": "check_support"
                 },
                 {
                     "key": "modify_format_properties",
@@ -333,32 +313,22 @@
                     "type": "ENUM",
                     "flags": [
                         {
-                            "key": "none",
-                            "label": "None",
+                            "key": "check_support",
+                            "label": "Check support",
+                            "description": "Checks if the device supports the format properties from the specified profile."
+                        },
+                        {
+                            "key": "from_profile",
+                            "label": "From profile",
+                            "description": "Fully replaces the device's format properties with the format properties provided by the profiles configuration file."
+                        },
+                        {
+                            "key": "from_device",
+                            "label": "From device",
                             "description": "Turns off modification of the device's format properties. Uses the device's real format properties."
-                        },
-                        {
-                            "key": "replace",
-                            "label": "Replace",
-                            "description": "Fully replaces the device's format properties with the properties provided by the profiles configuration file for each format."
-                        },
-                        {
-                            "key": "whitelist",
-                            "label": "Whitelist",
-                            "description": "Includes properties for each format from the profiles configuration file only if they are supported by the device."
-                        },
-                        {
-                            "key": "blacklist",
-                            "label": "Blacklist",
-                            "description": "Removes properties from the device's formats if they are included in the profiles configuration file for that format."
-                        },
-                        {
-                            "key": "intersect",
-                            "label": "Intersect",
-                            "description": "Adds the properties from the profiles configuration file to the device's format while avoiding repeats."
                         }
                     ],
-                    "default": "none"
+                    "default": "check_support"
                 },
                 {
                     "key": "modify_surface_formats",
@@ -368,32 +338,22 @@
                     "type": "ENUM",
                     "flags": [
                         {
-                            "key": "none",
-                            "label": "None",
+                            "key": "check_support",
+                            "label": "Check support",
+                            "description": "Checks if the device supports the surface formats from the specified profile."
+                        },
+                        {
+                            "key": "from_profile",
+                            "label": "From profile",
+                            "description": "Fully replaces the device's surface formats with the surface formats provided by the profiles configuration file."
+                        },
+                        {
+                            "key": "from_device",
+                            "label": "From device",
                             "description": "Turns off modification of the device's surface formats. Uses the device's real surface formats."
-                        },
-                        {
-                            "key": "replace",
-                            "label": "Replace",
-                            "description": "Fully replaces the device's surface formats with those provided by the profiles configuration file."
-                        },
-                        {
-                            "key": "whitelist",
-                            "label": "Whitelist",
-                            "description": "Includes surface format from the profiles configuration file only if they are supported by the device."
-                        },
-                        {
-                            "key": "blacklist",
-                            "label": "Blacklist",
-                            "description": "Removes device's surface formats if they are included in the profiles configuration file."
-                        },
-                        {
-                            "key": "intersect",
-                            "label": "Intersect",
-                            "description": "Adds the surface formats from the profiles configuration file to the device's surface formats while avoiding repeats."
                         }
                     ],
-                    "default": "none"
+                    "default": "check_support"
                 },
                 {
                     "key": "modify_present_modes",
@@ -403,32 +363,22 @@
                     "type": "ENUM",
                     "flags": [
                         {
-                            "key": "none",
-                            "label": "None",
-                            "description": "Turns off modification of the device's present mode list. Uses the device's real present modes."
+                            "key": "check_support",
+                            "label": "Check support",
+                            "description": "Checks if the device supports the present mode list from the specified profile."
                         },
                         {
-                            "key": "replace",
-                            "label": "Replace",
-                            "description": "Fully replaces the device's present mode list with the list provided by the profiles configuration file."
+                            "key": "from_profile",
+                            "label": "From profile",
+                            "description": "Fully replaces the device's present mode list with the present mode list provided by the profiles configuration file."
                         },
                         {
-                            "key": "whitelist",
-                            "label": "Whitelist",
-                            "description": "Includes present modes from the profiles configuration file only if they are supported by the device."
-                        },
-                        {
-                            "key": "blacklist",
-                            "label": "Blacklist",
-                            "description": "Removes present modes from the device's list if they are included in the profiles configuration file."
-                        },
-                        {
-                            "key": "intersect",
-                            "label": "Intersect",
-                            "description": "Adds the present modes from the profiles configuration file to the device's list while avoiding repeats."
+                            "key": "from_device",
+                            "label": "From device",
+                            "description": "Turns off modification of the device's present mode list. Uses the device's real present mode list."
                         }
                     ],
-                    "default": "none"
+                    "default": "check_support"
                 }
             ]
         }
