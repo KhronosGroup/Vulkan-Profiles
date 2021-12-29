@@ -280,7 +280,7 @@ These and other sample files can be found in the [${VulkanTools}/layersvt/device
 
 The DevSim layer provides the ability to emulate the `VK_KHR_portability_subset` extension on devices that do not implement this extension.
 This feature allows users to test their application with limitations found on non-conformant Vulkan implementations.
-To turn on this feature, set the `VK_DEVSIM_EMULATE_PORTABILITY_SUBSET_EXTENSION` environment variable (or the corresponding vk_layer_settings.txt option `khronos_profiles.emulate_portability`) to a positive integer.
+To turn on this feature, set the `VK_KHRONOS_PROFILES_EMULATE_PORTABILITY_SUBSET_EXTENSION` environment variable (or the corresponding vk_layer_settings.txt option `khronos_profiles.emulate_portability`) to a positive integer.
 DevSim config files that use this feature should validate to the portability specific schema https://schema.khronos.org/vulkan/devsim_VK_KHR_portability_subset-provisional-1.json#.
 
 ### DevSim Layer Options
@@ -376,12 +376,12 @@ export VK_LAYER_PATH="${VulkanTools}/build/layersvt"
 export VK_INSTANCE_LAYERS="VK_LAYER_KHRONOS_profiles`"
 
 # Specify the simulated device's configuration file.
-export VK_DEVSIM_FILENAME="${VulkanTools}/layersvt/device_simulation_examples/tiny1.json"
+export VK_KHRONOS_PROFILES_FILENAME="${VulkanTools}/layersvt/device_simulation_examples/tiny1.json"
 # A list of files could look like:
-# export VK_DEVSIM_FILENAME="/home/foo/first.json:/home/foo/second.json"
+# export VK_KHRONOS_PROFILES_FILENAME="/home/foo/first.json:/home/foo/second.json"
 
 # Enable verbose messages from the Profiles layer.
-export VK_DEVSIM_DEBUG_ENABLE="1"
+export VK_KHRONOS_PROFILES_DEBUG_ENABLE="1"
 
 # Run a Vulkan application through the Profiles layer.
 vulkaninfo
