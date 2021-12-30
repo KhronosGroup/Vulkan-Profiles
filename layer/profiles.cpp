@@ -7633,6 +7633,8 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
 
+    uint32_t pCount_copy = *pCount;
+
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
     const uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->simulation_extensions_.size()) : 0;
     if (pLayerName) {
@@ -7650,6 +7652,9 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
     if (result == VK_SUCCESS && !pLayerName && emulatePortability.num > 0 &&
         !PhysicalDeviceData::HasSimulatedOrRealExtension(physicalDevice, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
         if (pProperties) {
+            if (pCount_copy == *pCount + 1) {
+                *pCount = pCount_copy;
+            }
             strncpy(pProperties[(*pCount) - 1].extensionName, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, VK_MAX_EXTENSION_NAME_SIZE);
             pProperties[(*pCount) - 1].specVersion = VK_KHR_PORTABILITY_SUBSET_SPEC_VERSION;
         } else {
