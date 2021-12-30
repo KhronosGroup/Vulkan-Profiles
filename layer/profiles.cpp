@@ -3004,10 +3004,20 @@ bool JsonLoader::LoadFile(const char *filename) {
         for (const auto &e : extensions.getMemberNames()) {
             VkExtensionProperties extension;
             strcpy(extension.extensionName, e.c_str());
+            printf("%s\n", extension.extensionName);
             extension.specVersion = extensions[e].asInt();
             pdd_.arrayof_extension_properties_.push_back(extension);
             if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE) {
-                pdd_.simulation_extensions_.push_back(extension);
+                bool found = false;
+                for (const auto &ext : pdd_.simulation_extensions_) {
+                    if (strcmp(ext.extensionName, extension.extensionName) == 0) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    pdd_.simulation_extensions_.push_back(extension);
+                }
             }
         }
         const auto &features = c["features"];
