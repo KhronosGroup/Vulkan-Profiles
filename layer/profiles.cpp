@@ -2578,81 +2578,64 @@ void JsonLoader::GetFeature(const Json::Value &features, const std::string &feat
 
     if (feature_name == "VkPhysicalDeviceFeatures") {
         GetValue(feature, &pdd_.physical_device_features_);
-    } else if (feature_name == "VkPhysicalDeviceHostQueryResetFeatures") {
+    } else if (feature_name == "VkPhysicalDeviceHostQueryResetFeatures" ||
+               feature_name == "VkPhysicalDeviceHostQueryResetFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_host_query_reset_features_);
-    } else if (feature_name == "VkPhysicalDeviceHostQueryResetFeaturesEXT") {
-        GetValue(feature, &pdd_.physical_device_host_query_reset_features_);
-    } else if (feature_name == "VkPhysicalDeviceMaintenance4FeaturesKHR") {
+    } else if (feature_name == "VkPhysicalDeviceMaintenance4Features" ||
+               feature_name == "VkPhysicalDeviceMaintenance4FeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_maintenance_4_features_);
-    } else if (feature_name == "VkPhysicalDevice16BitStorageFeatures") {
+    } else if (feature_name == "VkPhysicalDevice16BitStorageFeatures" ||
+               feature_name == "VkPhysicalDevice16BitStorageFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_16bit_storage_features_);
-    } else if (feature_name == "VkPhysicalDevice16BitStorageFeaturesKHR") {
-        GetValue(feature, &pdd_.physical_device_16bit_storage_features_);
-    } else if (feature_name == "VkPhysicalDevice8BitStorageFeatures") {
+    } else if (feature_name == "VkPhysicalDevice8BitStorageFeatures" || feature_name == "VkPhysicalDevice8BitStorageFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_8bit_storage_features_);
-    } else if (feature_name == "VkPhysicalDevice8BitStorageFeaturesKHR") {
-        GetValue(feature, &pdd_.physical_device_8bit_storage_features_);
-    } else if (feature_name == "VkPhysicalDeviceBufferDeviceAddressFeatures") {
+    } else if (feature_name == "VkPhysicalDeviceBufferDeviceAddressFeatures" ||
+               feature_name == "VkPhysicalDeviceBufferDeviceAddressFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_buffer_device_address_features_);
-    } else if (feature_name == "VkPhysicalDeviceBufferDeviceAddressFeaturesKHR") {
-        GetValue(feature, &pdd_.physical_device_buffer_device_address_features_);
-    } else if (feature_name == "VkPhysicalDeviceDescriptorIndexingFeatures") {
+    } else if (feature_name == "VkPhysicalDeviceDescriptorIndexingFeatures" ||
+               feature_name == "VkPhysicalDeviceDescriptorIndexingFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_descriptor_indexing_features_);
-    } else if (feature_name == "VkPhysicalDeviceDescriptorIndexingFeaturesEXT") {
-        GetValue(feature, &pdd_.physical_device_descriptor_indexing_features_);
-    } else if (feature_name == "VkPhysicalDeviceImagelessFramebufferFeatures") {
+    } else if (feature_name == "VkPhysicalDeviceImagelessFramebufferFeatures" ||
+               feature_name == "VkPhysicalDeviceImagelessFramebufferFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_imageless_framebuffer_features_);
-    } else if (feature_name == "VkPhysicalDeviceImagelessFramebufferFeaturesKHR") {
-        GetValue(feature, &pdd_.physical_device_imageless_framebuffer_features_);
-    } else if (feature_name == "VkPhysicalDeviceMultiviewFeatures") {
-        GetValue(feature, &pdd_.physical_device_multiview_features_);
-    } else if (feature_name == "VkPhysicalDeviceMultiviewFeaturesKHR") {
+    } else if (feature_name == "VkPhysicalDeviceMultiviewFeatures" || feature_name == "VkPhysicalDeviceMultiviewFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_multiview_features_);
     } else if (feature_name == "VkPhysicalDeviceProtectedMemoryFeatures") {
         GetValue(feature, &pdd_.physical_device_protected_memory_features_);
-    } else if (feature_name == "VkPhysicalDeviceSamplerYcbcrConversionFeatures") {
+    } else if (feature_name == "VkPhysicalDeviceSamplerYcbcrConversionFeatures" ||
+               feature_name == "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_sampler_ycbcr_conversion_features_);
-    } else if (feature_name == "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR") {
-        GetValue(feature, &pdd_.physical_device_sampler_ycbcr_conversion_features_);
-    } else if (feature_name == "VkPhysicalDeviceScalarBlockLayoutFeatures") {
+    } else if (feature_name == "VkPhysicalDeviceScalarBlockLayoutFeatures" ||
+               feature_name == "VkPhysicalDeviceScalarBlockLayoutFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_scalar_block_layout_features_);
-    } else if (feature_name == "VkPhysicalDeviceScalarBlockLayoutFeaturesEXT") {
-        GetValue(feature, &pdd_.physical_device_scalar_block_layout_features_);
-    } else if (feature_name == "VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures") {
+    } else if (feature_name == "VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures" ||
+               feature_name == "VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_separate_depth_stencil_layouts_features_);
-    } else if (feature_name == "VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR") {
-        GetValue(feature, &pdd_.physical_device_separate_depth_stencil_layouts_features_);
-    } else if (feature_name == "VkPhysicalDeviceShaderAtomicInt64Features") {
-        GetValue(feature, &pdd_.physical_device_shader_atomic_int64_features_);
-    } else if (feature_name == "VkPhysicalDeviceShaderAtomicInt64FeaturesKHR") {
+    } else if (feature_name == "VkPhysicalDeviceShaderAtomicInt64Features" ||
+               feature_name == "VkPhysicalDeviceShaderAtomicInt64FeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_shader_atomic_int64_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderDrawParametersFeatures") {
         GetValue(feature, &pdd_.physical_device_shader_draw_parameters_features_);
-    } else if (feature_name == "VkPhysicalDeviceShaderFloat16Int8Features") {
+    } else if (feature_name == "VkPhysicalDeviceShaderFloat16Int8Features" ||
+               feature_name == "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_shader_float16_int8_features_);
-    } else if (feature_name == "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR") {
-        GetValue(feature, &pdd_.physical_device_shader_float16_int8_features_);
-    } else if (feature_name == "VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures") {
+    } else if (feature_name == "VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures" ||
+               feature_name == "VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_shader_subgroup_extended_types_features_);
-    } else if (feature_name == "VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR") {
-        GetValue(feature, &pdd_.physical_device_shader_subgroup_extended_types_features_);
-    } else if (feature_name == "VkPhysicalDeviceTimelineSemaphoreFeatures") {
+    } else if (feature_name == "VkPhysicalDeviceTimelineSemaphoreFeatures" ||
+               feature_name == "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_timeline_semaphore_features_);
-    } else if (feature_name == "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR") {
-        GetValue(feature, &pdd_.physical_device_timeline_semaphore_features_);
-    } else if (feature_name == "VkPhysicalDeviceUniformBufferStandardLayoutFeatures") {
+    } else if (feature_name == "VkPhysicalDeviceUniformBufferStandardLayoutFeatures" ||
+               feature_name == "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_uniform_buffer_standard_layout_features_);
-    } else if (feature_name == "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR") {
-        GetValue(feature, &pdd_.physical_device_uniform_buffer_standard_layout_features_);
-    } else if (feature_name == "VkPhysicalDeviceVariablePointersFeatures") {
+    } else if (feature_name == "VkPhysicalDeviceVariablePointersFeatures" ||
+               feature_name == "VkPhysicalDeviceVariablePointersFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_variable_pointers_features_);
-    } else if (feature_name == "VkPhysicalDeviceVariablePointersFeaturesKHR") {
-        GetValue(feature, &pdd_.physical_device_variable_pointers_features_);
-    } else if (feature_name == "VkPhysicalDeviceVulkanMemoryModelFeatures") {
+    } else if (feature_name == "VkPhysicalDeviceVulkanMemoryModelFeatures" ||
+               feature_name == "VkPhysicalDeviceVulkanMemoryModelFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_vulkan_memory_model_features_);
-    } else if (feature_name == "VkPhysicalDeviceVulkanMemoryModelFeaturesKHR") {
-        GetValue(feature, &pdd_.physical_device_vulkan_memory_model_features_);
-    } else if (feature_name == "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR") {
+    } else if (feature_name == "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures" ||
+               feature_name == "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_zero_initialize_workgroup_memory_features_);
     } else if (feature_name == "VkPhysicalDeviceAccelerationStructureFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_acceleration_structure_features_);
@@ -2670,13 +2653,16 @@ void JsonLoader::GetFeature(const Json::Value &features, const std::string &feat
         GetValue(feature, &pdd_.physical_device_ray_tracing_pipeline_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderClockFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_shader_clock_features_);
-    } else if (feature_name == "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR") {
+    } else if (feature_name == "VkPhysicalDeviceShaderIntegerDotProductFeatures" ||
+               feature_name == "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_shader_integer_dot_product_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_shader_subgroup_uniform_control_flow_features_);
-    } else if (feature_name == "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR") {
+    } else if (feature_name == "VkPhysicalDeviceShaderTerminateInvocationFeatures" ||
+               feature_name == "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_shader_terminate_invocation_features_);
-    } else if (feature_name == "VkPhysicalDeviceSynchronization2FeaturesKHR") {
+    } else if (feature_name == "VkPhysicalDeviceSynchronization2Features" ||
+               feature_name == "VkPhysicalDeviceSynchronization2FeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_synchronization2_features_);
     } else if (feature_name == "VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_workgroup_memory_explicit_layout_features_);
@@ -2706,13 +2692,16 @@ void JsonLoader::GetFeature(const Json::Value &features, const std::string &feat
         GetValue(feature, &pdd_.physical_device_fragment_density_map_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_fragment_shader_interlock_features_);
-    } else if (feature_name == "VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT") {
+    } else if (feature_name == "VkPhysicalDeviceGlobalPriorityQueryFeaturesKHR" ||
+               feature_name == "VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_global_priority_query_features_);
-    } else if (feature_name == "VkPhysicalDeviceImageRobustnessFeaturesEXT") {
+    } else if (feature_name == "VkPhysicalDeviceImageRobustnessFeatures" ||
+               feature_name == "VkPhysicalDeviceImageRobustnessFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_image_robustness_features_);
     } else if (feature_name == "VkPhysicalDeviceIndexTypeUint8FeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_index_type_uint8_features_);
-    } else if (feature_name == "VkPhysicalDeviceInlineUniformBlockFeaturesEXT") {
+    } else if (feature_name == "VkPhysicalDeviceInlineUniformBlockFeatures" ||
+               feature_name == "VkPhysicalDeviceInlineUniformBlockFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_inline_uniform_block_features_);
     } else if (feature_name == "VkPhysicalDeviceLineRasterizationFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_line_rasterization_features_);
@@ -2722,11 +2711,12 @@ void JsonLoader::GetFeature(const Json::Value &features, const std::string &feat
         GetValue(feature, &pdd_.physical_device_multi_draw_features_);
     } else if (feature_name == "VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_pageable_device_local_memory_features_);
-    } else if (feature_name == "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT") {
+    } else if (feature_name == "VkPhysicalDevicePipelineCreationCacheControlFeatures" ||
+               feature_name == "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_pipeline_creation_cache_control_features_);
     } else if (feature_name == "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_primitive_topology_list_restart_features_);
-    } else if (feature_name == "VkPhysicalDevicePrivateDataFeaturesEXT") {
+    } else if (feature_name == "VkPhysicalDevicePrivateDataFeatures" || feature_name == "VkPhysicalDevicePrivateDataFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_private_data_features_);
     } else if (feature_name == "VkPhysicalDeviceProvokingVertexFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_provoking_vertex_features_);
@@ -2738,15 +2728,18 @@ void JsonLoader::GetFeature(const Json::Value &features, const std::string &feat
         GetValue(feature, &pdd_.physical_device_shader_atomic_float_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_shader_atomic_float2_features_);
-    } else if (feature_name == "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT") {
+    } else if (feature_name == "VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures" ||
+               feature_name == "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_shader_demote_to_helper_invocation_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_shader_image_atomic_int64_features_);
-    } else if (feature_name == "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT") {
+    } else if (feature_name == "VkPhysicalDeviceSubgroupSizeControlFeatures" ||
+               feature_name == "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_subgroup_size_control_features_);
     } else if (feature_name == "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_texel_buffer_alignment_features_);
-    } else if (feature_name == "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT") {
+    } else if (feature_name == "VkPhysicalDeviceTextureCompressionASTCHDRFeatures" ||
+               feature_name == "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_texture_compression_astc_hdr_features_);
     } else if (feature_name == "VkPhysicalDeviceTransformFeedbackFeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_transform_feedback_features_);
@@ -2806,7 +2799,8 @@ void JsonLoader::GetFeature(const Json::Value &features, const std::string &feat
         GetValue(feature, &pdd_.physical_device_shading_rate_image_features_);
     } else if (feature_name == "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE") {
         GetValue(feature, &pdd_.physical_device_mutable_descriptor_type_features_);
-    } else if (feature_name == "VkPhysicalDeviceDynamicRenderingFeaturesKHR") {
+    } else if (feature_name == "VkPhysicalDeviceDynamicRenderingFeatures" ||
+               feature_name == "VkPhysicalDeviceDynamicRenderingFeaturesKHR") {
         GetValue(feature, &pdd_.physical_device_dynamic_rendering_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentDensityMap2FeaturesEXT") {
         GetValue(feature, &pdd_.physical_device_fragment_density_map_2_features_);
@@ -2826,39 +2820,33 @@ void JsonLoader::GetProperty(const Json::Value &props, const std::string& proper
         GetValue(prop, &pdd_.physical_device_properties_.limits);
     } else if (property_name == "VkPhysicalDeviceSparseProperties") {
         GetValue(prop, &pdd_.physical_device_properties_.sparseProperties);
-    } else if (property_name == "VkPhysicalDeviceDepthStencilResolveProperties") {
-        GetValue(prop, &pdd_.physical_device_depth_stencil_resolve_properties_);
-    } else if (property_name == "VkPhysicalDeviceDepthStencilResolvePropertiesKHR") {
+    } else if (property_name == "VkPhysicalDeviceDepthStencilResolveProperties" ||
+               property_name == "VkPhysicalDeviceDepthStencilResolvePropertiesKHR") {
         GetValue(prop, &pdd_.physical_device_depth_stencil_resolve_properties_);
     } else if (property_name == "VkPhysicalDeviceSubgroupProperties") {
         GetValue(prop, &pdd_.physical_device_subgroup_properties_);
-    } else if (property_name == "VkPhysicalDeviceDescriptorIndexingProperties") {
+    } else if (property_name == "VkPhysicalDeviceDescriptorIndexingProperties" ||
+               property_name == "VkPhysicalDeviceDescriptorIndexingPropertiesEXT") {
         GetValue(prop, &pdd_.physical_device_descriptor_indexing_properties_);
-    } else if (property_name == "VkPhysicalDeviceDescriptorIndexingPropertiesEXT") {
-        GetValue(prop, &pdd_.physical_device_descriptor_indexing_properties_);
-    } else if (property_name == "VkPhysicalDeviceFloatControlsProperties") {
+    } else if (property_name == "VkPhysicalDeviceFloatControlsProperties" ||
+               property_name == "VkPhysicalDeviceFloatControlsPropertiesKHR") {
         GetValue(prop, &pdd_.physical_device_float_controls_properties_);
-    } else if (property_name == "VkPhysicalDeviceFloatControlsPropertiesKHR") {
-        GetValue(prop, &pdd_.physical_device_float_controls_properties_);
-    } else if (property_name == "VkPhysicalDeviceMaintenance3Properties") {
+    } else if (property_name == "VkPhysicalDeviceMaintenance3Properties" ||
+               property_name == "VkPhysicalDeviceMaintenance3PropertiesKHR") {
         GetValue(prop, &pdd_.physical_device_maintenance_3_properties_);
-    } else if (property_name == "VkPhysicalDeviceMaintenance3PropertiesKHR") {
-        GetValue(prop, &pdd_.physical_device_maintenance_3_properties_);
-    } else if (property_name == "VkPhysicalDeviceMaintenance4PropertiesKHR") {
+    } else if (property_name == "VkPhysicalDeviceMaintenance4Properties" ||
+               property_name == "VkPhysicalDeviceMaintenance4PropertiesKHR") {
         GetValue(prop, &pdd_.physical_device_maintenance_4_properties_);
-    } else if (property_name == "VkPhysicalDeviceMultiviewProperties") {
-        GetValue(prop, &pdd_.physical_device_multiview_properties_);
-    } else if (property_name == "VkPhysicalDeviceMultiviewPropertiesKHR") {
+    } else if (property_name == "VkPhysicalDeviceMultiviewProperties" ||
+               property_name == "VkPhysicalDeviceMultiviewPropertiesKHR") {
         GetValue(prop, &pdd_.physical_device_multiview_properties_);
     } else if (property_name == "VkPhysicalDeviceProtectedMemoryProperties") {
         GetValue(prop, &pdd_.physical_device_protected_memory_properties_);
-    } else if (property_name == "VkPhysicalDeviceTimelineSemaphoreProperties") {
+    } else if (property_name == "VkPhysicalDeviceTimelineSemaphoreProperties" ||
+               property_name == "VkPhysicalDeviceTimelineSemaphorePropertiesKHR") {
         GetValue(prop, &pdd_.physical_device_timeline_semaphore_properties_);
-    } else if (property_name == "VkPhysicalDeviceTimelineSemaphorePropertiesKHR") {
-        GetValue(prop, &pdd_.physical_device_timeline_semaphore_properties_);
-    } else if (property_name == "VkPhysicalDeviceSamplerFilterMinmaxProperties") {
-        GetValue(prop, &pdd_.physical_device_sampler_filter_minmax_properties_);
-    } else if (property_name == "VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT") {
+    } else if (property_name == "VkPhysicalDeviceSamplerFilterMinmaxProperties" ||
+               property_name == "VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT") {
         GetValue(prop, &pdd_.physical_device_sampler_filter_minmax_properties_);
     } else if (property_name == "VkPhysicalDeviceAccelerationStructurePropertiesKHR") {
         GetValue(prop, &pdd_.physical_device_acceleration_structure_properties_);
@@ -2868,7 +2856,8 @@ void JsonLoader::GetProperty(const Json::Value &props, const std::string& proper
         GetValue(prop, &pdd_.physical_device_push_descriptor_properites_);
     } else if (property_name == "VkPhysicalDeviceRayTracingPipelinePropertiesKHR") {
         GetValue(prop, &pdd_.physical_device_ray_tracing_pipeline_properties_);
-    } else if (property_name == "VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR") {
+    } else if (property_name == "VkPhysicalDeviceShaderIntegerDotProductProperties" ||
+               property_name == "VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR") {
         GetValue(prop, &pdd_.physical_device_shader_integer_dot_products_properties_);
     } else if (property_name == "VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT") {
         GetValue(prop, &pdd_.physical_device_blend_operation_advanced_properties_);
@@ -2882,7 +2871,8 @@ void JsonLoader::GetProperty(const Json::Value &props, const std::string& proper
         GetValue(prop, &pdd_.physical_device_external_memory_host_properties_);
     } else if (property_name == "VkPhysicalDeviceFragmentDensityMapPropertiesEXT") {
         GetValue(prop, &pdd_.physical_device_fragment_density_map_properties_);
-    } else if (property_name == "VkPhysicalDeviceInlineUniformBlockPropertiesEXT") {
+    } else if (property_name == "VkPhysicalDeviceInlineUniformBlockProperties" ||
+               property_name == "VkPhysicalDeviceInlineUniformBlockPropertiesEXT") {
         GetValue(prop, &pdd_.physical_device_inline_uniform_block_properties_);
     } else if (property_name == "VkPhysicalDeviceLineRasterizationPropertiesEXT") {
         GetValue(prop, &pdd_.physical_device_line_rasterization_properties_);
@@ -2894,9 +2884,11 @@ void JsonLoader::GetProperty(const Json::Value &props, const std::string& proper
         GetValue(prop, &pdd_.physical_device_robustness_2_properties_);
     } else if (property_name == "VkPhysicalDeviceSampleLocationsPropertiesEXT") {
         GetValue(prop, &pdd_.physical_device_sample_locations_properties_);
-    } else if (property_name == "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT") {
+    } else if (property_name == "VkPhysicalDeviceSubgroupSizeControlProperties" ||
+               property_name == "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT") {
         GetValue(prop, &pdd_.physical_device_subgroup_size_control_properties_);
-    } else if (property_name == "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT") {
+    } else if (property_name == "VkPhysicalDeviceTexelBufferAlignmentProperties" ||
+               property_name == "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT") {
         GetValue(prop, &pdd_.physical_device_texel_buffer_alignment_properties_);
     } else if (property_name == "VkPhysicalDeviceTransformFeedbackPropertiesEXT") {
         GetValue(prop, &pdd_.physical_device_transform_feedback_properties_);
@@ -2946,15 +2938,15 @@ void JsonLoader::GetProperty(const Json::Value &props, const std::string& proper
         GetValuePhysicalDevicePointClippingPropertiesKHR(prop);
     } else if (property_name == "VkPhysicalDevicePointClippingPropertiesKHR") {
         GetValuePhysicalDevicePointClippingPropertiesKHR(prop);
-    } else if (property_name == "VkPhysicalDeviceDriverPropertiesKHR") {
+    } else if (property_name == "VkPhysicalDeviceDriverProperties" || property_name == "VkPhysicalDeviceDriverPropertiesKHR") {
         GetValuePhysicalDeviceDriverProperties(prop);
-    } else if (property_name == "VkPhysicalDeviceIDPropertiesKHR") {
+    } else if (property_name == "VkPhysicalDeviceIDProperties" || property_name == "VkPhysicalDeviceIDPropertiesKHR") {
         GetValuePhysicalDeviceIDProperties(prop);
     } else if (property_name == "VkPhysicalDeviceMemoryBudgetPropertiesEXT") {
         GetValuePhysicalDeviceMemoryBudgetPropertiesEXT(prop);
     } else if (property_name == "VkPhysicalDevicePCIBusInfoPropertiesEXT") {
         GetValuePhysicalDevicePCIBusInfoPropertiesEXT(prop);
-    } else if (property_name == "VkPhysicalDeviceToolPropertiesEXT") {
+    } else if (property_name == "VkPhysicalDeviceToolProperties" || property_name == "VkPhysicalDeviceToolPropertiesEXT") {
         GetValuePhysicalDeviceToolPropertiesEXT(prop);
     }
 }
