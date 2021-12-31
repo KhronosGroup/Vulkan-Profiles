@@ -828,9 +828,6 @@ class PhysicalDeviceData {
     // VK_KHR_imageless_framebuffer structs
     VkPhysicalDeviceImagelessFramebufferFeaturesKHR physical_device_imageless_framebuffer_features_;
 
-    // VK_KHR_maintenance2 structs
-    VkPhysicalDevicePointClippingPropertiesKHR physical_device_point_clipping_properties_;
-
     // VK_KHR_maintenance3 structs
     VkPhysicalDeviceMaintenance3PropertiesKHR physical_device_maintenance_3_properties_;
 
@@ -1220,9 +1217,6 @@ class PhysicalDeviceData {
 
         // VK_KHR_imageless_framebuffer structs
         physical_device_imageless_framebuffer_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES_KHR};
-
-        // VK_KHR_maintenance2 structs
-        physical_device_point_clipping_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR};
 
         // VK_KHR_maintenance3 structs
         physical_device_maintenance_3_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR};
@@ -1652,13 +1646,7 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4FeaturesKHR *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4PropertiesKHR *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, VkPhysicalDevicePointClippingPropertiesKHR *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceGroupPropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, VkPhysicalDeviceDriverPropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, VkPhysicalDeviceIDPropertiesKHR *dest);
-    void GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryBudgetPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, VkPhysicalDevicePCIBusInfoPropertiesEXT *dest);
-    void GetValue(const Json::Value &parent, VkPhysicalDeviceToolPropertiesEXT *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryProperties *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *dest);
@@ -1816,6 +1804,14 @@ class JsonLoader {
     void GetValue(const Json::Value &parent, int index, VkPhysicalDevice *dest);
     void GetValue(const Json::Value &parent, int index, VkDeviceSize *dest);
 
+    // Non-modifiable
+    void GetValuePhysicalDevicePointClippingPropertiesKHR(const Json::Value &parent);
+    void GetValuePhysicalDeviceDriverProperties(const Json::Value &parent);
+    void GetValuePhysicalDeviceIDProperties(const Json::Value &parent);
+    void GetValuePhysicalDeviceMemoryBudgetPropertiesEXT(const Json::Value &parent);
+    void GetValuePhysicalDevicePCIBusInfoPropertiesEXT(const Json::Value &parent);
+    void GetValuePhysicalDeviceToolPropertiesEXT(const Json::Value &parent);
+
     void GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Properties *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Features *dest);
 
@@ -1823,6 +1819,15 @@ class JsonLoader {
     void GetValueGPUinfoCore11(const Json::Value &parent);
     void GetValueGPUinfoCore12(const Json::Value &parent);
     void GetValueGPUinfoSurfaceCapabilities(const Json::Value &parent);
+
+    static void WarnNotModifiable(const char* parent_name, const std::string &member, const char *name) {
+        if (member != name) {
+            return;
+        }
+        ErrorPrintf(
+            "WARN \"%s::%s\" value is set in the profile, but it is not modifiable by the Profiles Layer and will not be set.\n",
+            parent_name, name);
+    }
 
     static bool WarnIfGreater(const char *name, const uint64_t new_value, const uint64_t old_value) {
         if (new_value > old_value) {
@@ -2845,10 +2850,6 @@ void JsonLoader::GetProperty(const Json::Value &props, const std::string& proper
         GetValue(prop, &pdd_.physical_device_multiview_properties_);
     } else if (property_name == "VkPhysicalDeviceMultiviewPropertiesKHR") {
         GetValue(prop, &pdd_.physical_device_multiview_properties_);
-    } else if (property_name == "VkPhysicalDevicePointClippingProperties") {
-        GetValue(prop, &pdd_.physical_device_point_clipping_properties_);
-    } else if (property_name == "VkPhysicalDevicePointClippingPropertiesKHR") {
-        GetValue(prop, &pdd_.physical_device_point_clipping_properties_);
     } else if (property_name == "VkPhysicalDeviceProtectedMemoryProperties") {
         GetValue(prop, &pdd_.physical_device_protected_memory_properties_);
     } else if (property_name == "VkPhysicalDeviceTimelineSemaphoreProperties") {
@@ -2941,6 +2942,20 @@ void JsonLoader::GetProperty(const Json::Value &props, const std::string& proper
         GetValue(prop, &pdd_.physical_device_vulkan_1_2_properties_);
     } else if (property_name == "VkPhysicalDevicePortabilitySubsetPropertiesKHR") {
         GetValue(prop, &pdd_.physical_device_portability_subset_properties_);
+    } else if (property_name == "VkPhysicalDevicePointClippingProperties") {
+        GetValuePhysicalDevicePointClippingPropertiesKHR(prop);
+    } else if (property_name == "VkPhysicalDevicePointClippingPropertiesKHR") {
+        GetValuePhysicalDevicePointClippingPropertiesKHR(prop);
+    } else if (property_name == "VkPhysicalDeviceDriverPropertiesKHR") {
+        GetValuePhysicalDeviceDriverProperties(prop);
+    } else if (property_name == "VkPhysicalDeviceIDPropertiesKHR") {
+        GetValuePhysicalDeviceIDProperties(prop);
+    } else if (property_name == "VkPhysicalDeviceMemoryBudgetPropertiesEXT") {
+        GetValuePhysicalDeviceMemoryBudgetPropertiesEXT(prop);
+    } else if (property_name == "VkPhysicalDevicePCIBusInfoPropertiesEXT") {
+        GetValuePhysicalDevicePCIBusInfoPropertiesEXT(prop);
+    } else if (property_name == "VkPhysicalDeviceToolPropertiesEXT") {
+        GetValuePhysicalDeviceToolPropertiesEXT(prop);
     }
 }
 
@@ -3227,68 +3242,69 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPr
     }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePointClippingPropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
+void JsonLoader::GetValuePhysicalDevicePointClippingPropertiesKHR(const Json::Value &parent) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePointClippingPropertiesKHR)\n");
-    DebugPrintf("WARN VkPhysicalDevicePointClippingProperties only reports how a device functions and will not be set.");
-    // GET_VALUE(pointClippingBehavior);
+    for (const auto &prop : parent.getMemberNames()) {
+        WarnNotModifiable("VkPhysicalDevicePointClippingPropertiesKHR", prop, "pointClippingBehavior");
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGroupPropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceGroupPropertiesKHR)\n");
-    DebugPrintf("WARN VkPhysicalDeviceGroupPropertiesKHR only reports how a device functions and will not be set.");
+    for (const auto &prop : parent.getMemberNames()) {
+        WarnNotModifiable("VkPhysicalDeviceGroupPropertiesKHR", prop, "physicalDeviceCount");
+        WarnNotModifiable("VkPhysicalDeviceGroupPropertiesKHR", prop, "physicalDevices");
+        WarnNotModifiable("VkPhysicalDeviceGroupPropertiesKHR", prop, "subsetAllocation");
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDriverPropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
+void JsonLoader::GetValuePhysicalDeviceDriverProperties(const Json::Value &parent) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDriverPropertiesKHR)\n");
-    DebugPrintf("WARN VkPhysicalDeviceDriverPropertiesKHR only reports how a device functions and will not be set.");
+    for (const auto &prop : parent.getMemberNames()) {
+        WarnNotModifiable("VkPhysicalDeviceDriverPropertiesKHR", prop, "driverName");
+        WarnNotModifiable("VkPhysicalDeviceDriverPropertiesKHR", prop, "driverInfo");
+        WarnNotModifiable("VkPhysicalDeviceDriverPropertiesKHR", prop, "conformanceVersion");
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIDPropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
+void JsonLoader::GetValuePhysicalDeviceIDProperties(const Json::Value &parent) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceIDPropertiesKHR)\n");
-    DebugPrintf("WARN VkPhysicalDeviceIDPropertiesKHR only reports how a device functions and will not be set.");
+    for (const auto &prop : parent.getMemberNames()) {
+        WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", prop, "deviceUUID");
+        WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", prop, "driverUUID");
+        WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", prop, "deviceLUID");
+        WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", prop, "deviceNodeMask");
+        WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", prop, "deviceLUIDValid");
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryBudgetPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
+void JsonLoader::GetValuePhysicalDeviceMemoryBudgetPropertiesEXT(const Json::Value &parent) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMemoryBudgetPropertiesEXT)\n");
-    DebugPrintf("WARN VkPhysicalDeviceMemoryBudgetPropertiesEXT only reports how a device functions and will not be set.");
+    for (const auto &prop : parent.getMemberNames()) {
+        WarnNotModifiable("VkPhysicalDeviceMemoryBudgetPropertiesEXT", prop, "heapBudget");
+        WarnNotModifiable("VkPhysicalDeviceMemoryBudgetPropertiesEXT", prop, "heapUsage");
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePCIBusInfoPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
+void JsonLoader::GetValuePhysicalDevicePCIBusInfoPropertiesEXT(const Json::Value &parent) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePCIBusInfoPropertiesEXT)\n");
-    DebugPrintf("WARN VkPhysicalDevicePCIBusInfoPropertiesEXT only reports how a device functions and will not be set.");
+    for (const auto &prop : parent.getMemberNames()) {
+        WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", prop, "pciDomain");
+        WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", prop, "pciBus");
+        WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", prop, "pciDevice");
+        WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", prop, "pciFunction");
+    }
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceToolPropertiesEXT *dest) {
-    const Json::Value value = parent["members"];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
+void JsonLoader::GetValuePhysicalDeviceToolPropertiesEXT(const Json::Value &parent) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceToolPropertiesEXT)\n");
-    DebugPrintf("WARN VkPhysicalDeviceToolPropertiesEXT only reports how a device functions and will not be set.");
+    for (const auto &prop : parent.getMemberNames()) {
+        WarnNotModifiable("VkPhysicalDeviceToolPropertiesEXT", prop, "name");
+        WarnNotModifiable("VkPhysicalDeviceToolPropertiesEXT", prop, "version");
+        WarnNotModifiable("VkPhysicalDeviceToolPropertiesEXT", prop, "purposes");
+        WarnNotModifiable("VkPhysicalDeviceToolPropertiesEXT", prop, "description");
+        WarnNotModifiable("VkPhysicalDeviceToolPropertiesEXT", prop, "layer");
+    }
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
@@ -3329,7 +3345,6 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilt
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphorePropertiesKHR *dest) {
-    const Json::Value value = parent["members"];
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTimelineSemaphorePropertiesKHR)\n");
     if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
         ErrorPrintf(
@@ -6391,14 +6406,6 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     iff->pNext = pNext;
                 }
                 break;
-            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR:
-                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_MAINTENANCE2_EXTENSION_NAME)) {
-                    VkPhysicalDevicePointClippingPropertiesKHR *pcp = (VkPhysicalDevicePointClippingPropertiesKHR *)place;
-                    void *pNext = pcp->pNext;
-                    *pcp = physicalDeviceData->physical_device_point_clipping_properties_;
-                    pcp->pNext = pNext;
-                }
-                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
                     VkPhysicalDeviceMaintenance3PropertiesKHR *pcp = (VkPhysicalDeviceMaintenance3PropertiesKHR *)place;
@@ -8423,12 +8430,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_imageless_framebuffer_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_MAINTENANCE2_EXTENSION_NAME)) {
-                    pdd.physical_device_point_clipping_properties_.pNext = property_chain.pNext;
-
-                    property_chain.pNext = &(pdd.physical_device_point_clipping_properties_);
-                }
-
                 if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
                     pdd.physical_device_maintenance_3_properties_.pNext = property_chain.pNext;
 
@@ -9206,7 +9207,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             pdd.combineExtensionLists();
 
             // VK_VULKAN_1_1
-            TransferValue(&(pdd.physical_device_vulkan_1_1_properties_), &(pdd.physical_device_point_clipping_properties_));
             TransferValue(&(pdd.physical_device_vulkan_1_1_properties_), &(pdd.physical_device_multiview_properties_));
             TransferValue(&(pdd.physical_device_vulkan_1_1_properties_), &(pdd.physical_device_maintenance_3_properties_));
             TransferValue(&(pdd.physical_device_vulkan_1_1_properties_), &(pdd.physical_device_protected_memory_properties_));

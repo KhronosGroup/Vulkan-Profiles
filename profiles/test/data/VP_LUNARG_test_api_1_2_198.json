@@ -1295,6 +1295,23 @@
                     "maxRayDispatchInvocationCount": 374,
                     "shaderGroupHandleAlignment": 375,
                     "maxRayHitAttributeSize": 376
+                },
+                "VkPhysicalDeviceDriverPropertiesKHR": {
+                    "driverName": "Driver name",
+                    "driverInfo": "Driver info",
+                    "conformanceVersion": {
+                        "major": 1,
+                        "minor": 2,
+                        "subminor": 3,
+                        "patch": 4
+                    }
+                },
+                "VkPhysicalDeviceIDPropertiesKHR": {
+                    "deviceUUID": "0",
+                    "driverUUID": "1",
+                    "deviceLUID": "2",
+                    "deviceNodeMask": 377,
+                    "deviceLUIDValid": true
                 }
             },
             "formats": {
