@@ -1834,9 +1834,8 @@ class JsonLoader {
     }
 
     static bool WarnIfNotEqual(const char *name, const bool new_value, const bool old_value) {
-        if (new_value != old_value) {
-            DebugPrintf("WARN \"%s\" JSON value (%s) is greater than existing value (%s)\n", name, new_value ? "true" : "false",
-                        old_value ? "true" : "false");
+        if (new_value && !old_value) {
+            DebugPrintf("WARN \"%s\" JSON value is enabled in the profile, but the device does not support it.\n", name);
             return true;
         }
         return false;
