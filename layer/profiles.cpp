@@ -3072,6 +3072,7 @@ JsonLoader::SchemaId JsonLoader::IdentifySchema(const Json::Value &value) {
 #define GET_ARRAY(name) GetArray(parent, #name, dest->name)
 #define GET_MEMBER_VALUE(member, name) GetValue(parent, member, #name, &dest->name)
 #define GET_VALUE_WARN(member, name, warn_func) GetValue(parent, member, #name, &dest->name, warn_func)
+#define GET_MEMBER_VALUE_WARN(member, name, warn_func) GetValue(parent, member, #name, &dest->name, warn_func)
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProperties)\n");
@@ -3476,61 +3477,61 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupPro
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFeatures)\n");
     for (const auto &member : parent.getMemberNames()) {
-        GET_MEMBER_VALUE(member, robustBufferAccess);
-        GET_MEMBER_VALUE(member, fullDrawIndexUint32);
-        GET_MEMBER_VALUE(member, imageCubeArray);
-        GET_MEMBER_VALUE(member, independentBlend);
-        GET_MEMBER_VALUE(member, geometryShader);
-        GET_MEMBER_VALUE(member, tessellationShader);
-        GET_MEMBER_VALUE(member, sampleRateShading);
-        GET_MEMBER_VALUE(member, dualSrcBlend);
-        GET_MEMBER_VALUE(member, logicOp);
-        GET_MEMBER_VALUE(member, multiDrawIndirect);
-        GET_MEMBER_VALUE(member, drawIndirectFirstInstance);
-        GET_MEMBER_VALUE(member, depthClamp);
-        GET_MEMBER_VALUE(member, depthBiasClamp);
-        GET_MEMBER_VALUE(member, fillModeNonSolid);
-        GET_MEMBER_VALUE(member, depthBounds);
-        GET_MEMBER_VALUE(member, wideLines);
-        GET_MEMBER_VALUE(member, largePoints);
-        GET_MEMBER_VALUE(member, alphaToOne);
-        GET_MEMBER_VALUE(member, multiViewport);
-        GET_MEMBER_VALUE(member, samplerAnisotropy);
-        GET_MEMBER_VALUE(member, textureCompressionETC2);
-        GET_MEMBER_VALUE(member, textureCompressionASTC_LDR);
-        GET_MEMBER_VALUE(member, textureCompressionBC);
-        GET_MEMBER_VALUE(member, occlusionQueryPrecise);
-        GET_MEMBER_VALUE(member, pipelineStatisticsQuery);
-        GET_MEMBER_VALUE(member, vertexPipelineStoresAndAtomics);
-        GET_MEMBER_VALUE(member, fragmentStoresAndAtomics);
-        GET_MEMBER_VALUE(member, shaderTessellationAndGeometryPointSize);
-        GET_MEMBER_VALUE(member, shaderImageGatherExtended);
-        GET_MEMBER_VALUE(member, shaderStorageImageExtendedFormats);
-        GET_MEMBER_VALUE(member, shaderStorageImageMultisample);
-        GET_MEMBER_VALUE(member, shaderStorageImageReadWithoutFormat);
-        GET_MEMBER_VALUE(member, shaderStorageImageWriteWithoutFormat);
-        GET_MEMBER_VALUE(member, shaderUniformBufferArrayDynamicIndexing);
-        GET_MEMBER_VALUE(member, shaderSampledImageArrayDynamicIndexing);
-        GET_MEMBER_VALUE(member, shaderStorageBufferArrayDynamicIndexing);
-        GET_MEMBER_VALUE(member, shaderStorageImageArrayDynamicIndexing);
-        GET_MEMBER_VALUE(member, shaderClipDistance);
-        GET_MEMBER_VALUE(member, shaderCullDistance);
-        GET_MEMBER_VALUE(member, shaderFloat64);
-        GET_MEMBER_VALUE(member, shaderInt64);
-        GET_MEMBER_VALUE(member, shaderInt16);
-        GET_MEMBER_VALUE(member, shaderResourceResidency);
-        GET_MEMBER_VALUE(member, shaderResourceMinLod);
-        GET_MEMBER_VALUE(member, sparseBinding);
-        GET_MEMBER_VALUE(member, sparseResidencyBuffer);
-        GET_MEMBER_VALUE(member, sparseResidencyImage2D);
-        GET_MEMBER_VALUE(member, sparseResidencyImage3D);
-        GET_MEMBER_VALUE(member, sparseResidency2Samples);
-        GET_MEMBER_VALUE(member, sparseResidency4Samples);
-        GET_MEMBER_VALUE(member, sparseResidency8Samples);
-        GET_MEMBER_VALUE(member, sparseResidency16Samples);
-        GET_MEMBER_VALUE(member, sparseResidencyAliased);
-        GET_MEMBER_VALUE(member, variableMultisampleRate);
-        GET_MEMBER_VALUE(member, inheritedQueries);
+        GET_MEMBER_VALUE_WARN(member, robustBufferAccess, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, fullDrawIndexUint32, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, imageCubeArray, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, independentBlend, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, geometryShader, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, tessellationShader, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, sampleRateShading, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, dualSrcBlend, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, logicOp, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, multiDrawIndirect, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, drawIndirectFirstInstance, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, depthClamp, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, depthBiasClamp, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, fillModeNonSolid, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, depthBounds, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, wideLines, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, largePoints, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, alphaToOne, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, multiViewport, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, samplerAnisotropy, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, textureCompressionETC2, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, textureCompressionASTC_LDR, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, textureCompressionBC, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, occlusionQueryPrecise, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, pipelineStatisticsQuery, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, vertexPipelineStoresAndAtomics, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, fragmentStoresAndAtomics, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderTessellationAndGeometryPointSize, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderImageGatherExtended, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderStorageImageExtendedFormats, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderStorageImageMultisample, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderStorageImageReadWithoutFormat, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderStorageImageWriteWithoutFormat, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderUniformBufferArrayDynamicIndexing, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderSampledImageArrayDynamicIndexing, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderStorageBufferArrayDynamicIndexing, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderStorageImageArrayDynamicIndexing, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderClipDistance, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderCullDistance, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderFloat64, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderInt64, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderInt16, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderResourceResidency, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, shaderResourceMinLod, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, sparseBinding, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, sparseResidencyBuffer, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, sparseResidencyImage2D, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, sparseResidencyImage3D, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, sparseResidency2Samples, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, sparseResidency4Samples, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, sparseResidency8Samples, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, sparseResidency16Samples, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, sparseResidencyAliased, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, variableMultisampleRate, WarnIfNotEqual);
+        GET_MEMBER_VALUE_WARN(member, inheritedQueries, WarnIfNotEqual);
     }
 }
 
