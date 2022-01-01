@@ -1638,6 +1638,7 @@ class JsonLoader {
     void GetFeature(const Json::Value &features, const std::string& feature_name);
     void GetProperty(const Json::Value &props, const std::string &property_name);
     void GetFormat(const Json::Value &formats, const std::string& format_name, ArrayOfVkFormatProperties *dest);
+    void CheckExtensionSupport(const char* extension);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStencilResolveProperties *dest);
     void GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dest);
@@ -2967,6 +2968,24 @@ void JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
     }
 }
 
+void JsonLoader::CheckExtensionSupport(const char* extension) {
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        if (!PhysicalDeviceData::HasExtension(&pdd_, extension)) {
+            ErrorPrintf(
+                "JSON file sets variables for structs provided by %s, but %s is "
+                "not supported by the device.\n",
+                extension, extension);
+        }
+    } else if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE) {
+        if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, extension)) {
+            ErrorPrintf(
+                "JSON file sets variables for structs provided by %s, but %s is "
+                "not enabled by the profile.\n",
+                extension, extension);
+        }
+    }
+}
+
 bool JsonLoader::LoadFile(const char *filename) {
 
     std::ifstream json_file(filename);
@@ -3003,39 +3022,41 @@ bool JsonLoader::LoadFile(const char *filename) {
         pdd_.simulation_extensions_.clear();
     }
 
-    const auto &caps = root["capabilities"];
-    for (const auto &c : caps) {
-        const auto &extensions = c["extensions"];
-        pdd_.arrayof_extension_properties_.reserve(extensions.size());
-        for (const auto &e : extensions.getMemberNames()) {
-            VkExtensionProperties extension;
-            strcpy(extension.extensionName, e.c_str());
-            extension.specVersion = extensions[e].asInt();
-            bool found = false;
-            for (const auto &ext : pdd_.arrayof_extension_properties_) {
-                if (strcmp(ext.extensionName, extension.extensionName) == 0) {
-                    found = true;
-                    break;
+    if (pdd_.extension_list_combination_mode_ != SetCombinationMode::SET_FROM_DEVICE) {
+        const auto &caps = root["capabilities"];
+        for (const auto &c : caps) {
+            const auto &extensions = c["extensions"];
+            pdd_.arrayof_extension_properties_.reserve(extensions.size());
+            for (const auto &e : extensions.getMemberNames()) {
+                VkExtensionProperties extension;
+                strcpy(extension.extensionName, e.c_str());
+                extension.specVersion = extensions[e].asInt();
+                bool found = false;
+                for (const auto &ext : pdd_.arrayof_extension_properties_) {
+                    if (strcmp(ext.extensionName, extension.extensionName) == 0) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    pdd_.arrayof_extension_properties_.push_back(extension);
+                    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE) {
+                        pdd_.simulation_extensions_.push_back(extension);
+                    }
                 }
             }
-            if (!found) {
-                pdd_.arrayof_extension_properties_.push_back(extension);
-                if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE) {
-                    pdd_.simulation_extensions_.push_back(extension);
-                }
+            const auto &features = c["features"];
+            for (const auto &feature : features.getMemberNames()) {
+                GetFeature(features, feature);
             }
-        }
-        const auto &features = c["features"];
-        for (const auto &feature : features.getMemberNames()) {
-            GetFeature(features, feature);
-        }
-        const auto &properties = c["properties"];
-        for (const auto &prop : properties.getMemberNames()) {
-            GetProperty(properties, prop);
-        }
-        const auto& formats = c["formats"];
-        for (const auto& format : formats.getMemberNames()) {
-            GetFormat(formats, format, &pdd_.arrayof_format_properties_);
+            const auto &properties = c["properties"];
+            for (const auto &prop : properties.getMemberNames()) {
+                GetProperty(properties, prop);
+            }
+            const auto &formats = c["formats"];
+            for (const auto &format : formats.getMemberNames()) {
+                GetFormat(formats, format, &pdd_.arrayof_format_properties_);
+            }
         }
     }
 
@@ -3482,6 +3503,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupPro
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFeatures)\n");
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
+    }
     for (const auto &member : parent.getMemberNames()) {
         GET_MEMBER_VALUE_WARN(member, robustBufferAccess, WarnIfNotEqual);
         GET_MEMBER_VALUE_WARN(member, fullDrawIndexUint32, WarnIfNotEqual);
@@ -3543,10 +3567,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *d
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorageFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevice8BitStorageFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_8BIT_STORAGE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_8bit_storage, but VK_KHR_8bit_storage is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_8BIT_STORAGE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, storageBuffer8BitAccess, WarnIfNotEqual);
@@ -3557,10 +3580,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorage
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorageFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevice16BitStorageFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_16BIT_STORAGE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_16bit_storage, but VK_KHR_16bit_storage is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_16BIT_STORAGE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, storageBuffer16BitAccess, WarnIfNotEqual);
@@ -3572,11 +3594,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorag
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBufferDeviceAddressFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_buffer_device_address, but "
-            "VK_KHR_buffer_device_address is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, bufferDeviceAddress, WarnIfNotEqual);
@@ -3587,11 +3607,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDevic
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDescriptorIndexingFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_descriptor_indexing, but "
-            "VK_EXT_descriptor_indexing is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderInputAttachmentArrayDynamicIndexing, WarnIfNotEqual);
@@ -3619,11 +3637,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryResetFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceHostQueryResetFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_host_query_reset, but "
-            "VK_EXT_host_query_reset is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, hostQueryReset, WarnIfNotEqual);
@@ -3632,11 +3648,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryRe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFramebufferFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceImagelessFramebufferFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_imageless_framebuffer, but "
-            "VK_KHR_imageless_framebuffer is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, imagelessFramebuffer, WarnIfNotEqual);
@@ -3645,10 +3659,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFr
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMultiviewFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_multiview, but VK_KHR_multiview is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_MULTIVIEW_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, multiview, WarnIfNotEqual);
@@ -3659,12 +3672,15 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && emulatePortability.num <= 0) {
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && emulatePortability.num <= 0) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
             "not supported by the device and emulation is not turned on.\nIf you wish to emulate "
             "VK_KHR_portability_subset, please set environment variable %s to 1.\n",
             kEnvarProfilesEmulatePortability);
+    }
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, constantAlphaColorBlendFactors, WarnIfNotEqual);
@@ -3694,11 +3710,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_sampler_ycbcr_conversion, but "
-            "VK_KHR_sampler_ycbcr_conversion is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, samplerYcbcrConversion, WarnIfNotEqual);
@@ -3707,11 +3721,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbc
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceScalarBlockLayoutFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_scalar_block_layout, but "
-            "VK_EXT_scalar_block_layout is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, scalarBlockLayout, WarnIfNotEqual);
@@ -3720,11 +3732,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlock
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_separate_depth_stencil_layouts, but "
-            "VK_KHR_separate_depth_stencil_layouts is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, separateDepthStencilLayouts, WarnIfNotEqual);
@@ -3733,11 +3743,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDep
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicInt64FeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_shader_atomic_int64, but "
-            "VK_KHR_shader_atomic_int64 is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderBufferInt64Atomics, WarnIfNotEqual);
@@ -3747,6 +3755,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawParametersFeatures *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicInt64FeaturesKHR)\n");
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
+    }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderDrawParameters, WarnIfNotEqual);
     }
@@ -3754,11 +3765,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderFloat16Int8FeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_shader_float16_int8, but "
-            "VK_KHR_shader_float16_int8 is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderFloat16, WarnIfNotEqual);
@@ -3768,11 +3777,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFeatures)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_shader_subgroup_extended_types, but "
-            "VK_KHR_shader_subgroup_extended_types is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderSubgroupExtendedTypes, WarnIfNotEqual);
@@ -3781,6 +3788,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgr
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTimelineSemaphoreFeaturesKHR)\n");
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
+    }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, timelineSemaphore, WarnIfNotEqual);
     }
@@ -3788,11 +3798,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSem
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_uniform_buffer_standard_layout, but"
-            "VK_KHR_unifrom_buffer_standard_layout is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, uniformBufferStandardLayout, WarnIfNotEqual);
@@ -3801,10 +3809,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBuff
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePointersFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVariablePointersFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_variable_pointers, but VK_KHR_variable_pointers is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, variablePointersStorageBuffer, WarnIfNotEqual);
@@ -3814,11 +3821,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePoi
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVulkanMemoryModelFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_vulkan_memory_model, but VK_KHR_vulkan_memory_model "
-            "is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, vulkanMemoryModel, WarnIfNotEqual);
@@ -3829,11 +3834,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemor
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_zero_initialize_workgroup_memory, but "
-            "VK_KHR_zero_initialize_workgroup_memory is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderZeroInitializeWorkgroupMemory, WarnIfNotEqual);
@@ -3842,11 +3845,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitial
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructureFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceAccelerationStructureFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_acceleration_structure, but "
-            "VK_KHR_acceleration_structure is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, accelerationStructure, WarnIfNotEqual);
@@ -3859,13 +3860,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructurePropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceAccelerationStructurePropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_acceleration_structure, but "
-            "VK_KHR_acceleration_structure is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxGeometryCount, WarnIfGreater);
         GET_VALUE_WARN(prop, maxInstanceCount, WarnIfGreater);
@@ -3880,11 +3878,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePerformanceQueryFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_performance_query, but "
-            "VK_KHR_performance_query is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, performanceCounterQueryPools, WarnIfNotEqual);
@@ -3894,13 +3890,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryPropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePerformanceQueryPropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_performance_query, but "
-            "VK_KHR_performance_query is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, allowCommandBufferQueryCopies, WarnIfNotEqual);
     }
@@ -3908,11 +3901,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_pipeline_executable_properties, but "
-            "VK_KHR_pipeline_executable_properties is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, pipelineExecutableInfo, WarnIfNotEqual);
@@ -3921,11 +3912,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePresentIdFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PRESENT_ID_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_present_id, but "
-            "VK_KHR_present_id is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_PRESENT_ID_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, presentId, WarnIfNotEqual);
@@ -3934,11 +3923,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWaitFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePresentWaitFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_present_wait, but "
-            "VK_KHR_present_wait is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_PRESENT_WAIT_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, presentWait, WarnIfNotEqual);
@@ -3947,13 +3934,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWait
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescriptorPropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePushDescriptorPropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_push_descriptor, but "
-            "VK_KHR_push_descriptor is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxPushDescriptors, WarnIfGreater);
     }
@@ -3961,11 +3945,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescrip
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayQueryFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_ray_query, but "
-            "VK_KHR_ray_query is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, rayQuery, WarnIfNotEqual);
@@ -3974,11 +3956,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFea
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelineFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPipelineFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_ray_tracing_pipeline, but "
-            "VK_KHR_ray_tracing_pipeline is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, rayTracingPipeline, WarnIfNotEqual);
@@ -3991,13 +3971,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelinePropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPipelinePropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_ray_tracing_pipeline, but "
-            "VK_KHR_ray_tracing_pipeline is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, shaderGroupHandleSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxRayRecursionDepth, WarnIfGreater);
@@ -4012,11 +3989,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClockFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderClockFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_shader_clock, but "
-            "VK_KHR_shader_clock is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_SHADER_CLOCK_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderSubgroupClock, WarnIfNotEqual);
@@ -4026,11 +4001,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClock
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_shader_integer_dot_product, but "
-            "VK_KHR_shader_integer_dot_product is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderIntegerDotProduct, WarnIfNotEqual);
@@ -4039,13 +4012,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_shader_integer_dot_product, but "
-            "VK_KHR_shader_integer_dot_product is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, integerDotProduct8BitUnsignedAccelerated, WarnIfNotEqual);
         GET_VALUE_WARN(prop, integerDotProduct8BitSignedAccelerated, WarnIfNotEqual);
@@ -4082,11 +4052,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_shader_subgroup_uniform_control_flow, but "
-            "VK_KHR_shader_subgroup_uniform_control_flow is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderSubgroupUniformControlFlow, WarnIfNotEqual);
@@ -4095,11 +4063,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgr
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_shader_terminate_invocation, but "
-            "VK_KHR_shader_terminate_invocation is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderTerminateInvocation, WarnIfNotEqual);
@@ -4108,11 +4074,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTermi
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchronization2FeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSynchronization2FeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_synchronization2, but "
-            "VK_KHR_synchronization2 is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, synchronization2, WarnIfNotEqual);
@@ -4121,11 +4085,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchroniza
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_workgroup_memory_explicit_layout, but "
-            "VK_KHR_workgroup_memory_explicit_layout is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, workgroupMemoryExplicitLayout, WarnIfNotEqual);
@@ -4137,11 +4099,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444FormatsFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_4444_formats, but "
-            "VK_EXT_4444_formats is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_4444_FORMATS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, formatA4R4G4B4, WarnIfNotEqual);
@@ -4151,11 +4111,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444Formats
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceASTCDecodeFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_astc_decode_mode, but "
-            "VK_EXT_astc_decode_mode is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, decodeModeSharedExponent, WarnIfNotEqual);
@@ -4164,11 +4122,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeF
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_blend_operation_advanced, but "
-            "VK_EXT_blend_operation_advanced is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, advancedBlendCoherentOperations, WarnIfNotEqual);
@@ -4177,13 +4133,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_blend_operation_advanced, but "
-            "VK_EXT_blend_operation_advanced is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, advancedBlendMaxColorAttachments, WarnIfGreater);
         GET_VALUE_WARN(prop, advancedBlendIndependentBlend, WarnIfNotEqual);
@@ -4196,11 +4149,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBorderColorSwizzleFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_border_color_swizzle, but "
-            "VK_EXT_border_color_swizzle is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, borderColorSwizzle, WarnIfNotEqual);
@@ -4210,11 +4161,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColor
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceColorWriteEnableFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_color_write_enable, but "
-            "VK_EXT_color_write_enable is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, colorWriteEnable, WarnIfNotEqual);
@@ -4223,11 +4172,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteE
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceConditionalRenderingFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_conditional_rendering, but "
-            "VK_EXT_conditional_rendering is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, conditionalRendering, WarnIfNotEqual);
@@ -4237,13 +4184,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditional
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceConservativeRasterizationPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_conservative_rasterization, but "
-            "VK_EXT_conservative_rasterization is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, primitiveOverestimationSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxExtraPrimitiveOverestimationSize, WarnIfGreater);
@@ -4259,11 +4203,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativ
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCustomBorderColorFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_custom_border_color, but "
-            "VK_EXT_custom_border_color is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, customBorderColors, WarnIfNotEqual);
@@ -4273,13 +4215,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorde
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCustomBorderColorPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_custom_border_color, but "
-            "VK_EXT_custom_border_color is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxCustomBorderColorSamplers, WarnIfGreater);
     }
@@ -4287,11 +4226,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorde
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDepthClipEnableFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_depth_clip_enable, but "
-            "VK_EXT_depth_clip_enable is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, depthClipEnable, WarnIfNotEqual);
@@ -4300,11 +4237,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEn
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDeviceMemoryReportFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_device_memory_report, but "
-            "VK_EXT_device_memory_report is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, deviceMemoryReport, WarnIfNotEqual);
@@ -4313,13 +4248,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemor
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDiscardRectanglePropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_discard_rectangles, but "
-            "VK_EXT_discard_rectangles is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxDiscardRectangles, WarnIfGreater);
     }
@@ -4327,11 +4259,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRect
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExtendedDynamicStateFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_extended_dynamic_state, but "
-            "VK_EXT_extended_dynamic_state is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, extendedDynamicState, WarnIfNotEqual);
@@ -4340,11 +4270,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExtendedDynamicState2FeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_extended_dynamic_state2, but "
-            "VK_EXT_extended_dynamic_state2 is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, extendedDynamicState2, WarnIfNotEqual);
@@ -4355,13 +4283,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryHostPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExternalMemoryHostPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_external_memory_host, but "
-            "VK_EXT_external_memory_host is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, minImportedHostPointerAlignment, WarnIfGreater);
     }
@@ -4369,11 +4294,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_fragment_density_map, but "
-            "VK_EXT_fragment_density_map is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, fragmentDensityMap, WarnIfNotEqual);
@@ -4384,13 +4307,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_fragment_density_map, but "
-            "VK_EXT_fragment_density_map is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, minFragmentDensityTexelSize, WarnIfLesser);
         GET_VALUE_WARN(prop, maxFragmentDensityTexelSize, WarnIfGreater);
@@ -4400,11 +4320,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_fragment_shader_interlock, but "
-            "VK_EXT_fragment_shader_interlock is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, fragmentShaderSampleInterlock, WarnIfNotEqual);
@@ -4415,11 +4333,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_global_priority_query, but "
-            "VK_EXT_global_priority_query is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, globalPriorityQuery, WarnIfNotEqual);
@@ -4428,11 +4344,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPrior
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobustnessFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceImageRobustnessFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_image_robustness, but "
-            "VK_EXT_image_robustness is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, robustImageAccess, WarnIfNotEqual);
@@ -4441,11 +4355,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobust
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUint8FeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceIndexTypeUint8FeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_index_type_uint8, but "
-            "VK_EXT_index_type_uint8 is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, indexTypeUint8, WarnIfNotEqual);
@@ -4454,11 +4366,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUi
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceInlineUniformBlockFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_inline_uniform_block, but "
-            "VK_EXT_inline_uniform_block is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, inlineUniformBlock, WarnIfNotEqual);
@@ -4468,13 +4378,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceInlineUniformBlockPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_inline_uniform_block, but "
-            "VK_EXT_inline_uniform_block is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxInlineUniformBlockSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxPerStageDescriptorInlineUniformBlocks, WarnIfGreater);
@@ -4486,11 +4393,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceLineRasterizationFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_line_rasterization, but "
-            "VK_EXT_line_rasterization is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, rectangularLines, WarnIfNotEqual);
@@ -4504,13 +4409,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceLineRasterizationPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_line_rasterization, but "
-            "VK_EXT_line_rasterization is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, lineSubPixelPrecisionBits, WarnIfGreater);
     }
@@ -4518,11 +4420,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPriorityFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMemoryPriorityFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_memory_priority, but "
-            "VK_EXT_memory_priority is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, memoryPriority, WarnIfNotEqual);
@@ -4531,11 +4431,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPrior
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMultiDrawFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_multi_draw, but "
-            "VK_EXT_multi_draw is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_MULTI_DRAW_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, multiDraw, WarnIfNotEqual);
@@ -4544,13 +4442,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMultiDrawPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_multi_draw, but "
-            "VK_EXT_multi_draw is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_MULTI_DRAW_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxMultiDrawCount, WarnIfGreater);
     }
@@ -4558,11 +4453,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPr
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_pageable_device_local_memory, but "
-            "VK_EXT_pageable_device_local_memory is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, pageableDeviceLocalMemory, WarnIfNotEqual);
@@ -4571,11 +4464,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDev
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_pipeline_creation_cache_control, but "
-            "VK_EXT_pipeline_creation_cache_control is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, pipelineCreationCacheControl, WarnIfNotEqual);
@@ -4584,11 +4475,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCre
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_primitive_topology_list_restart, but "
-            "VK_EXT_primitive_topology_list_restart is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, primitiveTopologyListRestart, WarnIfNotEqual);
@@ -4598,11 +4487,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTo
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateDataFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePrivateDataFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_private_data, but "
-            "VK_EXT_private_data is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_PRIVATE_DATA_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, privateData, WarnIfNotEqual);
@@ -4611,11 +4498,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateData
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProvokingVertexFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_provoking_vertex, but "
-            "VK_EXT_provoking_vertex is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, provokingVertexLast, WarnIfNotEqual);
@@ -4625,13 +4510,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceProvokingVertexPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_provoking_vertex, but "
-            "VK_EXT_provoking_vertex is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, provokingVertexModePerPipeline, WarnIfNotEqual);
         GET_VALUE_WARN(prop, transformFeedbackPreservesTriangleFanProvokingVertex, WarnIfNotEqual);
@@ -4640,11 +4522,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_rgba10x6_formats, but "
-            "VK_EXT_rgba10x6_formats is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, formatRgba10x6WithoutYCbCrSampler, WarnIfNotEqual);
@@ -4653,11 +4533,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6For
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2FeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRobustness2FeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_robustness2, but "
-            "VK_EXT_robustness2 is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_ROBUSTNESS_2_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, robustBufferAccess2, WarnIfNotEqual);
@@ -4668,13 +4546,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2PropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRobustness2PropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_robustness2, but "
-            "VK_EXT_robustness2 is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_ROBUSTNESS_2_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, robustStorageBufferAccessSizeAlignment, WarnIfGreater);
         GET_VALUE_WARN(prop, robustUniformBufferAccessSizeAlignment, WarnIfGreater);
@@ -4683,13 +4558,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocationsPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSampleLocationsPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_sample_locations, but "
-            "VK_EXT_sample_locations is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, sampleLocationSampleCounts, WarnIfGreater);
         GET_VALUE_WARN(prop, maxSampleLocationGridSize, WarnIfGreater);
@@ -4701,11 +4573,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocat
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicFloatFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_shader_atomic_float, but "
-            "VK_EXT_shader_atomic_float is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderBufferFloat32Atomics, WarnIfNotEqual);
@@ -4725,11 +4595,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_shader_atomic_float2, but "
-            "VK_EXT_shader_atomic_float2 is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderBufferFloat16Atomics, WarnIfNotEqual);
@@ -4749,11 +4617,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_shader_demote_to_helper_invocation, but "
-            "VK_EXT_shader_demote_to_helper_invocation is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderDemoteToHelperInvocation, WarnIfNotEqual);
@@ -4762,11 +4628,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemot
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_shader_image_atomic_int64, but "
-            "VK_EXT_shader_image_atomic_int64 is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderImageInt64Atomics, WarnIfNotEqual);
@@ -4776,11 +4640,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupSizeControlFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_subgroup_size_control, but "
-            "VK_EXT_subgroup_size_control is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, subgroupSizeControl, WarnIfNotEqual);
@@ -4790,13 +4652,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupSizeControlPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_subgroup_size_control, but "
-            "VK_EXT_subgroup_size_control is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, minSubgroupSize, WarnIfLesser);
         GET_VALUE_WARN(prop, maxSubgroupSize, WarnIfGreater);
@@ -4807,11 +4666,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_texel_buffer_alignment, but "
-            "VK_EXT_texel_buffer_alignment is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, texelBufferAlignment, WarnIfNotEqual);
@@ -4820,13 +4677,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_texel_buffer_alignment, but "
-            "VK_EXT_texel_buffer_alignment is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, storageTexelBufferOffsetAlignmentBytes, WarnIfGreater);
         GET_VALUE_WARN(prop, storageTexelBufferOffsetSingleTexelAlignment, WarnIfNotEqual);
@@ -4837,11 +4691,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_texture_compression_astc_hdr, but "
-            "VK_EXT_texture_compression_astc_hdr is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, textureCompressionASTC_HDR, WarnIfNotEqual);
@@ -4850,11 +4702,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureComp
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTransformFeedbackFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_transform_feedback, but "
-            "VK_EXT_transform_feedback is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, transformFeedback, WarnIfNotEqual);
@@ -4864,13 +4714,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceTransformFeedbackPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_transform_feedback, but "
-            "VK_EXT_transform_feedback is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxTransformFeedbackStreams, WarnIfGreater);
         GET_VALUE_WARN(prop, maxTransformFeedbackBuffers, WarnIfGreater);
@@ -4887,11 +4734,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_vertex_attribute_divisor, but "
-            "VK_EXT_vertex_attribute_divisor is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, vertexAttributeInstanceRateDivisor, WarnIfNotEqual);
@@ -4901,13 +4746,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_vertex_attribute_divisor, but "
-            "VK_EXT_vertex_attribute_divisor is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxVertexAttribDivisor, WarnIfGreater);
     }
@@ -4915,11 +4757,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_vertex_input_dynamic_state, but "
-            "VK_EXT_vertex_input_dynamic_state is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, vertexInputDynamicState, WarnIfNotEqual);
@@ -4928,11 +4768,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInput
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_ycbcr_2plane_444_formats, but "
-            "VK_EXT_ycbcr_2plane_444_formats is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, ycbcr2plane444Formats, WarnIfNotEqual);
@@ -4941,11 +4779,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceYcbcrImageArraysFeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_ycbcr_image_arrays, but "
-            "VK_EXT_ycbcr_image_arrays is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, ycbcrImageArrays, WarnIfNotEqual);
@@ -4954,11 +4790,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageA
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_fragment_shading_rate, but "
-            "VK_KHR_fragment_shading_rate is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, pipelineFragmentShadingRate, WarnIfNotEqual);
@@ -4969,13 +4803,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRatePropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_fragment_shading_rate, but "
-            "VK_KHR_fragment_shading_rate is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, minFragmentShadingRateAttachmentTexelSize, WarnIfLesser);
         GET_VALUE_WARN(prop, maxFragmentShadingRateAttachmentTexelSize, WarnIfGreater);
@@ -4999,11 +4830,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMemoryFeaturesAMD *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCoherentMemoryFeaturesAMD)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_AMD_device_coherent_memory, but "
-            "VK_AMD_device_coherent_memory is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, deviceCoherentMemory, WarnIfNotEqual);
@@ -5012,13 +4841,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMem
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCorePropertiesAMD *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderCorePropertiesAMD)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_AMD_shader_core_properties, but "
-            "VK_AMD_shader_core_properties is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, shaderEngineCount, WarnIfGreater);
         GET_VALUE_WARN(prop, shaderArraysPerEngineCount, WarnIfGreater);
@@ -5039,13 +4865,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreProperties2AMD *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderCoreProperties2AMD)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_AMD_shader_core_properties2, but "
-            "VK_AMD_shader_core_properties2 is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, shaderCoreFeatures, WarnIfGreater);
         GET_VALUE_WARN(prop, activeComputeUnitCount, WarnIfGreater);
@@ -5054,11 +4877,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceInvocationMaskFeaturesHUAWEI)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_HUAWEI_invocation_mask, but "
-            "VK_HUAWEI_invocation_mask is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, invocationMask, WarnIfNotEqual);
@@ -5067,11 +4888,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationM
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubpassShadingFeaturesHUAWEI)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_HUAWEI_subpass_shading, but "
-            "VK_HUAWEI_subpass_shading is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, subpassShading, WarnIfNotEqual);
@@ -5080,13 +4899,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceSubpassShadingPropertiesHUAWEI)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_HUAWEI_subpass_shading, but "
-            "VK_HUAWEI_subpass_shading is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxSubpassShadingWorkgroupSizeAspectRatio, WarnIfNotEqual);
     }
@@ -5094,11 +4910,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_INTEL_shader_integer_functions2, but "
-            "VK_INTEL_shader_integer_functions2 is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderIntegerFunctions2, WarnIfNotEqual);
@@ -5107,11 +4921,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceComputeShaderDerivativesFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_compute_shader_derivatives, but "
-            "VK_NV_compute_shader_derivatives is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, computeDerivativeGroupQuads, WarnIfNotEqual);
@@ -5121,11 +4933,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShad
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCooperativeMatrixFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_cooperative_matrix, but "
-            "VK_NV_cooperative_matrix is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, cooperativeMatrix, WarnIfNotEqual);
@@ -5135,13 +4945,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixPropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCooperativeMatrixPropertiesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_cooperative_matrix, but "
-            "VK_NV_cooperative_matrix is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, cooperativeMatrixSupportedStages, WarnIfGreater);
     }
@@ -5149,11 +4956,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampledImageFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCornerSampledImageFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_corner_sampled_image, but "
-            "VK_NV_corner_sampled_image is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, cornerSampledImage, WarnIfNotEqual);
@@ -5162,11 +4967,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampl
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageReductionModeFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceCoverageReductionModeFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_coverage_reduction_mode, but "
-            "VK_NV_coverage_reduction_mode is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, coverageReductionMode, WarnIfNotEqual);
@@ -5175,11 +4978,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageRed
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_DEDICATED_ALLOCATION_IMAGE_ALIASING_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_dedicated_allocation_image_aliasing, but "
-            "VK_NV_dedicated_allocation_image_aliasing is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_DEDICATED_ALLOCATION_IMAGE_ALIASING_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, dedicatedAllocationImageAliasing, WarnIfNotEqual);
@@ -5188,11 +4989,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAl
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDiagnosticsConfigFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_device_diagnostics_config, but "
-            "VK_NV_device_diagnostics_config is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, diagnosticsConfig, WarnIfNotEqual);
@@ -5201,11 +5000,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnostics
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_device_generated_commands, but "
-            "VK_NV_device_generated_commands is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, deviceGeneratedCommands, WarnIfNotEqual);
@@ -5214,13 +5011,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_device_generated_commands, but "
-            "VK_NV_device_generated_commands is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxGraphicsShaderGroupCount, WarnIfGreater);
         GET_VALUE_WARN(prop, maxIndirectSequenceCount, WarnIfGreater);
@@ -5236,11 +5030,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExternalMemoryRDMAFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_external_memory_rdma, but "
-            "VK_NV_external_memory_rdma is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, externalMemoryRDMA, WarnIfNotEqual);
@@ -5249,11 +5041,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_fragment_shader_barycentric, but "
-            "VK_NV_fragment_shader_barycentric is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, fragmentShaderBarycentric, WarnIfNotEqual);
@@ -5262,11 +5052,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_fragment_shading_rate_enums, but "
-            "VK_NV_fragment_shading_rate_enums is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, fragmentShadingRateEnums, WarnIfNotEqual);
@@ -5277,13 +5065,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_fragment_shading_rate_enums, but "
-            "VK_NV_fragment_shading_rate_enums is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE(prop, maxFragmentShadingRateInvocationCount);
     }
@@ -5291,11 +5076,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedViewportScissorFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceInheritedViewportScissorFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_inherited_viewport_scissor, but "
-            "VK_NV_inherited_viewport_scissor is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, inheritedViewportScissor2D, WarnIfNotEqual);
@@ -5304,11 +5087,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedVi
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_mesh_shader, but "
-            "VK_NV_mesh_shader is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_MESH_SHADER_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, taskShader, WarnIfNotEqual);
@@ -5318,13 +5099,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderF
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderPropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderPropertiesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_mesh_shader, but "
-            "VK_NV_mesh_shader is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_MESH_SHADER_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxDrawMeshTasksCount, WarnIfGreater);
         GET_VALUE_WARN(prop, maxTaskWorkGroupInvocations, WarnIfGreater);
@@ -5344,13 +5122,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPropertiesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_RAY_TRACING_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_ray_tracing, but "
-            "VK_NV_ray_tracing is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_RAY_TRACING_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, shaderGroupHandleSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxRecursionDepth, WarnIfGreater);
@@ -5365,11 +5140,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingMotionBlurFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_ray_tracing_motion_blur, but "
-            "VK_NV_ray_tracing_motion_blur is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, rayTracingMotionBlur, WarnIfNotEqual);
@@ -5379,11 +5152,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingM
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_representative_fragment_test, but "
-            "VK_NV_representative_fragment_test is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, representativeFragmentTest, WarnIfNotEqual);
@@ -5392,11 +5163,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentat
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveScissorFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceExclusiveScissorFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_scissor_exclusive, but "
-            "VK_NV_scissor_exclusive is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, exclusiveScissor, WarnIfNotEqual);
@@ -5405,11 +5174,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveSc
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageFootprintFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderImageFootprintFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_shader_image_footprint, but "
-            "VK_NV_shader_image_footprint is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, imageFootprint, WarnIfNotEqual);
@@ -5418,11 +5185,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderSMBuiltinsFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_shader_sm_builtins, but "
-            "VK_NV_shader_sm_builtins is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderSMBuiltins, WarnIfNotEqual);
@@ -5431,13 +5196,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBui
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsPropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShaderSMBuiltinsPropertiesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_shader_sm_builtins, but "
-            "VK_NV_shader_sm_builtins is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, shaderSMCount, WarnIfGreater);
         GET_VALUE_WARN(prop, shaderWarpsPerSM, WarnIfGreater);
@@ -5446,11 +5208,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBui
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImageFeaturesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShadingRateImageFeaturesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_shading_rate_image, but "
-            "VK_NV_shading_rate_image is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shadingRateImage, WarnIfNotEqual);
@@ -5460,13 +5220,10 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImagePropertiesNV *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceShadingRateImagePropertiesNV)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_NV_shading_rate_image, but "
-            "VK_NV_shading_rate_image is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
-
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, shadingRateTexelSize, WarnIfGreater);
         GET_VALUE_WARN(prop, shadingRatePaletteSize, WarnIfGreater);
@@ -5476,11 +5233,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_VALVE_mutable_descriptor_type, but "
-            "VK_VALVE_mutable_descriptor_type is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, mutableDescriptorType, WarnIfNotEqual);
@@ -5489,11 +5244,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDesc
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRenderingFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDynamicRenderingFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_KHR_dynamic_rendering, but "
-            "VK_KHR_dynamic_rendering is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, dynamicRendering, WarnIfNotEqual);
@@ -5502,11 +5255,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRend
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMap2FeaturesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_fragment_density_map2, but "
-            "VK_EXT_fragment_density_map2 is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, fragmentDensityMapDeferred, WarnIfNotEqual);
@@ -5515,11 +5266,9 @@ void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 
 void JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMap2PropertiesEXT)\n");
-    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
-        ErrorPrintf(
-            "JSON file sets variables for structs provided by VK_EXT_fragment_density_map2, but "
-            "VK_EXT_fragment_density_map2 is "
-            "not supported by the device.\n");
+    CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME);
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return;
     }
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, subsampledLoads, WarnIfNotEqual);
