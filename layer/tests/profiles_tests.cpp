@@ -193,6 +193,7 @@ TEST(profiles, TestSelectingProfile) {
                                           TEST_SOURCE_PATH "/../../profiles/VP_ANDROID_baseline_2021.json"};
     profiles_test::setProfilesFilenames(filepaths);
     profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
+    profiles_test::setProfilesModifyExtensionList(profiles_test::SetCombinationMode::SET_FROM_PROFILE);
 
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
