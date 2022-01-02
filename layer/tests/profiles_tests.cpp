@@ -760,3 +760,58 @@ TEST(profiles, TestSetCombinationMode) {
     }
 
 }
+
+TEST(profiles, TestExtensionNotSupported) {
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    std::vector<VkExtensionProperties> device_extensions;
+    {
+        err = inst_builder.makeInstance();
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkInstance test_inst = inst_builder.getInstance();
+
+        uint32_t gpu_count = 1;
+        VkPhysicalDevice gpu = VK_NULL_HANDLE;
+        err = vkEnumeratePhysicalDevices(test_inst, &gpu_count, &gpu);
+
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+        } else {
+            uint32_t count;
+            vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
+            device_extensions.resize(count);
+            vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, device_extensions.data());
+        }
+
+        vkDestroyInstance(test_inst, nullptr);
+        inst_builder.reset();
+    }
+
+    {
+        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+        std::vector<std::string> filepaths = {TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_api_1_2_198.json"};
+        profiles_test::setProfilesFilenames(filepaths);
+        profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
+        profiles_test::setProfilesProfileName("VP_LUNARG_test_api_1_2_198");
+        profiles_test::setProfilesModifyExtensionList(profiles_test::SetCombinationMode::SET_FROM_PROFILE);
+
+        err = inst_builder.makeInstance();
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkInstance test_inst = inst_builder.getInstance();
+
+        uint32_t gpu_count = 1;
+        VkPhysicalDevice gpu = VK_NULL_HANDLE;
+        err = vkEnumeratePhysicalDevices(test_inst, &gpu_count, &gpu);
+
+        if (device_extensions.size() < 231) {
+            ASSERT_EQ(err, VK_ERROR_EXTENSION_NOT_PRESENT);
+        }
+
+        vkDestroyInstance(test_inst, nullptr);
+        inst_builder.reset();
+    }
+}
