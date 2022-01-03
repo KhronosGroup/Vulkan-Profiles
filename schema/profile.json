@@ -1,8 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.3.201",
-    "description": "TODO",
+    "$id": "https://schema.khronos.org/vulkan/profiles-1.3.203.json#",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.203",
     "additionalProperties": true,
     "required": [
         "capabilities",
@@ -463,13 +462,17 @@
                 }
             }
         },
-        "VkQueueGlobalPriorityEXT": {
+        "VkQueueGlobalPriorityKHR": {
             "type": "string",
             "enum": [
                 "VK_QUEUE_GLOBAL_PRIORITY_LOW_EXT",
                 "VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_EXT",
                 "VK_QUEUE_GLOBAL_PRIORITY_HIGH_EXT",
-                "VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT"
+                "VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT",
+                "VK_QUEUE_GLOBAL_PRIORITY_LOW_KHR",
+                "VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_KHR",
+                "VK_QUEUE_GLOBAL_PRIORITY_HIGH_KHR",
+                "VK_QUEUE_GLOBAL_PRIORITY_REALTIME_KHR"
             ]
         },
         "VkQueueFamilyGlobalPriorityPropertiesEXT": {
@@ -483,7 +486,23 @@
                     "type": "array",
                     "maxItems": 16,
                     "items": {
-                        "$ref": "#/definitions/VkQueueGlobalPriorityEXT"
+                        "$ref": "#/definitions/VkQueueGlobalPriorityKHR"
+                    }
+                }
+            }
+        },
+        "VkQueueFamilyGlobalPriorityPropertiesKHR": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "priorities"
+            ],
+            "properties": {
+                "priorities": {
+                    "type": "array",
+                    "maxItems": 16,
+                    "items": {
+                        "$ref": "#/definitions/VkQueueGlobalPriorityKHR"
                     }
                 }
             }
@@ -1357,7 +1376,7 @@
                 }
             }
         },
-        "VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT": {
+        "VkPhysicalDeviceGlobalPriorityQueryFeaturesKHR": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -2661,6 +2680,57 @@
             "additionalProperties": false,
             "properties": {
                 "dynamicRendering": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "fragmentDensityMapOffset": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceDepthClipControlFeaturesEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "depthClipControl": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceImageViewMinLodFeaturesEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "minLod": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "rasterizationOrderColorAttachmentAccess": {
+                    "type": "boolean"
+                },
+                "rasterizationOrderDepthAttachmentAccess": {
+                    "type": "boolean"
+                },
+                "rasterizationOrderStencilAttachmentAccess": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceLinearColorAttachmentFeaturesNV": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "linearColorAttachment": {
                     "type": "boolean"
                 }
             }
@@ -4489,6 +4559,24 @@
                     "$ref": "#/definitions/uint64_t"
                 }
             }
+        },
+        "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "fragmentDensityOffsetGranularity": {
+                    "$ref": "#/definitions/VkExtent2D"
+                }
+            }
+        },
+        "VkQueueFamilyQueryResultStatusProperties2KHR": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "supported": {
+                    "type": "boolean"
+                }
+            }
         }
     },
     "properties": {
@@ -4613,6 +4701,9 @@
                                 "type": "integer"
                             },
                             "VK_KHR_get_surface_capabilities2": {
+                                "type": "integer"
+                            },
+                            "VK_KHR_global_priority": {
                                 "type": "integer"
                             },
                             "VK_KHR_image_format_list": {
@@ -5047,6 +5138,9 @@
                             "VK_EXT_ycbcr_image_arrays": {
                                 "type": "integer"
                             },
+                            "VK_EXT_disable_cube_map_wrap": {
+                                "type": "integer"
+                            },
                             "VK_AMD_buffer_marker": {
                                 "type": "integer"
                             },
@@ -5138,6 +5232,9 @@
                                 "type": "integer"
                             },
                             "VK_GOOGLE_display_timing": {
+                                "type": "integer"
+                            },
+                            "VK_GOOGLE_surfaceless_query": {
                                 "type": "integer"
                             },
                             "VK_GOOGLE_hlsl_functionality1": {
@@ -5281,6 +5378,9 @@
                             "VK_NV_win32_keyed_mutex": {
                                 "type": "integer"
                             },
+                            "VK_NV_linear_color_attachment": {
+                                "type": "integer"
+                            },
                             "VK_NVX_binary_import": {
                                 "type": "integer"
                             },
@@ -5300,6 +5400,9 @@
                                 "type": "integer"
                             },
                             "VK_QCOM_rotated_copy_commands": {
+                                "type": "integer"
+                            },
+                            "VK_QCOM_fragment_density_map_offset": {
                                 "type": "integer"
                             },
                             "VK_QNX_screen_surface": {
@@ -5412,7 +5515,10 @@
                                 "$ref": "#/definitions/VkPhysicalDeviceHostQueryResetFeatures"
                             },
                             "VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT": {
-                                "$ref": "#/definitions/VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT"
+                                "$ref": "#/definitions/VkPhysicalDeviceGlobalPriorityQueryFeaturesKHR"
+                            },
+                            "VkPhysicalDeviceGlobalPriorityQueryFeaturesKHR": {
+                                "$ref": "#/definitions/VkPhysicalDeviceGlobalPriorityQueryFeaturesKHR"
                             },
                             "VkPhysicalDeviceDeviceMemoryReportFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceDeviceMemoryReportFeaturesEXT"
@@ -5728,6 +5834,21 @@
                             },
                             "VkPhysicalDeviceDynamicRenderingFeaturesKHR": {
                                 "$ref": "#/definitions/VkPhysicalDeviceDynamicRenderingFeatures"
+                            },
+                            "VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM": {
+                                "$ref": "#/definitions/VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM"
+                            },
+                            "VkPhysicalDeviceDepthClipControlFeaturesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceDepthClipControlFeaturesEXT"
+                            },
+                            "VkPhysicalDeviceImageViewMinLodFeaturesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceImageViewMinLodFeaturesEXT"
+                            },
+                            "VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM": {
+                                "$ref": "#/definitions/VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM"
+                            },
+                            "VkPhysicalDeviceLinearColorAttachmentFeaturesNV": {
+                                "$ref": "#/definitions/VkPhysicalDeviceLinearColorAttachmentFeaturesNV"
                             }
                         }
                     },
@@ -5951,6 +6072,12 @@
                             },
                             "VkPhysicalDeviceDrmPropertiesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceDrmPropertiesEXT"
+                            },
+                            "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM": {
+                                "$ref": "#/definitions/VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM"
+                            },
+                            "VkQueueFamilyQueryResultStatusProperties2KHR": {
+                                "$ref": "#/definitions/VkQueueFamilyQueryResultStatusProperties2KHR"
                             }
                         }
                     },
@@ -6819,6 +6946,9 @@
                                 },
                                 "VkQueueFamilyGlobalPriorityPropertiesEXT": {
                                     "$ref": "#/definitions/VkQueueFamilyGlobalPriorityPropertiesEXT"
+                                },
+                                "VkQueueFamilyGlobalPriorityPropertiesKHR": {
+                                    "$ref": "#/definitions/VkQueueFamilyGlobalPriorityPropertiesKHR"
                                 },
                                 "VkVideoQueueFamilyProperties2KHR": {
                                     "$ref": "#/definitions/VkVideoQueueFamilyProperties2KHR"
