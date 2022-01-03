@@ -4319,13 +4319,13 @@
                     "$ref": "#/definitions/VkDeviceSize"
                 },
                 "storageTexelBufferOffsetSingleTexelAlignment": {
-                    "$ref": "#/definitions/uint32_t"
+                    "type": "boolean"
                 },
                 "uniformTexelBufferOffsetAlignmentBytes": {
                     "$ref": "#/definitions/VkDeviceSize"
                 },
                 "uniformTexelBufferOffsetSingleTexelAlignment": {
-                    "$ref": "#/definitions/uint32_t"
+                    "type": "boolean"
                 },
                 "maxBufferSize": {
                     "$ref": "#/definitions/VkDeviceSize"
