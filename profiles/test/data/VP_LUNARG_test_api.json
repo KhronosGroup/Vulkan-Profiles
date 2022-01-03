@@ -753,6 +753,23 @@
                 },
                 "VkPhysicalDeviceFragmentDensityMap2FeaturesEXT": {
                     "fragmentDensityMapDeferred": true
+                },
+                "VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM": {
+                    "fragmentDensityMapOffset": true
+                },
+                "VkPhysicalDeviceDepthClipControlFeaturesEXT": {
+                    "depthClipControl": true
+                },
+                "VkPhysicalDeviceImageViewMinLodFeaturesEXT": {
+                    "minLod": true
+                },
+                "VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM": {
+                    "rasterizationOrderColorAttachmentAccess": true,
+                    "rasterizationOrderDepthAttachmentAccess": true,
+                    "rasterizationOrderStencilAttachmentAccess": true
+                },
+                "VkPhysicalDeviceLinearColorAttachmentFeaturesNV": {
+                    "linearColorAttachment": true
                 }
             },
             "properties": {
@@ -1312,6 +1329,15 @@
                     "deviceLUID": "2",
                     "deviceNodeMask": 377,
                     "deviceLUIDValid": true
+                },
+                "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM": {
+                    "fragmentDensityOffsetGranularity": {
+                        "width": 7,
+                        "height": 6
+                    }
+                },
+                "VkQueueFamilyQueryResultStatusProperties2KHR": {
+                    "supported": true
                 }
             },
             "formats": {
@@ -3110,10 +3136,16 @@
             },
             "history": [
                 {
+                    "revision": 2,
+                    "date": "2022-01-03",
+                    "author": "Christophe Riccio",
+                    "comment": "Rebase to Vulkan 1.3.203 capabilities"
+                },
+                {
                     "revision": 1,
                     "date": "2021-12-08",
                     "author": "Ziga Markus",
-                    "comment": "Initial revision"
+                    "comment": "Initial revision against 1.2.198"
                 }
             ],
             "capabilities": [ "capabilities" ]

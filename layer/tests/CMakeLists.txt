@@ -18,7 +18,7 @@ function(ProfilesTest NAME)
         target_link_libraries(${TEST_NAME} Vulkan::Vulkan)
     endif()
     target_compile_definitions(${TEST_NAME} PUBLIC TEST_SOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
-    target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="${CMAKE_BINARY_DIR}/bin/")
+    target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="${CMAKE_BINARY_DIR}/")
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
     # try to be OS-independent
