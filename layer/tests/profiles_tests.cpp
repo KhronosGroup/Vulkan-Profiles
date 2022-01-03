@@ -5,8 +5,21 @@
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
 
+#ifdef _WIN32
+#ifdef _DEBUG
+static const char* CONFIG_PATH = "Debug";
+#else
+static const char* CONFIG_PATH = "Release";
+#endif
+#else 
+static const char* CONFIG_PATH = "";
+#endif
+
 TEST(profiles, TestDesktopPortability2022Limits) {
     VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
