@@ -30,7 +30,7 @@ void unsetEnvironmentSetting(std::string setting);
 
 std::string getAbsolutePath(std::string filepath);
 
-enum SetCombinationMode { SET_CHECK_SUPPORT, SET_FROM_PROFILE, SET_FROM_DEVICE };
+enum SetCombinationMode { SET_CHECK_SUPPORT, SET_FROM_DEVICE, SET_FROM_PROFILE, SET_FROM_PROFILE_OVERRIDE };
 
 std::string setCombinationModeToString(SetCombinationMode mode);
 
@@ -66,4 +66,4 @@ class VulkanInstanceBuilder {
     std::vector<const char*> _layer_names;
     std::vector<const char*> _extension_names;
 };
-}
+}  // namespace profiles_test

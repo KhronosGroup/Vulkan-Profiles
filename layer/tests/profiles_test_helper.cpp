@@ -66,10 +66,12 @@ std::string profiles_test::setCombinationModeToString(SetCombinationMode mode) {
     switch (mode) {
         case SetCombinationMode::SET_CHECK_SUPPORT:
             return "check_support";
-        case SetCombinationMode::SET_FROM_PROFILE:
-            return "from_profile";
         case SetCombinationMode::SET_FROM_DEVICE:
             return "from_device";
+        case SetCombinationMode::SET_FROM_PROFILE:
+            return "from_profile";
+        case SetCombinationMode::SET_FROM_PROFILE_OVERRIDE:
+            return "from_profile_override";
         default:
             break;
     }
