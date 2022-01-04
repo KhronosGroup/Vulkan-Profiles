@@ -1628,7 +1628,8 @@ class JsonLoader {
     enum class SchemaId {
         kUnknown = 0,
         kProfiles_1_3_200,
-        kProfiles_1_3_201
+        kProfiles_1_3_201,
+        kProfiles_1_3_203
     };
 
     struct Extension {
@@ -3156,6 +3157,8 @@ JsonLoader::SchemaId JsonLoader::IdentifySchema(const Json::Value &value) {
         schema_id = SchemaId::kProfiles_1_3_200;
     } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/profiles-1.3.201.json#") == 0) {
         schema_id = SchemaId::kProfiles_1_3_201;
+    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/profiles-1.3.203.json#") == 0) {
+        schema_id = SchemaId::kProfiles_1_3_203;
     }
 
     if (schema_id != SchemaId::kUnknown) {
