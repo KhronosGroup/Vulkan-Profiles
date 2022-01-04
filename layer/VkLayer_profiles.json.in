@@ -1,14 +1,14 @@
 {
-    "file_format_version": "1.2.0",
+    "file_format_version": "1.2.1",
     "layer": {
         "name": "VK_LAYER_KHRONOS_profiles",
         "type": "GLOBAL",
         "library_path": "@RELATIVE_LAYER_BINARY@",
         "api_version": "@VK_VERSION@",
-        "implementation_version": "1.6.0",
-        "description": "LunarG Profiles layer",
-        "introduction": "The LunarG Profiles layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device.",
-        "url": "https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles.html",
+        "implementation_version": "1.0.0",
+        "description": "Khronos Profiles layer",
+        "introduction": "The Khronos Profiles layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device.",
+        "url": "https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html",
         "device_extensions": [
             {
                 "name": "VK_EXT_tooling_info",
@@ -21,28 +21,8 @@
         "features": {
             "presets": [
                 {
-                    "label": "Desktop Vulkan 1.0 Portability",
-                    "description": "Check the Vulkan 1.0 application will run on Windows and Linux platforms without exceeding ecosystem effective devices capabilities",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "status": "STABLE",
-                    "settings": [
-                        {
-                            "key": "emulate_portability",
-                            "value": true
-                        },
-                        {
-                            "key": "modify_extension_list",
-                            "value": "from_profile"
-                        },
-                        {
-                            "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/portability_desktop_1_0.json"
-                        }
-                    ]
-                },
-                {
-                    "label": "Desktop Vulkan 1.2 Portability",
-                    "description": "Check the Vulkan 1.2 application will run on Windows and Linux platforms without exceeding ecosystem effective devices capabilities.",
+                    "label": "LunarG Desktop Portability Profile",
+                    "description": "Check the Vulkan 1.1 application will run on Windows,  Linux and macOS platforms without exceeding ecosystem effective devices capabilities",
                     "platforms": [ "WINDOWS", "LINUX" ],
                     "status": "STABLE",
                     "settings": [
@@ -51,181 +31,82 @@
                             "value": true
                         },
                         {
-                            "key": "modify_extension_list",
-                            "value": "from_profile"
+                            "key": "profile_file",
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2021.json"
                         },
                         {
-                            "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/portability_desktop_1_2.json"
+                            "key": "profile_name",
+                            "value": "VP_LUNARG_desktop_portability_2021_subset"
                         }
                     ]
                 },
                 {
-                    "label": "macOS Portability Subset",
-                    "description": "Check the Vulkan application for Vulkan portability subset capabilities.",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "status": "STABLE",
-                    "settings": [
-                        {
-                            "key": "emulate_portability",
-                            "value": true
-                        },
-                        {
-                            "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/macOS_gpu_family_1_portability.json"
-                        }
-                    ]
-                },
-                {
-                    "label": "iOS GPU family 3 Portability Subset",
-                    "description": "Check the application for Vulkan portability subset capabilities.",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "status": "STABLE",
-                    "settings": [
-                        {
-                            "key": "emulate_portability",
-                            "value": true
-                        },
-                        {
-                            "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/iOS_gpu_family_3_portability.json"
-                        }
-                    ]
-                },
-                {
-                    "label": "iOS GPU family 5 Portability Subset",
-                    "description": "Check the application for Vulkan portability subset capabilities.",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "status": "STABLE",
-                    "settings": [
-                        {
-                            "key": "emulate_portability",
-                            "value": true
-                        },
-                        {
-                            "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/iOS_gpu_family_5_portability.json"
-                        }
-                    ]
-                },
-                {
-                    "label": "Vulkan 1.2 Minimum Requirements",
-                    "description": "Check the application for Vulkan 1.2 minimum requirements.",
-                    "platforms": [ "WINDOWS", "LINUX" ],
-                    "status": "STABLE",
-                    "settings": [
-                        {
-                            "key": "modify_extension_list",
-                            "value": "from_profile"
-                        },
-                        {
-                            "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/spec_minimum_vulkan_1_2.json"
-                        }
-                    ]
-                },
-                {
-                    "label": "Vulkan 1.1 Minimum Requirements",
-                    "description": "Check the application for Vulkan 1.1 minimum requirements.",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "status": "STABLE",
-                    "settings": [
-                        {
-                            "key": "modify_extension_list",
-                            "value": "from_profile"
-                        },
-                        {
-                            "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/spec_minimum_vulkan_1_1.json"
-                        }
-                    ]
-                },
-                {
-                    "label": "Vulkan 1.0 Minimum Requirements",
-                    "description": "Check the application for Vulkan 1.0 minimum requirements.",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "status": "STABLE",
-                    "settings": [
-                        {
-                            "key": "modify_extension_list",
-                            "value": "from_profile"
-                        },
-                        {
-                            "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/spec_minimum_vulkan_1_0.json"
-                        }
-                    ]
-                },
-                {
-                    "label": "Vulkan 1.2 Portability Requirements",
-                    "description": "Check the application for Vulkan 1.2 minimum and portability subset requirements.",
+                    "label": "Khronos Roadmap 2022 Profile",
+                    "description": "Check the Vulkan 1.3 application will run on the Khronos Roadmap 2022 Profile devices",
                     "platforms": [ "WINDOWS", "LINUX" ],
                     "status": "STABLE",
                     "settings": [
                         {
                             "key": "emulate_portability",
-                            "value": true
+                            "value": false
                         },
                         {
-                            "key": "modify_extension_list",
-                            "value": "from_profile"
+                            "key": "profile_file",
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_KHR_roadmap_2022.json"
                         },
                         {
-                            "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/portability_minimum_vulkan_1_2.json"
+                            "key": "profile_name",
+                            "value": "VP_KHR_roadmap_2022"
                         }
                     ]
                 },
                 {
-                    "label": "Vulkan 1.1 Portability Requirements",
-                    "description": "Check the application for Vulkan 1.1 minimum and portability subset requirements.",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                    "label": "Android Baseline 2021 Profile",
+                    "description": "Check the Vulkan 1.0 application will run on the Android Baseline 2022 Profile devices",
+                    "platforms": [ "WINDOWS", "LINUX" ],
                     "status": "STABLE",
                     "settings": [
                         {
                             "key": "emulate_portability",
-                            "value": true
+                            "value": false
                         },
                         {
-                            "key": "modify_extension_list",
-                            "value": "from_profile"
+                            "key": "profile_file",
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_ANDROID_baseline_2021.json"
                         },
                         {
-                            "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/portability_minimum_vulkan_1_1.json"
-                        }
-                    ]
-                },
-                {
-                    "label": "Vulkan 1.0 Portability Requirements",
-                    "description": "Check the application for Vulkan 1.0 minimum and portability subset requirements.",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "status": "STABLE",
-                    "settings": [
-                        {
-                            "key": "emulate_portability",
-                            "value": true
-                        },
-                        {
-                            "key": "modify_extension_list",
-                            "value": "from_profile"
-                        },
-                        {
-                            "key": "filename",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/portability_minimum_vulkan_1_0.json"
+                            "key": "profile_name",
+                            "value": "VP_ANDROID_baseline_2021"
                         }
                     ]
                 }
             ],
             "settings": [
                 {
-                    "key": "filename",
-                    "env": "VK_PROFILES_FILENAME",
-                    "label": "Profiles JSON configuration file",
-                    "description": "Path of a profiles configuration file to load.",
+                    "key": "profile_file",
+                    "label": "Profile Selection",
+                    "description": "Path of a profile file and the name of the profile to load.",
                     "type": "LOAD_FILE",
                     "filter": "*.json",
-                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/portability_desktop_1_0.json"
+                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2021.json",
+                    "settings": [
+                        {
+                            "key": "profile_name",
+                            "label": "Profile",
+                            "description": "Name of the profile specified by the profile file to use.",
+                            "type": "ENUM",
+                            "flags": [],
+                            "default": "",
+                            "dependence": {
+                                "mode": "PROFILE",
+                                "settings": [
+                                    {
+                                        "key": "profile_file"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
                 },
                 {
                     "key": "debug_enable",
