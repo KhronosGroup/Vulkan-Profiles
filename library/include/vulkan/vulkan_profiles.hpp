@@ -65,11 +65,11 @@
 #endif
 
 #if defined(VK_VERSION_1_3) && \
-    defined(VK_EXT_global_priority)
+    defined(VK_KHR_global_priority)
 #define VP_KHR_roadmap_2022 1
 #define VP_KHR_ROADMAP_2022_NAME "VP_KHR_roadmap_2022"
 #define VP_KHR_ROADMAP_2022_SPEC_VERSION 1
-#define VP_KHR_ROADMAP_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 3, 201)
+#define VP_KHR_ROADMAP_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 3, 203)
 #endif
 
 #if defined(VK_VERSION_1_1) && \
@@ -1605,7 +1605,7 @@ static const _vpStructChainerDesc _chainerDesc = {
 namespace VP_KHR_ROADMAP_2022 {
 
 static const VkExtensionProperties _deviceExtensions[] = {
-    VkExtensionProperties{ VK_EXT_GLOBAL_PRIORITY_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_GLOBAL_PRIORITY_EXTENSION_NAME, 1 },
 };
 
 static const VkStructureType _featureStructTypes[] = {

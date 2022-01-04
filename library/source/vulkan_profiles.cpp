@@ -1402,7 +1402,7 @@ static const _vpStructChainerDesc _chainerDesc = {
 namespace VP_KHR_ROADMAP_2022 {
 
 static const VkExtensionProperties _deviceExtensions[] = {
-    VkExtensionProperties{ VK_EXT_GLOBAL_PRIORITY_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_GLOBAL_PRIORITY_EXTENSION_NAME, 1 },
 };
 
 static const VkStructureType _featureStructTypes[] = {
