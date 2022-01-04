@@ -27,12 +27,6 @@
 #include <vulkan/vulkan_profiles.h>
 #endif
 
-auto containsProfile = [](const std::vector<VpProfileProperties>& vec, const char* name, uint32_t version) {
-    for (std::size_t i = 0; i < vec.size(); ++i)
-        if (strcmp(vec[i].profileName, name) == 0 && vec[i].specVersion == version) return true;
-    return false;
-};
-
 TEST(api_get_profiles_core, full) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfiles(&propertyCount, nullptr);
@@ -46,8 +40,11 @@ TEST(api_get_profiles_core, full) {
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(2, propertyCount);
 
-    EXPECT_TRUE(containsProfile(properties, VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION));
-    EXPECT_TRUE(containsProfile(properties, VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION));
+    EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, properties[0].profileName);
+    EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, properties[0].specVersion);
+
+    EXPECT_STREQ(VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, properties[1].profileName);
+    EXPECT_EQ(VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION, properties[1].specVersion);
 }
 
 TEST(api_get_profiles_core, partial) {
@@ -64,5 +61,6 @@ TEST(api_get_profiles_core, partial) {
     EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(1, propertyCount);
 
-    EXPECT_NE(properties[0].specVersion, 0);
+    EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, properties[0].profileName);
+    EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, properties[0].specVersion);
 }

@@ -1377,7 +1377,8 @@ class VulkanProfile():
         self.version = data['version']
         self.apiVersion = data['api-version']
         self.fallback = data.get('fallback')
-        self.requirements = []
+        self.versionRequirements = []
+        self.extensionRequirements = []
         self.capabilities = VulkanProfileCapabilities(registry, data, caps)
         self.structs = VulkanProfileStructs(registry, self.capabilities)
         self.collectCompileTimeRequirements()
@@ -1390,7 +1391,7 @@ class VulkanProfile():
         if match != None:
             versionNumber = match.group(1)
             if versionNumber in self.registry.versions:
-                self.requirements.append(self.registry.versions[versionNumber].name)
+                self.versionRequirements.append(self.registry.versions[versionNumber].name)
             else:
                 Log.f("No version '{0}' found in registry required by profile '{1}'".format(versionNumber, self.name))
         else:
@@ -1399,7 +1400,7 @@ class VulkanProfile():
         # Add any required extension to the list of requirements
         for extName in self.capabilities.extensions:
             if extName in self.registry.extensions:
-                self.requirements.append(extName)
+                self.extensionRequirements.append(extName)
             else:
                 Log.f("Extension '{0}' required by profile '{1}' does not exist".format(extName, self.name))
 
@@ -1463,7 +1464,7 @@ class VulkanProfile():
         foundExt = False
         gen = '\n'
         gen += 'static const VkExtensionProperties _{0}Extensions[] = {{\n'.format(type)
-        for extName, specVer in self.capabilities.extensions.items():
+        for extName, specVer in sorted(self.capabilities.extensions.items()):
             extInfo = self.registry.extensions[extName]
             if extInfo.type == type:
                 gen += '    VkExtensionProperties{{ {0}_EXTENSION_NAME, {1} }},\n'.format(extInfo.upperCaseName, specVer)
@@ -1527,7 +1528,7 @@ class VulkanProfile():
 
     def gen_structFill(self, fmt, structDef, var, values):
         gen = ''
-        for member, value in values.items():
+        for member, value in sorted(values.items()):
             if member in structDef.members:
                 if type(value) == dict:
                     # Nested structure
@@ -1571,7 +1572,7 @@ class VulkanProfile():
 
     def gen_structCompare(self, fmt, structDef, var, values, parentLimittype = None):
         gen = ''
-        for member, value in values.items():
+        for member, value in sorted(values.items()):
             if member in structDef.members:
                 limittype = structDef.members[member].limittype
                 if limittype == None:
@@ -1758,7 +1759,7 @@ class VulkanProfile():
         if self.structs.format:
             gen += ('\n'
                     'static const _vpFormatDesc _formatDesc[] = {\n')
-            for formatName, formatCaps in self.capabilities.formats.items():
+            for formatName, formatCaps in sorted(self.capabilities.formats.items()):
                 gen += ('    {{\n'
                         '        {0},\n'
                         '        [](VkBaseOutStructure* p) {{\n').format(formatName)
@@ -1853,13 +1854,14 @@ class VulkanProfilesBuilder():
 
     def gen_profileDefs(self):
         gen = ''
-        for name, profile in self.profiles.items():
+        for name, profile in sorted(self.profiles.items()):
             uname = name.upper()
             gen += '\n'
 
             # Add prerequisites
-            if profile.requirements:
-                for i, requirement in enumerate(profile.requirements):
+            allRequirements = sorted(profile.versionRequirements) + sorted(profile.extensionRequirements)
+            if allRequirements:
+                for i, requirement in enumerate(allRequirements):
                     if i == 0:
                         gen += '#if '
                     else:
@@ -1867,7 +1869,7 @@ class VulkanProfilesBuilder():
 
                     gen += 'defined({0})'.format(requirement)
 
-                    if i < len(profile.requirements) - 1:
+                    if i < len(allRequirements) - 1:
                         gen += ' && \\\n'
                     else:
                         gen += '\n'
@@ -1877,7 +1879,7 @@ class VulkanProfilesBuilder():
             gen += '#define {0}_SPEC_VERSION {1}\n'.format(uname, profile.version)
             gen += '#define {0}_MIN_API_VERSION VK_MAKE_VERSION({1})\n'.format(uname, profile.apiVersion.replace(".", ", "))
 
-            if profile.requirements:
+            if allRequirements:
                 gen += '#endif\n'
 
         return gen
@@ -1893,7 +1895,7 @@ class VulkanProfilesBuilder():
 
     def gen_profilePrivateImpl(self):
         gen = ''
-        for profile in self.profiles.values():
+        for _, profile in sorted(self.profiles.items()):
             gen += profile.generatePrivateImpl()
         return gen
 
@@ -1909,7 +1911,7 @@ class VulkanProfilesBuilder():
         gen = '\n'
         gen += 'static const _vpProfileDesc _vpProfiles[] = {\n'
 
-        for name, profile in self.profiles.items():
+        for name, profile in sorted(self.profiles.items()):
             uname = name.upper()
             gen += ('#ifdef {0}\n'
                     '    _vpProfileDesc{{\n'

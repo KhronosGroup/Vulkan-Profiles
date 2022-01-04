@@ -27,12 +27,6 @@
 #include <vulkan/vulkan_profiles.h>
 #endif
 
-auto containsFormat = [](const std::vector<VkFormat>& vec, VkFormat fmt) {
-    for (std::size_t i = 0; i < vec.size(); ++i)
-        if (vec[i] == fmt) return true;
-    return false;
-};
-
 TEST(api_get_profile_formats, full) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
@@ -48,11 +42,9 @@ TEST(api_get_profile_formats, full) {
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(65, formatCount);
 
-    EXPECT_TRUE(containsFormat(formats, VK_FORMAT_R8_UNORM));
-    EXPECT_TRUE(containsFormat(formats, VK_FORMAT_R8_SNORM));
-    EXPECT_TRUE(containsFormat(formats, VK_FORMAT_R8_UINT));
-    EXPECT_TRUE(containsFormat(formats, VK_FORMAT_R8G8B8A8_UNORM));
-    EXPECT_TRUE(containsFormat(formats, VK_FORMAT_R8G8B8A8_SRGB));
+    EXPECT_EQ(VK_FORMAT_A2B10G10R10_UINT_PACK32, formats[0]);
+    EXPECT_EQ(VK_FORMAT_A2B10G10R10_UNORM_PACK32, formats[1]);
+    EXPECT_EQ(VK_FORMAT_A8B8G8R8_SINT_PACK32, formats[2]);
 }
 
 TEST(api_get_profile_formats, partial) {
@@ -65,13 +57,14 @@ TEST(api_get_profile_formats, partial) {
 
     formatCount = 3;
 
-    std::vector<VkFormat> formats(formatCount, VK_FORMAT_UNDEFINED);
+    std::vector<VkFormat> formats(formatCount);
     VkResult result1 = vpGetProfileFormats(&profile, &formatCount, &formats[0]);
     EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(3, formatCount);
 
-    for (std::size_t i = 0; i < formatCount; ++i)
-        EXPECT_NE(formats[i], VK_FORMAT_UNDEFINED);
+    EXPECT_EQ(VK_FORMAT_A2B10G10R10_UINT_PACK32, formats[0]);
+    EXPECT_EQ(VK_FORMAT_A2B10G10R10_UNORM_PACK32, formats[1]);
+    EXPECT_EQ(VK_FORMAT_A8B8G8R8_SINT_PACK32, formats[2]);
 }
 
 TEST(api_get_profile_formats, unspecified) {
