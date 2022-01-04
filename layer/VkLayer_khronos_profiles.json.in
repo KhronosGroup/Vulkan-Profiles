@@ -110,7 +110,6 @@
                 },
                 {
                     "key": "debug_enable",
-                    "env": "VK_PROFILES_DEBUG_ENABLE",
                     "label": "Debug Enable",
                     "description": "Enables debug message output.",
                     "type": "BOOL",
@@ -118,7 +117,6 @@
                 },
                 {
                     "key": "emulate_portability",
-                    "env": "VK_PROFILES_EMULATE_PORTABILITY_SUBSET_EXTENSION",
                     "label": "Emulate VK_KHR_portability_subset",
                     "description": "Emulate that VK_KHR_portability_subset extension is supported by the device.",
                     "platforms": [
@@ -130,7 +128,6 @@
                 },
                 {
                     "key": "modify_extension_list",
-                    "env": "VK_PROFILES_MODIFY_EXTENSION_LIST",
                     "label": "Modify Device Extension list",
                     "description": "Modify the device extensions list from the layer JSON config file.",
                     "type": "ENUM",
@@ -155,7 +152,6 @@
                 },
                 {
                     "key": "modify_memory_flags",
-                    "env": "VK_PROFILES_MODIFY_MEMORY_FLAGS",
                     "label": "Modify Device Memory Flags",
                     "description": "Modify the device memory heap flags and memory type flags from the JSON config file.",
                     "type": "BOOL",
@@ -163,7 +159,6 @@
                 },
                 {
                     "key": "modify_format_list",
-                    "env": "VK_PROFILES_MODIFY_FORMAT_LIST",
                     "label": "Modify Device Format list",
                     "description": "Modify the device format list from the layer JSON config file.",
                     "type": "ENUM",
@@ -188,7 +183,6 @@
                 },
                 {
                     "key": "modify_format_properties",
-                    "env": "VK_PROFILES_MODIFY_FORMAT_PROPERTIES",
                     "label": "Modify Device Format Properties",
                     "description": "Modify the device format properties from the layer JSON config file.",
                     "type": "ENUM",
@@ -213,7 +207,6 @@
                 },
                 {
                     "key": "modify_surface_formats",
-                    "env": "VK_PROFILES_MODIFY_SURFACE_FORMATS",
                     "label": "Modify Device Surface Formats",
                     "description": "Modify the device surface formats from the layer JSON config file.",
                     "type": "ENUM",
@@ -238,7 +231,6 @@
                 },
                 {
                     "key": "modify_present_modes",
-                    "env": "VK_PROFILES_MODIFY_PRESENT_MODES",
                     "label": "Modify Device Present Modes",
                     "description": "Modify the device present mode list from the layer JSON config file.",
                     "type": "ENUM",
