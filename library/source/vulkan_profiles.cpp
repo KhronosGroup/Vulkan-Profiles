@@ -6533,10 +6533,10 @@ VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, u
 VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported) {
     VkResult result = VK_SUCCESS;
 
-    uint32_t apiVersion;
+    uint32_t apiVersion = VK_MAKE_VERSION(1, 0, 0);
     vkEnumerateInstanceVersion(&apiVersion);
 
-    uint32_t extCount;
+    uint32_t extCount = 0;
     result = vkEnumerateInstanceExtensionProperties(pLayerName, &extCount, nullptr);
     if (result != VK_SUCCESS) {
         return result;
@@ -6561,7 +6561,7 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
     }
 
     for (uint32_t i = 0; i < pDesc->instanceExtensionCount; ++i) {
-        if (!_vpCheckExtension(ext.data(), ext.size(),
+        if (!_vpCheckExtension(ext.data(), extCount,
             pDesc->pInstanceExtensions[i].extensionName,
             pDesc->pInstanceExtensions[i].specVersion)) {
             return result;
@@ -6610,7 +6610,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
 {
     VkResult result = VK_SUCCESS;
 
-    uint32_t extCount;
+    uint32_t extCount = 0;
     result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, nullptr);
     if (result != VK_SUCCESS) {
         return result;
@@ -6639,7 +6639,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
     }
 
     for (uint32_t i = 0; i < pDesc->deviceExtensionCount; ++i) {
-        if (!_vpCheckExtension(ext.data(), ext.size(),
+        if (!_vpCheckExtension(ext.data(), extCount,
             pDesc->pDeviceExtensions[i].extensionName,
             pDesc->pDeviceExtensions[i].specVersion)) {
             return result;
