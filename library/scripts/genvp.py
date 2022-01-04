@@ -70,7 +70,6 @@ CPP_HEADER = '''
 #include <vulkan/vulkan_profiles.h>
 #include <stddef.h>
 #include <string.h>
-#include <assert.h>
 #include <stdint.h>
 #include <vector>
 #include <algorithm>
@@ -90,7 +89,6 @@ HPP_HEADER = '''
 #endif
 #include <stddef.h>
 #include <string.h>
-#include <assert.h>
 #include <stdint.h>
 #include <vector>
 #include <algorithm>
@@ -394,8 +392,6 @@ VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, u
 }
 
 VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported) {
-    assert(pProfile != nullptr);
-    assert(pSupported != nullptr);
     VkResult result = VK_SUCCESS;
 
     uint32_t apiVersion;
@@ -473,9 +469,6 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
 
 VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalDevice, const VpProfileProperties *pProfile, VkBool32 *pSupported)
 {
-    assert(pProfile != nullptr);
-    assert(pSupported != nullptr);
-    assert(physicalDevice != VK_NULL_HANDLE);
     VkResult result = VK_SUCCESS;
 
     uint32_t extCount;
@@ -613,8 +606,6 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
 VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
                                    const VkAllocationCallbacks *pAllocator, VkDevice *pDevice)
 {
-    assert(pCreateInfo != nullptr);
-
     if (physicalDevice == VK_NULL_HANDLE || pCreateInfo == nullptr || pDevice == nullptr) {
         return vkCreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : pCreateInfo->pCreateInfo, pAllocator, pDevice);
     }
