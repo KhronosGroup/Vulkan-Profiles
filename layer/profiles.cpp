@@ -101,8 +101,9 @@ const uint32_t kDeviceExtensionPropertiesCount = static_cast<uint32_t>(kDeviceEx
 
 enum SetCombinationMode {
     SET_CHECK_SUPPORT,
+    SET_FROM_DEVICE,
     SET_FROM_PROFILE,
-    SET_FROM_DEVICE
+    SET_FROM_PROFILE_OVERRIDE,
 };
 
 // Environment variables defined by this layer ///////////////////////////////////////////////////////////////////////////////////
@@ -759,6 +760,7 @@ class PhysicalDeviceData {
                 simulation_extensions_ = device_extensions_;
                 break;
             case SET_FROM_PROFILE:
+            case SET_FROM_PROFILE_OVERRIDE:
                 simulation_extensions_ = arrayof_extension_properties_;
                 break;
             default:
@@ -1867,14 +1869,15 @@ class JsonLoader {
         if (!value.isDouble()) {
             return true;
         }
+        bool valid = true;
         const float new_value = value.asFloat();
         if (warn_func) {
             if (warn_func(name, new_value, *dest)) {
-                return false;
+                valid = false;
             }
         }
         *dest = new_value;
-        return true;
+        return valid;
     }
 
     bool GetValue(const Json::Value &parent, const std::string& member, const char *name, int32_t *dest,
@@ -1886,14 +1889,15 @@ class JsonLoader {
         if (!value.isInt()) {
             return true;
         }
+        bool valid = true;
         const uint32_t new_value = value.asInt();
         if (warn_func) {
             if (warn_func(name, new_value, *dest)) {
-                return false;
+                valid = false;
             }
         }
         *dest = new_value;
-        return true;
+        return valid;
     }
 
     bool GetValue(const Json::Value &parent, const std::string& member, const char *name, uint32_t *dest,
@@ -1902,11 +1906,12 @@ class JsonLoader {
             return true;
         }
         const Json::Value value = parent[name];
+        bool valid = true;
         if (value.isBool()) {
             const bool new_value = value.asBool();
             if (warn_func) {
                 if (warn_func(name, new_value, *dest)) {
-                    return false;
+                    valid = false;
                 }
             }
             *dest = static_cast<uint32_t>(new_value);
@@ -1922,12 +1927,12 @@ class JsonLoader {
             const uint32_t new_value = value.asUInt();
             if (warn_func) {
                 if (warn_func(name, new_value, *dest)) {
-                    return false;
+                    valid = false;
                 }
             }
             *dest = new_value;
         }
-        return true;
+        return valid;
     }
 
     bool GetValue(const Json::Value &parent, const char *name, uint32_t *dest,
@@ -1944,14 +1949,15 @@ class JsonLoader {
         if (!value.isUInt64()) {
             return true;
         }
+        bool valid = true;
         const uint64_t new_value = value.asUInt64();
         if (warn_func) {
             if (warn_func(name, new_value, *dest)) {
-                return false;
+                valid = false;
             }
         }
         *dest = new_value;
-        return true;
+        return valid;
     }
 
     bool GetValue(const Json::Value &parent, const char *name, uint64_t *dest,
@@ -1968,14 +1974,15 @@ class JsonLoader {
         if (!value.isInt64()) {
             return true;
         }
+        bool valid = true;
         const int64_t new_value = value.asInt64();
         if (warn_func) {
             if (warn_func(name, new_value, *dest)) {
-                return false;
+                valid = false;
             }
         }
         *dest = new_value;
-        return true;
+        return valid;
     }
 
     bool GetValue(const Json::Value &parent, const std::string& member, const char *name, uint8_t *dest,
@@ -1987,14 +1994,15 @@ class JsonLoader {
         if (!value.isUInt()) {
             return true;
         }
+        bool valid = true;
         const uint8_t new_value = value.asUInt();
         if (warn_func) {
             if (warn_func(name, new_value, *dest)) {
-                return false;
+                valid = false;
             }
         }
         *dest = new_value;
-        return true;
+        return valid;
     }
 
     template <typename T>  // for Vulkan enum types
@@ -2004,6 +2012,7 @@ class JsonLoader {
             return true;
         }
         const Json::Value value = parent[name];
+        bool valid = true;
         if (value.isArray()) {
             uint32_t sum_bits = {};
             for (const auto &entry : value) {
@@ -2016,12 +2025,12 @@ class JsonLoader {
             const T new_value = static_cast<T>(value.asInt());
             if (warn_func) {
                 if (warn_func(name, new_value, *dest)) {
-                    return false;
+                    valid = false;
                 }
             }
             *dest = new_value;
         }
-        return true;
+        return valid;
     }
 
     template <typename T>  // for Vulkan enum types
@@ -2977,7 +2986,6 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string& proper
     } else if (property_name == "VkPhysicalDeviceToolProperties" || property_name == "VkPhysicalDeviceToolPropertiesEXT") {
         return GetValuePhysicalDeviceToolPropertiesEXT(prop);
     }
-
     return true;
 }
 
@@ -3029,13 +3037,16 @@ bool JsonLoader::CheckExtensionSupport(const char* extension) {
                 extension, extension);
             return false;
         }
-    } else if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE) {
+    } else if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE ||
+               pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
         if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, extension)) {
             ErrorPrintf(
                 "JSON file sets variables for structs provided by %s, but %s is "
                 "not enabled by the profile.\n",
                 extension, extension);
-            return false;
+            if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE) {
+                return false;
+            }
         }
     }
     return true;
@@ -3065,30 +3076,35 @@ VkResult JsonLoader::ReadProfile(const Json::Value root) {
                         break;
                     }
                 }
-                if (!supported_on_device) {
+                if (!supported_on_device &&
+                    pdd_.extension_list_combination_mode_ != SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
                     return VK_ERROR_EXTENSION_NOT_PRESENT;
                 }
                 pdd_.arrayof_extension_properties_.push_back(extension);
-                if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE) {
+                if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE ||
+                    pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
                     pdd_.simulation_extensions_.push_back(extension);
                 }
             }
         }
         const auto &features = c["features"];
         for (const auto &feature : features.getMemberNames()) {
-            if (!GetFeature(features, feature)) {
+            bool success = !GetFeature(features, feature);
+            if (!success && pdd_.extension_list_combination_mode_ != SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
                 return VK_ERROR_FEATURE_NOT_PRESENT;
             }
         }
         const auto &properties = c["properties"];
         for (const auto &prop : properties.getMemberNames()) {
-            if (!GetProperty(properties, prop)) {
+            bool success = GetProperty(properties, prop);
+            if (!success && pdd_.extension_list_combination_mode_ != SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
                 return VK_ERROR_FEATURE_NOT_PRESENT;
             }
         }
         const auto &formats = c["formats"];
         for (const auto &format : formats.getMemberNames()) {
-            if (!GetFormat(formats, format, &pdd_.arrayof_format_properties_)) {
+            bool success = GetFormat(formats, format, &pdd_.arrayof_format_properties_);
+            if (!success && pdd_.extension_list_combination_mode_ != SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
                 return VK_ERROR_FORMAT_NOT_SUPPORTED;
             }
         }
@@ -3128,7 +3144,8 @@ VkResult JsonLoader::LoadFile(const char *filename) {
     }
 
     VkResult result = VK_SUCCESS;
-    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE) {
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE ||
+        pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
         pdd_.simulation_extensions_.clear();
     }
     if (pdd_.extension_list_combination_mode_ != SetCombinationMode::SET_FROM_DEVICE) {
@@ -3175,11 +3192,11 @@ JsonLoader::SchemaId JsonLoader::IdentifySchema(const Json::Value &value) {
 #define GET_MEMBER_VALUE(member, name) GetValue(parent, member, #name, &dest->name)
 #define GET_VALUE_WARN(member, name, warn_func)                     \
     if (!GetValue(parent, member, #name, &dest->name, warn_func)) { \
-        return false;                                               \
+        valid = false;                                              \
     }
 #define GET_MEMBER_VALUE_WARN(member, name, warn_func)              \
     if (!GetValue(parent, member, #name, &dest->name, warn_func)) { \
-        return false;                                               \
+        valid = false;                                              \
     }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest) {
@@ -3187,8 +3204,9 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProperties 
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     if (!GetValue(parent["limits"], &dest->limits)) {
-        return false;
+        valid = false;
     }
     for (const auto &prop : parent) {
         GET_VALUE("apiVersion", apiVersion);
@@ -3200,7 +3218,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProperties 
         GET_ARRAY(deviceName);         // size < VK_MAX_PHYSICAL_DEVICE_NAME_SIZE
         GET_ARRAY(pipelineCacheUUID);  // size == VK_UUID_SIZE*/
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStencilResolveProperties *dest) {
@@ -3211,13 +3229,14 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStenci
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE(prop, supportedDepthResolveModes);
         GET_VALUE(prop, supportedStencilResolveModes);
         GET_VALUE_WARN(prop, independentResolveNone, WarnIfNotEqual);
         GET_VALUE_WARN(prop, independentResolve, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dest) {
@@ -3228,6 +3247,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxUpdateAfterBindDescriptorsInAllPools, WarnIfGreater);
         GET_VALUE_WARN(prop, maxUpdateAfterBindDescriptorsInAllPools, WarnIfGreater);
@@ -3254,7 +3274,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
         GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindStorageImages, WarnIfGreater);
         GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindInputAttachments, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatControlsPropertiesKHR *dest) {
@@ -3265,6 +3285,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatContro
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE(prop, denormBehaviorIndependence);
         GET_VALUE(prop, roundingModeIndependence);
@@ -3284,7 +3305,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatContro
         GET_VALUE_WARN(prop, shaderRoundingModeRTZFloat32, WarnIfNotEqual);
         GET_VALUE_WARN(prop, shaderRoundingModeRTZFloat64, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance3PropertiesKHR *dest) {
@@ -3295,11 +3316,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxPerSetDescriptors, WarnIfGreater);
         GET_VALUE_WARN(prop, maxMemoryAllocationSize, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4FeaturesKHR *dest) {
@@ -3310,10 +3332,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maintenance4, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4PropertiesKHR *dest) {
@@ -3324,10 +3347,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxBufferSize, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPropertiesKHR *dest) {
@@ -3338,11 +3362,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPr
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxMultiviewViewCount, WarnIfGreater);
         GET_VALUE_WARN(prop, maxMultiviewInstanceIndex, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValuePhysicalDevicePointClippingPropertiesKHR(const Json::Value &parent) {
@@ -3350,10 +3375,11 @@ bool JsonLoader::GetValuePhysicalDevicePointClippingPropertiesKHR(const Json::Va
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         WarnNotModifiable("VkPhysicalDevicePointClippingPropertiesKHR", prop, "pointClippingBehavior");
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGroupPropertiesKHR *dest) {
@@ -3361,12 +3387,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGroupProper
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         WarnNotModifiable("VkPhysicalDeviceGroupPropertiesKHR", prop, "physicalDeviceCount");
         WarnNotModifiable("VkPhysicalDeviceGroupPropertiesKHR", prop, "physicalDevices");
         WarnNotModifiable("VkPhysicalDeviceGroupPropertiesKHR", prop, "subsetAllocation");
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValuePhysicalDeviceDriverProperties(const Json::Value &parent) {
@@ -3374,12 +3401,13 @@ bool JsonLoader::GetValuePhysicalDeviceDriverProperties(const Json::Value &paren
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         WarnNotModifiable("VkPhysicalDeviceDriverPropertiesKHR", prop, "driverName");
         WarnNotModifiable("VkPhysicalDeviceDriverPropertiesKHR", prop, "driverInfo");
         WarnNotModifiable("VkPhysicalDeviceDriverPropertiesKHR", prop, "conformanceVersion");
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValuePhysicalDeviceIDProperties(const Json::Value &parent) {
@@ -3387,6 +3415,7 @@ bool JsonLoader::GetValuePhysicalDeviceIDProperties(const Json::Value &parent) {
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", prop, "deviceUUID");
         WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", prop, "driverUUID");
@@ -3394,7 +3423,7 @@ bool JsonLoader::GetValuePhysicalDeviceIDProperties(const Json::Value &parent) {
         WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", prop, "deviceNodeMask");
         WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", prop, "deviceLUIDValid");
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValuePhysicalDeviceMemoryBudgetPropertiesEXT(const Json::Value &parent) {
@@ -3402,11 +3431,12 @@ bool JsonLoader::GetValuePhysicalDeviceMemoryBudgetPropertiesEXT(const Json::Val
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         WarnNotModifiable("VkPhysicalDeviceMemoryBudgetPropertiesEXT", prop, "heapBudget");
         WarnNotModifiable("VkPhysicalDeviceMemoryBudgetPropertiesEXT", prop, "heapUsage");
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValuePhysicalDevicePCIBusInfoPropertiesEXT(const Json::Value &parent) {
@@ -3414,13 +3444,14 @@ bool JsonLoader::GetValuePhysicalDevicePCIBusInfoPropertiesEXT(const Json::Value
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", prop, "pciDomain");
         WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", prop, "pciBus");
         WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", prop, "pciDevice");
         WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", prop, "pciFunction");
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValuePhysicalDeviceToolPropertiesEXT(const Json::Value &parent) {
@@ -3428,6 +3459,7 @@ bool JsonLoader::GetValuePhysicalDeviceToolPropertiesEXT(const Json::Value &pare
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         WarnNotModifiable("VkPhysicalDeviceToolPropertiesEXT", prop, "name");
         WarnNotModifiable("VkPhysicalDeviceToolPropertiesEXT", prop, "version");
@@ -3435,7 +3467,7 @@ bool JsonLoader::GetValuePhysicalDeviceToolPropertiesEXT(const Json::Value &pare
         WarnNotModifiable("VkPhysicalDeviceToolPropertiesEXT", prop, "description");
         WarnNotModifiable("VkPhysicalDeviceToolPropertiesEXT", prop, "layer");
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
@@ -3451,10 +3483,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, minVertexInputBindingStrideAlignment, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryProperties *dest) {
@@ -3462,10 +3495,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMe
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, protectedNoFault, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *dest) {
@@ -3476,11 +3510,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilt
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, filterMinmaxSingleComponentFormats, WarnIfNotEqual);
         GET_VALUE_WARN(prop, filterMinmaxImageComponentMapping, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphorePropertiesKHR *dest) {
@@ -3491,16 +3526,18 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSem
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxTimelineSemaphoreValueDifference, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *dest) {
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxImageDimension1D, WarnIfGreater);
         GET_VALUE_WARN(prop, maxImageDimension2D, WarnIfGreater);
@@ -3609,13 +3646,14 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_VALUE_WARN(prop, optimalBufferCopyRowPitchAlignment, WarnIfGreater);
         GET_VALUE_WARN(prop, nonCoherentAtomSize, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSparseProperties *dest) {
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, residencyStandard2DBlockShape, WarnIfNotEqual);
         GET_VALUE_WARN(prop, residencyStandard2DMultisampleBlockShape, WarnIfNotEqual);
@@ -3623,7 +3661,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSparsePrope
         GET_VALUE_WARN(prop, residencyAlignedMipSize, WarnIfNotEqual);
         GET_VALUE_WARN(prop, residencyNonResidentStrict, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupProperties *dest) {
@@ -3631,13 +3669,14 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupPro
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, subgroupSize, WarnIfGreater);
         GET_VALUE_WARN(prop, supportedStages, WarnIfGreater);
         GET_VALUE_WARN(prop, supportedOperations, WarnIfGreater);
         GET_VALUE_WARN(prop, quadOperationsInAllStages, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *dest) {
@@ -3645,6 +3684,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *d
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_MEMBER_VALUE_WARN(member, robustBufferAccess, WarnIfNotEqual);
         GET_MEMBER_VALUE_WARN(member, fullDrawIndexUint32, WarnIfNotEqual);
@@ -3702,7 +3742,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *d
         GET_MEMBER_VALUE_WARN(member, variableMultisampleRate, WarnIfNotEqual);
         GET_MEMBER_VALUE_WARN(member, inheritedQueries, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorageFeaturesKHR *dest) {
@@ -3713,12 +3753,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorage
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, storageBuffer8BitAccess, WarnIfNotEqual);
         GET_VALUE_WARN(member, uniformAndStorageBuffer8BitAccess, WarnIfNotEqual);
         GET_VALUE_WARN(member, storagePushConstant8, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorageFeaturesKHR *dest) {
@@ -3729,13 +3770,14 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorag
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, storageBuffer16BitAccess, WarnIfNotEqual);
         GET_VALUE_WARN(member, uniformAndStorageBuffer16BitAccess, WarnIfNotEqual);
         GET_VALUE_WARN(member, storagePushConstant16, WarnIfNotEqual);
         GET_VALUE_WARN(member, storageInputOutput16, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest) {
@@ -3746,12 +3788,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDevic
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, bufferDeviceAddress, WarnIfNotEqual);
         GET_VALUE_WARN(member, bufferDeviceAddressCaptureReplay, WarnIfNotEqual);
         GET_VALUE_WARN(member, bufferDeviceAddressMultiDevice, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dest) {
@@ -3762,6 +3805,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderInputAttachmentArrayDynamicIndexing, WarnIfNotEqual);
         GET_VALUE_WARN(member, shaderUniformTexelBufferArrayDynamicIndexing, WarnIfNotEqual);
@@ -3784,7 +3828,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
         GET_VALUE_WARN(member, descriptorBindingVariableDescriptorCount, WarnIfNotEqual);
         GET_VALUE_WARN(member, runtimeDescriptorArray, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryResetFeaturesEXT *dest) {
@@ -3795,10 +3839,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryRe
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, hostQueryReset, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFramebufferFeaturesKHR *dest) {
@@ -3809,10 +3854,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFr
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, imagelessFramebuffer, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFeaturesKHR *dest) {
@@ -3823,12 +3869,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFe
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, multiview, WarnIfNotEqual);
         GET_VALUE_WARN(member, multiviewGeometryShader, WarnIfNotEqual);
         GET_VALUE_WARN(member, multiviewTessellationShader, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
@@ -3844,6 +3891,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, constantAlphaColorBlendFactors, WarnIfNotEqual);
         GET_VALUE_WARN(member, events, WarnIfNotEqual);
@@ -3861,7 +3909,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
         GET_VALUE_WARN(member, triangleFans, WarnIfNotEqual);
         GET_VALUE_WARN(member, vertexAttributeAccessBeyondStride, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryFeatures *dest) {
@@ -3869,10 +3917,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMe
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, protectedMemory, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *dest) {
@@ -3883,10 +3932,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbc
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, samplerYcbcrConversion, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *dest) {
@@ -3897,10 +3947,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlock
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, scalarBlockLayout, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *dest) {
@@ -3911,10 +3962,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDep
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, separateDepthStencilLayouts, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *dest) {
@@ -3925,11 +3977,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderBufferInt64Atomics, WarnIfNotEqual);
         GET_VALUE_WARN(member, shaderSharedInt64Atomics, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawParametersFeatures *dest) {
@@ -3937,10 +3990,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawP
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderDrawParameters, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *dest) {
@@ -3951,11 +4005,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderFloat16, WarnIfNotEqual);
         GET_VALUE_WARN(member, shaderInt8, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *dest) {
@@ -3966,10 +4021,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgr
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderSubgroupExtendedTypes, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *dest) {
@@ -3980,10 +4036,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSem
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, timelineSemaphore, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *dest) {
@@ -3994,10 +4051,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBuff
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, uniformBufferStandardLayout, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePointersFeaturesKHR *dest) {
@@ -4008,11 +4066,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePoi
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, variablePointersStorageBuffer, WarnIfNotEqual);
         GET_VALUE_WARN(member, variablePointers, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *dest) {
@@ -4023,12 +4082,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemor
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, vulkanMemoryModel, WarnIfNotEqual);
         GET_VALUE_WARN(member, vulkanMemoryModelDeviceScope, WarnIfNotEqual);
         GET_VALUE_WARN(member, vulkanMemoryModelAvailabilityVisibilityChains, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest) {
@@ -4039,10 +4099,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitial
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderZeroInitializeWorkgroupMemory, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructureFeaturesKHR *dest) {
@@ -4053,6 +4114,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, accelerationStructure, WarnIfNotEqual);
         GET_VALUE_WARN(member, accelerationStructureCaptureReplay, WarnIfNotEqual);
@@ -4060,7 +4122,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
         GET_VALUE_WARN(member, accelerationStructureHostCommands, WarnIfNotEqual);
         GET_VALUE_WARN(member, descriptorBindingAccelerationStructureUpdateAfterBind, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructurePropertiesKHR *dest) {
@@ -4071,6 +4133,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxGeometryCount, WarnIfGreater);
         GET_VALUE_WARN(prop, maxInstanceCount, WarnIfGreater);
@@ -4081,7 +4144,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
         GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindAccelerationStructures, WarnIfGreater);
         GET_VALUE_WARN(prop, minAccelerationStructureScratchOffsetAlignment, WarnIfLesser);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryFeaturesKHR *dest) {
@@ -4092,11 +4155,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, performanceCounterQueryPools, WarnIfNotEqual);
         GET_VALUE_WARN(member, performanceCounterMultipleQueryPools, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryPropertiesKHR *dest) {
@@ -4107,10 +4171,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, allowCommandBufferQueryCopies, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *dest) {
@@ -4121,10 +4186,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExe
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, pipelineExecutableInfo, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFeaturesKHR *dest) {
@@ -4135,10 +4201,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFe
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, presentId, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWaitFeaturesKHR *dest) {
@@ -4149,10 +4216,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWait
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, presentWait, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescriptorPropertiesKHR *dest) {
@@ -4163,10 +4231,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescrip
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxPushDescriptors, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFeaturesKHR *dest) {
@@ -4177,10 +4246,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFea
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, rayQuery, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelineFeaturesKHR *dest) {
@@ -4191,6 +4261,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, rayTracingPipeline, WarnIfNotEqual);
         GET_VALUE_WARN(member, rayTracingPipelineShaderGroupHandleCaptureReplay, WarnIfNotEqual);
@@ -4198,7 +4269,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
         GET_VALUE_WARN(member, rayTracingPipelineTraceRaysIndirect, WarnIfNotEqual);
         GET_VALUE_WARN(member, rayTraversalPrimitiveCulling, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelinePropertiesKHR *dest) {
@@ -4209,6 +4280,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, shaderGroupHandleSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxRayRecursionDepth, WarnIfGreater);
@@ -4219,7 +4291,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
         GET_VALUE_WARN(prop, shaderGroupHandleAlignment, WarnIfGreater);
         GET_VALUE_WARN(prop, maxRayHitAttributeSize, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClockFeaturesKHR *dest) {
@@ -4230,11 +4302,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClock
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderSubgroupClock, WarnIfNotEqual);
         GET_VALUE_WARN(member, shaderDeviceClock, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *dest) {
@@ -4245,10 +4318,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderIntegerDotProduct, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *dest) {
@@ -4259,6 +4333,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, integerDotProduct8BitUnsignedAccelerated, WarnIfNotEqual);
         GET_VALUE_WARN(prop, integerDotProduct8BitSignedAccelerated, WarnIfNotEqual);
@@ -4291,7 +4366,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
         GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitSignedAccelerated, WarnIfNotEqual);
         GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest) {
@@ -4302,10 +4377,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgr
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderSubgroupUniformControlFlow, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *dest) {
@@ -4316,10 +4392,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTermi
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderTerminateInvocation, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchronization2FeaturesKHR *dest) {
@@ -4330,10 +4407,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchroniza
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, synchronization2, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *dest) {
@@ -4344,13 +4422,14 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMe
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, workgroupMemoryExplicitLayout, WarnIfNotEqual);
         GET_VALUE_WARN(member, workgroupMemoryExplicitLayoutScalarBlockLayout, WarnIfNotEqual);
         GET_VALUE_WARN(member, workgroupMemoryExplicitLayout8BitAccess, WarnIfNotEqual);
         GET_VALUE_WARN(member, workgroupMemoryExplicitLayout16BitAccess, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444FormatsFeaturesEXT *dest) {
@@ -4361,11 +4440,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444Formats
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, formatA4R4G4B4, WarnIfNotEqual);
         GET_VALUE_WARN(member, formatA4B4G4R4, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeFeaturesEXT *dest) {
@@ -4376,10 +4456,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeF
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, decodeModeSharedExponent, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *dest) {
@@ -4390,10 +4471,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, advancedBlendCoherentOperations, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *dest) {
@@ -4404,6 +4486,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, advancedBlendMaxColorAttachments, WarnIfGreater);
         GET_VALUE_WARN(prop, advancedBlendIndependentBlend, WarnIfNotEqual);
@@ -4412,7 +4495,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
         GET_VALUE_WARN(prop, advancedBlendCorrelatedOverlap, WarnIfNotEqual);
         GET_VALUE_WARN(prop, advancedBlendAllOperations, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest) {
@@ -4423,11 +4506,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColor
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, borderColorSwizzle, WarnIfNotEqual);
         GET_VALUE_WARN(member, borderColorSwizzleFromImage, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest) {
@@ -4438,10 +4522,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteE
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, colorWriteEnable, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest) {
@@ -4452,11 +4537,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditional
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, conditionalRendering, WarnIfNotEqual);
         GET_VALUE_WARN(member, inheritedConditionalRendering, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest) {
@@ -4467,6 +4553,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativ
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, primitiveOverestimationSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxExtraPrimitiveOverestimationSize, WarnIfGreater);
@@ -4478,7 +4565,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativ
         GET_VALUE_WARN(prop, fullyCoveredFragmentShaderInputVariable, WarnIfNotEqual);
         GET_VALUE_WARN(prop, conservativeRasterizationPostDepthCoverage, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorFeaturesEXT *dest) {
@@ -4489,11 +4576,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorde
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, customBorderColors, WarnIfNotEqual);
         GET_VALUE_WARN(member, customBorderColorWithoutFormat, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorPropertiesEXT *dest) {
@@ -4504,10 +4592,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorde
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxCustomBorderColorSamplers, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest) {
@@ -4518,10 +4607,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEn
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, depthClipEnable, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dest) {
@@ -4532,10 +4622,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemor
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, deviceMemoryReport, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest) {
@@ -4546,10 +4637,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRect
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxDiscardRectangles, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *dest) {
@@ -4560,10 +4652,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, extendedDynamicState, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *dest) {
@@ -4574,12 +4667,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, extendedDynamicState2, WarnIfNotEqual);
         GET_VALUE_WARN(member, extendedDynamicState2LogicOp, WarnIfNotEqual);
         GET_VALUE_WARN(member, extendedDynamicState2PatchControlPoints, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryHostPropertiesEXT *dest) {
@@ -4590,10 +4684,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, minImportedHostPointerAlignment, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapFeaturesEXT *dest) {
@@ -4604,12 +4699,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, fragmentDensityMap, WarnIfNotEqual);
         GET_VALUE_WARN(member, fragmentDensityMapDynamic, WarnIfNotEqual);
         GET_VALUE_WARN(member, fragmentDensityMapNonSubsampledImages, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapPropertiesEXT *dest) {
@@ -4620,12 +4716,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, minFragmentDensityTexelSize, WarnIfLesser);
         GET_VALUE_WARN(prop, maxFragmentDensityTexelSize, WarnIfGreater);
         GET_VALUE_WARN(prop, fragmentDensityInvocations, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *dest) {
@@ -4636,12 +4733,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, fragmentShaderSampleInterlock, WarnIfNotEqual);
         GET_VALUE_WARN(member, fragmentShaderPixelInterlock, WarnIfNotEqual);
         GET_VALUE_WARN(member, fragmentShaderShadingRateInterlock, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *dest) {
@@ -4652,10 +4750,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPrior
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, globalPriorityQuery, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobustnessFeaturesEXT *dest) {
@@ -4666,10 +4765,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobust
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, robustImageAccess, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUint8FeaturesEXT *dest) {
@@ -4680,10 +4780,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUi
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, indexTypeUint8, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockFeaturesEXT *dest) {
@@ -4694,11 +4795,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, inlineUniformBlock, WarnIfNotEqual);
         GET_VALUE_WARN(member, descriptorBindingInlineUniformBlockUpdateAfterBind, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockPropertiesEXT *dest) {
@@ -4709,6 +4811,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxInlineUniformBlockSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxPerStageDescriptorInlineUniformBlocks, WarnIfGreater);
@@ -4716,7 +4819,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
         GET_VALUE_WARN(prop, maxDescriptorSetInlineUniformBlocks, WarnIfGreater);
         GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindInlineUniformBlocks, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationFeaturesEXT *dest) {
@@ -4727,6 +4830,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, rectangularLines, WarnIfNotEqual);
         GET_VALUE_WARN(member, bresenhamLines, WarnIfNotEqual);
@@ -4735,7 +4839,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
         GET_VALUE_WARN(member, stippledBresenhamLines, WarnIfNotEqual);
         GET_VALUE_WARN(member, stippledSmoothLines, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationPropertiesEXT *dest) {
@@ -4746,10 +4850,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, lineSubPixelPrecisionBits, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPriorityFeaturesEXT *dest) {
@@ -4760,10 +4865,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPrior
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, memoryPriority, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFeaturesEXT *dest) {
@@ -4774,10 +4880,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFe
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, multiDraw, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPropertiesEXT *dest) {
@@ -4788,10 +4895,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPr
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxMultiDrawCount, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest) {
@@ -4802,10 +4910,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDev
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, pageableDeviceLocalMemory, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest) {
@@ -4816,10 +4925,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCre
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, pipelineCreationCacheControl, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest) {
@@ -4830,11 +4940,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTo
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, primitiveTopologyListRestart, WarnIfNotEqual);
         GET_VALUE_WARN(member, primitiveTopologyPatchListRestart, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateDataFeaturesEXT *dest) {
@@ -4845,10 +4956,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateData
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, privateData, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexFeaturesEXT *dest) {
@@ -4859,11 +4971,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, provokingVertexLast, WarnIfNotEqual);
         GET_VALUE_WARN(member, transformFeedbackPreservesProvokingVertex, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexPropertiesEXT *dest) {
@@ -4874,11 +4987,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, provokingVertexModePerPipeline, WarnIfNotEqual);
         GET_VALUE_WARN(prop, transformFeedbackPreservesTriangleFanProvokingVertex, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *dest) {
@@ -4889,10 +5003,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6For
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, formatRgba10x6WithoutYCbCrSampler, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2FeaturesEXT *dest) {
@@ -4903,12 +5018,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, robustBufferAccess2, WarnIfNotEqual);
         GET_VALUE_WARN(member, robustImageAccess2, WarnIfNotEqual);
         GET_VALUE_WARN(member, nullDescriptor, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2PropertiesEXT *dest) {
@@ -4919,11 +5035,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, robustStorageBufferAccessSizeAlignment, WarnIfGreater);
         GET_VALUE_WARN(prop, robustUniformBufferAccessSizeAlignment, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocationsPropertiesEXT *dest) {
@@ -4934,6 +5051,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocat
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, sampleLocationSampleCounts, WarnIfGreater);
         GET_VALUE_WARN(prop, maxSampleLocationGridSize, WarnIfGreater);
@@ -4941,7 +5059,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocat
         GET_VALUE_WARN(prop, sampleLocationSubPixelBits, WarnIfGreater);
         GET_VALUE_WARN(prop, variableSampleLocations, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *dest) {
@@ -4952,6 +5070,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderBufferFloat32Atomics, WarnIfNotEqual);
         GET_VALUE_WARN(member, shaderBufferFloat32AtomicAdd, WarnIfNotEqual);
@@ -4966,7 +5085,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
         GET_VALUE_WARN(member, sparseImageFloat32Atomics, WarnIfNotEqual);
         GET_VALUE_WARN(member, sparseImageFloat32AtomicAdd, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *dest) {
@@ -4977,6 +5096,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderBufferFloat16Atomics, WarnIfNotEqual);
         GET_VALUE_WARN(member, shaderBufferFloat16AtomicAdd, WarnIfNotEqual);
@@ -4991,7 +5111,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
         GET_VALUE_WARN(member, shaderImageFloat32AtomicMinMax, WarnIfNotEqual);
         GET_VALUE_WARN(member, sparseImageFloat32AtomicMinMax, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *dest) {
@@ -5002,10 +5122,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemot
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderDemoteToHelperInvocation, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *dest) {
@@ -5016,11 +5137,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderImageInt64Atomics, WarnIfNotEqual);
         GET_VALUE_WARN(member, sparseImageInt64Atomics, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *dest) {
@@ -5031,11 +5153,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, subgroupSizeControl, WarnIfNotEqual);
         GET_VALUE_WARN(member, computeFullSubgroups, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *dest) {
@@ -5046,13 +5169,14 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, minSubgroupSize, WarnIfLesser);
         GET_VALUE_WARN(prop, maxSubgroupSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxComputeWorkgroupSubgroups, WarnIfGreater);
         GET_VALUE_WARN(prop, requiredSubgroupSizeStages, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *dest) {
@@ -5063,10 +5187,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, texelBufferAlignment, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *dest) {
@@ -5077,13 +5202,14 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, storageTexelBufferOffsetAlignmentBytes, WarnIfGreater);
         GET_VALUE_WARN(prop, storageTexelBufferOffsetSingleTexelAlignment, WarnIfNotEqual);
         GET_VALUE_WARN(prop, uniformTexelBufferOffsetAlignmentBytes, WarnIfGreater);
         GET_VALUE_WARN(prop, uniformTexelBufferOffsetSingleTexelAlignment, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest) {
@@ -5094,10 +5220,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureComp
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, textureCompressionASTC_HDR, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackFeaturesEXT *dest) {
@@ -5108,11 +5235,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, transformFeedback, WarnIfNotEqual);
         GET_VALUE_WARN(member, geometryStreams, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackPropertiesEXT *dest) {
@@ -5123,6 +5251,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxTransformFeedbackStreams, WarnIfGreater);
         GET_VALUE_WARN(prop, maxTransformFeedbackBuffers, WarnIfGreater);
@@ -5135,7 +5264,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
         GET_VALUE_WARN(prop, transformFeedbackRasterizationStreamSelect, WarnIfNotEqual);
         GET_VALUE_WARN(prop, transformFeedbackDraw, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *dest) {
@@ -5146,11 +5275,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, vertexAttributeInstanceRateDivisor, WarnIfNotEqual);
         GET_VALUE_WARN(member, vertexAttributeInstanceRateZeroDivisor, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *dest) {
@@ -5161,10 +5291,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxVertexAttribDivisor, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *dest) {
@@ -5175,10 +5306,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInput
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, vertexInputDynamicState, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest) {
@@ -5189,10 +5321,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, ycbcr2plane444Formats, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest) {
@@ -5203,10 +5336,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageA
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, ycbcrImageArrays, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest) {
@@ -5217,12 +5351,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, pipelineFragmentShadingRate, WarnIfNotEqual);
         GET_VALUE_WARN(member, primitiveFragmentShadingRate, WarnIfNotEqual);
         GET_VALUE_WARN(member, attachmentFragmentShadingRate, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest) {
@@ -5233,6 +5368,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, minFragmentShadingRateAttachmentTexelSize, WarnIfLesser);
         GET_VALUE_WARN(prop, maxFragmentShadingRateAttachmentTexelSize, WarnIfGreater);
@@ -5252,7 +5388,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
         GET_VALUE_WARN(prop, fragmentShadingRateWithCustomSampleLocations, WarnIfNotEqual);
         GET_VALUE_WARN(prop, fragmentShadingRateStrictMultiplyCombiner, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMemoryFeaturesAMD *dest) {
@@ -5263,10 +5399,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMem
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, deviceCoherentMemory, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCorePropertiesAMD *dest) {
@@ -5277,6 +5414,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, shaderEngineCount, WarnIfGreater);
         GET_VALUE_WARN(prop, shaderArraysPerEngineCount, WarnIfGreater);
@@ -5293,7 +5431,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
         GET_VALUE_WARN(prop, maxVgprAllocation, WarnIfGreater);
         GET_VALUE_WARN(prop, vgprAllocationGranularity, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreProperties2AMD *dest) {
@@ -5304,11 +5442,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, shaderCoreFeatures, WarnIfGreater);
         GET_VALUE_WARN(prop, activeComputeUnitCount, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *dest) {
@@ -5319,10 +5458,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationM
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, invocationMask, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *dest) {
@@ -5333,10 +5473,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, subpassShading, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest) {
@@ -5347,10 +5488,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxSubpassShadingWorkgroupSizeAspectRatio, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *dest) {
@@ -5361,10 +5503,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderIntegerFunctions2, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest) {
@@ -5375,11 +5518,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShad
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, computeDerivativeGroupQuads, WarnIfNotEqual);
         GET_VALUE_WARN(member, computeDerivativeGroupLinear, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixFeaturesNV *dest) {
@@ -5390,11 +5534,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, cooperativeMatrix, WarnIfNotEqual);
         GET_VALUE_WARN(member, cooperativeMatrixRobustBufferAccess, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixPropertiesNV *dest) {
@@ -5405,10 +5550,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, cooperativeMatrixSupportedStages, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampledImageFeaturesNV *dest) {
@@ -5419,10 +5565,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampl
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, cornerSampledImage, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageReductionModeFeaturesNV *dest) {
@@ -5433,10 +5580,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageRed
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, coverageReductionMode, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *dest) {
@@ -5447,10 +5595,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAl
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, dedicatedAllocationImageAliasing, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest) {
@@ -5461,10 +5610,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnostics
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, diagnosticsConfig, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dest) {
@@ -5475,10 +5625,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, deviceGeneratedCommands, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dest) {
@@ -5489,6 +5640,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxGraphicsShaderGroupCount, WarnIfGreater);
         GET_VALUE_WARN(prop, maxIndirectSequenceCount, WarnIfGreater);
@@ -5500,7 +5652,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
         GET_VALUE_WARN(prop, minSequencesIndexBufferOffsetAlignment, WarnIfGreater);
         GET_VALUE_WARN(prop, minIndirectCommandsBufferOffsetAlignment, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *dest) {
@@ -5511,10 +5663,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, externalMemoryRDMA, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *dest) {
@@ -5525,10 +5678,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, fragmentShaderBarycentric, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *dest) {
@@ -5539,12 +5693,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, fragmentShadingRateEnums, WarnIfNotEqual);
         GET_VALUE_WARN(member, supersampleFragmentShadingRates, WarnIfNotEqual);
         GET_VALUE_WARN(member, noInvocationFragmentShadingRates, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest) {
@@ -5569,10 +5724,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedVi
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, inheritedViewportScissor2D, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderFeaturesNV *dest) {
@@ -5583,11 +5739,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderF
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, taskShader, WarnIfNotEqual);
         GET_VALUE_WARN(member, meshShader, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderPropertiesNV *dest) {
@@ -5598,6 +5755,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderP
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxDrawMeshTasksCount, WarnIfGreater);
         GET_VALUE_WARN(prop, maxTaskWorkGroupInvocations, WarnIfGreater);
@@ -5613,7 +5771,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderP
         GET_VALUE_WARN(prop, meshOutputPerVertexGranularity, WarnIfGreater);
         GET_VALUE_WARN(prop, meshOutputPerPrimitiveGranularity, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPropertiesNV *dest) {
@@ -5624,6 +5782,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, shaderGroupHandleSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxRecursionDepth, WarnIfGreater);
@@ -5634,7 +5793,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
         GET_VALUE_WARN(prop, maxTriangleCount, WarnIfGreater);
         GET_VALUE_WARN(prop, maxDescriptorSetAccelerationStructures, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest) {
@@ -5645,11 +5804,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingM
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, rayTracingMotionBlur, WarnIfNotEqual);
         GET_VALUE_WARN(member, rayTracingMotionBlurPipelineTraceRaysIndirect, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV *dest) {
@@ -5660,10 +5820,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentat
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, representativeFragmentTest, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveScissorFeaturesNV *dest) {
@@ -5674,10 +5835,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveSc
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, exclusiveScissor, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageFootprintFeaturesNV *dest) {
@@ -5688,10 +5850,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, imageFootprint, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsFeaturesNV *dest) {
@@ -5702,10 +5865,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBui
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderSMBuiltins, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsPropertiesNV *dest) {
@@ -5716,11 +5880,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBui
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, shaderSMCount, WarnIfGreater);
         GET_VALUE_WARN(prop, shaderWarpsPerSM, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImageFeaturesNV *dest) {
@@ -5731,11 +5896,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shadingRateImage, WarnIfNotEqual);
         GET_VALUE_WARN(member, shadingRateCoarseSampleOrder, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImagePropertiesNV *dest) {
@@ -5746,12 +5912,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, shadingRateTexelSize, WarnIfGreater);
         GET_VALUE_WARN(prop, shadingRatePaletteSize, WarnIfGreater);
         GET_VALUE_WARN(prop, shadingRateMaxCoarseSamples, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *dest) {
@@ -5762,10 +5929,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDesc
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, mutableDescriptorType, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRenderingFeaturesKHR *dest) {
@@ -5776,10 +5944,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRend
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, dynamicRendering, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *dest) {
@@ -5790,10 +5959,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, fragmentDensityMapDeferred, WarnIfNotEqual);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *dest) {
@@ -5804,13 +5974,14 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, subsampledLoads, WarnIfNotEqual);
         GET_VALUE_WARN(prop, subsampledCoarseReconstructionEarlyAccess, WarnIfNotEqual);
         GET_VALUE(prop, maxSubsampledArrayLayers);
         GET_VALUE(prop, maxDescriptorSetSubsampledSamplers);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, const std::string &member, const char *name, VkExtent2D *dest) {
@@ -5837,11 +6008,12 @@ bool JsonLoader::GetValue(const Json::Value &pparent, const std::string &member,
     if (parent.type() != Json::objectValue) {
         return true;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, width, warn_func);
         GET_VALUE_WARN(prop, height, warn_func);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &pparent, const std::string &member, const char *name, VkExtent3D *dest) {
@@ -5889,11 +6061,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, int index, VkMemoryHeap *de
     if (value.type() != Json::objectValue) {
         return true;
     }
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, size, WarnIfGreater);
         GET_MEMBER_VALUE(member, flags);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryProperties *dest) {
@@ -5916,6 +6089,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPrope
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkSurfaceCapabilitiesKHR *dest) {
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, minImageCount, WarnIfLesser);
         GET_VALUE_WARN(member, maxImageCount, WarnIfGreater);
@@ -5926,7 +6100,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkSurfaceCapabilitiesKHR *d
         GET_VALUE(member, supportedCompositeAlpha);
         GET_VALUE(member, supportedUsageFlags);
     }
-    return true;
+    return valid;
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, int index, VkLayerProperties *dest) {
@@ -5992,16 +6166,18 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Pro
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return false;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, framebufferIntegerColorSampleCounts, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Features *dest) {
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return false;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, samplerMirrorClampToEdge, WarnIfGreater);
         GET_VALUE_WARN(prop, shaderOutputViewportIndex, WarnIfGreater);
@@ -6011,7 +6187,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Fea
         GET_VALUE_WARN(prop, descriptorIndexing, WarnIfGreater);
         GET_VALUE_WARN(prop, samplerFilterMinmax, WarnIfGreater);
     }
-    return true;
+    return valid;
 }
 
 void JsonLoader::GetValueGPUinfoCore11(const Json::Value &parent) {
@@ -6344,16 +6520,17 @@ static SetCombinationMode GetSetCombinationModeValue(const std::string &value) {
     std::string temp = value;
     std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
 
-    if (value.empty())
+    if (temp == "check_support") {
         return SET_CHECK_SUPPORT;
-    else if (temp == "check_support" || temp == "0")
-        return SET_CHECK_SUPPORT;
-    else if (temp == "from_profile" || temp == "1")
-        return SET_FROM_PROFILE;
-    else if (temp == "from_device" || temp == "2")
+    } else if (temp == "from_device") {
         return SET_FROM_DEVICE;
-    else
-        return SET_CHECK_SUPPORT;
+    } else if (temp == "from_profile") {
+        return SET_FROM_PROFILE;
+    } else if (temp == "from_profile_override") {
+        return SET_FROM_PROFILE_OVERRIDE;
+    }
+
+    return SET_CHECK_SUPPORT;
 }
 // Fill the debugLevel variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
@@ -8076,6 +8253,7 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
                 *pFormatProperties = device_format;
                 break;
             case SET_FROM_PROFILE:
+            case SET_FROM_PROFILE_OVERRIDE:
                 *pFormatProperties = (iter != pdd->arrayof_format_properties_.end()) ? iter->second : VkFormatProperties{};
                 break;
                 break;
@@ -8090,6 +8268,7 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
                     *pFormatProperties = device_format;
                     break;
                 case SET_FROM_PROFILE:
+                case SET_FROM_PROFILE_OVERRIDE:
                     *pFormatProperties = iter->second;
                     break;
                 default:
@@ -8230,6 +8409,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormatsKHR(VkPhysicalDevi
                 return dt->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, pSurfaceFormatCount, pSurfaceFormats);
                 break;
             case SET_FROM_PROFILE:
+            case SET_FROM_PROFILE_OVERRIDE:
                 return EnumerateProperties(src_count, pdd->arrayof_surface_formats_.data(), pSurfaceFormatCount, pSurfaceFormats);
                 break;
             default:
@@ -8273,6 +8453,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormats2KHR(VkPhysicalDev
             return result;
             break;
         case SET_FROM_PROFILE:
+        case SET_FROM_PROFILE_OVERRIDE:
             if (!pSurfaceFormats) {
                 *pSurfaceFormatCount = src_count;
                 return result;
@@ -8342,6 +8523,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfacePresentModesKHR(VkPhysica
             return result;
             break;
         case SET_FROM_PROFILE:
+        case SET_FROM_PROFILE_OVERRIDE:
             result = EnumerateProperties(src_count, pdd->arrayof_present_modes_.data(), pPresentModeCount, pPresentModes);
             return result;
             break;
