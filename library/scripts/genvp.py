@@ -1946,18 +1946,13 @@ class VulkanProfilesBuilder():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    # TODO: Remove temporary default values used for testing purposes only
-    parser.add_argument('-registry', action='store',
-                        default='./library/scripts/vk.xml',
+    parser.add_argument('-registry', action='store', required=True,
                         help='Use specified registry file instead of vk.xml')
-    parser.add_argument('-profiles', action='store',
-                        default='./profiles',
+    parser.add_argument('-profiles', action='store', required=True,
                         help='Generate based on profiles in the specified directory')
-    parser.add_argument('-outIncDir', action='store',
-                        default='./library/include/vulkan',
+    parser.add_argument('-outIncDir', action='store', required=True,
                         help='Output include directory')
-    parser.add_argument('-outSrcDir', action='store',
-                        default='./library/source',
+    parser.add_argument('-outSrcDir', action='store', required=True,
                         help='Output source directory')
 
     args = parser.parse_args()
