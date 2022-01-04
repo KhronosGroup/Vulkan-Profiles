@@ -16,8 +16,8 @@
  * DO NOT EDIT: This file is generated.
  */
 
-#ifndef VULKAN_PROFILES_
-#define VULKAN_PROFILES_ 1
+#ifndef VULKAN_PROFILES_H_
+#define VULKAN_PROFILES_H_ 1
 
 #define VPAPI_ATTR
 
@@ -28,7 +28,6 @@
 #include <vulkan/vulkan_core.h>
 #ifdef VK_ENABLE_BETA_EXTENSIONS
 #include <vulkan/vulkan_beta.h>
-
 #endif
 
 #if defined(VK_VERSION_1_0) && \
@@ -230,4 +229,4 @@ VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *
 }
 #endif
 
-#endif //VULKAN_PROFILES_
+#endif // VULKAN_PROFILES_H_
