@@ -38,9 +38,7 @@ endif()
 
 add_definitions(-DVK_ENABLE_BETA_EXTENSIONS)
 
-set(TARGET_NAMES
-    VkLayer_profiles
-    )
+set(TARGET_NAME khronos_profiles)
 
 if (APPLE)
     include_directories(
@@ -73,7 +71,7 @@ else()
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wpointer-arith")
 endif()
 
-add_vk_layer(profiles profiles.cpp vk_layer_table.cpp ${jsoncpp_SOURCE_DIR}/dist/jsoncpp.cpp ${jsoncpp_SOURCE_DIR}/include/json/json.h)
+add_vk_layer(${TARGET_NAME} profiles.cpp vk_layer_table.cpp ${jsoncpp_SOURCE_DIR}/dist/jsoncpp.cpp ${jsoncpp_SOURCE_DIR}/include/json/json.h)
 
 # json file creation
 
@@ -86,31 +84,31 @@ string(REPLACE "\\" "\\\\" RELATIVE_PATH_PREFIX "${RELATIVE_PATH_PREFIX}")
 # We need to create the generator.cmake script so that the generator can be run at compile time, instead of configure time
 # Running at compile time lets us use cmake generator expressions (TARGET_FILE_NAME and TARGET_FILE_DIR, specifically)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/generator.cmake" "configure_file(\"\${INPUT_FILE}\" \"\${OUTPUT_FILE}\" @ONLY)")
-foreach(TARGET_NAME ${TARGET_NAMES})
-    set(CONFIG_DEFINES
-        -DINPUT_FILE="${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_NAME}.json.in"
-        -DVK_VERSION="1.2.195"
-    )
-    # Get the needed properties from that target
-    set(CONFIG_DEFINES ${CONFIG_DEFINES}
-        -DOUTPUT_FILE="$<TARGET_FILE_DIR:${TARGET_NAME}>/${TARGET_NAME}.json"
-        -DRELATIVE_LAYER_BINARY="${RELATIVE_PATH_PREFIX}$<TARGET_FILE_NAME:${TARGET_NAME}>"
+
+set(CONFIG_DEFINES
+    -DINPUT_FILE="${CMAKE_CURRENT_SOURCE_DIR}/VkLayer_${TARGET_NAME}.json.in"
+    -DVK_VERSION="1.2.195"
+)
+
+# Get the needed properties from that target
+set(CONFIG_DEFINES ${CONFIG_DEFINES}
+    -DOUTPUT_FILE="$<TARGET_FILE_DIR:VkLayer_${TARGET_NAME}>/VkLayer_${TARGET_NAME}.json"
+    -DRELATIVE_LAYER_BINARY="${RELATIVE_PATH_PREFIX}$<TARGET_FILE_NAME:VkLayer_${TARGET_NAME}>"
+)
+
+add_custom_target(VkLayer_${TARGET_NAME}-json ALL COMMAND ${CMAKE_COMMAND} ${CONFIG_DEFINES} -P "${CMAKE_CURRENT_BINARY_DIR}/generator.cmake")
+
+# Add target for JSON file install.
+if(NOT WIN32)
+    # Add targets for JSON file install on Linux.
+    # Need to remove the "./" from the library path before installing
+    add_custom_target(VkLayer_${TARGET_NAME}-staging-json ALL
+        COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/staging-json
+        COMMAND cp $<TARGET_FILE_DIR:VkLayer_${TARGET_NAME}>/VkLayer_${TARGET_NAME}.json ${CMAKE_CURRENT_BINARY_DIR}/staging-json
+        COMMAND sed -i -e "/.library_path.:/s=./libVkLayer=libVkLayer=" ${CMAKE_CURRENT_BINARY_DIR}/staging-json/VkLayer_${TARGET_NAME}.json
+        VERBATIM
+        DEPENDS VkLayer_${TARGET_NAME}-json
         )
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/staging-json/VkLayer_${TARGET_NAME}.json DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/vulkan/explicit_layer.d)
+endif()
 
-    add_custom_target(${TARGET_NAME}-json ALL COMMAND ${CMAKE_COMMAND} ${CONFIG_DEFINES} -P "${CMAKE_CURRENT_BINARY_DIR}/generator.cmake")
-
-    # Add target for JSON file install.
-    if(NOT WIN32)
-        # Add targets for JSON file install on Linux.
-        # Need to remove the "./" from the library path before installing
-        add_custom_target(${TARGET_NAME}-staging-json ALL
-            COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/staging-json
-            COMMAND cp $<TARGET_FILE_DIR:${TARGET_NAME}>/${TARGET_NAME}.json ${CMAKE_CURRENT_BINARY_DIR}/staging-json
-            COMMAND sed -i -e "/.library_path.:/s=./libVkLayer=libVkLayer=" ${CMAKE_CURRENT_BINARY_DIR}/staging-json/${TARGET_NAME}.json
-            VERBATIM
-            DEPENDS ${TARGET_NAME}-json
-            )
-        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/staging-json/${TARGET_NAME}.json DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/vulkan/explicit_layer.d)
-    endif()
-
-endforeach()
