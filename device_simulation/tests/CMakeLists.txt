@@ -1,7 +1,0 @@
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-set(CMAKE_CXX_STANDARD 11)
-
-DevsimTest(test_array_combination_modes)
-DevsimTest(test_physical_device_extended_property_modification)
-DevsimTest(test_physical_device_main_property_modification)
