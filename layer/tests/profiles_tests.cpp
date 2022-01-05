@@ -204,6 +204,9 @@ TEST(profiles, TestDesktopPortability2022Limits) {
 TEST(profiles, TestSelectingProfile) {
     VkResult err = VK_SUCCESS;
 
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
     profiles_test::VulkanInstanceBuilder inst_builder;
 
     std::vector<std::string> filepaths = {TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json",
@@ -469,82 +472,71 @@ TEST(profiles, TestSelectingProfile) {
         vkGetPhysicalDeviceFeatures(gpu, &gpu_feats);
 
         // Limits
-        EXPECT_GE(gpu_props.limits.maxImageDimension1D, 16384u);
+        EXPECT_GE(gpu_props.limits.maxImageDimension1D, 8192u);
         EXPECT_GE(gpu_props.limits.maxImageDimension2D, 8192u);
-        EXPECT_GE(gpu_props.limits.maxImageDimension3D, 4096u);
+        EXPECT_GE(gpu_props.limits.maxImageDimension3D, 2048u);
         EXPECT_GE(gpu_props.limits.maxImageDimensionCube, 8192u);
         EXPECT_GE(gpu_props.limits.maxImageArrayLayers, 256u);
         EXPECT_GE(gpu_props.limits.maxTexelBufferElements, 65536u);
-        EXPECT_GE(gpu_props.limits.maxUniformBufferRange, 65536u);
-        EXPECT_GE(gpu_props.limits.maxStorageBufferRange, 268435456u);
+        EXPECT_GE(gpu_props.limits.maxUniformBufferRange, 16384u);
+        EXPECT_GE(gpu_props.limits.maxStorageBufferRange, 134217728u);
         EXPECT_GE(gpu_props.limits.maxPushConstantsSize, 128u);
-        EXPECT_GE(gpu_props.limits.maxMemoryAllocationCount, 4294967295u);
-        EXPECT_GE(gpu_props.limits.maxSamplerAllocationCount, 16384u);
-        EXPECT_GE(gpu_props.limits.bufferImageGranularity, 4096u);
+        EXPECT_GE(gpu_props.limits.maxMemoryAllocationCount, 4096u);
+        EXPECT_GE(gpu_props.limits.maxSamplerAllocationCount, 4000u);
         EXPECT_GE(gpu_props.limits.maxBoundDescriptorSets, 4u);
-        EXPECT_GE(gpu_props.limits.maxPerStageDescriptorSamplers, 128u);
+        EXPECT_GE(gpu_props.limits.maxPerStageDescriptorSamplers, 16u);
         EXPECT_GE(gpu_props.limits.maxPerStageDescriptorUniformBuffers, 12u);
-        EXPECT_GE(gpu_props.limits.maxPerStageDescriptorStorageBuffers, 35u);
+        EXPECT_GE(gpu_props.limits.maxPerStageDescriptorStorageBuffers, 4u);
         EXPECT_GE(gpu_props.limits.maxPerStageDescriptorSampledImages, 16u);
-        EXPECT_GE(gpu_props.limits.maxPerStageDescriptorStorageImages, 8u);
+        EXPECT_GE(gpu_props.limits.maxPerStageDescriptorStorageImages, 4u);
         EXPECT_GE(gpu_props.limits.maxPerStageDescriptorInputAttachments, 4u);
-        EXPECT_GE(gpu_props.limits.maxPerStageResources, 79u);
-        EXPECT_GE(gpu_props.limits.maxDescriptorSetSamplers, 768u);
+        EXPECT_GE(gpu_props.limits.maxPerStageResources, 44u);
+        EXPECT_GE(gpu_props.limits.maxDescriptorSetSamplers, 96u);
         EXPECT_GE(gpu_props.limits.maxDescriptorSetUniformBuffers, 72u);
         EXPECT_GE(gpu_props.limits.maxDescriptorSetUniformBuffersDynamic, 8u);
-        EXPECT_GE(gpu_props.limits.maxDescriptorSetStorageBuffers, 72u);
+        EXPECT_GE(gpu_props.limits.maxDescriptorSetStorageBuffers, 24u);
         EXPECT_GE(gpu_props.limits.maxDescriptorSetStorageBuffersDynamic, 4u);
         EXPECT_GE(gpu_props.limits.maxDescriptorSetSampledImages, 96u);
-        EXPECT_GE(gpu_props.limits.maxDescriptorSetStorageImages, 48u);
+        EXPECT_GE(gpu_props.limits.maxDescriptorSetStorageImages, 24u);
         EXPECT_GE(gpu_props.limits.maxDescriptorSetInputAttachments, 4u);
         EXPECT_GE(gpu_props.limits.maxVertexInputAttributes, 16u);
         EXPECT_GE(gpu_props.limits.maxVertexInputBindings, 16u);
         EXPECT_GE(gpu_props.limits.maxVertexInputAttributeOffset, 2047u);
         EXPECT_GE(gpu_props.limits.maxVertexInputBindingStride, 2048u);
-        EXPECT_GE(gpu_props.limits.maxVertexOutputComponents, 128u);
-        EXPECT_GE(gpu_props.limits.maxTessellationGenerationLevel, 64u);
-        EXPECT_GE(gpu_props.limits.maxTessellationPatchSize, 32u);
-        EXPECT_GE(gpu_props.limits.maxTessellationControlPerVertexInputComponents, 128u);
-        EXPECT_GE(gpu_props.limits.maxTessellationControlPerVertexOutputComponents, 128u);
-        EXPECT_GE(gpu_props.limits.maxTessellationControlPerPatchOutputComponents, 120u);
-        EXPECT_GE(gpu_props.limits.maxTessellationControlTotalOutputComponents, 4096u);
-        EXPECT_GE(gpu_props.limits.maxTessellationEvaluationInputComponents, 128u);
-        EXPECT_GE(gpu_props.limits.maxTessellationEvaluationOutputComponents, 128u);
-        EXPECT_GE(gpu_props.limits.maxFragmentInputComponents, 128u);
+        EXPECT_GE(gpu_props.limits.maxVertexOutputComponents, 64u);
+        EXPECT_GE(gpu_props.limits.maxFragmentInputComponents, 64u);
         EXPECT_GE(gpu_props.limits.maxFragmentOutputAttachments, 4u);
-        EXPECT_GE(gpu_props.limits.maxFragmentDualSrcAttachments, 0u);
-        EXPECT_GE(gpu_props.limits.maxFragmentCombinedOutputResources, 47u);
-        EXPECT_GE(gpu_props.limits.maxComputeSharedMemorySize, 32768u);
+        EXPECT_GE(gpu_props.limits.maxFragmentCombinedOutputResources, 8u);
+        EXPECT_GE(gpu_props.limits.maxComputeSharedMemorySize, 16384u);
         EXPECT_GE(gpu_props.limits.maxComputeWorkGroupCount[0], 65535u);
         EXPECT_GE(gpu_props.limits.maxComputeWorkGroupCount[1], 65535u);
         EXPECT_GE(gpu_props.limits.maxComputeWorkGroupCount[2], 65535u);
         EXPECT_GE(gpu_props.limits.maxComputeWorkGroupInvocations, 128u);
         EXPECT_GE(gpu_props.limits.maxComputeWorkGroupSize[0], 128u);
         EXPECT_GE(gpu_props.limits.maxComputeWorkGroupSize[1], 128u);
-        EXPECT_GE(gpu_props.limits.maxComputeWorkGroupSize[2], 128u);
-        EXPECT_GE(gpu_props.limits.subPixelPrecisionBits, 8u);
-        EXPECT_GE(gpu_props.limits.subTexelPrecisionBits, 8u);
-        EXPECT_GE(gpu_props.limits.mipmapPrecisionBits, 8u);
+        EXPECT_GE(gpu_props.limits.maxComputeWorkGroupSize[2], 64u);
+        EXPECT_GE(gpu_props.limits.subPixelPrecisionBits, 4u);
+        EXPECT_GE(gpu_props.limits.subTexelPrecisionBits, 4u);
+        EXPECT_GE(gpu_props.limits.mipmapPrecisionBits, 4u);
         EXPECT_GE(gpu_props.limits.maxDrawIndexedIndexValue, 4294967295u);
         EXPECT_GE(gpu_props.limits.maxDrawIndirectCount, 1u);
-        EXPECT_GE(gpu_props.limits.maxSamplerLodBias, 15.9961f);
+        EXPECT_GE(gpu_props.limits.maxSamplerLodBias, 2.0f);
         EXPECT_GE(gpu_props.limits.maxSamplerAnisotropy, 1.0f);
         EXPECT_GE(gpu_props.limits.maxViewports, 1u);
         EXPECT_GE(gpu_props.limits.maxViewportDimensions[0], 8192u);
         EXPECT_GE(gpu_props.limits.maxViewportDimensions[1], 8192u);
-        EXPECT_GE(gpu_props.limits.viewportBoundsRange[0], -32768);
-        EXPECT_GE(gpu_props.limits.viewportBoundsRange[1], 32767u);
-        EXPECT_GE(gpu_props.limits.viewportSubPixelBits, 0u);
-        EXPECT_GE(gpu_props.limits.minMemoryMapAlignment, 64u);
+        EXPECT_GE(gpu_props.limits.viewportBoundsRange[0], -8192);
+        EXPECT_GE(gpu_props.limits.viewportBoundsRange[1], 8192u);
+        EXPECT_GE(gpu_props.limits.minMemoryMapAlignment, 4096u);
         EXPECT_GE(gpu_props.limits.minTexelBufferOffsetAlignment, 256u);
-        EXPECT_GE(gpu_props.limits.minUniformBufferOffsetAlignment, 64u);
+        EXPECT_GE(gpu_props.limits.minUniformBufferOffsetAlignment, 256u);
         EXPECT_GE(gpu_props.limits.minStorageBufferOffsetAlignment, 256u);
         EXPECT_GE(gpu_props.limits.minTexelOffset, -8);
         EXPECT_GE(gpu_props.limits.maxTexelOffset, 7u);
         EXPECT_GE(gpu_props.limits.minTexelGatherOffset, -8);
         EXPECT_GE(gpu_props.limits.maxTexelGatherOffset, 7u);
         EXPECT_GE(gpu_props.limits.minInterpolationOffset, -0.5f);
-        EXPECT_GE(gpu_props.limits.maxInterpolationOffset, 0.5f);
+        EXPECT_GE(gpu_props.limits.maxInterpolationOffset, 0.4375f);
         EXPECT_GE(gpu_props.limits.subPixelInterpolationOffsetBits, 4u);
         EXPECT_GE(gpu_props.limits.maxFramebufferWidth, 8192u);
         EXPECT_GE(gpu_props.limits.maxFramebufferHeight, 8192u);
@@ -567,19 +559,14 @@ TEST(profiles, TestSelectingProfile) {
         EXPECT_GE(gpu_props.limits.sampledImageStencilSampleCounts & VK_SAMPLE_COUNT_4_BIT, VK_SAMPLE_COUNT_4_BIT);
         EXPECT_GE(gpu_props.limits.storageImageSampleCounts & VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_1_BIT);
         EXPECT_GE(gpu_props.limits.maxSampleMaskWords, 1u);
-        EXPECT_GE(gpu_props.limits.timestampComputeAndGraphics, VK_TRUE);
-        EXPECT_GE(gpu_props.limits.timestampPeriod, 38.4615f);
-        EXPECT_GE(gpu_props.limits.maxClipDistances, 0u);
-        EXPECT_GE(gpu_props.limits.maxCullDistances, 0u);
-        EXPECT_GE(gpu_props.limits.maxCombinedClipAndCullDistances, 0u);
         EXPECT_GE(gpu_props.limits.discreteQueuePriorities, 2u);
         EXPECT_GE(gpu_props.limits.pointSizeRange[0], 1.0f);
-        EXPECT_GE(gpu_props.limits.pointSizeRange[1], 1024.0f);
+        EXPECT_GE(gpu_props.limits.pointSizeRange[1], 1.0f);
         EXPECT_GE(gpu_props.limits.lineWidthRange[0], 1.0f);
         EXPECT_GE(gpu_props.limits.lineWidthRange[1], 1.0f);
-        EXPECT_GE(gpu_props.limits.pointSizeGranularity, 0.0625f);
-        EXPECT_GE(gpu_props.limits.strictLines, VK_TRUE);
-        EXPECT_GE(gpu_props.limits.nonCoherentAtomSize, 64u);
+        EXPECT_GE(gpu_props.limits.pointSizeGranularity, 1u);
+        EXPECT_GE(gpu_props.limits.lineWidthGranularity, 1u);
+        EXPECT_GE(gpu_props.limits.standardSampleLocations, VK_TRUE);
 
         // Features
         EXPECT_EQ(gpu_feats.robustBufferAccess, VK_TRUE);
@@ -591,12 +578,10 @@ TEST(profiles, TestSelectingProfile) {
         EXPECT_EQ(gpu_feats.independentBlend, VK_TRUE);
         EXPECT_EQ(gpu_feats.largePoints, VK_TRUE);
         EXPECT_EQ(gpu_feats.robustBufferAccess, VK_TRUE);
+        EXPECT_EQ(gpu_feats.sampleRateShading, VK_TRUE);
         EXPECT_EQ(gpu_feats.shaderImageGatherExtended, VK_TRUE);
-        EXPECT_EQ(gpu_feats.shaderInt16, VK_TRUE);
         EXPECT_EQ(gpu_feats.shaderSampledImageArrayDynamicIndexing, VK_TRUE);
-        EXPECT_EQ(gpu_feats.shaderStorageBufferArrayDynamicIndexing, VK_TRUE);
         EXPECT_EQ(gpu_feats.shaderStorageImageArrayDynamicIndexing, VK_TRUE);
-        EXPECT_EQ(gpu_feats.shaderStorageImageWriteWithoutFormat, VK_TRUE);
         EXPECT_EQ(gpu_feats.shaderUniformBufferArrayDynamicIndexing, VK_TRUE);
         EXPECT_EQ(gpu_feats.textureCompressionASTC_LDR, VK_TRUE);
         EXPECT_EQ(gpu_feats.textureCompressionETC2, VK_TRUE);
@@ -607,6 +592,9 @@ TEST(profiles, TestSelectingProfile) {
 
 TEST(profiles, TestSetCombinationMode) {
     VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -765,6 +753,9 @@ TEST(profiles, TestSetCombinationMode) {
 
 TEST(profiles, TestExtensionNotSupported) {
     VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
