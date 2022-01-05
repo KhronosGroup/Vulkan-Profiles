@@ -42,7 +42,7 @@ TEST(test_profile, example_add_features_add_extensions) {
     VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
     deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     deviceFeatures2.features.depthBiasClamp = VK_TRUE;
-    deviceFeatures2.features.depthBounds = VK_TRUE;
+    deviceFeatures2.features.depthBounds = VK_FALSE;
     deviceFeatures2.features.depthClamp = VK_TRUE;
 
     VkDeviceCreateInfo info = {};

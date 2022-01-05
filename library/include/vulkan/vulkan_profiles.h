@@ -84,7 +84,6 @@
     defined(VK_KHR_image_format_list) && \
     defined(VK_KHR_imageless_framebuffer) && \
     defined(VK_KHR_sampler_mirror_clamp_to_edge) && \
-    defined(VK_KHR_sampler_ycbcr_conversion) && \
     defined(VK_KHR_shader_float16_int8) && \
     defined(VK_KHR_shader_subgroup_extended_types) && \
     defined(VK_KHR_swapchain) && \
@@ -113,7 +112,6 @@
     defined(VK_KHR_imageless_framebuffer) && \
     defined(VK_KHR_portability_subset) && \
     defined(VK_KHR_sampler_mirror_clamp_to_edge) && \
-    defined(VK_KHR_sampler_ycbcr_conversion) && \
     defined(VK_KHR_shader_float16_int8) && \
     defined(VK_KHR_shader_subgroup_extended_types) && \
     defined(VK_KHR_swapchain) && \

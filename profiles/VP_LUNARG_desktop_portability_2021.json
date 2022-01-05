@@ -30,7 +30,6 @@
                 "VK_EXT_descriptor_indexing": 1,
                 "VK_EXT_host_query_reset": 1,
                 "VK_EXT_scalar_block_layout": 1,
-                "VK_KHR_sampler_ycbcr_conversion": 1,
                 "VK_EXT_robustness2": 1,
                 "VK_EXT_subgroup_size_control": 1,
                 "VK_EXT_texel_buffer_alignment": 1,
@@ -111,9 +110,6 @@
                 },
                 "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR": {
                     "shaderInt8": true
-                },
-                "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
-                    "samplerYcbcrConversion": true
                 },
                 "VkPhysicalDeviceVariablePointersFeatures": {
                     "variablePointersStorageBuffer": true,

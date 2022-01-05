@@ -85,7 +85,6 @@
     defined(VK_KHR_image_format_list) && \
     defined(VK_KHR_imageless_framebuffer) && \
     defined(VK_KHR_sampler_mirror_clamp_to_edge) && \
-    defined(VK_KHR_sampler_ycbcr_conversion) && \
     defined(VK_KHR_shader_float16_int8) && \
     defined(VK_KHR_shader_subgroup_extended_types) && \
     defined(VK_KHR_swapchain) && \
@@ -114,7 +113,6 @@
     defined(VK_KHR_imageless_framebuffer) && \
     defined(VK_KHR_portability_subset) && \
     defined(VK_KHR_sampler_mirror_clamp_to_edge) && \
-    defined(VK_KHR_sampler_ycbcr_conversion) && \
     defined(VK_KHR_shader_float16_int8) && \
     defined(VK_KHR_shader_subgroup_extended_types) && \
     defined(VK_KHR_swapchain) && \
@@ -1907,7 +1905,6 @@ static const VkExtensionProperties deviceExtensions[] = {
     VkExtensionProperties{ VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_SWAPCHAIN_EXTENSION_NAME, 70 },
@@ -1928,7 +1925,6 @@ static const VkStructureType featureStructTypes[] = {
     { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR },
     { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES },
     { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR },
-    { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR },
     { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES },
 };
 
@@ -2039,10 +2035,6 @@ static const VpFeatureDesc featureDesc = {
                     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR* s = static_cast<VkPhysicalDeviceShaderFloat16Int8FeaturesKHR*>(static_cast<void*>(p));
                     s->shaderInt8 = VK_TRUE;
                 } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR: {
-                    VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR* s = static_cast<VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR*>(static_cast<void*>(p));
-                    s->samplerYcbcrConversion = VK_TRUE;
-                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES: {
                     VkPhysicalDeviceVariablePointersFeatures* s = static_cast<VkPhysicalDeviceVariablePointersFeatures*>(static_cast<void*>(p));
                     s->variablePointers = VK_TRUE;
@@ -2140,10 +2132,6 @@ static const VpFeatureDesc featureDesc = {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR: {
                     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR* s = static_cast<VkPhysicalDeviceShaderFloat16Int8FeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->shaderInt8 == VK_TRUE);
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR: {
-                    VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR* s = static_cast<VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR*>(static_cast<void*>(p));
-                    ret = ret && (s->samplerYcbcrConversion == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES: {
                     VkPhysicalDeviceVariablePointersFeatures* s = static_cast<VkPhysicalDeviceVariablePointersFeatures*>(static_cast<void*>(p));
@@ -4166,8 +4154,7 @@ static const VpStructChainerDesc chainerDesc = {
         VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR physicalDeviceUniformBufferStandardLayoutFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR, &physicalDeviceShaderSubgroupExtendedTypesFeaturesKHR };
         VkPhysicalDeviceShaderDrawParametersFeatures physicalDeviceShaderDrawParametersFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES, &physicalDeviceUniformBufferStandardLayoutFeaturesKHR };
         VkPhysicalDeviceShaderFloat16Int8FeaturesKHR physicalDeviceShaderFloat16Int8FeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR, &physicalDeviceShaderDrawParametersFeatures };
-        VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR physicalDeviceSamplerYcbcrConversionFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR, &physicalDeviceShaderFloat16Int8FeaturesKHR };
-        VkPhysicalDeviceVariablePointersFeatures physicalDeviceVariablePointersFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES, &physicalDeviceSamplerYcbcrConversionFeaturesKHR };
+        VkPhysicalDeviceVariablePointersFeatures physicalDeviceVariablePointersFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES, &physicalDeviceShaderFloat16Int8FeaturesKHR };
         p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceVariablePointersFeatures));
         pfnCb(p, pUser);
     },
@@ -4212,7 +4199,6 @@ static const VkExtensionProperties deviceExtensions[] = {
     VkExtensionProperties{ VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_SWAPCHAIN_EXTENSION_NAME, 70 },
@@ -4237,7 +4223,6 @@ static const VkStructureType featureStructTypes[] = {
     { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR },
     { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES },
     { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR },
-    { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR },
     { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES },
     { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR },
 };
@@ -4350,10 +4335,6 @@ static const VpFeatureDesc featureDesc = {
                     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR* s = static_cast<VkPhysicalDeviceShaderFloat16Int8FeaturesKHR*>(static_cast<void*>(p));
                     s->shaderInt8 = VK_TRUE;
                 } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR: {
-                    VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR* s = static_cast<VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR*>(static_cast<void*>(p));
-                    s->samplerYcbcrConversion = VK_TRUE;
-                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES: {
                     VkPhysicalDeviceVariablePointersFeatures* s = static_cast<VkPhysicalDeviceVariablePointersFeatures*>(static_cast<void*>(p));
                     s->variablePointers = VK_TRUE;
@@ -4462,10 +4443,6 @@ static const VpFeatureDesc featureDesc = {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR: {
                     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR* s = static_cast<VkPhysicalDeviceShaderFloat16Int8FeaturesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->shaderInt8 == VK_TRUE);
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR: {
-                    VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR* s = static_cast<VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR*>(static_cast<void*>(p));
-                    ret = ret && (s->samplerYcbcrConversion == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES: {
                     VkPhysicalDeviceVariablePointersFeatures* s = static_cast<VkPhysicalDeviceVariablePointersFeatures*>(static_cast<void*>(p));
@@ -6507,8 +6484,7 @@ static const VpStructChainerDesc chainerDesc = {
         VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR physicalDeviceUniformBufferStandardLayoutFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR, &physicalDeviceShaderSubgroupExtendedTypesFeaturesKHR };
         VkPhysicalDeviceShaderDrawParametersFeatures physicalDeviceShaderDrawParametersFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES, &physicalDeviceUniformBufferStandardLayoutFeaturesKHR };
         VkPhysicalDeviceShaderFloat16Int8FeaturesKHR physicalDeviceShaderFloat16Int8FeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR, &physicalDeviceShaderDrawParametersFeatures };
-        VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR physicalDeviceSamplerYcbcrConversionFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR, &physicalDeviceShaderFloat16Int8FeaturesKHR };
-        VkPhysicalDeviceVariablePointersFeatures physicalDeviceVariablePointersFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES, &physicalDeviceSamplerYcbcrConversionFeaturesKHR };
+        VkPhysicalDeviceVariablePointersFeatures physicalDeviceVariablePointersFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES, &physicalDeviceShaderFloat16Int8FeaturesKHR };
         VkPhysicalDevicePortabilitySubsetFeaturesKHR physicalDevicePortabilitySubsetFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR, &physicalDeviceVariablePointersFeatures };
         p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDevicePortabilitySubsetFeaturesKHR));
         pfnCb(p, pUser);
