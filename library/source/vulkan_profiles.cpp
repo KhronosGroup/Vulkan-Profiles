@@ -6562,7 +6562,7 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
     }
 
     for (uint32_t i = 0; i < pDesc->instanceExtensionCount; ++i) {
-        if (!detail::vpCheckExtension(ext.data(), extCount,
+        if (!detail::vpCheckExtension(ext.data(), ext.size(),
             pDesc->pInstanceExtensions[i].extensionName,
             pDesc->pInstanceExtensions[i].specVersion)) {
             return result;
@@ -6621,6 +6621,9 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
         return result;
     }
 
+    // Workaround old loader bug where count could be smaller on the second call to vkEnumerateDeviceExtensionProperties
+    ext.resize(extCount);
+
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
@@ -6631,7 +6634,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
     }
 
     {
-        VkPhysicalDeviceProperties props;
+        VkPhysicalDeviceProperties props{};
         vkGetPhysicalDeviceProperties(physicalDevice, &props);
         if (VK_VERSION_PATCH(props.apiVersion) < VK_VERSION_PATCH(pDesc->minApiVersion)) {
             return result;
@@ -6639,7 +6642,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkPhysicalDevice physicalD
     }
 
     for (uint32_t i = 0; i < pDesc->deviceExtensionCount; ++i) {
-        if (!detail::vpCheckExtension(ext.data(), extCount,
+        if (!detail::vpCheckExtension(ext.data(), ext.size(),
             pDesc->pDeviceExtensions[i].extensionName,
             pDesc->pDeviceExtensions[i].specVersion)) {
             return result;
