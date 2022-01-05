@@ -109,7 +109,7 @@ add_subdirectory(library)
 
 add_subdirectory(vku)
 
-# add_vk_layer macro is used by both device_simulation/ and layer/.
+# add_vk_layer macro is used by layer/.
 if (WIN32)
     macro(add_vk_layer target)
     FILE(TO_NATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/VkLayer_${target}.def DEF_FILE)
@@ -134,7 +134,6 @@ else()
     install(TARGETS VkLayer_${target} DESTINATION ${CMAKE_INSTALL_LIBDIR})
     endmacro()
 endif()
-add_subdirectory(device_simulation)
 add_subdirectory(layer)
 
 include_directories(external)
