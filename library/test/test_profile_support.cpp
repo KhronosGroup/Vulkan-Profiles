@@ -32,7 +32,7 @@ TEST(test_profile, VP_KHR_1_2_roadmap_2022_support) {
     const VpProfileProperties profile{VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold.instance, scaffold.physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_SUCCESS, result);
 
 #ifdef __APPLE__
@@ -49,7 +49,7 @@ TEST(test_profile, VP_LUNARG_1_1_desktop_portability_2022_support) {
                                       VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold.instance, scaffold.physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_SUCCESS, result);
 
 #ifdef __APPLE__
@@ -66,7 +66,7 @@ TEST(test_profile, VP_LUNARG_1_1_desktop_portability_2022_subset_support) {
                                 VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold.physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold.instance, scaffold.physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_SUCCESS, result);
 
 #ifdef __APPLE__
