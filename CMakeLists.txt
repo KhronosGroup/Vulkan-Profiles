@@ -17,6 +17,9 @@ find_package(PythonInterp 3 REQUIRED)
 # Third-party libraries
 include(FetchContent)
 
+# Always need C++2011 throughout the project.
+set(CMAKE_CXX_STANDARD 11)
+
 # Declare all content before making available, to ensure that these
 # settings are used instead of any settings that may be encountered
 # inside these projects.
