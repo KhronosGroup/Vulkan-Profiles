@@ -160,24 +160,16 @@ const char *const kEnvarProfilesModifyPresentModes =
 const char *const kEnvarProfilesProfileName = "VK_KHRONOS_PROFILES_PROFILE_NAME";  // name of the profile to be used
 #endif
 
-const char *const kLayerSettingsProfilesFilename = "filename";  // vk_layer_settings.txt equivalent for kEnvarProfilesFilename
-const char *const kLayerSettingsProfilesDebugEnable =
-    "debug_enable";  // vk_layer_settings.txt equivalent for kEnvarProfilesDebugEnable
-const char *const kLayerSettingsProfilesEmulatePortability =
-    "emulate_portability";  // vk_layer_settings.txt equivalent for kEnvarProfilesEmulatePortability
-const char *const kLayerSettingsProfilesModifyExtensionList =
-    "modify_extension_list";  // vk_layer_settings.txt equivalent for kEnvarProfilesModifyExtensionList
-const char *const kLayerSettingsProfilesModifyMemoryFlags =
-    "modify_memory_flags";  // vk_layer_settings.txt equivalent for kEnvarProfilesModifyMemoryFlags
-const char *const kLayerSettingsProfilesModifyFormatList =
-    "modify_format_list";  // an SetCombinationMode value sets how the device and config format lists are combined.
-const char *const kLayerSettingsProfilesModifyFormatProperties =
-    "modify_format_properties";  // an SetCombinationMode value sets how the device and config format properties are combined.
-const char *const kLayerSettingsProfilesModifySurfaceFormats =
-    "modify_surface_formats";  // an SetCombinationMode value sets how the device and config surface format lists are combined.
-const char *const kLayerSettingsProfilesModifyPresentModes =
-    "modify_present_modes";  // an SetCombinationMode value sets how the device and config present modes are combined.
-const char *const kLayerSettingProfilesProfileName = "profile_name";  // name of the profile to be used
+const char *const kLayerSettingsProfileFilename = "profile_filename";
+const char *const kLayerSettingsDebugEnable = "debug_enable";
+const char *const kLayerSettingsEmulatePortability = "emulate_portability";
+const char *const kLayerSettingsModifyExtensionList = "modify_extension_list";
+const char *const kLayerSettingsModifyMemoryFlags = "modify_memory_flags";
+const char *const kLayerSettingsModifyFormatList = "modify_format_list";
+const char *const kLayerSettingsModifyFormatProperties = "modify_format_properties";
+const char *const kLayerSettingsModifySurfaceFormats = "modify_surface_formats";
+const char *const kLayerSettingsModifyPresentModes = "modify_present_modes";
+const char *const kLayerSettingsProfileName = "profile_name";
 
 struct SetCombinationModeSetting {
     SetCombinationMode mode;
@@ -2552,7 +2544,7 @@ static inline VkFormatFeatureFlags StringToVkFormatFeatureFlags(const std::strin
 
 VkResult JsonLoader::LoadFiles() {
     if (inputFilename.str.empty()) {
-        ErrorPrintf("envar %s and %s in vk_layer_settings.txt are unset\n", kEnvarProfilesFilename, kLayerSettingsProfilesFilename);
+        ErrorPrintf("envar %s and %s in vk_layer_settings.txt are unset\n", kEnvarProfilesFilename, kLayerSettingsProfileFilename);
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
@@ -2560,7 +2552,8 @@ VkResult JsonLoader::LoadFiles() {
     if (inputFilename.fromEnvVar) {
         DebugPrintf("envar %s = \"%s\"\n", kEnvarProfilesFilename, filename_list);
     } else {
-        DebugPrintf("vk_layer_settings.txt setting %s = \"%s\"\n", kLayerSettingsProfilesFilename, filename_list);
+        DebugPrintf("vk_layer_settings.txt setting %s = \"%s\"\n", kLayerSettingsProfileFilename,
+                    filename_list);
     }
     return LoadFiles(filename_list);
 }
@@ -6486,9 +6479,9 @@ static void GetProfilesFilename() {
         inputFilename.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesFilename)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileFilename)) {
         inputFilename.fromEnvVar = false;
-        inputFilename.str = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfilesFilename);
+        inputFilename.str = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileFilename);
     }
 }
 
@@ -6535,9 +6528,9 @@ static void GetProfilesDebugLevel() {
         debugLevel.num = GetBooleanValue(env_var);
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesDebugEnable)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugEnable)) {
         debugLevel.fromEnvVar = false;
-        debugLevel.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsProfilesDebugEnable);
+        debugLevel.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDebugEnable);
     }
 }
 
@@ -6550,9 +6543,9 @@ static void GetProfilesEmulatePortability() {
         emulatePortability.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesEmulatePortability)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsEmulatePortability)) {
         emulatePortability.fromEnvVar = false;
-        emulatePortability.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsProfilesEmulatePortability);
+        emulatePortability.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsEmulatePortability);
     }
 }
 
@@ -6566,8 +6559,8 @@ static void GetProfilesModifyExtensionList() {
         modifyExtensionList.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesModifyExtensionList)) {
-        modify_extension_list = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfilesModifyExtensionList);
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsModifyExtensionList)) {
+        modify_extension_list = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsModifyExtensionList);
         modifyExtensionList.fromEnvVar = false;
     }
     modifyExtensionList.mode = GetSetCombinationModeValue(modify_extension_list);
@@ -6582,9 +6575,9 @@ static void GetProfilesModifyMemoryFlags() {
         modifyMemoryFlags.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesModifyMemoryFlags)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsModifyMemoryFlags)) {
         modifyMemoryFlags.fromEnvVar = false;
-        modifyMemoryFlags.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsProfilesModifyMemoryFlags);
+        modifyMemoryFlags.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsModifyMemoryFlags);
     }
 }
 
@@ -6598,9 +6591,9 @@ static void GetProfilesModifyFormatList() {
         modifyFormatList.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesModifyFormatList)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsModifyFormatList)) {
         modifyFormatList.fromEnvVar = false;
-        modify_format_list = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfilesModifyFormatList);
+        modify_format_list = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsModifyFormatList);
     }
     modifyFormatList.mode = GetSetCombinationModeValue(modify_format_list);
 }
@@ -6615,9 +6608,9 @@ static void GetProfilesModifyFormatProperties() {
         modifyFormatProperties.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesModifyFormatProperties)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsModifyFormatProperties)) {
         modifyFormatProperties.fromEnvVar = false;
-        modify_format_properties = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfilesModifyFormatProperties);
+        modify_format_properties = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsModifyFormatProperties);
     }
     modifyFormatProperties.mode = GetSetCombinationModeValue(modify_format_properties);
 }
@@ -6632,9 +6625,9 @@ static void GetProfilesModifySurfaceFormats() {
         modifySurfaceFormats.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesModifySurfaceFormats)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsModifySurfaceFormats)) {
         modifySurfaceFormats.fromEnvVar = false;
-        modify_surface_formats = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfilesModifySurfaceFormats);
+        modify_surface_formats = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsModifySurfaceFormats);
     }
     modifySurfaceFormats.mode = GetSetCombinationModeValue(modify_surface_formats);
 }
@@ -6649,9 +6642,9 @@ static void GetProfilesModifyPresentModes() {
         modifyPresentModes.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfilesModifyPresentModes)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsModifyPresentModes)) {
         modifyPresentModes.fromEnvVar = false;
-        modify_present_modes = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfilesModifyPresentModes);
+        modify_present_modes = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsModifyPresentModes);
     }
     modifyPresentModes.mode = GetSetCombinationModeValue(modify_present_modes);
 }
@@ -6663,9 +6656,9 @@ static void GetProfileName() {
         modifyPresentModes.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingProfilesProfileName)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileName)) {
         emulatePortability.fromEnvVar = false;
-        profile_name = vku::GetLayerSettingString(kOurLayerName, kLayerSettingProfilesProfileName);
+        profile_name = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileName);
     }
 }
 

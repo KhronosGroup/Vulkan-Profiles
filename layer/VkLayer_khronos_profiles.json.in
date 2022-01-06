@@ -85,28 +85,26 @@
                 {
                     "key": "profile_file",
                     "label": "Profile Selection",
-                    "description": "Path of a profile file and the name of the profile to load.",
+                    "description": "Paths to the profile files separated by ';'.",
                     "type": "LOAD_FILE",
                     "filter": "*.json",
-                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2021.json",
-                    "settings": [
-                        {
-                            "key": "profile_name",
-                            "label": "Profile",
-                            "description": "Name of the profile specified by the profile file to use.",
-                            "type": "ENUM",
-                            "flags": [],
-                            "default": "",
-                            "dependence": {
-                                "mode": "PROFILE",
-                                "settings": [
-                                    {
-                                        "key": "profile_file"
-                                    }
-                                ]
+                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2021.json"
+                },
+                {
+                    "key": "profile_name",
+                    "label": "Profile",
+                    "description": "Name of the profile to be used.",
+                    "type": "ENUM",
+                    "flags": [],
+                    "default": "VP_LUNARG_desktop_portability_2021",
+                    "dependence": {
+                        "mode": "PROFILE",
+                        "settings": [
+                            {
+                                "key": "profile_file"
                             }
-                        }
-                    ]
+                        ]
+                    }
                 },
                 {
                     "key": "debug_enable",
@@ -140,12 +138,17 @@
                         {
                             "key": "from_profile",
                             "label": "From profile",
-                            "description": "Fully replaces the device's extension list with the extension list provided by the profiles configuration file."
+                            "description": "Fully replaces the device's extension list with the extension list provided by the profiles configuration file, if an extension is not supported by the device it will return an error."
                         },
                         {
                             "key": "from_device",
                             "label": "From device",
                             "description": "Turns off modification of the device's extensions list. Uses the device's real extensions list."
+                        },
+                        {
+                            "key": "from_profile_override",
+                            "label": "From profile override",
+                            "description": "Fully replaces the device's extension list with the extension list provided by the profiles configuration file."
                         }
                     ],
                     "default": "check_support"
@@ -171,12 +174,17 @@
                         {
                             "key": "from_profile",
                             "label": "From profile",
-                            "description": "Fully replaces the device's format list with the format list provided by the profiles configuration file."
+                            "description": "Fully replaces the device's format list with the format list provided by the profiles configuration file, if a format is not supported by the devcie it will return an error."
                         },
                         {
                             "key": "from_device",
                             "label": "From device",
                             "description": "Turns off modification of the device's format list. Uses the device's real format list."
+                        },
+                        {
+                            "key": "from_profile_override",
+                            "label": "From profile override",
+                            "description": "Fully replaces the device's format list with the format list provided by the profiles configuration file."
                         }
                     ],
                     "default": "check_support"
@@ -195,12 +203,17 @@
                         {
                             "key": "from_profile",
                             "label": "From profile",
-                            "description": "Fully replaces the device's format properties with the format properties provided by the profiles configuration file."
+                            "description": "Fully replaces the device's format properties with the format properties provided by the profiles configuration file, if format properties are not supported by the device it will return an error."
                         },
                         {
                             "key": "from_device",
                             "label": "From device",
                             "description": "Turns off modification of the device's format properties. Uses the device's real format properties."
+                        },
+                        {
+                            "key": "from_profile_override",
+                            "label": "From profile override",
+                            "description": "Fully replaces the device's format properties with the format properties provided by the profiles configuration file."
                         }
                     ],
                     "default": "check_support"
@@ -219,12 +232,17 @@
                         {
                             "key": "from_profile",
                             "label": "From profile",
-                            "description": "Fully replaces the device's surface formats with the surface formats provided by the profiles configuration file."
+                            "description": "Fully replaces the device's surface formats with the surface formats provided by the profiles configuration file, if a surface format is not supported by the device it will return an error."
                         },
                         {
                             "key": "from_device",
                             "label": "From device",
                             "description": "Turns off modification of the device's surface formats. Uses the device's real surface formats."
+                        },
+                        {
+                            "key": "from_profile_override",
+                            "label": "From profile override",
+                            "description": "Fully replaces the device's surface formats with the surface formats provided by the profiles configuration file."
                         }
                     ],
                     "default": "check_support"
@@ -243,12 +261,17 @@
                         {
                             "key": "from_profile",
                             "label": "From profile",
-                            "description": "Fully replaces the device's present mode list with the present mode list provided by the profiles configuration file."
+                            "description": "Fully replaces the device's present mode list with the present mode list provided by the profiles configuration file, if a present mode is not supported by the device it will return an error."
                         },
                         {
                             "key": "from_device",
                             "label": "From device",
                             "description": "Turns off modification of the device's present mode list. Uses the device's real present mode list."
+                        },
+                        {
+                            "key": "from_profile_override",
+                            "label": "From profile override",
+                            "description": "Fully replaces the device's present mode list with the present mode list provided by the profiles configuration file."
                         }
                     ],
                     "default": "check_support"
