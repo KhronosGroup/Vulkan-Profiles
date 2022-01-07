@@ -87,6 +87,7 @@
                     "label": "Profile Selection",
                     "description": "Path of a profile file and the name of the profile to load.",
                     "type": "LOAD_FILE",
+                    "format": "PROFILE",
                     "filter": "*.json",
                     "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2021.json",
                     "settings": [
@@ -96,15 +97,7 @@
                             "description": "Name of the profile specified by the profile file to use.",
                             "type": "ENUM",
                             "flags": [],
-                            "default": "",
-                            "dependence": {
-                                "mode": "PROFILE",
-                                "settings": [
-                                    {
-                                        "key": "profile_file"
-                                    }
-                                ]
-                            }
+                            "default": ""
                         }
                     ]
                 },
@@ -127,156 +120,99 @@
                     "default": true
                 },
                 {
-                    "key": "modify_extension_list",
-                    "label": "Modify Device Extension list",
-                    "description": "Modify the device extensions list from the layer JSON config file.",
-                    "type": "ENUM",
-                    "flags": [
+                    "key": "override_capabilities_modes",
+                    "label": "Override Capabilities Modes",
+                    "description": "Control of the enumalated capabilities of the Vulkan physical device from the selected Vulkan Profile.",
+                    "type": "GROUP",
+                    "settings": [
                         {
-                            "key": "check_support",
-                            "label": "Check support",
-                            "description": "Checks if the device supports the extensions from the specified profile."
+                            "key": "modify_extension_list",
+                            "label": "Extensions",
+                            "description": "Modes to control the enumalated extensions list of the Vulkan physical device.",
+                            "type": "ENUM",
+                            "flags": [
+                                {
+                                    "key": "from_device",
+                                    "label": "From device",
+                                    "description": "Uses the physical device's actual format list. The selected Vulkan Profile is ignored."
+                                },
+                                {
+                                    "key": "check_support",
+                                    "label": "Check support",
+                                    "description": "Checks if the device supports the extensions from the selected Vulkan Profile."
+                                },
+                                {
+                                    "key": "from_profile",
+                                    "label": "From profile",
+                                    "description": "Replaces the device's extension list with the extension list provided by the selected Vulkan Profile, if an extension is not supported by the device it will return an error."
+                                },
+                                {
+                                    "key": "from_profile_override",
+                                    "label": "From profile override",
+                                    "description": "Replaces the device's extension list with the extension list provided by the selected Vulkan Profile."
+                                }
+                            ],
+                            "default": "check_support"
                         },
                         {
-                            "key": "from_profile",
-                            "label": "From profile",
-                            "description": "Fully replaces the device's extension list with the extension list provided by the profiles configuration file, if an extension is not supported by the device it will return an error."
+                            "key": "modify_format_list",
+                            "label": "Formats",
+                            "description": "Modes to control the enumalated format list of the Vulkan physical device.",
+                            "type": "ENUM",
+                            "flags": [
+                                {
+                                    "key": "from_device",
+                                    "label": "From device",
+                                    "description": "Uses the physical device's actual format list. The selected Vulkan Profile is ignored."
+                                },
+                                {
+                                    "key": "check_support",
+                                    "label": "Check support",
+                                    "description": "Checks if the device supports the format list from the selected Vulkan Profile."
+                                },
+                                {
+                                    "key": "from_profile",
+                                    "label": "From profile",
+                                    "description": "Fully replaces the device's format list with the format list provided by the selected Vulkan Profile, if a format is not supported by the devcie it will return an error."
+                                },
+                                {
+                                    "key": "from_profile_override",
+                                    "label": "From profile override",
+                                    "description": "Fully replaces the device's format list with the format list provided by the selected Vulkan Profile."
+                                }
+                            ],
+                            "default": "check_support"
                         },
                         {
-                            "key": "from_device",
-                            "label": "From device",
-                            "description": "Turns off modification of the device's extensions list. Uses the device's real extensions list."
-                        },
-                        {
-                            "key": "from_profile_override",
-                            "label": "From profile override",
-                            "description": "Fully replaces the device's extension list with the extension list provided by the profiles configuration file."
+                            "key": "modify_format_properties",
+                            "label": "Format Properties",
+                            "description": "Modes to control the enumalated format properties of the Vulkan physical device.",
+                            "type": "ENUM",
+                            "flags": [
+                                {
+                                    "key": "from_device",
+                                    "label": "From Device",
+                                    "description": "Uses the physical device's actual format list. The selected Vulkan Profile is ignored."
+                                },
+                                {
+                                    "key": "check_support",
+                                    "label": "Check Support",
+                                    "description": "Checks if the device supports the format properties from the selected Vulkan Profile."
+                                },
+                                {
+                                    "key": "from_profile",
+                                    "label": "From Profile",
+                                    "description": "Fully replaces the device's format properties with the format properties provided by the selected Vulkan Profile, if format properties are not supported by the device it will return an error."
+                                },
+                                {
+                                    "key": "from_profile_override",
+                                    "label": "From Profile Override",
+                                    "description": "Fully replaces the device's format properties with the format properties provided by the selected Vulkan Profile."
+                                }
+                            ],
+                            "default": "check_support"
                         }
-                    ],
-                    "default": "check_support"
-                },
-                {
-                    "key": "modify_memory_flags",
-                    "label": "Modify Device Memory Flags",
-                    "description": "Modify the device memory heap flags and memory type flags from the JSON config file.",
-                    "type": "BOOL",
-                    "default": false
-                },
-                {
-                    "key": "modify_format_list",
-                    "label": "Modify Device Format list",
-                    "description": "Modify the device format list from the layer JSON config file.",
-                    "type": "ENUM",
-                    "flags": [
-                        {
-                            "key": "check_support",
-                            "label": "Check support",
-                            "description": "Checks if the device supports the format list from the specified profile."
-                        },
-                        {
-                            "key": "from_profile",
-                            "label": "From profile",
-                            "description": "Fully replaces the device's format list with the format list provided by the profiles configuration file, if a format is not supported by the devcie it will return an error."
-                        },
-                        {
-                            "key": "from_device",
-                            "label": "From device",
-                            "description": "Turns off modification of the device's format list. Uses the device's real format list."
-                        },
-                        {
-                            "key": "from_profile_override",
-                            "label": "From profile override",
-                            "description": "Fully replaces the device's format list with the format list provided by the profiles configuration file."
-                        }
-                    ],
-                    "default": "check_support"
-                },
-                {
-                    "key": "modify_format_properties",
-                    "label": "Modify Device Format Properties",
-                    "description": "Modify the device format properties from the layer JSON config file.",
-                    "type": "ENUM",
-                    "flags": [
-                        {
-                            "key": "check_support",
-                            "label": "Check support",
-                            "description": "Checks if the device supports the format properties from the specified profile."
-                        },
-                        {
-                            "key": "from_profile",
-                            "label": "From profile",
-                            "description": "Fully replaces the device's format properties with the format properties provided by the profiles configuration file, if format properties are not supported by the device it will return an error."
-                        },
-                        {
-                            "key": "from_device",
-                            "label": "From device",
-                            "description": "Turns off modification of the device's format properties. Uses the device's real format properties."
-                        },
-                        {
-                            "key": "from_profile_override",
-                            "label": "From profile override",
-                            "description": "Fully replaces the device's format properties with the format properties provided by the profiles configuration file."
-                        }
-                    ],
-                    "default": "check_support"
-                },
-                {
-                    "key": "modify_surface_formats",
-                    "label": "Modify Device Surface Formats",
-                    "description": "Modify the device surface formats from the layer JSON config file.",
-                    "type": "ENUM",
-                    "flags": [
-                        {
-                            "key": "check_support",
-                            "label": "Check support",
-                            "description": "Checks if the device supports the surface formats from the specified profile."
-                        },
-                        {
-                            "key": "from_profile",
-                            "label": "From profile",
-                            "description": "Fully replaces the device's surface formats with the surface formats provided by the profiles configuration file, if a surface format is not supported by the device it will return an error."
-                        },
-                        {
-                            "key": "from_device",
-                            "label": "From device",
-                            "description": "Turns off modification of the device's surface formats. Uses the device's real surface formats."
-                        },
-                        {
-                            "key": "from_profile_override",
-                            "label": "From profile override",
-                            "description": "Fully replaces the device's surface formats with the surface formats provided by the profiles configuration file."
-                        }
-                    ],
-                    "default": "check_support"
-                },
-                {
-                    "key": "modify_present_modes",
-                    "label": "Modify Device Present Modes",
-                    "description": "Modify the device present mode list from the layer JSON config file.",
-                    "type": "ENUM",
-                    "flags": [
-                        {
-                            "key": "check_support",
-                            "label": "Check support",
-                            "description": "Checks if the device supports the present mode list from the specified profile."
-                        },
-                        {
-                            "key": "from_profile",
-                            "label": "From profile",
-                            "description": "Fully replaces the device's present mode list with the present mode list provided by the profiles configuration file, if a present mode is not supported by the device it will return an error."
-                        },
-                        {
-                            "key": "from_device",
-                            "label": "From device",
-                            "description": "Turns off modification of the device's present mode list. Uses the device's real present mode list."
-                        },
-                        {
-                            "key": "from_profile_override",
-                            "label": "From profile override",
-                            "description": "Fully replaces the device's present mode list with the present mode list provided by the profiles configuration file."
-                        }
-                    ],
-                    "default": "check_support"
+                    ]
                 }
             ]
         }
