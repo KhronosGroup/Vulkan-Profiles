@@ -792,14 +792,18 @@ class PhysicalDeviceData {
     ArrayOfVkDeviceSize arrayof_heap_budgets_;
     ArrayOfVkDeviceSize arrayof_heap_usages_;
 
-    // Vulkan 1.2 structs for summarizing core extension properties and features
-    VkPhysicalDeviceVulkan11Properties physical_device_vulkan_1_1_properties_;
-    VkPhysicalDeviceVulkan11Features physical_device_vulkan_1_1_features_;
+    // Vulkan 1.3 structs
+    VkPhysicalDeviceVulkan13Properties physical_device_vulkan_1_3_properties_;
+    VkPhysicalDeviceVulkan13Features physical_device_vulkan_1_3_features_;
 
+    // Vulkan 1.2 structs for summarizing core extension properties and features
     VkPhysicalDeviceVulkan12Properties physical_device_vulkan_1_2_properties_;
     VkPhysicalDeviceVulkan12Features physical_device_vulkan_1_2_features_;
 
     // Vulkan 1.1 structs
+    VkPhysicalDeviceVulkan11Properties physical_device_vulkan_1_1_properties_;
+    VkPhysicalDeviceVulkan11Features physical_device_vulkan_1_1_features_;
+
     VkPhysicalDeviceProtectedMemoryProperties physical_device_protected_memory_properties_;
     VkPhysicalDeviceProtectedMemoryFeatures physical_device_protected_memory_features_;
 
@@ -814,7 +818,7 @@ class PhysicalDeviceData {
     VkPhysicalDevice16BitStorageFeaturesKHR physical_device_16bit_storage_features_;
 
     // VK_KHR_buffer_device_address structs
-    VkPhysicalDeviceBufferDeviceAddressFeaturesKHR physical_device_buffer_device_address_features_;
+    VkPhysicalDeviceBufferDeviceAddressFeaturesEXT physical_device_buffer_device_address_features_;
 
     // VK_KHR_depth_stencil_resolve structs
     VkPhysicalDeviceDepthStencilResolvePropertiesKHR physical_device_depth_stencil_resolve_properties_;
@@ -1167,6 +1171,19 @@ class PhysicalDeviceData {
     VkPhysicalDeviceFragmentDensityMap2FeaturesEXT physical_device_fragment_density_map_2_features_;
     VkPhysicalDeviceFragmentDensityMap2PropertiesEXT physical_device_fragment_density_map_2_properties_;
 
+    // VK_QCOM_fragment_density_map_offset structs
+    VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM physical_device_fragment_density_map_offset_features_;
+    VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM physical_device_fragment_density_map_offset_properties_;
+
+    // VK_EXT_depth_clip_control structs
+    VkPhysicalDeviceDepthClipControlFeaturesEXT physical_device_depth_clip_control_features_;
+
+    // VK_ARM_rasterization_order_attachment_access structs
+    VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM physical_device_rasterization_order_attachment_access_features_;
+
+    // VK_NV_linear_color_attachment structs
+    VkPhysicalDeviceLinearColorAttachmentFeaturesNV physical_device_linear_color_attachment_features_;
+
    private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -1181,14 +1198,18 @@ class PhysicalDeviceData {
         physical_device_memory_properties_ = {};
         surface_capabilities_ = {};
 
-        // Vulkan 1.2 structs for summarizing core extension properties and features
-        physical_device_vulkan_1_1_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES};
-        physical_device_vulkan_1_1_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES};
+        // Vulkan 1.1 structs
+        physical_device_vulkan_1_3_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES};
+        physical_device_vulkan_1_3_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES};
 
+        // Vulkan 1.2 structs for summarizing core extension properties and features
         physical_device_vulkan_1_2_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES};
         physical_device_vulkan_1_2_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES};
 
         // Vulkan 1.1 structs
+        physical_device_vulkan_1_1_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES};
+        physical_device_vulkan_1_1_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES};
+
         physical_device_protected_memory_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES};
         physical_device_protected_memory_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_FEATURES};
 
@@ -1203,7 +1224,7 @@ class PhysicalDeviceData {
         physical_device_16bit_storage_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR};
 
         // VK_KHR_buffer_device_address structs
-        physical_device_buffer_device_address_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR};
+        physical_device_buffer_device_address_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_EXT};
 
         // VK_KHR_depth_stencil_resolve structs
         physical_device_depth_stencil_resolve_properties_ = {
@@ -1600,6 +1621,22 @@ class PhysicalDeviceData {
         physical_device_fragment_density_map_2_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_FEATURES_EXT};
         physical_device_fragment_density_map_2_properties_ = {
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_PROPERTIES_EXT};
+
+        // VK_QCOM_fragment_density_map_offset structs
+        physical_device_fragment_density_map_offset_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_FEATURES_QCOM};
+        physical_device_fragment_density_map_offset_properties_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_PROPERTIES_QCOM};
+
+        // VK_EXT_depth_clip_control structs
+        physical_device_depth_clip_control_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_CONTROL_FEATURES_EXT};
+
+        // VK_ARM_rasterization_order_attachment_access structs
+        physical_device_rasterization_order_attachment_access_features_ = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_FEATURES_ARM};
+
+        // VK_NV_linear_color_attachment structs
+        physical_device_linear_color_attachment_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINEAR_COLOR_ATTACHMENT_FEATURES_NV};
     }
 
     const VkInstance instance_;
@@ -1656,7 +1693,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorageFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorageFeaturesKHR *dest);
-    bool GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryResetFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFramebufferFeaturesKHR *dest);
@@ -1786,6 +1823,11 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRenderingFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipControlFeaturesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceLinearColorAttachmentFeaturesNV *dest);
     void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
     bool GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryProperties *dest);
@@ -1812,6 +1854,9 @@ class JsonLoader {
 
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Properties *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Features *dest);
+
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Properties *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Features *dest);
 
     // GPUinfo config file format
     void GetValueGPUinfoCore11(const Json::Value &parent);
@@ -2597,7 +2642,8 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &feat
     } else if (feature_name == "VkPhysicalDevice8BitStorageFeatures" || feature_name == "VkPhysicalDevice8BitStorageFeaturesKHR") {
         return GetValue(feature, &pdd_.physical_device_8bit_storage_features_);
     } else if (feature_name == "VkPhysicalDeviceBufferDeviceAddressFeatures" ||
-               feature_name == "VkPhysicalDeviceBufferDeviceAddressFeaturesKHR") {
+               feature_name == "VkPhysicalDeviceBufferDeviceAddressFeaturesKHR" ||
+               feature_name == "VkPhysicalDeviceBufferDeviceAddressFeaturesEXT") {
         return GetValue(feature, &pdd_.physical_device_buffer_device_address_features_);
     } else if (feature_name == "VkPhysicalDeviceDescriptorIndexingFeatures" ||
                feature_name == "VkPhysicalDeviceDescriptorIndexingFeaturesEXT") {
@@ -2811,6 +2857,14 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &feat
         return GetValue(feature, &pdd_.physical_device_dynamic_rendering_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentDensityMap2FeaturesEXT") {
         return GetValue(feature, &pdd_.physical_device_fragment_density_map_2_features_);
+    } else if (feature_name == "VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM") {
+        return GetValue(feature, &pdd_.physical_device_fragment_density_map_offset_features_);
+    } else if (feature_name == "VkPhysicalDeviceDepthClipControlFeaturesEXT") {
+        return GetValue(feature, &pdd_.physical_device_depth_clip_control_features_);
+    } else if (feature_name == "VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM") {
+        return GetValue(feature, &pdd_.physical_device_rasterization_order_attachment_access_features_);
+    } else if (feature_name == "VkPhysicalDeviceLinearColorAttachmentFeaturesNV") {
+        return GetValue(feature, &pdd_.physical_device_linear_color_attachment_features_);
     } else if (feature_name == "Vulkan12Features") {
         return GetValue(feature, &pdd_.physical_device_vulkan_1_2_features_);
     } else if (feature_name == "VkPhysicalDevicePortabilitySubsetFeaturesKHR") {
@@ -2926,6 +2980,8 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &proper
         return GetValue(prop, &pdd_.physical_device_shading_rate_image_properties_);
     } else if (property_name == "VkPhysicalDeviceFragmentDensityMap2PropertiesEXT") {
         return GetValue(prop, &pdd_.physical_device_fragment_density_map_2_properties_);
+    } else if (property_name == "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM") {
+        return GetValue(prop, &pdd_.physical_device_fragment_density_map_offset_properties_);
     } else if (property_name == "VkPhysicalDeviceMemoryProperties") {
         return GetValue(prop, &pdd_.physical_device_memory_properties_);
     } else if (property_name == "VkSurfaceCapabilitiesKHR") {
@@ -2940,6 +2996,8 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &proper
         return GetArray(prop, "ArrayOfVkPresentModes", &pdd_.arrayof_present_modes_);
     } else if (property_name == "Vulkan12Properties") {
         return GetValue(prop, &pdd_.physical_device_vulkan_1_2_properties_);
+    } else if (property_name == "Vulkan13Properties") {
+        return GetValue(prop, &pdd_.physical_device_vulkan_1_3_properties_);
     } else if (property_name == "VkPhysicalDevicePortabilitySubsetPropertiesKHR") {
         return GetValue(prop, &pdd_.physical_device_portability_subset_properties_);
     } else if (property_name == "VkPhysicalDevicePointClippingProperties") {
@@ -3767,8 +3825,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorag
     return valid;
 }
 
-bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest) {
-    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBufferDeviceAddressFeaturesKHR)\n");
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesEXT *dest) {
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBufferDeviceAddressFeaturesEXT)\n");
     if (!CheckExtensionSupport(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
         return false;
     }
@@ -5971,6 +6029,83 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
     return valid;
 }
 
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM *dest) {
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM)\n");
+    if (!CheckExtensionSupport(VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME)) {
+        return false;
+    }
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return true;
+    }
+    bool valid = true;
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, fragmentDensityMapOffset, WarnIfNotEqual);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM *dest) {
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM)\n");
+    if (!CheckExtensionSupport(VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME)) {
+        return false;
+    }
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return true;
+    }
+    bool valid = true;
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, fragmentDensityOffsetGranularity, WarnIfGreater);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipControlFeaturesEXT *dest) {
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDepthClipControlFeaturesEXT)\n");
+    if (!CheckExtensionSupport(VK_EXT_DEPTH_CLIP_CONTROL_EXTENSION_NAME)) {
+        return false;
+    }
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return true;
+    }
+    bool valid = true;
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, depthClipControl, WarnIfNotEqual);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM *dest) {
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM)\n");
+    if (!CheckExtensionSupport(VK_ARM_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_EXTENSION_NAME)) {
+        return false;
+    }
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return true;
+    }
+    bool valid = true;
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, rasterizationOrderColorAttachmentAccess, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, rasterizationOrderDepthAttachmentAccess, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, rasterizationOrderStencilAttachmentAccess, WarnIfNotEqual);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLinearColorAttachmentFeaturesNV *dest) {
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceLinearColorAttachmentFeaturesNV)\n");
+    if (!CheckExtensionSupport(VK_NV_LINEAR_COLOR_ATTACHMENT_EXTENSION_NAME)) {
+        return false;
+    }
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return true;
+    }
+    bool valid = true;
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, linearColorAttachment, WarnIfNotEqual);
+    }
+    return valid;
+}
+
 bool JsonLoader::GetValue(const Json::Value &parent, const std::string &member, const char *name, VkExtent2D *dest) {
     if (member != name) {
         return true;
@@ -6160,19 +6295,99 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Pro
     return valid;
 }
 
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Properties *dest) {
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return false;
+    }
+    bool valid = true;
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, minSubgroupSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxSubgroupSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxComputeWorkgroupSubgroups, WarnIfGreater);
+        GET_VALUE_WARN(prop, requiredSubgroupSizeStages, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxInlineUniformBlockSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorInlineUniformBlocks, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetInlineUniformBlocks, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindInlineUniformBlocks, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxInlineUniformTotalSize, WarnIfGreater);
+        GET_VALUE_WARN(prop, integerDotProduct8BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct8BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct8BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct4x8BitPackedUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct4x8BitPackedSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct4x8BitPackedMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct16BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct16BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct16BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct32BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct32BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct32BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct64BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct64BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProduct64BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating8BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating8BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating16BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating16BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating32BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating32BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitUnsignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitSignedAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, storageTexelBufferOffsetAlignmentBytes, WarnIfGreater);
+        GET_VALUE_WARN(prop, storageTexelBufferOffsetSingleTexelAlignment, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, uniformTexelBufferOffsetAlignmentBytes, WarnIfGreater);
+        GET_VALUE_WARN(prop, uniformTexelBufferOffsetSingleTexelAlignment, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, maxBufferSize, WarnIfGreater);
+    }
+    return valid;
+}
+
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Features *dest) {
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return false;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE_WARN(prop, samplerMirrorClampToEdge, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderOutputViewportIndex, WarnIfGreater);
-        GET_VALUE_WARN(prop, shaderOutputLayer, WarnIfGreater);
-        GET_VALUE_WARN(prop, subgroupBroadcastDynamicId, WarnIfGreater);
-        GET_VALUE_WARN(prop, drawIndirectCount, WarnIfGreater);
-        GET_VALUE_WARN(prop, descriptorIndexing, WarnIfGreater);
-        GET_VALUE_WARN(prop, samplerFilterMinmax, WarnIfGreater);
+        GET_VALUE_WARN(prop, samplerMirrorClampToEdge, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderOutputViewportIndex, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderOutputLayer, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, subgroupBroadcastDynamicId, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, drawIndirectCount, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, descriptorIndexing, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, samplerFilterMinmax, WarnIfNotEqual);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Features *dest) {
+    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+        return false;
+    }
+    bool valid = true;
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE_WARN(prop, robustImageAccess, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, inlineUniformBlock, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, descriptorBindingInlineUniformBlockUpdateAfterBind, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, pipelineCreationCacheControl, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, privateData, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderDemoteToHelperInvocation, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderTerminateInvocation, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, subgroupSizeControl, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, computeFullSubgroups, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, synchronization2, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, textureCompressionASTC_HDR, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderZeroInitializeWorkgroupMemory, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, dynamicRendering, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, shaderIntegerDotProduct, WarnIfNotEqual);
+        GET_VALUE_WARN(prop, maintenance4, WarnIfNotEqual);
     }
     return valid;
 }
@@ -6801,9 +7016,9 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     sbsf->pNext = pNext;
                 }
                 break;
-            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR:
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_EXT:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
-                    VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *bdaf = (VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *)place;
+                    VkPhysicalDeviceBufferDeviceAddressFeaturesEXT *bdaf = (VkPhysicalDeviceBufferDeviceAddressFeaturesEXT *)place;
                     void *pNext = bdaf->pNext;
                     *bdaf = physicalDeviceData->physical_device_buffer_device_address_features_;
                     bdaf->pNext = pNext;
@@ -7961,6 +8176,53 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     fdm2f->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_FEATURES_QCOM:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME)) {
+                    VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM *fdmof =
+                        (VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM *)place;
+                    void *pNext = fdmof->pNext;
+                    *fdmof = physicalDeviceData->physical_device_fragment_density_map_offset_features_;
+                    fdmof->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_PROPERTIES_QCOM:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData,
+                                                              VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME)) {
+                    VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM *fdmop =
+                        (VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM *)place;
+                    void *pNext = fdmop->pNext;
+                    *fdmop = physicalDeviceData->physical_device_fragment_density_map_offset_properties_;
+                    fdmop->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_CONTROL_FEATURES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_DEPTH_CLIP_CONTROL_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDepthClipControlFeaturesEXT *dccf = (VkPhysicalDeviceDepthClipControlFeaturesEXT *)place;
+                    void *pNext = dccf->pNext;
+                    *dccf = physicalDeviceData->physical_device_depth_clip_control_features_;
+                    dccf->pNext = pNext;
+                }
+                break;
+            // Todo: needs spec fix on VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM::pNext
+            /*case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_FEATURES_ARM:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData,
+                                                              VK_ARM_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM *roaaf =
+                        (VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM *)place;
+                    void *pNext = roaaf->pNext;
+                    *roaaf = physicalDeviceData->physical_device_rasterization_order_attachment_access_features_;
+                    roaaf->pNext = pNext;
+                }
+                break;*/
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINEAR_COLOR_ATTACHMENT_FEATURES_NV:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_LINEAR_COLOR_ATTACHMENT_EXTENSION_NAME)) {
+                    VkPhysicalDeviceLinearColorAttachmentFeaturesNV *lcaf =
+                        (VkPhysicalDeviceLinearColorAttachmentFeaturesNV *)place;
+                    void *pNext = lcaf->pNext;
+                    *lcaf = physicalDeviceData->physical_device_linear_color_attachment_features_;
+                    lcaf->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_PROPERTIES_EXT:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *fdm2p =
@@ -8711,7 +8973,7 @@ void TransferValue(VkPhysicalDeviceVulkan12Features *dest, VkPhysicalDevice8BitS
     TRANSFER_VALUE(storagePushConstant8);
 }
 
-void TransferValue(VkPhysicalDeviceVulkan12Features *dest, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *src) {
+void TransferValue(VkPhysicalDeviceVulkan12Features *dest, VkPhysicalDeviceBufferDeviceAddressFeaturesEXT *src) {
     TRANSFER_VALUE(bufferDeviceAddress);
     TRANSFER_VALUE(bufferDeviceAddressCaptureReplay);
     TRANSFER_VALUE(bufferDeviceAddressMultiDevice);
@@ -8782,6 +9044,123 @@ void TransferValue(VkPhysicalDeviceVulkan12Features *dest, VkPhysicalDeviceVulka
     TRANSFER_VALUE(vulkanMemoryModel);
     TRANSFER_VALUE(vulkanMemoryModelDeviceScope);
     TRANSFER_VALUE(vulkanMemoryModelAvailabilityVisibilityChains);
+}
+
+// VK_VULKAN_1_3
+
+// Properties
+void TransferValue(VkPhysicalDeviceVulkan13Properties *dest, VkPhysicalDeviceSubgroupSizeControlProperties *src) {
+    TRANSFER_VALUE(minSubgroupSize);
+    TRANSFER_VALUE(maxSubgroupSize);
+    TRANSFER_VALUE(maxComputeWorkgroupSubgroups);
+    TRANSFER_VALUE(requiredSubgroupSizeStages);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Properties *dest, VkPhysicalDeviceInlineUniformBlockProperties *src) {
+    TRANSFER_VALUE(maxInlineUniformBlockSize);
+    TRANSFER_VALUE(maxPerStageDescriptorInlineUniformBlocks);
+    TRANSFER_VALUE(maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks);
+    TRANSFER_VALUE(maxDescriptorSetInlineUniformBlocks);
+    TRANSFER_VALUE(maxDescriptorSetUpdateAfterBindInlineUniformBlocks);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Properties *dest, VkPhysicalDeviceShaderIntegerDotProductProperties *src) {
+    TRANSFER_VALUE(integerDotProduct8BitUnsignedAccelerated);
+    TRANSFER_VALUE(integerDotProduct8BitSignedAccelerated);
+    TRANSFER_VALUE(integerDotProduct8BitMixedSignednessAccelerated);
+    TRANSFER_VALUE(integerDotProduct4x8BitPackedUnsignedAccelerated);
+    TRANSFER_VALUE(integerDotProduct4x8BitPackedSignedAccelerated);
+    TRANSFER_VALUE(integerDotProduct4x8BitPackedMixedSignednessAccelerated);
+    TRANSFER_VALUE(integerDotProduct16BitUnsignedAccelerated);
+    TRANSFER_VALUE(integerDotProduct16BitSignedAccelerated);
+    TRANSFER_VALUE(integerDotProduct16BitMixedSignednessAccelerated);
+    TRANSFER_VALUE(integerDotProduct32BitUnsignedAccelerated);
+    TRANSFER_VALUE(integerDotProduct32BitSignedAccelerated);
+    TRANSFER_VALUE(integerDotProduct32BitMixedSignednessAccelerated);
+    TRANSFER_VALUE(integerDotProduct64BitUnsignedAccelerated);
+    TRANSFER_VALUE(integerDotProduct64BitSignedAccelerated);
+    TRANSFER_VALUE(integerDotProduct64BitMixedSignednessAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating8BitUnsignedAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating8BitSignedAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating16BitUnsignedAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating16BitSignedAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating32BitUnsignedAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating32BitSignedAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating64BitUnsignedAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating64BitSignedAccelerated);
+    TRANSFER_VALUE(integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Properties *dest, VkPhysicalDeviceTexelBufferAlignmentProperties *src) {
+    TRANSFER_VALUE(storageTexelBufferOffsetAlignmentBytes);
+    TRANSFER_VALUE(storageTexelBufferOffsetSingleTexelAlignment);
+    TRANSFER_VALUE(uniformTexelBufferOffsetAlignmentBytes);
+    TRANSFER_VALUE(uniformTexelBufferOffsetSingleTexelAlignment);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Properties *dest, VkPhysicalDeviceMaintenance4Properties *src) {
+    TRANSFER_VALUE(maxBufferSize);
+}
+
+// Features
+void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceImageRobustnessFeatures *src) {
+    TRANSFER_VALUE(robustImageAccess);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceInlineUniformBlockFeatures *src) {
+    TRANSFER_VALUE(inlineUniformBlock);
+    TRANSFER_VALUE(descriptorBindingInlineUniformBlockUpdateAfterBind);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDevicePipelineCreationCacheControlFeatures *src) {
+    TRANSFER_VALUE(pipelineCreationCacheControl);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDevicePrivateDataFeatures *src) {
+    TRANSFER_VALUE(privateData);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures *src) {
+    TRANSFER_VALUE(shaderDemoteToHelperInvocation);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceShaderTerminateInvocationFeatures *src) {
+    TRANSFER_VALUE(shaderTerminateInvocation);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceSubgroupSizeControlFeatures *src) {
+    TRANSFER_VALUE(subgroupSizeControl);
+    TRANSFER_VALUE(computeFullSubgroups);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceSynchronization2Features *src) {
+    TRANSFER_VALUE(synchronization2);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceTextureCompressionASTCHDRFeatures *src) {
+    TRANSFER_VALUE(textureCompressionASTC_HDR);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures *src) {
+    TRANSFER_VALUE(shaderZeroInitializeWorkgroupMemory);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceDynamicRenderingFeatures *src) {
+    TRANSFER_VALUE(dynamicRendering);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceShaderIntegerDotProductFeatures *src) {
+    TRANSFER_VALUE(shaderIntegerDotProduct);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceMaintenance4Features *src) {
+    TRANSFER_VALUE(maintenance4);
 }
 
 #undef TRANSFER_VALUE
@@ -9900,6 +10279,36 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_fragment_density_map_2_properties_);
                 }
 
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
+                                                              VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME)) {
+                    pdd.physical_device_fragment_density_map_offset_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_fragment_density_map_offset_features_);
+
+                    pdd.physical_device_fragment_density_map_offset_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_fragment_density_map_offset_properties_);
+                }
+
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_DEPTH_CLIP_CONTROL_EXTENSION_NAME)) {
+                    pdd.physical_device_depth_clip_control_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_depth_clip_control_features_);
+                }
+
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
+                                                              VK_ARM_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_EXTENSION_NAME)) {
+                    pdd.physical_device_rasterization_order_attachment_access_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_rasterization_order_attachment_access_features_);
+                }
+
+                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_LINEAR_COLOR_ATTACHMENT_EXTENSION_NAME)) {
+                    pdd.physical_device_linear_color_attachment_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_linear_color_attachment_features_);
+                }
+
                 if (api_version_above_1_1) {
                     pdd.physical_device_protected_memory_properties_.pNext = property_chain.pNext;
 
@@ -9989,6 +10398,28 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             TransferValue(&(pdd.physical_device_vulkan_1_2_features_),
                           &(pdd.physical_device_uniform_buffer_standard_layout_features_));
             TransferValue(&(pdd.physical_device_vulkan_1_2_features_), &(pdd.physical_device_vulkan_memory_model_features_));
+
+            // VK_VULKAN_1_3
+            TransferValue(&(pdd.physical_device_vulkan_1_3_properties_), &(pdd.physical_device_subgroup_size_control_properties_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_properties_), &(pdd.physical_device_inline_uniform_block_properties_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_properties_),
+                          &(pdd.physical_device_shader_integer_dot_products_properties_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_properties_), &(pdd.physical_device_texel_buffer_alignment_properties_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_properties_), &(pdd.physical_device_maintenance_4_properties_));
+
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_image_robustness_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_inline_uniform_block_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_pipeline_creation_cache_control_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_private_data_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_shader_demote_to_helper_invocation_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_shader_terminate_invocation_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_subgroup_size_control_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_synchronization2_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_texture_compression_astc_hdr_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_zero_initialize_workgroup_memory_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_dynamic_rendering_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_shader_integer_dot_product_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_maintenance_4_features_));
         }
     }
     return result;
