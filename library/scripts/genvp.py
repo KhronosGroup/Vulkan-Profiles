@@ -104,7 +104,13 @@ typedef struct VpProfileProperties {
 } VpProfileProperties;
 
 typedef enum VpInstanceCreateFlagBits {
+    // Default behavior:
+    // - profile extensions are used (application must not specify extensions)
+
+    // Merge application provided extension list and profile extension list
     VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT = 0x00000001,
+
+    // Use application provided extension list
     VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT = 0x00000002,
 
     VP_INSTANCE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
@@ -118,13 +124,38 @@ typedef struct VpInstanceCreateInfo {
 } VpInstanceCreateInfo;
 
 typedef enum VpDeviceCreateFlagBits {
-    VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT = 0x00000001,
-    VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT = 0x00000002,
-    VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT = 0x00000004,
-    VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT = 0x00000008,
+    // Default behavior:
+    // - profile extensions are used (application must not specify extensions)
+    // - profile feature structures are used (application must not specify any of them) extended
+    //   with any other application provided struct that isn't defined by the profile
 
-    VP_DEVICE_CREATE_DISABLE_ROBUST_ACCESS_BIT =
+    // Merge application provided extension list and profile extension list
+    VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT = 0x00000001,
+
+    // Use application provided extension list
+    VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT = 0x00000002,
+
+    // Merge application provided versions of feature structures with the profile features
+    // Currently unsupported, but is considered for future inclusion in which case the
+    // default behavior could potentially be changed to merging as the currently defined
+    // default behavior is forward-compatible with that
+    // VP_DEVICE_CREATE_MERGE_FEATURES_BIT = 0x00000004,
+
+    // Use application provided versions of feature structures but use the profile feature
+    // structures when the application doesn't provide one (robust access disable flags are
+    // ignored if the application overrides the corresponding feature structures)
+    VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT = 0x00000008,
+
+    // Only use application provided feature structures, don't add any profile specific
+    // feature structures (robust access disable flags are ignored in this case and only the
+    // application provided structures are used)
+    VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT = 0x00000010,
+
+    VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT = 0x00000020,
+    VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT = 0x00000040,
+    VP_DEVICE_CREATE_DISABLE_ROBUST_ACCESS_MASK =
         VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT | VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT,
+
     VP_DEVICE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
 } VpDeviceCreateFlagBits;
 typedef VkFlags VpDeviceCreateFlags;
@@ -276,6 +307,14 @@ VPAPI_ATTR const VpProfileDesc* vpGetProfileDesc(const char profileName[VP_MAX_P
     return nullptr;
 }
 
+VPAPI_ATTR bool vpCheckVersion(uint32_t actual, uint32_t expected) {
+    uint32_t actualMajor = VK_API_VERSION_MAJOR(actual);
+    uint32_t actualMinor = VK_API_VERSION_MINOR(actual);
+    uint32_t expectedMajor = VK_API_VERSION_MAJOR(expected);
+    uint32_t expectedMinor = VK_API_VERSION_MINOR(expected);
+    return actualMajor > expectedMajor || (actualMajor == expectedMajor && actualMinor >= expectedMinor);
+}
+
 VPAPI_ATTR bool vpCheckExtension(const VkExtensionProperties *supportedProperties, size_t supportedSize,
                                  const char *requestedExtension, uint32_t expectedVersion = 0) {
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
@@ -288,42 +327,25 @@ VPAPI_ATTR bool vpCheckExtension(const VkExtensionProperties *supportedPropertie
     return false;
 }
 
-VPAPI_ATTR void vpGetInstanceExtensions(const VpInstanceCreateInfo *pCreateInfo, uint32_t propertyCount,
-                                        const VkExtensionProperties *pProperties, std::vector<const char *> &extensions) {
-    if (pCreateInfo->flags & VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT) {
-        for (uint32_t i = 0, n = propertyCount; i < n; ++i) {
-            extensions.push_back(pProperties[i].extensionName);
+VPAPI_ATTR void vpGetExtensions(uint32_t requestedExtensionCount, const char *const *ppRequestedExtensionNames,
+                                uint32_t profileExtensionCount, const VkExtensionProperties *pProfileExtensionProperties,
+                                std::vector<const char *> &extensions, bool merge, bool override) {
+    if (override) {
+        for (uint32_t i = 0; i < requestedExtensionCount; ++i) {
+            extensions.push_back(ppRequestedExtensionNames[i]);
+        }
+    } else {
+        for (uint32_t i = 0; i < profileExtensionCount; ++i) {
+            extensions.push_back(pProfileExtensionProperties[i].extensionName);
         }
 
-        for (uint32_t i = 0; i < pCreateInfo->pCreateInfo->enabledExtensionCount; ++i) {
-            if (vpCheckExtension(pProperties, propertyCount, pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i])) {
-                continue;
+        if (merge) {
+            for (uint32_t i = 0; i < requestedExtensionCount; ++i) {
+                if (vpCheckExtension(pProfileExtensionProperties, profileExtensionCount, ppRequestedExtensionNames[i])) {
+                    continue;
+                }
+                extensions.push_back(ppRequestedExtensionNames[i]);
             }
-            extensions.push_back(pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i]);
-        }
-    } else {  // or VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT
-        for (uint32_t i = 0, n = pCreateInfo->pCreateInfo->enabledExtensionCount; i < n; ++i) {
-            extensions.push_back(pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i]);
-        }
-    }
-}
-
-VPAPI_ATTR void vpGetDeviceExtensions(const VpDeviceCreateInfo *pCreateInfo, uint32_t propertyCount,
-                                      const VkExtensionProperties *pProperties, std::vector<const char *> &extensions) {
-    if (pCreateInfo->flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) {
-        for (int i = 0, n = propertyCount; i < n; ++i) {
-            extensions.push_back(pProperties[i].extensionName);
-        }
-
-        for (uint32_t i = 0; i < pCreateInfo->pCreateInfo->enabledExtensionCount; ++i) {
-            if (vpCheckExtension(pProperties, propertyCount, pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i])) {
-                continue;
-            }
-            extensions.push_back(pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i]);
-        }
-    } else {  // or VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT
-        for (int i = 0, n = pCreateInfo->pCreateInfo->enabledExtensionCount; i < n; ++i) {
-            extensions.push_back(pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i]);
         }
     }
 }
@@ -394,7 +416,10 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
     static PFN_vkEnumerateInstanceVersion pfnEnumerateInstanceVersion =
         (PFN_vkEnumerateInstanceVersion)vkGetInstanceProcAddr(VK_NULL_HANDLE, "vkEnumerateInstanceVersion");
     if (pfnEnumerateInstanceVersion != nullptr) {
-        pfnEnumerateInstanceVersion(&apiVersion);
+        result = pfnEnumerateInstanceVersion(&apiVersion);
+        if (result != VK_SUCCESS) {
+            return result;
+        }
     }
 
     uint32_t extCount = 0;
@@ -417,7 +442,7 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
         return result;
     }
 
-    if (VK_VERSION_PATCH(apiVersion) < VK_VERSION_PATCH(pDesc->minApiVersion)) {
+    if (!detail::vpCheckVersion(apiVersion, pDesc->minApiVersion)) {
         return result;
     }
 
@@ -472,7 +497,20 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
         }
 
         if (pDesc != nullptr && pDesc->pInstanceExtensions != nullptr) {
-            detail::vpGetInstanceExtensions(pCreateInfo, pDesc->instanceExtensionCount, pDesc->pInstanceExtensions, extensions);
+            bool merge = (pCreateInfo->flags & VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT) != 0;
+            bool override = (pCreateInfo->flags & VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0;
+
+            if (!merge && !override && pCreateInfo->pCreateInfo->enabledExtensionCount > 0) {
+                // If neither merge nor override is used then the application must not specify its
+                // own extensions
+                return VK_ERROR_UNKNOWN;
+            }
+
+            detail::vpGetExtensions(pCreateInfo->pCreateInfo->enabledExtensionCount,
+                                    pCreateInfo->pCreateInfo->ppEnabledExtensionNames,
+                                    pDesc->instanceExtensionCount,
+                                    pDesc->pInstanceExtensions,
+                                    extensions, merge, override);
 
             // Need to include VK_KHR_get_physical_device_properties2 if we are on Vulkan 1.0
             if (createInfo.pApplicationInfo->apiVersion < VK_API_VERSION_1_1) {
@@ -526,7 +564,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
     {
         VkPhysicalDeviceProperties props{};
         vkGetPhysicalDeviceProperties(physicalDevice, &props);
-        if (VK_VERSION_PATCH(props.apiVersion) < VK_VERSION_PATCH(pDesc->minApiVersion)) {
+        if (!detail::vpCheckVersion(props.apiVersion, pDesc->minApiVersion)) {
             return result;
         }
     }
@@ -697,8 +735,22 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
             const detail::VpProfileDesc* pDesc = pUserData->pDesc;
             const VpDeviceCreateInfo* pCreateInfo = pUserData->pCreateInfo;
 
+            bool merge = (pCreateInfo->flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0;
+            bool override = (pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0;
+
+            if (!merge && !override && pCreateInfo->pCreateInfo->enabledExtensionCount > 0) {
+                // If neither merge nor override is used then the application must not specify its
+                // own extensions
+                pUserData->result = VK_ERROR_UNKNOWN;
+                return;
+            }
+
             std::vector<const char*> extensions;
-            detail::vpGetDeviceExtensions(pCreateInfo, pDesc->deviceExtensionCount, pDesc->pDeviceExtensions, extensions);
+            detail::vpGetExtensions(pCreateInfo->pCreateInfo->enabledExtensionCount,
+                                    pCreateInfo->pCreateInfo->ppEnabledExtensionNames,
+                                    pDesc->deviceExtensionCount,
+                                    pDesc->pDeviceExtensions,
+                                    extensions, merge, override);
 
             VkBaseOutStructure profileStructList;
             profileStructList.pNext = p;
@@ -748,18 +800,26 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
 #endif
 
             VkBaseOutStructure* pNext = static_cast<VkBaseOutStructure*>(const_cast<void*>(pCreateInfo->pCreateInfo->pNext));
-            for (uint32_t i = 0; i < pDesc->featureStructTypeCount; ++i) {
-                const void* pRequested = detail::vpGetStructure(pNext, pDesc->pFeatureStructTypes[i]);
-                if (pRequested == nullptr) {
-                    VkBaseOutStructure* pPrevStruct = &profileStructList;
-                    VkBaseOutStructure* pCurrStruct = pPrevStruct->pNext;
-                    while (pCurrStruct->sType != pDesc->pFeatureStructTypes[i]) {
-                        pPrevStruct = pCurrStruct;
-                        pCurrStruct = pCurrStruct->pNext;
+            if ((pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT) == 0) {
+                for (uint32_t i = 0; i < pDesc->featureStructTypeCount; ++i) {
+                    const void* pRequested = detail::vpGetStructure(pNext, pDesc->pFeatureStructTypes[i]);
+                    if (pRequested == nullptr) {
+                        VkBaseOutStructure* pPrevStruct = &profileStructList;
+                        VkBaseOutStructure* pCurrStruct = pPrevStruct->pNext;
+                        while (pCurrStruct->sType != pDesc->pFeatureStructTypes[i]) {
+                            pPrevStruct = pCurrStruct;
+                            pCurrStruct = pCurrStruct->pNext;
+                        }
+                        pPrevStruct->pNext = pCurrStruct->pNext;
+                        pCurrStruct->pNext = pNext;
+                        pNext = pCurrStruct;
+                    } else
+                    if ((pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT) == 0) {
+                        // If override is not used then the application must not specify its
+                        // own feature structure for anything that the profile defines
+                        pUserData->result = VK_ERROR_UNKNOWN;
+                        return;
                     }
-                    pPrevStruct->pNext = pCurrStruct->pNext;
-                    pCurrStruct->pNext = pNext;
-                    pNext = pCurrStruct;
                 }
             }
 

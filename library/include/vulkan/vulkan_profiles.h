@@ -130,7 +130,13 @@ typedef struct VpProfileProperties {
 } VpProfileProperties;
 
 typedef enum VpInstanceCreateFlagBits {
+    // Default behavior:
+    // - profile extensions are used (application must not specify extensions)
+
+    // Merge application provided extension list and profile extension list
     VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT = 0x00000001,
+
+    // Use application provided extension list
     VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT = 0x00000002,
 
     VP_INSTANCE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
@@ -144,13 +150,38 @@ typedef struct VpInstanceCreateInfo {
 } VpInstanceCreateInfo;
 
 typedef enum VpDeviceCreateFlagBits {
-    VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT = 0x00000001,
-    VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT = 0x00000002,
-    VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT = 0x00000004,
-    VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT = 0x00000008,
+    // Default behavior:
+    // - profile extensions are used (application must not specify extensions)
+    // - profile feature structures are used (application must not specify any of them) extended
+    //   with any other application provided struct that isn't defined by the profile
 
-    VP_DEVICE_CREATE_DISABLE_ROBUST_ACCESS_BIT =
+    // Merge application provided extension list and profile extension list
+    VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT = 0x00000001,
+
+    // Use application provided extension list
+    VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT = 0x00000002,
+
+    // Merge application provided versions of feature structures with the profile features
+    // Currently unsupported, but is considered for future inclusion in which case the
+    // default behavior could potentially be changed to merging as the currently defined
+    // default behavior is forward-compatible with that
+    // VP_DEVICE_CREATE_MERGE_FEATURES_BIT = 0x00000004,
+
+    // Use application provided versions of feature structures but use the profile feature
+    // structures when the application doesn't provide one (robust access disable flags are
+    // ignored if the application overrides the corresponding feature structures)
+    VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT = 0x00000008,
+
+    // Only use application provided feature structures, don't add any profile specific
+    // feature structures (robust access disable flags are ignored in this case and only the
+    // application provided structures are used)
+    VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT = 0x00000010,
+
+    VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT = 0x00000020,
+    VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT = 0x00000040,
+    VP_DEVICE_CREATE_DISABLE_ROBUST_ACCESS_MASK =
         VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT | VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT,
+
     VP_DEVICE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
 } VpDeviceCreateFlagBits;
 typedef VkFlags VpDeviceCreateFlags;

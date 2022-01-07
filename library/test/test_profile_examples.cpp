@@ -57,6 +57,7 @@ TEST(test_profile, example_add_features_add_extensions) {
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
     profileInfo.pProfile = &profile;
+    profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT | VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT;
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
@@ -95,6 +96,7 @@ TEST(test_profile, example_individual_override_features) {
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
     profileInfo.pProfile = &profile;
+    profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT;
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
@@ -135,6 +137,7 @@ TEST(test_profile, example_collective_override_features) {
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
     profileInfo.pProfile = &profile;
+    profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT;
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
@@ -151,15 +154,11 @@ TEST(test_profile, example_flag_disable_robust_access) {
     vpGetPhysicalDeviceProfileSupport(scaffold.instance, scaffold.physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
-    // Regardness of robustBufferAccess = VK_TRUE, because of VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT is set
+    // Regardness of robustBufferAccess = VK_TRUE in the profile, because of VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT is set
     // robustBufferAccess is effectively set to VK_FALSE when creating the VkDevice
-    VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
-    deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-    deviceFeatures2.features.robustBufferAccess = VK_TRUE;
 
     VkDeviceCreateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    info.pNext = &deviceFeatures2;
     info.queueCreateInfoCount = 1;
     info.pQueueCreateInfos = &scaffold.queueCreateInfo;
 

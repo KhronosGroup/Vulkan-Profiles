@@ -212,8 +212,13 @@ TEST(test_library_util, GetDeviceExtensions) {
         profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
 
         std::vector<const char *> extensions;
-        detail::vpGetDeviceExtensions(&profileInfo, ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions),
-                                      &detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions[0], extensions);
+        detail::vpGetExtensions(profileInfo.pCreateInfo->enabledExtensionCount,
+                                profileInfo.pCreateInfo->ppEnabledExtensionNames,
+                                ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions),
+                                &detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions[0],
+                                extensions,
+                                (profileInfo.flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0,
+                                (profileInfo.flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0);
         EXPECT_EQ(ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions), extensions.size());
     }
 
@@ -223,8 +228,13 @@ TEST(test_library_util, GetDeviceExtensions) {
         profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
 
         std::vector<const char *> extensions;
-        detail::vpGetDeviceExtensions(&profileInfo, ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions),
-                                      &detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions[0], extensions);
+        detail::vpGetExtensions(profileInfo.pCreateInfo->enabledExtensionCount,
+                                profileInfo.pCreateInfo->ppEnabledExtensionNames,
+                                ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions),
+                                &detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions[0],
+                                extensions,
+                                (profileInfo.flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0,
+                                (profileInfo.flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0);
         EXPECT_EQ(ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions) + 2, extensions.size());
     }
 
@@ -234,8 +244,13 @@ TEST(test_library_util, GetDeviceExtensions) {
         profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
         std::vector<const char *> extensions;
-        detail::vpGetDeviceExtensions(&profileInfo, ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions),
-                                      &detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions[0], extensions);
+        detail::vpGetExtensions(profileInfo.pCreateInfo->enabledExtensionCount,
+                                profileInfo.pCreateInfo->ppEnabledExtensionNames,
+                                ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions),
+                                &detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions[0],
+                                extensions,
+                                (profileInfo.flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0,
+                                (profileInfo.flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0);
         EXPECT_EQ(ARRAY_SIZE(EXTENSIONS), extensions.size());
     }
 
@@ -245,8 +260,13 @@ TEST(test_library_util, GetDeviceExtensions) {
         profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
         std::vector<const char *> extensions;
-        detail::vpGetDeviceExtensions(&profileInfo, ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions),
-                                      &detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions[0], extensions);
+        detail::vpGetExtensions(profileInfo.pCreateInfo->enabledExtensionCount,
+                                profileInfo.pCreateInfo->ppEnabledExtensionNames,
+                                ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions),
+                                &detail::VP_LUNARG_DESKTOP_PORTABILITY_2021::deviceExtensions[0],
+                                extensions,
+                                (profileInfo.flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0,
+                                (profileInfo.flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0);
         EXPECT_EQ(0, extensions.size());
     }
 }
