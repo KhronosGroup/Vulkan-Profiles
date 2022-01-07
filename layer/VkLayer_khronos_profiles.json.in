@@ -85,26 +85,28 @@
                 {
                     "key": "profile_file",
                     "label": "Profile Selection",
-                    "description": "Paths to the profile files separated by ';'.",
+                    "description": "Path of a profile file and the name of the profile to load.",
                     "type": "LOAD_FILE",
                     "filter": "*.json",
-                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2021.json"
-                },
-                {
-                    "key": "profile_name",
-                    "label": "Profile",
-                    "description": "Name of the profile to be used.",
-                    "type": "ENUM",
-                    "flags": [],
-                    "default": "VP_LUNARG_desktop_portability_2021",
-                    "dependence": {
-                        "mode": "PROFILE",
-                        "settings": [
-                            {
-                                "key": "profile_file"
+                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2021.json",
+                    "settings": [
+                        {
+                            "key": "profile_name",
+                            "label": "Profile",
+                            "description": "Name of the profile specified by the profile file to use.",
+                            "type": "ENUM",
+                            "flags": [],
+                            "default": "",
+                            "dependence": {
+                                "mode": "PROFILE",
+                                "settings": [
+                                    {
+                                        "key": "profile_file"
+                                    }
+                                ]
                             }
-                        ]
-                    }
+                        }
+                    ]
                 },
                 {
                     "key": "debug_enable",
