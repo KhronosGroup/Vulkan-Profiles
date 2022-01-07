@@ -194,7 +194,7 @@ TEST(mocked_api_create_instance, default_extensions_negative) {
     // flag is used. This leaves us the door open to use merge behavior as the default in
     // the future if we ever decide to do so.
     EXPECT_EQ(result, VK_ERROR_UNKNOWN);
-    EXPECT_EQ(instance, VK_NULL_HANDLE);
+    EXPECT_TRUE(instance == VK_NULL_HANDLE);
 }
 
 TEST(mocked_api_create_instance, override_extensions) {
