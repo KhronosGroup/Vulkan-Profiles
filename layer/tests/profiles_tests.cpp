@@ -794,3 +794,72 @@ TEST(profiles, TestExtensionNotSupported) {
         inst_builder.reset();
     }
 }
+
+TEST(profiles, TestSelectingProfileAndCapabilities) {
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    {
+        std::vector<std::string> filepaths = {TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_selecting_profile.json"};
+        profiles_test::setProfilesFilenames(filepaths);
+        profiles_test::setProfilesProfileName("VP_LUNARG_test_selecting_profile");
+        profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
+        profiles_test::setProfilesModifyExtensionList(profiles_test::SetCombinationMode::SET_FROM_PROFILE_OVERRIDE);
+
+        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+
+        err = inst_builder.makeInstance();
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkInstance test_inst = inst_builder.getInstance();
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            vkDestroyInstance(test_inst, nullptr);
+            return;
+        }
+
+        VkPhysicalDeviceProperties gpu_props{};
+        vkGetPhysicalDeviceProperties(gpu, &gpu_props);
+
+        EXPECT_EQ(gpu_props.limits.maxImageDimension1D, 16384u);
+
+        inst_builder.reset();
+    }
+
+    {
+        std::vector<std::string> filepaths = {TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_selecting_profile.json"};
+        profiles_test::setProfilesFilenames(filepaths);
+        profiles_test::setProfilesProfileName("VP_LUNARG_test_selecting_profile_subset");
+        profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
+        profiles_test::setProfilesModifyExtensionList(profiles_test::SetCombinationMode::SET_FROM_PROFILE_OVERRIDE);
+
+        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+
+        err = inst_builder.makeInstance();
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkInstance test_inst = inst_builder.getInstance();
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            vkDestroyInstance(test_inst, nullptr);
+            return;
+        }
+
+        VkPhysicalDeviceProperties gpu_props{};
+        vkGetPhysicalDeviceProperties(gpu, &gpu_props);
+
+        EXPECT_EQ(gpu_props.limits.maxImageDimension1D, 4096u);
+
+        inst_builder.reset();
+    }
+}
