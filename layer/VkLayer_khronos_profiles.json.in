@@ -97,36 +97,18 @@
                             "description": "Name of the profile specified by the profile file to use.",
                             "type": "ENUM",
                             "flags": [],
-                            "default": ""
+                            "default": "${VK_PROFILES}"
                         }
                     ]
                 },
                 {
-                    "key": "debug_enable",
-                    "label": "Debug Enable",
-                    "description": "Enables debug message output.",
-                    "type": "BOOL",
-                    "default": true
-                },
-                {
-                    "key": "emulate_portability",
-                    "label": "Emulate VK_KHR_portability_subset",
-                    "description": "Emulate that VK_KHR_portability_subset extension is supported by the device.",
-                    "platforms": [
-                        "WINDOWS",
-                        "LINUX"
-                    ],
-                    "type": "BOOL",
-                    "default": true
-                },
-                {
-                    "key": "override_capabilities_modes",
-                    "label": "Override Capabilities Modes",
+                    "key": "emulate_capabilities_modes",
+                    "label": "Emulate Vulkan Capabilities Modes",
                     "description": "Control of the enumalated capabilities of the Vulkan physical device from the selected Vulkan Profile.",
                     "type": "GROUP",
                     "settings": [
                         {
-                            "key": "modify_extension_list",
+                            "key": "emulate_extension_list",
                             "label": "Extensions",
                             "description": "Modes to control the enumalated extensions list of the Vulkan physical device.",
                             "type": "ENUM",
@@ -155,7 +137,7 @@
                             "default": "check_support"
                         },
                         {
-                            "key": "modify_format_list",
+                            "key": "emulate_format_list",
                             "label": "Formats",
                             "description": "Modes to control the enumalated format list of the Vulkan physical device.",
                             "type": "ENUM",
@@ -184,7 +166,7 @@
                             "default": "check_support"
                         },
                         {
-                            "key": "modify_format_properties",
+                            "key": "emulate_format_properties",
                             "label": "Format Properties",
                             "description": "Modes to control the enumalated format properties of the Vulkan physical device.",
                             "type": "ENUM",
@@ -213,6 +195,24 @@
                             "default": "check_support"
                         }
                     ]
+                },
+                {
+                    "key": "emulate_portability",
+                    "label": "Emulate VK_KHR_portability_subset",
+                    "description": "Emulate that VK_KHR_portability_subset extension is supported by the device.",
+                    "platforms": [
+                        "WINDOWS",
+                        "LINUX"
+                    ],
+                    "type": "BOOL",
+                    "default": true
+                },
+                {
+                    "key": "debug_output",
+                    "label": "Debug Output",
+                    "description": "Enables debug message output.",
+                    "type": "BOOL",
+                    "default": true
                 }
             ]
         }

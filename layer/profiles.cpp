@@ -160,16 +160,16 @@ const char *const kEnvarProfilesModifyPresentModes =
 const char *const kEnvarProfilesProfileName = "VK_KHRONOS_PROFILES_PROFILE_NAME";  // name of the profile to be used
 #endif
 
-const char *const kLayerSettingsProfileFilename = "profile_filename";
-const char *const kLayerSettingsDebugEnable = "debug_enable";
-const char *const kLayerSettingsEmulatePortability = "emulate_portability";
-const char *const kLayerSettingsModifyExtensionList = "modify_extension_list";
-const char *const kLayerSettingsModifyMemoryFlags = "modify_memory_flags";
-const char *const kLayerSettingsModifyFormatList = "modify_format_list";
-const char *const kLayerSettingsModifyFormatProperties = "modify_format_properties";
-const char *const kLayerSettingsModifySurfaceFormats = "modify_surface_formats";
-const char *const kLayerSettingsModifyPresentModes = "modify_present_modes";
+const char *const kLayerSettingsProfileFile = "profile_file";
 const char *const kLayerSettingsProfileName = "profile_name";
+const char *const kLayerSettingsDebugOutput = "debug_output";
+const char *const kLayerSettingsEmulatePortability = "emulate_portability";
+const char *const kLayerSettingsModifyExtensionList = "emulate_extension_list";
+const char *const kLayerSettingsModifyFormatList = "emulate_format_list";
+const char *const kLayerSettingsModifyFormatProperties = "emulate_format_properties";
+const char *const kLayerSettingsModifyMemoryFlags = "emulate_memory_flags";
+const char *const kLayerSettingsModifySurfaceFormats = "emulate_surface_formats";
+const char *const kLayerSettingsModifyPresentModes = "emulate_present_modes";
 
 struct SetCombinationModeSetting {
     SetCombinationMode mode;
@@ -2544,7 +2544,7 @@ static inline VkFormatFeatureFlags StringToVkFormatFeatureFlags(const std::strin
 
 VkResult JsonLoader::LoadFiles() {
     if (inputFilename.str.empty()) {
-        ErrorPrintf("envar %s and %s in vk_layer_settings.txt are unset\n", kEnvarProfilesFilename, kLayerSettingsProfileFilename);
+        ErrorPrintf("envar %s and %s in vk_layer_settings.txt are unset\n", kEnvarProfilesFilename, kLayerSettingsProfileFile);
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
@@ -2552,7 +2552,7 @@ VkResult JsonLoader::LoadFiles() {
     if (inputFilename.fromEnvVar) {
         DebugPrintf("envar %s = \"%s\"\n", kEnvarProfilesFilename, filename_list);
     } else {
-        DebugPrintf("vk_layer_settings.txt setting %s = \"%s\"\n", kLayerSettingsProfileFilename,
+        DebugPrintf("vk_layer_settings.txt setting %s = \"%s\"\n", kLayerSettingsProfileFile,
                     filename_list);
     }
     return LoadFiles(filename_list);
@@ -6479,9 +6479,9 @@ static void GetProfilesFilename() {
         inputFilename.fromEnvVar = true;
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileFilename)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileFile)) {
         inputFilename.fromEnvVar = false;
-        inputFilename.str = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileFilename);
+        inputFilename.str = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileFile);
     }
 }
 
@@ -6528,9 +6528,9 @@ static void GetProfilesDebugLevel() {
         debugLevel.num = GetBooleanValue(env_var);
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugEnable)) {
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugOutput)) {
         debugLevel.fromEnvVar = false;
-        debugLevel.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDebugEnable);
+        debugLevel.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDebugOutput);
     }
 }
 
