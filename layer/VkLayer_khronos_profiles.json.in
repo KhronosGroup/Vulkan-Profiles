@@ -115,22 +115,22 @@
                             "flags": [
                                 {
                                     "key": "from_device",
-                                    "label": "From device",
+                                    "label": "From Device",
                                     "description": "Uses the physical device's actual format list. The selected Vulkan Profile is ignored."
                                 },
                                 {
                                     "key": "check_support",
-                                    "label": "Check support",
+                                    "label": "Check Support",
                                     "description": "Checks if the device supports the extensions from the selected Vulkan Profile."
                                 },
                                 {
                                     "key": "from_profile",
-                                    "label": "From profile",
+                                    "label": "From Profile",
                                     "description": "Replaces the device's extension list with the extension list provided by the selected Vulkan Profile, if an extension is not supported by the device it will return an error."
                                 },
                                 {
                                     "key": "from_profile_override",
-                                    "label": "From profile override",
+                                    "label": "From Profile Override",
                                     "description": "Replaces the device's extension list with the extension list provided by the selected Vulkan Profile."
                                 }
                             ],
@@ -144,17 +144,17 @@
                             "flags": [
                                 {
                                     "key": "from_device",
-                                    "label": "From device",
+                                    "label": "From Device",
                                     "description": "Uses the physical device's actual format list. The selected Vulkan Profile is ignored."
                                 },
                                 {
                                     "key": "check_support",
-                                    "label": "Check support",
+                                    "label": "Check Support",
                                     "description": "Checks if the device supports the format list from the selected Vulkan Profile."
                                 },
                                 {
                                     "key": "from_profile",
-                                    "label": "From profile",
+                                    "label": "From Profile",
                                     "description": "Fully replaces the device's format list with the format list provided by the selected Vulkan Profile, if a format is not supported by the devcie it will return an error."
                                 },
                                 {
