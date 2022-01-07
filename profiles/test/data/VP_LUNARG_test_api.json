@@ -3212,7 +3212,7 @@
                     "comment": "Initial revision against 1.2.198"
                 }
             ],
-            "capabilities": [ "capabilities" ]
+            "capabilities": [ "baseline" ]
         }
     }
 }

@@ -1630,7 +1630,7 @@ class JsonLoader {
     VkResult LoadFiles();
     VkResult LoadFiles(const char *filename_list);
     VkResult LoadFile(const char *filename);
-    VkResult ReadProfile(const Json::Value root);
+    VkResult ReadProfile(const Json::Value root, const std::vector<std::string>& capabilities);
 
    private:
     enum class SchemaId { kUnknown = 0, kProfiles_1_3_200, kProfiles_1_3_201, kProfiles_1_3_203 };
@@ -2572,17 +2572,8 @@ VkResult JsonLoader::LoadFiles() {
     return LoadFiles(filename_list);
 }
 
-bool IsProfileSelected(std::string filename) {
-    const std::string ext = ".json";
-    if (filename.length() >= ext.length()) {
-        if (filename.substr(filename.length() - ext.length()) == ext) {
-            filename = filename.substr(0, filename.length() - ext.length());
-        }
-    }
-    if (filename.length() > profile_name.length() && filename.substr(filename.length() - profile_name.length()) == profile_name) {
-        return true;
-    }
-    return false;
+bool IsProfileSelected(const std::string& current_profile) {
+    return current_profile == profile_name;
 }
 
 VkResult JsonLoader::LoadFiles(const char *filename_list) {
@@ -2594,16 +2585,10 @@ VkResult JsonLoader::LoadFiles(const char *filename_list) {
     std::stringstream ss_list(filename_list);
     std::string filename;
 
-    bool no_profile_selected = profile_name.empty();
-    bool first_profile = true;
     while (std::getline(ss_list, filename, delimiter)) {
-        if (!filename.empty() &&
-            ((no_profile_selected && first_profile) || (!no_profile_selected && IsProfileSelected(filename)))) {
-            first_profile = false;
-            VkResult result = LoadFile(filename.c_str());
-            if (result != VK_SUCCESS) {
-                return result;
-            }
+        VkResult result = LoadFile(filename.c_str());
+        if (result != VK_SUCCESS) {
+            return result;
         }
     }
     return VK_SUCCESS;
@@ -3052,9 +3037,10 @@ bool JsonLoader::CheckExtensionSupport(const char *extension) {
     return true;
 }
 
-VkResult JsonLoader::ReadProfile(const Json::Value root) {
+VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities) {
     const auto &caps = root["capabilities"];
-    for (const auto &c : caps) {
+    for (const auto &capability : capabilities) {
+        const auto &c = caps[capability];
         const auto &extensions = c["extensions"];
         pdd_.arrayof_extension_properties_.reserve(extensions.size());
         for (const auto &e : extensions.getMemberNames()) {
@@ -3134,6 +3120,21 @@ VkResult JsonLoader::LoadFile(const char *filename) {
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
+    const auto &profiles = root["profiles"];
+    std::vector<std::string> capabilities;
+    for (const auto &profile : profiles.getMemberNames()) {
+        if (IsProfileSelected(profile)) {
+            const auto& caps = profiles[profile]["capabilities"];
+            for (const auto &cap : caps) {
+                capabilities.push_back(cap.asString());
+            }
+            break;
+        }
+    }
+    if (capabilities.empty()) {
+        return VK_SUCCESS;
+    }
+
     DebugPrintf("{\n");
     const Json::Value schema_value = root["$schema"];
     const SchemaId schema_id = IdentifySchema(schema_value);
@@ -3148,7 +3149,7 @@ VkResult JsonLoader::LoadFile(const char *filename) {
         pdd_.simulation_extensions_.clear();
     }
     if (pdd_.extension_list_combination_mode_ != SetCombinationMode::SET_FROM_DEVICE) {
-        result = ReadProfile(root);
+        result = ReadProfile(root, capabilities);
     }
 
     // GPUinfo structures
