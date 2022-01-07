@@ -49,8 +49,6 @@
     defined(VK_KHR_get_surface_capabilities2) && \
     defined(VK_KHR_incremental_present) && \
     defined(VK_KHR_maintenance1) && \
-    defined(VK_KHR_maintenance2) && \
-    defined(VK_KHR_shader_draw_parameters) && \
     defined(VK_KHR_storage_buffer_storage_class) && \
     defined(VK_KHR_surface) && \
     defined(VK_KHR_swapchain) && \
