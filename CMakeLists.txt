@@ -86,22 +86,72 @@ set(BUILD_TESTS OFF)
 set(_build_type ${CMAKE_BUILD_TYPE})
 set(VVL_CPP_STANDARD 11)
 set(_build_type ${CMAKE_BUILD_TYPE})
-FetchContent_MakeAvailable(vulkan-headers)
-if (NOT ANDROID)
-    FetchContent_MakeAvailable(vulkan-loader)
+
+# For SDK (flat) builds, we'll receive pointers to our dependency repository builds.
+# Otherwise, we'll fetch and build ourselves.  Other repositories also respect environment
+# variables, so we're doing it here too.
+
+# FetchContent() doesn't seem to actually do a Vulkan-Headers build at all.
+# Consequently, we're really only interested in the source.
+if(VULKAN_HEADERS_SOURCE_DIR)
+    message(STATUS "Using Vulkan-Headers source located at ${VULKAN_HEADERS_SOURCE_DIR}")
+    set(vulkan-headers_SOURCE_DIR ${VULKAN_HEADERS_SOURCE_DIR})
+elseif(DEFINED ENV{VULKAN_HEADERS_SOURCE_DIR})
+    message(STATUS "Using Vulkan-Headers source from environment VULKAN_HEADERS_SOURCE_DIR=$ENV{VULKAN_HEADERS_SOURCE_DIR}")
+    set(vulkan-headers_SOURCE_DIR $ENV{VULKAN_HEADERS_SOURCE_DIR})
+else()
+    message(STATUS "Fetching Vulkan-Headers source")
+    FetchContent_MakeAvailable(vulkan-headers)
 endif()
 
-# We want the code for Vulkan-ValidationLayers, to get source required
-# to build devsim, but we don't need its build and build dependencies;
-# we just need some source from its tree.  We avoid using
-# FetchContent_MakeAvailable() because it will add the dependency build
-# (and all of its dependencies, recursively) to our build; by calling 
-# FetchContent_Populate() directly, we avoid the troubles that can cause.
-FetchContent_GetProperties(vulkan-validationlayers)
-# We protect the FetchContent_Populate() call just in case this project
-# is a dependent project of a higher-level project.
-if(NOT vulkan-validationlayers_POPULATED)
-    FetchContent_Populate(vulkan-validationlayers)
+# We really only want source for Vulkan-ValidationLayers.  We do not want or need
+# a CMake sub-build (which would in turn pull in all VVL dependencies).
+if(VULKAN_VALIDATIONLAYERS_SOURCE_DIR)
+    message(STATUS "Using Vulkan-ValidationLayers source located at ${VULKAN_VALIDATIONLAYERS_SOURCE_DIR}")
+    set(vulkan-validationlayers_SOURCE_DIR ${VULKAN_VALIDATIONLAYERS_SOURCE_DIR})
+elseif(DEFINED ENV{VULKAN_VALIDATIONLAYERS_SOURCE_DIR})
+    message(STATUS "Using Vulkan-ValidationLayers source from environment VULKAN_VALIDATIONLAYERS_SOURCE_DIR=$ENV{VULKAN_VALIDATIONLAYERS_SOURCE_DIR}")
+    set(vulkan-validationlayers_SOURCE_DIR $ENV{VULKAN_VALIDATIONLAYERS_SOURCE_DIR})
+else()
+    # We use FetchContent_Populate() instead of FetchContent_MakeAvailable()
+    # because we don't want to pull in dependencies and do a build.
+    # We protect the FetchContent_Populate() call as a best practice,
+    # in case this project is a dependency of a higher-level project
+    # that also directly populates Vulkan-ValidationLayers.
+    message(STATUS "Fetching Vulkan-ValidationLayers source")
+    FetchContent_GetProperties(vulkan-validationlayers)
+    if(NOT vulkan-validationlayers_POPULATED)
+        FetchContent_Populate(vulkan-validationlayers)
+    endif()
+endif()
+
+# We don't need to build a loader on Android, but we do everywhere else.
+if (NOT ANDROID)
+    if(VULKAN_LOADER_INSTALL_DIR OR DEFINED ENV{VULKAN_LOADER_INSTALL_DIR})
+        if(VULKAN_LOADER_INSTALL_DIR)
+            message(STATUS "Using Vulkan-Loader build located at ${VULKAN_LOADER_INSTALL_DIR}")
+        else()
+            message(STATUS "Using Vulkan-Loader build from environment VULKAN_LOADER_INSTALL_DIR=$ENV{VULKAN_LOADER_INSTALL_DIR}")
+            set(VULKAN_LOADER_INSTALL_DIR $ENV{VULKAN_LOADER_INSTALL_DIR})
+        endif()
+
+        find_file(VULKAN_LOADER
+            # Don't search any system paths
+            NO_DEFAULT_PATH
+            # vulkan-1.lib on Windows, libvulkan.so on Linux
+            NAMES vulkan-1.lib libvulkan.so.1
+            PATHS ${VULKAN_LOADER_INSTALL_DIR}
+            # lib subdirectory on both Windows and Linux
+            PATH_SUFFIXES lib
+        )
+        message(STATUS "Using Vulkan-Loader library ${VULKAN_LOADER}")
+        # Sub-builds look for Vulkan::Vulkan to link the loader.
+        add_library(Vulkan::Vulkan STATIC IMPORTED)
+        set_target_properties(Vulkan::Vulkan PROPERTIES IMPORTED_LOCATION "${VULKAN_LOADER}")
+    else()
+        message(STATUS "Fetching and building Vulkan-Loader")
+        FetchContent_MakeAvailable(vulkan-loader)
+    endif()
 endif()
 
 set(API_NAME "Vulkan" CACHE STRING "API name to use when building")
