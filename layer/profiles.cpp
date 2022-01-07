@@ -2989,6 +2989,8 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
         format_properties.bufferFeatures |= StringToVkFormatFeatureFlags(feature.asString());
     }
 
+    (*dest)[format] = format_properties;
+
     if ((pdd_.device_formats_[format].linearTilingFeatures & format_properties.linearTilingFeatures) !=
         format_properties.linearTilingFeatures) {
         ErrorPrintf("JSON file sets variables for format %s, but set linearTilingFeatures are not supported.\n",
@@ -3008,7 +3010,6 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
     if (pdd_.format_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
         return true;
     }
-    (*dest)[format] = format_properties;
     return true;
 }
 
