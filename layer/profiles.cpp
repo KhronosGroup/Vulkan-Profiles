@@ -1830,7 +1830,7 @@ class JsonLoader {
         if (member != name) {
             return;
         }
-        ErrorPrintf(
+        DebugPrintf(
             "WARN \"%s::%s\" value is set in the profile, but it is not modifiable by the Profiles Layer and will not be set.\n",
             parent_name, name);
     }
@@ -2193,13 +2193,6 @@ class JsonLoader {
             dest->push_back(device_size);
         }
         return static_cast<int>(dest->size());
-    }
-
-    void WarnDeprecated(const Json::Value &parent, const char *name) {
-        const Json::Value value = parent[name];
-        if (value.type() != Json::nullValue) {
-            DebugPrintf("WARN JSON section %s is deprecated and ignored.\n", name);
-        }
     }
 
     PhysicalDeviceData &pdd_;
@@ -2993,18 +2986,18 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
 
     if ((pdd_.device_formats_[format].linearTilingFeatures & format_properties.linearTilingFeatures) !=
         format_properties.linearTilingFeatures) {
-        ErrorPrintf("JSON file sets variables for format %s, but set linearTilingFeatures are not supported.\n",
+        DebugPrintf("JSON file sets variables for format %s, but set linearTilingFeatures are not supported.\n",
                     format_name.c_str());
         return false;
     }
     if ((pdd_.device_formats_[format].optimalTilingFeatures & format_properties.optimalTilingFeatures) !=
         format_properties.optimalTilingFeatures) {
-        ErrorPrintf("JSON file sets variables for format %s, but set optimalTilingFeatures are not supported.\n",
+        DebugPrintf("JSON file sets variables for format %s, but set optimalTilingFeatures are not supported.\n",
                     format_name.c_str());
         return false;
     }
     if ((pdd_.device_formats_[format].bufferFeatures & format_properties.bufferFeatures) != format_properties.bufferFeatures) {
-        ErrorPrintf("JSON file sets variables for format %s, but set bufferFeatures are not supported.\n", format_name.c_str());
+        DebugPrintf("JSON file sets variables for format %s, but set bufferFeatures are not supported.\n", format_name.c_str());
         return false;
     }
     if (pdd_.format_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
