@@ -87,6 +87,7 @@
                     "key": "profile_file",
                     "label": "Profile Selection",
                     "description": "Path of a profile file and the name of the profile to load.",
+                    "status": "STABLE",
                     "type": "LOAD_FILE",
                     "format": "PROFILE",
                     "filter": "*.json",
@@ -106,6 +107,7 @@
                     "key": "emulate_capabilities_modes",
                     "label": "Emulate Vulkan Capabilities Modes",
                     "description": "Control of the enumalated capabilities of the Vulkan physical device from the selected Vulkan Profile.",
+                    "status": "STABLE",
                     "type": "GROUP",
                     "settings": [
                         {
@@ -201,6 +203,7 @@
                     "key": "emulate_portability",
                     "label": "Emulate VK_KHR_portability_subset",
                     "description": "Emulate that VK_KHR_portability_subset extension is supported by the device.",
+                    "status": "STABLE",
                     "platforms": [
                         "WINDOWS",
                         "LINUX"
@@ -211,6 +214,7 @@
                 {
                     "key": "debug_output",
                     "label": "Debug Output",
+                    "status": "STABLE",
                     "description": "Enables debug message output.",
                     "type": "BOOL",
                     "default": true
