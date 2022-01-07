@@ -53,6 +53,7 @@ class VulkanInstanceBuilder {
     void addLayer(const char* layer_name) { _layer_names.push_back(layer_name); }
     void addExtension(const char* extension_name) { _extension_names.push_back(extension_name); }
     VkResult makeInstance();
+    VkResult getPhysicalDevice(VkPhysicalDevice* phys_dev);
 
     void reset();
 

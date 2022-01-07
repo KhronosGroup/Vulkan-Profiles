@@ -155,6 +155,23 @@ VkApplicationInfo profiles_test::GetDefaultApplicationInfo() {
     return out;
 }
 
+VkResult profiles_test::VulkanInstanceBuilder::getPhysicalDevice(VkPhysicalDevice* phys_dev) {
+    *phys_dev = VK_NULL_HANDLE;
+    VkResult res;
+    uint32_t gpu_count = 0;
+    res = vkEnumeratePhysicalDevices(_instance, &gpu_count, nullptr);
+    if (res != VK_SUCCESS) {
+        return res;
+    }
+    std::vector<VkPhysicalDevice> gpus(gpu_count);
+    res = vkEnumeratePhysicalDevices(_instance, &gpu_count, gpus.data());
+    if (res != VK_SUCCESS) {
+        return res;
+    }
+    *phys_dev = gpus[0];
+    return res;
+}
+
 VkResult profiles_test::VulkanInstanceBuilder::makeInstance() {
     _inst_create_info.pApplicationInfo = &_app_info;
     _inst_create_info.enabledLayerCount = static_cast<uint32_t>(_layer_names.size());

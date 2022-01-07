@@ -35,9 +35,8 @@ TEST(profiles, TestDesktopPortability2022Limits) {
 
     VkInstance test_inst = inst_builder.getInstance();
 
-    uint32_t gpu_count = 1;
-    VkPhysicalDevice gpu = VK_NULL_HANDLE;
-    err = vkEnumeratePhysicalDevices(test_inst, &gpu_count, &gpu);
+    VkPhysicalDevice gpu;
+    err = inst_builder.getPhysicalDevice(&gpu);
     if (err != VK_SUCCESS) {
         printf("Profile not supported on device, skipping test.\n");
         vkDestroyInstance(test_inst, nullptr);
@@ -226,10 +225,8 @@ TEST(profiles, TestSelectingProfile) {
 
         VkInstance test_inst = inst_builder.getInstance();
 
-        uint32_t gpu_count = 1;
-        VkPhysicalDevice gpu = VK_NULL_HANDLE;
-        err = vkEnumeratePhysicalDevices(test_inst, &gpu_count, &gpu);
-        ASSERT_EQ(err, VK_SUCCESS);
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
 
         VkPhysicalDeviceProperties gpu_props{};
         vkGetPhysicalDeviceProperties(gpu, &gpu_props);
@@ -388,9 +385,8 @@ TEST(profiles, TestSelectingProfile) {
 
         VkInstance test_inst = inst_builder.getInstance();
 
-        uint32_t gpu_count = 1;
-        VkPhysicalDevice gpu = VK_NULL_HANDLE;
-        err = vkEnumeratePhysicalDevices(test_inst, &gpu_count, &gpu);
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDeviceProperties gpu_props{};
@@ -460,9 +456,8 @@ TEST(profiles, TestSelectingProfile) {
 
         VkInstance test_inst = inst_builder.getInstance();
 
-        uint32_t gpu_count = 1;
-        VkPhysicalDevice gpu = VK_NULL_HANDLE;
-        err = vkEnumeratePhysicalDevices(test_inst, &gpu_count, &gpu);
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDeviceProperties gpu_props{};
@@ -605,9 +600,8 @@ TEST(profiles, TestSetCombinationMode) {
 
         VkInstance test_inst = inst_builder.getInstance();
 
-        uint32_t gpu_count = 1;
-        VkPhysicalDevice gpu = VK_NULL_HANDLE;
-        err = vkEnumeratePhysicalDevices(test_inst, &gpu_count, &gpu);
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
 
         if (err != VK_SUCCESS) {
             printf("Profile not supported on device, skipping test.\n");
@@ -635,9 +629,8 @@ TEST(profiles, TestSetCombinationMode) {
 
         VkInstance test_inst = inst_builder.getInstance();
 
-        uint32_t gpu_count = 1;
-        VkPhysicalDevice gpu = VK_NULL_HANDLE;
-        err = vkEnumeratePhysicalDevices(test_inst, &gpu_count, &gpu);
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
 
         if (err != VK_SUCCESS) {
             printf("Profile not supported on device, skipping test.\n");
@@ -680,9 +673,8 @@ TEST(profiles, TestSetCombinationMode) {
 
         VkInstance test_inst = inst_builder.getInstance();
 
-        uint32_t gpu_count = 1;
-        VkPhysicalDevice gpu = VK_NULL_HANDLE;
-        err = vkEnumeratePhysicalDevices(test_inst, &gpu_count, &gpu);
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
 
         if (err != VK_SUCCESS) {
             printf("Profile not supported on device, skipping test.\n");
@@ -725,9 +717,8 @@ TEST(profiles, TestSetCombinationMode) {
 
         VkInstance test_inst = inst_builder.getInstance();
 
-        uint32_t gpu_count = 1;
-        VkPhysicalDevice gpu = VK_NULL_HANDLE;
-        err = vkEnumeratePhysicalDevices(test_inst, &gpu_count, &gpu);
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
 
         if (err != VK_SUCCESS) {
             printf("Profile not supported on device, skipping test.\n");
@@ -766,9 +757,8 @@ TEST(profiles, TestExtensionNotSupported) {
 
         VkInstance test_inst = inst_builder.getInstance();
 
-        uint32_t gpu_count = 1;
-        VkPhysicalDevice gpu = VK_NULL_HANDLE;
-        err = vkEnumeratePhysicalDevices(test_inst, &gpu_count, &gpu);
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
         ASSERT_EQ(err, VK_SUCCESS);
 
         uint32_t count;
@@ -793,9 +783,8 @@ TEST(profiles, TestExtensionNotSupported) {
 
         VkInstance test_inst = inst_builder.getInstance();
 
-        uint32_t gpu_count = 1;
-        VkPhysicalDevice gpu = VK_NULL_HANDLE;
-        err = vkEnumeratePhysicalDevices(test_inst, &gpu_count, &gpu);
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
 
         if (device_extensions.size() < 231) {
             ASSERT_EQ(err, VK_ERROR_EXTENSION_NOT_PRESENT);
