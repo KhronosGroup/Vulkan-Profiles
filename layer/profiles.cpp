@@ -6916,8 +6916,8 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
 
     const VkApplicationInfo *app_info = pCreateInfo->pApplicationInfo;
     const uint32_t requested_version = (app_info && app_info->apiVersion) ? app_info->apiVersion : VK_API_VERSION_1_0;
-    if (requested_version > VK_API_VERSION_1_2) {
-        DebugPrintf("%s currently only supports VK_API_VERSION_1_2 and lower.\n", kOurLayerName);
+    if (requested_version > VK_API_VERSION_1_3) {
+        DebugPrintf("%s currently only supports VK_API_VERSION_1_3 and lower.\n", kOurLayerName);
     }
 
     std::lock_guard<std::recursive_mutex> lock(global_lock);
@@ -9462,6 +9462,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             dt->GetPhysicalDeviceProperties(physical_device, &pdd.physical_device_properties_);
             bool api_version_above_1_1 = pdd.physical_device_properties_.apiVersion >= VK_API_VERSION_1_1;
             bool api_version_above_1_2 = pdd.physical_device_properties_.apiVersion >= VK_API_VERSION_1_2;
+            bool api_version_above_1_3 = pdd.physical_device_properties_.apiVersion >= VK_API_VERSION_1_3;
 
             // Initialize PDD members to the actual Vulkan implementation's defaults.
             if (get_physical_device_properties2_active) {
@@ -10339,6 +10340,17 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_vulkan_1_2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_vulkan_1_2_features_);
+                }
+
+                if (api_version_above_1_3) {
+                    // VK_VULKAN_1_3
+                    pdd.physical_device_vulkan_1_3_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_vulkan_1_3_properties_);
+
+                    pdd.physical_device_vulkan_1_3_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_vulkan_1_3_features_);
                 }
 
                 dt->GetPhysicalDeviceProperties2KHR(physical_device, &property_chain);
