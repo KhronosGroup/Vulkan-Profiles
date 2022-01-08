@@ -818,7 +818,7 @@ class PhysicalDeviceData {
     VkPhysicalDevice16BitStorageFeaturesKHR physical_device_16bit_storage_features_;
 
     // VK_KHR_buffer_device_address structs
-    VkPhysicalDeviceBufferDeviceAddressFeaturesEXT physical_device_buffer_device_address_features_;
+    VkPhysicalDeviceBufferDeviceAddressFeaturesKHR physical_device_buffer_device_address_features_;
 
     // VK_KHR_depth_stencil_resolve structs
     VkPhysicalDeviceDepthStencilResolvePropertiesKHR physical_device_depth_stencil_resolve_properties_;
@@ -1693,7 +1693,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorageFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorageFeaturesKHR *dest);
-    bool GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryResetFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFramebufferFeaturesKHR *dest);
@@ -3825,8 +3825,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorag
     return valid;
 }
 
-bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesEXT *dest) {
-    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBufferDeviceAddressFeaturesEXT)\n");
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest) {
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceBufferDeviceAddressFeaturesKHR)\n");
     if (!CheckExtensionSupport(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
         return false;
     }
@@ -7016,9 +7016,10 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     sbsf->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR:
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_EXT:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
-                    VkPhysicalDeviceBufferDeviceAddressFeaturesEXT *bdaf = (VkPhysicalDeviceBufferDeviceAddressFeaturesEXT *)place;
+                    VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *bdaf = (VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *)place;
                     void *pNext = bdaf->pNext;
                     *bdaf = physicalDeviceData->physical_device_buffer_device_address_features_;
                     bdaf->pNext = pNext;
@@ -8973,7 +8974,7 @@ void TransferValue(VkPhysicalDeviceVulkan12Features *dest, VkPhysicalDevice8BitS
     TRANSFER_VALUE(storagePushConstant8);
 }
 
-void TransferValue(VkPhysicalDeviceVulkan12Features *dest, VkPhysicalDeviceBufferDeviceAddressFeaturesEXT *src) {
+void TransferValue(VkPhysicalDeviceVulkan12Features *dest, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *src) {
     TRANSFER_VALUE(bufferDeviceAddress);
     TRANSFER_VALUE(bufferDeviceAddressCaptureReplay);
     TRANSFER_VALUE(bufferDeviceAddressMultiDevice);
