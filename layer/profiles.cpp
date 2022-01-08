@@ -1651,6 +1651,7 @@ class JsonLoader {
     bool GetProperty(const Json::Value &props, const std::string &property_name);
     bool GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest);
     bool CheckExtensionSupport(const char *extension);
+    void AddPromotedExtensions(uint32_t api_level);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStencilResolveProperties *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dest);
@@ -2986,6 +2987,115 @@ bool JsonLoader::CheckExtensionSupport(const char *extension) {
     return true;
 }
 
+void JsonLoader::AddPromotedExtensions(uint32_t api_version) {
+    static const std::vector<const char *> promoted_1_1 = {
+        VK_KHR_MULTIVIEW_EXTENSION_NAME,
+        VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+        VK_KHR_DEVICE_GROUP_EXTENSION_NAME,
+        VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME,
+        VK_KHR_MAINTENANCE1_EXTENSION_NAME,
+        VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME,
+        VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME,
+        VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME,
+        VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME,
+        VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME,
+        VK_KHR_16BIT_STORAGE_EXTENSION_NAME,
+        VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME,
+        VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME,
+        VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME,
+        VK_KHR_MAINTENANCE2_EXTENSION_NAME,
+        VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME,
+        VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME,
+        VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME,
+        VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME,
+        VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME,
+        VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
+        VK_KHR_BIND_MEMORY_2_EXTENSION_NAME,
+        VK_KHR_MAINTENANCE3_EXTENSION_NAME,
+    };
+    static const std::vector<const char *> promoted_1_2 = {
+        VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME,
+        VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME,
+        VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME,
+        VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,
+        VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME,
+        VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME,
+        VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
+        VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME,
+        VK_KHR_DRAW_INDIRECT_COUNT_EXTENSION_NAME,
+        VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME,
+        VK_KHR_8BIT_STORAGE_EXTENSION_NAME,
+        VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME,
+        VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME,
+        VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
+        VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME,
+        VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
+        VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME,
+        VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME,
+        VK_KHR_SPIRV_1_4_EXTENSION_NAME,
+        VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME,
+        VK_EXT_SEPARATE_STENCIL_USAGE_EXTENSION_NAME,
+        VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME,
+        VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
+        VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME,
+    };
+    static const std::vector<const char *> promoted_1_3 = {
+        VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+        VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME,
+        VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME,
+        VK_EXT_PIPELINE_CREATION_FEEDBACK_EXTENSION_NAME,
+        VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME,
+        VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME,
+        VK_EXT_TOOLING_INFO_EXTENSION_NAME,
+        VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME,
+        VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME,
+        VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME,
+        VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME,
+        VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME,
+        VK_EXT_PRIVATE_DATA_EXTENSION_NAME,
+        VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME,
+        VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
+        VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME,
+        VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME,
+        VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME,
+        VK_KHR_COPY_COMMANDS_2_EXTENSION_NAME,
+        VK_EXT_4444_FORMATS_EXTENSION_NAME,
+        VK_KHR_FORMAT_FEATURE_FLAGS_2_EXTENSION_NAME,
+        VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME,
+        VK_KHR_MAINTENANCE_4_EXTENSION_NAME,
+    };
+    if (api_version >= VK_API_VERSION_1_1) {
+        for (const auto ext : promoted_1_1) {
+            if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, ext)) {
+                VkExtensionProperties extension;
+                strcpy(extension.extensionName, ext);
+                extension.specVersion = 1;
+                pdd_.simulation_extensions_.push_back(extension);
+            }
+        }
+    }
+    if (api_version >= VK_API_VERSION_1_2) {
+        for (const auto ext : promoted_1_2) {
+            if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, ext)) {
+                VkExtensionProperties extension;
+                strcpy(extension.extensionName, ext);
+                extension.specVersion = 1;
+                pdd_.simulation_extensions_.push_back(extension);
+            }
+        }
+    }
+    if (api_version >= VK_API_VERSION_1_3) {
+        for (const auto ext : promoted_1_3) {
+            if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, ext)) {
+                VkExtensionProperties extension;
+                strcpy(extension.extensionName, ext);
+                extension.specVersion = 1;
+                pdd_.simulation_extensions_.push_back(extension);
+            }
+        }
+    }
+}
+
 bool JsonLoader::ReturnError() const {
     if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE) {
         return true;
@@ -2997,7 +3107,15 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
     const auto &caps = root["capabilities"];
     for (const auto &capability : capabilities) {
         const auto &c = caps[capability];
+
         const auto &extensions = c["extensions"];
+        const auto &features = c["features"];
+        const auto &properties = c["properties"];
+        const auto &formats = c["formats"];
+
+        uint32_t apiVersion = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
+        AddPromotedExtensions(apiVersion);
+
         pdd_.arrayof_extension_properties_.reserve(extensions.size());
         for (const auto &e : extensions.getMemberNames()) {
             VkExtensionProperties extension;
@@ -3024,25 +3142,27 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
                 pdd_.arrayof_extension_properties_.push_back(extension);
                 if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE ||
                     pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
-                    pdd_.simulation_extensions_.push_back(extension);
+                    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, extension.extensionName)) {
+                        pdd_.simulation_extensions_.push_back(extension);
+                    }
                 }
             }
         }
-        const auto &features = c["features"];
+
         for (const auto &feature : features.getMemberNames()) {
             bool success = GetFeature(features, feature);
             if (!success && ReturnError()) {
                 return VK_ERROR_INITIALIZATION_FAILED;
             }
         }
-        const auto &properties = c["properties"];
+
         for (const auto &prop : properties.getMemberNames()) {
             bool success = GetProperty(properties, prop);
             if (!success && ReturnError()) {
                 return VK_ERROR_INITIALIZATION_FAILED;
             }
         }
-        const auto &formats = c["formats"];
+
         for (const auto &format : formats.getMemberNames()) {
             bool success = GetFormat(formats, format, &pdd_.arrayof_format_properties_);
             if (!success && ReturnError()) {
