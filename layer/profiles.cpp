@@ -1829,6 +1829,7 @@ class JsonLoader {
     bool GetValuePhysicalDeviceIDProperties(const Json::Value &parent);
     bool GetValuePhysicalDeviceMemoryBudgetPropertiesEXT(const Json::Value &parent);
     bool GetValuePhysicalDevicePCIBusInfoPropertiesEXT(const Json::Value &parent);
+    bool GetValuePhysicalDeviceDrmPropertiesEXT(const Json::Value &parent);
     bool GetValuePhysicalDeviceToolPropertiesEXT(const Json::Value &parent);
 
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Properties *dest);
@@ -2917,6 +2918,8 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &proper
         return GetValuePhysicalDeviceMemoryBudgetPropertiesEXT(prop);
     } else if (property_name == "VkPhysicalDevicePCIBusInfoPropertiesEXT") {
         return GetValuePhysicalDevicePCIBusInfoPropertiesEXT(prop);
+    } else if (property_name == "VkPhysicalDeviceDrmPropertiesEXT") {
+        return GetValuePhysicalDeviceDrmPropertiesEXT(prop);
     } else if (property_name == "VkPhysicalDeviceToolProperties" || property_name == "VkPhysicalDeviceToolPropertiesEXT") {
         return GetValuePhysicalDeviceToolPropertiesEXT(prop);
     }
@@ -3491,6 +3494,20 @@ bool JsonLoader::GetValuePhysicalDevicePCIBusInfoPropertiesEXT(const Json::Value
         WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", prop, "pciBus");
         WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", prop, "pciDevice");
         WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", prop, "pciFunction");
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValuePhysicalDeviceDrmPropertiesEXT(const Json::Value& parent) {
+    DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDrmPropertiesEXT)\n");
+    bool valid = true;
+    for (const auto &prop : parent.getMemberNames()) {
+        WarnNotModifiable("PhysicalDeviceDrmPropertiesEXT", prop, "hasPrimary");
+        WarnNotModifiable("PhysicalDeviceDrmPropertiesEXT", prop, "hasRender");
+        WarnNotModifiable("PhysicalDeviceDrmPropertiesEXT", prop, "primaryMajor");
+        WarnNotModifiable("PhysicalDeviceDrmPropertiesEXT", prop, "primaryMinor");
+        WarnNotModifiable("PhysicalDeviceDrmPropertiesEXT", prop, "renderMajor");
+        WarnNotModifiable("PhysicalDeviceDrmPropertiesEXT", prop, "renderMinor");
     }
     return valid;
 }
