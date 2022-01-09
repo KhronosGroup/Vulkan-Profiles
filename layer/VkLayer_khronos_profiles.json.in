@@ -28,7 +28,7 @@
                     "status": "STABLE",
                     "settings": [
                         {
-                            "key": "emulate_portability",
+                            "key": "simulate_portability",
                             "value": true
                         },
                         {
@@ -48,7 +48,7 @@
                     "status": "STABLE",
                     "settings": [
                         {
-                            "key": "emulate_portability",
+                            "key": "simulate_portability",
                             "value": false
                         },
                         {
@@ -68,7 +68,7 @@
                     "status": "STABLE",
                     "settings": [
                         {
-                            "key": "emulate_portability",
+                            "key": "simulate_portability",
                             "value": false
                         },
                         {
@@ -104,16 +104,16 @@
                     ]
                 },
                 {
-                    "key": "emulate_capabilities_modes",
-                    "label": "Emulate Vulkan Capabilities Modes",
-                    "description": "Control of the enumalated capabilities of the Vulkan physical device from the selected Vulkan Profile.",
+                    "key": "simulate_capabilities_modes",
+                    "label": "Simulate Vulkan Capabilities Modes",
+                    "description": "Control of the simulated capabilities of the Vulkan physical device from the selected Vulkan Profile.",
                     "status": "STABLE",
                     "type": "GROUP",
                     "settings": [
                         {
-                            "key": "emulate_extension_list",
+                            "key": "simulate_extension_list",
                             "label": "Extensions",
-                            "description": "Modes to control the enumalated extensions list of the Vulkan physical device.",
+                            "description": "Modes to control the simulated extensions list of the Vulkan physical device.",
                             "type": "ENUM",
                             "flags": [
                                 {
@@ -140,9 +140,9 @@
                             "default": "check_support"
                         },
                         {
-                            "key": "emulate_format_list",
+                            "key": "simulate_format_list",
                             "label": "Formats",
-                            "description": "Modes to control the enumalated format list of the Vulkan physical device.",
+                            "description": "Modes to control the simulated format list of the Vulkan physical device.",
                             "type": "ENUM",
                             "flags": [
                                 {
@@ -169,9 +169,9 @@
                             "default": "check_support"
                         },
                         {
-                            "key": "emulate_format_properties",
+                            "key": "simulate_format_properties",
                             "label": "Format Properties",
-                            "description": "Modes to control the enumalated format properties of the Vulkan physical device.",
+                            "description": "Modes to control the simulated format properties of the Vulkan physical device.",
                             "type": "ENUM",
                             "flags": [
                                 {
@@ -200,9 +200,9 @@
                     ]
                 },
                 {
-                    "key": "emulate_portability",
-                    "label": "Emulate VK_KHR_portability_subset",
-                    "description": "Emulate that VK_KHR_portability_subset extension is supported by the device.",
+                    "key": "simulate_portability",
+                    "label": "Simulate VK_KHR_portability_subset",
+                    "description": "Simulate that VK_KHR_portability_subset extension is supported by the device.",
                     "status": "STABLE",
                     "platforms": [
                         "WINDOWS",
