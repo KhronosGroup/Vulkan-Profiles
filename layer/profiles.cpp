@@ -3114,7 +3114,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
                 }
                 if (!supported_on_device &&
                     pdd_.extension_list_combination_mode_ != SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
-                    return VK_ERROR_EXTENSION_NOT_PRESENT;
+                    return VK_ERROR_INITIALIZATION_FAILED;
                 }
                 pdd_.arrayof_extension_properties_.push_back(extension);
                 if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE ||
@@ -3127,21 +3127,21 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         for (const auto &feature : features.getMemberNames()) {
             bool success = !GetFeature(features, feature);
             if (!success && pdd_.extension_list_combination_mode_ != SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
-                return VK_ERROR_FEATURE_NOT_PRESENT;
+                return VK_ERROR_INITIALIZATION_FAILED;
             }
         }
         const auto &properties = c["properties"];
         for (const auto &prop : properties.getMemberNames()) {
             bool success = GetProperty(properties, prop);
             if (!success && pdd_.extension_list_combination_mode_ != SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
-                return VK_ERROR_FEATURE_NOT_PRESENT;
+                return VK_ERROR_INITIALIZATION_FAILED;
             }
         }
         const auto &formats = c["formats"];
         for (const auto &format : formats.getMemberNames()) {
             bool success = GetFormat(formats, format, &pdd_.arrayof_format_properties_);
             if (!success && pdd_.extension_list_combination_mode_ != SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
-                return VK_ERROR_FORMAT_NOT_SUPPORTED;
+                return VK_ERROR_INITIALIZATION_FAILED;
             }
         }
     }

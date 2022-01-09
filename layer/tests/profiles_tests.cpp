@@ -787,7 +787,7 @@ TEST(profiles, TestExtensionNotSupported) {
         err = inst_builder.getPhysicalDevice(&gpu);
 
         if (device_extensions.size() < 231) {
-            ASSERT_EQ(err, VK_ERROR_EXTENSION_NOT_PRESENT);
+            ASSERT_EQ(err, VK_ERROR_INITIALIZATION_FAILED);
         }
 
         vkDestroyInstance(test_inst, nullptr);
