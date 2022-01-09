@@ -3125,7 +3125,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         }
         const auto &features = c["features"];
         for (const auto &feature : features.getMemberNames()) {
-            bool success = !GetFeature(features, feature);
+            bool success = GetFeature(features, feature);
             if (!success && pdd_.extension_list_combination_mode_ != SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
                 return VK_ERROR_INITIALIZATION_FAILED;
             }
