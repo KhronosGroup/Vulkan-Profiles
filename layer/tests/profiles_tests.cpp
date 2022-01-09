@@ -776,7 +776,7 @@ TEST(profiles, TestExtensionNotSupported) {
         profiles_test::setProfilesFilenames(filepaths);
         profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
         profiles_test::setProfilesProfileName("VP_LUNARG_test_api");
-        profiles_test::setProfilesModifyExtensionList(profiles_test::SetCombinationMode::SET_CHECK_SUPPORT);
+        profiles_test::setProfilesModifyExtensionList(profiles_test::SetCombinationMode::SET_FROM_PROFILE);
 
         err = inst_builder.makeInstance();
         ASSERT_EQ(err, VK_SUCCESS);
