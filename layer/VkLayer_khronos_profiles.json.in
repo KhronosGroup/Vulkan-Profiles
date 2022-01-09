@@ -28,7 +28,7 @@
                     "status": "STABLE",
                     "settings": [
                         {
-                            "key": "simulate_portability",
+                            "key": "emulate_portability",
                             "value": true
                         },
                         {
@@ -48,7 +48,7 @@
                     "status": "STABLE",
                     "settings": [
                         {
-                            "key": "simulate_portability",
+                            "key": "emulate_portability",
                             "value": false
                         },
                         {
@@ -68,7 +68,7 @@
                     "status": "STABLE",
                     "settings": [
                         {
-                            "key": "simulate_portability",
+                            "key": "emulate_portability",
                             "value": false
                         },
                         {
@@ -200,9 +200,9 @@
                     ]
                 },
                 {
-                    "key": "simulate_portability",
-                    "label": "Simulate VK_KHR_portability_subset",
-                    "description": "Simulate that VK_KHR_portability_subset extension is supported by the device.",
+                    "key": "emulate_portability",
+                    "label": "Emulate VK_KHR_portability_subset",
+                    "description": "Emulate the VK_KHR_portability_subset extension on the device.",
                     "status": "STABLE",
                     "platforms": [
                         "WINDOWS",
