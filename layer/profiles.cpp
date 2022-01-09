@@ -187,6 +187,7 @@ struct StringSetting {
 };
 
 struct StringSetting inputFilename;
+struct StringSetting profileName = {};
 struct IntSetting debugLevel;
 struct IntSetting emulatePortability;
 struct SetCombinationModeSetting modifyExtensionList;
@@ -195,7 +196,6 @@ struct SetCombinationModeSetting modifyFormatList;
 struct SetCombinationModeSetting modifyFormatProperties;
 struct SetCombinationModeSetting modifySurfaceFormats;
 struct SetCombinationModeSetting modifyPresentModes;
-std::string profile_name = {};
 
 // Various small utility functions ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2610,10 +2610,6 @@ VkResult JsonLoader::LoadFiles() {
     return LoadFiles(filename_list);
 }
 
-bool IsProfileSelected(const std::string& current_profile) {
-    return current_profile == profile_name;
-}
-
 VkResult JsonLoader::LoadFiles(const char *filename_list) {
 #if defined(_WIN32)
     const char delimiter = ';';
@@ -3174,10 +3170,17 @@ VkResult JsonLoader::LoadFile(const char *filename) {
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
+    const std::string profile_name = profileName.str;
+    if (inputFilename.fromEnvVar) {
+        DebugPrintf("envar %s = \"%s\"\n", kEnvarProfilesProfileName, profile_name.c_str());
+    } else {
+        DebugPrintf("vk_layer_settings.txt setting %s = \"%s\"\n", kEnvarProfilesProfileName, profile_name.c_str());
+    }
+
     const auto &profiles = root["profiles"];
     std::vector<std::string> capabilities;
     for (const auto &profile : profiles.getMemberNames()) {
-        if (IsProfileSelected(profile)) {
+        if (profile == profile_name) {
             const auto& caps = profiles[profile]["capabilities"];
             for (const auto &cap : caps) {
                 capabilities.push_back(cap.asString());
@@ -6891,13 +6894,13 @@ static void GetProfilesModifyPresentModes() {
 static void GetProfileName() {
     std::string env_var = GetEnvarValue(kEnvarProfilesProfileName);
     if (!env_var.empty()) {
-        profile_name = env_var;
-        modifyPresentModes.fromEnvVar = true;
+        profileName.str = env_var;
+        profileName.fromEnvVar = true;
     }
 
     if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileName)) {
-        emulatePortability.fromEnvVar = false;
-        profile_name = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileName);
+        profileName.fromEnvVar = false;
+        profileName.str = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileName);
     }
 }
 
