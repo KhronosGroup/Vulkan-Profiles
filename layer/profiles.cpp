@@ -118,20 +118,12 @@ const char *const kEnvarProfilesEmulatePortability =
                                                  // extension.
 const char *const kEnvarProfilesModifyExtensionList =
     "debug.vulkan.profiles.modifyextensionlist";  // a non-zero integer will enable modifying device extensions list.
-const char *const kEnvarProfilesModifyMemoryFlags =
-    "debug.vulkan.Profiles.modifymemoryflags";  // a non-zero integer will enable modifying device memory flags.
 const char *const kEnvarProfilesModifyFormatList =
     "debug.vulkan.Profiles.modifyformatlist";  // an ArrayCombinationMode value sets how the device and config format lists are
                                                // combined.
 const char *const kEnvarProfilesModifyFormatProperties =
     "debug.vulkan.Profiles.modifyformatproperties";  // an ArrayCombinationMode value sets how the device and config format
                                                      // properties are combined.
-const char *const kEnvarProfilesModifySurfaceFormats =
-    "debug.vulkan.Profiles.modifysurfaceformats";  // an ArrayCombinationMode value sets how the device and config surface format
-                                                   // lists are combined.
-const char *const kEnvarProfilesModifyPresentModes =
-    "debug.vulkan.Profiles.modifypresentmodes";  // an ArrayCombinationMode value sets how the device and config present modes are
-                                                 // combined.
 const char *const kEnvarProfilesProfileName = "debug.vulkan.profiles.profilename";  // name of the profile to be used
 #else
 const char *const kEnvarProfilesFilename = "VK_KHRONOS_PROFILES_FILENAME";  // path of the configuration file(s) to load.
@@ -143,20 +135,12 @@ const char *const kEnvarProfilesEmulatePortability =
 const char *const kEnvarProfilesModifyExtensionList =
     "VK_KHRONOS_PROFILES_MODIFY_EXTENSION_LIST";  // an ArrayCombinationMode value sets how the device and config extension lists
                                                   // are combined.
-const char *const kEnvarProfilesModifyMemoryFlags =
-    "VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS";  // a non-zero integer will enable modifying device memory flags.
 const char *const kEnvarProfilesModifyFormatList =
     "VK_KHRONOS_PROFILES_MODIFY_FORMAT_LIST";  // an ArrayCombinationMode value sets how the device and config format lists are
                                                // combined.
 const char *const kEnvarProfilesModifyFormatProperties =
     "VK_KHRONOS_PROFILES_MODIFY_FORMAT_PROPERTIES";  // an ArrayCombinationMode value sets how the device and config format
                                                      // properties are combined.
-const char *const kEnvarProfilesModifySurfaceFormats =
-    "VK_KHRONOS_PROFILES_MODIFY_SURFACE_FORMATS";  // an ArrayCombinationMode value sets how the device and config surface format
-                                                   // lists are combined.
-const char *const kEnvarProfilesModifyPresentModes =
-    "VK_KHRONOS_PROFILES_MODIFY_PRESENT_MODES";  // an ArrayCombinationMode value sets how the device and config present modes are
-                                                 // combined.
 const char *const kEnvarProfilesProfileName = "VK_KHRONOS_PROFILES_PROFILE_NAME";  // name of the profile to be used
 #endif
 
@@ -167,9 +151,6 @@ const char *const kLayerSettingsEmulatePortability = "emulate_portability";
 const char *const kLayerSettingsModifyExtensionList = "emulate_extension_list";
 const char *const kLayerSettingsModifyFormatList = "emulate_format_list";
 const char *const kLayerSettingsModifyFormatProperties = "emulate_format_properties";
-const char *const kLayerSettingsModifyMemoryFlags = "emulate_memory_flags";
-const char *const kLayerSettingsModifySurfaceFormats = "emulate_surface_formats";
-const char *const kLayerSettingsModifyPresentModes = "emulate_present_modes";
 
 struct SetCombinationModeSetting {
     SetCombinationMode mode;
@@ -191,11 +172,8 @@ struct StringSetting profileName = {};
 struct IntSetting debugLevel;
 struct IntSetting emulatePortability;
 struct SetCombinationModeSetting modifyExtensionList;
-struct IntSetting modifyMemoryFlags;
 struct SetCombinationModeSetting modifyFormatList;
 struct SetCombinationModeSetting modifyFormatProperties;
-struct SetCombinationModeSetting modifySurfaceFormats;
-struct SetCombinationModeSetting modifyPresentModes;
 
 // Various small utility functions ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -666,12 +644,8 @@ std::recursive_mutex global_lock;  // Enforce thread-safety for this layer.
 
 uint32_t loader_layer_iface_version = CURRENT_LOADER_LAYER_INTERFACE_VERSION;
 
-typedef std::vector<VkQueueFamilyProperties> ArrayOfVkQueueFamilyProperties;
 typedef std::unordered_map<uint32_t /*VkFormat*/, VkFormatProperties> ArrayOfVkFormatProperties;
-typedef std::vector<VkLayerProperties> ArrayOfVkLayerProperties;
 typedef std::vector<VkExtensionProperties> ArrayOfVkExtensionProperties;
-typedef std::vector<VkSurfaceFormatKHR> ArrayOfVkSurfaceFormats;
-typedef std::vector<VkPresentModeKHR> ArrayOfVkPresentModes;
 typedef std::vector<VkDeviceSize> ArrayOfVkDeviceSize;
 
 // FormatProperties utilities ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -783,12 +757,8 @@ class PhysicalDeviceData {
     VkPhysicalDeviceFeatures physical_device_features_;
     VkPhysicalDeviceMemoryProperties physical_device_memory_properties_;
     VkSurfaceCapabilitiesKHR surface_capabilities_;
-    ArrayOfVkPresentModes arrayof_present_modes_;
-    ArrayOfVkQueueFamilyProperties arrayof_queue_family_properties_;
     ArrayOfVkFormatProperties arrayof_format_properties_;
-    ArrayOfVkLayerProperties arrayof_layer_properties_;
     ArrayOfVkExtensionProperties arrayof_extension_properties_;
-    ArrayOfVkSurfaceFormats arrayof_surface_formats_;
     ArrayOfVkDeviceSize arrayof_heap_budgets_;
     ArrayOfVkDeviceSize arrayof_heap_usages_;
 
@@ -2160,70 +2130,6 @@ class JsonLoader {
         return count;
     }
 
-    int GetArray(const Json::Value &parent, const char *name, ArrayOfVkQueueFamilyProperties *dest) {
-        const Json::Value value = parent[name];
-        if (value.type() != Json::arrayValue) {
-            return -1;
-        }
-        DebugPrintf("\t\tJsonLoader::GetArray(ArrayOfVkQueueFamilyProperties)\n");
-        dest->clear();
-        const int count = static_cast<int>(value.size());
-        for (int i = 0; i < count; ++i) {
-            VkQueueFamilyProperties queue_family_properties = {};
-            GetValue(value, i, &queue_family_properties);
-            dest->push_back(queue_family_properties);
-        }
-        return static_cast<int>(dest->size());
-    }
-
-    int GetArray(const Json::Value &parent, const char *name, ArrayOfVkLayerProperties *dest) {
-        const Json::Value value = parent[name];
-        if (value.type() != Json::arrayValue) {
-            return -1;
-        }
-        DebugPrintf("\t\tJsonLoader::GetArray(ArrayOfVkLayerProperties)\n");
-        dest->clear();
-        const int count = static_cast<int>(value.size());
-        for (int i = 0; i < count; ++i) {
-            VkLayerProperties layer_properties = {};
-            GetValue(value, i, &layer_properties);
-            dest->push_back(layer_properties);
-        }
-        return static_cast<int>(dest->size());
-    }
-
-    int GetArray(const Json::Value &parent, const char *name, ArrayOfVkSurfaceFormats *dest) {
-        const Json::Value value = parent[name];
-        if (value.type() != Json::arrayValue) {
-            return -1;
-        }
-        DebugPrintf("\t\tJsonLoader::GetArray(ArrayOfVkSurfaceFormats)\n");
-        dest->clear();
-        const int count = static_cast<int>(value.size());
-        for (int i = 0; i < count; ++i) {
-            VkSurfaceFormatKHR surface_format = {};
-            GetValue(value, i, &surface_format);
-            dest->push_back(surface_format);
-        }
-        return static_cast<int>(dest->size());
-    }
-
-    int GetArray(const Json::Value &parent, const char *name, ArrayOfVkPresentModes *dest) {
-        const Json::Value value = parent[name];
-        if (value.type() != Json::arrayValue) {
-            return -1;
-        }
-        DebugPrintf("\t\tJsonLoader::GetArray(ArrayOfVkPresentModes)\n");
-        dest->clear();
-        const int count = static_cast<int>(value.size());
-        for (int i = 0; i < count; ++i) {
-            VkPresentModeKHR present_mode = VK_PRESENT_MODE_IMMEDIATE_KHR;
-            GetValue(value, i, &present_mode);
-            dest->push_back(present_mode);
-        }
-        return static_cast<int>(dest->size());
-    }
-
     int GetArray(const Json::Value &parent, const char *name, ArrayOfVkDeviceSize *dest) {
         const Json::Value value = parent[name];
         if (value.type() != Json::arrayValue) {
@@ -2992,14 +2898,6 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &proper
         return GetValue(prop, &pdd_.physical_device_memory_properties_);
     } else if (property_name == "VkSurfaceCapabilitiesKHR") {
         return GetValue(prop, &pdd_.surface_capabilities_);
-    } else if (property_name == "ArrayOfVkQueueFamilyProperties") {
-        return GetArray(prop, "ArrayOfVkQueueFamilyProperties", &pdd_.arrayof_queue_family_properties_);
-    } else if (property_name == "ArrayOfVkLayerProperties") {
-        return GetArray(prop, "ArrayOfVkLayerProperties", &pdd_.arrayof_layer_properties_);
-    } else if (property_name == "ArrayOfVkSurfaceFormats") {
-        return GetArray(prop, "ArrayOfVkSurfaceFormats", &pdd_.arrayof_surface_formats_);
-    } else if (property_name == "ArrayOfVkPresentModes") {
-        return GetArray(prop, "ArrayOfVkPresentModes", &pdd_.arrayof_present_modes_);
     } else if (property_name == "Vulkan12Properties") {
         return GetValue(prop, &pdd_.physical_device_vulkan_1_2_properties_);
     } else if (property_name == "Vulkan13Properties") {
@@ -6320,21 +6218,6 @@ static void GetProfilesModifyExtensionList() {
     modifyExtensionList.mode = GetSetCombinationModeValue(modify_extension_list);
 }
 
-// Fill the modifyMemoryFlags variable with a value from either vk_layer_settings.txt or environment variables.
-// Environment variables get priority.
-static void GetProfilesModifyMemoryFlags() {
-    std::string env_var = GetEnvarValue(kEnvarProfilesModifyMemoryFlags);
-    if (!env_var.empty()) {
-        modifyMemoryFlags.num = GetBooleanValue(env_var);
-        modifyMemoryFlags.fromEnvVar = true;
-    }
-
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsModifyMemoryFlags)) {
-        modifyMemoryFlags.fromEnvVar = false;
-        modifyMemoryFlags.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsModifyMemoryFlags);
-    }
-}
-
 // Fill the modifyFormatList variable with a value from either vk_layer_settings.txt or environment variables.
 // Environment variables get priority.
 static void GetProfilesModifyFormatList() {
@@ -6369,40 +6252,6 @@ static void GetProfilesModifyFormatProperties() {
     modifyFormatProperties.mode = GetSetCombinationModeValue(modify_format_properties);
 }
 
-// Fill the modifySurfaceFormats variable with a value from either vk_layer_settings.txt or environment variables.
-// Environment variables get priority.
-static void GetProfilesModifySurfaceFormats() {
-    std::string modify_surface_formats = "";
-    std::string env_var = GetEnvarValue(kEnvarProfilesModifySurfaceFormats);
-    if (!env_var.empty()) {
-        modify_surface_formats = env_var;
-        modifySurfaceFormats.fromEnvVar = true;
-    }
-
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsModifySurfaceFormats)) {
-        modifySurfaceFormats.fromEnvVar = false;
-        modify_surface_formats = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsModifySurfaceFormats);
-    }
-    modifySurfaceFormats.mode = GetSetCombinationModeValue(modify_surface_formats);
-}
-
-// Fill the modifyPresentModes variable with a value from either vk_layer_settings.txt or environment variables.
-// Environment variables get priority.
-static void GetProfilesModifyPresentModes() {
-    std::string modify_present_modes = "";
-    std::string env_var = GetEnvarValue(kEnvarProfilesModifyPresentModes);
-    if (!env_var.empty()) {
-        modify_present_modes = env_var;
-        modifyPresentModes.fromEnvVar = true;
-    }
-
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsModifyPresentModes)) {
-        modifyPresentModes.fromEnvVar = false;
-        modify_present_modes = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsModifyPresentModes);
-    }
-    modifyPresentModes.mode = GetSetCombinationModeValue(modify_present_modes);
-}
-
 static void GetProfileName() {
     std::string env_var = GetEnvarValue(kEnvarProfilesProfileName);
     if (!env_var.empty()) {
@@ -6423,11 +6272,8 @@ static VkResult LayerSetupCreateInstance(const VkInstanceCreateInfo *pCreateInfo
     GetProfilesFilename();
     GetProfilesDebugLevel();
     GetProfilesModifyExtensionList();
-    GetProfilesModifyMemoryFlags();
     GetProfilesModifyFormatList();
     GetProfilesModifyFormatProperties();
-    GetProfilesModifySurfaceFormats();
-    GetProfilesModifyPresentModes();
     GetProfileName();
 
     VkLayerInstanceCreateInfo *chain_info = get_chain_info(pCreateInfo, VK_LAYER_LINK_INFO);
@@ -7961,7 +7807,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
     return result;
 }
 
-VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceMemoryProperties(VkPhysicalDevice physicalDevice,
+/*VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceMemoryProperties(VkPhysicalDevice physicalDevice,
                                                              VkPhysicalDeviceMemoryProperties *pMemoryProperties) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
@@ -7985,9 +7831,9 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceMemoryProperties(VkPhysicalDevice ph
     } else {
         dt->GetPhysicalDeviceMemoryProperties(physicalDevice, pMemoryProperties);
     }
-}
+}*/
 
-VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceMemoryProperties2(VkPhysicalDevice physicalDevice,
+/*VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceMemoryProperties2(VkPhysicalDevice physicalDevice,
                                                               VkPhysicalDeviceMemoryProperties2KHR *pMemoryProperties) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
@@ -7997,14 +7843,14 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceMemoryProperties2(VkPhysicalDevice p
         PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
         FillPNextChain(pdd, pMemoryProperties->pNext);
     }
-}
+}*/
 
-VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceMemoryProperties2KHR(VkPhysicalDevice physicalDevice,
+/*VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceMemoryProperties2KHR(VkPhysicalDevice physicalDevice,
                                                                  VkPhysicalDeviceMemoryProperties2KHR *pMemoryProperties) {
     GetPhysicalDeviceMemoryProperties2(physicalDevice, pMemoryProperties);
-}
+}*/
 
-VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice physicalDevice,
+/*VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice physicalDevice,
                                                                   uint32_t *pQueueFamilyPropertyCount,
                                                                   VkQueueFamilyProperties *pQueueFamilyProperties) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
@@ -8019,9 +7865,9 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties(VkPhysicalDevi
         EnumerateProperties(src_count, pdd->arrayof_queue_family_properties_.data(), pQueueFamilyPropertyCount,
                             pQueueFamilyProperties);
     }
-}
+}*/
 
-VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2KHR(VkPhysicalDevice physicalDevice,
+/*VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2KHR(VkPhysicalDevice physicalDevice,
                                                                       uint32_t *pQueueFamilyPropertyCount,
                                                                       VkQueueFamilyProperties2KHR *pQueueFamilyProperties2) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
@@ -8047,13 +7893,13 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2KHR(VkPhysical
         pQueueFamilyProperties2[i].queueFamilyProperties = src_props[i];
     }
     *pQueueFamilyPropertyCount = copy_count;
-}
+}*/
 
-VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2(VkPhysicalDevice physicalDevice,
+/*VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2(VkPhysicalDevice physicalDevice,
                                                                    uint32_t *pQueueFamilyPropertyCount,
                                                                    VkQueueFamilyProperties2KHR *pQueueFamilyProperties2) {
     GetPhysicalDeviceQueueFamilyProperties2KHR(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties2);
-}
+}*/
 
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice physicalDevice, VkFormat format,
                                                              VkFormatProperties *pFormatProperties) {
@@ -8164,7 +8010,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties2(VkPhysica
     return GetPhysicalDeviceImageFormatProperties2KHR(physicalDevice, pImageFormatInfo, pImageFormatProperties);
 }
 
-VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceCapabilitiesKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
+/*VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceCapabilitiesKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
                                                                        VkSurfaceCapabilitiesKHR *pSurfaceCapabilities) {
     VkResult result = VK_SUCCESS;
     std::lock_guard<std::recursive_mutex> lock(global_lock);
@@ -8195,9 +8041,9 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceCapabilitiesKHR(VkPhysica
     }
 
     return result;
-}
+}*/
 
-VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceCapabilities2KHR(VkPhysicalDevice physicalDevice,
+/*VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceCapabilities2KHR(VkPhysicalDevice physicalDevice,
                                                                         VkPhysicalDeviceSurfaceInfo2KHR *pSurfaceInfo,
                                                                         VkSurfaceCapabilities2KHR *pSurfaceCapabilities) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
@@ -8205,9 +8051,9 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceCapabilities2KHR(VkPhysic
     dt->GetPhysicalDeviceSurfaceCapabilities2KHR(physicalDevice, pSurfaceInfo, pSurfaceCapabilities);
     return GetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, pSurfaceInfo->surface,
                                                    &pSurfaceCapabilities->surfaceCapabilities);
-}
+}*/
 
-VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormatsKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
+/*VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormatsKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
                                                                   uint32_t *pSurfaceFormatCount,
                                                                   VkSurfaceFormatKHR *pSurfaceFormats) {
     VkResult result = VK_SUCCESS;
@@ -8244,9 +8090,9 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormatsKHR(VkPhysicalDevi
     }
 
     return result;
-}
+}*/
 
-VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormats2KHR(VkPhysicalDevice physicalDevice,
+/*VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormats2KHR(VkPhysicalDevice physicalDevice,
                                                                    const VkPhysicalDeviceSurfaceInfo2KHR *pSurfaceInfo,
                                                                    uint32_t *pSurfaceFormatCount,
                                                                    VkSurfaceFormat2KHR *pSurfaceFormats) {
@@ -8317,9 +8163,9 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormats2KHR(VkPhysicalDev
     *pSurfaceFormatCount = copy_count;
 
     return result;
-}
+}*/
 
-VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfacePresentModesKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
+/*VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfacePresentModesKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
                                                                        uint32_t *pPresentModeCount,
                                                                        VkPresentModeKHR *pPresentModes) {
     VkResult result = VK_SUCCESS;
@@ -8357,7 +8203,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfacePresentModesKHR(VkPhysica
 
     return EnumerateProperties(static_cast<uint32_t>(simulation_present_modes.size()), simulation_present_modes.data(),
                                pPresentModeCount, pPresentModes);
-}
+}*/
 
 VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolPropertiesEXT(VkPhysicalDevice physicalDevice, uint32_t *pToolCount,
                                                                   VkPhysicalDeviceToolPropertiesEXT *pToolProperties) {
@@ -10008,24 +9854,24 @@ VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL GetInstanceProcAddr(VkInstance instance
     GET_PROC_ADDR(GetPhysicalDeviceFeatures);
     GET_PROC_ADDR(GetPhysicalDeviceFeatures2);
     GET_PROC_ADDR(GetPhysicalDeviceFeatures2KHR);
-    GET_PROC_ADDR(GetPhysicalDeviceMemoryProperties);
+    /*GET_PROC_ADDR(GetPhysicalDeviceMemoryProperties);
     GET_PROC_ADDR(GetPhysicalDeviceMemoryProperties2);
     GET_PROC_ADDR(GetPhysicalDeviceMemoryProperties2KHR);
     GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties);
     GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties2);
-    GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties2KHR);
+    GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties2KHR);*/
     GET_PROC_ADDR(GetPhysicalDeviceFormatProperties);
     GET_PROC_ADDR(GetPhysicalDeviceFormatProperties2);
     GET_PROC_ADDR(GetPhysicalDeviceFormatProperties2KHR);
     GET_PROC_ADDR(GetPhysicalDeviceImageFormatProperties);
     GET_PROC_ADDR(GetPhysicalDeviceImageFormatProperties2);
     GET_PROC_ADDR(GetPhysicalDeviceImageFormatProperties2KHR);
-    GET_PROC_ADDR(GetPhysicalDeviceSurfaceCapabilitiesKHR);
+    /*GET_PROC_ADDR(GetPhysicalDeviceSurfaceCapabilitiesKHR);
     GET_PROC_ADDR(GetPhysicalDeviceSurfaceCapabilities2KHR);
     GET_PROC_ADDR(GetPhysicalDeviceSurfaceFormatsKHR);
     GET_PROC_ADDR(GetPhysicalDeviceSurfaceFormats2KHR);
     GET_PROC_ADDR(GetPhysicalDeviceSurfacePresentModesKHR);
-    GET_PROC_ADDR(GetPhysicalDeviceToolPropertiesEXT);
+    GET_PROC_ADDR(GetPhysicalDeviceToolPropertiesEXT);*/
 #undef GET_PROC_ADDR
 
     if (!instance) {
