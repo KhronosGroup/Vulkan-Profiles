@@ -199,23 +199,23 @@ VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfilePropert
 VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
 
 // Query the list of feature structure types specified by the profile
-VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                      VkStructureType *pProperties);
+VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+                                                      VkStructureType *pStructureTypes);
 
 // Fill the property structures with the requirements of a profile
 VPAPI_ATTR void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext);
 
 // Query the list of property structure types specified by the profile
-VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                       VkStructureType *pProperties);
+VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+                                                       VkStructureType *pStructureTypes);
 
 // Query the requirements of queue families by a profile
 VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
                                                       VkQueueFamilyProperties2KHR *pProperties);
 
 // Query the list of query family structure types specified by the profile
-VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                          VkStructureType *pProperties);
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+                                                          VkStructureType *pStructureTypes);
 
 // Query the list of formats with specified requirements by a profile
 VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
@@ -224,8 +224,8 @@ VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uin
 VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
 // Query the list of format structure types specified by the profile
-VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, VkFormat format, uint32_t *pPropertyCount,
-                                                     VkStructureType *pProperties);
+VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+                                                     VkStructureType *pStructureTypes);
 '''
 
 PRIVATE_DEFS = '''
@@ -920,23 +920,23 @@ VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *
     }
 }
 
-VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                      VkStructureType *pProperties) {
+VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+                                                      VkStructureType *pStructureTypes) {
     VkResult result = VK_SUCCESS;
 
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
-    if (pProperties == nullptr) {
-        *pPropertyCount = pDesc->featureStructTypeCount;
+    if (pStructureTypes == nullptr) {
+        *pStructureTypeCount = pDesc->featureStructTypeCount;
     } else {
-        if (*pPropertyCount < pDesc->featureStructTypeCount) {
+        if (*pStructureTypeCount < pDesc->featureStructTypeCount) {
             result = VK_INCOMPLETE;
         } else {
-            *pPropertyCount = pDesc->featureStructTypeCount;
+            *pStructureTypeCount = pDesc->featureStructTypeCount;
         }
-        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-            pProperties[i] = pDesc->pFeatureStructTypes[i];
+        for (uint32_t i = 0; i < *pStructureTypeCount; ++i) {
+            pStructureTypes[i] = pDesc->pFeatureStructTypes[i];
         }
     }
     return result;
@@ -953,23 +953,23 @@ VPAPI_ATTR void vpGetProfileProperties(const VpProfileProperties *pProfile, void
     }
 }
 
-VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                       VkStructureType *pProperties) {
+VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+                                                       VkStructureType *pStructureTypes) {
     VkResult result = VK_SUCCESS;
 
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
-    if (pProperties == nullptr) {
-        *pPropertyCount = pDesc->propertyStructTypeCount;
+    if (pStructureTypes == nullptr) {
+        *pStructureTypeCount = pDesc->propertyStructTypeCount;
     } else {
-        if (*pPropertyCount < pDesc->propertyStructTypeCount) {
+        if (*pStructureTypeCount < pDesc->propertyStructTypeCount) {
             result = VK_INCOMPLETE;
         } else {
-            *pPropertyCount = pDesc->propertyStructTypeCount;
+            *pStructureTypeCount = pDesc->propertyStructTypeCount;
         }
-        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-            pProperties[i] = pDesc->pPropertyStructTypes[i];
+        for (uint32_t i = 0; i < *pStructureTypeCount; ++i) {
+            pStructureTypes[i] = pDesc->pPropertyStructTypes[i];
         }
     }
     return result;
@@ -1001,23 +1001,23 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties 
     return result;
 }
 
-VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                          VkStructureType *pProperties) {
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+                                                          VkStructureType *pStructureTypes) {
     VkResult result = VK_SUCCESS;
 
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
-    if (pProperties == nullptr) {
-        *pPropertyCount = pDesc->queueFamilyStructTypeCount;
+    if (pStructureTypes == nullptr) {
+        *pStructureTypeCount = pDesc->queueFamilyStructTypeCount;
     } else {
-        if (*pPropertyCount < pDesc->queueFamilyStructTypeCount) {
+        if (*pStructureTypeCount < pDesc->queueFamilyStructTypeCount) {
             result = VK_INCOMPLETE;
         } else {
-            *pPropertyCount = pDesc->queueFamilyStructTypeCount;
+            *pStructureTypeCount = pDesc->queueFamilyStructTypeCount;
         }
-        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-            pProperties[i] = pDesc->pQueueFamilyStructTypes[i];
+        for (uint32_t i = 0; i < *pStructureTypeCount; ++i) {
+            pStructureTypes[i] = pDesc->pQueueFamilyStructTypes[i];
         }
     }
     return result;
@@ -1081,23 +1081,23 @@ VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile
     }
 }
 
-VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, VkFormat format, uint32_t *pPropertyCount,
-                                                     VkStructureType *pProperties) {
+VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+                                                     VkStructureType *pStructureTypes) {
     VkResult result = VK_SUCCESS;
 
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
-    if (pProperties == nullptr) {
-        *pPropertyCount = pDesc->formatStructTypeCount;
+    if (pStructureTypes == nullptr) {
+        *pStructureTypeCount = pDesc->formatStructTypeCount;
     } else {
-        if (*pPropertyCount < pDesc->formatStructTypeCount) {
+        if (*pStructureTypeCount < pDesc->formatStructTypeCount) {
             result = VK_INCOMPLETE;
         } else {
-            *pPropertyCount = pDesc->formatStructTypeCount;
+            *pStructureTypeCount = pDesc->formatStructTypeCount;
         }
-        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-            pProperties[i] = pDesc->pFormatStructTypes[i];
+        for (uint32_t i = 0; i < *pStructureTypeCount; ++i) {
+            pStructureTypes[i] = pDesc->pFormatStructTypes[i];
         }
     }
     return result;
