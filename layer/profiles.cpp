@@ -1861,6 +1861,14 @@ class JsonLoader {
         return false;
     }
 
+    static bool WarnIfGreaterFloat(const char *name, const float new_value, const float old_value) {
+        if (new_value > old_value) {
+            DebugPrintf("WARN \"%s\" JSON value (%3.2f) is greater than existing value (%3.2f)\n", name, new_value, old_value);
+            return true;
+        }
+        return false;
+    }
+
     static bool WarnIfNotEqual(const char *name, const bool new_value, const bool old_value) {
         if (new_value && !old_value) {
             DebugPrintf("WARN \"%s\" JSON value is enabled in the profile, but the device does not support it.\n", name);
@@ -1873,6 +1881,14 @@ class JsonLoader {
         if (new_value < old_value) {
             DebugPrintf("WARN \"%s\" JSON value (%" PRIu64 ") is lesser than existing value (%" PRIu64 ")\n", name, new_value,
                         old_value);
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfLesserFloat(const char *name, const float new_value, const float old_value) {
+        if (new_value < old_value) {
+            DebugPrintf("WARN \"%s\" JSON value (%3.2f) is lesser than existing value (%3.2f)\n", name, new_value, old_value);
             return true;
         }
         return false;
@@ -3639,8 +3655,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_VALUE_WARN(prop, mipmapPrecisionBits, WarnIfGreater);
         GET_VALUE_WARN(prop, maxDrawIndexedIndexValue, WarnIfGreater);
         GET_VALUE_WARN(prop, maxDrawIndirectCount, WarnIfGreater);
-        GET_VALUE_WARN(prop, maxSamplerLodBias, WarnIfGreater);
-        GET_VALUE_WARN(prop, maxSamplerAnisotropy, WarnIfGreater);
+        GET_VALUE_WARN(prop, maxSamplerLodBias, WarnIfGreaterFloat);
+        GET_VALUE_WARN(prop, maxSamplerAnisotropy, WarnIfGreaterFloat);
         GET_VALUE_WARN(prop, maxViewports, WarnIfGreater);
         GET_ARRAY(maxViewportDimensions);  // size == 2
         GET_ARRAY(viewportBoundsRange);    // size == 2
@@ -3653,8 +3669,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_VALUE_WARN(prop, maxTexelOffset, WarnIfGreater);
         GET_VALUE_WARN(prop, minTexelGatherOffset, WarnIfLesser);
         GET_VALUE_WARN(prop, maxTexelGatherOffset, WarnIfGreater);
-        GET_VALUE_WARN(prop, minInterpolationOffset, WarnIfLesser);
-        GET_VALUE_WARN(prop, maxInterpolationOffset, WarnIfGreater);
+        GET_VALUE_WARN(prop, minInterpolationOffset, WarnIfLesserFloat);
+        GET_VALUE_WARN(prop, maxInterpolationOffset, WarnIfGreaterFloat);
         GET_VALUE_WARN(prop, subPixelInterpolationOffsetBits, WarnIfGreater);
         GET_VALUE_WARN(prop, maxFramebufferWidth, WarnIfGreater);
         GET_VALUE_WARN(prop, maxFramebufferHeight, WarnIfGreater);
@@ -3671,15 +3687,15 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_VALUE_WARN(prop, storageImageSampleCounts, WarnIfGreater);
         GET_VALUE_WARN(prop, maxSampleMaskWords, WarnIfGreater);
         GET_VALUE_WARN(prop, timestampComputeAndGraphics, WarnIfNotEqual);
-        GET_VALUE_WARN(prop, timestampPeriod, WarnIfGreater);
+        GET_VALUE_WARN(prop, timestampPeriod, WarnIfGreaterFloat);
         GET_VALUE_WARN(prop, maxClipDistances, WarnIfGreater);
         GET_VALUE_WARN(prop, maxCullDistances, WarnIfGreater);
         GET_VALUE_WARN(prop, maxCombinedClipAndCullDistances, WarnIfGreater);
         GET_VALUE_WARN(prop, discreteQueuePriorities, WarnIfGreater);
         GET_ARRAY(pointSizeRange);  // size == 2
         GET_ARRAY(lineWidthRange);  // size == 2
-        GET_VALUE_WARN(prop, pointSizeGranularity, WarnIfGreater);
-        GET_VALUE_WARN(prop, lineWidthGranularity, WarnIfGreater);
+        GET_VALUE_WARN(prop, pointSizeGranularity, WarnIfGreaterFloat);
+        GET_VALUE_WARN(prop, lineWidthGranularity, WarnIfGreaterFloat);
         GET_VALUE_WARN(prop, strictLines, WarnIfNotEqual);
         GET_VALUE_WARN(prop, standardSampleLocations, WarnIfNotEqual);
         GET_VALUE_WARN(prop, optimalBufferCopyOffsetAlignment, WarnIfGreater);
@@ -4445,9 +4461,9 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativ
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE_WARN(prop, primitiveOverestimationSize, WarnIfGreater);
-        GET_VALUE_WARN(prop, maxExtraPrimitiveOverestimationSize, WarnIfGreater);
-        GET_VALUE_WARN(prop, extraPrimitiveOverestimationSizeGranularity, WarnIfGreater);
+        GET_VALUE_WARN(prop, primitiveOverestimationSize, WarnIfGreaterFloat);
+        GET_VALUE_WARN(prop, maxExtraPrimitiveOverestimationSize, WarnIfGreaterFloat);
+        GET_VALUE_WARN(prop, extraPrimitiveOverestimationSizeGranularity, WarnIfGreaterFloat);
         GET_VALUE_WARN(prop, primitiveUnderestimation, WarnIfNotEqual);
         GET_VALUE_WARN(prop, conservativePointAndLineRasterization, WarnIfNotEqual);
         GET_VALUE_WARN(prop, degenerateTrianglesRasterized, WarnIfNotEqual);
