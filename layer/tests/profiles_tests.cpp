@@ -227,6 +227,7 @@ TEST(profiles, TestSelectingProfile) {
 
         VkPhysicalDevice gpu;
         err = inst_builder.getPhysicalDevice(&gpu);
+        ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDeviceProperties gpu_props{};
         vkGetPhysicalDeviceProperties(gpu, &gpu_props);
