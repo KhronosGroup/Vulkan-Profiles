@@ -9,6 +9,8 @@ function(ProfilesTest NAME)
     file(GLOB FILES_JSON ./*.json)
 
     add_executable(${TEST_NAME} ${TEST_FILE} ${FILES_JSON} profiles_test_helper.h profiles_test_helper.cpp ${jsoncpp_SOURCE_DIR}/dist/jsoncpp.cpp)
+    add_dependencies(${TEST_NAME} VkLayer_khronos_profiles)
+
     target_link_libraries(${TEST_NAME} gtest gtest_main)
     if(ANDROID)
         # Android executables generally need these libraries.
