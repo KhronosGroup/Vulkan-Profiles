@@ -101,134 +101,101 @@ const std::array<VkExtensionProperties, 2> kDeviceExtensionProperties = {
      {VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, VK_KHR_PORTABILITY_SUBSET_SPEC_VERSION}}};
 const uint32_t kDeviceExtensionPropertiesCount = static_cast<uint32_t>(kDeviceExtensionProperties.size());
 
-enum SetCombinationMode {
-    SET_CHECK_SUPPORT,
-    SET_FROM_DEVICE,
-    SET_FROM_PROFILE,
-    SET_FROM_PROFILE_OVERRIDE,
-};
-
-// Environment variables defined by this layer ///////////////////////////////////////////////////////////////////////////////////
-
-#if defined(__ANDROID__)
-const char *const kEnvarProfilesFilename = "debug.vulkan.profiles.filepath";  // path of the configuration file(s) to load.
-const char *const kEnvarProfilesDebugEnable =
-    "debug.vulkan.profiles.debugenable";  // a non-zero integer will enable debugging output.
-const char *const kEnvarProfilesEmulatePortability =
-    "debug.vulkan.profiles.emulateportability";  // a non-zero integer will enable emulation of the VK_KHR_portability_subset
-                                                 // extension.
-const char *const kEnvarProfilesModifyExtensionList =
-    "debug.vulkan.profiles.modifyextensionlist";  // a non-zero integer will enable modifying device extensions list.
-const char *const kEnvarProfilesModifyFormatList =
-    "debug.vulkan.Profiles.modifyformatlist";  // an ArrayCombinationMode value sets how the device and config format lists are
-                                               // combined.
-const char *const kEnvarProfilesModifyFormatProperties =
-    "debug.vulkan.Profiles.modifyformatproperties";  // an ArrayCombinationMode value sets how the device and config format
-                                                     // properties are combined.
-const char *const kEnvarProfilesProfileName = "debug.vulkan.profiles.profilename";  // name of the profile to be used
-#else
-const char *const kEnvarProfilesFilename = "VK_KHRONOS_PROFILES_FILENAME";  // path of the configuration file(s) to load.
-const char *const kEnvarProfilesDebugEnable =
-    "VK_KHRONOS_PROFILES_DEBUG_ENABLE";  // a non-zero integer will enable debugging output.
-const char *const kEnvarProfilesEmulatePortability =
-    "VK_KHRONOS_PROFILES_EMULATE_PORTABILITY_SUBSET_EXTENSION";  // a non-zero integer will enable emulation of the
-                                                                 // VK_KHR_portability_subset extension.
-const char *const kEnvarProfilesModifyExtensionList =
-    "VK_KHRONOS_PROFILES_MODIFY_EXTENSION_LIST";  // an ArrayCombinationMode value sets how the device and config extension lists
-                                                  // are combined.
-const char *const kEnvarProfilesModifyFormatList =
-    "VK_KHRONOS_PROFILES_MODIFY_FORMAT_LIST";  // an ArrayCombinationMode value sets how the device and config format lists are
-                                               // combined.
-const char *const kEnvarProfilesModifyFormatProperties =
-    "VK_KHRONOS_PROFILES_MODIFY_FORMAT_PROPERTIES";  // an ArrayCombinationMode value sets how the device and config format
-                                                     // properties are combined.
-const char *const kEnvarProfilesProfileName = "VK_KHRONOS_PROFILES_PROFILE_NAME";  // name of the profile to be used
-#endif
-
 const char *const kLayerSettingsProfileFile = "profile_file";
 const char *const kLayerSettingsProfileName = "profile_name";
-const char *const kLayerSettingsDebugOutput = "debug_output";
 const char *const kLayerSettingsEmulatePortability = "emulate_portability";
-const char *const kLayerSettingsModifyExtensionList = "emulate_extension_list";
-const char *const kLayerSettingsModifyFormatList = "emulate_format_list";
-const char *const kLayerSettingsModifyFormatProperties = "emulate_format_properties";
+const char *const kLayerSettingsSimulateCapabilities = "simulate_capabilities";
+const char *const kLayerSettingsDebugActions = "debug_actions";
+const char *const kLayerSettingsDebugFilename = "debug_filename";
+const char *const kLayerSettingsDebugFailOnError = "debug_fail_on_error";
+const char *const kLayerSettingsDebugReports = "debug_reports";
 
-struct SetCombinationModeSetting {
-    SetCombinationMode mode;
-    bool fromEnvVar;
+enum SimulateCapabilityFlag {
+    SIMULATE_API_VERSION_BIT = 1 << 0,
+    SIMULATE_FEATURES_BIT = 1 << 1,
+    SIMULATE_PROPERTIES_BIT = 1 << 2,
+    SIMULATE_EXTENSIONS_BIT = 1 << 3,
+    SIMULATE_FORMATS_BIT = 1 << 4,
+    SIMULATE_FORMAT_PROPERTIES_BIT = 1 << 5
 };
+typedef int SimulateCapabilityFlags;
 
-struct IntSetting {
-    int num;
-    bool fromEnvVar;
+SimulateCapabilityFlags GetSimulateCapabilities(const vku::Strings &values) {
+    int result = 0;
+
+    for (std::size_t i = 0, n = values.size(); i < n; ++i) {
+        if (values[i] == "SIMULATE_API_VERSION_BIT") {
+            result |= SIMULATE_API_VERSION_BIT;
+        } else if (values[i] == "SIMULATE_FEATURES_BIT") {
+            result |= SIMULATE_FEATURES_BIT;
+        } else if (values[i] == "SIMULATE_PROPERTIES_BIT") {
+            result |= SIMULATE_PROPERTIES_BIT;
+        } else if (values[i] == "SIMULATE_EXTENSIONS_BIT") {
+            result |= SIMULATE_EXTENSIONS_BIT;
+        } else if (values[i] == "SIMULATE_FORMATS_BIT") {
+            result |= SIMULATE_FORMATS_BIT;
+        } else if (values[i] == "SIMULATE_FORMAT_PROPERTIES_BIT") {
+            result |= SIMULATE_FORMAT_PROPERTIES_BIT;
+        }
+    }
+
+    return result;
+}
+
+enum DebugAction { DEBUG_ACTION_LOG_BIT = (1 << 0), DEBUG_ACTION_OUTPUT_BIT = (1 << 1), DEBUG_ACTION_BREAKPOINT_BIT = (1 << 2) };
+typedef int DebugActionFlags;
+
+DebugActionFlags GetDebugActionFlags(const vku::Strings &values) {
+    int result = 0;
+
+    for (std::size_t i = 0, n = values.size(); i < n; ++i) {
+        if (values[i] == "DEBUG_ACTION_LOG_BIT") {
+            result |= DEBUG_ACTION_LOG_BIT;
+        } else if (values[i] == "DEBUG_ACTION_OUTPUT_BIT") {
+            result |= DEBUG_ACTION_OUTPUT_BIT;
+        } else if (values[i] == "DEBUG_ACTION_BREAKPOINT_BIT") {
+            result |= DEBUG_ACTION_BREAKPOINT_BIT;
+        }
+    }
+
+    return result;
+}
+
+enum DebugReport {
+    DEBUG_REPORT_NOTIFICATION_BIT = (1 << 0),
+    DEBUG_REPORT_WARNING_BIT = (1 << 1),
+    DEBUG_REPORT_ERROR_BIT = (1 << 2)
 };
+typedef int DebugReportFlags;
 
-struct StringSetting {
-    std::string str;
-    bool fromEnvVar;
-};
+DebugReportFlags GetDebugReportFlags(const vku::Strings &values) {
+    int result = 0;
 
-struct StringSetting inputFilename;
-struct StringSetting profileName = {};
-struct IntSetting debugLevel;
-struct IntSetting emulatePortability;
-struct SetCombinationModeSetting modifyExtensionList;
-struct SetCombinationModeSetting modifyFormatList;
-struct SetCombinationModeSetting modifyFormatProperties;
+    for (std::size_t i = 0, n = values.size(); i < n; ++i) {
+        if (values[i] == "DEBUG_REPORT_NOTIFICATION_BIT") {
+            result |= DEBUG_REPORT_NOTIFICATION_BIT;
+        } else if (values[i] == "DEBUG_REPORT_WARNING_BIT") {
+            result |= DEBUG_REPORT_WARNING_BIT;
+        } else if (values[i] == "DEBUG_REPORT_ERROR_BIT") {
+            result |= DEBUG_REPORT_ERROR_BIT;
+        }
+    }
+
+    return result;
+}
+
+struct LayerSettings {
+    std::string profile_name;
+    std::string profile_file;
+    bool emulate_portability;
+    SimulateCapabilityFlags simulate_capabilities;
+    DebugActionFlags debug_actions;
+    std::string debug_filename;
+    DebugReportFlags debug_reports;
+    bool debug_fail_on_error;
+} layer_settings;
 
 // Various small utility functions ///////////////////////////////////////////////////////////////////////////////////////////////
-
-#if defined(__ANDROID__)
-#include <android/log.h>
-const uint32_t MAX_BUFFER_SIZE = 255;
-typedef enum { VK_LOG_NONE = 0, VK_LOG_ERROR, VK_LOG_WARNING, VK_LOG_VERBOSE, VK_LOG_DEBUG } VkLogLevel;
-
-std::string AndroidGetEnv(const char *key) {
-    std::string command("settings get global ");
-    command += key;
-
-    std::string android_env;
-    FILE *pipe = popen(command.c_str(), "r");
-    if (pipe != nullptr) {
-        char buffer[MAX_BUFFER_SIZE] = {};
-        while (fgets(buffer, MAX_BUFFER_SIZE, pipe) != NULL) {
-            android_env.append(buffer);
-        }
-        pclose(pipe);
-    }
-
-    // Only if the value is set will we get a string back
-    if (android_env.length() > 0) {
-        __android_log_print(ANDROID_LOG_INFO, "profiles", "Vulkan device simulation layer %s: %s", command.c_str(),
-                            android_env.c_str());
-        android_env.erase(android_env.find_last_not_of(" \n\r\t") + 1);
-        return android_env;
-    }
-
-    return "";
-}
-#endif
-
-// Retrieve the value of an environment variable.
-std::string GetEnvarValue(const char *name) {
-    std::string value = "";
-#if defined(_WIN32)
-    DWORD size = GetEnvironmentVariable(name, nullptr, 0);
-    if (size > 0) {
-        std::vector<char> buffer(size);
-        GetEnvironmentVariable(name, buffer.data(), size);
-        value = buffer.data();
-    }
-#elif defined(__ANDROID__)
-    std::string v = AndroidGetEnv(name);
-    if (v.length() > 0) value = v;
-#else
-    const char *v = getenv(name);
-    if (v) value = v;
-#endif
-    // printf("envar %s = \"%s\"\n", name, value.c_str());
-    return value;
-}
 
 #if defined(__ANDROID__)
 void AndroidPrintf(VkLogLevel level, const char *fmt, va_list args) {
@@ -256,7 +223,7 @@ void AndroidPrintf(VkLogLevel level, const char *fmt, va_list args) {
 #endif
 
 void DebugPrintf(const char *fmt, ...) {
-    if (debugLevel.num > 0) {
+    if (layer_settings.debug_reports & (DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_NOTIFICATION_BIT)) {
 #if !defined(__ANDROID__)
         printf("\tDEBUG profiles ");
 #endif
@@ -272,17 +239,19 @@ void DebugPrintf(const char *fmt, ...) {
 }
 
 void ErrorPrintf(const char *fmt, ...) {
+    if (layer_settings.debug_reports & DEBUG_REPORT_ERROR_BIT) {
 #if !defined(__ANDROID__)
-    fprintf(stderr, "\tERROR profiles ");
+        fprintf(stderr, "\tERROR profiles ");
 #endif
-    va_list args;
-    va_start(args, fmt);
+        va_list args;
+        va_start(args, fmt);
 #if defined(__ANDROID__)
-    AndroidPrintf(VK_LOG_ERROR, fmt, args);
+        AndroidPrintf(VK_LOG_ERROR, fmt, args);
 #else
-    vfprintf(stderr, fmt, args);
+        vfprintf(stderr, fmt, args);
 #endif
-    va_end(args);
+        va_end(args);
+    }
 }
 
 #define FORMAT_TO_STRING(format) \
@@ -716,34 +685,11 @@ class PhysicalDeviceData {
         return HasSimulatedExtension(pdd, extension_name) || HasExtension(pdd, extension_name);
     }
 
-    uint32_t combineExtensionLists() {
-        switch (extension_list_combination_mode_) {
-            case SET_CHECK_SUPPORT:
-            case SET_FROM_DEVICE:
-                simulation_extensions_ = device_extensions_;
-                break;
-            case SET_FROM_PROFILE:
-            case SET_FROM_PROFILE_OVERRIDE:
-                simulation_extensions_ = arrayof_extension_properties_;
-                break;
-            default:
-                simulation_extensions_ = device_extensions_;
-        }
-
-        return static_cast<uint32_t>(simulation_extensions_.size());
-    }
-
     VkInstance instance() const { return instance_; }
 
     ArrayOfVkExtensionProperties device_extensions_;
     ArrayOfVkFormatProperties device_formats_;
-
-    SetCombinationMode extension_list_combination_mode_;
     ArrayOfVkExtensionProperties simulation_extensions_;
-
-    SetCombinationMode format_list_combination_mode_;
-    SetCombinationMode format_properties_combination_mode_;
-
     VkPhysicalDeviceProperties physical_device_properties_;
     VkPhysicalDeviceFeatures physical_device_features_;
     VkPhysicalDeviceMemoryProperties physical_device_memory_properties_;
@@ -1150,11 +1096,6 @@ class PhysicalDeviceData {
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
     PhysicalDeviceData(VkInstance instance) : instance_(instance) {
-        extension_list_combination_mode_ = SET_CHECK_SUPPORT;
-
-        format_list_combination_mode_ = SET_CHECK_SUPPORT;
-        format_properties_combination_mode_ = SET_CHECK_SUPPORT;
-
         physical_device_properties_ = {};
         physical_device_features_ = {};
         physical_device_memory_properties_ = {};
@@ -1621,10 +1562,7 @@ class JsonLoader {
     JsonLoader(const JsonLoader &) = delete;
     JsonLoader &operator=(const JsonLoader &) = delete;
 
-    VkResult LoadFiles();
-    VkResult LoadFiles(const char *filename_list);
     VkResult LoadFile(const char *filename);
-    bool ReturnError() const;
     VkResult ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities);
 
    private:
@@ -2542,39 +2480,6 @@ static inline VkFormatFeatureFlags StringToVkFormatFeatureFlags(const std::strin
     return 0;
 }
 
-VkResult JsonLoader::LoadFiles() {
-    if (inputFilename.str.empty()) {
-        ErrorPrintf("envar %s and %s in vk_layer_settings.txt are unset\n", kEnvarProfilesFilename, kLayerSettingsProfileFile);
-        return VK_ERROR_INITIALIZATION_FAILED;
-    }
-
-    const char *filename_list = inputFilename.str.c_str();
-    if (inputFilename.fromEnvVar) {
-        DebugPrintf("envar %s = \"%s\"\n", kEnvarProfilesFilename, filename_list);
-    } else {
-        DebugPrintf("vk_layer_settings.txt setting %s = \"%s\"\n", kLayerSettingsProfileFile, filename_list);
-    }
-    return LoadFiles(filename_list);
-}
-
-VkResult JsonLoader::LoadFiles(const char *filename_list) {
-#if defined(_WIN32)
-    const char delimiter = ';';
-#else
-    const char delimiter = ':';
-#endif
-    std::stringstream ss_list(filename_list);
-    std::string filename;
-
-    while (std::getline(ss_list, filename, delimiter)) {
-        VkResult result = LoadFile(filename.c_str());
-        if (result != VK_SUCCESS) {
-            return result;
-        }
-    }
-    return VK_SUCCESS;
-}
-
 bool JsonLoader::GetFeature(const Json::Value &features, const std::string &feature_name) {
     const Json::Value &feature = features[feature_name];
 
@@ -2997,32 +2902,25 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
         DebugPrintf("JSON file sets variables for format %s, but set bufferFeatures are not supported.\n", format_name.c_str());
         return false;
     }
-    if (pdd_.format_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
-        return true;
-    }
+    // if (pdd_.format_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT) {
+    //    return true;
+    //}
     return true;
 }
 
 bool JsonLoader::CheckExtensionSupport(const char *extension) {
-    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_CHECK_SUPPORT ||
-        pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_DEVICE) {
-        if (!PhysicalDeviceData::HasExtension(&pdd_, extension)) {
-            ErrorPrintf(
-                "JSON file sets variables for structs provided by %s, but %s is "
-                "not supported by the device.\n",
-                extension, extension);
-            return false;
-        }
-    } else if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE ||
-               pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
+    if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
         if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, extension)) {
-            ErrorPrintf(
-                "JSON file sets variables for structs provided by %s, but %s is "
-                "not enabled by the profile.\n",
-                extension, extension);
-            if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE) {
+            ErrorPrintf("JSON file sets variables for structs provided by %s, but %s is not enabled by the profile.\n", extension,
+                        extension);
+            if (layer_settings.debug_fail_on_error) {
                 return false;
             }
+        }
+    } else {
+        if (!PhysicalDeviceData::HasExtension(&pdd_, extension)) {
+            DebugPrintf("JSON file sets variables for structs provided by %s, but %s is not supported by the device.\n", extension,
+                        extension);
         }
     }
     return true;
@@ -3137,13 +3035,6 @@ void JsonLoader::AddPromotedExtensions(uint32_t api_version) {
     }
 }
 
-bool JsonLoader::ReturnError() const {
-    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE) {
-        return true;
-    }
-    return false;
-}
-
 VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities) {
     const auto &caps = root["capabilities"];
     for (const auto &capability : capabilities) {
@@ -3177,12 +3068,11 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
                         break;
                     }
                 }
-                if (!supported_on_device && ReturnError()) {
+                if (!supported_on_device && layer_settings.debug_fail_on_error) {
                     return VK_ERROR_INITIALIZATION_FAILED;
                 }
                 pdd_.arrayof_extension_properties_.push_back(extension);
-                if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE ||
-                    pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
+                if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
                     if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, extension.extensionName)) {
                         pdd_.simulation_extensions_.push_back(extension);
                     }
@@ -3190,24 +3080,30 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
             }
         }
 
-        for (const auto &feature : features.getMemberNames()) {
-            bool success = GetFeature(features, feature);
-            if (!success && ReturnError()) {
-                return VK_ERROR_INITIALIZATION_FAILED;
+        if (layer_settings.simulate_capabilities & SIMULATE_FEATURES_BIT) {
+            for (const auto &feature : features.getMemberNames()) {
+                bool success = GetFeature(features, feature);
+                if (!success && layer_settings.debug_fail_on_error) {
+                    return VK_ERROR_INITIALIZATION_FAILED;
+                }
             }
         }
 
-        for (const auto &prop : properties.getMemberNames()) {
-            bool success = GetProperty(properties, prop);
-            if (!success && ReturnError()) {
-                return VK_ERROR_INITIALIZATION_FAILED;
+        if (layer_settings.simulate_capabilities & SIMULATE_PROPERTIES_BIT) {
+            for (const auto &prop : properties.getMemberNames()) {
+                bool success = GetProperty(properties, prop);
+                if (!success && layer_settings.debug_fail_on_error) {
+                    return VK_ERROR_INITIALIZATION_FAILED;
+                }
             }
         }
 
-        for (const auto &format : formats.getMemberNames()) {
-            bool success = GetFormat(formats, format, &pdd_.arrayof_format_properties_);
-            if (!success && ReturnError()) {
-                return VK_ERROR_INITIALIZATION_FAILED;
+        if (layer_settings.simulate_capabilities & SIMULATE_FORMATS_BIT) {
+            for (const auto &format : formats.getMemberNames()) {
+                bool success = GetFormat(formats, format, &pdd_.arrayof_format_properties_);
+                if (!success && layer_settings.debug_fail_on_error) {
+                    return VK_ERROR_INITIALIZATION_FAILED;
+                }
             }
         }
     }
@@ -3236,12 +3132,8 @@ VkResult JsonLoader::LoadFile(const char *filename) {
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
-    const std::string profile_name = profileName.str;
-    if (inputFilename.fromEnvVar) {
-        DebugPrintf("envar %s = \"%s\"\n", kEnvarProfilesProfileName, profile_name.c_str());
-    } else {
-        DebugPrintf("vk_layer_settings.txt setting %s = \"%s\"\n", kEnvarProfilesProfileName, profile_name.c_str());
-    }
+    const std::string profile_name = layer_settings.profile_name;
+    DebugPrintf("Setting %s = \"%s\"\n", kLayerSettingsProfileName, profile_name.c_str());
 
     const auto &profiles = root["profiles"];
     std::vector<std::string> capabilities;
@@ -3288,13 +3180,11 @@ VkResult JsonLoader::LoadFile(const char *filename) {
     }
 
     VkResult result = VK_SUCCESS;
-    if (pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE ||
-        pdd_.extension_list_combination_mode_ == SetCombinationMode::SET_FROM_PROFILE_OVERRIDE) {
+    if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
         pdd_.simulation_extensions_.clear();
     }
-    if (pdd_.extension_list_combination_mode_ != SetCombinationMode::SET_FROM_DEVICE) {
-        result = ReadProfile(root, capabilities);
-    }
+
+    result = ReadProfile(root, capabilities);
 
     // GPUinfo structures
     GetValueGPUinfoCore11(root);
@@ -3565,12 +3455,12 @@ bool JsonLoader::GetValuePhysicalDeviceToolPropertiesEXT(const Json::Value &pare
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetPropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && emulatePortability.num <= 0) {
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && !layer_settings.emulate_portability) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
             "not supported by the device and emulation is not turned on.\nIf you wish to emulate "
-            "VK_KHR_portability_subset, please set environment variable %s to 1.\n",
-            kEnvarProfilesEmulatePortability);
+            "VK_KHR_portability_subset, please enable %s variable.\n",
+            kLayerSettingsEmulatePortability);
         return false;
     }
     bool valid = true;
@@ -3928,12 +3818,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFe
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && emulatePortability.num <= 0) {
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && !layer_settings.emulate_portability) {
         ErrorPrintf(
             "JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
             "not supported by the device and emulation is not turned on.\nIf you wish to emulate "
             "VK_KHR_portability_subset, please set environment variable %s to 1.\n",
-            kEnvarProfilesEmulatePortability);
+            kLayerSettingsEmulatePortability);
         return false;
     }
     bool valid = true;
@@ -6296,161 +6186,54 @@ void JsonLoader::GetValueGPUinfoSurfaceCapabilities(const Json::Value &parent) {
 #undef GET_VALUE
 #undef GET_ARRAY
 
-// Layer-specific wrappers for Vulkan functions, accessed via vkGet*ProcAddr() ///////////////////////////////////////////////////
+static void InitSettings() {
+    layer_settings.profile_name.clear();
+    layer_settings.profile_file.clear();
+    layer_settings.emulate_portability = false;
+    layer_settings.simulate_capabilities = 0;
+    layer_settings.debug_actions = 0;
+    layer_settings.debug_filename.clear();
+    layer_settings.debug_reports = 0;
+    layer_settings.debug_fail_on_error = 0;
 
-// Fill the inputFilename variable with a value from either vk_layer_settings.txt or environment variables.
-// Environment variables get priority.
-static void GetProfilesFilename() {
-    std::string env_var = GetEnvarValue(kEnvarProfilesFilename);
-    if (!env_var.empty()) {
-        inputFilename.str = env_var;
-        inputFilename.fromEnvVar = true;
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileName)) {
+        layer_settings.profile_name = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileName);
     }
 
     if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileFile)) {
-        inputFilename.fromEnvVar = false;
-        inputFilename.str = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileFile);
-    }
-}
-
-static int GetBooleanValue(const std::string &value) {
-    std::string temp = value;
-    std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
-
-    if (value.empty())
-        return 0;
-    else if (temp == "true")
-        return 1;
-    else if (temp == "false")
-        return 0;
-    else
-#if defined(__ANDROID__)
-        return atoi(temp.c_str());
-#else
-        return std::atoi(temp.c_str());
-#endif
-}
-
-static SetCombinationMode GetSetCombinationModeValue(const std::string &value) {
-    std::string temp = value;
-    std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
-
-    if (temp == "check_support") {
-        return SET_CHECK_SUPPORT;
-    } else if (temp == "from_device") {
-        return SET_FROM_DEVICE;
-    } else if (temp == "from_profile") {
-        return SET_FROM_PROFILE;
-    } else if (temp == "from_profile_override") {
-        return SET_FROM_PROFILE_OVERRIDE;
-    }
-
-    return SET_CHECK_SUPPORT;
-}
-// Fill the debugLevel variable with a value from either vk_layer_settings.txt or environment variables.
-// Environment variables get priority.
-static void GetProfilesDebugLevel() {
-    std::string env_var = GetEnvarValue(kEnvarProfilesDebugEnable);
-    if (!env_var.empty()) {
-        debugLevel.fromEnvVar = true;
-        debugLevel.num = GetBooleanValue(env_var);
-    }
-
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugOutput)) {
-        debugLevel.fromEnvVar = false;
-        debugLevel.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDebugOutput);
-    }
-}
-
-// Fill the emulatePortability variable with a value from either vk_layer_settings.txt or environment variables.
-// Environment variables get priority.
-static void GetProfilesEmulatePortability() {
-    std::string env_var = GetEnvarValue(kEnvarProfilesEmulatePortability);
-    if (!env_var.empty()) {
-        emulatePortability.num = GetBooleanValue(env_var);
-        emulatePortability.fromEnvVar = true;
+        layer_settings.profile_file = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileFile);
     }
 
     if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsEmulatePortability)) {
-        emulatePortability.fromEnvVar = false;
-        emulatePortability.num = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsEmulatePortability);
-    }
-}
-
-// Fill the modifyExtensionList variable with a value from either vk_layer_settings.txt or environment variables.
-// Environment variables get priority.
-static void GetProfilesModifyExtensionList() {
-    std::string modify_extension_list = "";
-    std::string env_var = GetEnvarValue(kEnvarProfilesModifyExtensionList);
-    if (!env_var.empty()) {
-        modify_extension_list = env_var;
-        modifyExtensionList.fromEnvVar = true;
+        layer_settings.emulate_portability = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsEmulatePortability);
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsModifyExtensionList)) {
-        modify_extension_list = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsModifyExtensionList);
-        modifyExtensionList.fromEnvVar = false;
-    }
-    modifyExtensionList.mode = GetSetCombinationModeValue(modify_extension_list);
-}
-
-// Fill the modifyFormatList variable with a value from either vk_layer_settings.txt or environment variables.
-// Environment variables get priority.
-static void GetProfilesModifyFormatList() {
-    std::string modify_format_list = "";
-    std::string env_var = GetEnvarValue(kEnvarProfilesModifyFormatList);
-    if (!env_var.empty()) {
-        modify_format_list = env_var;
-        modifyFormatList.fromEnvVar = true;
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsSimulateCapabilities)) {
+        layer_settings.simulate_capabilities =
+            GetSimulateCapabilities(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsSimulateCapabilities));
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsModifyFormatList)) {
-        modifyFormatList.fromEnvVar = false;
-        modify_format_list = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsModifyFormatList);
-    }
-    modifyFormatList.mode = GetSetCombinationModeValue(modify_format_list);
-}
-
-// Fill the modifyFormatProperties variable with a value from either vk_layer_settings.txt or environment variables.
-// Environment variables get priority.
-static void GetProfilesModifyFormatProperties() {
-    std::string modify_format_properties = "";
-    std::string env_var = GetEnvarValue(kEnvarProfilesModifyFormatProperties);
-    if (!env_var.empty()) {
-        modify_format_properties = env_var;
-        modifyFormatProperties.fromEnvVar = true;
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugActions)) {
+        layer_settings.debug_actions = GetDebugActionFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsDebugActions));
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsModifyFormatProperties)) {
-        modifyFormatProperties.fromEnvVar = false;
-        modify_format_properties = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsModifyFormatProperties);
-    }
-    modifyFormatProperties.mode = GetSetCombinationModeValue(modify_format_properties);
-}
-
-static void GetProfileName() {
-    std::string env_var = GetEnvarValue(kEnvarProfilesProfileName);
-    if (!env_var.empty()) {
-        profileName.str = env_var;
-        profileName.fromEnvVar = true;
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugReports)) {
+        layer_settings.debug_filename = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDebugReports);
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileName)) {
-        profileName.fromEnvVar = false;
-        profileName.str = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileName);
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugReports)) {
+        layer_settings.debug_reports = GetDebugReportFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsDebugReports));
+    }
+
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugFailOnError)) {
+        layer_settings.debug_fail_on_error = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDebugFailOnError);
     }
 }
 
 // Generic layer dispatch table setup, see [LALI].
 static VkResult LayerSetupCreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
                                          VkInstance *pInstance) {
-    GetProfilesEmulatePortability();
-    GetProfilesFilename();
-    GetProfilesDebugLevel();
-    GetProfilesModifyExtensionList();
-    GetProfilesModifyFormatList();
-    GetProfilesModifyFormatProperties();
-    GetProfileName();
+    InitSettings();
 
     VkLayerInstanceCreateInfo *chain_info = get_chain_info(pCreateInfo, VK_LAYER_LINK_INFO);
     assert(chain_info->u.pLayerInfo);
@@ -6545,7 +6328,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
             // VK_KHR_portability_subset is a special case since it can also be emulated by the Profiles layer.
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) ||
-                    emulatePortability.num > 0) {
+                    layer_settings.emulate_portability) {
                     VkPhysicalDevicePortabilitySubsetPropertiesKHR *psp = (VkPhysicalDevicePortabilitySubsetPropertiesKHR *)place;
                     void *pNext = psp->pNext;
                     *psp = physicalDeviceData->physical_device_portability_subset_properties_;
@@ -6554,7 +6337,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR:
                 if ((PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) ||
-                     emulatePortability.num > 0)) {
+                     layer_settings.emulate_portability)) {
                     VkPhysicalDevicePortabilitySubsetFeaturesKHR *psf = (VkPhysicalDevicePortabilitySubsetFeaturesKHR *)place;
                     void *pNext = psf->pNext;
                     *psf = physicalDeviceData->physical_device_portability_subset_features_;
@@ -7961,14 +7744,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
             result = EnumerateProperties(kDeviceExtensionPropertiesCount, kDeviceExtensionProperties.data(), pCount, pProperties);
         else
             result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
-    } else if (src_count == 0 || (pdd->extension_list_combination_mode_ == SET_CHECK_SUPPORT ||
-                                  pdd->extension_list_combination_mode_ == SET_FROM_DEVICE)) {
+    } else if (src_count == 0 || !(layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT)) {
         result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
     } else {
         result = EnumerateProperties(src_count, pdd->simulation_extensions_.data(), pCount, pProperties);
     }
 
-    if (result == VK_SUCCESS && !pLayerName && emulatePortability.num > 0 &&
+    if (result == VK_SUCCESS && !pLayerName && layer_settings.emulate_portability &&
         !PhysicalDeviceData::HasSimulatedOrRealExtension(physicalDevice, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
         if (pProperties) {
             if (pCount_copy == *pCount + 1) {
@@ -7999,33 +7781,20 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
         dt->GetPhysicalDeviceFormatProperties(physicalDevice, format, &device_format);
         const auto iter = pdd->arrayof_format_properties_.find(format);
 
-        switch (pdd->format_list_combination_mode_) {
-            case SET_CHECK_SUPPORT:
-            case SET_FROM_DEVICE:
-                *pFormatProperties = device_format;
-                break;
-            case SET_FROM_PROFILE:
-            case SET_FROM_PROFILE_OVERRIDE:
-                *pFormatProperties = (iter != pdd->arrayof_format_properties_.end()) ? iter->second : VkFormatProperties{};
-                break;
-                break;
-            default:
-                *pFormatProperties = device_format;
+        if ((layer_settings.simulate_capabilities & SIMULATE_FORMAT_PROPERTIES_BIT)) {
+            *pFormatProperties = (iter != pdd->arrayof_format_properties_.end()) ? iter->second : VkFormatProperties{};
+        } else {
+            *pFormatProperties = device_format;
         }
 
         if (IsFormatSupported(*pFormatProperties) && iter != pdd->arrayof_format_properties_.end()) {
-            switch (pdd->format_properties_combination_mode_) {
-                case SET_CHECK_SUPPORT:
-                case SET_FROM_DEVICE:
-                    *pFormatProperties = device_format;
-                    break;
-                case SET_FROM_PROFILE:
-                case SET_FROM_PROFILE_OVERRIDE:
-                    *pFormatProperties = iter->second;
-                    break;
-                default:
-                    *pFormatProperties = device_format;
+            if ((layer_settings.simulate_capabilities & SIMULATE_FORMAT_PROPERTIES_BIT)) {
+                *pFormatProperties = iter->second;
+            } else {
+                *pFormatProperties = device_format;
             }
+
+            // TODO FIXME: this code is totally wrong, the values are flags!
             if ((*pFormatProperties).linearTilingFeatures > device_format.linearTilingFeatures ||
                 (*pFormatProperties).optimalTilingFeatures > device_format.optimalTilingFeatures ||
                 (*pFormatProperties).bufferFeatures > device_format.bufferFeatures)
@@ -8056,8 +7825,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties(VkPhysical
 
     // Are there JSON overrides, or should we call down to return the original values?
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    if (pdd->format_list_combination_mode_ ==
-        (pdd->extension_list_combination_mode_ == SET_CHECK_SUPPORT || pdd->extension_list_combination_mode_ == SET_FROM_DEVICE)) {
+    if (!(layer_settings.simulate_capabilities & SIMULATE_FORMAT_PROPERTIES_BIT)) {
         return dt->GetPhysicalDeviceImageFormatProperties(physicalDevice, format, type, tiling, usage, flags,
                                                           pImageFormatProperties);
     }
@@ -8731,10 +8499,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
 
             PhysicalDeviceData &pdd = PhysicalDeviceData::Create(physical_device, instance);
 
-            pdd.extension_list_combination_mode_ = modifyExtensionList.mode;
-            pdd.format_list_combination_mode_ = modifyFormatList.mode;
-            pdd.format_properties_combination_mode_ = modifyFormatProperties.mode;
-
             EnumerateAll<VkExtensionProperties>(&(pdd.device_extensions_), [&](uint32_t *count, VkExtensionProperties *results) {
                 return dt->EnumerateDeviceExtensionProperties(physical_device, nullptr, count, results);
             });
@@ -8755,7 +8519,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
                     property_chain.pNext = &(pdd.physical_device_portability_subset_properties_);
                     feature_chain.pNext = &(pdd.physical_device_portability_subset_features_);
-                } else if (emulatePortability.num > 0) {
+                } else if (layer_settings.emulate_portability) {
                     pdd.physical_device_portability_subset_properties_ = {
                         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR, nullptr, 1};
                     pdd.physical_device_portability_subset_features_ = {
@@ -9659,9 +9423,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
 
             // Override PDD members with values from configuration file(s).
             JsonLoader json_loader(pdd);
-            result = json_loader.LoadFiles();
+            result = json_loader.LoadFile(layer_settings.profile_file.c_str());
 
-            pdd.combineExtensionLists();
+            if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
+                pdd.simulation_extensions_ = pdd.arrayof_extension_properties_;
+            } else {
+                pdd.simulation_extensions_ = pdd.device_extensions_;
+            }
 
             // VK_VULKAN_1_1
             TransferValue(&(pdd.physical_device_vulkan_1_1_properties_), &(pdd.physical_device_multiview_properties_));
