@@ -80,7 +80,7 @@ const VkLayerProperties kLayerProperties[] = {{
     "VK_LAYER_KHRONOS_profiles",     // layerName
     VK_MAKE_VERSION(1, 0, 68),       // specVersion (clamped to final 1.0 spec version)
     kVersionProfilesImplementation,  // implementationVersion
-    "Khronos profiles layer"         // description
+    "Khronos Profiles layer"         // description
 }};
 const uint32_t kLayerPropertiesCount = (sizeof(kLayerProperties) / sizeof(kLayerProperties[0]));
 
