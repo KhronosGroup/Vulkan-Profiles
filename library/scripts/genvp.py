@@ -1555,7 +1555,7 @@ class VulkanProfile():
                 gen += ('\n'
                         'static const VkStructureType {0}StructTypes[] = {{\n').format(name)
                 for structDef in structDefs:
-                    gen += '    {{ {0} }},\n'.format(structDef.sType)
+                    gen += '    {0},\n'.format(structDef.sType)
                 gen += '};\n'
         return gen
 
