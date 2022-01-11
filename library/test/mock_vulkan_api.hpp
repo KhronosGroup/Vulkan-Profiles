@@ -112,6 +112,7 @@ private:
 public:
     VkInstance              vkInstance;
     VkPhysicalDevice        vkPhysicalDevice;
+    VkDevice                vkDevice;
     VkAllocationCallbacks   vkAllocator;
 
     MockVulkanAPI()
@@ -130,6 +131,7 @@ public:
         , m_mockedQueueFamilies{}
         , vkInstance{ VkInstance(0x11D00D00) }
         , vkPhysicalDevice{ VkPhysicalDevice(0x42D00D00) }
+        , vkDevice{ VkDevice(0x66D00D00) }
         , vkAllocator{}
     {
         sInstance = this;
@@ -363,7 +365,7 @@ public:
         if (sInstance != nullptr) {
             VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pFeatures));
             while (p != nullptr) {
-                auto& it = sInstance->m_mockedFeatures.find(p->sType);
+                auto it = sInstance->m_mockedFeatures.find(p->sType);
                 if (it != sInstance->m_mockedFeatures.end()) {
                     it->second.copyTo(p);
                 }
@@ -387,7 +389,7 @@ public:
         if (sInstance != nullptr) {
             VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pProperties));
             while (p != nullptr) {
-                auto& it = sInstance->m_mockedProperties.find(p->sType);
+                auto it = sInstance->m_mockedProperties.find(p->sType);
                 if (it != sInstance->m_mockedProperties.end()) {
                     it->second.copyTo(p);
                 }
@@ -416,7 +418,7 @@ public:
                 auto& mockedFormat = fmtIt->second;
                 VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pFormatProperties));
                 while (p != nullptr) {
-                    auto& it = mockedFormat.find(p->sType);
+                    auto it = mockedFormat.find(p->sType);
                     if (it != mockedFormat.end()) {
                         it->second.copyTo(p);
                     }
@@ -451,7 +453,7 @@ public:
                 for (uint32_t i = 0; i < *pQueueFamilyPropertyCount; ++i) {
                     VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pQueueFamilyProperties[i]));
                     while (p != nullptr) {
-                        auto& it = sInstance->m_mockedQueueFamilies[i].find(p->sType);
+                        auto it = sInstance->m_mockedQueueFamilies[i].find(p->sType);
                         if (it != sInstance->m_mockedQueueFamilies[i].end()) {
                             it->second.copyTo(p);
                         }
@@ -462,6 +464,12 @@ public:
         }
     }
 
+    void SetExpectedDeviceCreateInfo(const VkDeviceCreateInfo* pCreateInfo, std::vector<VulkanStructData>&& structs)
+    {
+        m_pDeviceCreateInfo = pCreateInfo;
+        m_deviceCreateStructs = std::move(structs);
+    }
+
     static VkResult vkCreateDevice(
         VkPhysicalDevice                            physicalDevice,
         const VkDeviceCreateInfo*                   pCreateInfo,
@@ -469,8 +477,36 @@ public:
         VkDevice*                                   pDevice)
     {
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
-        if (sInstance != nullptr) {
-            // TODO
+        EXPECT_NE(pCreateInfo, nullptr);
+        if (sInstance != nullptr && pCreateInfo != nullptr) {
+            EXPECT_EQ(pAllocator, &sInstance->vkAllocator) << "Unexpected allocator callbacks";
+
+            EXPECT_EQ(pCreateInfo->sType, VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO);
+            EXPECT_EQ(pCreateInfo->flags, sInstance->m_pDeviceCreateInfo->flags);
+            EXPECT_EQ(pCreateInfo->queueCreateInfoCount, sInstance->m_pDeviceCreateInfo->queueCreateInfoCount);
+            EXPECT_EQ(pCreateInfo->pQueueCreateInfos, sInstance->m_pDeviceCreateInfo->pQueueCreateInfos);
+            EXPECT_EQ(pCreateInfo->enabledLayerCount, sInstance->m_pDeviceCreateInfo->enabledLayerCount);
+            EXPECT_EQ(pCreateInfo->ppEnabledLayerNames, sInstance->m_pDeviceCreateInfo->ppEnabledLayerNames);
+
+            EXPECT_EQ(pCreateInfo->enabledExtensionCount, sInstance->m_pDeviceCreateInfo->enabledExtensionCount);
+            {
+                uint32_t matches = 0;
+                for (uint32_t i = 0; i < sInstance->m_pDeviceCreateInfo->enabledExtensionCount; ++i) {
+                    for (uint32_t j = 0; j < pCreateInfo->enabledExtensionCount; ++j) {
+                        if (strcmp(sInstance->m_pDeviceCreateInfo->ppEnabledExtensionNames[i], pCreateInfo->ppEnabledExtensionNames[j]) == 0) {
+                            matches++;
+                        }
+                    }
+                }
+                EXPECT_EQ(matches, sInstance->m_pDeviceCreateInfo->enabledExtensionCount) << "Extension list does not match";
+            }
+
+            EXPECT_EQ(pCreateInfo->pEnabledFeatures, sInstance->m_pDeviceCreateInfo->pEnabledFeatures);
+
+            sInstance->CheckChainedStructs(pCreateInfo->pNext, sInstance->m_deviceCreateStructs);
+
+            *pDevice = sInstance->vkDevice;
+            return VK_SUCCESS;
         }
         return VK_ERROR_INITIALIZATION_FAILED;
     }
