@@ -597,7 +597,7 @@ TEST(mocked_api_create_device, disable_robust_access) {
         VK_STRUCT(outFeatures13)
     });
 
-    VpDeviceCreateInfo createInfo{ &inCreateInfo, &profile, VP_DEVICE_CREATE_DISABLE_ROBUST_ACCESS_MASK };
+    VpDeviceCreateInfo createInfo{ &inCreateInfo, &profile, VP_DEVICE_CREATE_DISABLE_ROBUST_ACCESS };
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
