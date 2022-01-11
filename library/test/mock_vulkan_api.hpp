@@ -30,19 +30,25 @@
 #include <unordered_map>
 #include <algorithm>
 
-struct ExpectedStructData {
+struct VulkanStructData {
     VkStructureType         sType;
     std::vector<uint8_t>    contents;
 
-    ExpectedStructData(VkStructureType sTypeIn, size_t size, const uint8_t* pData)
+    VulkanStructData(VkStructureType sTypeIn, size_t size, const uint8_t* pData)
         : sType(sTypeIn)
         , contents(size - sizeof(VkBaseInStructure))
     {
         memcpy(contents.data(), pData + sizeof(VkBaseInStructure), size - sizeof(VkBaseInStructure));
     }
+
+    void copyTo(VkBaseOutStructure* pStruct)
+    {
+        uint8_t* p = static_cast<uint8_t*>(static_cast<void*>(pStruct));
+        memcpy(p + sizeof(VkBaseOutStructure), contents.data(), contents.size());
+    }
 };
 
-#define EXPECT_STRUCT(STRUCT) ExpectedStructData(STRUCT.sType, sizeof(STRUCT), static_cast<uint8_t*>(static_cast<void*>(&STRUCT)))
+#define VK_STRUCT(STRUCT) VulkanStructData(STRUCT.sType, sizeof(STRUCT), static_cast<uint8_t*>(static_cast<void*>(&STRUCT)))
 #define VK_EXT(NAME) VkExtensionProperties{ NAME##_EXTENSION_NAME, NAME##_SPEC_VERSION }
 
 class MockVulkanAPI final
@@ -54,11 +60,18 @@ private:
 
     uint32_t                            m_instanceAPIVersion;
     const VkInstanceCreateInfo*         m_pInstanceCreateInfo;
-    std::vector<ExpectedStructData>     m_instanceCreateStructs;
+    std::vector<VulkanStructData>       m_instanceCreateStructs;
 
     uint32_t                            m_deviceAPIVersion;
     const VkDeviceCreateInfo*           m_pDeviceCreateInfo;
-    std::vector<ExpectedStructData>     m_deviceCreateStructs;
+    std::vector<VulkanStructData>       m_deviceCreateStructs;
+
+    using MockedStructData = std::unordered_map<VkStructureType, VulkanStructData>;
+
+    MockedStructData                                m_mockedFeatures;
+    MockedStructData                                m_mockedProperties;
+    std::unordered_map<VkFormat, MockedStructData>  m_mockedFormats;
+    std::vector<MockedStructData>                   m_mockedQueueFamilies;
 
     static MockVulkanAPI*   sInstance;
 
@@ -72,15 +85,15 @@ private:
         return nullptr;
     }
 
-    void CheckChainedStructs(const void* pNext, const std::vector<ExpectedStructData>& expectedStructs)
+    void CheckChainedStructs(const void* pNext, const std::vector<VulkanStructData>& expectedStructs)
     {
-        for (auto& expectedStructData : expectedStructs) {
-            const void* pActualStructData = GetStructure(pNext, expectedStructData.sType);
+        for (auto& VulkanStructData : expectedStructs) {
+            const void* pActualStructData = GetStructure(pNext, VulkanStructData.sType);
             EXPECT_NE(pActualStructData, nullptr) << "Chained struct is missing";
             if (pActualStructData != nullptr) {
-                EXPECT_TRUE(memcmp(expectedStructData.contents.data(),
+                EXPECT_TRUE(memcmp(VulkanStructData.contents.data(),
                                    static_cast<const uint8_t*>(pActualStructData) + sizeof(VkBaseInStructure),
-                                   expectedStructData.contents.size()) == 0) << "Chained struct data mismatch";
+                                   VulkanStructData.contents.size()) == 0) << "Chained struct data mismatch";
             }
         }
     }
@@ -111,6 +124,10 @@ public:
         , m_deviceAPIVersion{ VK_API_VERSION_1_0 }
         , m_pDeviceCreateInfo{}
         , m_deviceCreateStructs{}
+        , m_mockedFeatures{}
+        , m_mockedProperties{}
+        , m_mockedFormats{}
+        , m_mockedQueueFamilies{}
         , vkInstance{ VkInstance(0x11D00D00) }
         , vkPhysicalDevice{ VkPhysicalDevice(0x42D00D00) }
         , vkAllocator{}
@@ -253,7 +270,7 @@ public:
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
-    void SetExpectedInstanceCreateInfo(const VkInstanceCreateInfo* pCreateInfo, std::vector<ExpectedStructData>&& structs)
+    void SetExpectedInstanceCreateInfo(const VkInstanceCreateInfo* pCreateInfo, std::vector<VulkanStructData>&& structs)
     {
         m_pInstanceCreateInfo = pCreateInfo;
         m_instanceCreateStructs = std::move(structs);
@@ -331,13 +348,34 @@ public:
         }
     }
 
+    void SetFeatures(std::vector<VulkanStructData>&& structs)
+    {
+        for (size_t i = 0; i < structs.size(); ++i) {
+            m_mockedFeatures.emplace(structs[i].sType, std::move(structs[i]));
+        }
+    }
+
     static void vkGetPhysicalDeviceFeatures2(
         VkPhysicalDevice                            physicalDevice,
         VkPhysicalDeviceFeatures2*                  pFeatures)
     {
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
         if (sInstance != nullptr) {
-            // TODO
+            VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pFeatures));
+            while (p != nullptr) {
+                auto& it = sInstance->m_mockedFeatures.find(p->sType);
+                if (it != sInstance->m_mockedFeatures.end()) {
+                    it->second.copyTo(p);
+                }
+                p = p->pNext;
+            }
+        }
+    }
+
+    void SetProperties(std::vector<VulkanStructData>&& structs)
+    {
+        for (size_t i = 0; i < structs.size(); ++i) {
+            m_mockedProperties.emplace(structs[i].sType, std::move(structs[i]));
         }
     }
 
@@ -347,7 +385,22 @@ public:
     {
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
         if (sInstance != nullptr) {
-            // TODO
+            VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pProperties));
+            while (p != nullptr) {
+                auto& it = sInstance->m_mockedProperties.find(p->sType);
+                if (it != sInstance->m_mockedProperties.end()) {
+                    it->second.copyTo(p);
+                }
+                p = p->pNext;
+            }
+        }
+    }
+
+    void AddFormat(VkFormat format, std::vector<VulkanStructData>&& structs)
+    {
+        auto& formatProperties = m_mockedFormats[format];
+        for (size_t i = 0; i < structs.size(); ++i) {
+            formatProperties.emplace(structs[i].sType, std::move(structs[i]));
         }
     }
 
@@ -358,7 +411,27 @@ public:
     {
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
         if (sInstance != nullptr) {
-            // TODO
+            auto& fmtIt = sInstance->m_mockedFormats.find(format);
+            if (fmtIt != sInstance->m_mockedFormats.end()) {
+                auto& mockedFormat = fmtIt->second;
+                VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pFormatProperties));
+                while (p != nullptr) {
+                    auto& it = mockedFormat.find(p->sType);
+                    if (it != mockedFormat.end()) {
+                        it->second.copyTo(p);
+                    }
+                    p = p->pNext;
+                }
+            }
+        }
+    }
+
+    void AddQueueFamily(std::vector<VulkanStructData>&& structs)
+    {
+        m_mockedQueueFamilies.push_back({});
+        auto& queueFamilyProperties = m_mockedQueueFamilies.back();
+        for (size_t i = 0; i < structs.size(); ++i) {
+            queueFamilyProperties.emplace(structs[i].sType, std::move(structs[i]));
         }
     }
 
@@ -369,7 +442,23 @@ public:
     {
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
         if (sInstance != nullptr) {
-            // TODO
+            if (pQueueFamilyProperties == nullptr) {
+                *pQueueFamilyPropertyCount = static_cast<uint32_t>(sInstance->m_mockedQueueFamilies.size());
+            } else {
+                if (*pQueueFamilyPropertyCount > sInstance->m_mockedQueueFamilies.size()) {
+                    *pQueueFamilyPropertyCount = static_cast<uint32_t>(sInstance->m_mockedQueueFamilies.size());
+                }
+                for (uint32_t i = 0; i < *pQueueFamilyPropertyCount; ++i) {
+                    VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pQueueFamilyProperties[i]));
+                    while (p != nullptr) {
+                        auto& it = sInstance->m_mockedQueueFamilies[i].find(p->sType);
+                        if (it != sInstance->m_mockedQueueFamilies[i].end()) {
+                            it->second.copyTo(p);
+                        }
+                        p = p->pNext;
+                    }
+                }
+            }
         }
     }
 

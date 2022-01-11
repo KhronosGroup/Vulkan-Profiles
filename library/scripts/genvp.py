@@ -555,28 +555,6 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
-    *pSupported = VK_FALSE;
-
-    if (pDesc->props.specVersion < pProfile->specVersion) {
-        return result;
-    }
-
-    {
-        VkPhysicalDeviceProperties props{};
-        vkGetPhysicalDeviceProperties(physicalDevice, &props);
-        if (!detail::vpCheckVersion(props.apiVersion, pDesc->minApiVersion)) {
-            return result;
-        }
-    }
-
-    for (uint32_t i = 0; i < pDesc->deviceExtensionCount; ++i) {
-        if (!detail::vpCheckExtension(ext.data(), ext.size(),
-            pDesc->pDeviceExtensions[i].extensionName,
-            pDesc->pDeviceExtensions[i].specVersion)) {
-            return result;
-        }
-    }
-
     struct GPDP2EntryPoints {
         PFN_vkGetPhysicalDeviceFeatures2KHR                 pfnGetPhysicalDeviceFeatures2;
         PFN_vkGetPhysicalDeviceProperties2KHR               pfnGetPhysicalDeviceProperties2;
@@ -623,6 +601,28 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 
+    *pSupported = VK_FALSE;
+
+    if (pDesc->props.specVersion < pProfile->specVersion) {
+        return result;
+    }
+
+    {
+        VkPhysicalDeviceProperties props{};
+        vkGetPhysicalDeviceProperties(physicalDevice, &props);
+        if (!detail::vpCheckVersion(props.apiVersion, pDesc->minApiVersion)) {
+            return result;
+        }
+    }
+
+    for (uint32_t i = 0; i < pDesc->deviceExtensionCount; ++i) {
+        if (!detail::vpCheckExtension(ext.data(), ext.size(),
+            pDesc->pDeviceExtensions[i].extensionName,
+            pDesc->pDeviceExtensions[i].specVersion)) {
+            return result;
+        }
+    }
+
     {
         VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
         pDesc->chainers.pfnFeature(static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData,
@@ -630,7 +630,14 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                 UserData* pUserData = static_cast<UserData*>(pUser);
                 pUserData->gpdp2.pfnGetPhysicalDeviceFeatures2(pUserData->physicalDevice,
                                                                static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p)));
-                pUserData->supported = pUserData->pDesc->feature.pfnComparator(p);
+                pUserData->supported = true;
+                while (p != nullptr) {
+                    if (!pUserData->pDesc->feature.pfnComparator(p)) {
+                        pUserData->supported = false;
+                        break;
+                    }
+                    p = p->pNext;
+                }
             }
         );
         if (!userData.supported) {
@@ -645,7 +652,14 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                 UserData* pUserData = static_cast<UserData*>(pUser);
                 pUserData->gpdp2.pfnGetPhysicalDeviceProperties2(pUserData->physicalDevice,
                                                                  static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p)));
-                pUserData->supported = pUserData->pDesc->property.pfnComparator(p);
+                pUserData->supported = true;
+                while (p != nullptr) {
+                    if (!pUserData->pDesc->property.pfnComparator(p)) {
+                        pUserData->supported = false;
+                        break;
+                    }
+                    p = p->pNext;
+                }
             }
         );
         if (!userData.supported) {
@@ -662,7 +676,14 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                 pUserData->gpdp2.pfnGetPhysicalDeviceFormatProperties2(pUserData->physicalDevice,
                                                                        pUserData->pDesc->pFormats[pUserData->index].format,
                                                                        static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p)));
-                pUserData->supported = pUserData->pDesc->pFormats[pUserData->index].pfnComparator(p);
+                pUserData->supported = true;
+                while (p != nullptr) {
+                    if (!pUserData->pDesc->pFormats[pUserData->index].pfnComparator(p)) {
+                        pUserData->supported = false;
+                        break;
+                    }
+                    p = p->pNext;
+                }
             }
         );
         if (!userData.supported) {
@@ -687,7 +708,15 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                 for (uint32_t i = 0; i < pUserData->pDesc->queueFamilyCount; ++i) {
                     pUserData->supported = false;
                     for (uint32_t j = 0; j < pUserData->count; ++j) {
-                        if (pUserData->pDesc->pQueueFamilies[i].pfnComparator(&p[j])) {
+                        bool propsMatch = true;
+                        while (p != nullptr) {
+                            if (!pUserData->pDesc->pQueueFamilies[i].pfnComparator(p)) {
+                                propsMatch = false;
+                                break;
+                            }
+                            p = p->pNext;
+                        }
+                        if (propsMatch) {
                             pUserData->supported = true;
                             break;
                         }

@@ -68,3 +68,5 @@ add_unit_test_simple(test_util)
 
 add_unit_test_simple(test_mocked_api_get_instance_profile_support)
 add_unit_test_simple(test_mocked_api_create_instance)
+add_unit_test_simple(test_mocked_api_get_physdev_profile_support)
+add_unit_test_simple(test_mocked_api_create_device)

@@ -296,9 +296,9 @@ TEST(mocked_api_create_instance, retain_chained_structs) {
     outCreateInfo.ppEnabledExtensionNames = outExtensions.data();
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {
-        EXPECT_STRUCT(validationFlags),
-        EXPECT_STRUCT(validationFeatures),
-        EXPECT_STRUCT(debugReportCallback),
+        VK_STRUCT(validationFlags),
+        VK_STRUCT(validationFeatures),
+        VK_STRUCT(debugReportCallback),
     });
 
     VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
