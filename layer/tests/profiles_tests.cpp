@@ -649,7 +649,7 @@ TEST(profiles, TestSetCombinationMode) {
 
             size_t portability_subset_add = 1;
             for (const auto& ext : device_extensions) {
-                if (ext.extensionName == "VK_KHR_portability_subset") {
+                if (strcmp(ext.extensionName, "VK_KHR_portability_subset") == 0) {
                     portability_subset_add = 0;
                     break;
                 }
@@ -693,7 +693,7 @@ TEST(profiles, TestSetCombinationMode) {
 
             size_t portability_subset_add = 1;
             for (const auto& ext : device_extensions) {
-                if (ext.extensionName == "VK_KHR_portability_subset") {
+                if (strcmp(ext.extensionName, "VK_KHR_portability_subset") == 0) {
                     portability_subset_add = 0;
                     break;
                 }
