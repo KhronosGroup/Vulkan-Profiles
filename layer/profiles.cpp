@@ -3041,46 +3041,48 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         const auto &c = caps[capability];
 
         const auto &extensions = c["extensions"];
-        const auto &features = c["features"];
-        const auto &properties = c["properties"];
-        const auto &formats = c["formats"];
 
+        const auto &properties = c["properties"];
         uint32_t apiVersion = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
         AddPromotedExtensions(apiVersion);
 
-        pdd_.arrayof_extension_properties_.reserve(extensions.size());
-        for (const auto &e : extensions.getMemberNames()) {
-            VkExtensionProperties extension;
-            strcpy(extension.extensionName, e.c_str());
-            extension.specVersion = extensions[e].asInt();
-            bool found = false;
-            for (const auto &ext : pdd_.arrayof_extension_properties_) {
-                if (strcmp(ext.extensionName, extension.extensionName) == 0) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                bool supported_on_device = false;
-                for (const auto &device_extension : pdd_.device_extensions_) {
-                    if (strcmp(device_extension.extensionName, extension.extensionName) == 0) {
-                        supported_on_device = true;
+        if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
+            pdd_.arrayof_extension_properties_.reserve(extensions.size());
+            for (const auto &e : extensions.getMemberNames()) {
+                VkExtensionProperties extension;
+                strcpy(extension.extensionName, e.c_str());
+                extension.specVersion = extensions[e].asInt();
+                bool found = false;
+                for (const auto &ext : pdd_.arrayof_extension_properties_) {
+                    if (strcmp(ext.extensionName, extension.extensionName) == 0) {
+                        found = true;
                         break;
                     }
                 }
-                if (!supported_on_device && layer_settings.debug_fail_on_error) {
-                    return VK_ERROR_INITIALIZATION_FAILED;
-                }
-                pdd_.arrayof_extension_properties_.push_back(extension);
-                if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
-                    if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, extension.extensionName)) {
-                        pdd_.simulation_extensions_.push_back(extension);
+                if (!found) {
+                    bool supported_on_device = false;
+                    for (const auto &device_extension : pdd_.device_extensions_) {
+                        if (strcmp(device_extension.extensionName, extension.extensionName) == 0) {
+                            supported_on_device = true;
+                            break;
+                        }
+                    }
+                    if (!supported_on_device && layer_settings.debug_fail_on_error) {
+                        return VK_ERROR_INITIALIZATION_FAILED;
+                    }
+                    pdd_.arrayof_extension_properties_.push_back(extension);
+                    if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
+                        if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, extension.extensionName)) {
+                            pdd_.simulation_extensions_.push_back(extension);
+                        }
                     }
                 }
             }
         }
 
         if (layer_settings.simulate_capabilities & SIMULATE_FEATURES_BIT) {
+            const auto &features = c["features"];
+
             for (const auto &feature : features.getMemberNames()) {
                 bool success = GetFeature(features, feature);
                 if (!success && layer_settings.debug_fail_on_error) {
@@ -3099,6 +3101,8 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         }
 
         if (layer_settings.simulate_capabilities & SIMULATE_FORMATS_BIT) {
+            const auto &formats = c["formats"];
+
             for (const auto &format : formats.getMemberNames()) {
                 bool success = GetFormat(formats, format, &pdd_.arrayof_format_properties_);
                 if (!success && layer_settings.debug_fail_on_error) {
