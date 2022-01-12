@@ -51,10 +51,7 @@ H_HEADER = '''
     extern "C" {
 #endif
 
-#include <vulkan/vulkan_core.h>
-#ifdef VK_ENABLE_BETA_EXTENSIONS
-#include <vulkan/vulkan_beta.h>
-#endif
+#include <vulkan/vulkan.h>
 '''
 
 H_FOOTER = '''
@@ -80,10 +77,7 @@ HPP_HEADER = '''
 
 #define VPAPI_ATTR inline
 
-#include <vulkan/vulkan_core.h>
-#ifdef VK_ENABLE_BETA_EXTENSIONS
-#include <vulkan/vulkan_beta.h>
-#endif
+#include <vulkan/vulkan.h>
 #include <stddef.h>
 #include <string.h>
 #include <stdint.h>

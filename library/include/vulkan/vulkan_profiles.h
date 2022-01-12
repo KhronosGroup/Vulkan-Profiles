@@ -25,10 +25,7 @@
     extern "C" {
 #endif
 
-#include <vulkan/vulkan_core.h>
-#ifdef VK_ENABLE_BETA_EXTENSIONS
-#include <vulkan/vulkan_beta.h>
-#endif
+#include <vulkan/vulkan.h>
 
 #if defined(VK_VERSION_1_0) && \
     defined(VK_EXT_swapchain_colorspace) && \
