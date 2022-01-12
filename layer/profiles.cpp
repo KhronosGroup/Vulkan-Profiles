@@ -6345,7 +6345,7 @@ static void InitSettings() {
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugFailOnError, layer_settings.debug_fail_on_error ? "true" : "false");
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugReports, debug_reports_log.c_str());
 
-    LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, format("Profile Layers Settings: {\n\t%s\n}\n", settings_log));
+    LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, format("Profile Layers Settings: {\n\t%s\n}\n", settings_log.c_str()));
 }
 
 // Generic layer dispatch table setup, see [LALI].
