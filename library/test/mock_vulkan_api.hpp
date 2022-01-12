@@ -70,7 +70,7 @@ private:
 
     MockedStructData                                m_mockedFeatures;
     MockedStructData                                m_mockedProperties;
-    std::unordered_map<VkFormat, MockedStructData>  m_mockedFormats;
+    std::unordered_map<uint32_t, MockedStructData>  m_mockedFormats;
     std::vector<MockedStructData>                   m_mockedQueueFamilies;
 
     static MockVulkanAPI*   sInstance;
