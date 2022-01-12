@@ -413,7 +413,7 @@ public:
     {
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
         if (sInstance != nullptr) {
-            auto& fmtIt = sInstance->m_mockedFormats.find(format);
+            auto fmtIt = sInstance->m_mockedFormats.find(format);
             if (fmtIt != sInstance->m_mockedFormats.end()) {
                 auto& mockedFormat = fmtIt->second;
                 VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pFormatProperties));
