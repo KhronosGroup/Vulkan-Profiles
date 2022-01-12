@@ -198,7 +198,7 @@ struct LayerSettings {
 // Various small utility functions ///////////////////////////////////////////////////////////////////////////////////////////////
 
 #if defined(__ANDROID__)
-void AndroidPrintf(VkLogLevel level, const char *fmt, va_list args) {
+void AndroidPrintf(DebugReport level, const char *fmt, va_list args) {
     int requiredLength;
     va_list argcopy;
     va_copy(argcopy, args);
@@ -208,10 +208,10 @@ void AndroidPrintf(VkLogLevel level, const char *fmt, va_list args) {
     char *message = (char *)malloc(requiredLength);
     vsnprintf(message, requiredLength, fmt, args);
     switch (level) {
-        case VK_LOG_DEBUG:
+        case DEBUG_REPORT_NOTIFICATION_BIT:
             __android_log_print(ANDROID_LOG_DEBUG, "profiles", "%s", message);
             break;
-        case VK_LOG_ERROR:
+        case DEBUG_REPORT_ERROR_BIT:
             __android_log_print(ANDROID_LOG_ERROR, "profiles", "%s", message);
             break;
         default:
@@ -230,7 +230,7 @@ void DebugPrintf(const char *fmt, ...) {
         va_list args;
         va_start(args, fmt);
 #if defined(__ANDROID__)
-        AndroidPrintf(VK_LOG_DEBUG, fmt, args);
+        AndroidPrintf(DEBUG_REPORT_NOTIFICATION_BIT, fmt, args);
 #else
         vprintf(fmt, args);
 #endif
@@ -246,7 +246,7 @@ void ErrorPrintf(const char *fmt, ...) {
         va_list args;
         va_start(args, fmt);
 #if defined(__ANDROID__)
-        AndroidPrintf(VK_LOG_ERROR, fmt, args);
+        AndroidPrintf(DEBUG_REPORT_ERROR_BIT, fmt, args);
 #else
         vfprintf(stderr, fmt, args);
 #endif
