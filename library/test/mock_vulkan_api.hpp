@@ -66,7 +66,7 @@ private:
     const VkDeviceCreateInfo*           m_pDeviceCreateInfo;
     std::vector<VulkanStructData>       m_deviceCreateStructs;
 
-    using MockedStructData = std::unordered_map<VkStructureType, VulkanStructData>;
+    using MockedStructData = std::unordered_map<uint32_t, VulkanStructData>;
 
     MockedStructData                                m_mockedFeatures;
     MockedStructData                                m_mockedProperties;
