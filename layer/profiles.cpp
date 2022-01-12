@@ -7798,11 +7798,13 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
                 *pFormatProperties = device_format;
             }
 
-            // TODO FIXME: this code is totally wrong, the values are flags!
-            if ((*pFormatProperties).linearTilingFeatures > device_format.linearTilingFeatures ||
-                (*pFormatProperties).optimalTilingFeatures > device_format.optimalTilingFeatures ||
-                (*pFormatProperties).bufferFeatures > device_format.bufferFeatures)
+            if (((*pFormatProperties).linearTilingFeatures | device_format.linearTilingFeatures) !=
+                    device_format.linearTilingFeatures ||
+                ((*pFormatProperties).optimalTilingFeatures | device_format.optimalTilingFeatures) !=
+                    device_format.optimalTilingFeatures ||
+                ((*pFormatProperties).bufferFeatures | device_format.bufferFeatures) != device_format.bufferFeatures) {
                 DebugPrintf("WARN format %s may be simulating unsupported features!\n", vkFormatToString(format).c_str());
+            }
         }
     }
 }
