@@ -121,7 +121,7 @@ enum SimulateCapabilityFlag {
 typedef int SimulateCapabilityFlags;
 
 static SimulateCapabilityFlags GetSimulateCapabilityFlags(const vku::Strings &values) {
-    int result = 0;
+    SimulateCapabilityFlags result = 0;
 
     for (std::size_t i = 0, n = values.size(); i < n; ++i) {
         if (values[i] == "SIMULATE_API_VERSION_BIT") {
@@ -183,7 +183,7 @@ enum DebugAction { DEBUG_ACTION_LOG_BIT = (1 << 0), DEBUG_ACTION_OUTPUT_BIT = (1
 typedef int DebugActionFlags;
 
 static DebugActionFlags GetDebugActionFlags(const vku::Strings &values) {
-    int result = 0;
+    DebugActionFlags result = 0;
 
     for (std::size_t i = 0, n = values.size(); i < n; ++i) {
         if (values[i] == "DEBUG_ACTION_LOG_BIT") {
@@ -229,7 +229,7 @@ enum DebugReport {
 typedef int DebugReportFlags;
 
 DebugReportFlags GetDebugReportFlags(const vku::Strings &values) {
-    int result = 0;
+    DebugReportFlags result = 0;
 
     for (std::size_t i = 0, n = values.size(); i < n; ++i) {
         if (values[i] == "DEBUG_REPORT_NOTIFICATION_BIT") {
