@@ -301,6 +301,9 @@ std::string format(const char *message, ...) {
 void AndroidPrintf(DebugReport level, const std::string &message) {
     switch (level) {
         default:
+        case DEBUG_REPORT_DEBUG_BIT:
+            __android_log_print(ANDROID_LOG_INFO, "Profiles", "%s", message.c_str());
+            break;
         case DEBUG_REPORT_NOTIFICATION_BIT:
             __android_log_print(ANDROID_LOG_INFO, "Profiles", "%s", message.c_str());
             break;
@@ -315,9 +318,19 @@ void AndroidPrintf(DebugReport level, const std::string &message) {
 #endif
 
 const char *GetLogPrefix(DebugReport report) {
-    static const char *table[] = {"\tPROFILES NOTIFICATION: ", "\tPROFILES WARNING: ", "\tPROFILES ERROR: ", "\tPROFILES DEBUG: "};
+    static const char *table[] = {"PROFILES NOTIFICATION: ", "PROFILES WARNING: ", "PROFILES ERROR: ", "PROFILES DEBUG: "};
 
-    return table[report];
+    switch (report) {
+        case DEBUG_REPORT_NOTIFICATION_BIT:
+            return table[0];
+        default:
+        case DEBUG_REPORT_WARNING_BIT:
+            return table[1];
+        case DEBUG_REPORT_ERROR_BIT:
+            return table[2];
+        case DEBUG_REPORT_DEBUG_BIT:
+            return table[3];
+    }
 }
 
 void LogMessage(DebugReport report, const std::string &message) {
@@ -6354,7 +6367,7 @@ static void InitSettings() {
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugFailOnError, layer_settings.debug_fail_on_error ? "true" : "false");
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugReports, debug_reports_log.c_str());
 
-    LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, format("Profile Layers Settings: {\n\t%s\n}\n", settings_log.c_str()));
+    LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, format("Profile Layers Settings: {\n%s}", settings_log.c_str()));
 }
 
 // Generic layer dispatch table setup, see [LALI].
@@ -9563,7 +9576,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             LoadDeviceFormats(instance, physical_device, &pdd.device_formats_);
 
             LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
-                       format("\tdeviceName \"%s\"\n", pdd.physical_device_properties_.deviceName).c_str());
+                       format("deviceName \"%s\"\n", pdd.physical_device_properties_.deviceName).c_str());
 
             // Override PDD members with values from configuration file(s).
             JsonLoader json_loader(pdd);
