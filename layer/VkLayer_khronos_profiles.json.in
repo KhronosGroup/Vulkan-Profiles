@@ -38,6 +38,10 @@
                         {
                             "key": "profile_name",
                             "value": "VP_LUNARG_desktop_portability_2021_subset"
+                        },
+                        {
+                            "key": "simulate_capabilities",
+                            "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
                         }
                     ]
                 },
@@ -58,6 +62,10 @@
                         {
                             "key": "profile_name",
                             "value": "VP_KHR_roadmap_2022"
+                        },
+                        {
+                            "key": "simulate_capabilities",
+                            "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
                         }
                     ]
                 },
@@ -78,6 +86,10 @@
                         {
                             "key": "profile_name",
                             "value": "VP_ANDROID_baseline_2021"
+                        },
+                        {
+                            "key": "simulate_capabilities",
+                            "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT", "SIMULATE_FORMATS_BIT", "SIMULATE_FORMAT_PROPERTIES_BIT" ]
                         }
                     ]
                 }
@@ -104,102 +116,6 @@
                     ]
                 },
                 {
-                    "key": "simulate_capabilities_modes",
-                    "label": "Simulate Vulkan Capabilities Modes",
-                    "description": "Control of the simulated capabilities of the Vulkan physical device from the selected Vulkan Profile.",
-                    "status": "STABLE",
-                    "type": "GROUP",
-                    "settings": [
-                        {
-                            "key": "simulate_extension_list",
-                            "label": "Extensions",
-                            "description": "Modes to control the simulated extensions list of the Vulkan physical device.",
-                            "type": "ENUM",
-                            "flags": [
-                                {
-                                    "key": "from_device",
-                                    "label": "From Device",
-                                    "description": "Uses the physical device's actual format list. The selected Vulkan Profile is ignored."
-                                },
-                                {
-                                    "key": "check_support",
-                                    "label": "Check Support",
-                                    "description": "Checks if the device supports the extensions from the selected Vulkan Profile."
-                                },
-                                {
-                                    "key": "from_profile",
-                                    "label": "From Profile",
-                                    "description": "Replaces the device's extension list with the extension list provided by the selected Vulkan Profile, if an extension is not supported by the device it will return an error."
-                                },
-                                {
-                                    "key": "from_profile_override",
-                                    "label": "From Profile Override",
-                                    "description": "Replaces the device's extension list with the extension list provided by the selected Vulkan Profile."
-                                }
-                            ],
-                            "default": "check_support"
-                        },
-                        {
-                            "key": "simulate_format_list",
-                            "label": "Formats",
-                            "description": "Modes to control the simulated format list of the Vulkan physical device.",
-                            "type": "ENUM",
-                            "flags": [
-                                {
-                                    "key": "from_device",
-                                    "label": "From Device",
-                                    "description": "Uses the physical device's actual format list. The selected Vulkan Profile is ignored."
-                                },
-                                {
-                                    "key": "check_support",
-                                    "label": "Check Support",
-                                    "description": "Checks if the device supports the format list from the selected Vulkan Profile."
-                                },
-                                {
-                                    "key": "from_profile",
-                                    "label": "From Profile",
-                                    "description": "Fully replaces the device's format list with the format list provided by the selected Vulkan Profile, if a format is not supported by the devcie it will return an error."
-                                },
-                                {
-                                    "key": "from_profile_override",
-                                    "label": "From profile override",
-                                    "description": "Fully replaces the device's format list with the format list provided by the selected Vulkan Profile."
-                                }
-                            ],
-                            "default": "check_support"
-                        },
-                        {
-                            "key": "simulate_format_properties",
-                            "label": "Format Properties",
-                            "description": "Modes to control the simulated format properties of the Vulkan physical device.",
-                            "type": "ENUM",
-                            "flags": [
-                                {
-                                    "key": "from_device",
-                                    "label": "From Device",
-                                    "description": "Uses the physical device's actual format list. The selected Vulkan Profile is ignored."
-                                },
-                                {
-                                    "key": "check_support",
-                                    "label": "Check Support",
-                                    "description": "Checks if the device supports the format properties from the selected Vulkan Profile."
-                                },
-                                {
-                                    "key": "from_profile",
-                                    "label": "From Profile",
-                                    "description": "Fully replaces the device's format properties with the format properties provided by the selected Vulkan Profile, if format properties are not supported by the device it will return an error."
-                                },
-                                {
-                                    "key": "from_profile_override",
-                                    "label": "From Profile Override",
-                                    "description": "Fully replaces the device's format properties with the format properties provided by the selected Vulkan Profile."
-                                }
-                            ],
-                            "default": "check_support"
-                        }
-                    ]
-                },
-                {
                     "key": "emulate_portability",
                     "label": "Emulate VK_KHR_portability_subset",
                     "description": "Emulate the VK_KHR_portability_subset extension on the device.",
@@ -212,12 +128,125 @@
                     "default": true
                 },
                 {
-                    "key": "debug_output",
-                    "label": "Debug Output",
+                    "key": "simulate_capabilities",
+                    "label": "Simulate Profile Capabilities",
+                    "description": "Control of the simulated capabilities of the Vulkan physical device from the selected Vulkan Profile.",
                     "status": "STABLE",
-                    "description": "Enables debug message output.",
+                    "type": "FLAGS",
+                    "flags": [
+                        {
+                            "key": "SIMULATE_API_VERSION_BIT",
+                            "label": "Version",
+                            "description": "The Vulkan device will report the API version from the selected Profile."
+                        },
+                        {
+                            "key": "SIMULATE_FEATURES_BIT",
+                            "label": "Features",
+                            "description": "The Vulkan device will report the features from the selected Profile."
+                        },
+                        {
+                            "key": "SIMULATE_PROPERTIES_BIT",
+                            "label": "Properties",
+                            "description": "The Vulkan device will report the properties from the selected Profile."
+                        },
+                        {
+                            "key": "SIMULATE_EXTENSIONS_BIT",
+                            "label": "Extensions",
+                            "description": "The Vulkan device will report the extensions from the selected Profile."
+                        },
+                        {
+                            "key": "SIMULATE_FORMATS_BIT",
+                            "label": "Formats",
+                            "description": "The Vulkan device will report the formats from the selected Profile."
+                        },
+                        {
+                            "key": "SIMULATE_FORMAT_PROPERTIES_BIT",
+                            "label": "Format Properties",
+                            "description": "The Vulkan device will report the format properties from the selected Profile."
+                        }
+                    ],
+                    "default": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
+                },
+                {
+                    "key": "debug_actions",
+                    "label": "Debug Actions",
+                    "description": "This indicates what action is to be taken when a layer wants to report information",
+                    "status": "STABLE",
+                    "type": "FLAGS",
+                    "flags": [
+                        {
+                            "key": "DEBUG_ACTION_LOG_BIT",
+                            "label": "Log Message",
+                            "description": "Log a txt message to stdout or to a log filename.",
+                            "settings": [
+                                {
+                                    "key": "debug_filename",
+                                    "label": "Log Filename",
+                                    "description": "Specifies the output filename",
+                                    "type": "SAVE_FILE",
+                                    "default": "stdout",
+                                    "dependence": {
+                                        "mode": "ALL",
+                                        "settings": [
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "debug_action_log" ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "key": "DEBUG_ACTION_OUTPUT_BIT",
+                            "label": "Debug Output",
+                            "description": "Log a txt message using the Windows OutputDebugString function.",
+                            "platforms": [ "WINDOWS" ]
+                        },
+                        {
+                            "key": "DEBUG_ACTION_BREAKPOINT_BIT",
+                            "label": "Break",
+                            "description": "Trigger a breakpoint if a debugger is in use."
+                        }
+                    ],
+                    "default": [ "DEBUG_ACTION_LOG_BIT" ]
+                },
+                {
+                    "key": "debug_fail_on_error",
+                    "label": "Fail On Error",
+                    "description": "If the device doesn't support the capabilities of the selected Profile, the layer fail to load. When enabled, vkEnumeratePhysicalDevices will fail when the selected Profile is not supported.",
+                    "status": "STABLE",
                     "type": "BOOL",
-                    "default": true
+                    "default": false
+                },
+                {
+                    "key": "debug_reports",
+                    "label": "Message Types",
+                    "description": "This is a comma-delineated list of options telling the layer what types of messages it should report back",
+                    "status": "STABLE",
+                    "type": "FLAGS",
+                    "flags": [
+                        {
+                            "key": "DEBUG_REPORT_NOTIFICATION_BIT",
+                            "label": "Notification",
+                            "description": "Report notifications."
+                        },
+                        {
+                            "key": "DEBUG_REPORT_WARNING_BIT",
+                            "label": "Warning",
+                            "description": "Report warnings from using the API in a manner which may lead to undefined behavior or to warn the user of common trouble spots. A warning does NOT necessarily signify illegal application behavior."
+                        },
+                        {
+                            "key": "DEBUG_REPORT_ERROR_BIT",
+                            "label": "Error",
+                            "description": "Report errors in API usage."
+                        }
+                    ],
+                    "default": [
+                        "DEBUG_REPORT_NOTIFICATION_BIT",
+                        "DEBUG_REPORT_WARNING_BIT",
+                        "DEBUG_REPORT_ERROR_BIT"
+                    ]
                 }
             ]
         }
