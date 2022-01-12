@@ -1861,6 +1861,16 @@ class JsonLoader {
         return false;
     }
 
+    static bool WarnIfGreaterSizet(const char *name, const size_t new_value, const size_t old_value) {
+        if (new_value > old_value) {
+            DebugPrintf("WARN \"%s\" JSON value (%" PRIuLEAST64 ") is greater than existing value (%" PRIuLEAST64 ")\n", name,
+                        new_value,
+                        old_value);
+            return true;
+        }
+        return false;
+    }
+
     static bool WarnIfGreaterFloat(const char *name, const float new_value, const float old_value) {
         if (new_value > old_value) {
             DebugPrintf("WARN \"%s\" JSON value (%3.2f) is greater than existing value (%3.2f)\n", name, new_value, old_value);
@@ -1880,6 +1890,16 @@ class JsonLoader {
     static bool WarnIfLesser(const char *name, const uint64_t new_value, const uint64_t old_value) {
         if (new_value < old_value) {
             DebugPrintf("WARN \"%s\" JSON value (%" PRIu64 ") is lesser than existing value (%" PRIu64 ")\n", name, new_value,
+                        old_value);
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfLesserSizet(const char *name, const size_t new_value, const size_t old_value) {
+        if (new_value < old_value) {
+            DebugPrintf("WARN \"%s\" JSON value (%" PRIuLEAST64 ") is lesser than existing value (%" PRIuLEAST64 ")\n", name,
+                        new_value,
                         old_value);
             return true;
         }
@@ -3661,7 +3681,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_ARRAY(maxViewportDimensions);  // size == 2
         GET_ARRAY(viewportBoundsRange);    // size == 2
         GET_VALUE_WARN(prop, viewportSubPixelBits, WarnIfGreater);
-        GET_VALUE_WARN(prop, minMemoryMapAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, minMemoryMapAlignment, WarnIfGreaterSizet);
         GET_VALUE_WARN(prop, minTexelBufferOffsetAlignment, WarnIfGreater);
         GET_VALUE_WARN(prop, minUniformBufferOffsetAlignment, WarnIfGreater);
         GET_VALUE_WARN(prop, minStorageBufferOffsetAlignment, WarnIfGreater);
