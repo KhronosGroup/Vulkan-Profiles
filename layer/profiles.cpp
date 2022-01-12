@@ -24,7 +24,6 @@
  * This Profiles layer simulates a device by loading a JSON configuration file to override values that would normally be returned
  * from a Vulkan implementation.  Configuration files must validate with the Profiles schema; this layer does not redundantly
  * check for configuration errors that would be caught by schema validation.
- * See JsonLoader::IdentifySchema() for the URIs of supported schemas.
  *
  * References (several documents are also included in the LunarG Vulkan SDK, see [SDK]):
  * [SPEC]   https://www.khronos.org/registry/vulkan/specs/1.0-extensions/html/vkspec.html
@@ -74,6 +73,8 @@ const uint32_t kVersionProfilesMinor = 9;
 const uint32_t kVersionProfilesPatch = 1;
 const uint32_t kVersionProfilesImplementation =
     VK_MAKE_VERSION(kVersionProfilesMajor, kVersionProfilesMinor, kVersionProfilesPatch);
+
+static const char *SCHEMA_URI_BASE = "https://schema.khronos.org/vulkan/profiles-";
 
 // Properties of this layer:
 const VkLayerProperties kLayerProperties[] = {{
@@ -1636,17 +1637,14 @@ class JsonLoader {
     VkResult LoadFiles(const char *filename_list);
     VkResult LoadFile(const char *filename);
     bool ReturnError() const;
-    VkResult ReadProfile(const Json::Value root, const std::vector<std::string>& capabilities);
+    VkResult ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities);
 
    private:
-    enum class SchemaId { kUnknown = 0, kProfiles_1_3_200, kProfiles_1_3_201, kProfiles_1_3_203 };
-
     struct Extension {
         std::string name;
         int specVersion;
     };
 
-    SchemaId IdentifySchema(const Json::Value &value);
     bool GetFeature(const Json::Value &features, const std::string &feature_name);
     bool GetProperty(const Json::Value &props, const std::string &property_name);
     bool GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest);
@@ -1864,8 +1862,7 @@ class JsonLoader {
     static bool WarnIfGreaterSizet(const char *name, const size_t new_value, const size_t old_value) {
         if (new_value > old_value) {
             DebugPrintf("WARN \"%s\" JSON value (%" PRIuLEAST64 ") is greater than existing value (%" PRIuLEAST64 ")\n", name,
-                        new_value,
-                        old_value);
+                        new_value, old_value);
             return true;
         }
         return false;
@@ -1899,8 +1896,7 @@ class JsonLoader {
     static bool WarnIfLesserSizet(const char *name, const size_t new_value, const size_t old_value) {
         if (new_value < old_value) {
             DebugPrintf("WARN \"%s\" JSON value (%" PRIuLEAST64 ") is lesser than existing value (%" PRIuLEAST64 ")\n", name,
-                        new_value,
-                        old_value);
+                        new_value, old_value);
             return true;
         }
         return false;
@@ -2549,8 +2545,7 @@ VkResult JsonLoader::LoadFiles() {
     if (inputFilename.fromEnvVar) {
         DebugPrintf("envar %s = \"%s\"\n", kEnvarProfilesFilename, filename_list);
     } else {
-        DebugPrintf("vk_layer_settings.txt setting %s = \"%s\"\n", kLayerSettingsProfileFile,
-                    filename_list);
+        DebugPrintf("vk_layer_settings.txt setting %s = \"%s\"\n", kLayerSettingsProfileFile, filename_list);
     }
     return LoadFiles(filename_list);
 }
@@ -3246,7 +3241,7 @@ VkResult JsonLoader::LoadFile(const char *filename) {
     for (const auto &profile : profiles.getMemberNames()) {
         bool select = (profile_name.empty() && !profiles[profile].isMember("fallback")) || (profile == profile_name);
         if (select) {
-            const auto& caps = profiles[profile]["capabilities"];
+            const auto &caps = profiles[profile]["capabilities"];
             for (const auto &cap : caps) {
                 capabilities.push_back(cap.asString());
             }
@@ -3259,10 +3254,30 @@ VkResult JsonLoader::LoadFile(const char *filename) {
 
     DebugPrintf("{\n");
     const Json::Value schema_value = root["$schema"];
-    const SchemaId schema_id = IdentifySchema(schema_value);
-    if (schema_id == SchemaId::kUnknown) {
+    if (!schema_value.isString()) {
+        ErrorPrintf("JSON element \"$schema\" is not a string\n");
+        return VK_ERROR_INITIALIZATION_FAILED;
+    } 
+    
+    const std::string schema = schema_value.asCString();
+    if (schema.find(SCHEMA_URI_BASE) == std::string::npos) {
+        DebugPrintf("Document schema \"%s\" not supported by %s\n", schema.c_str(), kOurLayerName);
         DebugPrintf("}\n");
         return VK_ERROR_INITIALIZATION_FAILED;
+    }
+
+    const std::size_t size_schema = schema.size();
+    const std::size_t size_base = std::strlen(SCHEMA_URI_BASE);
+    const std::size_t size_version = std::strlen(".json#");
+    const std::string version = schema.substr(size_base, size_schema - size_base - size_version);
+
+    uint32_t version_major = 0;
+    uint32_t version_minor = 0;
+    uint32_t version_patch = 0;
+    std::sscanf(version.c_str(), "%d.%d.%d", &version_major, &version_minor, &version_patch);
+    if (VK_HEADER_VERSION < version_patch) {
+        DebugPrintf("%s is built againt Vulkan Header %d but the profile is written againt Vulkan Header %d. All newer capabilities in the profile will be ignored by the layer.\n", 
+            kOurLayerName, VK_HEADER_VERSION, version_patch);
     }
 
     VkResult result = VK_SUCCESS;
@@ -3282,30 +3297,6 @@ VkResult JsonLoader::LoadFile(const char *filename) {
     DebugPrintf("}\n");
 
     return result;
-}
-
-JsonLoader::SchemaId JsonLoader::IdentifySchema(const Json::Value &value) {
-    if (!value.isString()) {
-        ErrorPrintf("JSON element \"$schema\" is not a string\n");
-        return SchemaId::kUnknown;
-    }
-
-    SchemaId schema_id = SchemaId::kUnknown;
-    const char *schema_string = value.asCString();
-    if (strcmp(schema_string, "https://schema.khronos.org/vulkan/profiles-1.3.200.json#") == 0) {
-        schema_id = SchemaId::kProfiles_1_3_200;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/profiles-1.3.201.json#") == 0) {
-        schema_id = SchemaId::kProfiles_1_3_201;
-    } else if (strcmp(schema_string, "https://schema.khronos.org/vulkan/profiles-1.3.203.json#") == 0) {
-        schema_id = SchemaId::kProfiles_1_3_203;
-    }
-
-    if (schema_id != SchemaId::kUnknown) {
-        DebugPrintf("\tDocument schema \"%s\" is schema_id %d\n", schema_string, schema_id);
-    } else {
-        ErrorPrintf("Document schema \"%s\" not supported by %s\n", schema_string, kOurLayerName);
-    }
-    return schema_id;
 }
 
 // Apply the DRY principle, see https://en.wikipedia.org/wiki/Don%27t_repeat_yourself
@@ -3534,7 +3525,7 @@ bool JsonLoader::GetValuePhysicalDevicePCIBusInfoPropertiesEXT(const Json::Value
     return valid;
 }
 
-bool JsonLoader::GetValuePhysicalDeviceDrmPropertiesEXT(const Json::Value& parent) {
+bool JsonLoader::GetValuePhysicalDeviceDrmPropertiesEXT(const Json::Value &parent) {
     DebugPrintf("\t\tJsonLoader::GetValue(VkPhysicalDeviceDrmPropertiesEXT)\n");
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -7745,7 +7736,8 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_FEATURES_QCOM:
-                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData,
+                                                              VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME)) {
                     VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM *fdmof =
                         (VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM *)place;
                     void *pNext = fdmof->pNext;
@@ -9995,14 +9987,19 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
 
             TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_image_robustness_features_));
             TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_inline_uniform_block_features_));
-            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_pipeline_creation_cache_control_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_),
+                          &(pdd.physical_device_pipeline_creation_cache_control_features_));
             TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_private_data_features_));
-            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_shader_demote_to_helper_invocation_features_));
-            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_shader_terminate_invocation_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_),
+                          &(pdd.physical_device_shader_demote_to_helper_invocation_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_),
+                          &(pdd.physical_device_shader_terminate_invocation_features_));
             TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_subgroup_size_control_features_));
             TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_synchronization2_features_));
-            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_texture_compression_astc_hdr_features_));
-            TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_zero_initialize_workgroup_memory_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_),
+                          &(pdd.physical_device_texture_compression_astc_hdr_features_));
+            TransferValue(&(pdd.physical_device_vulkan_1_3_features_),
+                          &(pdd.physical_device_zero_initialize_workgroup_memory_features_));
             TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_dynamic_rendering_features_));
             TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_shader_integer_dot_product_features_));
             TransferValue(&(pdd.physical_device_vulkan_1_3_features_), &(pdd.physical_device_maintenance_4_features_));
