@@ -142,7 +142,7 @@ public:
         sInstance = nullptr;
     }
 
-    static PFN_vkVoidFunction vkGetInstanceProcAddr(
+    static VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(
         VkInstance                                  instance,
         const char*                                 pName)
     {
@@ -184,7 +184,7 @@ public:
         }
     }
 
-    static VkResult vkEnumerateInstanceVersion(
+    static VKAPI_ATTR VkResult VKAPI_CALL vkEnumerateInstanceVersion(
         uint32_t*                                   pApiVersion)
     {
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
@@ -201,7 +201,7 @@ public:
         m_instanceExtensions[layerName] = extensions;
     }
 
-    static VkResult vkEnumerateInstanceExtensionProperties(
+    static VKAPI_ATTR VkResult VKAPI_CALL vkEnumerateInstanceExtensionProperties(
         const char*                                 pLayerName,
         uint32_t*                                   pPropertyCount,
         VkExtensionProperties*                      pProperties)
@@ -239,7 +239,7 @@ public:
         m_deviceExtensions[physicalDevice] = extensions;
     }
 
-    static VkResult vkEnumerateDeviceExtensionProperties(
+    static VKAPI_ATTR VkResult VKAPI_CALL vkEnumerateDeviceExtensionProperties(
         VkPhysicalDevice                            physicalDevice,
         const char*                                 pLayerName,
         uint32_t*                                   pPropertyCount,
@@ -278,7 +278,7 @@ public:
         m_instanceCreateStructs = std::move(structs);
     }
 
-    static VkResult vkCreateInstance(
+    static VKAPI_ATTR VkResult VKAPI_CALL vkCreateInstance(
         const VkInstanceCreateInfo*                 pCreateInfo,
         const VkAllocationCallbacks*                pAllocator,
         VkInstance*                                 pInstance)
@@ -340,7 +340,7 @@ public:
         m_deviceAPIVersion = version;
     }
 
-    static void vkGetPhysicalDeviceProperties(
+    static VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceProperties(
         VkPhysicalDevice                            physicalDevice,
         VkPhysicalDeviceProperties*                 pProperties)
     {
@@ -357,7 +357,7 @@ public:
         }
     }
 
-    static void vkGetPhysicalDeviceFeatures2(
+    static VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceFeatures2(
         VkPhysicalDevice                            physicalDevice,
         VkPhysicalDeviceFeatures2*                  pFeatures)
     {
@@ -381,7 +381,7 @@ public:
         }
     }
 
-    static void vkGetPhysicalDeviceProperties2(
+    static VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceProperties2(
         VkPhysicalDevice                            physicalDevice,
         VkPhysicalDeviceProperties2*                pProperties)
     {
@@ -406,7 +406,7 @@ public:
         }
     }
 
-    static void vkGetPhysicalDeviceFormatProperties2(
+    static VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceFormatProperties2(
         VkPhysicalDevice                            physicalDevice,
         VkFormat                                    format,
         VkFormatProperties2*                        pFormatProperties)
@@ -437,7 +437,7 @@ public:
         }
     }
 
-    static void vkGetPhysicalDeviceQueueFamilyProperties2(
+    static VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceQueueFamilyProperties2(
         VkPhysicalDevice                            physicalDevice,
         uint32_t*                                   pQueueFamilyPropertyCount,
         VkQueueFamilyProperties2*                   pQueueFamilyProperties)
@@ -470,7 +470,7 @@ public:
         m_deviceCreateStructs = std::move(structs);
     }
 
-    static VkResult vkCreateDevice(
+    static VKAPI_ATTR VkResult VKAPI_CALL vkCreateDevice(
         VkPhysicalDevice                            physicalDevice,
         const VkDeviceCreateInfo*                   pCreateInfo,
         const VkAllocationCallbacks*                pAllocator,
