@@ -143,7 +143,7 @@ static SimulateCapabilityFlags GetSimulateCapabilityFlags(const vku::Strings &va
 }
 
 static std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags) {
-    std::string result;
+    std::string result = {};
     bool need_comma = false;
 
     if (flags & SIMULATE_API_VERSION_BIT) {
@@ -199,7 +199,7 @@ static DebugActionFlags GetDebugActionFlags(const vku::Strings &values) {
 }
 
 static std::string GetDebugActionsLog(DebugActionFlags flags) {
-    std::string result;
+    std::string result = {};
     bool need_comma = false;
 
     if (flags & DEBUG_ACTION_LOG_BIT) {
@@ -245,7 +245,7 @@ DebugReportFlags GetDebugReportFlags(const vku::Strings &values) {
 }
 
 static std::string GetDebugReportsLog(DebugActionFlags flags) {
-    std::string result;
+    std::string result = {};
     bool need_comma = false;
 
     if (flags & DEBUG_REPORT_NOTIFICATION_BIT) {
