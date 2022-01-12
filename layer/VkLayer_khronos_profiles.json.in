@@ -240,6 +240,12 @@
                             "key": "DEBUG_REPORT_ERROR_BIT",
                             "label": "Error",
                             "description": "Report errors in API usage."
+                        },
+                        {
+                            "key": "DEBUG_REPORT_DEBUG_BIT",
+                            "label": "Debug",
+                            "description": "Report debug information for the Profiles Layer development.",
+                            "view": "ADVANCED"
                         }
                     ],
                     "default": [
