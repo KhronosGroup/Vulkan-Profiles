@@ -190,7 +190,7 @@
                                         "settings": [
                                             {
                                                 "key": "debug_actions",
-                                                "value": [ "debug_action_log" ]
+                                                "value": [ "DEBUG_ACTION_LOG_BIT" ]
                                             }
                                         ]
                                     }
