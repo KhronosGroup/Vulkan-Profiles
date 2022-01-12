@@ -63,7 +63,7 @@ TEST(mocked_api_create_device, default_extensions) {
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(device, mock.vkDevice);
+    EXPECT_TRUE(device == mock.vkDevice);
 }
 
 TEST(mocked_api_create_device, default_extensions_negative) {
@@ -162,7 +162,7 @@ TEST(mocked_api_create_device, override_extensions) {
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(device, mock.vkDevice);
+    EXPECT_TRUE(device == mock.vkDevice);
 }
 
 TEST(mocked_api_create_device, merge_extensions) {
@@ -215,7 +215,7 @@ TEST(mocked_api_create_device, merge_extensions) {
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(device, mock.vkDevice);
+    EXPECT_TRUE(device == mock.vkDevice);
 }
 
 TEST(mocked_api_create_device, default_features) {
@@ -260,7 +260,7 @@ TEST(mocked_api_create_device, default_features) {
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(device, mock.vkDevice);
+    EXPECT_TRUE(device == mock.vkDevice);
 }
 
 TEST(mocked_api_create_device, default_features_negative) {
@@ -362,7 +362,7 @@ TEST(mocked_api_create_device, override_features) {
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(device, mock.vkDevice);
+    EXPECT_TRUE(device == mock.vkDevice);
 }
 
 TEST(mocked_api_create_device, override_all_features) {
@@ -407,7 +407,7 @@ TEST(mocked_api_create_device, override_all_features) {
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(device, mock.vkDevice);
+    EXPECT_TRUE(device == mock.vkDevice);
 }
 
 TEST(mocked_api_create_device, legacy_enabled_features) {
@@ -461,7 +461,7 @@ TEST(mocked_api_create_device, legacy_enabled_features) {
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(device, mock.vkDevice);
+    EXPECT_TRUE(device == mock.vkDevice);
 }
 
 TEST(mocked_api_create_device, disable_robust_buffer_access) {
@@ -508,7 +508,7 @@ TEST(mocked_api_create_device, disable_robust_buffer_access) {
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(device, mock.vkDevice);
+    EXPECT_TRUE(device == mock.vkDevice);
 }
 
 TEST(mocked_api_create_device, disable_robust_image_access) {
@@ -555,7 +555,7 @@ TEST(mocked_api_create_device, disable_robust_image_access) {
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(device, mock.vkDevice);
+    EXPECT_TRUE(device == mock.vkDevice);
 }
 
 TEST(mocked_api_create_device, disable_robust_access) {
@@ -603,5 +603,5 @@ TEST(mocked_api_create_device, disable_robust_access) {
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(device, mock.vkDevice);
+    EXPECT_TRUE(device == mock.vkDevice);
 }

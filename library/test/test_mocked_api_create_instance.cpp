@@ -51,7 +51,7 @@ TEST(mocked_api_create_instance, vulkan10_no_app_info) {
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(instance, mock.vkInstance);
+    EXPECT_TRUE(instance == mock.vkInstance);
 }
 
 TEST(mocked_api_create_instance, vulkan10_with_app_info) {
@@ -87,7 +87,7 @@ TEST(mocked_api_create_instance, vulkan10_with_app_info) {
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(instance, mock.vkInstance);
+    EXPECT_TRUE(instance == mock.vkInstance);
 }
 
 TEST(mocked_api_create_instance, vulkan11) {
@@ -119,7 +119,7 @@ TEST(mocked_api_create_instance, vulkan11) {
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(instance, mock.vkInstance);
+    EXPECT_TRUE(instance == mock.vkInstance);
 }
 
 TEST(mocked_api_create_instance, default_extensions) {
@@ -151,7 +151,7 @@ TEST(mocked_api_create_instance, default_extensions) {
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(instance, mock.vkInstance);
+    EXPECT_TRUE(instance == mock.vkInstance);
 }
 
 TEST(mocked_api_create_instance, default_extensions_negative) {
@@ -226,7 +226,7 @@ TEST(mocked_api_create_instance, override_extensions) {
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(instance, mock.vkInstance);
+    EXPECT_TRUE(instance == mock.vkInstance);
 }
 
 TEST(mocked_api_create_instance, merge_extensions) {
@@ -267,7 +267,7 @@ TEST(mocked_api_create_instance, merge_extensions) {
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(instance, mock.vkInstance);
+    EXPECT_TRUE(instance == mock.vkInstance);
 }
 
 
@@ -307,5 +307,5 @@ TEST(mocked_api_create_instance, retain_chained_structs) {
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
 
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(instance, mock.vkInstance);
+    EXPECT_TRUE(instance == mock.vkInstance);
 }
