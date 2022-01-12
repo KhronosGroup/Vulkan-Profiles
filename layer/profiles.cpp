@@ -2012,7 +2012,7 @@ class JsonLoader {
     }
 
     bool GetValueSizet(const Json::Value &parent, const std::string &member, const char *name, size_t *dest,
-                  std::function<bool(const char *, size_t, size_t)> warn_func = nullptr) {
+                       std::function<bool(const char *, size_t, size_t)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -3558,11 +3558,12 @@ bool JsonLoader::GetValuePhysicalDeviceToolPropertiesEXT(const Json::Value &pare
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\t\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetPropertiesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && !layer_settings.emulate_portability) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, format(
-            "JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
-            "not supported by the device and emulation is not turned on.\nIf you wish to emulate "
-            "VK_KHR_portability_subset, please enable %s variable.\n",
-            kLayerSettingsEmulatePortability));
+        LogMessage(
+            DEBUG_REPORT_ERROR_BIT,
+            format("JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
+                   "not supported by the device and emulation is not turned on.\nIf you wish to emulate "
+                   "VK_KHR_portability_subset, please enable %s variable.\n",
+                   kLayerSettingsEmulatePortability));
         return false;
     }
     bool valid = true;
@@ -3921,11 +3922,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFe
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\t\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\n");
     if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && !layer_settings.emulate_portability) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, format(
-            "JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
-            "not supported by the device and emulation is not turned on.\nIf you wish to emulate "
-            "VK_KHR_portability_subset, please enable %s variable.\n",
-            kLayerSettingsEmulatePortability));
+        LogMessage(
+            DEBUG_REPORT_ERROR_BIT,
+            format("JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
+                   "not supported by the device and emulation is not turned on.\nIf you wish to emulate "
+                   "VK_KHR_portability_subset, please enable %s variable.\n",
+                   kLayerSettingsEmulatePortability));
         return false;
     }
     bool valid = true;
@@ -5819,8 +5821,9 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPrope
         dest->memoryTypeCount = type_count;
         for (int i = 0; i < type_count; ++i) {
             if (dest->memoryTypes[i].heapIndex >= dest->memoryHeapCount) {
-                LogMessage(DEBUG_REPORT_ERROR_BIT, format("WARN \"memoryType[%" PRIu32 "].heapIndex\" (%" PRIu32 ") exceeds memoryHeapCount (%" PRIu32 ")\n", i,
-                            dest->memoryTypes[i].heapIndex, dest->memoryHeapCount));
+                LogMessage(DEBUG_REPORT_ERROR_BIT, format("WARN \"memoryType[%" PRIu32 "].heapIndex\" (%" PRIu32
+                                                          ") exceeds memoryHeapCount (%" PRIu32 ")\n",
+                                                          i, dest->memoryTypes[i].heapIndex, dest->memoryHeapCount));
             }
         }
     }
@@ -6374,7 +6377,8 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
                                               VkInstance *pInstance) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "CreateInstance\n");
     LogMessage(DEBUG_REPORT_DEBUG_BIT, format("JsonCpp version %s\n", JSONCPP_VERSION_STRING));
-    LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, format("%s version %d.%d.%d\n", kOurLayerName, kVersionProfilesMajor, kVersionProfilesMinor, kVersionProfilesPatch));
+    LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+               format("%s version %d.%d.%d\n", kOurLayerName, kVersionProfilesMajor, kVersionProfilesMinor, kVersionProfilesPatch));
 
     const VkApplicationInfo *app_info = pCreateInfo->pApplicationInfo;
     const uint32_t requested_version = (app_info && app_info->apiVersion) ? app_info->apiVersion : VK_API_VERSION_1_0;
@@ -7840,7 +7844,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateInstanceLayerProperties(uint32_t *pCount
 VKAPI_ATTR VkResult VKAPI_CALL EnumerateInstanceExtensionProperties(const char *pLayerName, uint32_t *pCount,
                                                                     VkExtensionProperties *pProperties) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, format("vkEnumerateInstanceExtensionProperties \"%s\" %s n", (pLayerName ? pLayerName : ""),
-                (pProperties ? "VALUES" : "COUNT")));
+                                              (pProperties ? "VALUES" : "COUNT")));
     if (pLayerName && !strcmp(pLayerName, kOurLayerName)) {
         return EnumerateProperties(kInstanceExtensionPropertiesCount, kInstanceExtensionProperties.data(), pCount, pProperties);
     }
@@ -7921,8 +7925,8 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
             if (!HasFlags(pFormatProperties->linearTilingFeatures, device_format.linearTilingFeatures) ||
                 !HasFlags(pFormatProperties->optimalTilingFeatures, device_format.optimalTilingFeatures) ||
                 !HasFlags(pFormatProperties->bufferFeatures, device_format.bufferFeatures)) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT, ::format("format %s is simulating unsupported features!\n",
-                           vkFormatToString(format).c_str()));
+                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                           ::format("format %s is simulating unsupported features!\n", vkFormatToString(format).c_str()));
             }
         }
     }
