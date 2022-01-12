@@ -1985,6 +1985,41 @@ class JsonLoader {
         return valid;
     }
 
+    bool GetValueSizet(const Json::Value &parent, const std::string &member, const char *name, size_t *dest,
+                  std::function<bool(const char *, size_t, size_t)> warn_func = nullptr) {
+        if (member != name) {
+            return true;
+        }
+        const Json::Value value = parent[name];
+        bool valid = true;
+        if (value.isBool()) {
+            const bool new_value = value.asBool();
+            if (warn_func) {
+                if (warn_func(name, new_value, *dest)) {
+                    valid = false;
+                }
+            }
+            *dest = static_cast<size_t>(new_value);
+        } else if (value.isArray()) {
+            size_t sum_bits = 0;
+            for (const auto &entry : value) {
+                if (entry.isString()) {
+                    sum_bits |= VkStringToUint(entry.asString());
+                }
+            }
+            *dest = sum_bits;
+        } else if (value.isUInt()) {
+            const size_t new_value = value.asUInt();
+            if (warn_func) {
+                if (warn_func(name, new_value, *dest)) {
+                    valid = false;
+                }
+            }
+            *dest = new_value;
+        }
+        return valid;
+    }
+
     bool GetValue(const Json::Value &parent, const char *name, uint32_t *dest,
                   std::function<bool(const char *, uint32_t, uint32_t)> warn_func = nullptr) {
         return GetValue(parent, name, name, dest, warn_func);
@@ -3307,6 +3342,10 @@ VkResult JsonLoader::LoadFile(const char *filename) {
     if (!GetValue(parent, member, #name, &dest->name, warn_func)) { \
         valid = false;                                              \
     }
+#define GET_VALUE_SIZE_T_WARN(member, name, warn_func)                   \
+    if (!GetValueSizet(parent, member, #name, &dest->name, warn_func)) { \
+        valid = false;                                                   \
+    }
 #define GET_MEMBER_VALUE_WARN(member, name, warn_func)              \
     if (!GetValue(parent, member, #name, &dest->name, warn_func)) { \
         valid = false;                                              \
@@ -3672,7 +3711,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_ARRAY(maxViewportDimensions);  // size == 2
         GET_ARRAY(viewportBoundsRange);    // size == 2
         GET_VALUE_WARN(prop, viewportSubPixelBits, WarnIfGreater);
-        GET_VALUE_WARN(prop, minMemoryMapAlignment, WarnIfGreaterSizet);
+        GET_VALUE_SIZE_T_WARN(prop, minMemoryMapAlignment, WarnIfGreaterSizet);
         GET_VALUE_WARN(prop, minTexelBufferOffsetAlignment, WarnIfGreater);
         GET_VALUE_WARN(prop, minUniformBufferOffsetAlignment, WarnIfGreater);
         GET_VALUE_WARN(prop, minStorageBufferOffsetAlignment, WarnIfGreater);
