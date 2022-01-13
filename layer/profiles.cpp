@@ -3249,6 +3249,21 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &proper
 
 bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest) {
     VkFormat format = StringToFormat(format_name);
+    VkFormatProperties profile_properties = {};
+    const auto &member = formats[format_name];
+    const auto &props = member["VkFormatProperties"];
+    for (const auto &feature : props["linearTilingFeatures"]) {
+        profile_properties.linearTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+    }
+    for (const auto &feature : props["optimalTilingFeatures"]) {
+        profile_properties.optimalTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+    }
+    for (const auto &feature : props["bufferFeatures"]) {
+        profile_properties.bufferFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+    }
+
+    (*dest)[format] = profile_properties;
+
     if (IsASTCHDRFormat(format) && !device_has_astc_hdr) {
         // We already notified that ASTC HDR is not supported, no spaming
         return layer_settings.debug_fail_on_error ? false : true;
@@ -3265,21 +3280,6 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
         // We already notified that BC is not supported, no spaming
         return layer_settings.debug_fail_on_error ? false : true;
     }
-
-    VkFormatProperties profile_properties = {};
-    const auto &member = formats[format_name];
-    const auto &props = member["VkFormatProperties"];
-    for (const auto &feature : props["linearTilingFeatures"]) {
-        profile_properties.linearTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
-    }
-    for (const auto &feature : props["optimalTilingFeatures"]) {
-        profile_properties.optimalTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
-    }
-    for (const auto &feature : props["bufferFeatures"]) {
-        profile_properties.bufferFeatures |= StringToVkFormatFeatureFlags(feature.asString());
-    }
-
-    (*dest)[format] = profile_properties;
 
     const VkFormatProperties &device_properties = pdd_.device_formats_[format];
     if (!HasFlags(device_properties.linearTilingFeatures, profile_properties.linearTilingFeatures)) {
