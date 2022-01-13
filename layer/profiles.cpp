@@ -302,8 +302,6 @@ void AndroidPrintf(DebugReport level, const std::string &message) {
     switch (level) {
         default:
         case DEBUG_REPORT_DEBUG_BIT:
-            __android_log_print(ANDROID_LOG_INFO, "Profiles", "%s", message.c_str());
-            break;
         case DEBUG_REPORT_NOTIFICATION_BIT:
             __android_log_print(ANDROID_LOG_INFO, "Profiles", "%s", message.c_str());
             break;
