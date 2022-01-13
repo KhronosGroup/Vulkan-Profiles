@@ -62,36 +62,8 @@ std::string profiles_test::getAbsolutePath(std::string filepath) {
     return out;
 }
 
-std::string profiles_test::setCombinationModeToString(SetCombinationMode mode) {
-    switch (mode) {
-        case SetCombinationMode::SET_CHECK_SUPPORT:
-            return "check_support";
-        case SetCombinationMode::SET_FROM_DEVICE:
-            return "from_device";
-        case SetCombinationMode::SET_FROM_PROFILE:
-            return "from_profile";
-        case SetCombinationMode::SET_FROM_PROFILE_OVERRIDE:
-            return "from_profile_override";
-        default:
-            break;
-    }
-
-    return "check_support";
-}
-
-void profiles_test::setProfilesFilenames(std::vector<std::string>& filepaths) {
-    std::stringstream out;
-#ifdef _WIN32
-    char seperator = ';';
-#else
-    char seperator = ':';
-#endif // _WIN32
-
-    for (std::string& filepath : filepaths) {
-        std::string config_filepath = profiles_test::getAbsolutePath(filepath);
-        out << filepath << seperator;
-    }
-    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_FILENAME", out.str().c_str());
+void profiles_test::setProfilesFilename(const std::string& filepath) {
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_PROFILE_FILE", filepath.c_str());
 }
 
 void profiles_test::setProfilesDebugEnable(bool enable) {
@@ -108,40 +80,53 @@ void profiles_test::setProfilesEmulatePortabilitySubsetExtension(bool enable) {
         profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EMULATE_PORTABILITY", "false");
 }
 
-void profiles_test::setProfilesModifyExtensionList(SetCombinationMode mode) {
-    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_EXTENSION_LIST",
-                                       setCombinationModeToString(mode).c_str());
+std::string profiles_test::GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags) {
+    std::string result = {};
+    bool need_comma = false;
+
+    if (flags & SIMULATE_API_VERSION_BIT) {
+        result += "SIMULATE_API_VERSION_BIT";
+        need_comma = true;
+    }
+    if (flags & SIMULATE_FEATURES_BIT) {
+        if (need_comma) result += ", ";
+        result += "SIMULATE_FEATURES_BIT";
+        need_comma = true;
+    }
+    if (flags & SIMULATE_PROPERTIES_BIT) {
+        if (need_comma) result += ", ";
+        result += "SIMULATE_PROPERTIES_BIT";
+        need_comma = true;
+    }
+    if (flags & SIMULATE_EXTENSIONS_BIT) {
+        if (need_comma) result += ", ";
+        result += "SIMULATE_EXTENSIONS_BIT";
+        need_comma = true;
+    }
+    if (flags & SIMULATE_FORMATS_BIT) {
+        if (need_comma) result += ", ";
+        result += "SIMULATE_FORMATS_BIT";
+        need_comma = true;
+    }
+    if (flags & SIMULATE_FORMAT_PROPERTIES_BIT) {
+        if (need_comma) result += ", ";
+        result += "SIMULATE_FORMAT_PROPERTIES_BIT";
+        need_comma = true;
+    }
+
+    return result;
 }
 
-void profiles_test::setProfilesModifyMemoryFlags(bool enable) {
-    if (enable)
-        profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS", "true");
-    else
-        profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_MEMORY_FLAGS", "false");
-}
-
-void profiles_test::setProfilesModifyFormatList(SetCombinationMode mode) {
-    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_FORMAT_LIST",
-                                       setCombinationModeToString(mode).c_str());
-}
-
-void profiles_test::setProfilesModifyFormatProperties(SetCombinationMode mode) {
-    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_FORMAT_PROPERTIES",
-                                       setCombinationModeToString(mode).c_str());
-}
-
-void profiles_test::setProfilesModifySurfaceFormats(SetCombinationMode mode) {
-    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_SURFACE_FORMAT",
-                                       setCombinationModeToString(mode).c_str());
-}
-
-void profiles_test::setProfilesModifyPresentModes(SetCombinationMode mode) {
-    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_MODIFY_PRESENT_MODES",
-                                       setCombinationModeToString(mode).c_str());
+void profiles_test::setProfilesSimulateCapabilities(SimulateCapabilityFlags flags) {
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_SIMULATE_CAPABILITIES", GetSimulateCapabilitiesLog(flags).c_str());
 }
 
 void profiles_test::setProfilesProfileName(const std::string& profile) {
     profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_PROFILE_NAME", profile.c_str());
+}
+
+void profiles_test::setProfilesFailOnError(bool fail) {
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DEBUG_FAIL_ON_ERROR", fail ? "true" : "false");
 }
 
 VkApplicationInfo profiles_test::GetDefaultApplicationInfo() {

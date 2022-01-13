@@ -30,20 +30,23 @@ void unsetEnvironmentSetting(std::string setting);
 
 std::string getAbsolutePath(std::string filepath);
 
-enum SetCombinationMode { SET_CHECK_SUPPORT, SET_FROM_DEVICE, SET_FROM_PROFILE, SET_FROM_PROFILE_OVERRIDE };
+enum SimulateCapabilityFlag {
+    SIMULATE_API_VERSION_BIT = 1 << 0,
+    SIMULATE_FEATURES_BIT = 1 << 1,
+    SIMULATE_PROPERTIES_BIT = 1 << 2,
+    SIMULATE_EXTENSIONS_BIT = 1 << 3,
+    SIMULATE_FORMATS_BIT = 1 << 4,
+    SIMULATE_FORMAT_PROPERTIES_BIT = 1 << 5
+};
+typedef int SimulateCapabilityFlags;
 
-std::string setCombinationModeToString(SetCombinationMode mode);
-
-void setProfilesFilenames(std::vector<std::string>& filepaths);
+void setProfilesFilename(const std::string& filepath);
 void setProfilesDebugEnable(bool enable);
 void setProfilesEmulatePortabilitySubsetExtension(bool enable);
-void setProfilesModifyExtensionList(SetCombinationMode mode);
-void setProfilesModifyMemoryFlags(bool enable);
-void setProfilesModifyFormatList(SetCombinationMode mode);
-void setProfilesModifyFormatProperties(SetCombinationMode mode);
-void setProfilesModifySurfaceFormats(SetCombinationMode mode);
-void setProfilesModifyPresentModes(SetCombinationMode mode);
+std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags);
+void setProfilesSimulateCapabilities(SimulateCapabilityFlags flags);
 void setProfilesProfileName(const std::string& profile);
+void setProfilesFailOnError(bool fail);
 
 VkApplicationInfo GetDefaultApplicationInfo();
 
