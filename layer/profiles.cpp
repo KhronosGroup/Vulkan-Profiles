@@ -95,6 +95,11 @@ const uint32_t kInstanceExtensionPropertiesCount = static_cast<uint32_t>(kInstan
 // TODO (ncesario): Where should this live?
 bool get_physical_device_properties2_active = false;
 
+bool device_has_astc_hdr = false;
+bool device_has_astc = false;
+bool device_has_etc2 = false;
+bool device_has_bc = false;
+
 // Device extensions that this layer provides:
 const std::array<VkExtensionProperties, 2> kDeviceExtensionProperties = {
     {{VK_EXT_TOOLING_INFO_EXTENSION_NAME, VK_EXT_TOOLING_INFO_SPEC_VERSION},
@@ -260,6 +265,168 @@ static std::string GetDebugReportsLog(DebugActionFlags flags) {
     if (flags & DEBUG_REPORT_ERROR_BIT) {
         if (need_comma) result += ", ";
         result += "DEBUG_REPORT_ERROR_BIT";
+        need_comma = true;
+    }
+
+    return result;
+}
+
+static std::string GetFormatFeatureString(VkFormatFeatureFlags flags) {
+    std::string result = {};
+    bool need_comma = false;
+
+    if (flags & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) {
+        result += "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_BLIT_SRC_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_BLIT_SRC_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_BLIT_DST_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_BLIT_DST_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_TRANSFER_SRC_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_TRANSFER_DST_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_TRANSFER_DST_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_DISJOINT_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_DISJOINT_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_VIDEO_ENCODE_INPUT_BIT_KHR) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_VIDEO_ENCODE_INPUT_BIT_KHR";
+        need_comma = true;
+    }
+    if (flags & VK_FORMAT_FEATURE_VIDEO_ENCODE_DPB_BIT_KHR) {
+        if (need_comma) result += ", ";
+        result += "VK_FORMAT_FEATURE_VIDEO_ENCODE_DPB_BIT_KHR";
         need_comma = true;
     }
 
@@ -2239,6 +2406,106 @@ class JsonLoader {
     PhysicalDeviceData &pdd_;
 };
 
+static bool IsASTCHDRFormat(VkFormat format) {
+    switch (format) {
+        case VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT:
+        case VK_FORMAT_ASTC_5x4_SFLOAT_BLOCK_EXT:
+        case VK_FORMAT_ASTC_5x5_SFLOAT_BLOCK_EXT:
+        case VK_FORMAT_ASTC_6x5_SFLOAT_BLOCK_EXT:
+        case VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT:
+        case VK_FORMAT_ASTC_8x5_SFLOAT_BLOCK_EXT:
+        case VK_FORMAT_ASTC_8x6_SFLOAT_BLOCK_EXT:
+        case VK_FORMAT_ASTC_8x8_SFLOAT_BLOCK_EXT:
+        case VK_FORMAT_ASTC_10x5_SFLOAT_BLOCK_EXT:
+        case VK_FORMAT_ASTC_10x6_SFLOAT_BLOCK_EXT:
+        case VK_FORMAT_ASTC_10x8_SFLOAT_BLOCK_EXT:
+        case VK_FORMAT_ASTC_10x10_SFLOAT_BLOCK_EXT:
+        case VK_FORMAT_ASTC_12x10_SFLOAT_BLOCK_EXT:
+        case VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK_EXT:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool IsASTCFormat(VkFormat format) {
+    switch (format) {
+        case VK_FORMAT_ASTC_4x4_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_4x4_SRGB_BLOCK:
+        case VK_FORMAT_ASTC_5x4_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_5x4_SRGB_BLOCK:
+        case VK_FORMAT_ASTC_5x5_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_5x5_SRGB_BLOCK:
+        case VK_FORMAT_ASTC_6x5_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_6x5_SRGB_BLOCK:
+        case VK_FORMAT_ASTC_6x6_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_6x6_SRGB_BLOCK:
+        case VK_FORMAT_ASTC_8x5_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_8x5_SRGB_BLOCK:
+        case VK_FORMAT_ASTC_8x6_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_8x6_SRGB_BLOCK:
+        case VK_FORMAT_ASTC_8x8_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_8x8_SRGB_BLOCK:
+        case VK_FORMAT_ASTC_10x5_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_10x5_SRGB_BLOCK:
+        case VK_FORMAT_ASTC_10x6_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_10x6_SRGB_BLOCK:
+        case VK_FORMAT_ASTC_10x8_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_10x8_SRGB_BLOCK:
+        case VK_FORMAT_ASTC_10x10_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_10x10_SRGB_BLOCK:
+        case VK_FORMAT_ASTC_12x10_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_12x10_SRGB_BLOCK:
+        case VK_FORMAT_ASTC_12x12_UNORM_BLOCK:
+        case VK_FORMAT_ASTC_12x12_SRGB_BLOCK:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool IsETC2Format(VkFormat format) {
+    switch (format) {
+        case VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK:
+        case VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK:
+        case VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK:
+        case VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK:
+        case VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK:
+        case VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK:
+        case VK_FORMAT_EAC_R11_UNORM_BLOCK:
+        case VK_FORMAT_EAC_R11_SNORM_BLOCK:
+        case VK_FORMAT_EAC_R11G11_UNORM_BLOCK:
+        case VK_FORMAT_EAC_R11G11_SNORM_BLOCK:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool IsBCFormat(VkFormat format) {
+    switch (format) {
+        case VK_FORMAT_BC1_RGB_UNORM_BLOCK:
+        case VK_FORMAT_BC1_RGB_SRGB_BLOCK:
+        case VK_FORMAT_BC1_RGBA_UNORM_BLOCK:
+        case VK_FORMAT_BC1_RGBA_SRGB_BLOCK:
+        case VK_FORMAT_BC2_UNORM_BLOCK:
+        case VK_FORMAT_BC2_SRGB_BLOCK:
+        case VK_FORMAT_BC3_UNORM_BLOCK:
+        case VK_FORMAT_BC3_SRGB_BLOCK:
+        case VK_FORMAT_BC4_UNORM_BLOCK:
+        case VK_FORMAT_BC4_SNORM_BLOCK:
+        case VK_FORMAT_BC5_UNORM_BLOCK:
+        case VK_FORMAT_BC5_SNORM_BLOCK:
+        case VK_FORMAT_BC6H_UFLOAT_BLOCK:
+        case VK_FORMAT_BC6H_SFLOAT_BLOCK:
+        case VK_FORMAT_BC7_UNORM_BLOCK:
+        case VK_FORMAT_BC7_SRGB_BLOCK:
+            return true;
+        default:
+            return false;
+    }
+}
+
 static inline VkFormat StringToFormat(const std::string &input_value) {
     static const std::unordered_map<std::string, VkFormat> map = {
         {"VK_FORMAT_UNDEFINED", VK_FORMAT_UNDEFINED},
@@ -2982,41 +3249,65 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &proper
 
 bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest) {
     VkFormat format = StringToFormat(format_name);
-    VkFormatProperties format_properties = {};
+    if (IsASTCHDRFormat(format) && !device_has_astc_hdr) {
+        // We already notified that ASTC HDR is not supported, no spaming
+        return layer_settings.debug_fail_on_error ? false : true;
+    }
+    if (IsASTCFormat(format) && !device_has_astc) {
+        // We already notified that ASTC is not supported, no spaming
+        return layer_settings.debug_fail_on_error ? false : true;
+    }
+    if (IsETC2Format(format) && !device_has_etc2) {
+        // We already notified that ETC2 is not supported, no spaming
+        return layer_settings.debug_fail_on_error ? false : true;
+    }
+    if (IsBCFormat(format) && !device_has_bc) {
+        // We already notified that BC is not supported, no spaming
+        return layer_settings.debug_fail_on_error ? false : true;
+    }
+
+    VkFormatProperties profile_properties = {};
     const auto &member = formats[format_name];
     const auto &props = member["VkFormatProperties"];
     for (const auto &feature : props["linearTilingFeatures"]) {
-        format_properties.linearTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+        profile_properties.linearTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
     }
     for (const auto &feature : props["optimalTilingFeatures"]) {
-        format_properties.optimalTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+        profile_properties.optimalTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
     }
     for (const auto &feature : props["bufferFeatures"]) {
-        format_properties.bufferFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+        profile_properties.bufferFeatures |= StringToVkFormatFeatureFlags(feature.asString());
     }
 
-    (*dest)[format] = format_properties;
+    (*dest)[format] = profile_properties;
 
-    if (!HasFlags(format_properties.linearTilingFeatures, pdd_.device_formats_[format].linearTilingFeatures)) {
+    const VkFormatProperties &device_properties = pdd_.device_formats_[format];
+    if (!HasFlags(device_properties.linearTilingFeatures, profile_properties.linearTilingFeatures)) {
         LogMessage(DEBUG_REPORT_WARNING_BIT,
-                   ::format("JSON file sets variables for format %s, but set linearTilingFeatures are not supported.\n",
-                            format_name.c_str()));
+                   ::format("For %s `linearTilingFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
+                            "supports:\n\t\"%s\".\nThe `linearTilingFeatures` can't be simulated on this Device.\n",
+                            format_name.c_str(), GetFormatFeatureString(profile_properties.linearTilingFeatures).c_str(),
+                            GetFormatFeatureString(device_properties.linearTilingFeatures).c_str()));
         if (layer_settings.debug_fail_on_error) {
             return false;
         }
     }
-    if (!HasFlags(format_properties.optimalTilingFeatures, pdd_.device_formats_[format].optimalTilingFeatures)) {
+    if (!HasFlags(pdd_.device_formats_[format].optimalTilingFeatures, profile_properties.optimalTilingFeatures)) {
         LogMessage(DEBUG_REPORT_WARNING_BIT,
-                   ::format("JSON file sets variables for format %s, but set optimalTilingFeatures are not supported.\n",
-                            format_name.c_str()));
+                   ::format("For %s `optimalTilingFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
+                            "supports:\n\t\"%s\".\nThe `optimalTilingFeatures` can't be simulated on this Device.\n",
+                            format_name.c_str(), GetFormatFeatureString(profile_properties.optimalTilingFeatures).c_str(),
+                            GetFormatFeatureString(device_properties.optimalTilingFeatures).c_str()));
         if (layer_settings.debug_fail_on_error) {
             return false;
         }
     }
-    if (!HasFlags(format_properties.bufferFeatures, pdd_.device_formats_[format].bufferFeatures)) {
-        LogMessage(
-            DEBUG_REPORT_WARNING_BIT,
-            ::format("JSON file sets variables for format %s, but set bufferFeatures are not supported.\n", format_name.c_str()));
+    if (!HasFlags(pdd_.device_formats_[format].bufferFeatures, profile_properties.bufferFeatures)) {
+        LogMessage(DEBUG_REPORT_WARNING_BIT,
+                   ::format("For %s `bufferFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
+                            "supports:\n\t\"%s\".\nThe `bufferFeatures` can't be simulated on this Device.\n",
+                            format_name.c_str(), GetFormatFeatureString(profile_properties.bufferFeatures).c_str(),
+                            GetFormatFeatureString(device_properties.bufferFeatures).c_str()));
         if (layer_settings.debug_fail_on_error) {
             return false;
         }
@@ -3693,7 +3984,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_ARRAY(maxViewportDimensions);  // size == 2
         GET_ARRAY(viewportBoundsRange);    // size == 2
         GET_VALUE_WARN(prop, viewportSubPixelBits, WarnIfGreater);
-        GET_VALUE_SIZE_T_WARN(prop, minMemoryMapAlignment, WarnIfGreaterSizet);
+        GET_VALUE_SIZE_T_WARN(prop, minMemoryMapAlignment, WarnIfLesserSizet);
         GET_VALUE_WARN(prop, minTexelBufferOffsetAlignment, WarnIfLesser);
         GET_VALUE_WARN(prop, minUniformBufferOffsetAlignment, WarnIfLesser);
         GET_VALUE_WARN(prop, minStorageBufferOffsetAlignment, WarnIfLesser);
@@ -8664,6 +8955,8 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             bool api_version_above_1_2 = pdd.physical_device_properties_.apiVersion >= VK_API_VERSION_1_2;
             bool api_version_above_1_3 = pdd.physical_device_properties_.apiVersion >= VK_API_VERSION_1_3;
 
+            ::device_has_astc_hdr = ::PhysicalDeviceData::HasExtension(&pdd, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME);
+
             // Initialize PDD members to the actual Vulkan implementation's defaults.
             if (get_physical_device_properties2_active) {
                 VkPhysicalDeviceProperties2KHR property_chain = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR};
@@ -9570,6 +9863,10 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 dt->GetPhysicalDeviceFeatures(physical_device, &pdd.physical_device_features_);
                 dt->GetPhysicalDeviceMemoryProperties(physical_device, &pdd.physical_device_memory_properties_);
             }
+
+            ::device_has_astc = pdd.physical_device_features_.textureCompressionASTC_LDR;
+            ::device_has_bc = pdd.physical_device_features_.textureCompressionBC;
+            ::device_has_etc2 = pdd.physical_device_features_.textureCompressionETC2;
 
             LoadDeviceFormats(instance, physical_device, &pdd.device_formats_);
 
