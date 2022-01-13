@@ -2990,19 +2990,25 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
         LogMessage(DEBUG_REPORT_WARNING_BIT,
                    ::format("JSON file sets variables for format %s, but set linearTilingFeatures are not supported.\n",
                             format_name.c_str()));
-        return false;
+        if (layer_settings.debug_fail_on_error) {
+            return false;
+        }
     }
     if (!HasFlags(format_properties.optimalTilingFeatures, pdd_.device_formats_[format].optimalTilingFeatures)) {
         LogMessage(DEBUG_REPORT_WARNING_BIT,
                    ::format("JSON file sets variables for format %s, but set optimalTilingFeatures are not supported.\n",
                             format_name.c_str()));
-        return false;
+        if (layer_settings.debug_fail_on_error) {
+            return false;
+        }
     }
     if (!HasFlags(format_properties.bufferFeatures, pdd_.device_formats_[format].bufferFeatures)) {
         LogMessage(
             DEBUG_REPORT_WARNING_BIT,
             ::format("JSON file sets variables for format %s, but set bufferFeatures are not supported.\n", format_name.c_str()));
-        return false;
+        if (layer_settings.debug_fail_on_error) {
+            return false;
+        }
     }
 
     return true;
