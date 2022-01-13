@@ -66,11 +66,11 @@ namespace {
 // For new features/functionality, increment the minor level and reset patch level to zero.
 // For any changes, at least increment the patch level.  See https://semver.org/
 // When updating the version, be sure to make corresponding changes to the layer manifest file at
-// layersvt/VkLayer_device_simulation.json.in
+// layersvt/VkLayer_khronos_profiles.json.in
 
 const uint32_t kVersionProfilesMajor = 1;
-const uint32_t kVersionProfilesMinor = 9;
-const uint32_t kVersionProfilesPatch = 1;
+const uint32_t kVersionProfilesMinor = 0;
+const uint32_t kVersionProfilesPatch = 0;
 const uint32_t kVersionProfilesImplementation =
     VK_MAKE_VERSION(kVersionProfilesMajor, kVersionProfilesMinor, kVersionProfilesPatch);
 
@@ -8026,11 +8026,11 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolPropertiesEXT(VkPhysicalDevi
     static VkPhysicalDeviceToolPropertiesEXT profiles_layer_tool_props = {};
     profiles_layer_tool_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TOOL_PROPERTIES_EXT;
     profiles_layer_tool_props.pNext = nullptr;
-    strcpy(profiles_layer_tool_props.name, "Profiles Layer");
+    strcpy(profiles_layer_tool_props.name, kLayerProperties[0].description);
     strcpy(profiles_layer_tool_props.version, version_string.c_str());
     profiles_layer_tool_props.purposes = VK_TOOL_PURPOSE_MODIFYING_FEATURES_BIT_EXT;
-    strcpy(profiles_layer_tool_props.description, "Khronos profiles layer");
-    strcpy(profiles_layer_tool_props.layer, "VK_LAYER_KHRONOS_profiles");
+    strcpy(profiles_layer_tool_props.description, kLayerProperties[0].description);
+    strcpy(profiles_layer_tool_props.layer, kLayerProperties[0].layerName);
 
     auto original_pToolProperties = pToolProperties;
     if (pToolProperties != nullptr) {
