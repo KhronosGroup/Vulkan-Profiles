@@ -647,18 +647,8 @@ uint32_t loader_layer_iface_version = CURRENT_LOADER_LAYER_INTERFACE_VERSION;
 
 typedef std::unordered_map<uint32_t /*VkFormat*/, VkFormatProperties> ArrayOfVkFormatProperties;
 typedef std::vector<VkExtensionProperties> ArrayOfVkExtensionProperties;
-typedef std::vector<VkDeviceSize> ArrayOfVkDeviceSize;
 
 // FormatProperties utilities ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// This is the JSON representation of VkFormat property data, as defined by the Profiles schema.
-// It will be split to create a VkFormat value and a VkFormatProperties structure after loading from JSON.
-struct ProfilesFormatProperties {
-    VkFormat formatID;
-    VkFormatFeatureFlags linearTilingFeatures;
-    VkFormatFeatureFlags optimalTilingFeatures;
-    VkFormatFeatureFlags bufferFeatures;
-};
 
 bool IsFormatSupported(const VkFormatProperties &props) {
     // Per [SPEC] section 30.3.2 "Format Properties":
@@ -760,8 +750,6 @@ class PhysicalDeviceData {
     VkSurfaceCapabilitiesKHR surface_capabilities_;
     ArrayOfVkFormatProperties arrayof_format_properties_;
     ArrayOfVkExtensionProperties arrayof_extension_properties_;
-    ArrayOfVkDeviceSize arrayof_heap_budgets_;
-    ArrayOfVkDeviceSize arrayof_heap_usages_;
 
     // Vulkan 1.3 structs
     VkPhysicalDeviceVulkan13Properties physical_device_vulkan_1_3_properties_;
@@ -2197,22 +2185,6 @@ class JsonLoader {
             GetValue(value, i, &dest[i]);
         }
         return count;
-    }
-
-    int GetArray(const Json::Value &parent, const char *name, ArrayOfVkDeviceSize *dest) {
-        const Json::Value value = parent[name];
-        if (value.type() != Json::arrayValue) {
-            return -1;
-        }
-        DebugPrintf("\t\tJsonLoader::GetArray(ArrayOfVkDeviceSize)\n");
-        dest->clear();
-        const int count = static_cast<int>(value.size());
-        for (int i = 0; i < count; ++i) {
-            VkDeviceSize device_size = {};
-            GetValue(value, i, &device_size);
-            dest->push_back(device_size);
-        }
-        return static_cast<int>(dest->size());
     }
 
     PhysicalDeviceData &pdd_;
@@ -8012,100 +7984,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
     return result;
 }
 
-/*VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceMemoryProperties(VkPhysicalDevice physicalDevice,
-                                                             VkPhysicalDeviceMemoryProperties *pMemoryProperties) {
-    std::lock_guard<std::recursive_mutex> lock(global_lock);
-    const auto dt = instance_dispatch_table(physicalDevice);
-
-    // Are there JSON overrides, or should we call down to return the original values?
-    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    if (pdd) {
-        if (modifyMemoryFlags.num > 0) {
-            *pMemoryProperties = pdd->physical_device_memory_properties_;
-        } else {
-            dt->GetPhysicalDeviceMemoryProperties(physicalDevice, pMemoryProperties);
-            uint32_t min_memory_heap_count =
-                pMemoryProperties->memoryHeapCount < pdd->physical_device_memory_properties_.memoryHeapCount
-                    ? pMemoryProperties->memoryHeapCount
-                    : pdd->physical_device_memory_properties_.memoryHeapCount;
-            pMemoryProperties->memoryHeapCount = min_memory_heap_count;
-            for (uint32_t i = 0; i < min_memory_heap_count; i++) {
-                pMemoryProperties->memoryHeaps[i].size = pdd->physical_device_memory_properties_.memoryHeaps[i].size;
-            }
-        }
-    } else {
-        dt->GetPhysicalDeviceMemoryProperties(physicalDevice, pMemoryProperties);
-    }
-}*/
-
-/*VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceMemoryProperties2(VkPhysicalDevice physicalDevice,
-                                                              VkPhysicalDeviceMemoryProperties2KHR *pMemoryProperties) {
-    std::lock_guard<std::recursive_mutex> lock(global_lock);
-    const auto dt = instance_dispatch_table(physicalDevice);
-    dt->GetPhysicalDeviceMemoryProperties2(physicalDevice, pMemoryProperties);
-    GetPhysicalDeviceMemoryProperties(physicalDevice, &pMemoryProperties->memoryProperties);
-    if (modifyMemoryFlags.num > 0) {
-        PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-        FillPNextChain(pdd, pMemoryProperties->pNext);
-    }
-}*/
-
-/*VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceMemoryProperties2KHR(VkPhysicalDevice physicalDevice,
-                                                                 VkPhysicalDeviceMemoryProperties2KHR *pMemoryProperties) {
-    GetPhysicalDeviceMemoryProperties2(physicalDevice, pMemoryProperties);
-}*/
-
-/*VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice physicalDevice,
-                                                                  uint32_t *pQueueFamilyPropertyCount,
-                                                                  VkQueueFamilyProperties *pQueueFamilyProperties) {
-    std::lock_guard<std::recursive_mutex> lock(global_lock);
-    const auto dt = instance_dispatch_table(physicalDevice);
-
-    // Are there JSON overrides, or should we call down to return the original values?
-    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    const uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->arrayof_queue_family_properties_.size()) : 0;
-    if (src_count == 0) {
-        dt->GetPhysicalDeviceQueueFamilyProperties(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties);
-    } else {
-        EnumerateProperties(src_count, pdd->arrayof_queue_family_properties_.data(), pQueueFamilyPropertyCount,
-                            pQueueFamilyProperties);
-    }
-}*/
-
-/*VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2KHR(VkPhysicalDevice physicalDevice,
-                                                                      uint32_t *pQueueFamilyPropertyCount,
-                                                                      VkQueueFamilyProperties2KHR *pQueueFamilyProperties2) {
-    std::lock_guard<std::recursive_mutex> lock(global_lock);
-    const auto dt = instance_dispatch_table(physicalDevice);
-
-    // Are there JSON overrides, or should we call down to return the original values?
-    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    const uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->arrayof_queue_family_properties_.size()) : 0;
-    if (src_count == 0) {
-        dt->GetPhysicalDeviceQueueFamilyProperties2KHR(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties2);
-        return;
-    }
-
-    if (!pQueueFamilyProperties2) {
-        *pQueueFamilyPropertyCount = src_count;
-        return;
-    }
-
-    // Careful: cannot use EnumerateProperties() here! (because src and dst structs are not the same type)
-    const uint32_t copy_count = (*pQueueFamilyPropertyCount < src_count) ? *pQueueFamilyPropertyCount : src_count;
-    const VkQueueFamilyProperties *src_props = pdd->arrayof_queue_family_properties_.data();
-    for (uint32_t i = 0; i < copy_count; ++i) {
-        pQueueFamilyProperties2[i].queueFamilyProperties = src_props[i];
-    }
-    *pQueueFamilyPropertyCount = copy_count;
-}*/
-
-/*VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2(VkPhysicalDevice physicalDevice,
-                                                                   uint32_t *pQueueFamilyPropertyCount,
-                                                                   VkQueueFamilyProperties2KHR *pQueueFamilyProperties2) {
-    GetPhysicalDeviceQueueFamilyProperties2KHR(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties2);
-}*/
-
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice physicalDevice, VkFormat format,
                                                              VkFormatProperties *pFormatProperties) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
@@ -8214,201 +8092,6 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties2(VkPhysica
                                                                        VkImageFormatProperties2 *pImageFormatProperties) {
     return GetPhysicalDeviceImageFormatProperties2KHR(physicalDevice, pImageFormatInfo, pImageFormatProperties);
 }
-
-/*VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceCapabilitiesKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
-                                                                       VkSurfaceCapabilitiesKHR *pSurfaceCapabilities) {
-    VkResult result = VK_SUCCESS;
-    std::lock_guard<std::recursive_mutex> lock(global_lock);
-    const auto dt = instance_dispatch_table(physicalDevice);
-
-    result = dt->GetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, pSurfaceCapabilities);
-    if (result != VK_SUCCESS) return result;
-
-    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    if (pdd) {
-        VkSurfaceCapabilitiesKHR surf_caps = pdd->surface_capabilities_;
-        surf_caps.currentExtent = pSurfaceCapabilities->currentExtent;
-        surf_caps.currentTransform = pSurfaceCapabilities->currentTransform;
-
-        if (surf_caps.minImageCount == 0) surf_caps.minImageCount = pSurfaceCapabilities->minImageCount;
-        if (surf_caps.maxImageCount == 0) surf_caps.maxImageCount = pSurfaceCapabilities->maxImageCount;
-        if (surf_caps.minImageExtent.width == 0 && surf_caps.minImageExtent.height == 0)
-            surf_caps.minImageExtent = pSurfaceCapabilities->minImageExtent;
-        if (surf_caps.maxImageExtent.width == 0 && surf_caps.maxImageExtent.height == 0)
-            surf_caps.maxImageExtent = pSurfaceCapabilities->maxImageExtent;
-        if (surf_caps.maxImageArrayLayers == 0) surf_caps.maxImageArrayLayers = pSurfaceCapabilities->maxImageArrayLayers;
-        if (surf_caps.supportedTransforms == 0) surf_caps.supportedTransforms = pSurfaceCapabilities->supportedTransforms;
-        if (surf_caps.supportedCompositeAlpha == 0)
-            surf_caps.supportedCompositeAlpha = pSurfaceCapabilities->supportedCompositeAlpha;
-        if (surf_caps.supportedUsageFlags == 0) surf_caps.supportedUsageFlags = pSurfaceCapabilities->supportedUsageFlags;
-
-        *pSurfaceCapabilities = surf_caps;
-    }
-
-    return result;
-}*/
-
-/*VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceCapabilities2KHR(VkPhysicalDevice physicalDevice,
-                                                                        VkPhysicalDeviceSurfaceInfo2KHR *pSurfaceInfo,
-                                                                        VkSurfaceCapabilities2KHR *pSurfaceCapabilities) {
-    std::lock_guard<std::recursive_mutex> lock(global_lock);
-    const auto dt = instance_dispatch_table(physicalDevice);
-    dt->GetPhysicalDeviceSurfaceCapabilities2KHR(physicalDevice, pSurfaceInfo, pSurfaceCapabilities);
-    return GetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, pSurfaceInfo->surface,
-                                                   &pSurfaceCapabilities->surfaceCapabilities);
-}*/
-
-/*VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormatsKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
-                                                                  uint32_t *pSurfaceFormatCount,
-                                                                  VkSurfaceFormatKHR *pSurfaceFormats) {
-    VkResult result = VK_SUCCESS;
-    std::lock_guard<std::recursive_mutex> lock(global_lock);
-    const auto dt = instance_dispatch_table(physicalDevice);
-
-    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->arrayof_surface_formats_.size()) : 0;
-    if (src_count == 0) {
-        result = dt->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, pSurfaceFormatCount, pSurfaceFormats);
-    } else {
-        uint32_t sf_count = 0;
-        dt->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &sf_count, nullptr);
-        std::vector<VkSurfaceFormatKHR> device_surface_formats(sf_count);
-        dt->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &sf_count, device_surface_formats.data());
-
-        std::vector<VkSurfaceFormatKHR> simulation_surface_formats;
-
-        switch (modifySurfaceFormats.mode) {
-            case SET_CHECK_SUPPORT:
-            case SET_FROM_DEVICE:
-                return dt->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, pSurfaceFormatCount, pSurfaceFormats);
-                break;
-            case SET_FROM_PROFILE:
-            case SET_FROM_PROFILE_OVERRIDE:
-                return EnumerateProperties(src_count, pdd->arrayof_surface_formats_.data(), pSurfaceFormatCount, pSurfaceFormats);
-                break;
-            default:
-                return dt->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, pSurfaceFormatCount, pSurfaceFormats);
-        }
-
-        result = EnumerateProperties(static_cast<uint32_t>(simulation_surface_formats.size()), simulation_surface_formats.data(),
-                                     pSurfaceFormatCount, pSurfaceFormats);
-    }
-
-    return result;
-}*/
-
-/*VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormats2KHR(VkPhysicalDevice physicalDevice,
-                                                                   const VkPhysicalDeviceSurfaceInfo2KHR *pSurfaceInfo,
-                                                                   uint32_t *pSurfaceFormatCount,
-                                                                   VkSurfaceFormat2KHR *pSurfaceFormats) {
-    VkResult result = VK_SUCCESS;
-    std::lock_guard<std::recursive_mutex> lock(global_lock);
-    const auto dt = instance_dispatch_table(physicalDevice);
-
-    // Are there JSON overrides, or should we call down to return the original values?
-    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->arrayof_surface_formats_.size()) : 0;
-    if (src_count == 0) {
-        result = dt->GetPhysicalDeviceSurfaceFormats2KHR(physicalDevice, pSurfaceInfo, pSurfaceFormatCount, pSurfaceFormats);
-        return result;
-    }
-
-    uint32_t sf_count = 0;
-    dt->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, pSurfaceInfo->surface, &sf_count, nullptr);
-    std::vector<VkSurfaceFormatKHR> device_surface_formats(sf_count);
-    dt->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, pSurfaceInfo->surface, &sf_count, device_surface_formats.data());
-
-    std::vector<VkSurfaceFormatKHR> simulation_surface_formats;
-
-    switch (modifySurfaceFormats.mode) {
-        case SET_CHECK_SUPPORT:
-        case SET_FROM_DEVICE:
-            result = dt->GetPhysicalDeviceSurfaceFormats2KHR(physicalDevice, pSurfaceInfo, pSurfaceFormatCount, pSurfaceFormats);
-            return result;
-            break;
-        case SET_FROM_PROFILE:
-        case SET_FROM_PROFILE_OVERRIDE:
-            if (!pSurfaceFormats) {
-                *pSurfaceFormatCount = src_count;
-                return result;
-            }
-
-            // You can't directly initialize a variable in a switch case because of scope issues, so we explicitly add a scope here.
-            {
-                if (*pSurfaceFormatCount < src_count) result = VK_INCOMPLETE;
-                const uint32_t copy_count = (*pSurfaceFormatCount < src_count) ? *pSurfaceFormatCount : src_count;
-                const VkSurfaceFormatKHR *src_props = pdd->arrayof_surface_formats_.data();
-                for (uint32_t i = 0; i < copy_count; ++i) {
-                    pSurfaceFormats[i].surfaceFormat = src_props[i];
-                }
-                *pSurfaceFormatCount = copy_count;
-            }
-
-            return result;
-            break;
-        default:
-            result = dt->GetPhysicalDeviceSurfaceFormats2KHR(physicalDevice, pSurfaceInfo, pSurfaceFormatCount, pSurfaceFormats);
-            return result;
-    }
-
-    src_count = static_cast<uint32_t>(simulation_surface_formats.size());
-
-    if (!pSurfaceFormats) {
-        *pSurfaceFormatCount = src_count;
-        return result;
-    }
-
-    // Careful: cannot use EnumerateProperties() here! (because src and dst structs are not the same type)
-    if (*pSurfaceFormatCount < src_count) result = VK_INCOMPLETE;
-    const uint32_t copy_count = (*pSurfaceFormatCount < src_count) ? *pSurfaceFormatCount : src_count;
-    const VkSurfaceFormatKHR *src_props = simulation_surface_formats.data();
-    for (uint32_t i = 0; i < copy_count; ++i) {
-        pSurfaceFormats[i].surfaceFormat = src_props[i];
-    }
-    *pSurfaceFormatCount = copy_count;
-
-    return result;
-}*/
-
-/*VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfacePresentModesKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
-                                                                       uint32_t *pPresentModeCount,
-                                                                       VkPresentModeKHR *pPresentModes) {
-    VkResult result = VK_SUCCESS;
-    std::lock_guard<std::recursive_mutex> lock(global_lock);
-    const auto dt = instance_dispatch_table(physicalDevice);
-
-    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    const uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->arrayof_present_modes_.size()) : 0;
-    if (src_count == 0) {
-        return dt->GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, pPresentModeCount, pPresentModes);
-    }
-
-    uint32_t present_mode_count = 0;
-    dt->GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &present_mode_count, nullptr);
-    std::vector<VkPresentModeKHR> device_present_modes(present_mode_count);
-    dt->GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &present_mode_count, device_present_modes.data());
-
-    std::vector<VkPresentModeKHR> simulation_present_modes;
-
-    switch (modifyPresentModes.mode) {
-        case SET_CHECK_SUPPORT:
-        case SET_FROM_DEVICE:
-            result = dt->GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, pPresentModeCount, pPresentModes);
-            return result;
-            break;
-        case SET_FROM_PROFILE:
-        case SET_FROM_PROFILE_OVERRIDE:
-            result = EnumerateProperties(src_count, pdd->arrayof_present_modes_.data(), pPresentModeCount, pPresentModes);
-            return result;
-            break;
-        default:
-            result = dt->GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, pPresentModeCount, pPresentModes);
-            return result;
-    }
-
-    return EnumerateProperties(static_cast<uint32_t>(simulation_present_modes.size()), simulation_present_modes.data(),
-                               pPresentModeCount, pPresentModes);
-}*/
 
 VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolPropertiesEXT(VkPhysicalDevice physicalDevice, uint32_t *pToolCount,
                                                                   VkPhysicalDeviceToolPropertiesEXT *pToolProperties) {
