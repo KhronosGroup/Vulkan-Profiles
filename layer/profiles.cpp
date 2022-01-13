@@ -3585,7 +3585,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE_WARN(prop, minVertexInputBindingStrideAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, minVertexInputBindingStrideAlignment, WarnIfLesser);
     }
     return valid;
 }
@@ -3694,9 +3694,9 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_ARRAY(viewportBoundsRange);    // size == 2
         GET_VALUE_WARN(prop, viewportSubPixelBits, WarnIfGreater);
         GET_VALUE_SIZE_T_WARN(prop, minMemoryMapAlignment, WarnIfGreaterSizet);
-        GET_VALUE_WARN(prop, minTexelBufferOffsetAlignment, WarnIfGreater);
-        GET_VALUE_WARN(prop, minUniformBufferOffsetAlignment, WarnIfGreater);
-        GET_VALUE_WARN(prop, minStorageBufferOffsetAlignment, WarnIfGreater);
+        GET_VALUE_WARN(prop, minTexelBufferOffsetAlignment, WarnIfLesser);
+        GET_VALUE_WARN(prop, minUniformBufferOffsetAlignment, WarnIfLesser);
+        GET_VALUE_WARN(prop, minStorageBufferOffsetAlignment, WarnIfLesser);
         GET_VALUE_WARN(prop, minTexelOffset, WarnIfLesser);
         GET_VALUE_WARN(prop, maxTexelOffset, WarnIfGreater);
         GET_VALUE_WARN(prop, minTexelGatherOffset, WarnIfLesser);
@@ -3726,8 +3726,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_VALUE_WARN(prop, discreteQueuePriorities, WarnIfGreater);
         GET_ARRAY(pointSizeRange);  // size == 2
         GET_ARRAY(lineWidthRange);  // size == 2
-        GET_VALUE_WARN(prop, pointSizeGranularity, WarnIfGreaterFloat);
-        GET_VALUE_WARN(prop, lineWidthGranularity, WarnIfGreaterFloat);
+        GET_VALUE_WARN(prop, pointSizeGranularity, WarnIfLesserFloat);
+        GET_VALUE_WARN(prop, lineWidthGranularity, WarnIfLesserFloat);
         GET_VALUE_WARN(prop, strictLines, WarnIfNotEqual);
         GET_VALUE_WARN(prop, standardSampleLocations, WarnIfNotEqual);
         GET_VALUE_WARN(prop, optimalBufferCopyOffsetAlignment, WarnIfGreater);
