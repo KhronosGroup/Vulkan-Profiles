@@ -795,11 +795,10 @@
             },
             "properties": {
                 "VkPhysicalDeviceProperties": {
-                    "apiVersion": 1,
+                    "apiVersion": 4206592,
                     "driverVersion": 2,
                     "vendorID": 0,
                     "deviceID": 0,
-                    "deviceType": [ "VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU" ],
                     "deviceName": 100,
                     "pipelineCacheUUID": 101,
                     "limits": {

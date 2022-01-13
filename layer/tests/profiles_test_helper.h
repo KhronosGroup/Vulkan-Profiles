@@ -45,6 +45,7 @@ void setProfilesDebugEnable(bool enable);
 void setProfilesEmulatePortabilitySubsetExtension(bool enable);
 std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags);
 void setProfilesSimulateCapabilities(SimulateCapabilityFlags flags);
+void setProfilesSimulateAllCapabilities();
 void setProfilesProfileName(const std::string& profile);
 void setProfilesFailOnError(bool fail);
 

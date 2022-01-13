@@ -89,27 +89,27 @@ std::string profiles_test::GetSimulateCapabilitiesLog(SimulateCapabilityFlags fl
         need_comma = true;
     }
     if (flags & SIMULATE_FEATURES_BIT) {
-        if (need_comma) result += ", ";
+        if (need_comma) result += ",";
         result += "SIMULATE_FEATURES_BIT";
         need_comma = true;
     }
     if (flags & SIMULATE_PROPERTIES_BIT) {
-        if (need_comma) result += ", ";
+        if (need_comma) result += ",";
         result += "SIMULATE_PROPERTIES_BIT";
         need_comma = true;
     }
     if (flags & SIMULATE_EXTENSIONS_BIT) {
-        if (need_comma) result += ", ";
+        if (need_comma) result += ",";
         result += "SIMULATE_EXTENSIONS_BIT";
         need_comma = true;
     }
     if (flags & SIMULATE_FORMATS_BIT) {
-        if (need_comma) result += ", ";
+        if (need_comma) result += ",";
         result += "SIMULATE_FORMATS_BIT";
         need_comma = true;
     }
     if (flags & SIMULATE_FORMAT_PROPERTIES_BIT) {
-        if (need_comma) result += ", ";
+        if (need_comma) result += ",";
         result += "SIMULATE_FORMAT_PROPERTIES_BIT";
         need_comma = true;
     }
@@ -119,6 +119,11 @@ std::string profiles_test::GetSimulateCapabilitiesLog(SimulateCapabilityFlags fl
 
 void profiles_test::setProfilesSimulateCapabilities(SimulateCapabilityFlags flags) {
     profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_SIMULATE_CAPABILITIES", GetSimulateCapabilitiesLog(flags).c_str());
+}
+
+void profiles_test::setProfilesSimulateAllCapabilities() {
+    setProfilesSimulateCapabilities(SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT |
+                                    SIMULATE_EXTENSIONS_BIT | SIMULATE_FORMATS_BIT | SIMULATE_FORMAT_PROPERTIES_BIT);
 }
 
 void profiles_test::setProfilesProfileName(const std::string& profile) {

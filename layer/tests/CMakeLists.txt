@@ -38,3 +38,4 @@ function(ProfilesTest NAME)
 endfunction(ProfilesTest)
 
 ProfilesTest(profiles_tests)
+ProfilesTest(profiles_test_properties_features_formats)
