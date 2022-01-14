@@ -886,6 +886,7 @@ std::recursive_mutex global_lock;  // Enforce thread-safety for this layer.
 uint32_t loader_layer_iface_version = CURRENT_LOADER_LAYER_INTERFACE_VERSION;
 
 typedef std::unordered_map<uint32_t /*VkFormat*/, VkFormatProperties> ArrayOfVkFormatProperties;
+typedef std::unordered_map<uint32_t /*VkFormat*/, VkFormatProperties3> ArrayOfVkFormatProperties3;
 typedef std::vector<VkExtensionProperties> ArrayOfVkExtensionProperties;
 
 // FormatProperties utilities ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -960,12 +961,14 @@ class PhysicalDeviceData {
 
     ArrayOfVkExtensionProperties device_extensions_;
     ArrayOfVkFormatProperties device_formats_;
+    ArrayOfVkFormatProperties3 device_formats_3_;
     ArrayOfVkExtensionProperties simulation_extensions_;
     VkPhysicalDeviceProperties physical_device_properties_;
     VkPhysicalDeviceFeatures physical_device_features_;
     VkPhysicalDeviceMemoryProperties physical_device_memory_properties_;
     VkSurfaceCapabilitiesKHR surface_capabilities_;
     ArrayOfVkFormatProperties arrayof_format_properties_;
+    ArrayOfVkFormatProperties3 arrayof_format_properties_3_;
     ArrayOfVkExtensionProperties arrayof_extension_properties_;
 
     // Vulkan 1.3 structs
@@ -1844,7 +1847,7 @@ class JsonLoader {
 
     bool GetFeature(const Json::Value &features, const std::string &feature_name);
     bool GetProperty(const Json::Value &props, const std::string &property_name);
-    bool GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest);
+    bool GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest, ArrayOfVkFormatProperties3 *dest3);
     bool CheckExtensionSupport(const char *extension);
     void AddPromotedExtensions(uint32_t api_level);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest);
@@ -2858,6 +2861,88 @@ static inline VkFormatFeatureFlags StringToVkFormatFeatureFlags(const std::strin
     return 0;
 }
 
+static inline VkFormatFeatureFlags2 StringToVkFormatFeatureFlags2(const std::string &input_value) {
+    static const std::unordered_map<std::string, VkFormatFeatureFlags2> map = {
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT", VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT_KHR", VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT", VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT},
+        {"VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT_KHR", VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT", VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT},
+        {"VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT_KHR", VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT", VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT},
+        {"VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT_KHR", VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_BIT", VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_BIT},
+        {"VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_BIT_KHR", VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT", VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT},
+        {"VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT_KHR", VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT", VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT},
+        {"VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT_KHR", VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT", VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT},
+        {"VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT_KHR", VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT", VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT},
+        {"VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT_KHR", VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_DEPTH_STENCIL_ATTACHMENT_BIT", VK_FORMAT_FEATURE_2_DEPTH_STENCIL_ATTACHMENT_BIT},
+        {"VK_FORMAT_FEATURE_2_DEPTH_STENCIL_ATTACHMENT_BIT_KHR", VK_FORMAT_FEATURE_2_DEPTH_STENCIL_ATTACHMENT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_BLIT_SRC_BIT", VK_FORMAT_FEATURE_2_BLIT_SRC_BIT},
+        {"VK_FORMAT_FEATURE_2_BLIT_SRC_BIT_KHR", VK_FORMAT_FEATURE_2_BLIT_SRC_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_BLIT_DST_BIT", VK_FORMAT_FEATURE_2_BLIT_DST_BIT},
+        {"VK_FORMAT_FEATURE_2_BLIT_DST_BIT_KHR", VK_FORMAT_FEATURE_2_BLIT_DST_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_BIT", VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_BIT},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_BIT_KHR", VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_CUBIC_BIT", VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_CUBIC_BIT},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT", VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT},
+        {"VK_FORMAT_FEATURE_2_TRANSFER_SRC_BIT", VK_FORMAT_FEATURE_2_TRANSFER_SRC_BIT},
+        {"VK_FORMAT_FEATURE_2_TRANSFER_SRC_BIT_KHR", VK_FORMAT_FEATURE_2_TRANSFER_SRC_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_TRANSFER_DST_BIT", VK_FORMAT_FEATURE_2_TRANSFER_DST_BIT},
+        {"VK_FORMAT_FEATURE_2_TRANSFER_DST_BIT_KHR", VK_FORMAT_FEATURE_2_TRANSFER_DST_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_MINMAX_BIT", VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_MINMAX_BIT},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_MINMAX_BIT_KHR", VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_MINMAX_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_MIDPOINT_CHROMA_SAMPLES_BIT", VK_FORMAT_FEATURE_2_MIDPOINT_CHROMA_SAMPLES_BIT},
+        {"VK_FORMAT_FEATURE_2_MIDPOINT_CHROMA_SAMPLES_BIT_KHR", VK_FORMAT_FEATURE_2_MIDPOINT_CHROMA_SAMPLES_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT",
+         VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR",
+         VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT",
+         VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR",
+         VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT",
+         VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR",
+         VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT",
+         VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR",
+         VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_DISJOINT_BIT", VK_FORMAT_FEATURE_2_DISJOINT_BIT},
+        {"VK_FORMAT_FEATURE_2_DISJOINT_BIT_KHR", VK_FORMAT_FEATURE_2_DISJOINT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_COSITED_CHROMA_SAMPLES_BIT", VK_FORMAT_FEATURE_2_COSITED_CHROMA_SAMPLES_BIT},
+        {"VK_FORMAT_FEATURE_2_COSITED_CHROMA_SAMPLES_BIT_KHR", VK_FORMAT_FEATURE_2_COSITED_CHROMA_SAMPLES_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT", VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT},
+        {"VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT_KHR", VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT", VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT},
+        {"VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT_KHR", VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT", VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT},
+        {"VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT_KHR", VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_VIDEO_DECODE_OUTPUT_BIT_KHR", VK_FORMAT_FEATURE_2_VIDEO_DECODE_OUTPUT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_VIDEO_DECODE_DPB_BIT_KHR", VK_FORMAT_FEATURE_2_VIDEO_DECODE_DPB_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR",
+         VK_FORMAT_FEATURE_2_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_FRAGMENT_DENSITY_MAP_BIT_EXT", VK_FORMAT_FEATURE_2_FRAGMENT_DENSITY_MAP_BIT_EXT},
+        {"VK_FORMAT_FEATURE_2_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR",
+         VK_FORMAT_FEATURE_2_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_VIDEO_ENCODE_INPUT_BIT_KHR", VK_FORMAT_FEATURE_2_VIDEO_ENCODE_INPUT_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_VIDEO_ENCODE_DPB_BIT_KHR", VK_FORMAT_FEATURE_2_VIDEO_ENCODE_DPB_BIT_KHR},
+        {"VK_FORMAT_FEATURE_2_LINEAR_COLOR_ATTACHMENT_BIT_NV", VK_FORMAT_FEATURE_2_LINEAR_COLOR_ATTACHMENT_BIT_NV},
+    };
+    const auto it = map.find(input_value);
+    if (it != map.end()) {
+        return it->second;
+    }
+    return 0;
+}
+
 bool JsonLoader::GetFeature(const Json::Value &features, const std::string &feature_name) {
     const Json::Value &feature = features[feature_name];
 
@@ -3247,22 +3332,49 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &proper
     return true;
 }
 
-bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest) {
+bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest,
+                           ArrayOfVkFormatProperties3 *dest3) {
     VkFormat format = StringToFormat(format_name);
     VkFormatProperties profile_properties = {};
+    VkFormatProperties3 profile_properties_3 = {};
     const auto &member = formats[format_name];
-    const auto &props = member["VkFormatProperties"];
-    for (const auto &feature : props["linearTilingFeatures"]) {
-        profile_properties.linearTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
-    }
-    for (const auto &feature : props["optimalTilingFeatures"]) {
-        profile_properties.optimalTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
-    }
-    for (const auto &feature : props["bufferFeatures"]) {
-        profile_properties.bufferFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+    for (const auto &name : member.getMemberNames()) {
+        const auto &props = member[name];
+        if (name == "VkFormatProperties") {
+            for (const auto &feature : props["linearTilingFeatures"]) {
+                profile_properties.linearTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+            }
+            for (const auto &feature : props["optimalTilingFeatures"]) {
+                profile_properties.optimalTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+            }
+            for (const auto &feature : props["bufferFeatures"]) {
+                profile_properties.bufferFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+            }
+        } else if (name == "VkFormatProperties2") {
+            for (const auto &feature : props["formatProperties"]["linearTilingFeatures"]) {
+                profile_properties.linearTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+            }
+            for (const auto &feature : props["formatProperties"]["optimalTilingFeatures"]) {
+                profile_properties.optimalTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+            }
+            for (const auto &feature : props["formatProperties"]["bufferFeatures"]) {
+                profile_properties.bufferFeatures |= StringToVkFormatFeatureFlags(feature.asString());
+            }
+        } else if (name == "VkFormatProperties3") {
+            for (const auto &feature : props["linearTilingFeatures"]) {
+                profile_properties_3.linearTilingFeatures |= StringToVkFormatFeatureFlags2(feature.asString());
+            }
+            for (const auto &feature : props["optimalTilingFeatures"]) {
+                profile_properties_3.optimalTilingFeatures |= StringToVkFormatFeatureFlags2(feature.asString());
+            }
+            for (const auto &feature : props["bufferFeatures"]) {
+                profile_properties_3.bufferFeatures |= StringToVkFormatFeatureFlags2(feature.asString());
+            }
+        }
     }
 
     (*dest)[format] = profile_properties;
+    (*dest3)[format] = profile_properties_3;
 
     if (IsASTCHDRFormat(format) && !device_has_astc_hdr) {
         // We already notified that ASTC HDR is not supported, no spaming
@@ -3292,7 +3404,7 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
             return false;
         }
     }
-    if (!HasFlags(pdd_.device_formats_[format].optimalTilingFeatures, profile_properties.optimalTilingFeatures)) {
+    if (!HasFlags(device_properties.optimalTilingFeatures, profile_properties.optimalTilingFeatures)) {
         LogMessage(DEBUG_REPORT_WARNING_BIT,
                    ::format("For %s `optimalTilingFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
                             "supports:\n\t\"%s\".\nThe `optimalTilingFeatures` can't be simulated on this Device.\n",
@@ -3302,12 +3414,44 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
             return false;
         }
     }
-    if (!HasFlags(pdd_.device_formats_[format].bufferFeatures, profile_properties.bufferFeatures)) {
+    if (!HasFlags(device_properties.bufferFeatures, profile_properties.bufferFeatures)) {
         LogMessage(DEBUG_REPORT_WARNING_BIT,
                    ::format("For %s `bufferFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
                             "supports:\n\t\"%s\".\nThe `bufferFeatures` can't be simulated on this Device.\n",
                             format_name.c_str(), GetFormatFeatureString(profile_properties.bufferFeatures).c_str(),
                             GetFormatFeatureString(device_properties.bufferFeatures).c_str()));
+        if (layer_settings.debug_fail_on_error) {
+            return false;
+        }
+    }
+
+    const VkFormatProperties3 &device_properties_3 = pdd_.device_formats_3_[format];
+    if (!HasFlags(device_properties_3.linearTilingFeatures, profile_properties_3.linearTilingFeatures)) {
+        LogMessage(DEBUG_REPORT_WARNING_BIT,
+                   ::format("For %s `linearTilingFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
+                            "supports:\n\t\"%s\".\nThe `linearTilingFeatures` can't be simulated on this Device.\n",
+                            format_name.c_str(), GetFormatFeatureString(profile_properties_3.linearTilingFeatures).c_str(),
+                            GetFormatFeatureString(device_properties_3.linearTilingFeatures).c_str()));
+        if (layer_settings.debug_fail_on_error) {
+            return false;
+        }
+    }
+    if (!HasFlags(device_properties_3.optimalTilingFeatures, profile_properties_3.optimalTilingFeatures)) {
+        LogMessage(DEBUG_REPORT_WARNING_BIT,
+                   ::format("For %s `optimalTilingFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
+                            "supports:\n\t\"%s\".\nThe `optimalTilingFeatures` can't be simulated on this Device.\n",
+                            format_name.c_str(), GetFormatFeatureString(profile_properties_3.optimalTilingFeatures).c_str(),
+                            GetFormatFeatureString(device_properties_3.optimalTilingFeatures).c_str()));
+        if (layer_settings.debug_fail_on_error) {
+            return false;
+        }
+    }
+    if (!HasFlags(device_properties_3.bufferFeatures, profile_properties_3.bufferFeatures)) {
+        LogMessage(DEBUG_REPORT_WARNING_BIT,
+                   ::format("For %s `bufferFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
+                            "supports:\n\t\"%s\".\nThe `bufferFeatures` can't be simulated on this Device.\n",
+                            format_name.c_str(), GetFormatFeatureString(profile_properties_3.bufferFeatures).c_str(),
+                            GetFormatFeatureString(device_properties_3.bufferFeatures).c_str()));
         if (layer_settings.debug_fail_on_error) {
             return false;
         }
@@ -3514,7 +3658,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
             const auto &formats = c["formats"];
 
             for (const auto &format : formats.getMemberNames()) {
-                bool success = GetFormat(formats, format, &pdd_.arrayof_format_properties_);
+                bool success = GetFormat(formats, format, &pdd_.arrayof_format_properties_, &pdd_.arrayof_format_properties_3_);
                 if (!success && layer_settings.debug_fail_on_error) {
                     return VK_ERROR_INITIALIZATION_FAILED;
                 }
@@ -8090,6 +8234,30 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
     }
 }
 
+void FillFormatPropertiesPNextChain(PhysicalDeviceData *physicalDeviceData, void *place, VkFormat format) {
+    VkFormatProperties3& format_properties_3 = physicalDeviceData->arrayof_format_properties_3_[format];
+
+    while (place) {
+        VkBaseOutStructure *structure = (VkBaseOutStructure *)place;
+
+        // These switch statements check which struct is in the pNext chain and, if the physical device has the proper extension,
+        // fill the struct with any override data provided by the PhysicalDeviceData object.
+
+        switch (structure->sType) {
+            case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3: {
+                VkFormatProperties3 *sp = (VkFormatProperties3 *)place;
+                void *pNext = sp->pNext;
+                *sp = format_properties_3;
+                sp->pNext = pNext;
+            } break;
+            default:
+                break;
+        }
+
+        place = structure->pNext;
+    }
+}
+
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceProperties2(VkPhysicalDevice physicalDevice,
                                                         VkPhysicalDeviceProperties2KHR *pProperties) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
@@ -8248,6 +8416,8 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties2(VkPhysicalDevice p
     const auto dt = instance_dispatch_table(physicalDevice);
     dt->GetPhysicalDeviceFormatProperties2(physicalDevice, format, pFormatProperties);
     GetPhysicalDeviceFormatProperties(physicalDevice, format, &pFormatProperties->formatProperties);
+    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
+    FillFormatPropertiesPNextChain(pdd, pFormatProperties->pNext, format);
 }
 
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties2KHR(VkPhysicalDevice physicalDevice, VkFormat format,
@@ -8660,7 +8830,7 @@ void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceMaint
 
 #undef TRANSFER_VALUE
 
-void LoadDeviceFormats(VkInstance instance, VkPhysicalDevice pd, ArrayOfVkFormatProperties *dest) {
+void LoadDeviceFormats(VkInstance instance, VkPhysicalDevice pd, ArrayOfVkFormatProperties *dest, ArrayOfVkFormatProperties3 *dest3) {
     std::vector<VkFormat> formats = {
         VK_FORMAT_R4G4_UNORM_PACK8,
         VK_FORMAT_R4G4B4A4_UNORM_PACK16,
@@ -8911,9 +9081,16 @@ void LoadDeviceFormats(VkInstance instance, VkPhysicalDevice pd, ArrayOfVkFormat
     };
     const auto dt = instance_dispatch_table(instance);
     for (const auto format : formats) {
-        VkFormatProperties format_properties;
-        dt->GetPhysicalDeviceFormatProperties(pd, format, &format_properties);
-        (*dest)[format] = format_properties;
+        VkFormatProperties3KHR format_properties_3 = {};
+        format_properties_3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR;
+
+        VkFormatProperties2 format_properties = {};
+        format_properties.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        format_properties.pNext = &format_properties_3;
+
+        dt->GetPhysicalDeviceFormatProperties2(pd, format, &format_properties);
+        (*dest)[format] = format_properties.formatProperties;
+        (*dest3)[format] = format_properties_3;
     }
 }
 
@@ -9868,7 +10045,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             ::device_has_bc = pdd.physical_device_features_.textureCompressionBC;
             ::device_has_etc2 = pdd.physical_device_features_.textureCompressionETC2;
 
-            LoadDeviceFormats(instance, physical_device, &pdd.device_formats_);
+            LoadDeviceFormats(instance, physical_device, &pdd.device_formats_, &pdd.device_formats_3_);
 
             LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
                        format("deviceName \"%s\"\n", pdd.physical_device_properties_.deviceName).c_str());

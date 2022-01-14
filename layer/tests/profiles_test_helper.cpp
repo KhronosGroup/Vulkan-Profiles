@@ -136,7 +136,7 @@ void profiles_test::setProfilesFailOnError(bool fail) {
 
 VkApplicationInfo profiles_test::GetDefaultApplicationInfo() {
     VkApplicationInfo out{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
-    out.apiVersion = VK_API_VERSION_1_0;
+    out.apiVersion = VK_API_VERSION_1_1;
     out.applicationVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
     out.pApplicationName = "profiles_tests";
     out.engineVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
