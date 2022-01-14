@@ -42,120 +42,120 @@ TEST(profiles, TestPhysicalDeviceProperties) {
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
     const auto& limits = gpu_props.properties.limits;
-    EXPECT_GE(limits.maxImageDimension1D, 102u);
-    EXPECT_GE(limits.maxImageDimension2D, 103u);
-    EXPECT_GE(limits.maxImageDimension3D, 104u);
-    EXPECT_GE(limits.maxImageDimensionCube, 105u);
-    EXPECT_GE(limits.maxImageArrayLayers, 106u);
-    EXPECT_GE(limits.maxTexelBufferElements, 107u);
-    EXPECT_GE(limits.maxUniformBufferRange, 108u);
-    EXPECT_GE(limits.maxStorageBufferRange, 109u);
-    EXPECT_GE(limits.maxPushConstantsSize, 110u);
-    EXPECT_GE(limits.maxMemoryAllocationCount, 111u);
-    EXPECT_GE(limits.maxSamplerAllocationCount, 112u);
-    EXPECT_GE(limits.bufferImageGranularity, 113u);
-    EXPECT_GE(limits.sparseAddressSpaceSize, 114u);
-    EXPECT_GE(limits.maxBoundDescriptorSets, 115u);
-    EXPECT_GE(limits.maxPerStageDescriptorSamplers, 116u);
-    EXPECT_GE(limits.maxPerStageDescriptorUniformBuffers, 117u);
-    EXPECT_GE(limits.maxPerStageDescriptorStorageBuffers, 118u);
-    EXPECT_GE(limits.maxPerStageDescriptorSampledImages, 119u);
-    EXPECT_GE(limits.maxPerStageDescriptorStorageImages, 120u);
-    EXPECT_GE(limits.maxPerStageDescriptorInputAttachments, 121u);
-    EXPECT_GE(limits.maxPerStageResources, 122u);
-    EXPECT_GE(limits.maxDescriptorSetSamplers, 123u);
-    EXPECT_GE(limits.maxDescriptorSetUniformBuffers, 124u);
-    EXPECT_GE(limits.maxDescriptorSetUniformBuffersDynamic, 125u);
-    EXPECT_GE(limits.maxDescriptorSetStorageBuffers, 126u);
-    EXPECT_GE(limits.maxDescriptorSetStorageBuffersDynamic, 127u);
-    EXPECT_GE(limits.maxDescriptorSetSampledImages, 128u);
-    EXPECT_GE(limits.maxDescriptorSetStorageImages, 129u);
-    EXPECT_GE(limits.maxDescriptorSetInputAttachments, 130u);
-    EXPECT_GE(limits.maxVertexInputAttributes, 131u);
-    EXPECT_GE(limits.maxVertexInputBindings, 132u);
-    EXPECT_GE(limits.maxVertexInputAttributeOffset, 133u);
-    EXPECT_GE(limits.maxVertexInputBindingStride, 134u);
-    EXPECT_GE(limits.maxVertexOutputComponents, 135u);
-    EXPECT_GE(limits.maxTessellationGenerationLevel, 136u);
-    EXPECT_GE(limits.maxTessellationPatchSize, 137u);
-    EXPECT_GE(limits.maxTessellationControlPerVertexInputComponents, 138u);
-    EXPECT_GE(limits.maxTessellationControlPerVertexOutputComponents, 139u);
-    EXPECT_GE(limits.maxTessellationControlPerPatchOutputComponents, 140u);
-    EXPECT_GE(limits.maxTessellationControlTotalOutputComponents, 141u);
-    EXPECT_GE(limits.maxTessellationEvaluationInputComponents, 142u);
-    EXPECT_GE(limits.maxTessellationEvaluationOutputComponents, 143u);
-    EXPECT_GE(limits.maxGeometryShaderInvocations, 144u);
-    EXPECT_GE(limits.maxGeometryInputComponents, 145u);
-    EXPECT_GE(limits.maxGeometryOutputComponents, 146u);
-    EXPECT_GE(limits.maxGeometryOutputVertices, 147u);
-    EXPECT_GE(limits.maxGeometryTotalOutputComponents, 148u);
-    EXPECT_GE(limits.maxFragmentInputComponents, 149u);
-    EXPECT_GE(limits.maxFragmentOutputAttachments, 150u);
-    EXPECT_GE(limits.maxFragmentDualSrcAttachments, 151u);
-    EXPECT_GE(limits.maxFragmentCombinedOutputResources, 152u);
-    EXPECT_GE(limits.maxComputeSharedMemorySize, 153u);
-    EXPECT_GE(limits.maxComputeWorkGroupCount[0], 154u);
-    EXPECT_GE(limits.maxComputeWorkGroupCount[1], 155u);
-    EXPECT_GE(limits.maxComputeWorkGroupCount[2], 156u);
-    EXPECT_GE(limits.maxComputeWorkGroupInvocations, 157u);
-    EXPECT_GE(limits.maxComputeWorkGroupSize[0], 158u);
-    EXPECT_GE(limits.maxComputeWorkGroupSize[1], 159u);
-    EXPECT_GE(limits.maxComputeWorkGroupSize[2], 160u);
-    EXPECT_GE(limits.subPixelPrecisionBits, 161u);
-    EXPECT_GE(limits.subTexelPrecisionBits, 162u);
-    EXPECT_GE(limits.mipmapPrecisionBits, 163u);
-    EXPECT_GE(limits.maxDrawIndexedIndexValue, 164u);
-    EXPECT_GE(limits.maxDrawIndirectCount, 165u);
-    EXPECT_GE(limits.maxSamplerLodBias, 166.0f);
-    EXPECT_GE(limits.maxSamplerAnisotropy, 167.0f);
-    EXPECT_GE(limits.maxViewports, 168u);
-    EXPECT_GE(limits.maxViewportDimensions[0], 169u);
-    EXPECT_GE(limits.maxViewportDimensions[1], 170u);
-    EXPECT_GE(limits.viewportBoundsRange[0], 171.0f);
-    EXPECT_GE(limits.viewportBoundsRange[1], 172.0f);
-    EXPECT_GE(limits.viewportSubPixelBits, 173u);
-    EXPECT_GE(limits.minMemoryMapAlignment, 174u);
-    EXPECT_GE(limits.minTexelBufferOffsetAlignment, 175u);
-    EXPECT_GE(limits.minUniformBufferOffsetAlignment, 176u);
-    EXPECT_GE(limits.minStorageBufferOffsetAlignment, 177u);
-    EXPECT_GE(limits.minTexelOffset, -178);
-    EXPECT_GE(limits.maxTexelOffset, 179u);
-    EXPECT_GE(limits.minTexelGatherOffset, -180);
-    EXPECT_GE(limits.maxTexelGatherOffset, 181u);
-    EXPECT_GE(limits.minInterpolationOffset, 182.0f);
-    EXPECT_GE(limits.maxInterpolationOffset, 183.0f);
-    EXPECT_GE(limits.subPixelInterpolationOffsetBits, 184u);
-    EXPECT_GE(limits.maxFramebufferWidth, 185u);
-    EXPECT_GE(limits.maxFramebufferHeight, 186u);
-    EXPECT_GE(limits.maxFramebufferLayers, 187u);
+    EXPECT_EQ(limits.maxImageDimension1D, 102u);
+    EXPECT_EQ(limits.maxImageDimension2D, 103u);
+    EXPECT_EQ(limits.maxImageDimension3D, 104u);
+    EXPECT_EQ(limits.maxImageDimensionCube, 105u);
+    EXPECT_EQ(limits.maxImageArrayLayers, 106u);
+    EXPECT_EQ(limits.maxTexelBufferElements, 107u);
+    EXPECT_EQ(limits.maxUniformBufferRange, 108u);
+    EXPECT_EQ(limits.maxStorageBufferRange, 109u);
+    EXPECT_EQ(limits.maxPushConstantsSize, 110u);
+    EXPECT_EQ(limits.maxMemoryAllocationCount, 111u);
+    EXPECT_EQ(limits.maxSamplerAllocationCount, 112u);
+    EXPECT_EQ(limits.bufferImageGranularity, 113u);
+    EXPECT_EQ(limits.sparseAddressSpaceSize, 114u);
+    EXPECT_EQ(limits.maxBoundDescriptorSets, 115u);
+    EXPECT_EQ(limits.maxPerStageDescriptorSamplers, 116u);
+    EXPECT_EQ(limits.maxPerStageDescriptorUniformBuffers, 117u);
+    EXPECT_EQ(limits.maxPerStageDescriptorStorageBuffers, 118u);
+    EXPECT_EQ(limits.maxPerStageDescriptorSampledImages, 119u);
+    EXPECT_EQ(limits.maxPerStageDescriptorStorageImages, 120u);
+    EXPECT_EQ(limits.maxPerStageDescriptorInputAttachments, 121u);
+    EXPECT_EQ(limits.maxPerStageResources, 122u);
+    EXPECT_EQ(limits.maxDescriptorSetSamplers, 123u);
+    EXPECT_EQ(limits.maxDescriptorSetUniformBuffers, 124u);
+    EXPECT_EQ(limits.maxDescriptorSetUniformBuffersDynamic, 125u);
+    EXPECT_EQ(limits.maxDescriptorSetStorageBuffers, 126u);
+    EXPECT_EQ(limits.maxDescriptorSetStorageBuffersDynamic, 127u);
+    EXPECT_EQ(limits.maxDescriptorSetSampledImages, 128u);
+    EXPECT_EQ(limits.maxDescriptorSetStorageImages, 129u);
+    EXPECT_EQ(limits.maxDescriptorSetInputAttachments, 130u);
+    EXPECT_EQ(limits.maxVertexInputAttributes, 131u);
+    EXPECT_EQ(limits.maxVertexInputBindings, 132u);
+    EXPECT_EQ(limits.maxVertexInputAttributeOffset, 133u);
+    EXPECT_EQ(limits.maxVertexInputBindingStride, 134u);
+    EXPECT_EQ(limits.maxVertexOutputComponents, 135u);
+    EXPECT_EQ(limits.maxTessellationGenerationLevel, 136u);
+    EXPECT_EQ(limits.maxTessellationPatchSize, 137u);
+    EXPECT_EQ(limits.maxTessellationControlPerVertexInputComponents, 138u);
+    EXPECT_EQ(limits.maxTessellationControlPerVertexOutputComponents, 139u);
+    EXPECT_EQ(limits.maxTessellationControlPerPatchOutputComponents, 140u);
+    EXPECT_EQ(limits.maxTessellationControlTotalOutputComponents, 141u);
+    EXPECT_EQ(limits.maxTessellationEvaluationInputComponents, 142u);
+    EXPECT_EQ(limits.maxTessellationEvaluationOutputComponents, 143u);
+    EXPECT_EQ(limits.maxGeometryShaderInvocations, 144u);
+    EXPECT_EQ(limits.maxGeometryInputComponents, 145u);
+    EXPECT_EQ(limits.maxGeometryOutputComponents, 146u);
+    EXPECT_EQ(limits.maxGeometryOutputVertices, 147u);
+    EXPECT_EQ(limits.maxGeometryTotalOutputComponents, 148u);
+    EXPECT_EQ(limits.maxFragmentInputComponents, 149u);
+    EXPECT_EQ(limits.maxFragmentOutputAttachments, 150u);
+    EXPECT_EQ(limits.maxFragmentDualSrcAttachments, 151u);
+    EXPECT_EQ(limits.maxFragmentCombinedOutputResources, 152u);
+    EXPECT_EQ(limits.maxComputeSharedMemorySize, 153u);
+    EXPECT_EQ(limits.maxComputeWorkGroupCount[0], 154u);
+    EXPECT_EQ(limits.maxComputeWorkGroupCount[1], 155u);
+    EXPECT_EQ(limits.maxComputeWorkGroupCount[2], 156u);
+    EXPECT_EQ(limits.maxComputeWorkGroupInvocations, 157u);
+    EXPECT_EQ(limits.maxComputeWorkGroupSize[0], 158u);
+    EXPECT_EQ(limits.maxComputeWorkGroupSize[1], 159u);
+    EXPECT_EQ(limits.maxComputeWorkGroupSize[2], 160u);
+    EXPECT_EQ(limits.subPixelPrecisionBits, 161u);
+    EXPECT_EQ(limits.subTexelPrecisionBits, 162u);
+    EXPECT_EQ(limits.mipmapPrecisionBits, 163u);
+    EXPECT_EQ(limits.maxDrawIndexedIndexValue, 164u);
+    EXPECT_EQ(limits.maxDrawIndirectCount, 165u);
+    EXPECT_EQ(limits.maxSamplerLodBias, 166.0f);
+    EXPECT_EQ(limits.maxSamplerAnisotropy, 167.0f);
+    EXPECT_EQ(limits.maxViewports, 168u);
+    EXPECT_EQ(limits.maxViewportDimensions[0], 169u);
+    EXPECT_EQ(limits.maxViewportDimensions[1], 170u);
+    EXPECT_EQ(limits.viewportBoundsRange[0], 171.0f);
+    EXPECT_EQ(limits.viewportBoundsRange[1], 172.0f);
+    EXPECT_EQ(limits.viewportSubPixelBits, 173u);
+    EXPECT_EQ(limits.minMemoryMapAlignment, 174u);
+    EXPECT_EQ(limits.minTexelBufferOffsetAlignment, 175u);
+    EXPECT_EQ(limits.minUniformBufferOffsetAlignment, 176u);
+    EXPECT_EQ(limits.minStorageBufferOffsetAlignment, 177u);
+    EXPECT_EQ(limits.minTexelOffset, -178);
+    EXPECT_EQ(limits.maxTexelOffset, 179u);
+    EXPECT_EQ(limits.minTexelGatherOffset, -180);
+    EXPECT_EQ(limits.maxTexelGatherOffset, 181u);
+    EXPECT_EQ(limits.minInterpolationOffset, 182.0f);
+    EXPECT_EQ(limits.maxInterpolationOffset, 183.0f);
+    EXPECT_EQ(limits.subPixelInterpolationOffsetBits, 184u);
+    EXPECT_EQ(limits.maxFramebufferWidth, 185u);
+    EXPECT_EQ(limits.maxFramebufferHeight, 186u);
+    EXPECT_EQ(limits.maxFramebufferLayers, 187u);
     EXPECT_EQ(limits.framebufferColorSampleCounts & VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_1_BIT);
     EXPECT_EQ(limits.framebufferDepthSampleCounts & VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_1_BIT);
     EXPECT_EQ(limits.framebufferStencilSampleCounts & VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_1_BIT);
     EXPECT_EQ(limits.framebufferNoAttachmentsSampleCounts & VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_1_BIT);
-    EXPECT_GE(limits.maxColorAttachments, 188u);
+    EXPECT_EQ(limits.maxColorAttachments, 188u);
     EXPECT_EQ(limits.sampledImageColorSampleCounts & VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_1_BIT);
     EXPECT_EQ(limits.sampledImageIntegerSampleCounts & VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_1_BIT);
     EXPECT_EQ(limits.sampledImageDepthSampleCounts & VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_1_BIT);
     EXPECT_EQ(limits.sampledImageStencilSampleCounts & VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_1_BIT);
     EXPECT_EQ(limits.storageImageSampleCounts & VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_1_BIT);
-    EXPECT_GE(limits.maxSampleMaskWords, 189u);
-    EXPECT_GE(limits.timestampComputeAndGraphics, VK_TRUE);
-    EXPECT_GE(limits.timestampPeriod, 190.0f);
-    EXPECT_GE(limits.maxClipDistances, 191u);
-    EXPECT_GE(limits.maxCullDistances, 192u);
-    EXPECT_GE(limits.maxCombinedClipAndCullDistances, 193u);
-    EXPECT_GE(limits.discreteQueuePriorities, 194u);
-    EXPECT_GE(limits.pointSizeRange[0], 195.0f);
-    EXPECT_GE(limits.pointSizeRange[1], 196.0f);
-    EXPECT_GE(limits.lineWidthRange[0], 197.0f);
-    EXPECT_GE(limits.lineWidthRange[1], 198.0f);
-    EXPECT_GE(limits.pointSizeGranularity, 1200.0f);
-    EXPECT_GE(limits.lineWidthGranularity, 201.0f);
-    EXPECT_GE(limits.strictLines, VK_TRUE);
-    EXPECT_GE(limits.standardSampleLocations, VK_TRUE);
-    EXPECT_GE(limits.optimalBufferCopyOffsetAlignment, 202u);
-    EXPECT_GE(limits.optimalBufferCopyRowPitchAlignment, 203u);
-    EXPECT_GE(limits.nonCoherentAtomSize, 204u);
+    EXPECT_EQ(limits.maxSampleMaskWords, 189u);
+    EXPECT_EQ(limits.timestampComputeAndGraphics, VK_TRUE);
+    EXPECT_EQ(limits.timestampPeriod, 190.0f);
+    EXPECT_EQ(limits.maxClipDistances, 191u);
+    EXPECT_EQ(limits.maxCullDistances, 192u);
+    EXPECT_EQ(limits.maxCombinedClipAndCullDistances, 193u);
+    EXPECT_EQ(limits.discreteQueuePriorities, 194u);
+    EXPECT_EQ(limits.pointSizeRange[0], 195.0f);
+    EXPECT_EQ(limits.pointSizeRange[1], 196.0f);
+    EXPECT_EQ(limits.lineWidthRange[0], 197.0f);
+    EXPECT_EQ(limits.lineWidthRange[1], 198.0f);
+    EXPECT_EQ(limits.pointSizeGranularity, 1200.0f);
+    EXPECT_EQ(limits.lineWidthGranularity, 201.0f);
+    EXPECT_EQ(limits.strictLines, VK_TRUE);
+    EXPECT_EQ(limits.standardSampleLocations, VK_TRUE);
+    EXPECT_EQ(limits.optimalBufferCopyOffsetAlignment, 202u);
+    EXPECT_EQ(limits.optimalBufferCopyRowPitchAlignment, 203u);
+    EXPECT_EQ(limits.nonCoherentAtomSize, 204u);
 
     vkDestroyInstance(test_inst, nullptr);
 }
@@ -197,8 +197,8 @@ TEST(profiles, TestDepthStencilResolveProperties) {
               VK_RESOLVE_MODE_AVERAGE_BIT);
     EXPECT_EQ(depth_stencil_resolve_properties.supportedStencilResolveModes & VK_RESOLVE_MODE_AVERAGE_BIT,
               VK_RESOLVE_MODE_AVERAGE_BIT);
-    EXPECT_GE(depth_stencil_resolve_properties.independentResolveNone, VK_TRUE);
-    EXPECT_GE(depth_stencil_resolve_properties.independentResolve, VK_TRUE);
+    EXPECT_EQ(depth_stencil_resolve_properties.independentResolveNone, VK_TRUE);
+    EXPECT_EQ(depth_stencil_resolve_properties.independentResolve, VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -237,7 +237,7 @@ TEST(profiles, TestSubgroupProperties) {
     gpu_props.pNext = &subgroup_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(subgroup_properties.subgroupSize, 205u);
+    EXPECT_EQ(subgroup_properties.subgroupSize, 205u);
     EXPECT_EQ(subgroup_properties.supportedStages & (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT),
               (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT));
     EXPECT_EQ(subgroup_properties.supportedOperations & (VK_SUBGROUP_FEATURE_BASIC_BIT), (VK_SUBGROUP_FEATURE_BASIC_BIT));
@@ -280,29 +280,29 @@ TEST(profiles, TestDescriptorIndexingProperties) {
     gpu_props.pNext = &descriptor_indexing_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(descriptor_indexing_properties.maxUpdateAfterBindDescriptorsInAllPools, 233u);
-    EXPECT_GE(descriptor_indexing_properties.shaderUniformBufferArrayNonUniformIndexingNative, VK_TRUE);
-    EXPECT_GE(descriptor_indexing_properties.shaderSampledImageArrayNonUniformIndexingNative, VK_TRUE);
-    EXPECT_GE(descriptor_indexing_properties.shaderStorageBufferArrayNonUniformIndexingNative, VK_TRUE);
-    EXPECT_GE(descriptor_indexing_properties.shaderStorageImageArrayNonUniformIndexingNative, VK_TRUE);
-    EXPECT_GE(descriptor_indexing_properties.shaderInputAttachmentArrayNonUniformIndexingNative, VK_TRUE);
-    EXPECT_GE(descriptor_indexing_properties.robustBufferAccessUpdateAfterBind, VK_TRUE);
-    EXPECT_GE(descriptor_indexing_properties.quadDivergentImplicitLod, VK_TRUE);
-    EXPECT_GE(descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindSamplers, 234u);
-    EXPECT_GE(descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindUniformBuffers, 235u);
-    EXPECT_GE(descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindStorageBuffers, 236u);
-    EXPECT_GE(descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindSampledImages, 237u);
-    EXPECT_GE(descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindStorageImages, 238u);
-    EXPECT_GE(descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindInputAttachments, 239u);
-    EXPECT_GE(descriptor_indexing_properties.maxPerStageUpdateAfterBindResources, 240u);
-    EXPECT_GE(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindSamplers, 241u);
-    EXPECT_GE(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindUniformBuffers, 242u);
-    EXPECT_GE(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic, 243u);
-    EXPECT_GE(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindStorageBuffers, 244u);
-    EXPECT_GE(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic, 245u);
-    EXPECT_GE(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindSampledImages, 246u);
-    EXPECT_GE(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindStorageImages, 247u);
-    EXPECT_GE(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindInputAttachments, 248u);
+    EXPECT_EQ(descriptor_indexing_properties.maxUpdateAfterBindDescriptorsInAllPools, 233u);
+    EXPECT_EQ(descriptor_indexing_properties.shaderUniformBufferArrayNonUniformIndexingNative, VK_TRUE);
+    EXPECT_EQ(descriptor_indexing_properties.shaderSampledImageArrayNonUniformIndexingNative, VK_TRUE);
+    EXPECT_EQ(descriptor_indexing_properties.shaderStorageBufferArrayNonUniformIndexingNative, VK_TRUE);
+    EXPECT_EQ(descriptor_indexing_properties.shaderStorageImageArrayNonUniformIndexingNative, VK_TRUE);
+    EXPECT_EQ(descriptor_indexing_properties.shaderInputAttachmentArrayNonUniformIndexingNative, VK_TRUE);
+    EXPECT_EQ(descriptor_indexing_properties.robustBufferAccessUpdateAfterBind, VK_TRUE);
+    EXPECT_EQ(descriptor_indexing_properties.quadDivergentImplicitLod, VK_TRUE);
+    EXPECT_EQ(descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindSamplers, 234u);
+    EXPECT_EQ(descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindUniformBuffers, 235u);
+    EXPECT_EQ(descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindStorageBuffers, 236u);
+    EXPECT_EQ(descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindSampledImages, 237u);
+    EXPECT_EQ(descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindStorageImages, 238u);
+    EXPECT_EQ(descriptor_indexing_properties.maxPerStageDescriptorUpdateAfterBindInputAttachments, 239u);
+    EXPECT_EQ(descriptor_indexing_properties.maxPerStageUpdateAfterBindResources, 240u);
+    EXPECT_EQ(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindSamplers, 241u);
+    EXPECT_EQ(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindUniformBuffers, 242u);
+    EXPECT_EQ(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic, 243u);
+    EXPECT_EQ(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindStorageBuffers, 244u);
+    EXPECT_EQ(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic, 245u);
+    EXPECT_EQ(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindSampledImages, 246u);
+    EXPECT_EQ(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindStorageImages, 247u);
+    EXPECT_EQ(descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindInputAttachments, 248u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -345,21 +345,21 @@ TEST(profiles, TestFloatControlsProperties) {
               VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL);
     EXPECT_EQ(float_control_properties.roundingModeIndependence & VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL,
               VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL);
-    EXPECT_GE(float_control_properties.shaderSignedZeroInfNanPreserveFloat16, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderSignedZeroInfNanPreserveFloat32, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderSignedZeroInfNanPreserveFloat64, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderDenormPreserveFloat16, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderDenormPreserveFloat32, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderDenormPreserveFloat64, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderDenormFlushToZeroFloat16, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderDenormFlushToZeroFloat32, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderDenormFlushToZeroFloat64, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderRoundingModeRTEFloat16, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderRoundingModeRTEFloat32, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderRoundingModeRTEFloat64, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderRoundingModeRTZFloat16, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderRoundingModeRTZFloat32, VK_TRUE);
-    EXPECT_GE(float_control_properties.shaderRoundingModeRTZFloat64, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderSignedZeroInfNanPreserveFloat16, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderSignedZeroInfNanPreserveFloat32, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderSignedZeroInfNanPreserveFloat64, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderDenormPreserveFloat16, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderDenormPreserveFloat32, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderDenormPreserveFloat64, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderDenormFlushToZeroFloat16, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderDenormFlushToZeroFloat32, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderDenormFlushToZeroFloat64, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderRoundingModeRTEFloat16, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderRoundingModeRTEFloat32, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderRoundingModeRTEFloat64, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderRoundingModeRTZFloat16, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderRoundingModeRTZFloat32, VK_TRUE);
+    EXPECT_EQ(float_control_properties.shaderRoundingModeRTZFloat64, VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -398,8 +398,8 @@ TEST(profiles, TestMaintenance3Properties) {
     gpu_props.pNext = &maintenance_3_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(maintenance_3_properties.maxPerSetDescriptors, 208u);
-    EXPECT_GE(maintenance_3_properties.maxMemoryAllocationSize, 209u);
+    EXPECT_EQ(maintenance_3_properties.maxPerSetDescriptors, 208u);
+    EXPECT_EQ(maintenance_3_properties.maxMemoryAllocationSize, 209u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -438,7 +438,7 @@ TEST(profiles, TestMaintenance4Properties) {
     gpu_props.pNext = &maintenance_4_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(maintenance_4_properties.maxBufferSize, 260u);
+    EXPECT_EQ(maintenance_4_properties.maxBufferSize, 260u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -477,8 +477,8 @@ TEST(profiles, TestMultiviewProperties) {
     gpu_props.pNext = &multiview_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(multiview_properties.maxMultiviewViewCount, 206u);
-    EXPECT_GE(multiview_properties.maxMultiviewInstanceIndex, 207u);
+    EXPECT_EQ(multiview_properties.maxMultiviewViewCount, 206u);
+    EXPECT_EQ(multiview_properties.maxMultiviewInstanceIndex, 207u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -517,7 +517,7 @@ TEST(profiles, TestPointClippingProperties) {
     gpu_props.pNext = &point_clipping_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(point_clipping_properties.pointClippingBehavior & VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES,
+    EXPECT_EQ(point_clipping_properties.pointClippingBehavior & VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES,
               VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES);
 
     vkDestroyInstance(test_inst, nullptr);
@@ -557,7 +557,7 @@ TEST(profiles, TestProtectedMemoryProperties) {
     gpu_props.pNext = &protected_memory_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(protected_memory_properties.protectedNoFault, VK_TRUE);
+    EXPECT_EQ(protected_memory_properties.protectedNoFault, VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -596,7 +596,7 @@ TEST(profiles, TestTimelineSemaphoreProperties) {
     gpu_props.pNext = &timeline_semaphore_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(timeline_semaphore_properties.maxTimelineSemaphoreValueDifference, 249u);
+    EXPECT_EQ(timeline_semaphore_properties.maxTimelineSemaphoreValueDifference, 249u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -635,8 +635,8 @@ TEST(profiles, TestSamplerFilterMinmaxProperties) {
     gpu_props.pNext = &sampler_filter_minmax_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(sampler_filter_minmax_properties.filterMinmaxSingleComponentFormats, VK_TRUE);
-    EXPECT_GE(sampler_filter_minmax_properties.filterMinmaxImageComponentMapping, VK_TRUE);
+    EXPECT_EQ(sampler_filter_minmax_properties.filterMinmaxSingleComponentFormats, VK_TRUE);
+    EXPECT_EQ(sampler_filter_minmax_properties.filterMinmaxImageComponentMapping, VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -675,14 +675,14 @@ TEST(profiles, TestAccelerationStructurePropertiesKHR) {
     gpu_props.pNext = &acceleration_structure_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(acceleration_structure_properties.maxGeometryCount, 361u);
-    EXPECT_GE(acceleration_structure_properties.maxInstanceCount, 362u);
-    EXPECT_GE(acceleration_structure_properties.maxPrimitiveCount, 363u);
-    EXPECT_GE(acceleration_structure_properties.maxPerStageDescriptorAccelerationStructures, 364u);
-    EXPECT_GE(acceleration_structure_properties.maxPerStageDescriptorUpdateAfterBindAccelerationStructures, 365u);
-    EXPECT_GE(acceleration_structure_properties.maxDescriptorSetAccelerationStructures, 366u);
-    EXPECT_GE(acceleration_structure_properties.maxDescriptorSetUpdateAfterBindAccelerationStructures, 367u);
-    EXPECT_GE(acceleration_structure_properties.minAccelerationStructureScratchOffsetAlignment, 368u);
+    EXPECT_EQ(acceleration_structure_properties.maxGeometryCount, 361u);
+    EXPECT_EQ(acceleration_structure_properties.maxInstanceCount, 362u);
+    EXPECT_EQ(acceleration_structure_properties.maxPrimitiveCount, 363u);
+    EXPECT_EQ(acceleration_structure_properties.maxPerStageDescriptorAccelerationStructures, 364u);
+    EXPECT_EQ(acceleration_structure_properties.maxPerStageDescriptorUpdateAfterBindAccelerationStructures, 365u);
+    EXPECT_EQ(acceleration_structure_properties.maxDescriptorSetAccelerationStructures, 366u);
+    EXPECT_EQ(acceleration_structure_properties.maxDescriptorSetUpdateAfterBindAccelerationStructures, 367u);
+    EXPECT_EQ(acceleration_structure_properties.minAccelerationStructureScratchOffsetAlignment, 368u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -721,7 +721,7 @@ TEST(profiles, TestPerformanceQueryProperties) {
     gpu_props.pNext = &performance_query_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(performance_query_properties.allowCommandBufferQueryCopies, VK_TRUE);
+    EXPECT_EQ(performance_query_properties.allowCommandBufferQueryCopies, VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -760,7 +760,7 @@ TEST(profiles, TestPushDescriptorProperties) {
     gpu_props.pNext = &push_descriptor_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(push_descriptor_properties.maxPushDescriptors, 250u);
+    EXPECT_EQ(push_descriptor_properties.maxPushDescriptors, 250u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -799,14 +799,14 @@ TEST(profiles, TestRayTracingPipelineProperties) {
     gpu_props.pNext = &ray_tracing_pipeline_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(ray_tracing_pipeline_properties.shaderGroupHandleSize, 369u);
-    EXPECT_GE(ray_tracing_pipeline_properties.maxRayRecursionDepth, 370u);
-    EXPECT_GE(ray_tracing_pipeline_properties.maxShaderGroupStride, 371u);
-    EXPECT_GE(ray_tracing_pipeline_properties.shaderGroupBaseAlignment, 372u);
-    EXPECT_GE(ray_tracing_pipeline_properties.shaderGroupHandleCaptureReplaySize, 373u);
-    EXPECT_GE(ray_tracing_pipeline_properties.maxRayDispatchInvocationCount, 374u);
-    EXPECT_GE(ray_tracing_pipeline_properties.shaderGroupHandleAlignment, 375u);
-    EXPECT_GE(ray_tracing_pipeline_properties.maxRayHitAttributeSize, 376u);
+    EXPECT_EQ(ray_tracing_pipeline_properties.shaderGroupHandleSize, 369u);
+    EXPECT_EQ(ray_tracing_pipeline_properties.maxRayRecursionDepth, 370u);
+    EXPECT_EQ(ray_tracing_pipeline_properties.maxShaderGroupStride, 371u);
+    EXPECT_EQ(ray_tracing_pipeline_properties.shaderGroupBaseAlignment, 372u);
+    EXPECT_EQ(ray_tracing_pipeline_properties.shaderGroupHandleCaptureReplaySize, 373u);
+    EXPECT_EQ(ray_tracing_pipeline_properties.maxRayDispatchInvocationCount, 374u);
+    EXPECT_EQ(ray_tracing_pipeline_properties.shaderGroupHandleAlignment, 375u);
+    EXPECT_EQ(ray_tracing_pipeline_properties.maxRayHitAttributeSize, 376u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -845,40 +845,40 @@ TEST(profiles, TestShaderIntegerDotProductProperties) {
     gpu_props.pNext = &shader_integer_dot_product_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct8BitUnsignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct8BitSignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct8BitMixedSignednessAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct4x8BitPackedUnsignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct4x8BitPackedSignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct4x8BitPackedMixedSignednessAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct16BitUnsignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct16BitSignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct16BitMixedSignednessAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct32BitUnsignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct32BitSignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct32BitMixedSignednessAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct64BitUnsignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct64BitSignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProduct64BitMixedSignednessAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating8BitUnsignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating8BitSignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated,
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct8BitUnsignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct8BitSignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct8BitMixedSignednessAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct4x8BitPackedUnsignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct4x8BitPackedSignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct4x8BitPackedMixedSignednessAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct16BitUnsignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct16BitSignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct16BitMixedSignednessAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct32BitUnsignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct32BitSignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct32BitMixedSignednessAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct64BitUnsignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct64BitSignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProduct64BitMixedSignednessAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating8BitUnsignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating8BitSignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated,
               VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated,
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated,
               VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating16BitUnsignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating16BitSignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated,
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating16BitUnsignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating16BitSignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated,
               VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating32BitUnsignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating32BitSignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated,
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating32BitUnsignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating32BitSignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated,
               VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating64BitUnsignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating64BitSignedAccelerated, VK_TRUE);
-    EXPECT_GE(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated,
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating64BitUnsignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating64BitSignedAccelerated, VK_TRUE);
+    EXPECT_EQ(shader_integer_dot_product_properties.integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated,
               VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
@@ -918,12 +918,12 @@ TEST(profiles, TestBlendOperationAdvancedProperties) {
     gpu_props.pNext = &blend_operation_advanced_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(blend_operation_advanced_properties.advancedBlendMaxColorAttachments, 281u);
-    EXPECT_GE(blend_operation_advanced_properties.advancedBlendIndependentBlend, VK_TRUE);
-    EXPECT_GE(blend_operation_advanced_properties.advancedBlendNonPremultipliedSrcColor, VK_TRUE);
-    EXPECT_GE(blend_operation_advanced_properties.advancedBlendNonPremultipliedDstColor, VK_TRUE);
-    EXPECT_GE(blend_operation_advanced_properties.advancedBlendCorrelatedOverlap, VK_TRUE);
-    EXPECT_GE(blend_operation_advanced_properties.advancedBlendAllOperations, VK_TRUE);
+    EXPECT_EQ(blend_operation_advanced_properties.advancedBlendMaxColorAttachments, 281u);
+    EXPECT_EQ(blend_operation_advanced_properties.advancedBlendIndependentBlend, VK_TRUE);
+    EXPECT_EQ(blend_operation_advanced_properties.advancedBlendNonPremultipliedSrcColor, VK_TRUE);
+    EXPECT_EQ(blend_operation_advanced_properties.advancedBlendNonPremultipliedDstColor, VK_TRUE);
+    EXPECT_EQ(blend_operation_advanced_properties.advancedBlendCorrelatedOverlap, VK_TRUE);
+    EXPECT_EQ(blend_operation_advanced_properties.advancedBlendAllOperations, VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -962,15 +962,15 @@ TEST(profiles, TestConservativeRasterizationProperties) {
     gpu_props.pNext = &conservative_rasterization_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(conservative_rasterization_properties.primitiveOverestimationSize, 268.0f);
-    EXPECT_GE(conservative_rasterization_properties.maxExtraPrimitiveOverestimationSize, 269.0f);
-    EXPECT_GE(conservative_rasterization_properties.extraPrimitiveOverestimationSizeGranularity, 270.0f);
-    EXPECT_GE(conservative_rasterization_properties.primitiveUnderestimation, VK_TRUE);
-    EXPECT_GE(conservative_rasterization_properties.conservativePointAndLineRasterization, VK_TRUE);
-    EXPECT_GE(conservative_rasterization_properties.degenerateTrianglesRasterized, VK_TRUE);
-    EXPECT_GE(conservative_rasterization_properties.degenerateLinesRasterized, VK_TRUE);
-    EXPECT_GE(conservative_rasterization_properties.fullyCoveredFragmentShaderInputVariable, VK_TRUE);
-    EXPECT_GE(conservative_rasterization_properties.conservativeRasterizationPostDepthCoverage, VK_TRUE);
+    EXPECT_EQ(conservative_rasterization_properties.primitiveOverestimationSize, 268.0f);
+    EXPECT_EQ(conservative_rasterization_properties.maxExtraPrimitiveOverestimationSize, 269.0f);
+    EXPECT_EQ(conservative_rasterization_properties.extraPrimitiveOverestimationSizeGranularity, 270.0f);
+    EXPECT_EQ(conservative_rasterization_properties.primitiveUnderestimation, VK_TRUE);
+    EXPECT_EQ(conservative_rasterization_properties.conservativePointAndLineRasterization, VK_TRUE);
+    EXPECT_EQ(conservative_rasterization_properties.degenerateTrianglesRasterized, VK_TRUE);
+    EXPECT_EQ(conservative_rasterization_properties.degenerateLinesRasterized, VK_TRUE);
+    EXPECT_EQ(conservative_rasterization_properties.fullyCoveredFragmentShaderInputVariable, VK_TRUE);
+    EXPECT_EQ(conservative_rasterization_properties.conservativeRasterizationPostDepthCoverage, VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1009,7 +1009,7 @@ TEST(profiles, TestCustomBorderColorProperties) {
     gpu_props.pNext = &custom_border_color_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(custom_border_color_properties.maxCustomBorderColorSamplers, 356u);
+    EXPECT_EQ(custom_border_color_properties.maxCustomBorderColorSamplers, 356u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1048,7 +1048,7 @@ TEST(profiles, TestDiscardRectangleProperties) {
     gpu_props.pNext = &discard_rectangle_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(discard_rectangle_properties.maxDiscardRectangles, 267u);
+    EXPECT_EQ(discard_rectangle_properties.maxDiscardRectangles, 267u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1087,7 +1087,7 @@ TEST(profiles, TestExternalMemoryHostPropertiesEXT) {
     gpu_props.pNext = &external_memory_host_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(external_memory_host_properties.minImportedHostPointerAlignment, 296u);
+    EXPECT_EQ(external_memory_host_properties.minImportedHostPointerAlignment, 296u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1128,9 +1128,9 @@ TEST(profiles, TestFragmentDensityMapProperties) {
 
     EXPECT_LE(fragment_density_map_properties.minFragmentDensityTexelSize.width, 334u);
     EXPECT_LE(fragment_density_map_properties.minFragmentDensityTexelSize.height, 335u);
-    EXPECT_GE(fragment_density_map_properties.maxFragmentDensityTexelSize.width, 336u);
-    EXPECT_GE(fragment_density_map_properties.maxFragmentDensityTexelSize.height, 337u);
-    EXPECT_GE(fragment_density_map_properties.fragmentDensityInvocations, VK_TRUE);
+    EXPECT_EQ(fragment_density_map_properties.maxFragmentDensityTexelSize.width, 336u);
+    EXPECT_EQ(fragment_density_map_properties.maxFragmentDensityTexelSize.height, 337u);
+    EXPECT_EQ(fragment_density_map_properties.fragmentDensityInvocations, VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1169,11 +1169,11 @@ TEST(profiles, TestInlineUniformBlockProperties) {
     gpu_props.pNext = &inline_uniform_block_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(inline_uniform_block_properties.maxInlineUniformBlockSize, 271u);
-    EXPECT_GE(inline_uniform_block_properties.maxPerStageDescriptorInlineUniformBlocks, 272u);
-    EXPECT_GE(inline_uniform_block_properties.maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks, 273u);
-    EXPECT_GE(inline_uniform_block_properties.maxDescriptorSetInlineUniformBlocks, 274u);
-    EXPECT_GE(inline_uniform_block_properties.maxDescriptorSetUpdateAfterBindInlineUniformBlocks, 275u);
+    EXPECT_EQ(inline_uniform_block_properties.maxInlineUniformBlockSize, 271u);
+    EXPECT_EQ(inline_uniform_block_properties.maxPerStageDescriptorInlineUniformBlocks, 272u);
+    EXPECT_EQ(inline_uniform_block_properties.maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks, 273u);
+    EXPECT_EQ(inline_uniform_block_properties.maxDescriptorSetInlineUniformBlocks, 274u);
+    EXPECT_EQ(inline_uniform_block_properties.maxDescriptorSetUpdateAfterBindInlineUniformBlocks, 275u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1212,7 +1212,7 @@ TEST(profiles, TestLineRasterizationProperties) {
     gpu_props.pNext = &line_rasterization_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(line_rasterization_properties.lineSubPixelPrecisionBits, 342u);
+    EXPECT_EQ(line_rasterization_properties.lineSubPixelPrecisionBits, 342u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1251,7 +1251,7 @@ TEST(profiles, TestMultiDrawProperties) {
     gpu_props.pNext = &mutli_draw_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(mutli_draw_properties.maxMultiDrawCount, 360u);
+    EXPECT_EQ(mutli_draw_properties.maxMultiDrawCount, 360u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1290,8 +1290,8 @@ TEST(profiles, TestProvokingVertexProperties) {
     gpu_props.pNext = &provoking_vertex_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(provoking_vertex_properties.provokingVertexModePerPipeline, VK_TRUE);
-    EXPECT_GE(provoking_vertex_properties.transformFeedbackPreservesTriangleFanProvokingVertex, VK_TRUE);
+    EXPECT_EQ(provoking_vertex_properties.provokingVertexModePerPipeline, VK_TRUE);
+    EXPECT_EQ(provoking_vertex_properties.transformFeedbackPreservesTriangleFanProvokingVertex, VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1330,8 +1330,8 @@ TEST(profiles, TestRobustness2Properties) {
     gpu_props.pNext = &robustness_2_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(robustness_2_properties.robustStorageBufferAccessSizeAlignment, 354u);
-    EXPECT_GE(robustness_2_properties.robustUniformBufferAccessSizeAlignment, 355u);
+    EXPECT_EQ(robustness_2_properties.robustStorageBufferAccessSizeAlignment, 354u);
+    EXPECT_EQ(robustness_2_properties.robustUniformBufferAccessSizeAlignment, 355u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1371,12 +1371,12 @@ TEST(profiles, TestSampleLocationsProperties) {
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
     // EXPECT_EQ(sample_locations_properties.sampleLocationSampleCounts & VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_1_BIT);
-    EXPECT_GE(sample_locations_properties.maxSampleLocationGridSize.width, 276u);
-    EXPECT_GE(sample_locations_properties.maxSampleLocationGridSize.height, 277u);
-    EXPECT_GE(sample_locations_properties.sampleLocationCoordinateRange[0], 278.0f);
-    EXPECT_GE(sample_locations_properties.sampleLocationCoordinateRange[1], 279.0f);
-    EXPECT_GE(sample_locations_properties.sampleLocationSubPixelBits, 280u);
-    EXPECT_GE(sample_locations_properties.variableSampleLocations, VK_TRUE);
+    EXPECT_EQ(sample_locations_properties.maxSampleLocationGridSize.width, 276u);
+    EXPECT_EQ(sample_locations_properties.maxSampleLocationGridSize.height, 277u);
+    EXPECT_EQ(sample_locations_properties.sampleLocationCoordinateRange[0], 278.0f);
+    EXPECT_EQ(sample_locations_properties.sampleLocationCoordinateRange[1], 279.0f);
+    EXPECT_EQ(sample_locations_properties.sampleLocationSubPixelBits, 280u);
+    EXPECT_EQ(sample_locations_properties.variableSampleLocations, VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1415,9 +1415,9 @@ TEST(profiles, TestSubgroupSizeControlProperties) {
     gpu_props.pNext = &subgroup_size_control_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(subgroup_size_control_properties.minSubgroupSize, 338u);
-    EXPECT_GE(subgroup_size_control_properties.maxSubgroupSize, 339u);
-    EXPECT_GE(subgroup_size_control_properties.maxComputeWorkgroupSubgroups, 340u);
+    EXPECT_EQ(subgroup_size_control_properties.minSubgroupSize, 338u);
+    EXPECT_EQ(subgroup_size_control_properties.maxSubgroupSize, 339u);
+    EXPECT_EQ(subgroup_size_control_properties.maxComputeWorkgroupSubgroups, 340u);
     EXPECT_EQ(subgroup_size_control_properties.requiredSubgroupSizeStages & VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_VERTEX_BIT);
 
     vkDestroyInstance(test_inst, nullptr);
@@ -1457,10 +1457,10 @@ TEST(profiles, TestTexelBufferAlignmentProperties) {
     gpu_props.pNext = &texel_buffer_alignment_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(texel_buffer_alignment_properties.storageTexelBufferOffsetAlignmentBytes, 352u);
-    EXPECT_GE(texel_buffer_alignment_properties.storageTexelBufferOffsetSingleTexelAlignment, VK_TRUE);
-    EXPECT_GE(texel_buffer_alignment_properties.uniformTexelBufferOffsetAlignmentBytes, 353u);
-    EXPECT_GE(texel_buffer_alignment_properties.uniformTexelBufferOffsetSingleTexelAlignment, VK_TRUE);
+    EXPECT_EQ(texel_buffer_alignment_properties.storageTexelBufferOffsetAlignmentBytes, 352u);
+    EXPECT_EQ(texel_buffer_alignment_properties.storageTexelBufferOffsetSingleTexelAlignment, VK_TRUE);
+    EXPECT_EQ(texel_buffer_alignment_properties.uniformTexelBufferOffsetAlignmentBytes, 353u);
+    EXPECT_EQ(texel_buffer_alignment_properties.uniformTexelBufferOffsetSingleTexelAlignment, VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1499,16 +1499,16 @@ TEST(profiles, TestTransformFeedbackProperties) {
     gpu_props.pNext = &transform_feedback_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(transform_feedback_properties.maxTransformFeedbackStreams, 261u);
-    EXPECT_GE(transform_feedback_properties.maxTransformFeedbackBuffers, 262u);
-    EXPECT_GE(transform_feedback_properties.maxTransformFeedbackBufferSize, 263u);
-    EXPECT_GE(transform_feedback_properties.maxTransformFeedbackStreamDataSize, 264u);
-    EXPECT_GE(transform_feedback_properties.maxTransformFeedbackBufferDataSize, 265u);
-    EXPECT_GE(transform_feedback_properties.maxTransformFeedbackBufferDataStride, 266u);
-    EXPECT_GE(transform_feedback_properties.transformFeedbackQueries, VK_TRUE);
-    EXPECT_GE(transform_feedback_properties.transformFeedbackStreamsLinesTriangles, VK_TRUE);
-    EXPECT_GE(transform_feedback_properties.transformFeedbackRasterizationStreamSelect, VK_TRUE);
-    EXPECT_GE(transform_feedback_properties.transformFeedbackDraw, VK_TRUE);
+    EXPECT_EQ(transform_feedback_properties.maxTransformFeedbackStreams, 261u);
+    EXPECT_EQ(transform_feedback_properties.maxTransformFeedbackBuffers, 262u);
+    EXPECT_EQ(transform_feedback_properties.maxTransformFeedbackBufferSize, 263u);
+    EXPECT_EQ(transform_feedback_properties.maxTransformFeedbackStreamDataSize, 264u);
+    EXPECT_EQ(transform_feedback_properties.maxTransformFeedbackBufferDataSize, 265u);
+    EXPECT_EQ(transform_feedback_properties.maxTransformFeedbackBufferDataStride, 266u);
+    EXPECT_EQ(transform_feedback_properties.transformFeedbackQueries, VK_TRUE);
+    EXPECT_EQ(transform_feedback_properties.transformFeedbackStreamsLinesTriangles, VK_TRUE);
+    EXPECT_EQ(transform_feedback_properties.transformFeedbackRasterizationStreamSelect, VK_TRUE);
+    EXPECT_EQ(transform_feedback_properties.transformFeedbackDraw, VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1547,7 +1547,7 @@ TEST(profiles, TestVertexAttributeDivisorProperties) {
     gpu_props.pNext = &vertex_attribute_divisor_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(vertex_attribute_divisor_properties.maxVertexAttribDivisor, 312u);
+    EXPECT_EQ(vertex_attribute_divisor_properties.maxVertexAttribDivisor, 312u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1588,25 +1588,25 @@ TEST(profiles, TestFragmentShadingRateProperties) {
 
     EXPECT_LE(fragment_shading_rate_properties.minFragmentShadingRateAttachmentTexelSize.width, 251u);
     EXPECT_LE(fragment_shading_rate_properties.minFragmentShadingRateAttachmentTexelSize.height, 252u);
-    EXPECT_GE(fragment_shading_rate_properties.maxFragmentShadingRateAttachmentTexelSize.width, 253u);
-    EXPECT_GE(fragment_shading_rate_properties.maxFragmentShadingRateAttachmentTexelSize.height, 254u);
-    EXPECT_GE(fragment_shading_rate_properties.maxFragmentShadingRateAttachmentTexelSizeAspectRatio, 255u);
-    EXPECT_GE(fragment_shading_rate_properties.primitiveFragmentShadingRateWithMultipleViewports, VK_TRUE);
-    EXPECT_GE(fragment_shading_rate_properties.layeredShadingRateAttachments, VK_TRUE);
-    EXPECT_GE(fragment_shading_rate_properties.fragmentShadingRateNonTrivialCombinerOps, VK_TRUE);
-    EXPECT_GE(fragment_shading_rate_properties.maxFragmentSize.width, 256u);
-    EXPECT_GE(fragment_shading_rate_properties.maxFragmentSize.height, 257u);
-    EXPECT_GE(fragment_shading_rate_properties.maxFragmentSizeAspectRatio, 258u);
-    EXPECT_GE(fragment_shading_rate_properties.maxFragmentShadingRateCoverageSamples, 259u);
+    EXPECT_EQ(fragment_shading_rate_properties.maxFragmentShadingRateAttachmentTexelSize.width, 253u);
+    EXPECT_EQ(fragment_shading_rate_properties.maxFragmentShadingRateAttachmentTexelSize.height, 254u);
+    EXPECT_EQ(fragment_shading_rate_properties.maxFragmentShadingRateAttachmentTexelSizeAspectRatio, 255u);
+    EXPECT_EQ(fragment_shading_rate_properties.primitiveFragmentShadingRateWithMultipleViewports, VK_TRUE);
+    EXPECT_EQ(fragment_shading_rate_properties.layeredShadingRateAttachments, VK_TRUE);
+    EXPECT_EQ(fragment_shading_rate_properties.fragmentShadingRateNonTrivialCombinerOps, VK_TRUE);
+    EXPECT_EQ(fragment_shading_rate_properties.maxFragmentSize.width, 256u);
+    EXPECT_EQ(fragment_shading_rate_properties.maxFragmentSize.height, 257u);
+    EXPECT_EQ(fragment_shading_rate_properties.maxFragmentSizeAspectRatio, 258u);
+    EXPECT_EQ(fragment_shading_rate_properties.maxFragmentShadingRateCoverageSamples, 259u);
     EXPECT_EQ(fragment_shading_rate_properties.maxFragmentShadingRateRasterizationSamples & VK_SAMPLE_COUNT_1_BIT,
               VK_SAMPLE_COUNT_1_BIT);
-    EXPECT_GE(fragment_shading_rate_properties.fragmentShadingRateWithShaderDepthStencilWrites, VK_TRUE);
-    EXPECT_GE(fragment_shading_rate_properties.fragmentShadingRateWithSampleMask, VK_TRUE);
-    EXPECT_GE(fragment_shading_rate_properties.fragmentShadingRateWithShaderSampleMask, VK_TRUE);
-    EXPECT_GE(fragment_shading_rate_properties.fragmentShadingRateWithConservativeRasterization, VK_TRUE);
-    EXPECT_GE(fragment_shading_rate_properties.fragmentShadingRateWithFragmentShaderInterlock, VK_TRUE);
-    EXPECT_GE(fragment_shading_rate_properties.fragmentShadingRateWithCustomSampleLocations, VK_TRUE);
-    EXPECT_GE(fragment_shading_rate_properties.fragmentShadingRateStrictMultiplyCombiner, VK_TRUE);
+    EXPECT_EQ(fragment_shading_rate_properties.fragmentShadingRateWithShaderDepthStencilWrites, VK_TRUE);
+    EXPECT_EQ(fragment_shading_rate_properties.fragmentShadingRateWithSampleMask, VK_TRUE);
+    EXPECT_EQ(fragment_shading_rate_properties.fragmentShadingRateWithShaderSampleMask, VK_TRUE);
+    EXPECT_EQ(fragment_shading_rate_properties.fragmentShadingRateWithConservativeRasterization, VK_TRUE);
+    EXPECT_EQ(fragment_shading_rate_properties.fragmentShadingRateWithFragmentShaderInterlock, VK_TRUE);
+    EXPECT_EQ(fragment_shading_rate_properties.fragmentShadingRateWithCustomSampleLocations, VK_TRUE);
+    EXPECT_EQ(fragment_shading_rate_properties.fragmentShadingRateStrictMultiplyCombiner, VK_TRUE);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1645,20 +1645,20 @@ TEST(profiles, TestShaderCoreProperties) {
     gpu_props.pNext = &shader_core_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(shader_core_properties.shaderEngineCount, 297u);
-    EXPECT_GE(shader_core_properties.shaderArraysPerEngineCount, 298u);
-    EXPECT_GE(shader_core_properties.computeUnitsPerShaderArray, 2300u);
-    EXPECT_GE(shader_core_properties.simdPerComputeUnit, 301u);
-    EXPECT_GE(shader_core_properties.wavefrontsPerSimd, 302u);
-    EXPECT_GE(shader_core_properties.wavefrontSize, 303u);
-    EXPECT_GE(shader_core_properties.sgprsPerSimd, 304u);
-    EXPECT_GE(shader_core_properties.minSgprAllocation, 305u);
-    EXPECT_GE(shader_core_properties.maxSgprAllocation, 306u);
-    EXPECT_GE(shader_core_properties.sgprAllocationGranularity, 307u);
-    EXPECT_GE(shader_core_properties.vgprsPerSimd, 308u);
-    EXPECT_GE(shader_core_properties.minVgprAllocation, 309u);
-    EXPECT_GE(shader_core_properties.maxVgprAllocation, 310u);
-    EXPECT_GE(shader_core_properties.vgprAllocationGranularity, 311u);
+    EXPECT_EQ(shader_core_properties.shaderEngineCount, 297u);
+    EXPECT_EQ(shader_core_properties.shaderArraysPerEngineCount, 298u);
+    EXPECT_EQ(shader_core_properties.computeUnitsPerShaderArray, 2300u);
+    EXPECT_EQ(shader_core_properties.simdPerComputeUnit, 301u);
+    EXPECT_EQ(shader_core_properties.wavefrontsPerSimd, 302u);
+    EXPECT_EQ(shader_core_properties.wavefrontSize, 303u);
+    EXPECT_EQ(shader_core_properties.sgprsPerSimd, 304u);
+    EXPECT_EQ(shader_core_properties.minSgprAllocation, 305u);
+    EXPECT_EQ(shader_core_properties.maxSgprAllocation, 306u);
+    EXPECT_EQ(shader_core_properties.sgprAllocationGranularity, 307u);
+    EXPECT_EQ(shader_core_properties.vgprsPerSimd, 308u);
+    EXPECT_EQ(shader_core_properties.minVgprAllocation, 309u);
+    EXPECT_EQ(shader_core_properties.maxVgprAllocation, 310u);
+    EXPECT_EQ(shader_core_properties.vgprAllocationGranularity, 311u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1697,8 +1697,8 @@ TEST(profiles, TestShaderCoreProperties2) {
     gpu_props.pNext = &shader_core_properties_2;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(shader_core_properties_2.shaderCoreFeatures, 0u);
-    EXPECT_GE(shader_core_properties_2.activeComputeUnitCount, 341u);
+    EXPECT_EQ(shader_core_properties_2.shaderCoreFeatures, 0u);
+    EXPECT_EQ(shader_core_properties_2.activeComputeUnitCount, 341u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1737,7 +1737,7 @@ TEST(profiles, TestSubpassShadingProperties) {
     gpu_props.pNext = &subpass_shading_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(subpass_shading_properties.maxSubpassShadingWorkgroupSizeAspectRatio, 359u);
+    EXPECT_EQ(subpass_shading_properties.maxSubpassShadingWorkgroupSizeAspectRatio, 359u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1816,15 +1816,15 @@ TEST(profiles, TestDeviceGeneratedCommandProperties) {
     gpu_props.pNext = &device_generated_commands_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(device_generated_commands_properties.maxGraphicsShaderGroupCount, 343u);
-    EXPECT_GE(device_generated_commands_properties.maxIndirectSequenceCount, 344u);
-    EXPECT_GE(device_generated_commands_properties.maxIndirectCommandsTokenCount, 345u);
-    EXPECT_GE(device_generated_commands_properties.maxIndirectCommandsStreamCount, 346u);
-    EXPECT_GE(device_generated_commands_properties.maxIndirectCommandsTokenOffset, 347u);
-    EXPECT_GE(device_generated_commands_properties.maxIndirectCommandsStreamStride, 348u);
-    EXPECT_GE(device_generated_commands_properties.minSequencesCountBufferOffsetAlignment, 349u);
-    EXPECT_GE(device_generated_commands_properties.minSequencesIndexBufferOffsetAlignment, 350u);
-    EXPECT_GE(device_generated_commands_properties.minIndirectCommandsBufferOffsetAlignment, 351u);
+    EXPECT_EQ(device_generated_commands_properties.maxGraphicsShaderGroupCount, 343u);
+    EXPECT_EQ(device_generated_commands_properties.maxIndirectSequenceCount, 344u);
+    EXPECT_EQ(device_generated_commands_properties.maxIndirectCommandsTokenCount, 345u);
+    EXPECT_EQ(device_generated_commands_properties.maxIndirectCommandsStreamCount, 346u);
+    EXPECT_EQ(device_generated_commands_properties.maxIndirectCommandsTokenOffset, 347u);
+    EXPECT_EQ(device_generated_commands_properties.maxIndirectCommandsStreamStride, 348u);
+    EXPECT_EQ(device_generated_commands_properties.minSequencesCountBufferOffsetAlignment, 349u);
+    EXPECT_EQ(device_generated_commands_properties.minSequencesIndexBufferOffsetAlignment, 350u);
+    EXPECT_EQ(device_generated_commands_properties.minIndirectCommandsBufferOffsetAlignment, 351u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1904,23 +1904,23 @@ TEST(profiles, TestMeshShaderProperties) {
     gpu_props.pNext = &mesh_shader_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(mesh_shader_properties.maxDrawMeshTasksCount, 313u);
-    EXPECT_GE(mesh_shader_properties.maxTaskWorkGroupInvocations, 314u);
-    EXPECT_GE(mesh_shader_properties.maxTaskWorkGroupSize[0], 315u);
-    EXPECT_GE(mesh_shader_properties.maxTaskWorkGroupSize[1], 316u);
-    EXPECT_GE(mesh_shader_properties.maxTaskWorkGroupSize[2], 317u);
-    EXPECT_GE(mesh_shader_properties.maxTaskTotalMemorySize, 318u);
-    EXPECT_GE(mesh_shader_properties.maxTaskOutputCount, 319u);
-    EXPECT_GE(mesh_shader_properties.maxMeshWorkGroupInvocations, 320u);
-    EXPECT_GE(mesh_shader_properties.maxMeshWorkGroupSize[0], 321u);
-    EXPECT_GE(mesh_shader_properties.maxMeshWorkGroupSize[1], 322u);
-    EXPECT_GE(mesh_shader_properties.maxMeshWorkGroupSize[2], 323u);
-    EXPECT_GE(mesh_shader_properties.maxMeshTotalMemorySize, 324u);
-    EXPECT_GE(mesh_shader_properties.maxMeshOutputVertices, 325u);
-    EXPECT_GE(mesh_shader_properties.maxMeshOutputPrimitives, 326u);
-    EXPECT_GE(mesh_shader_properties.maxMeshMultiviewViewCount, 327u);
-    EXPECT_GE(mesh_shader_properties.meshOutputPerVertexGranularity, 328u);
-    EXPECT_GE(mesh_shader_properties.meshOutputPerPrimitiveGranularity, 329u);
+    EXPECT_EQ(mesh_shader_properties.maxDrawMeshTasksCount, 313u);
+    EXPECT_EQ(mesh_shader_properties.maxTaskWorkGroupInvocations, 314u);
+    EXPECT_EQ(mesh_shader_properties.maxTaskWorkGroupSize[0], 315u);
+    EXPECT_EQ(mesh_shader_properties.maxTaskWorkGroupSize[1], 316u);
+    EXPECT_EQ(mesh_shader_properties.maxTaskWorkGroupSize[2], 317u);
+    EXPECT_EQ(mesh_shader_properties.maxTaskTotalMemorySize, 318u);
+    EXPECT_EQ(mesh_shader_properties.maxTaskOutputCount, 319u);
+    EXPECT_EQ(mesh_shader_properties.maxMeshWorkGroupInvocations, 320u);
+    EXPECT_EQ(mesh_shader_properties.maxMeshWorkGroupSize[0], 321u);
+    EXPECT_EQ(mesh_shader_properties.maxMeshWorkGroupSize[1], 322u);
+    EXPECT_EQ(mesh_shader_properties.maxMeshWorkGroupSize[2], 323u);
+    EXPECT_EQ(mesh_shader_properties.maxMeshTotalMemorySize, 324u);
+    EXPECT_EQ(mesh_shader_properties.maxMeshOutputVertices, 325u);
+    EXPECT_EQ(mesh_shader_properties.maxMeshOutputPrimitives, 326u);
+    EXPECT_EQ(mesh_shader_properties.maxMeshMultiviewViewCount, 327u);
+    EXPECT_EQ(mesh_shader_properties.meshOutputPerVertexGranularity, 328u);
+    EXPECT_EQ(mesh_shader_properties.meshOutputPerPrimitiveGranularity, 329u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -1959,14 +1959,14 @@ TEST(profiles, TestRayTracingProperties) {
     gpu_props.pNext = &ray_tracing_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(ray_tracing_properties.shaderGroupHandleSize, 288u);
-    EXPECT_GE(ray_tracing_properties.maxRecursionDepth, 289u);
-    EXPECT_GE(ray_tracing_properties.maxShaderGroupStride, 290u);
-    EXPECT_GE(ray_tracing_properties.shaderGroupBaseAlignment, 291u);
-    EXPECT_GE(ray_tracing_properties.maxGeometryCount, 292u);
-    EXPECT_GE(ray_tracing_properties.maxInstanceCount, 293u);
-    EXPECT_GE(ray_tracing_properties.maxTriangleCount, 294u);
-    EXPECT_GE(ray_tracing_properties.maxDescriptorSetAccelerationStructures, 295u);
+    EXPECT_EQ(ray_tracing_properties.shaderGroupHandleSize, 288u);
+    EXPECT_EQ(ray_tracing_properties.maxRecursionDepth, 289u);
+    EXPECT_EQ(ray_tracing_properties.maxShaderGroupStride, 290u);
+    EXPECT_EQ(ray_tracing_properties.shaderGroupBaseAlignment, 291u);
+    EXPECT_EQ(ray_tracing_properties.maxGeometryCount, 292u);
+    EXPECT_EQ(ray_tracing_properties.maxInstanceCount, 293u);
+    EXPECT_EQ(ray_tracing_properties.maxTriangleCount, 294u);
+    EXPECT_EQ(ray_tracing_properties.maxDescriptorSetAccelerationStructures, 295u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -2005,8 +2005,8 @@ TEST(profiles, TestShaderSMBuiltinsProperties) {
     gpu_props.pNext = &shader_sm_builtins_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(shader_sm_builtins_properties.shaderSMCount, 282u);
-    EXPECT_GE(shader_sm_builtins_properties.shaderWarpsPerSM, 283u);
+    EXPECT_EQ(shader_sm_builtins_properties.shaderSMCount, 282u);
+    EXPECT_EQ(shader_sm_builtins_properties.shaderWarpsPerSM, 283u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -2045,10 +2045,10 @@ TEST(profiles, TestShadingRateImageProperties) {
     gpu_props.pNext = &shading_rate_image_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(shading_rate_image_properties.shadingRateTexelSize.width, 284u);
-    EXPECT_GE(shading_rate_image_properties.shadingRateTexelSize.height, 285u);
-    EXPECT_GE(shading_rate_image_properties.shadingRatePaletteSize, 286u);
-    EXPECT_GE(shading_rate_image_properties.shadingRateMaxCoarseSamples, 287u);
+    EXPECT_EQ(shading_rate_image_properties.shadingRateTexelSize.width, 284u);
+    EXPECT_EQ(shading_rate_image_properties.shadingRateTexelSize.height, 285u);
+    EXPECT_EQ(shading_rate_image_properties.shadingRatePaletteSize, 286u);
+    EXPECT_EQ(shading_rate_image_properties.shadingRateMaxCoarseSamples, 287u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
@@ -2087,8 +2087,8 @@ TEST(profiles, TestFragmentDensityMapOffsetProperties) {
     gpu_props.pNext = &fragment_density_map_offset_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_GE(fragment_density_map_offset_properties.fragmentDensityOffsetGranularity.width, 7u);
-    EXPECT_GE(fragment_density_map_offset_properties.fragmentDensityOffsetGranularity.height, 6u);
+    EXPECT_EQ(fragment_density_map_offset_properties.fragmentDensityOffsetGranularity.width, 7u);
+    EXPECT_EQ(fragment_density_map_offset_properties.fragmentDensityOffsetGranularity.height, 6u);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif
