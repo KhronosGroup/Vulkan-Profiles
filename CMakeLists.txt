@@ -138,10 +138,10 @@ if (NOT ANDROID)
         find_file(VULKAN_LOADER
             # Don't search any system paths
             NO_DEFAULT_PATH
-            # vulkan-1.lib on Windows, libvulkan.so on Linux
-            NAMES vulkan-1.lib libvulkan.so.1
+            # vulkan-1.lib on Windows, libvulkan.so on Linux, libvulkan.1.dylib on Mac
+            NAMES vulkan-1.lib libvulkan.so.1 libvulkan.1.dylib
             PATHS ${VULKAN_LOADER_INSTALL_DIR}
-            # lib subdirectory on both Windows and Linux
+            # lib subdirectory on Windows, Linux, and Mac
             PATH_SUFFIXES lib
         )
         message(STATUS "Using Vulkan-Loader library ${VULKAN_LOADER}")
