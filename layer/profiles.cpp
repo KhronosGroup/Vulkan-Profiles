@@ -367,6 +367,7 @@ struct LayerSettings {
 } layer_settings;
 
 bool HasFlags(VkFlags deviceFlags, VkFlags profileFlags) { return (deviceFlags & profileFlags) == profileFlags; }
+bool HasFlags(VkFlags64 deviceFlags, VkFlags64 profileFlags) { return (deviceFlags & profileFlags) == profileFlags; }
 
 std::string format(const char *message, ...) {
     std::size_t const STRING_BUFFER(4096);
@@ -3362,8 +3363,8 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
         LogMessage(DEBUG_REPORT_WARNING_BIT,
                    ::format("For %s `linearTilingFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
                             "supports:\n\t\"%s\".\nThe `linearTilingFeatures` can't be simulated on this Device.\n",
-                            format_name.c_str(), GetFormatFeatureString(profile_properties_3.linearTilingFeatures).c_str(),
-                            GetFormatFeatureString(device_properties_3.linearTilingFeatures).c_str()));
+                            format_name.c_str(), GetFormatFeature2String(profile_properties_3.linearTilingFeatures).c_str(),
+                            GetFormatFeature2String(device_properties_3.linearTilingFeatures).c_str()));
         if (layer_settings.debug_fail_on_error) {
             return false;
         }
@@ -3372,8 +3373,8 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
         LogMessage(DEBUG_REPORT_WARNING_BIT,
                    ::format("For %s `optimalTilingFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
                             "supports:\n\t\"%s\".\nThe `optimalTilingFeatures` can't be simulated on this Device.\n",
-                            format_name.c_str(), GetFormatFeatureString(profile_properties_3.optimalTilingFeatures).c_str(),
-                            GetFormatFeatureString(device_properties_3.optimalTilingFeatures).c_str()));
+                            format_name.c_str(), GetFormatFeature2String(profile_properties_3.optimalTilingFeatures).c_str(),
+                            GetFormatFeature2String(device_properties_3.optimalTilingFeatures).c_str()));
         if (layer_settings.debug_fail_on_error) {
             return false;
         }
@@ -3382,8 +3383,8 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
         LogMessage(DEBUG_REPORT_WARNING_BIT,
                    ::format("For %s `bufferFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
                             "supports:\n\t\"%s\".\nThe `bufferFeatures` can't be simulated on this Device.\n",
-                            format_name.c_str(), GetFormatFeatureString(profile_properties_3.bufferFeatures).c_str(),
-                            GetFormatFeatureString(device_properties_3.bufferFeatures).c_str()));
+                            format_name.c_str(), GetFormatFeature2String(profile_properties_3.bufferFeatures).c_str(),
+                            GetFormatFeature2String(device_properties_3.bufferFeatures).c_str()));
         if (layer_settings.debug_fail_on_error) {
             return false;
         }
