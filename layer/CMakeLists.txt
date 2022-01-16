@@ -86,7 +86,7 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/generator.cmake" "configure_file(\"\${IN
 
 set(CONFIG_DEFINES
     -DINPUT_FILE="${CMAKE_CURRENT_SOURCE_DIR}/VkLayer_${TARGET_NAME}.json.in"
-    -DVK_VERSION="1.2.195"
+    -DVK_VERSION=1.3.203
 )
 
 # Get the needed properties from that target
