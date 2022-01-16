@@ -564,6 +564,35 @@ TEST(profiles, TestParsingAllFormatProperties) {
         EXPECT_EQ(format_properties3.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
         EXPECT_EQ(format_properties3.bufferFeatures & buffer_features, buffer_features);
     }
+    {
+        VkFormat format = VK_FORMAT_R5G6B5_UNORM_PACK16;
+        VkFormatProperties2 format_properties2 = {};
+        format_properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        VkDrmFormatModifierPropertiesList2EXT drm_format_modifier_properties = {};
+        drm_format_modifier_properties.sType = VK_STRUCTURE_TYPE_DRM_FORMAT_MODIFIER_PROPERTIES_LIST_2_EXT;
+        format_properties2.pNext = &drm_format_modifier_properties;
+        vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
+
+        std::vector<VkFormatFeatureFlags2KHR> drm_format_modifier_tiling_features = {
+            VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT,
+            VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT};
+        uint32_t count = (uint32_t)drm_format_modifier_tiling_features.size();
+
+        EXPECT_EQ(drm_format_modifier_properties.drmFormatModifierCount, count);
+        if (drm_format_modifier_properties.drmFormatModifierCount == count) {
+            EXPECT_EQ(drm_format_modifier_properties.pDrmFormatModifierProperties[0].drmFormatModifier, 1);
+            EXPECT_EQ(drm_format_modifier_properties.pDrmFormatModifierProperties[0].drmFormatModifierPlaneCount, 2);
+            EXPECT_EQ(drm_format_modifier_properties.pDrmFormatModifierProperties[0].drmFormatModifierTilingFeatures &
+                          drm_format_modifier_tiling_features[0],
+                      drm_format_modifier_tiling_features[0]);
+
+            EXPECT_EQ(drm_format_modifier_properties.pDrmFormatModifierProperties[1].drmFormatModifier, 3);
+            EXPECT_EQ(drm_format_modifier_properties.pDrmFormatModifierProperties[1].drmFormatModifierPlaneCount, 4);
+            EXPECT_EQ(drm_format_modifier_properties.pDrmFormatModifierProperties[1].drmFormatModifierTilingFeatures &
+                          drm_format_modifier_tiling_features[1],
+                      drm_format_modifier_tiling_features[1]);
+        }
+    }
 #endif
 
     vkDestroyInstance(test_inst, nullptr);

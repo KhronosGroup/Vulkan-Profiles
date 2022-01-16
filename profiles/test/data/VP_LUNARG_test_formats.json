@@ -31,8 +31,13 @@
 						"pDrmFormatModifierProperties": [
 							{
 								"drmFormatModifier": 1,
-								"drmFormatModifierPlaneCount": 1,
+								"drmFormatModifierPlaneCount": 2,
 								"drmFormatModifierTilingFeatures": [ "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT" ]
+							},
+							{
+								"drmFormatModifier": 3,
+								"drmFormatModifierPlaneCount": 4,
+								"drmFormatModifierTilingFeatures": [ "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT", "VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT" ]
 							}
 						]
                     }
