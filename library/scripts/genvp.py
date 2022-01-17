@@ -19,6 +19,7 @@
 import os
 import re
 import argparse
+from typing import OrderedDict
 import xml.etree.ElementTree as etree
 import json
 
@@ -1148,6 +1149,7 @@ class VulkanStructMember():
         self.type = type
         self.limittype = limittype
         self.isArray = isArray
+        self.arraySize = None
 
 
 class VulkanStruct():
@@ -1157,8 +1159,25 @@ class VulkanStruct():
         self.extends = []
         self.members = dict()
         self.aliases = [ name ]
+        self.isAlias = False
         self.definedByVersion = None
         self.definedByExtensions = []
+
+
+class VulkanEnum():
+    def __init__(self, name):
+        self.name = name
+        self.aliases = [ name ]
+        self.isAlias = False
+        self.values = set()
+
+
+class VulkanBitmask():
+    def __init__(self, name):
+        self.name = name
+        self.aliases = [ name ]
+        self.isAlias = False
+        self.bitsType = None
 
 
 class VulkanDefinitionScope():
@@ -1194,8 +1213,13 @@ class VulkanRegistry():
         self.parseExtensionInfo(xml)
         self.parseStructInfo(xml)
         self.parsePrerequisites(xml)
+        self.parseEnums(xml)
+        self.parseBitmasks(xml)
+        self.parseConstants(xml)
         self.parseAliases(xml)
+        self.parseExternalTypes(xml)
         self.applyWorkarounds()
+
 
     def parsePlatformInfo(self, xml):
         self.platforms = dict()
@@ -1209,7 +1233,7 @@ class VulkanRegistry():
             if re.search(r"^[1-9][0-9]*\.[0-9]+$", feature.get('number')):
                 self.versions[feature.get('number')] = VulkanVersion(feature)
             else:
-                Log.f("Unsupported feature with number '{0}'", feature.get('number'))
+                Log.f("Unsupported feature with number '{0}'".format(feature.get('number')))
 
 
     def parseExtensionInfo(self, xml):
@@ -1266,6 +1290,20 @@ class VulkanRegistry():
                     # Detect if it's an array
                     if tail != None and tail[0] == '[':
                         structDef.members[name].isArray = True
+                        match1D = re.search(r"^\[([0-9]+)\]$", tail)
+                        match2D = re.search(r"^\[([0-9]+)\]\[([0-9]+)\]$", tail)
+                        enum = member.find('./enum')
+                        if match1D != None:
+                            # [<number>] case
+                            structDef.members[name].arraySize = int(match1D.group(1))
+                        elif match2D != None:
+                            # [<number>][<number>] case
+                            structDef.members[name].arraySize = [ int(match2D.group(1)), int(match2D.group(2)) ]
+                        elif tail == '[' and enum != None and enum.tail == ']':
+                            # [<enum>] case
+                            structDef.members[name].arraySize = enum.text
+                        else:
+                            Log.f("Unsupported array format for struct member '{0}::{1}'".format(structDef.name, name))
 
             # Store struct definition
             self.structs[struct.get('name')] = structDef
@@ -1287,6 +1325,69 @@ class VulkanRegistry():
                     self.structs[requireType.get('name')].definedByExtensions.append(extension.get('name'))
 
 
+    def parseEnums(self, xml):
+        self.enums = dict()
+        # Find enum definitions
+        for enum in xml.findall("./types/type[@category='enum']"):
+            # Create enum type
+            enumDef = VulkanEnum(enum.get('name'))
+
+            # First collect base values
+            values = xml.find("./enums[@name='" + enumDef.name + "']")
+            if values:
+                for value in values.findall("./enum"):
+                    enumDef.values.add(value.get('name'))
+                    if value.get('alias') != None:
+                        enumDef.values.add(value.get('alias'))
+
+            # Then find extension values
+            for value in xml.findall(".//enum[@extends='" + enumDef.name + "']"):
+                enumDef.values.add(value.get('name'))
+                if value.get('alias') != None:
+                    enumDef.values.add(value.get('alias'))
+
+            # Finally store it in the registry
+            self.enums[enumDef.name] = enumDef
+
+
+    def parseBitmasks(self, xml):
+        self.bitmasks = dict()
+        # Find bitmask definitions
+        for bitmask in xml.findall("./types/type[@category='bitmask']"):
+            # Only consider non-alias bitmasks
+            name = bitmask.find("./name")
+            if bitmask.get('alias') is None and name != None:
+                bitmaskDef = VulkanBitmask(name.text)
+
+                # Get the name of the corresponding FlagBits type
+                bitsName = bitmask.get('bitvalues')
+                if bitsName is None:
+                    # Currently some definitions use "requires", not "bitvalues"
+                    bitsName = bitmask.get('requires') 
+
+                if bitsName != None:
+                    if bitsName in self.enums:
+                        bitmaskDef.bitsType = self.enums[bitsName]
+                    else:
+                        Log.f("Could not find bits enum '{0}' for bitmask '{1}'", bitsName, bitmaskDef.name)
+                else:
+                    # This bitmask doesn't have any bits defined
+                    pass
+
+                # Finally store it in the registry
+                self.bitmasks[bitmaskDef.name] = bitmaskDef
+
+
+    def parseConstants(self, xml):
+        self.constants = dict()
+        # Find constant definitions
+        constants = xml.find("./enums[@name='API Constants']").findall("./enum[@value]")
+        if constants != None:
+            for constant in constants:
+                self.constants[constant.get('name')] = constant.get('value')
+        else:
+            Log.f("Failed to find API constants in the registry")
+
     def parseAliases(self, xml):
         # Find any struct aliases
         for struct in xml.findall("./types/type[@category='struct']"):
@@ -1295,6 +1396,9 @@ class VulkanRegistry():
                 if alias in self.structs:
                     baseStructDef = self.structs[alias]
                     aliasStructDef = self.structs[struct.get('name')]
+
+                    # Set as alias
+                    aliasStructDef.isAlias = True
 
                     # Fill missing struct information for the alias
                     aliasStructDef.extends = baseStructDef.extends
@@ -1326,6 +1430,66 @@ class VulkanRegistry():
                             Log.f("Could not find sType enum of alias '{0}' of struct '{1}'".format(alias, struct.get('name')))
                 else:
                     Log.f("Failed to find alias '{0}' of struct '{1}'".format(alias, struct.get('name')))
+
+        # Find any enum aliases
+        for enum in xml.findall("./types/type[@category='enum']"):
+            alias = enum.get('alias')
+            if alias != None:
+                if alias in self.enums:
+                    baseEnumDef = self.enums[alias]
+                    aliasEnumDef = self.enums[enum.get('name')]
+
+                    # Set as alias
+                    aliasEnumDef.isAlias = True
+
+                    # Merge aliases
+                    aliasEnumDef.aliases = baseEnumDef.aliases
+                    aliasEnumDef.aliases.append(enum.get('name'))
+
+                    # Merge values
+                    mergedValues = set.union(baseEnumDef.values, aliasEnumDef.values)
+                    baseEnumDef.values = mergedValues
+                    aliasEnumDef.values = mergedValues
+                else:
+                    Log.f("Failed to find alias '{0}' of enum '{1}'".format(alias, enum.get('name')))
+
+        # Find any bitmask (flags) aliases
+        for bitmask in xml.findall("./types/type[@category='bitmask']"):
+            name = bitmask.get('name')
+            alias = bitmask.get('alias')
+            if alias != None:
+                if alias in self.bitmasks:
+                    # Duplicate bitmask definition
+                    baseBitmaskDef = self.bitmasks[alias]
+                    aliasBitmaskDef = VulkanBitmask(name)
+                    aliasBitmaskDef.bitsType = baseBitmaskDef.bitsType
+
+                    # Set as alias
+                    aliasBitmaskDef.isAlias = True
+
+                    # Merge aliases
+                    aliasBitmaskDef.aliases = baseBitmaskDef.aliases
+                    aliasBitmaskDef.aliases.append(name)
+                else:
+                    Log.f("Failed to find alias '{0}' of bitmask '{1}'".format(alias, bitmask.get('name')))
+
+        # Find any constant aliases
+        for constant in xml.find("./enums[@name='API Constants']").findall("./enum[@alias]"):
+            self.constants[constant.get('name')] = self.constants[constant.get('alias')]
+
+
+    def parseExternalTypes(self, xml):
+        self.includes = set()
+        self.externalTypes = set()
+
+        # Find all include definitions
+        for include in xml.findall("./types/type[@category='include']"):
+            self.includes.add(include.get('name'))
+
+        # Find all types depending on the includes
+        for type in xml.findall("./types/type[@requires]"):
+            if type.get('requires') in self.includes:
+                self.externalTypes.add(type.get('name'))
 
 
     def applyWorkarounds(self):
@@ -1379,6 +1543,16 @@ class VulkanRegistry():
         if not extends in structDef.extends + [ name ]:
             Log.f("Structure '{0}' does not extend '{1}'".format(name, extends))
         return structDef
+
+
+    def evalArraySize(self, arraySize):
+        if isinstance(arraySize, str):
+            if arraySize in self.constants:
+                return int(self.constants[arraySize])
+            else:
+                Log.f("Invalid array size '{0}'".format(arraySize))
+        else:
+            return arraySize
 
 
 class VulkanProfileCapabilities():
@@ -1978,7 +2152,7 @@ class VulkanProfile():
 
 
 class VulkanProfiles():
-    def loadFromDir(registry, profilesDir):
+    def loadFromDir(registry, profilesDir, schema):
         profiles = dict()
         dirAbsPath = os.path.abspath(profilesDir)
         filenames = os.listdir(dirAbsPath)
@@ -1988,6 +2162,10 @@ class VulkanProfiles():
                 Log.i("Loading profile file: '{0}'".format(filename))
                 with open(fileAbsPath, 'r') as f:
                     jsonData = json.load(f)
+                    if schema != None:
+                        import jsonschema
+                        Log.i("Validating profile file: '{0}'".format(filename))
+                        jsonschema.validate(jsonData, schema)
                     VulkanProfiles.parseProfiles(registry, profiles, jsonData['profiles'], jsonData['capabilities'])
         return profiles
 
@@ -1998,7 +2176,7 @@ class VulkanProfiles():
             profiles[name] = VulkanProfile(registry, name, data, caps)
 
 
-class VulkanProfilesBuilder():
+class VulkanProfilesLibraryGenerator():
     def __init__(self, registry, profiles, debugMessages = False):
         self.registry = registry
         self.profiles = profiles
@@ -2160,26 +2338,512 @@ class VulkanProfilesBuilder():
         return self.patch_code(gen)
 
 
+class VulkanProfilesSchemaGenerator():
+    def __init__(self, registry):
+        self.registry = registry
+        self.schema = self.gen_schema()
+
+
+    def validate(self):
+        import jsonschema
+        Log.i("Validating JSON profiles schema...")
+        jsonschema.Draft7Validator.check_schema(self.schema)
+
+
+    def generate(self, outSchema):
+        Log.i("Generating '{0}'...".format(outSchema))
+        with open(outSchema, 'w') as f:
+            f.write(json.dumps(self.schema, indent=4))
+
+
+    def gen_schema(self):
+        definitions = self.gen_baseDefinitions()
+        extensions = self.gen_extensions()
+        features = self.gen_features(definitions)
+        properties = self.gen_properties(definitions)
+        formats = self.gen_formats(definitions)
+        queueFamilies = self.gen_queueFamilies(definitions)
+
+        return OrderedDict({
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "$id": "https://schema.khronos.org/vulkan/profiles-1.3.203.json#",
+            "title": "Vulkan Profiles Schema for Vulkan 1.3.203",
+            "additionalProperties": True,
+            "required": [
+                "capabilities",
+                "profiles"
+            ],
+            "definitions": definitions,
+            "properties": OrderedDict({
+                "capabilities": OrderedDict({
+                    "description": "The block that specifies the list of capabilities sets.",
+                    "type": "object",
+                    "additionalProperties": OrderedDict({
+                        "type": "object",
+                        "additionalProperties": False,
+                        "properties": OrderedDict({
+                            "extensions": OrderedDict({
+                                "description": "The block that stores required extensions.",
+                                "type": "object",
+                                "additionalProperties": False,
+                                "properties": extensions
+                            }),
+                            "features": OrderedDict({
+                                "description": "The block that stores features requirements.",
+                                "type": "object",
+                                "additionalProperties": False,
+                                "properties": features
+                            }),
+                            "properties": OrderedDict({
+                                "description": "The block that stores properties requirements.",
+                                "type": "object",
+                                "additionalProperties": False,
+                                "properties": properties
+                            }),
+                            "formats": OrderedDict({
+                                "description": "The block that store formats capabilities definitions.",
+                                "type": "object",
+                                "additionalProperties": False,
+                                "properties": formats
+                            }),
+                            "queueFamiliesProperties": OrderedDict({
+                                "type": "array",
+                                "uniqueItems": True,
+                                "items": OrderedDict({
+                                    "type": "object",
+                                    "additionalProperties": False,
+                                    "properties": queueFamilies
+                                })
+                            })
+                        })
+                    })
+                }),
+                "profiles": OrderedDict({
+                    "description": "The list of profile definitions.",
+                    "type": "object",
+                    "patternProperties": OrderedDict({
+                        "^VP_[A-Z0-9]+_[A-Za-z0-9_]+": OrderedDict({
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": [
+                                "label",
+                                "description",
+                                "version",
+                                "api-version",
+                                "contributors",
+                                "history",
+                                "capabilities"
+                            ],
+                            "properties": OrderedDict({
+                                "version": OrderedDict({
+                                    "description": "The revision of the profile.",
+                                    "type": "integer"
+                                }),
+                                "label": OrderedDict({
+                                    "description": "The label used to present the profile to the Vulkan developer.",
+                                    "type": "string"
+                                }),
+                                "description": OrderedDict({
+                                    "description": "The description of the profile.",
+                                    "type": "string"
+                                }),
+                                "status": OrderedDict({
+                                    "description": "The developmet status of the profile: ALPHA, BETA, STABLE or DEPRECATED.",
+                                    "$ref": "#/definitions/status"
+                                }),
+                                "api-version": OrderedDict({
+                                    "description": "The Vulkan API version against which the profile is written.",
+                                    "type": "string",
+                                    "pattern": "^[0-9]+.[0-9]+.[0-9]+$"
+                                }),
+                                "contributors": OrderedDict({
+                                    "type": "object",
+                                    "description": "The list of contributors of the profile.",
+                                    "additionalProperties": OrderedDict({
+                                        "$ref": "#/definitions/contributor"
+                                    })
+                                }),
+                                "history": OrderedDict({
+                                    "description": "The version history of the profile file",
+                                    "type": "array",
+                                    "uniqueItems": True,
+                                    "minItems": 1,
+                                    "items": OrderedDict({
+                                        "type": "object",
+                                        "required": [
+                                            "revision",
+                                            "date",
+                                            "author",
+                                            "comment"
+                                        ],
+                                        "properties": OrderedDict({
+                                            "revision": OrderedDict({
+                                                "type": "integer"
+                                            }),
+                                            "date": OrderedDict({
+                                                "type": "string",
+                                                "pattern": "((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])"
+                                            }),
+                                            "author": OrderedDict({
+                                                "type": "string"
+                                            }),
+                                            "comment": OrderedDict({
+                                                "type": "string"
+                                            })
+                                        })
+                                    })
+                                }),
+                                "capabilities": OrderedDict({
+                                    "description": "The list of capability sets that can be reference by a profile.",
+                                    "type": "array",
+                                    "uniqueItems": True,
+                                    "items": OrderedDict({
+                                        "type": "string"
+                                    })
+                                }),
+                                "fallback": OrderedDict({
+                                    "description": "The list of profiles recommended if the checked profile is not supported by the platform.",
+                                    "type": "array",
+                                    "additionalProperties": False,
+                                    "uniqueItems": True,
+                                    "items": OrderedDict({
+                                        "type": "string"
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+        })
+
+
+    def gen_baseDefinitions(self):
+        gen = OrderedDict({
+            "status": OrderedDict({
+                "description": "The development status of the setting. When missing, this property is inherited from parent nodes. If no parent node defines it, the default value is 'STABLE'.",
+                "type": "string",
+                "enum": [ "ALPHA", "BETA", "STABLE", "DEPRECATED" ]
+            }),
+            "contributor": OrderedDict({
+                "type": "object",
+                "additionalProperties": False,
+                "required": [
+                    "company"
+                ],
+                "properties": OrderedDict({
+                    "company": OrderedDict({
+                        "type": "string"
+                    }),
+                    "email": OrderedDict({
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_.]+@[a-zA-Z0-9-].[a-zA-Z0-9-.]+$"
+                    }),
+                    "github": OrderedDict({
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]+$"
+                    }),
+                    "contact": OrderedDict({
+                        "type": "boolean"
+                    })
+                })
+            }),
+            "uint8_t": OrderedDict({
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 255
+            }),
+            "int32_t": OrderedDict({
+                "type": "integer",
+                "minimum": -2147483648,
+                "maximum": 2147483647
+            }),
+            "uint32_t": OrderedDict({
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+            }),
+            "int64_t": OrderedDict({
+                "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                ]
+            }),
+            "uint64_t": OrderedDict({
+                "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                ]
+            }),
+            "VkDeviceSize": { "$ref": "#/definitions/uint64_t" },
+            "char": {
+                "type": "string"
+            },
+            "float": {
+                "type": "number"
+            },
+            "size_t": {
+                "$ref": "#/definitions/uint32_t"
+            }
+        })
+        return gen
+
+
+    def gen_extensions(self):
+        gen = OrderedDict()
+        for extName in sorted(self.registry.extensions.keys()):
+            gen[extName] = { "type": "integer" }
+        return gen
+
+
+    def gen_type(self, type, definitions):
+        if type == 'VkBool32':
+            # Simple boolean
+            gen = { "type": "boolean" }
+        else:
+            # All other types are referenced
+            gen = { "$ref": "#/definitions/" + type }
+
+        if gen.get("$ref") != None:
+            # Generate referenced type, if needed
+            if type in definitions:
+                # Nothing to do, already defined
+                pass
+            elif type in self.registry.structs:
+                # Generate structure definition
+                self.gen_struct(type, definitions)
+            elif type in self.registry.enums:
+                # Generate enum definition
+                self.gen_enum(type, definitions)
+            elif type in self.registry.bitmasks:
+                # Generate bitmask definition
+                self.gen_bitmask(type, definitions)
+            else:
+                Log.f("Unknown type '{0}'".format(type))
+
+        return gen
+
+
+    def gen_array(self, type, size, definitions):
+        arraySize = self.registry.evalArraySize(size)
+        if isinstance(arraySize, list) and len(arraySize) == 1:
+            # This is the last dimension of a multi-dimensional array
+            # Treat it as one-dimensional from here on
+            arraySize = arraySize[0]
+
+        if type == 'char':
+            # Character arrays should be handled as strings
+            return OrderedDict({
+                "type": "string",
+                "maxLength": arraySize - 1
+            })
+        elif isinstance(arraySize, list):
+            # Multi-dimensional array
+            return OrderedDict({
+                "type": "array",
+                "items": self.gen_array(type, arraySize[1:], definitions),
+                "uniqueItems": False,
+                "minItems": arraySize[0],
+                "maxItems": arraySize[0]
+            })
+        else:
+            # One-dimensional array
+            return OrderedDict({
+                "type": "array",
+                "items": self.gen_type(type, definitions),
+                "uniqueItems": False,
+                "minItems": arraySize,
+                "maxItems": arraySize
+            })
+
+
+    def gen_enum(self, name, definitions):
+        enumDef = self.registry.enums[name]
+
+        if len(enumDef.values) > 0:
+            values = sorted(enumDef.values)
+        else:
+            # If the enum has no values then we must add a dummy one
+            # in order to produce a valid JSON schema
+            values = [ 0 ]
+
+        # Generate definition
+        definitions[name] = OrderedDict({
+            "enum": values
+        })
+
+
+    def gen_bitmask(self, name, definitions):
+        bitmaskDef = self.registry.bitmasks[name]
+
+        if bitmaskDef.bitsType != None:
+            # Also generate corresponding bits enum
+            self.gen_enum(bitmaskDef.bitsType.name, definitions)
+            itemType = { "$ref": "#/definitions/" + bitmaskDef.bitsType.name }
+        else:
+            # If the bitmask has no bits type then we must add a dummy
+            # item type with a single dummy value
+            itemType = { "enum": [ 0 ] }
+
+        # Generate definition
+        definitions[name] = OrderedDict({
+            "type": "array",
+            "items": itemType,
+            "uniqueItems": True
+        })
+
+
+    def gen_struct(self, name, definitions):
+        structDef = self.registry.structs[name]
+
+        # Generate member data
+        members = OrderedDict()
+        for memberName in sorted(structDef.members.keys()):
+            memberDef = structDef.members[memberName]
+
+            if memberDef.type in self.registry.externalTypes and not memberDef.type in definitions:
+                # Members with types defined externally and aren't manually defined are ignored
+                Log.w("Ignoring member '{0}' in struct '{1}' with external type '{2}'".format(memberName, name, memberDef.type))
+                continue
+
+            if memberDef.isArray:
+                members[memberDef.name] = self.gen_array(memberDef.type, memberDef.arraySize, definitions)
+            else:
+                members[memberDef.name] = self.gen_type(memberDef.type, definitions)
+
+        # Generate definition
+        definitions[name] = OrderedDict({
+            "type": "object",
+            "additionalProperties": False,
+            "properties": members
+        })
+
+
+    def gen_structChainDefinitions(self, basename, definitions):
+        # Collect unique chainable structures (ignoring aliases)
+        structNames = [ basename, basename + '2' ]
+        for structName in sorted(self.registry.structs.keys()):
+            structDef = self.registry.structs[structName]
+            if not structDef.isAlias and basename + '2' in structDef.extends:
+                structNames.append(structName)
+
+        # Generate structure definitions and references
+        gen = OrderedDict()
+        for structName in structNames:
+            # Add structure definition and reference
+            self.gen_struct(structName, definitions)
+            gen[structName] = { "$ref": "#/definitions/" + structName }
+
+            # Add structure references for all alises
+            for alias in self.registry.structs[structName].aliases:
+                if alias != structName:
+                    gen[alias] = gen[structName]
+
+        return gen
+
+
+    def gen_features(self, definitions):
+        return self.gen_structChainDefinitions("VkPhysicalDeviceFeatures", definitions)
+
+
+    def gen_properties(self, definitions):
+        return self.gen_structChainDefinitions("VkPhysicalDeviceProperties", definitions)
+
+
+    def gen_formats(self, definitions):
+        # Add definition for format properties
+        definitions['formatProperties'] = OrderedDict({
+            "type": "object",
+            "additionalProperties": False,
+            "properties": self.gen_structChainDefinitions("VkFormatProperties", definitions)
+        })
+
+        # Generate references to the format properties definition for each format
+        gen = OrderedDict()
+        for format in sorted(self.registry.enums['VkFormat'].values):
+            gen[format] = OrderedDict({
+                "$ref": "#/definitions/formatProperties"
+            })
+        return gen
+
+
+    def gen_queueFamilies(self, definitions):
+        return self.gen_structChainDefinitions("VkQueueFamilyProperties", definitions)
+
+
+class VulkanProfilesDocGenerator():
+    def __init__(self, registry, profiles):
+        self.registry = registry
+        self.profiles = profiles
+
+
+    def generate(self, outDoc):
+        pass
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-registry', action='store', required=True,
+    parser.add_argument('-registry', action='store', default='vk.xml',
                         help='Use specified registry file instead of vk.xml')
-    parser.add_argument('-profiles', action='store', required=True,
+    parser.add_argument('-profiles', action='store', default='./profiles',
                         help='Generate based on profiles in the specified directory')
-    parser.add_argument('-outIncDir', action='store', required=True,
-                        help='Output include directory')
-    parser.add_argument('-outSrcDir', action='store', required=True,
-                        help='Output source directory')
+    parser.add_argument('-outIncDir', action='store',
+                        help='Output include directory for profile library')
+    parser.add_argument('-outSrcDir', action='store',
+                        help='Output source directory for profile library')
+    parser.add_argument('-outSchema', action='store', default='profile_schema.json',
+                        help='Output file for JSON profile schema')
+    parser.add_argument('-outDoc', action='store',
+                        help='Output file for profiles documentation')
+    parser.add_argument('-validate', action='store_true', default=True,
+                        help='Validate generated JSON profile schema and JSON profiles against the schema')
     parser.add_argument('-generateDebugLibrary', action='store_true',
                         help='Also generate library variant with debug messages')
 
     args = parser.parse_args()
 
-    registry = VulkanRegistry(args.registry)
-    profiles = VulkanProfiles.loadFromDir(registry, args.profiles)
-    builder = VulkanProfilesBuilder(registry, profiles)
-    builder.generate(args.outIncDir, args.outSrcDir)
-    if args.generateDebugLibrary:
-        builder = VulkanProfilesBuilder(registry, profiles, True)
-        builder.generate(args.outIncDir + '/debug', args.outSrcDir + '/debug')
+    if args.outIncDir is not None or args.outSrcDir is not None:
+        if args.registry is None or args.profiles is None or args.outIncDir is None or args.outSrcDir is None:
+            Log.e("Generating the profile library requires specifying -registry, -profiles, -outIncDir and -outSrcDir arguments")
+            parser.print_help()
+            exit()
+
+    if args.outSchema is not None:
+        if args.registry is None:
+            Log.e("Generating the profile schema requires specifying -registry and -outSchema arguments")
+            parser.print_help()
+            exit()
+
+    if args.outDoc is not None:
+        if args.registry is None or args.profiles is None:
+            Log.e("Generating the profile schema requires specifying -registry, -profiles and -outDoc arguments")
+            parser.print_help()
+            exit()
+
+    schema = None
+
+    if args.registry is not None:
+        registry = VulkanRegistry(args.registry)
+
+    if args.outSchema is not None or args.validate:
+        generator = VulkanProfilesSchemaGenerator(registry)
+        if args.outSchema is not None:
+            generator.generate(args.outSchema)
+        if args.validate:
+            generator.validate()
+            schema = generator.schema
+
+    if args.profiles is not None:
+        profiles = VulkanProfiles.loadFromDir(registry, args.profiles, schema)
+
+    if args.outIncDir is not None:
+        generator = VulkanProfilesLibraryGenerator(registry, profiles)
+        generator.generate(args.outIncDir, args.outSrcDir)
+        if args.generateDebugLibrary:
+            generator = VulkanProfilesLibraryGenerator(registry, profiles, True)
+            generator.generate(args.outIncDir, args.outSrcDir)
+
+    if args.outDoc is not None:
+        generator = VulkanProfilesDocGenerator(registry, profiles)
+        generator.generate(args.outDoc)
