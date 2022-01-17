@@ -104,6 +104,7 @@
                     "format": "PROFILE",
                     "filter": "*.json",
                     "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2021.json",
+                    "expanded": true,
                     "settings": [
                         {
                             "key": "profile_name",
@@ -195,19 +196,92 @@
                                     "label": "Log Filename",
                                     "description": "Specifies the output filename",
                                     "type": "SAVE_FILE",
-                                    "default": "log.txt",
+                                    "default": "profiles_layer_log.txt",
                                     "dependence": {
-                                        "mode": "ALL",
+                                        "mode": "ANY",
                                         "settings": [
                                             {
                                                 "key": "debug_actions",
                                                 "value": [ "DEBUG_ACTION_FILE_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_STDOUT_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_OUTPUT_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_BREAKPOINT_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_STDOUT_BIT", "DEBUG_ACTION_OUTPUT_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_STDOUT_BIT", "DEBUG_ACTION_BREAKPOINT_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_OUTPUT_BIT", "DEBUG_ACTION_BREAKPOINT_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_STDOUT_BIT", "DEBUG_ACTION_OUTPUT_BIT", "DEBUG_ACTION_BREAKPOINT_BIT" ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "key": "debug_file_clear",
+                                    "label": "Clear Log at Launch",
+                                    "description": "Discard the content of the log file between each layer run",
+                                    "type": "BOOL",
+                                    "default": true,
+                                    "dependence": {
+                                        "mode": "ANY",
+                                        "settings": [
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_STDOUT_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_OUTPUT_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_BREAKPOINT_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_STDOUT_BIT", "DEBUG_ACTION_OUTPUT_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_STDOUT_BIT", "DEBUG_ACTION_BREAKPOINT_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_OUTPUT_BIT", "DEBUG_ACTION_BREAKPOINT_BIT" ]
+                                            },
+                                            {
+                                                "key": "debug_actions",
+                                                "value": [ "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_STDOUT_BIT", "DEBUG_ACTION_OUTPUT_BIT", "DEBUG_ACTION_BREAKPOINT_BIT" ]
                                             }
                                         ]
                                     }
                                 }
                             ],
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ]
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "expanded": true
                         },
                         {
                             "key": "DEBUG_ACTION_BREAKPOINT_BIT",
