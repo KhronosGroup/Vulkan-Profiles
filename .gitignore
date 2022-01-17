@@ -22,7 +22,6 @@ build
 build32
 dbuild
 rbuild
-external
 build-android/external
 *.config
 *.creator
