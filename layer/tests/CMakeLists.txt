@@ -8,7 +8,7 @@ function(LayerTest NAME)
     
     file(GLOB FILES_JSON ./*.json)
 
-    add_executable(${TEST_NAME} ${TEST_FILE} ${FILES_JSON} profiles_test_helper.h profiles_test_helper.cpp ${jsoncpp_SOURCE_DIR}/dist/jsoncpp.cpp)
+    add_executable(${TEST_NAME} ${TEST_FILE} ${FILES_JSON} profiles_test_helper.h profiles_test_helper.cpp ${jsoncpp_generated_source})
     add_dependencies(${TEST_NAME} VkLayer_khronos_profiles)
 
     target_include_directories(${TEST_NAME} PUBLIC

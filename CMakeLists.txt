@@ -11,8 +11,17 @@ set(VULKAN_TAG v1.3.204)
 # Define GNU standard installation directories.
 include(GNUInstallDirs)
 
-# Using Python 3.7.2 or better (required for typing.OrderedDict)
-find_package(PythonInterp 3.7.2 REQUIRED)
+# Regenerating profiles requires Python 3.7.2 or better (for typing.OrderedDict).
+# Regeneration jsoncpp requires Python 3.
+# Otherwise Python is not required, as checked-in generated code and
+# headers will be used.
+option(REGENERATE_PROFILES "Regenerate profiles source and headers" ON)
+option(REGENERATE_JSONCPP "Regenerate jsoncpp source and headers" ON)
+if(REGENERATE_PROFILES)
+    find_package(PythonInterp 3.7.2 REQUIRED)
+elseif(REGENERATE_JSONCPP)
+    find_package(PythonInterp 3 REQUIRED)
+endif()
 
 # Third-party libraries
 include(FetchContent)
@@ -20,31 +29,46 @@ include(FetchContent)
 # Always need C++2011 throughout the project.
 set(CMAKE_CXX_STANDARD 11)
 
+# FetchContent_MakeAvailable(jsoncpp) will set these values (which
+# affect the whole build).  Make sure they're set even if we
+# don't regenerate jsoncpp.
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Archive output dir.")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Library output dir.")
+set(CMAKE_PDB_OUTPUT_DIRECTORY     "${CMAKE_BINARY_DIR}/bin" CACHE PATH "PDB (MSVC debug symbol)output dir.")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" CACHE PATH "Executable/dll output dir.")
+
 # Declare all content before making available, to ensure that these
 # settings are used instead of any settings that may be encountered
 # inside these projects.
 #
-# Names should be lower-case, since FetchContent always sets 
-# <lowercaseName>_* variables.  Sometimes (only when using 
+# Names should be lower-case, since FetchContent always sets
+# <lowercaseName>_* variables.  Sometimes (only when using
 # FetchContent_MakeAvailable) it will also set <givenName>_*
 # variables, but this isn't consistent and isn't guaranteed
 # by the documentation.
-FetchContent_Declare(
-	googletest
-	GIT_REPOSITORY https://github.com/google/googletest
-	GIT_TAG release-1.11.0
-)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-FetchContent_Declare(
-	jsoncpp
-	GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp
-	GIT_TAG 1.9.4
-)
-set(JSONCPP_WITH_TESTS OFF CACHE BOOL "" FORCE)
-set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "" FORCE)
-set(JSONCPP_WITH_WARNING_AS_ERROR OFF CACHE BOOL "" FORCE)
-set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "" FORCE)
+# Allow the user to configure to not build tests if desired.
+option(PROFILES_BUILD_TESTS "Build the profiles tests" ON)
+if(PROFILES_BUILD_TESTS)
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest
+        GIT_TAG release-1.11.0
+    )
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+endif()
+
+# Allow the user to not regenerate jsoncpp if desired, using checked-in
+# generated source instead.  This can make downstream projects easier
+# to build (as they don't require Python).
+if(REGENERATE_JSONCPP)
+    FetchContent_Declare(
+        jsoncpp
+        GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp
+        GIT_TAG 1.9.4
+    )
+endif()
+
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_OBJECT_LIBS OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
@@ -68,19 +92,36 @@ if (NOT ANDROID)
 endif()
 
 # After all the content is declared, it can safely be made available.
-FetchContent_MakeAvailable(googletest)
-FetchContent_MakeAvailable(jsoncpp)
-execute_process(COMMAND ${PYTHON_EXECUTABLE} ${jsoncpp_SOURCE_DIR}/amalgamate.py WORKING_DIRECTORY ${jsoncpp_SOURCE_DIR})
+# For SDK (flat) builds, we'll receive pointers to our dependency repository builds.
+# Otherwise, we'll fetch and build ourselves.  Other repositories also respect environment
+# variables, so we're doing it here too.
+if(PROFILES_BUILD_TESTS)
+    FetchContent_MakeAvailable(googletest)
+endif()
 
+set(jsoncpp_generated_dir ${CMAKE_SOURCE_DIR}/external/generated-jsoncpp)
+set(jsoncpp_generated_source ${jsoncpp_generated_dir}/jsoncpp.cpp)
+set(jsoncpp_generated_include_dir ${jsoncpp_generated_dir})
+set(jsoncpp_generated_header ${jsoncpp_generated_include_dir}/json/json.h)
+if(REGENERATE_JSONCPP)
+    message(STATUS "Fetching jsoncpp source and regenerating in ${jsoncpp_generated_dir}")
+    set(JSONCPP_WITH_TESTS OFF CACHE BOOL "" FORCE)
+    set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "" FORCE)
+    set(JSONCPP_WITH_WARNING_AS_ERROR OFF CACHE BOOL "" FORCE)
+    set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(jsoncpp)
+    # This will create all three generated files.
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} ${jsoncpp_SOURCE_DIR}/amalgamate.py
+        -s ${jsoncpp_generated_source}
+        WORKING_DIRECTORY ${jsoncpp_SOURCE_DIR})
+endif()
+
+# Vulkan-ValidationLayers settings
 set(UPDATE_DEPS ON)
 set(BUILD_TESTS OFF)
 set(_build_type ${CMAKE_BUILD_TYPE})
 set(VVL_CPP_STANDARD 11)
 set(_build_type ${CMAKE_BUILD_TYPE})
-
-# For SDK (flat) builds, we'll receive pointers to our dependency repository builds.
-# Otherwise, we'll fetch and build ourselves.  Other repositories also respect environment
-# variables, so we're doing it here too.
 
 # FetchContent() doesn't seem to actually do a Vulkan-Headers build at all.
 # Consequently, we're really only interested in the source.
@@ -151,7 +192,10 @@ set(API_NAME "Vulkan" CACHE STRING "API name to use when building")
 string(TOLOWER ${API_NAME} API_LOWERCASE)
 add_definitions(-DAPI_NAME="${API_NAME}")
 
-add_subdirectory(scripts)
+# The scripts directory regenerates the Profiles source and headers.
+if(REGENERATE_PROFILES)
+    add_subdirectory(scripts)
+endif()
 
 add_subdirectory(library)
 
@@ -188,4 +232,8 @@ else()
 endif()
 add_subdirectory(layer)
 
-add_subdirectory(profiles/test)
+if(PROFILES_BUILD_TESTS)
+    add_subdirectory(profiles/test)
+endif()
+
+include_directories(external)
