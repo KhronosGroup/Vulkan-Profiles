@@ -3687,8 +3687,7 @@ VkResult JsonLoader::LoadFile(const char *filename) {
     const auto &profiles = root["profiles"];
     std::vector<std::string> capabilities;
     for (const auto &profile : profiles.getMemberNames()) {
-        bool select = (profile_name.empty() && !profiles[profile].isMember("fallback")) || (profile == profile_name);
-        if (select) {
+        if (profile_name.empty() || profile == profile_name) {
             const auto &caps = profiles[profile]["capabilities"];
             for (const auto &cap : caps) {
                 capabilities.push_back(cap.asString());
