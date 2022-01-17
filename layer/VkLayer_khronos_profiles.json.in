@@ -175,33 +175,39 @@
                     "type": "FLAGS",
                     "flags": [
                         {
-                            "key": "DEBUG_ACTION_LOG_BIT",
-                            "label": "Log Message",
-                            "description": "Log a txt message to stdout or to a log filename.",
+                            "key": "DEBUG_ACTION_STDOUT_BIT",
+                            "label": "Log to stdout",
+                            "description": "Log messages using the stdout."
+                        },
+                        {
+                            "key": "DEBUG_ACTION_OUTPUT_BIT",
+                            "label": "Log to OutputDebugString",
+                            "description": "Log messages using the Windows OutputDebugString for Vulkan Studio output display.",
+                            "platforms": [ "WINDOWS" ]
+                        },
+                        {
+                            "key": "DEBUG_ACTION_FILE_BIT",
+                            "label": "Log to File",
+                            "description": "Log messages to a file.",
                             "settings": [
                                 {
                                     "key": "debug_filename",
                                     "label": "Log Filename",
                                     "description": "Specifies the output filename",
                                     "type": "SAVE_FILE",
-                                    "default": "stdout",
+                                    "default": "log.txt",
                                     "dependence": {
                                         "mode": "ALL",
                                         "settings": [
                                             {
                                                 "key": "debug_actions",
-                                                "value": [ "DEBUG_ACTION_LOG_BIT" ]
+                                                "value": [ "DEBUG_ACTION_FILE_BIT" ]
                                             }
                                         ]
                                     }
                                 }
-                            ]
-                        },
-                        {
-                            "key": "DEBUG_ACTION_OUTPUT_BIT",
-                            "label": "Debug Output",
-                            "description": "Log a txt message using the Windows OutputDebugString function.",
-                            "platforms": [ "WINDOWS" ]
+                            ],
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ]
                         },
                         {
                             "key": "DEBUG_ACTION_BREAKPOINT_BIT",
@@ -209,11 +215,11 @@
                             "description": "Trigger a breakpoint if a debugger is in use."
                         }
                     ],
-                    "default": [ "DEBUG_ACTION_LOG_BIT" ]
+                    "default": [ "DEBUG_ACTION_STDOUT_BIT" ]
                 },
                 {
                     "key": "debug_fail_on_error",
-                    "label": "Fail On Error",
+                    "label": "Fail on Error",
                     "description": "If the device doesn't support the capabilities of the selected Profile, the layer fail to load. When enabled, vkEnumeratePhysicalDevices will fail when the selected Profile is not supported.",
                     "status": "STABLE",
                     "type": "BOOL",

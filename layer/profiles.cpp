@@ -184,15 +184,21 @@ static std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags) {
     return result;
 }
 
-enum DebugAction { DEBUG_ACTION_LOG_BIT = (1 << 0), DEBUG_ACTION_OUTPUT_BIT = (1 << 1), DEBUG_ACTION_BREAKPOINT_BIT = (1 << 2) };
+enum DebugAction { 
+    DEBUG_ACTION_FILE_BIT = (1 << 0), 
+    DEBUG_ACTION_STDOUT_BIT = (1 << 1), 
+    DEBUG_ACTION_OUTPUT_BIT = (1 << 2), 
+    DEBUG_ACTION_BREAKPOINT_BIT = (1 << 3) };
 typedef int DebugActionFlags;
 
 static DebugActionFlags GetDebugActionFlags(const vku::Strings &values) {
     DebugActionFlags result = 0;
 
     for (std::size_t i = 0, n = values.size(); i < n; ++i) {
-        if (values[i] == "DEBUG_ACTION_LOG_BIT") {
-            result |= DEBUG_ACTION_LOG_BIT;
+        if (values[i] == "DEBUG_ACTION_FILE_BIT") {
+            result |= DEBUG_ACTION_FILE_BIT;
+        } else if (values[i] == "DEBUG_ACTION_STDOUT_BIT") {
+            result |= DEBUG_ACTION_STDOUT_BIT;
         } else if (values[i] == "DEBUG_ACTION_OUTPUT_BIT") {
             result |= DEBUG_ACTION_OUTPUT_BIT;
         } else if (values[i] == "DEBUG_ACTION_BREAKPOINT_BIT") {
@@ -207,8 +213,13 @@ static std::string GetDebugActionsLog(DebugActionFlags flags) {
     std::string result = {};
     bool need_comma = false;
 
-    if (flags & DEBUG_ACTION_LOG_BIT) {
-        result += "DEBUG_ACTION_LOG_BIT";
+    if (flags & DEBUG_ACTION_FILE_BIT) {
+        result += "DEBUG_ACTION_FILE_BIT";
+        need_comma = true;
+    }
+    if (flags & DEBUG_ACTION_STDOUT_BIT) {
+        if (need_comma) result += ", ";
+        result += "DEBUG_ACTION_STDOUT_BIT";
         need_comma = true;
     }
     if (flags & DEBUG_ACTION_OUTPUT_BIT) {
@@ -243,6 +254,8 @@ DebugReportFlags GetDebugReportFlags(const vku::Strings &values) {
             result |= DEBUG_REPORT_WARNING_BIT;
         } else if (values[i] == "DEBUG_REPORT_ERROR_BIT") {
             result |= DEBUG_REPORT_ERROR_BIT;
+        } else if (values[i] == "DEBUG_REPORT_DEBUG_BIT") {
+            result |= DEBUG_REPORT_DEBUG_BIT;
         }
     }
 
@@ -424,7 +437,7 @@ const char *GetLogPrefix(DebugReport report) {
 void LogMessage(DebugReport report, const std::string &message) {
     if (!(layer_settings.debug_reports & report)) return;
 
-    if (layer_settings.debug_actions & DEBUG_ACTION_LOG_BIT) {
+    if (layer_settings.debug_actions & DEBUG_ACTION_STDOUT_BIT) {
 #if defined(__ANDROID__)
         AndroidPrintf(report, message);
 #else
@@ -439,7 +452,7 @@ void LogMessage(DebugReport report, const std::string &message) {
     }
 #endif  //_WIN32
 
-    if (layer_settings.debug_actions & DEBUG_ACTION_OUTPUT_BIT) {
+    if (layer_settings.debug_actions & DEBUG_ACTION_BREAKPOINT_BIT) {
 #ifdef WIN32
         DebugBreak();
 #else
