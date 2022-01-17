@@ -22,6 +22,7 @@ import argparse
 from typing import OrderedDict
 import xml.etree.ElementTree as etree
 import json
+import jsonschema
 
 COPYRIGHT_HEADER = '''/**
  * Copyright (c) 2021-2022 LunarG, Inc.
@@ -2152,7 +2153,7 @@ class VulkanProfile():
 
 
 class VulkanProfiles():
-    def loadFromDir(registry, profilesDir, schema):
+    def loadFromDir(registry, profilesDir, validate, schema):
         profiles = dict()
         dirAbsPath = os.path.abspath(profilesDir)
         filenames = os.listdir(dirAbsPath)
@@ -2162,8 +2163,7 @@ class VulkanProfiles():
                 Log.i("Loading profile file: '{0}'".format(filename))
                 with open(fileAbsPath, 'r') as f:
                     jsonData = json.load(f)
-                    if schema != None:
-                        import jsonschema
+                    if validate:
                         Log.i("Validating profile file: '{0}'".format(filename))
                         jsonschema.validate(jsonData, schema)
                     VulkanProfiles.parseProfiles(registry, profiles, jsonData['profiles'], jsonData['capabilities'])
@@ -2345,7 +2345,6 @@ class VulkanProfilesSchemaGenerator():
 
 
     def validate(self):
-        import jsonschema
         Log.i("Validating JSON profiles schema...")
         jsonschema.Draft7Validator.check_schema(self.schema)
 
@@ -2835,7 +2834,7 @@ if __name__ == '__main__':
             schema = generator.schema
 
     if args.profiles is not None:
-        profiles = VulkanProfiles.loadFromDir(registry, args.profiles, schema)
+        profiles = VulkanProfiles.loadFromDir(registry, args.profiles, args.validate, schema)
 
     if args.outIncDir is not None:
         generator = VulkanProfilesLibraryGenerator(registry, profiles)

@@ -15,7 +15,6 @@ add_custom_target(VpLibrary_generator
 		-outSchema ${CMAKE_CURRENT_SOURCE_DIR}/../schema/profile.json
 		-validate
 		-generateDebugLibrary
-
 	SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/genvp.py)
 
 set_target_properties(VpLibrary_generator PROPERTIES FOLDER "Profiles API library")
