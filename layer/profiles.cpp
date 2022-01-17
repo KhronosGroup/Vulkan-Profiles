@@ -447,12 +447,12 @@ void LogMessage(DebugReport report, const std::string &message) {
 #if defined(__ANDROID__)
         AndroidPrintf(report, message);
 #else
-        fprintf(stdout, log.c_str());
+        fprintf(stdout, "%s", log.c_str());
 #endif
     }
 
     if (layer_settings.debug_actions & DEBUG_ACTION_FILE_BIT) {
-        fprintf(profiles_log_file, log.c_str());
+        fprintf(profiles_log_file, "%s", log.c_str());
     }
 
 #if _WIN32
