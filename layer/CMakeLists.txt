@@ -84,9 +84,71 @@ string(REPLACE "\\" "\\\\" RELATIVE_PATH_PREFIX "${RELATIVE_PATH_PREFIX}")
 # Running at compile time lets us use cmake generator expressions (TARGET_FILE_NAME and TARGET_FILE_DIR, specifically)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/generator.cmake" "configure_file(\"\${INPUT_FILE}\" \"\${OUTPUT_FILE}\" @ONLY)")
 
+# Use HINTS instead of PATH to search these locations before
+# searching system environment variables like $PATH that may
+# contain SDK directories.
+find_path(VulkanHeaders_INCLUDE_DIR
+    NAMES vulkan/vulkan.h
+    HINTS
+        ${VULKAN_HEADERS_INSTALL_DIR}/include
+        "$ENV{VULKAN_HEADERS_INSTALL_DIR}/include"
+        "$ENV{VULKAN_SDK}/include")
+
+# Determine the major/minor/patch version from the vulkan header
+
+set(VulkanHeaders_VERSION_MAJOR "0")
+set(VulkanHeaders_VERSION_MINOR "0")
+set(VulkanHeaders_VERSION_PATCH "0")
+set(VulkanHeaders_main_header ${VulkanHeaders_INCLUDE_DIR}/vulkan/vulkan_core.h)
+
+# Find all lines in the header file that contain any version we may be interested in
+#  NOTE: They start with #define and then have other keywords
+file(STRINGS
+        ${VulkanHeaders_main_header}
+        VulkanHeader_lines
+        REGEX "^#define VK_HEADER_VERSION(_COMPLETE)? ")
+
+foreach(VulkanHeader_line ${VulkanHeader_lines})
+
+    # First, handle the case where we have a major/minor version
+    #   Format is:
+    #        #define VK_HEADER_VERSION_COMPLETE VK_MAKE_API_VERSION(0, X, Y, VK_HEADER_VERSION)
+    #   We grab the major version (X) and minor version (Y) out of the parentheses
+    string(REGEX MATCH "VK_HEADER_VERSION_COMPLETE VK_MAKE_API_VERSION\\(.*\\)" VulkanHeaders_out ${VulkanHeader_line})
+    string(REGEX MATCHALL "[0-9]+" VulkanHeaders_MAJOR_MINOR "${VulkanHeaders_out}")
+    if (VulkanHeaders_MAJOR_MINOR)
+        list (GET VulkanHeaders_MAJOR_MINOR 1 VulkanHeaders_cur_major)
+        list (GET VulkanHeaders_MAJOR_MINOR 2 VulkanHeaders_cur_minor)
+        if (${VulkanHeaders_cur_major} GREATER ${VulkanHeaders_VERSION_MAJOR})
+            set(VulkanHeaders_VERSION_MAJOR ${VulkanHeaders_cur_major})
+            set(VulkanHeaders_VERSION_MINOR ${VulkanHeaders_cur_minor})
+        endif()
+        if (${VulkanHeaders_cur_major} EQUAL ${VulkanHeaders_VERSION_MAJOR} AND
+            ${VulkanHeaders_cur_minor} GREATER ${VulkanHeaders_VERSION_MINOR})
+            set(VulkanHeaders_VERSION_MINOR ${VulkanHeaders_cur_minor})
+        endif()
+    endif()
+
+    # Second, handle the case where we have the patch version
+    #   Format is:
+    #      #define VK_HEADER_VERSION Z
+    #   Where Z is the patch version which we just grab off the end
+    string(REGEX MATCH "define.*VK_HEADER_VERSION[^_].*[0-9]+" VulkanHeaders_out ${VulkanHeader_line})
+    list(LENGTH VulkanHeaders_out VulkanHeaders_len)
+    if (VulkanHeaders_len)
+        string(REGEX MATCH "[0-9]+" VulkanHeaders_VERSION_PATCH "${VulkanHeaders_out}")
+    endif()
+
+endforeach()
+MESSAGE(STATUS
+        "Detected Vulkan Version ${VulkanHeaders_VERSION_MAJOR}."
+        "${VulkanHeaders_VERSION_MINOR}."
+        "${VulkanHeaders_VERSION_PATCH}")
+
+
 set(CONFIG_DEFINES
     -DINPUT_FILE="${CMAKE_CURRENT_SOURCE_DIR}/VkLayer_${TARGET_NAME}.json.in"
-    -DVK_VERSION=1.3.203
+    -DVK_VERSION="${VulkanHeaders_VERSION_MAJOR}.${VulkanHeaders_VERSION_MINOR}.${VulkanHeaders_VERSION_PATCH}"
 )
 
 # Get the needed properties from that target
