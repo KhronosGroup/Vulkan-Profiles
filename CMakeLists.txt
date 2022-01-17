@@ -20,6 +20,9 @@ include(FetchContent)
 # Always need C++2011 throughout the project.
 set(CMAKE_CXX_STANDARD 11)
 
+# Allow the user to configure to not build tests if desired.
+option(PROFILES_BUILD_TESTS "Build the profiles tests" ON)
+
 # Declare all content before making available, to ensure that these
 # settings are used instead of any settings that may be encountered
 # inside these projects.
@@ -29,22 +32,26 @@ set(CMAKE_CXX_STANDARD 11)
 # FetchContent_MakeAvailable) it will also set <givenName>_*
 # variables, but this isn't consistent and isn't guaranteed
 # by the documentation.
-FetchContent_Declare(
-	googletest
-	GIT_REPOSITORY https://github.com/google/googletest
-	GIT_TAG release-1.11.0
-)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+if(PROFILES_BUILD_TESTS)
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest
+        GIT_TAG release-1.11.0
+    )
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+endif()
 
-FetchContent_Declare(
-	jsoncpp
-	GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp
-	GIT_TAG 1.9.4
-)
-set(JSONCPP_WITH_TESTS OFF CACHE BOOL "" FORCE)
-set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "" FORCE)
-set(JSONCPP_WITH_WARNING_AS_ERROR OFF CACHE BOOL "" FORCE)
-set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "" FORCE)
+# Allow the user to configure to not build tests if desired.
+option(REGENERATE_JSONCPP "Regenerate jsoncpp source and headers" ON)
+
+if(REGENERATE_JSONCPP)
+    FetchContent_Declare(
+        jsoncpp
+        GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp
+        GIT_TAG 1.9.4
+    )
+endif()
+
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_OBJECT_LIBS OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
@@ -68,19 +75,36 @@ if (NOT ANDROID)
 endif()
 
 # After all the content is declared, it can safely be made available.
-FetchContent_MakeAvailable(googletest)
-FetchContent_MakeAvailable(jsoncpp)
-execute_process(COMMAND ${PYTHON_EXECUTABLE} ${jsoncpp_SOURCE_DIR}/amalgamate.py WORKING_DIRECTORY ${jsoncpp_SOURCE_DIR})
+# For SDK (flat) builds, we'll receive pointers to our dependency repository builds.
+# Otherwise, we'll fetch and build ourselves.  Other repositories also respect environment
+# variables, so we're doing it here too.
+if(PROFILES_BUILD_TESTS)
+    FetchContent_MakeAvailable(googletest)
+endif()
 
+set(jsoncpp_generated_dir ${CMAKE_SOURCE_DIR}/generated-jsoncpp)
+set(jsoncpp_generated_source ${jsoncpp_generated_dir}/jsoncpp.cpp)
+set(jsoncpp_generated_include_dir ${jsoncpp_generated_dir})
+set(jsoncpp_generated_header ${jsoncpp_generated_include_dir}/json/json.h)
+if(REGENERATE_JSONCPP)
+    message(STATUS "Fetching jsoncpp source and regenerating in ${jsoncpp_generated_dir}")
+    set(JSONCPP_WITH_TESTS OFF CACHE BOOL "" FORCE)
+    set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "" FORCE)
+    set(JSONCPP_WITH_WARNING_AS_ERROR OFF CACHE BOOL "" FORCE)
+    set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(jsoncpp)
+    # This will create all three generated files.
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} ${jsoncpp_SOURCE_DIR}/amalgamate.py 
+        -s ${jsoncpp_generated_source} -i ${jsoncpp_generated_header} 
+        WORKING_DIRECTORY ${jsoncpp_SOURCE_DIR})
+endif()
+
+# Vulkan-ValidationLayers settings
 set(UPDATE_DEPS ON)
 set(BUILD_TESTS OFF)
 set(_build_type ${CMAKE_BUILD_TYPE})
 set(VVL_CPP_STANDARD 11)
 set(_build_type ${CMAKE_BUILD_TYPE})
-
-# For SDK (flat) builds, we'll receive pointers to our dependency repository builds.
-# Otherwise, we'll fetch and build ourselves.  Other repositories also respect environment
-# variables, so we're doing it here too.
 
 # FetchContent() doesn't seem to actually do a Vulkan-Headers build at all.
 # Consequently, we're really only interested in the source.
@@ -188,4 +212,8 @@ else()
 endif()
 add_subdirectory(layer)
 
-add_subdirectory(profiles/test)
+include_directories(external)
+
+if(PROFILES_BUILD_TESTS)
+    add_subdirectory(profiles/test)
+endif()
