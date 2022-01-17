@@ -17,10 +17,12 @@
  * Author: Mike Weiblen <mikew@lunarg.com>
  * Author: Arda Coskunses <arda@lunarg.com>
  * Author: Jeremy Kniager <jeremyk@lunarg.com>
+ * Author: Ziga Markus <ziga@lunarg.com>
+ * Author: Christophe Riccio <christophe@lunarg.com>
  */
 
 /*
- * layersvt/device_simulation.cpp - The VK_LAYER_KHRONOS_profiles layer.
+ * layersvt/profiles.cpp - The VK_LAYER_KHRONOS_profiles layer.
  * This Profiles layer simulates a device by loading a JSON configuration file to override values that would normally be returned
  * from a Vulkan implementation.  Configuration files must validate with the Profiles schema; this layer does not redundantly
  * check for configuration errors that would be caught by schema validation.
@@ -92,7 +94,6 @@ const char *kOurLayerName = kLayerProperties[0].layerName;
 const std::array<VkExtensionProperties, 0> kInstanceExtensionProperties = {};
 const uint32_t kInstanceExtensionPropertiesCount = static_cast<uint32_t>(kInstanceExtensionProperties.size());
 
-// TODO (ncesario): Where should this live?
 bool get_physical_device_properties2_active = false;
 
 bool device_has_astc_hdr = false;
