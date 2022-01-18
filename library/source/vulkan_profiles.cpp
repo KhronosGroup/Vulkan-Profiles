@@ -8283,6 +8283,9 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
             createInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;
             createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
             createInfo.ppEnabledExtensionNames = extensions.data();
+            if (pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT) {
+                createInfo.pEnabledFeatures = pCreateInfo->pCreateInfo->pEnabledFeatures;
+            }
             pUserData->result = vkCreateDevice(pUserData->physicalDevice, &createInfo, pUserData->pAllocator, pUserData->pDevice);
         }
     );
