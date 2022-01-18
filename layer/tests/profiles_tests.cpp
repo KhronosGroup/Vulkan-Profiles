@@ -64,14 +64,13 @@ TEST(profiles, TestDesktopPortability2022Limits) {
     EXPECT_GE(gpu_props.limits.maxImageDimension3D, 2048u);
     EXPECT_GE(gpu_props.limits.maxImageDimensionCube, 16384u);
     EXPECT_GE(gpu_props.limits.maxImageArrayLayers, 2048u);
-    EXPECT_GE(gpu_props.limits.maxTexelBufferElements, 67108900u);
+    EXPECT_GE(gpu_props.limits.maxTexelBufferElements, 67108864u);
     EXPECT_GE(gpu_props.limits.maxUniformBufferRange, 65536u);
     EXPECT_GE(gpu_props.limits.maxStorageBufferRange, 134217728u);
     EXPECT_GE(gpu_props.limits.maxPushConstantsSize, 128u);
     EXPECT_GE(gpu_props.limits.maxMemoryAllocationCount, 4096u);
     EXPECT_GE(gpu_props.limits.maxSamplerAllocationCount, 1024u);
     EXPECT_LE(gpu_props.limits.bufferImageGranularity, 1024);
-    EXPECT_GE(gpu_props.limits.sparseAddressSpaceSize, 1073741824);
     EXPECT_GE(gpu_props.limits.maxBoundDescriptorSets, 8u);
     EXPECT_GE(gpu_props.limits.maxPerStageDescriptorSamplers, 16u);
     EXPECT_GE(gpu_props.limits.maxPerStageDescriptorUniformBuffers, 15u);
@@ -118,7 +117,7 @@ TEST(profiles, TestDesktopPortability2022Limits) {
     EXPECT_GE(gpu_props.limits.mipmapPrecisionBits, 4u);
     EXPECT_GE(gpu_props.limits.maxDrawIndexedIndexValue, 429467295u);
     EXPECT_GE(gpu_props.limits.maxDrawIndirectCount, 1073740000u);
-    EXPECT_GE(gpu_props.limits.maxSamplerLodBias, 14.0f);
+    EXPECT_GE(gpu_props.limits.maxSamplerLodBias, 4.0f);
     EXPECT_GE(gpu_props.limits.maxSamplerAnisotropy, 16.0f);
     EXPECT_GE(gpu_props.limits.maxViewports, 16u);
     EXPECT_GE(gpu_props.limits.maxViewportDimensions[0], 16384u);
@@ -157,14 +156,13 @@ TEST(profiles, TestDesktopPortability2022Limits) {
     EXPECT_EQ(gpu_props.limits.storageImageSampleCounts & VK_SAMPLE_COUNT_1_BIT, VK_SAMPLE_COUNT_1_BIT);
     EXPECT_LE(gpu_props.limits.maxSampleMaskWords, 1u);
     EXPECT_GE(gpu_props.limits.maxClipDistances, 8u);
-    EXPECT_GE(gpu_props.limits.maxCullDistances, 8u);
     EXPECT_GE(gpu_props.limits.maxCombinedClipAndCullDistances, 8u);
     EXPECT_GE(gpu_props.limits.discreteQueuePriorities, 2u);
     EXPECT_LE(gpu_props.limits.pointSizeRange[0], 1.0f);
     EXPECT_GE(gpu_props.limits.pointSizeRange[1], 64.0f);
     EXPECT_LE(gpu_props.limits.lineWidthRange[0], 1.0f);
     EXPECT_GE(gpu_props.limits.lineWidthRange[1], 1.0f);
-    EXPECT_LE(gpu_props.limits.pointSizeGranularity, 0.125f);
+    EXPECT_LE(gpu_props.limits.pointSizeGranularity, 1.0f);
     EXPECT_LE(gpu_props.limits.lineWidthGranularity, 0.5f);
 
     // Features
