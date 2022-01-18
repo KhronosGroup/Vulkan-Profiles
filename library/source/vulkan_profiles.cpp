@@ -3400,7 +3400,7 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.maxViewportDimensions[1] = 16384;
                     s->properties.limits.maxViewports = 16;
                     s->properties.limits.minInterpolationOffset = -0.5;
-                    s->properties.limits.minMemoryMapAlignment = 256;
+                    s->properties.limits.minMemoryMapAlignment = 4096;
                     s->properties.limits.minStorageBufferOffsetAlignment = 64;
                     s->properties.limits.minTexelBufferOffsetAlignment = 64;
                     s->properties.limits.minTexelGatherOffset = -8;
@@ -3414,7 +3414,6 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.sampledImageDepthSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT);
                     s->properties.limits.sampledImageIntegerSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT);
                     s->properties.limits.sampledImageStencilSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT);
-                    s->properties.limits.sparseAddressSpaceSize = 0;
                     s->properties.limits.storageImageSampleCounts |= (VK_SAMPLE_COUNT_1_BIT);
                     s->properties.limits.subPixelInterpolationOffsetBits = 4;
                     s->properties.limits.subPixelPrecisionBits = 4;
@@ -3544,7 +3543,7 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (s->properties.limits.maxViewportDimensions[1] >= 16384);
                     ret = ret && (s->properties.limits.maxViewports >= 16);
                     ret = ret && (s->properties.limits.minInterpolationOffset <= -0.5);
-                    ret = ret && (s->properties.limits.minMemoryMapAlignment <= 256);
+                    ret = ret && (s->properties.limits.minMemoryMapAlignment <= 4096);
                     ret = ret && (s->properties.limits.minStorageBufferOffsetAlignment <= 64);
                     ret = ret && (s->properties.limits.minTexelBufferOffsetAlignment <= 64);
                     ret = ret && (s->properties.limits.minTexelGatherOffset <= -8);
@@ -3558,7 +3557,6 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && ((s->properties.limits.sampledImageDepthSampleCounts & (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)) == (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT));
                     ret = ret && ((s->properties.limits.sampledImageIntegerSampleCounts & (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)) == (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT));
                     ret = ret && ((s->properties.limits.sampledImageStencilSampleCounts & (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)) == (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT));
-                    ret = ret && (s->properties.limits.sparseAddressSpaceSize >= 0);
                     ret = ret && ((s->properties.limits.storageImageSampleCounts & (VK_SAMPLE_COUNT_1_BIT)) == (VK_SAMPLE_COUNT_1_BIT));
                     ret = ret && (s->properties.limits.subPixelInterpolationOffsetBits >= 4);
                     ret = ret && (s->properties.limits.subPixelPrecisionBits >= 4);
@@ -5718,7 +5716,7 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.maxViewportDimensions[1] = 16384;
                     s->properties.limits.maxViewports = 16;
                     s->properties.limits.minInterpolationOffset = -0.5;
-                    s->properties.limits.minMemoryMapAlignment = 256;
+                    s->properties.limits.minMemoryMapAlignment = 4096;
                     s->properties.limits.minStorageBufferOffsetAlignment = 64;
                     s->properties.limits.minTexelBufferOffsetAlignment = 64;
                     s->properties.limits.minTexelGatherOffset = -8;
@@ -5732,7 +5730,6 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.sampledImageDepthSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT);
                     s->properties.limits.sampledImageIntegerSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT);
                     s->properties.limits.sampledImageStencilSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT);
-                    s->properties.limits.sparseAddressSpaceSize = 0;
                     s->properties.limits.storageImageSampleCounts |= (VK_SAMPLE_COUNT_1_BIT);
                     s->properties.limits.subPixelInterpolationOffsetBits = 4;
                     s->properties.limits.subPixelPrecisionBits = 4;
@@ -5866,7 +5863,7 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (s->properties.limits.maxViewportDimensions[1] >= 16384);
                     ret = ret && (s->properties.limits.maxViewports >= 16);
                     ret = ret && (s->properties.limits.minInterpolationOffset <= -0.5);
-                    ret = ret && (s->properties.limits.minMemoryMapAlignment <= 256);
+                    ret = ret && (s->properties.limits.minMemoryMapAlignment <= 4096);
                     ret = ret && (s->properties.limits.minStorageBufferOffsetAlignment <= 64);
                     ret = ret && (s->properties.limits.minTexelBufferOffsetAlignment <= 64);
                     ret = ret && (s->properties.limits.minTexelGatherOffset <= -8);
@@ -5880,7 +5877,6 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && ((s->properties.limits.sampledImageDepthSampleCounts & (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)) == (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT));
                     ret = ret && ((s->properties.limits.sampledImageIntegerSampleCounts & (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)) == (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT));
                     ret = ret && ((s->properties.limits.sampledImageStencilSampleCounts & (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)) == (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT));
-                    ret = ret && (s->properties.limits.sparseAddressSpaceSize >= 0);
                     ret = ret && ((s->properties.limits.storageImageSampleCounts & (VK_SAMPLE_COUNT_1_BIT)) == (VK_SAMPLE_COUNT_1_BIT));
                     ret = ret && (s->properties.limits.subPixelInterpolationOffsetBits >= 4);
                     ret = ret && (s->properties.limits.subPixelPrecisionBits >= 4);

@@ -79,8 +79,9 @@ TEST(api_get_profile_formats, unspecified) {
 TEST(api_get_profile_formats, properties_single) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
-    VkFormatProperties2 properties2 = {};
-    properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+#if defined(VK_VERSION_1_1) || defined(VK_KHR_get_physical_device_properties2)
+    VkFormatProperties2KHR properties2 = {};
+    properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR;
     vpGetProfileFormatProperties(&profile, VK_FORMAT_D16_UNORM, &properties2);
     EXPECT_EQ(0, properties2.formatProperties.bufferFeatures);
     EXPECT_EQ(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT |
@@ -88,7 +89,9 @@ TEST(api_get_profile_formats, properties_single) {
                   VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
               properties2.formatProperties.optimalTilingFeatures);
     EXPECT_EQ(0, properties2.formatProperties.linearTilingFeatures);
+#endif
 
+#if defined(VK_VERSION_1_3) || defined(VK_KHR_format_feature_flags2)
     VkFormatProperties3KHR properties3 = {};
     properties3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR;
     vpGetProfileFormatProperties(&profile, VK_FORMAT_D16_UNORM, &properties3);
@@ -98,13 +101,15 @@ TEST(api_get_profile_formats, properties_single) {
                   VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
               properties3.optimalTilingFeatures);
     EXPECT_EQ(0, properties3.linearTilingFeatures);
+#endif
 }
 
 TEST(api_get_profile_formats, properties_chained) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
 
-    VkFormatProperties2 properties2 = {};
-    properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+#if defined(VK_VERSION_1_3) || defined(VK_KHR_format_feature_flags2)
+    VkFormatProperties2KHR properties2 = {};
+    properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR;
     properties2.pNext = nullptr;
 
     VkFormatProperties3KHR properties3 = {};
@@ -126,4 +131,5 @@ TEST(api_get_profile_formats, properties_chained) {
                   VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
               properties3.optimalTilingFeatures);
     EXPECT_EQ(0, properties3.linearTilingFeatures);
+#endif
 }
