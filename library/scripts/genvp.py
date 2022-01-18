@@ -18,6 +18,8 @@
 
 import os
 import re
+import itertools
+import functools
 import argparse
 from typing import OrderedDict
 import xml.etree.ElementTree as etree
@@ -1150,6 +1152,8 @@ class VulkanStructMember():
         self.type = type
         self.limittype = limittype
         self.isArray = isArray
+        self.arraySizeMember = None
+        self.nullTerminated = False
         self.arraySize = None
 
 
@@ -1158,7 +1162,7 @@ class VulkanStruct():
         self.name = name
         self.sType = None
         self.extends = []
-        self.members = dict()
+        self.members = OrderedDict()
         self.aliases = [ name ]
         self.isAlias = False
         self.definedByVersion = None
@@ -1192,7 +1196,8 @@ class VulkanDefinitionScope():
 class VulkanVersion(VulkanDefinitionScope):
     def __init__(self, xml):
         self.name = xml.get('name')
-        self.number = xml.get('number')
+        self.number = float(xml.get('number'))
+        self.extensions = []
         self.parseAliases(xml)
 
 
@@ -1202,6 +1207,10 @@ class VulkanExtension(VulkanDefinitionScope):
         self.upperCaseName = upperCaseName
         self.type = xml.get('type')
         self.platform = xml.get('platform')
+        self.provisional = xml.get('provisional')
+        self.promotedTo = xml.get('promotedto')
+        self.obsoletedBy = xml.get('obsoletedby')
+        self.deprecatedBy = xml.get('deprecatedby')
         self.parseAliases(xml)
 
 
@@ -1232,7 +1241,7 @@ class VulkanRegistry():
         self.versions = dict()
         for feature in xml.findall('./feature'):
             if re.search(r"^[1-9][0-9]*\.[0-9]+$", feature.get('number')):
-                self.versions[feature.get('number')] = VulkanVersion(feature)
+                self.versions[feature.get('name')] = VulkanVersion(feature)
             else:
                 Log.f("Unsupported feature with number '{0}'".format(feature.get('number')))
 
@@ -1306,6 +1315,23 @@ class VulkanRegistry():
                         else:
                             Log.f("Unsupported array format for struct member '{0}::{1}'".format(structDef.name, name))
 
+                    # If it has a "len" attribute then it's also an array, just a dynamically sized one
+                    if member.get('len') != None:
+                        lenMeta = member.get('len').split(',')
+                        for len in lenMeta:
+                            if len == 'null-terminated':
+                                # Values are null-terminated
+                                structDef.members[name].nullTerminated = True
+                            else:
+                                # This is a pointer to an array with a corresponding count member
+                                structDef.members[name].isArray = True
+                                structDef.members[name].arraySizeMember = len
+
+            # If any of the members is a dynamic array then we should remove the corresponding count member
+            for member in list(structDef.members.values()):
+                if member.isArray and member.arraySizeMember != None:
+                    structDef.members.pop(member.arraySizeMember, None)
+
             # Store struct definition
             self.structs[struct.get('name')] = structDef
 
@@ -1316,7 +1342,7 @@ class VulkanRegistry():
             for requireType in feature.findall('./require/type'):
                 # Add feature as the source of the definition of a struct
                 if requireType.get('name') in self.structs:
-                    self.structs[requireType.get('name')].definedByVersion = feature.get('number')
+                    self.structs[requireType.get('name')].definedByVersion = float(feature.get('number'))
 
         # Check extensions
         for extension in xml.findall('./extensions/extension'):
@@ -1412,9 +1438,10 @@ class VulkanRegistry():
 
                         # First try to find sType alias in core versions
                         if aliasStructDef.definedByVersion != None:
-                            for version in self.versions:
-                                if version <= aliasStructDef.definedByVersion:
-                                    sTypeAlias = self.versions[version].sTypeAliases.get(baseStructDef.sType)
+                            for versionName in self.versions:
+                                version = self.versions[versionName]
+                                if version.number <= aliasStructDef.definedByVersion:
+                                    sTypeAlias = version.sTypeAliases.get(baseStructDef.sType)
                                     if sTypeAlias != None:
                                         break
 
@@ -1534,6 +1561,45 @@ class VulkanRegistry():
         self.structs['VkQueueFamilyProperties'].members['timestampValidBits'].limittype = 'max'
         self.structs['VkQueueFamilyProperties'].members['minImageTransferGranularity'].limittype = 'min' # should be maxmul
 
+        # TODO: The registry xml contains some return structures that contain count + pointers to arrays
+        # While the script itself is prepared to drop those, as they are ill-formed, as return structures
+        # should never contain such pointers, some of the structures (e.g. 'VkVideoProfilesKHR') actually
+        # doesn't even have the proper 'len' attribute to be able to detect the dynamic array
+        # Hence here we simply remove such "disallow-listed" structs so that they don't get in the way
+        self.structs.pop('VkDrmFormatModifierPropertiesListEXT', None)
+        self.structs.pop('VkDrmFormatModifierPropertiesList2EXT', None)
+        self.structs.pop('VkVideoProfilesKHR', None)
+
+
+    def isFeatureRequired(struct, feature, apiVersionNumber, extensions):
+        # TODO: The registry xml does not contain information about the required features defined
+        # in the "Feature Requirements" section of the Vulkan Specification so we have explicit
+        # hard-coded logic here to determine if a particular feature within a feature structure
+        # is required according to the API version and extensions defined
+        # It's unclear whether this will ever go away as some of the interactions are non-trivial
+        # to express
+
+        # TODO: We will have to consider here any feature aliases, so this will eventually be
+        # a list with possibly more elements in it
+        feature = [ '{0}::{1}'.format(struct, feature) ]
+
+        # robustBufferAccess, unless the VK_KHR_portability_subset extension is enabled
+        if 'VkPhysicalDeviceFeatures::robustBufferAccess' in feature:
+            return 'VK_KHR_portability_subset' not in extensions
+
+        # multiview, if Vulkan 1.1 is supported
+        if 'VkPhysicalDeviceMultiviewFeatures::multiview' in feature:
+            return apiVersionNumber >= 1.1
+
+        # shaderDrawParameters, if the VK_KHR_shader_draw_parameters extension is supported
+        if 'VkPhysicalDeviceShaderDrawParametersFeatures::shaderDrawParameters' in feature:
+            return 'VK_KHR_shader_draw_parameters' in extensions
+
+        # uniformBufferStandardLayout, if Vulkan 1.2 or the VK_KHR_uniform_buffer_standard_layout
+        # extension is supported
+        if 'VkPhysicalDeviceUniformBufferStandardLayoutFeatures::uniformBufferStandardLayout' in feature:
+            return
+
 
     def getChainableStructDef(self, name, extends):
         structDef = self.structs.get(name)
@@ -1554,6 +1620,18 @@ class VulkanRegistry():
                 Log.f("Invalid array size '{0}'".format(arraySize))
         else:
             return arraySize
+
+
+    def getVersionAsNumber(self, versionStr):
+        match = re.search(r"^([1-9][0-9]*\.[0-9]+)[^0-9]?.*$", versionStr)
+        if match != None:
+            return float(match.group(1))
+        else:
+            return None
+
+
+    def getVersionName(self, versionNumber):
+        return 'VK_VERSION_' + str(versionNumber).replace('.', '_')
 
 
 class VulkanProfileCapabilities():
@@ -1651,8 +1729,8 @@ class VulkanProfileStructs():
         # Feature struct types
         self.feature = []
         for name in caps.features:
-            if name in 'VkPhysicalDeviceFeatures':
-                # Special case, as it's wrapped in VkPhysicalDeviceFeatures2KHR
+            if name == 'VkPhysicalDeviceFeatures' or name == 'VkPHysicalDeviceFeatures2KHR':
+                # Special case, add both as VkPhysicalDeviceFeatures2KHR
                 self.feature.append(registry.structs['VkPhysicalDeviceFeatures2KHR'])
             else:
                 self.feature.append(registry.getChainableStructDef(name, 'VkPhysicalDeviceFeatures2'))
@@ -1661,8 +1739,8 @@ class VulkanProfileStructs():
         # Property struct types
         self.property = []
         for name in caps.properties:
-            if name == 'VkPhysicalDeviceProperties':
-                # Special case, as it's wrapped in VkPhysicalDeviceProperties2KHR
+            if name == 'VkPhysicalDeviceProperties' or name == 'VkPhysicalDeviceProperties2KHR':
+                # Special case, add both as VkPhysicalDeviceProperties2KHR
                 self.property.append(registry.structs['VkPhysicalDeviceProperties2KHR'])
             else:
                 self.property.append(registry.getChainableStructDef(name, 'VkPhysicalDeviceProperties2'))
@@ -1674,8 +1752,8 @@ class VulkanProfileStructs():
         for queueFamilyProps in caps.queueFamiliesProperties:
             queueFamilyStructs.update(queueFamilyProps)
         for name in queueFamilyStructs:
-            if name == 'VkQueueFamilyProperties':
-                # Special case, as it's wrapped in VkQueueFamilyProperties2KHR
+            if name == 'VkQueueFamilyProperties' or name == 'VkQueueFamilyProperties2KHR':
+                # Special case, add both as VkQueueFamilyProperties2KHR
                 self.queueFamily.append(registry.structs['VkQueueFamilyProperties2KHR'])
             else:
                 self.queueFamily.append(registry.getChainableStructDef(name, 'VkQueueFamilyProperties2'))
@@ -1687,8 +1765,8 @@ class VulkanProfileStructs():
         for formatProps in caps.formats.values():
             formatStructs.update(formatProps)
         for name in formatStructs:
-            if name == 'VkFormatProperties':
-                # Special case, as it's wrapped in VkFormatProperties2KHR or VkFormatProperties3KHR
+            if name == 'VkFormatProperties' or name == 'VkFormatProperties2KHR' or name == 'VkFormatProperties3KHR':
+                # Special case, add all as VkFormatProperties2KHR and VkFormatProperties3KHR
                 self.format.append(registry.structs['VkFormatProperties2KHR'])
                 self.format.append(registry.structs['VkFormatProperties3KHR'])
             else:
@@ -1713,8 +1791,11 @@ class VulkanProfile():
     def __init__(self, registry, name, data, caps):
         self.registry = registry
         self.name = name
+        self.label = data['label']
+        self.description = data['description']
         self.version = data['version']
         self.apiVersion = data['api-version']
+        self.apiVersionNumber = self.registry.getVersionAsNumber(self.apiVersion)
         self.fallback = data.get('fallback')
         self.versionRequirements = []
         self.extensionRequirements = []
@@ -1726,15 +1807,11 @@ class VulkanProfile():
 
     def collectCompileTimeRequirements(self):
         # Add API version to the list of requirements
-        match = re.search(r"^([1-9][0-9]*\.[0-9]+)[^0-9].*$", self.apiVersion)
-        if match != None:
-            versionNumber = match.group(1)
-            if versionNumber in self.registry.versions:
-                self.versionRequirements.append(self.registry.versions[versionNumber].name)
-            else:
-                Log.f("No version '{0}' found in registry required by profile '{1}'".format(versionNumber, self.name))
+        versionName = self.registry.getVersionName(self.apiVersionNumber)
+        if versionName in self.registry.versions:
+            self.versionRequirements.append(versionName)
         else:
-            Log.f("Invalid version number '{0}' in profile '{1}'".format(self.apiVersion, self.name))
+            Log.f("No version '{0}' found in registry required by profile '{1}'".format(str(self.apiVersionNumber), self.name))
 
         # Add any required extension to the list of requirements
         for extName in self.capabilities.extensions:
@@ -1769,7 +1846,7 @@ class VulkanProfile():
             depFound = False
 
             # Check if the required API version defines this struct
-            if structDef.definedByVersion != None and structDef.definedByVersion <= self.apiVersion:
+            if structDef.definedByVersion != None and structDef.definedByVersion <= self.apiVersionNumber:
                 depFound = True
 
             # Check if any required extension defines this struct
@@ -1883,6 +1960,9 @@ class VulkanProfile():
                         # If list is empty then ignore
                         continue
                     if structDef.members[member].isArray:
+                        if not isinstance(structDef.members[member].arraySize, int):
+                            Log.f("Unsupported array member '{0}' in structure '{1}'".format(member, structDef.name) +
+                                  "(currently only 1D non-dynamic arrays are supported in this context)")
                         # If it's an array we have to generate per-element assignment code
                         for i, v in enumerate(value):
                             gen += fmt.format('{0}{1}[{2}] = {3}'.format(var, member, i, v))
@@ -1952,6 +2032,9 @@ class VulkanProfile():
                         # If list is empty then ignore
                         continue
                     if structDef.members[member].isArray:
+                        if not isinstance(structDef.members[member].arraySize, int):
+                            Log.f("Unsupported array member '{0}' in structure '{1}'".format(member, structDef.name) +
+                                  "(currently only 1D non-dynamic arrays are supported in this context)")
                         # If it's an array we have to generate per-element comparison code
                         for i in range(len(value)):
                             if limittype == 'range':
@@ -2632,6 +2715,8 @@ class VulkanProfilesSchemaGenerator():
 
         if type == 'char':
             # Character arrays should be handled as strings
+            # We assume all are null-terminated, even though the vk.xml doesn't specify that
+            # everywhere, but that's probably a bug rather than intentional
             return OrderedDict({
                 "type": "string",
                 "maxLength": arraySize - 1
@@ -2642,7 +2727,9 @@ class VulkanProfilesSchemaGenerator():
                 "type": "array",
                 "items": self.gen_array(type, arraySize[1:], definitions),
                 "uniqueItems": False,
-                "minItems": arraySize[0],
+                # We don't have information from vk.xml to be able to tell what's the minimum
+                # number of items that may need to be specified
+                # "minItems": arraySize[0],
                 "maxItems": arraySize[0]
             })
         else:
@@ -2651,7 +2738,9 @@ class VulkanProfilesSchemaGenerator():
                 "type": "array",
                 "items": self.gen_type(type, definitions),
                 "uniqueItems": False,
-                "minItems": arraySize,
+                # We don't have information from vk.xml to be able to tell what's the minimum
+                # number of items that may need to be specified
+                # "minItems": arraySize,
                 "maxItems": arraySize
             })
 
@@ -2706,7 +2795,13 @@ class VulkanProfilesSchemaGenerator():
                 continue
 
             if memberDef.isArray:
-                members[memberDef.name] = self.gen_array(memberDef.type, memberDef.arraySize, definitions)
+                if memberDef.arraySizeMember != None:
+                    # This array is a dynamic one (count + pointer to array) which is not allowed
+                    # for return structures. Such structures hence are ill-formed and shouldn't
+                    # be included in the schema
+                    Log.w("Ignoring member '{0}' in struct '{1}' containing ill-formed pointer to array".format(memberName, name))
+                else:
+                    members[memberDef.name] = self.gen_array(memberDef.type, memberDef.arraySize, definitions)
             else:
                 members[memberDef.name] = self.gen_type(memberDef.type, definitions)
 
@@ -2770,14 +2865,190 @@ class VulkanProfilesSchemaGenerator():
         return self.gen_structChainDefinitions("VkQueueFamilyProperties", definitions)
 
 
+DOC_MD_HEADER = '''
+<!-- markdownlint-disable MD041 -->
+<p align="left"><img src="https://vulkan.lunarg.com/img/NewLunarGLogoBlack.png" alt="LunarG" width=263 height=113 /></p>
+<p align="left">Copyright (c) 2021-2022 LunarG, Inc.</p>
+
+<p align="center"><img src="./images/logo.png" width=400 /></p>
+
+[![Creative Commons][3]][4]
+
+[3]: https://i.creativecommons.org/l/by-nd/4.0/88x31.png "Creative Commons License"
+[4]: https://creativecommons.org/licenses/by-nd/4.0/
+'''
+
+
 class VulkanProfilesDocGenerator():
     def __init__(self, registry, profiles):
         self.registry = registry
-        self.profiles = profiles
+        self.profiles = sorted(profiles.values(), key = self.sort_KHR_EXT_first)
+
+
+    def sort_KHR_EXT_first(self, profileOrExtName):
+        # Make sure KHR profiles and extensions come first and EXT extensions come next
+        key = profileOrExtName.name if isinstance(profileOrExtName, VulkanProfile) else profileOrExtName
+        if key[2:7] == '_KHR_':
+            return 'A' + key
+        elif key[2:7] == '_KHX_':
+            return 'B' + key
+        elif key[2:7] == '_EXT_':
+            return 'C' + key
+        else:
+            return key
 
 
     def generate(self, outDoc):
-        pass
+        Log.i("Generating '{0}'...".format(outDoc))
+        with open(outDoc, 'w') as f:
+            f.write(self.gen_doc())
+
+
+    def gen_doc(self):
+        gen = DOC_MD_HEADER
+        gen += '\n# Vulkan Profiles Definitions\n'
+        gen += self.gen_registry()
+        gen += self.gen_extensions()
+        #gen += self.gen_features()
+        return gen
+
+
+    def gen_table(self, rowHandlers):
+        gen = '| Profiles |'
+        cellFmt = ' {0} |'
+        for profile in self.profiles:
+            gen += cellFmt.format(profile.name)
+        gen += '\n{0}'.format(re.sub(r"[^|]", '-', gen))
+        for row, rowHandler in rowHandlers.items():
+            gen += '\n| {0} |'.format(row)
+            for profile in self.profiles:
+                gen += cellFmt.format(rowHandler(row, profile))
+        return gen
+
+
+    def gen_sectionedTable(self, rowHandlers):
+        gen = '| Profiles |'
+        cellFmt = ' {0} |'
+        for profile in self.profiles:
+            gen += cellFmt.format(profile.name)
+        gen += '\n{0}'.format(re.sub(r"[^|]", '-', gen))
+        for section, sectionRowHandlers in rowHandlers.items():
+            gen += '\n| **{0}** |'.format(section)
+            for row, rowHandler in sectionRowHandlers.items():
+                gen += '\n| {0} |'.format(row)
+                for profile in self.profiles:
+                    gen += cellFmt.format(rowHandler(row, profile))
+        return gen
+
+
+    def gen_registry(self):
+        return '\n## Vulkan Profiles Registry\n\n{0}\n'.format(self.gen_table(OrderedDict({
+            'Label': lambda _, profile : profile.label,
+            'Description': lambda _, profile : profile.description,
+            'Version': lambda _, profile : profile.version,
+            'Required API version': lambda _, profile : profile.apiVersion,
+            'Fallback profiles': lambda _, profile : ', '.join(profile.fallback) if profile.fallback != None else '-'
+        })))
+
+
+    def gen_extension(self, extension, profile):
+        # If it's an extension explicitly required by the profile then this is a supported extension
+        if extension in profile.capabilities.extensions:
+            return ':heavy_check_mark:'
+
+        # Otherwise check if this extension has been promoted to a core API version that the profile requires
+        promotedTo = self.registry.extensions[extension].promotedTo
+        version = None
+        while promotedTo != None:
+            if promotedTo in self.registry.extensions:
+                # Functionality was promoted to another extension, continue with that
+                promotedTo = self.registry.extensions[promotedTo].promotedTo
+            elif promotedTo in self.registry.versions:
+                # Found extension in a core API version, we're done
+                version = self.registry.versions[promotedTo]
+                break
+        # If core API version found and is required by the profile then this extension is supported as being core
+        if version != None and version.number <= profile.apiVersionNumber:
+            return str(version.number) + ' Core'
+
+        # Otherwise it's unsupported
+        return ':x:'
+
+
+    def gen_extensions(self):
+        # Collect instance extensions
+        instanceExtensions = list(itertools.chain(*[ profile.capabilities.instanceExtensions.keys() for profile in self.profiles ]))
+        instanceExtensions.sort(key = self.sort_KHR_EXT_first)
+        # Collect device extensions
+        deviceExtensions = list(itertools.chain(*[ profile.capabilities.deviceExtensions.keys() for profile in self.profiles ]))
+        deviceExtensions.sort(key = self.sort_KHR_EXT_first)
+        # Generate table
+        table = self.gen_sectionedTable(OrderedDict({
+            'Instance extensions': OrderedDict({ row: self.gen_extension for row in instanceExtensions }),
+            'Device extensions': OrderedDict({ row: self.gen_extension for row in deviceExtensions })
+        }))
+        return '\n## Vulkan Profiles Extensions\n\n{0}\n'.format(table)
+
+
+    def has_nested_feature_data(self, data):
+        for key in data:
+            if not isinstance(data[key], bool):
+                return True
+        return None
+
+
+    def gen_feature(self, struct, member, profile):
+        return ':x:'
+
+
+    def gen_features(self):
+        # TODO: We will need to consider aliases, in particular, core version aliases of features
+
+        # Merge all feature references across the profiles to collect the relevant features to look at
+        definedFeatures = {}
+        for profile in self.profiles:
+            for featureStructName, features in profile.capabilities.features.items():
+                # VkPhysicalDeviceFeatures2 is an exception, as it contains a nested structure
+                # No other structure is allowed to have this
+                if featureStructName == 'VkPhysicalDeviceFeatures2' or featureStructName == 'VkPhysicalDeviceFeatures2KHR':
+                    features = features['features']
+                elif self.has_nested_feature_data(features):
+                    Log.f("Unexpected nested feature data in profile '{0}' structure '{1}'".format(profile.name, featureStructName))
+                # Copy defined feature structure data
+                if not featureStructName in definedFeatures:
+                    definedFeatures[featureStructName] = []
+                definedFeatures[featureStructName].extend(features.keys())
+
+        # Order list of defined structures starting from core version related ones to extension
+        # specific ones 
+        sectionedFeatures = OrderedDict({})
+        def sortKey(item):
+            structDef = self.registry.structs[item[0]]
+            if structDef.definedByVersion != None:
+                return str(structDef.definedByVersion)
+            else:
+                pass
+
+
+        definedFeatures = OrderedDict(sorted(definedFeatures.items(), key = sortKey))
+
+        data = OrderedDict({})
+
+        # First, go through the core version structures
+        for version in sorted(self.registry.versions.values(), key = lambda version: version.number):
+            structName = 'VkPhysicalDeviceVulkan{0}Features'.format(str(version.number).replace('.', ''))
+            if structName in definedFeatures:
+                # Create core version section
+                rows = data['Vulkan {0} ({1})'.format(str(version.number), structName)] = OrderedDict({})
+                features = definedFeatures[structName]
+                for memberName in self.registry.structs[structName].members.keys():
+                    if memberName in features:
+                        rows[memberName] = functools.partial(self.gen_feature, structName)
+
+        # Second, go through all other 
+
+        table = self.gen_sectionedTable(data)
+        return '\n## Vulkan Profile Features\n\n{0}\n'.format(table)
 
 
 if __name__ == '__main__':
@@ -2793,7 +3064,7 @@ if __name__ == '__main__':
                         help='Output source directory for profile library')
     parser.add_argument('-outSchema', action='store', default='profile_schema.json',
                         help='Output file for JSON profile schema')
-    parser.add_argument('-outDoc', action='store',
+    parser.add_argument('-outDoc', action='store', default='profile_doc.md',
                         help='Output file for profiles documentation')
     parser.add_argument('-validate', action='store_true', default=True,
                         help='Validate generated JSON profile schema and JSON profiles against the schema')
