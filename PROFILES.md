@@ -11,7 +11,7 @@
 
 # Vulkan Profiles definitions
 
-## Vulkan Profiles Registry
+## Vulkan Profiles List
 
 | Profiles | VP_KHR_roadmap_2022 | VP_LUNARG_desktop_portability_2022 | VP_ANDROID_angle_es31 | VP_ANDROID_baseline_2022 |
 | -------- | ------------------- | ---------------------------------- | --------------------- | ------------------------ |
