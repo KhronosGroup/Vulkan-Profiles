@@ -2281,6 +2281,8 @@ class JsonLoader {
                 }
             }
             *dest = new_value;
+        } else if (value.isString()) {
+            *dest = static_cast<T>(VkStringToUint(value.asString()));
         }
         return valid;
     }

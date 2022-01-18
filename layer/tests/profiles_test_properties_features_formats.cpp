@@ -1598,8 +1598,7 @@ TEST(profiles, TestFragmentShadingRateProperties) {
     EXPECT_EQ(fragment_shading_rate_properties.maxFragmentSize.height, 257u);
     EXPECT_EQ(fragment_shading_rate_properties.maxFragmentSizeAspectRatio, 258u);
     EXPECT_EQ(fragment_shading_rate_properties.maxFragmentShadingRateCoverageSamples, 259u);
-    EXPECT_EQ(fragment_shading_rate_properties.maxFragmentShadingRateRasterizationSamples & VK_SAMPLE_COUNT_1_BIT,
-              VK_SAMPLE_COUNT_1_BIT);
+    EXPECT_EQ(fragment_shading_rate_properties.maxFragmentShadingRateRasterizationSamples, VK_SAMPLE_COUNT_4_BIT);
     EXPECT_EQ(fragment_shading_rate_properties.fragmentShadingRateWithShaderDepthStencilWrites, VK_TRUE);
     EXPECT_EQ(fragment_shading_rate_properties.fragmentShadingRateWithSampleMask, VK_TRUE);
     EXPECT_EQ(fragment_shading_rate_properties.fragmentShadingRateWithShaderSampleMask, VK_TRUE);
@@ -1863,9 +1862,7 @@ TEST(profiles, TestFragmentShadingRateEnumsProperties) {
     gpu_props.pNext = &fragment_shading_rate_enums_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_EQ(fragment_shading_rate_enums_properties.maxFragmentShadingRateInvocationCount &
-                  (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT),
-              VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT);
+    EXPECT_EQ(fragment_shading_rate_enums_properties.maxFragmentShadingRateInvocationCount, VK_SAMPLE_COUNT_4_BIT);
 
     vkDestroyInstance(test_inst, nullptr);
 #endif

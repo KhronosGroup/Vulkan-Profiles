@@ -237,7 +237,8 @@
                 "VK_QCOM_fragment_density_map_offset": 1,
                 "VK_EXT_depth_clip_control": 1,
                 "VK_ARM_rasterization_order_attachment_access": 1,
-                "VK_NV_linear_color_attachment": 1
+                "VK_NV_linear_color_attachment": 1,
+                "VK_KHR_external_memory_capabilities": 1
             },
             "features": {
                 "VkPhysicalDeviceFeatures": {
@@ -799,8 +800,9 @@
                     "driverVersion": 2,
                     "vendorID": 0,
                     "deviceID": 0,
-                    "deviceName": 100,
-                    "pipelineCacheUUID": 101,
+                    "deviceType": "VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU",
+                    "deviceName": "Some device name",
+                    "pipelineCacheUUID": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ],
                     "limits": {
                         "maxImageDimension1D": 102,
                         "maxImageDimension2D": 103,
@@ -924,7 +926,7 @@
                     "quadOperationsInAllStages": true
                 },
                 "VkPhysicalDevicePointClippingProperties": {
-                    "pointClippingBehavior": [ "VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES" ]
+                    "pointClippingBehavior": "VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES"
                 },
                 "VkPhysicalDeviceMultiviewProperties": {
                     "maxMultiviewViewCount": 206,
@@ -944,7 +946,7 @@
                     "subgroupSupportedStages": [ "VK_SHADER_STAGE_VERTEX_BIT" ],
                     "subgroupSupportedOperations": [ "VK_SUBGROUP_FEATURE_BASIC_BIT" ],
                     "subgroupQuadOperationsInAllStages": true,
-                    "pointClippingBehavior": [ "VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES" ],
+                    "pointClippingBehavior": "VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES",
                     "maxMultiviewViewCount": 212,
                     "maxMultiviewInstanceIndex": 213,
                     "protectedNoFault": true,
@@ -952,8 +954,8 @@
                     "maxMemoryAllocationSize": 215
                 },
                 "VkPhysicalDeviceVulkan12Properties": {
-                    "denormBehaviorIndependence": [ "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL" ],
-                    "roundingModeIndependence": [ "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL" ],
+                    "denormBehaviorIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL",
+                    "roundingModeIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL",
                     "shaderSignedZeroInfNanPreserveFloat16": true,
                     "shaderSignedZeroInfNanPreserveFloat32": true,
                     "shaderSignedZeroInfNanPreserveFloat64": true,
@@ -1049,8 +1051,8 @@
                     "maxBufferSize": 260
                 },
                 "VkPhysicalDeviceFloatControlsProperties": {
-                    "denormBehaviorIndependence": [ "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL" ],
-                    "roundingModeIndependence": [ "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL" ],
+                    "denormBehaviorIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL",
+                    "roundingModeIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL",
                     "shaderSignedZeroInfNanPreserveFloat16": true,
                     "shaderSignedZeroInfNanPreserveFloat32": true,
                     "shaderSignedZeroInfNanPreserveFloat64": true,
@@ -1130,7 +1132,7 @@
                     },
                     "maxFragmentSizeAspectRatio": 258,
                     "maxFragmentShadingRateCoverageSamples": 259,
-                    "maxFragmentShadingRateRasterizationSamples": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                    "maxFragmentShadingRateRasterizationSamples": "VK_SAMPLE_COUNT_4_BIT",
                     "fragmentShadingRateWithShaderDepthStencilWrites": true,
                     "fragmentShadingRateWithSampleMask": true,
                     "fragmentShadingRateWithShaderSampleMask": true,
@@ -1308,7 +1310,7 @@
                     "requiredSubgroupSizeStages": [ "VK_SHADER_STAGE_VERTEX_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT" ]
                 },
                 "VkPhysicalDeviceShaderCoreProperties2AMD": {
-                    "shaderCoreFeatures": [ "" ],
+                    "shaderCoreFeatures": [],
                     "activeComputeUnitCount": 341
                 },
                 "VkPhysicalDeviceCooperativeMatrixPropertiesNV": {
@@ -1346,7 +1348,7 @@
                     "maxCustomBorderColorSamplers": 356
                 },
                 "VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV": {
-                    "maxFragmentShadingRateInvocationCount": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ]
+                    "maxFragmentShadingRateInvocationCount": "VK_SAMPLE_COUNT_4_BIT"
                 },
                 "VkPhysicalDeviceFragmentDensityMap2PropertiesEXT": {
                     "subsampledLoads": true,
@@ -1391,9 +1393,9 @@
                     }
                 },
                 "VkPhysicalDeviceIDPropertiesKHR": {
-                    "deviceUUID": "0",
-                    "driverUUID": "1",
-                    "deviceLUID": "2",
+                    "deviceUUID": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ],
+                    "driverUUID": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ],
+                    "deviceLUID": [ 0, 1, 2, 3, 4, 5, 6, 7 ],
                     "deviceNodeMask": 377,
                     "deviceLUIDValid": true
                 },
@@ -1402,9 +1404,6 @@
                         "width": 7,
                         "height": 6
                     }
-                },
-                "VkQueueFamilyQueryResultStatusProperties2KHR": {
-                    "supported": true
                 }
             },
             "formats": {
