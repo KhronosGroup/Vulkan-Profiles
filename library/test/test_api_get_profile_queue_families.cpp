@@ -33,6 +33,7 @@ TEST(api_get_profile_queue_families, full) {
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(1, count);
 
+#if defined(VK_VERSION_1_1) || defined(VK_KHR_get_physical_device_properties2)
     std::vector<VkQueueFamilyProperties2KHR> data(count, { VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR });
     VkResult result1 = vpGetProfileQueueFamilyProperties(&profile, &count, &data[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
@@ -45,6 +46,7 @@ TEST(api_get_profile_queue_families, full) {
     EXPECT_EQ(1, data[0].queueFamilyProperties.minImageTransferGranularity.width);
     EXPECT_EQ(1, data[0].queueFamilyProperties.minImageTransferGranularity.height);
     EXPECT_EQ(1, data[0].queueFamilyProperties.minImageTransferGranularity.depth);
+#endif//
 }
 
 TEST(api_get_profile_queue_families, unspecified) {
