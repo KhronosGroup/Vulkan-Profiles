@@ -124,8 +124,7 @@ enum SimulateCapabilityFlag {
     SIMULATE_FEATURES_BIT = 1 << 1,
     SIMULATE_PROPERTIES_BIT = 1 << 2,
     SIMULATE_EXTENSIONS_BIT = 1 << 3,
-    SIMULATE_FORMATS_BIT = 1 << 4,
-    SIMULATE_FORMAT_PROPERTIES_BIT = 1 << 5
+    SIMULATE_FORMATS_BIT = 1 << 4
 };
 typedef int SimulateCapabilityFlags;
 
@@ -143,8 +142,6 @@ static SimulateCapabilityFlags GetSimulateCapabilityFlags(const vku::Strings &va
             result |= SIMULATE_EXTENSIONS_BIT;
         } else if (values[i] == "SIMULATE_FORMATS_BIT") {
             result |= SIMULATE_FORMATS_BIT;
-        } else if (values[i] == "SIMULATE_FORMAT_PROPERTIES_BIT") {
-            result |= SIMULATE_FORMAT_PROPERTIES_BIT;
         }
     }
 
@@ -177,11 +174,6 @@ static std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags) {
     if (flags & SIMULATE_FORMATS_BIT) {
         if (need_comma) result += ", ";
         result += "SIMULATE_FORMATS_BIT";
-        need_comma = true;
-    }
-    if (flags & SIMULATE_FORMAT_PROPERTIES_BIT) {
-        if (need_comma) result += ", ";
-        result += "SIMULATE_FORMAT_PROPERTIES_BIT";
         need_comma = true;
     }
 
@@ -8455,14 +8447,14 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
         dt->GetPhysicalDeviceFormatProperties(physicalDevice, format, &device_format);
         const auto iter = pdd->arrayof_format_properties_.find(format);
 
-        if ((layer_settings.simulate_capabilities & SIMULATE_FORMAT_PROPERTIES_BIT)) {
+        if ((layer_settings.simulate_capabilities & SIMULATE_FORMATS_BIT)) {
             *pFormatProperties = (iter != pdd->arrayof_format_properties_.end()) ? iter->second : VkFormatProperties{};
         } else {
             *pFormatProperties = device_format;
         }
 
         if (IsFormatSupported(*pFormatProperties) && iter != pdd->arrayof_format_properties_.end()) {
-            if ((layer_settings.simulate_capabilities & SIMULATE_FORMAT_PROPERTIES_BIT)) {
+            if ((layer_settings.simulate_capabilities & SIMULATE_FORMATS_BIT)) {
                 *pFormatProperties = iter->second;
             } else {
                 *pFormatProperties = device_format;
@@ -8510,7 +8502,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties(VkPhysical
 
     // Are there JSON overrides, or should we call down to return the original values?
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    if (!(layer_settings.simulate_capabilities & SIMULATE_FORMAT_PROPERTIES_BIT)) {
+    if (!(layer_settings.simulate_capabilities & SIMULATE_FORMATS_BIT)) {
         return dt->GetPhysicalDeviceImageFormatProperties(physicalDevice, format, type, tiling, usage, flags,
                                                           pImageFormatProperties);
     }
@@ -10127,7 +10119,10 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             ::device_has_bc = pdd.physical_device_features_.textureCompressionBC;
             ::device_has_etc2 = pdd.physical_device_features_.textureCompressionETC2;
 
-            LoadDeviceFormats(instance, physical_device, &pdd.device_formats_, &pdd.device_formats_3_, &pdd.device_drm_format_modifier_properties_);
+            if (layer_settings.simulate_capabilities & SIMULATE_FORMATS_BIT) {
+                LoadDeviceFormats(instance, physical_device, &pdd.device_formats_, &pdd.device_formats_3_,
+                                  &pdd.device_drm_format_modifier_properties_);
+            }
 
             LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
                        format("deviceName \"%s\"\n", pdd.physical_device_properties_.deviceName).c_str());

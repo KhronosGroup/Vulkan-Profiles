@@ -159,11 +159,6 @@
                             "key": "SIMULATE_FORMATS_BIT",
                             "label": "Formats",
                             "description": "The Vulkan device will report the formats from the selected Profile."
-                        },
-                        {
-                            "key": "SIMULATE_FORMAT_PROPERTIES_BIT",
-                            "label": "Format Properties",
-                            "description": "The Vulkan device will report the format properties from the selected Profile."
                         }
                     ],
                     "default": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
