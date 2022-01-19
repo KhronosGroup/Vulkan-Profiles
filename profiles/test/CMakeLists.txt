@@ -1,7 +1,7 @@
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(TEST_FILE test_validate.cpp)
-set(TEST_NAME profile_test_validate)
+set(TEST_NAME VpProfile_test_schema_validation)
 
 file(GLOB FILES_UNIT_TEST ${CMAKE_CURRENT_SOURCE_DIR}/data/*.json)
 file(GLOB FILES_PROFILE ${CMAKE_CURRENT_SOURCE_DIR}/../*.json)
