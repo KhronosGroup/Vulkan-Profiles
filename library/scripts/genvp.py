@@ -1999,9 +1999,10 @@ class VulkanProfiles():
 
 
 class VulkanProfilesBuilder():
-    def __init__(self, registry, profiles):
+    def __init__(self, registry, profiles, debugMessages = False):
         self.registry = registry
         self.profiles = profiles
+        self.debugMessages = debugMessages
 
 
     def patch_code(self, code):
@@ -2017,8 +2018,7 @@ class VulkanProfilesBuilder():
             return '\n'.join(patched_lines)
 
 
-    def generate(self, outIncDir, outSrcDir, debugMessages = False):
-        self.debugMessages = debugMessages
+    def generate(self, outIncDir, outSrcDir):
         self.generate_h(outIncDir)
         self.generate_cpp(outSrcDir)
         self.generate_hpp(outIncDir)
@@ -2030,8 +2030,6 @@ class VulkanProfilesBuilder():
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
             f.write(H_HEADER)
-            if self.debugMessages:
-                f.write(DEBUG_MSG_CB_DEFINE)
             f.write(self.gen_profileDefs())
             f.write(API_DEFS)
             f.write(H_FOOTER)
@@ -2044,9 +2042,10 @@ class VulkanProfilesBuilder():
             f.write(COPYRIGHT_HEADER)
             f.write(CPP_HEADER)
             if self.debugMessages:
-                f.write('#include <vulkan/vulkan_profiles.h>')
+                f.write('#include <vulkan/debug/vulkan_profiles.h>\n')
+                f.write(DEBUG_MSG_CB_DEFINE)
             else:
-                f.write('#include <vulkan/debug/vulkan_profiles.h>')
+                f.write('#include <vulkan/vulkan_profiles.h>\n')
             f.write(self.gen_privateImpl())
             f.write(self.gen_publicImpl())
 
@@ -2182,4 +2181,5 @@ if __name__ == '__main__':
     builder = VulkanProfilesBuilder(registry, profiles)
     builder.generate(args.outIncDir, args.outSrcDir)
     if args.generateDebugLibrary:
-        builder.generate(args.outIncDir + '/debug', args.outSrcDir + '/debug', True)
+        builder = VulkanProfilesBuilder(registry, profiles, True)
+        builder.generate(args.outIncDir + '/debug', args.outSrcDir + '/debug')

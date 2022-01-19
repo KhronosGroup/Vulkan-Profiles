@@ -21,7 +21,8 @@
 #include <stdint.h>
 #include <vector>
 #include <algorithm>
-#include <vulkan/debug/vulkan_profiles.h>
+#include <vulkan/vulkan_profiles.h>
+
 namespace detail {
 
 
