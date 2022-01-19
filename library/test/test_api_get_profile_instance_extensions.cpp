@@ -25,19 +25,3 @@
 #include <vulkan/vulkan_profiles.h>
 #endif
 
-TEST(api_get_profile_instance_extension_properties, full) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
-
-    uint32_t propertyCount = 0;
-    VkResult result0 = vpGetProfileInstanceExtensionProperties(&profile, &propertyCount, nullptr);
-    EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(0, propertyCount);
-
-    propertyCount = 2;
-
-    std::vector<VkExtensionProperties> properties(propertyCount);
-    VkResult result1 = vpGetProfileInstanceExtensionProperties(&profile, &propertyCount, &properties[0]);
-    EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(0, propertyCount);
-}
-
