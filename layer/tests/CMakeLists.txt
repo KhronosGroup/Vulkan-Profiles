@@ -2,9 +2,9 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_CXX_STANDARD 11)
 
-function(ProfilesTest NAME)
+function(LayerTest NAME)
 	set(TEST_FILE ./${NAME}.cpp)
-    set(TEST_NAME profiles_${NAME})
+    set(TEST_NAME VkLayer_${NAME})
     
     file(GLOB FILES_JSON ./*.json)
 
@@ -36,7 +36,7 @@ function(ProfilesTest NAME)
     endif()
 
     set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "${run_environment}")
-endfunction(ProfilesTest)
+endfunction(LayerTest)
 
-ProfilesTest(profiles_tests)
-ProfilesTest(profiles_test_properties_features_formats)
+LayerTest(tests)
+LayerTest(tests_capabilities)

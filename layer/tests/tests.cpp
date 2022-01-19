@@ -15,7 +15,7 @@ static const char* CONFIG_PATH = "bin/Release";
 static const char* CONFIG_PATH = "lib";
 #endif
 
-TEST(profiles, TestDesktopPortability2022Limits) {
+TEST(layer, TestDesktopPortability2022Limits) {
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -199,7 +199,7 @@ TEST(profiles, TestDesktopPortability2022Limits) {
     vkDestroyInstance(test_inst, nullptr);
 }
 
-TEST(profiles, TestSetCombinationMode) {
+TEST(layer, TestSetCombinationMode) {
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -358,7 +358,7 @@ TEST(profiles, TestSetCombinationMode) {
     }
 }
 
-TEST(profiles, TestExtensionNotSupported) {
+TEST(layer, TestExtensionNotSupported) {
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -412,7 +412,7 @@ TEST(profiles, TestExtensionNotSupported) {
     }
 }
 
-TEST(profiles, TestSelectingProfileAndCapabilities) {
+TEST(layer, TestSelectingProfileAndCapabilities) {
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -483,7 +483,7 @@ TEST(profiles, TestSelectingProfileAndCapabilities) {
     }
 }
 
-TEST(profiles, TestParsingAllFormatProperties) {
+TEST(layer, TestParsingAllFormatProperties) {
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
