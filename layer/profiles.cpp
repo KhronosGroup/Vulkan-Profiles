@@ -3800,7 +3800,6 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProperties 
         GET_VALUE("vendorID", vendorID);
         GET_VALUE("deviceID", deviceID);
         GET_VALUE("deviceType", deviceType);
-        GetValue(parent, "deviceType", "deviceType", &dest->deviceType);
         GET_ARRAY(deviceName);         // size < VK_MAX_PHYSICAL_DEVICE_NAME_SIZE
         GET_ARRAY(pipelineCacheUUID);  // size == VK_UUID_SIZE*/
     }
