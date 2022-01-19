@@ -1013,6 +1013,61 @@ TEST(profiles, TestVulkan13Features) {
 #endif
 }
 
+
+TEST(profiles, TestEnumBits) {
+#if defined(VK_NV_fragment_shading_rate_enums) && defined(VK_KHR_fragment_shading_rate) && defined(VK_KHR_shader_float_controls)
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    const std::string filepath = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_api_alternate.json";
+    profiles_test::setProfilesFilename(filepath);
+    profiles_test::setProfilesProfileName("VP_LUNARG_test_api");
+    profiles_test::setProfilesSimulateAllCapabilities();
+
+    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+
+    err = inst_builder.makeInstance();
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkInstance instance = inst_builder.getInstance();
+
+    VkPhysicalDevice physical_device;
+    err = inst_builder.getPhysicalDevice(&physical_device);
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkPhysicalDevice gpu = VK_NULL_HANDLE;
+    err = inst_builder.getPhysicalDevice(&gpu);
+    if (gpu == VK_NULL_HANDLE) return;
+
+    VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV fragment_shading_rate_enums_properties{};
+    fragment_shading_rate_enums_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_ENUMS_PROPERTIES_NV;
+
+    VkPhysicalDeviceFragmentShadingRatePropertiesKHR fragment_shading_rate_properties{};
+    fragment_shading_rate_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR;
+    fragment_shading_rate_properties.pNext = &fragment_shading_rate_enums_properties;
+
+    VkPhysicalDeviceFloatControlsPropertiesKHR float_control_properties{};
+    float_control_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR;
+    float_control_properties.pNext = &fragment_shading_rate_properties;
+
+    VkPhysicalDeviceProperties2 gpu_props{};
+    gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props.pNext = &float_control_properties;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+
+    EXPECT_EQ(float_control_properties.denormBehaviorIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY);
+    EXPECT_EQ(float_control_properties.roundingModeIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY);
+
+    EXPECT_EQ(fragment_shading_rate_properties.maxFragmentShadingRateRasterizationSamples, VK_SAMPLE_COUNT_2_BIT);
+
+    EXPECT_EQ(fragment_shading_rate_enums_properties.maxFragmentShadingRateInvocationCount, VK_SAMPLE_COUNT_2_BIT);
+#endif
+}
+
 TEST(profiles, TestDuplicatedMembers) {
     VkResult err = VK_SUCCESS;
 

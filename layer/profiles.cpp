@@ -2086,6 +2086,26 @@ class JsonLoader {
         return false;
     }
 
+    static bool WarnIfNotEqualEnum(const char *name, const uint32_t new_value, const uint32_t old_value) {
+        if (new_value != old_value) {
+            LogMessage(DEBUG_REPORT_WARNING_BIT,
+                       format("%s JSON value (%" PRIu32 ") is different from the existing value (%" PRIu32 ").\n", name, new_value,
+                              old_value));
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfMissingBit(const char *name, const uint32_t new_value, const uint32_t old_value) {
+        if ((old_value | new_value) != old_value) {
+            LogMessage(DEBUG_REPORT_WARNING_BIT,
+                       format("%s JSON value (%" PRIu32 ") has bits set that the existing value (%" PRIu32 ") does not\n", name,
+                              new_value, old_value));
+            return true;
+        }
+        return false;
+    }
+
     static bool WarnIfLesser(const char *name, const uint64_t new_value, const uint64_t old_value) {
         if (new_value < old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT, format("%s JSON value (%" PRIu64 ") is lesser than existing value (%" PRIu64 ")\n",
@@ -2144,7 +2164,7 @@ class JsonLoader {
             return true;
         }
         bool valid = true;
-        const uint32_t new_value = value.asInt();
+        const int32_t new_value = value.asInt();
         if (warn_func) {
             if (warn_func(name, new_value, *dest)) {
                 valid = false;
@@ -2196,23 +2216,7 @@ class JsonLoader {
         }
         const Json::Value value = parent[name];
         bool valid = true;
-        if (value.isBool()) {
-            const bool new_value = value.asBool();
-            if (warn_func) {
-                if (warn_func(name, new_value, *dest)) {
-                    valid = false;
-                }
-            }
-            *dest = static_cast<size_t>(new_value);
-        } else if (value.isArray()) {
-            size_t sum_bits = 0;
-            for (const auto &entry : value) {
-                if (entry.isString()) {
-                    sum_bits |= VkStringToUint(entry.asString());
-                }
-            }
-            *dest = sum_bits;
-        } else if (value.isUInt()) {
+        if (value.isUInt()) {
             const size_t new_value = value.asUInt();
             if (warn_func) {
                 if (warn_func(name, new_value, *dest)) {
@@ -2222,11 +2226,6 @@ class JsonLoader {
             *dest = new_value;
         }
         return valid;
-    }
-
-    bool GetValue(const Json::Value &parent, const char *name, uint32_t *dest,
-                  std::function<bool(const char *, uint32_t, uint32_t)> warn_func = nullptr) {
-        return GetValue(parent, name, name, dest, warn_func);
     }
 
     bool GetValue(const Json::Value &parent, const std::string &member, const char *name, uint64_t *dest,
@@ -2249,85 +2248,46 @@ class JsonLoader {
         return valid;
     }
 
-    bool GetValue(const Json::Value &parent, const char *name, uint64_t *dest,
-                  std::function<bool(const char *, uint64_t, uint64_t)> warn_func = nullptr) {
-        return GetValue(parent, name, name, dest, warn_func);
-    }
-
-    bool GetValue(const Json::Value &parent, const std::string &member, const char *name, int64_t *dest,
-                  std::function<bool(const char *, int64_t, int64_t)> warn_func = nullptr) {
-        if (member != name) {
-            return true;
-        }
-        const Json::Value value = parent[name];
-        if (!value.isInt64()) {
-            return true;
-        }
-        bool valid = true;
-        const int64_t new_value = value.asInt64();
-        if (warn_func) {
-            if (warn_func(name, new_value, *dest)) {
-                valid = false;
-            }
-        }
-        *dest = new_value;
-        return valid;
-    }
-
-    bool GetValue(const Json::Value &parent, const std::string &member, const char *name, uint8_t *dest,
-                  std::function<bool(const char *, uint8_t, uint8_t)> warn_func = nullptr) {
-        if (member != name) {
-            return true;
-        }
-        const Json::Value value = parent[name];
-        if (!value.isUInt()) {
-            return true;
-        }
-        bool valid = true;
-        const uint8_t new_value = value.asUInt();
-        if (warn_func) {
-            if (warn_func(name, new_value, *dest)) {
-                valid = false;
-            }
-        }
-        *dest = new_value;
-        return valid;
-    }
-
     template <typename T>  // for Vulkan enum types
-    bool GetValue(const Json::Value &parent, const std::string &member, const char *name, T *dest,
-                  std::function<bool(const char *, T, T)> warn_func = nullptr) {
+    bool GetValueFlag(const Json::Value &parent, const std::string &member, const char *name, T *dest,
+                       std::function<bool(const char *, T, T)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
         const Json::Value value = parent[name];
         bool valid = true;
+        uint32_t new_value = 0;
         if (value.isArray()) {
-            uint32_t sum_bits = {};
             for (const auto &entry : value) {
                 if (entry.isString()) {
-                    sum_bits |= VkStringToUint(entry.asString());
+                    new_value |= VkStringToUint(entry.asString());
                 }
             }
-            *dest = static_cast<T>(sum_bits);
-        } else if (value.isInt()) {
-            const T new_value = static_cast<T>(value.asInt());
-            if (warn_func) {
-                if (warn_func(name, new_value, *dest)) {
-                    valid = false;
-                }
-            }
-            *dest = new_value;
-        } else if (value.isString()) {
-            *dest = static_cast<T>(VkStringToUint(value.asString()));
         }
+        if (WarnIfMissingBit(name, new_value, static_cast<uint32_t>(*dest))) {
+            valid = false;
+        }
+        *dest = static_cast<T>(new_value);
         return valid;
     }
 
     template <typename T>  // for Vulkan enum types
-    bool GetValue(const Json::Value &parent, const char *name, T *dest,
-                  std::function<bool(const char *, T, T)> warn_func = nullptr) {
-        return GetValue(parent, name, name, dest, warn_func);
+    bool GetValueEnum(const Json::Value &parent, const std::string &member, const char *name, T *dest,
+                       std::function<bool(const char *, T, T)> warn_func = nullptr) {
+        if (member != name) {
+            return true;
+        }
+        const Json::Value value = parent[name];
+        bool valid = true;
+        uint32_t new_value = 0;
+        if (value.isString()) {
+            new_value = static_cast<T>(VkStringToUint(value.asString()));
+        }
+        if (WarnIfNotEqualEnum(name, new_value, *dest)) {
+            valid = false;
+        }
+        *dest = static_cast<T>(new_value);
+        return valid;
     }
 
     int GetArray(const Json::Value &parent, const char *name, uint8_t *dest) {
@@ -4055,6 +4015,14 @@ VkResult JsonLoader::LoadFile(const char *filename) {
     if (!GetValue(parent, member, #name, &dest->name, warn_func)) { \
         valid = false;                                              \
     }
+#define GET_VALUE_FLAG_WARN(member, name)                    \
+    if (!GetValueFlag(parent, member, #name, &dest->name)) { \
+        valid = false;                                       \
+    }
+#define GET_VALUE_ENUM_WARN(member, name)                    \
+    if (!GetValueEnum(parent, member, #name, &dest->name)) { \
+        valid = false;                                       \
+    }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceProperties)\n");
@@ -4067,7 +4035,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProperties 
         GET_VALUE("driverVersion", driverVersion);
         GET_VALUE("vendorID", vendorID);
         GET_VALUE("deviceID", deviceID);
-        GET_VALUE("deviceType", deviceType);
+        GET_VALUE_ENUM_WARN("deviceType", deviceType);
         GET_ARRAY(deviceName);         // size < VK_MAX_PHYSICAL_DEVICE_NAME_SIZE
         GET_ARRAY(pipelineCacheUUID);  // size == VK_UUID_SIZE*/
     }
@@ -4081,8 +4049,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStenci
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE(prop, supportedDepthResolveModes);
-        GET_VALUE(prop, supportedStencilResolveModes);
+        GET_VALUE_FLAG_WARN(prop, supportedDepthResolveModes);
+        GET_VALUE_FLAG_WARN(prop, supportedStencilResolveModes);
         GET_VALUE_WARN(prop, independentResolveNone, WarnIfNotEqual);
         GET_VALUE_WARN(prop, independentResolve, WarnIfNotEqual);
     }
@@ -4131,8 +4099,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatContro
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE(prop, denormBehaviorIndependence);
-        GET_VALUE(prop, roundingModeIndependence);
+        GET_VALUE_ENUM_WARN(prop, denormBehaviorIndependence);
+        GET_VALUE_ENUM_WARN(prop, roundingModeIndependence);
         GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat16, WarnIfNotEqual);
         GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat32, WarnIfNotEqual);
         GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat64, WarnIfNotEqual);
@@ -4431,16 +4399,16 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_VALUE_WARN(prop, maxFramebufferWidth, WarnIfGreater);
         GET_VALUE_WARN(prop, maxFramebufferHeight, WarnIfGreater);
         GET_VALUE_WARN(prop, maxFramebufferLayers, WarnIfGreater);
-        GET_VALUE_WARN(prop, framebufferColorSampleCounts, WarnIfGreater);
-        GET_VALUE_WARN(prop, framebufferDepthSampleCounts, WarnIfGreater);
-        GET_VALUE_WARN(prop, framebufferStencilSampleCounts, WarnIfGreater);
-        GET_VALUE_WARN(prop, framebufferNoAttachmentsSampleCounts, WarnIfGreater);
+        GET_VALUE_FLAG_WARN(prop, framebufferColorSampleCounts);
+        GET_VALUE_FLAG_WARN(prop, framebufferDepthSampleCounts);
+        GET_VALUE_FLAG_WARN(prop, framebufferStencilSampleCounts);
+        GET_VALUE_FLAG_WARN(prop, framebufferNoAttachmentsSampleCounts);
         GET_VALUE_WARN(prop, maxColorAttachments, WarnIfGreater);
-        GET_VALUE_WARN(prop, sampledImageColorSampleCounts, WarnIfGreater);
-        GET_VALUE_WARN(prop, sampledImageIntegerSampleCounts, WarnIfGreater);
-        GET_VALUE_WARN(prop, sampledImageDepthSampleCounts, WarnIfGreater);
-        GET_VALUE_WARN(prop, sampledImageStencilSampleCounts, WarnIfGreater);
-        GET_VALUE_WARN(prop, storageImageSampleCounts, WarnIfGreater);
+        GET_VALUE_FLAG_WARN(prop, sampledImageColorSampleCounts);
+        GET_VALUE_FLAG_WARN(prop, sampledImageIntegerSampleCounts);
+        GET_VALUE_FLAG_WARN(prop, sampledImageDepthSampleCounts);
+        GET_VALUE_FLAG_WARN(prop, sampledImageStencilSampleCounts);
+        GET_VALUE_FLAG_WARN(prop, storageImageSampleCounts);
         GET_VALUE_WARN(prop, maxSampleMaskWords, WarnIfGreater);
         GET_VALUE_WARN(prop, timestampComputeAndGraphics, WarnIfNotEqual);
         GET_VALUE_WARN(prop, timestampPeriod, WarnIfGreaterFloat);
@@ -4478,8 +4446,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupPro
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, subgroupSize, WarnIfGreater);
-        GET_VALUE_WARN(prop, supportedStages, WarnIfGreater);
-        GET_VALUE_WARN(prop, supportedOperations, WarnIfGreater);
+        GET_VALUE_FLAG_WARN(prop, supportedStages);
+        GET_VALUE_FLAG_WARN(prop, supportedOperations);
         GET_VALUE_WARN(prop, quadOperationsInAllStages, WarnIfNotEqual);
     }
     return valid;
@@ -5623,7 +5591,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocat
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE_WARN(prop, sampleLocationSampleCounts, WarnIfGreater);
+        GET_VALUE_FLAG_WARN(prop, sampleLocationSampleCounts);
         GET_VALUE_WARN(prop, maxSampleLocationGridSize, WarnIfGreater);
         GET_ARRAY(sampleLocationCoordinateRange);
         GET_VALUE_WARN(prop, sampleLocationSubPixelBits, WarnIfGreater);
@@ -5726,7 +5694,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
         GET_VALUE_WARN(prop, minSubgroupSize, WarnIfLesser);
         GET_VALUE_WARN(prop, maxSubgroupSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxComputeWorkgroupSubgroups, WarnIfGreater);
-        GET_VALUE_WARN(prop, requiredSubgroupSizeStages, WarnIfGreater);
+        GET_VALUE_FLAG_WARN(prop, requiredSubgroupSizeStages);
     }
     return valid;
 }
@@ -5895,7 +5863,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
         GET_VALUE_WARN(prop, maxFragmentSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxFragmentSizeAspectRatio, WarnIfGreater);
         GET_VALUE_WARN(prop, maxFragmentShadingRateCoverageSamples, WarnIfGreater);
-        GET_VALUE(prop, maxFragmentShadingRateRasterizationSamples);
+        GET_VALUE_ENUM_WARN(prop, maxFragmentShadingRateRasterizationSamples);
         GET_VALUE_WARN(prop, fragmentShadingRateWithShaderDepthStencilWrites, WarnIfNotEqual);
         GET_VALUE_WARN(prop, fragmentShadingRateWithSampleMask, WarnIfNotEqual);
         GET_VALUE_WARN(prop, fragmentShadingRateWithShaderSampleMask, WarnIfGreater);
@@ -5951,7 +5919,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE_WARN(prop, shaderCoreFeatures, WarnIfGreater);
+        GET_VALUE_FLAG_WARN(prop, shaderCoreFeatures, WarnIfGreater);
         GET_VALUE_WARN(prop, activeComputeUnitCount, WarnIfGreater);
     }
     return valid;
@@ -6038,7 +6006,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE_WARN(prop, cooperativeMatrixSupportedStages, WarnIfGreater);
+        GET_VALUE_FLAG_WARN(prop, cooperativeMatrixSupportedStages, WarnIfGreater);
     }
     return valid;
 }
@@ -6166,10 +6134,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
     if (!CheckExtensionSupport(VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
         return false;
     }
+    bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE(prop, maxFragmentShadingRateInvocationCount);
+        GET_VALUE_ENUM_WARN(prop, maxFragmentShadingRateInvocationCount);
     }
-    return true;
+    return valid;
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedViewportScissorFeaturesNV *dest) {
@@ -6563,8 +6532,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan11Pro
         WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", prop, "deviceNodeMask");
         WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", prop, "deviceLUIDValid");
         GET_VALUE_WARN(prop, subgroupSize, WarnIfGreater);
-        GET_VALUE_WARN(prop, subgroupSupportedStages, WarnIfGreater);
-        GET_VALUE_WARN(prop, subgroupSupportedOperations, WarnIfGreater);
+        GET_VALUE_FLAG_WARN(prop, subgroupSupportedStages);
+        GET_VALUE_FLAG_WARN(prop, subgroupSupportedOperations, WarnIfGreater);
         GET_VALUE_WARN(prop, subgroupQuadOperationsInAllStages, WarnIfNotEqual);
         WarnNotModifiable("VkPhysicalDevicePointClippingPropertiesKHR", prop, "pointClippingBehavior");
         GET_VALUE_WARN(prop, maxMultiviewViewCount, WarnIfGreater);
@@ -6583,9 +6552,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Pro
         WarnNotModifiable("VkPhysicalDeviceDriverPropertiesKHR", prop, "driverName");
         WarnNotModifiable("VkPhysicalDeviceDriverPropertiesKHR", prop, "driverInfo");
         WarnNotModifiable("VkPhysicalDeviceDriverPropertiesKHR", prop, "conformanceVersion");
-        GET_VALUE(prop, denormBehaviorIndependence);
-        GET_VALUE(prop, roundingModeIndependence);
-        GET_VALUE_WARN(prop, framebufferIntegerColorSampleCounts, WarnIfGreater);
+        GET_VALUE_ENUM_WARN(prop, denormBehaviorIndependence);
+        GET_VALUE_ENUM_WARN(prop, roundingModeIndependence);
         GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat16, WarnIfNotEqual);
         GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat32, WarnIfNotEqual);
         GET_VALUE_WARN(prop, shaderSignedZeroInfNanPreserveFloat64, WarnIfNotEqual);
@@ -6625,13 +6593,14 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Pro
         GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindSampledImages, WarnIfGreater);
         GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindStorageImages, WarnIfGreater);
         GET_VALUE_WARN(prop, maxDescriptorSetUpdateAfterBindInputAttachments, WarnIfGreater);
-        GET_VALUE(prop, supportedDepthResolveModes);
-        GET_VALUE(prop, supportedStencilResolveModes);
+        GET_VALUE_FLAG_WARN(prop, supportedDepthResolveModes);
+        GET_VALUE_FLAG_WARN(prop, supportedStencilResolveModes);
         GET_VALUE_WARN(prop, independentResolveNone, WarnIfNotEqual);
         GET_VALUE_WARN(prop, independentResolve, WarnIfNotEqual);
         GET_VALUE_WARN(prop, filterMinmaxSingleComponentFormats, WarnIfNotEqual);
         GET_VALUE_WARN(prop, filterMinmaxImageComponentMapping, WarnIfNotEqual);
         GET_VALUE_WARN(prop, maxTimelineSemaphoreValueDifference, WarnIfGreater);
+        GET_VALUE_FLAG_WARN(prop, framebufferIntegerColorSampleCounts);
     }
     return valid;
 }
@@ -6642,7 +6611,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Pro
         GET_VALUE_WARN(prop, minSubgroupSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxSubgroupSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxComputeWorkgroupSubgroups, WarnIfGreater);
-        GET_VALUE_WARN(prop, requiredSubgroupSizeStages, WarnIfGreater);
+        GET_VALUE_FLAG_WARN(prop, requiredSubgroupSizeStages);
         GET_VALUE_WARN(prop, maxInlineUniformBlockSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxPerStageDescriptorInlineUniformBlocks, WarnIfGreater);
         GET_VALUE_WARN(prop, maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks, WarnIfGreater);
