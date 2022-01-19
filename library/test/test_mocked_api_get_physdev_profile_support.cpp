@@ -19,8 +19,14 @@
  */
 
 #include "mock_vulkan_api.hpp"
+#include "mock_debug_message_callback.hpp"
 #include <vulkan/vulkan_android.h>
+
+#if WITH_DEBUG_MESSAGES
+#include <vulkan/debug/vulkan_profiles.hpp>
+#else
 #include <vulkan/vulkan_profiles.hpp>
+#endif
 
 TEST(mocked_api_get_physdev_profile_support, vulkan10_supported) {
     MockVulkanAPI mock;
@@ -195,6 +201,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_no_gpdp2) {
 TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_version) {
     MockVulkanAPI mock;
 
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported API version: 1.1.142"
+    });
+#endif
+
     // Unsupported version
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_0);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_0);
@@ -317,6 +329,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_version) {
 TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_extension) {
     MockVulkanAPI mock;
 
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported extension: VK_GOOGLE_display_timing"
+    });
+#endif
+
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_0);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_0);
 
@@ -401,6 +419,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_extension) {
 
 TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_feature) {
     MockVulkanAPI mock;
+
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported feature condition (s->features.sampleRateShading == VK_TRUE)"
+    });
+#endif
 
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_0);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_0);
@@ -488,6 +512,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_feature) {
 TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_property) {
     MockVulkanAPI mock;
 
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported properties condition (s->properties.limits.maxImageDimension2D >= 8192)"
+    });
+#endif
+
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_0);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_0);
 
@@ -572,6 +602,23 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_property) {
 
 TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_format) {
     MockVulkanAPI mock;
+
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported format condition for VK_FORMAT_E5B9G9R9_UFLOAT_PACK32 "
+            "((s->formatProperties.optimalTilingFeatures & "
+            "(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | "
+            "VK_FORMAT_FEATURE_BLIT_SRC_BIT | "
+            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | "
+            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | "
+            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT)) == "
+            "(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | "
+            "VK_FORMAT_FEATURE_BLIT_SRC_BIT | "
+            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | "
+            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | "
+            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT))"
+    });
+#endif
 
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_0);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_0);
@@ -783,6 +830,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_supported) {
 TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_version) {
     MockVulkanAPI mock;
 
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported API version: 1.3.203"
+    });
+#endif
+
     // Unsupported version
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_1);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_1);
@@ -857,6 +910,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_version) {
 
 TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_extension) {
     MockVulkanAPI mock;
+
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported extension: VK_KHR_shader_subgroup_extended_types"
+    });
+#endif
 
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_1);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_1);
@@ -976,6 +1035,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_extension) {
 
 TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_feature) {
     MockVulkanAPI mock;
+
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported feature condition (s->shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE)"
+    });
+#endif
 
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_1);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_1);
@@ -1098,6 +1163,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_feature) {
 TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_property) {
     MockVulkanAPI mock;
 
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported properties condition (s->maxDescriptorSetUpdateAfterBindInputAttachments >= 8)"
+    });
+#endif
+
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_1);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_1);
 
@@ -1217,6 +1288,23 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_property) {
 
 TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_format) {
     MockVulkanAPI mock;
+
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported format condition for VK_FORMAT_E5B9G9R9_UFLOAT_PACK32 "
+            "((s->formatProperties.optimalTilingFeatures & "
+            "(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | "
+            "VK_FORMAT_FEATURE_BLIT_SRC_BIT | "
+            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | "
+            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | "
+            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT)) == "
+            "(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | "
+            "VK_FORMAT_FEATURE_BLIT_SRC_BIT | "
+            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | "
+            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | "
+            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT))"
+    });
+#endif
 
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_1);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_1);
@@ -1339,6 +1427,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_format) {
 
 TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_queue_family) {
     MockVulkanAPI mock;
+
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported queue family defined at profile data index #0"
+    });
+#endif
 
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_1);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_1);

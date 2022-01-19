@@ -7967,14 +7967,15 @@ VPAPI_ATTR bool vpCheckVersion(uint32_t actual, uint32_t expected) {
 
 VPAPI_ATTR bool vpCheckExtension(const VkExtensionProperties *supportedProperties, size_t supportedSize,
                                  const char *requestedExtension, uint32_t expectedVersion = 0) {
+    bool found = false;
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
         if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) {
-            return true;
+            found = true;
             // Drivers don't actually update their spec version, so we cannot rely on this
-            // return supportedProperties[i].specVersion >= expectedVersion;
+            // if (supportedProperties[i].specVersion >= expectedVersion) found = true;
         }
     }
-    return false;
+    return found;
 }
 
 VPAPI_ATTR void vpGetExtensions(uint32_t requestedExtensionCount, const char *const *ppRequestedExtensionNames,
@@ -8086,21 +8087,21 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
-    *pSupported = VK_FALSE;
+    *pSupported = VK_TRUE;
 
     if (pDesc->props.specVersion < pProfile->specVersion) {
-        return result;
+        *pSupported = VK_FALSE;
     }
 
     if (!detail::vpCheckVersion(apiVersion, pDesc->minApiVersion)) {
-        return result;
+        *pSupported = VK_FALSE;
     }
 
     for (uint32_t i = 0; i < pDesc->instanceExtensionCount; ++i) {
         if (!detail::vpCheckExtension(ext.data(), ext.size(),
             pDesc->pInstanceExtensions[i].extensionName,
             pDesc->pInstanceExtensions[i].specVersion)) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
@@ -8114,11 +8115,10 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
             }
         }
         if (!foundGPDP2) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
-    *pSupported = VK_TRUE;
     return result;
 }
 
@@ -8251,17 +8251,17 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 
-    *pSupported = VK_FALSE;
+    *pSupported = VK_TRUE;
 
     if (pDesc->props.specVersion < pProfile->specVersion) {
-        return result;
+        *pSupported = VK_FALSE;
     }
 
     {
         VkPhysicalDeviceProperties props{};
         vkGetPhysicalDeviceProperties(physicalDevice, &props);
         if (!detail::vpCheckVersion(props.apiVersion, pDesc->minApiVersion)) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
@@ -8269,7 +8269,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
         if (!detail::vpCheckExtension(ext.data(), ext.size(),
             pDesc->pDeviceExtensions[i].extensionName,
             pDesc->pDeviceExtensions[i].specVersion)) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
@@ -8284,14 +8284,13 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                 while (p != nullptr) {
                     if (!pUserData->pDesc->feature.pfnComparator(p)) {
                         pUserData->supported = false;
-                        break;
                     }
                     p = p->pNext;
                 }
             }
         );
         if (!userData.supported) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
@@ -8306,14 +8305,13 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                 while (p != nullptr) {
                     if (!pUserData->pDesc->property.pfnComparator(p)) {
                         pUserData->supported = false;
-                        break;
                     }
                     p = p->pNext;
                 }
             }
         );
         if (!userData.supported) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
@@ -8330,14 +8328,13 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                 while (p != nullptr) {
                     if (!pUserData->pDesc->pFormats[pUserData->index].pfnComparator(p)) {
                         pUserData->supported = false;
-                        break;
                     }
                     p = p->pNext;
                 }
             }
         );
         if (!userData.supported) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
@@ -8356,7 +8353,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                                                                             &pUserData->count,
                                                                             static_cast<VkQueueFamilyProperties2KHR*>(static_cast<void*>(p)));
                 for (uint32_t i = 0; i < pUserData->pDesc->queueFamilyCount; ++i) {
-                    pUserData->supported = false;
+                    bool found = false;
                     for (uint32_t j = 0; j < pUserData->count; ++j) {
                         bool propsMatch = true;
                         while (p != nullptr) {
@@ -8367,12 +8364,12 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                             p = p->pNext;
                         }
                         if (propsMatch) {
-                            pUserData->supported = true;
+                            found = true;
                             break;
                         }
                     }
-                    if (!pUserData->supported) {
-                        return;
+                    if (!found) {
+                        pUserData->supported = false;
                     }
                 }
             }
@@ -8381,11 +8378,10 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
 
         pDesc->chainers.pfnQueueFamily(static_cast<VkBaseOutStructure*>(static_cast<void*>(props.data())), &userData, callback);
         if (!userData.supported) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
-    *pSupported = VK_TRUE;
     return result;
 }
 

@@ -19,8 +19,14 @@
  */
 
 #include "mock_vulkan_api.hpp"
+#include "mock_debug_message_callback.hpp"
 #include <vulkan/vulkan_android.h>
+
+#if WITH_DEBUG_MESSAGES
+#include <vulkan/debug/vulkan_profiles.hpp>
+#else
 #include <vulkan/vulkan_profiles.hpp>
+#endif
 
 TEST(mocked_api_get_instance_profile_support, vulkan10_supported) {
     MockVulkanAPI mock;
@@ -50,6 +56,13 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_supported) {
 TEST(mocked_api_get_instance_profile_support, vulkan10_no_gpdp2) {
     MockVulkanAPI mock;
 
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported extension: VK_KHR_get_physical_device_properties2",
+        "Unsupported mandatory extension VK_KHR_get_physical_device_properties2 on Vulkan 1.0"
+    });
+#endif
+
     mock.SetInstanceExtensions(nullptr, {
         VK_EXT(VK_KHR_DISPLAY),
         VK_EXT(VK_KHR_SURFACE),
@@ -74,6 +87,12 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_no_gpdp2) {
 TEST(mocked_api_get_instance_profile_support, vulkan10_unsupported_version) {
     MockVulkanAPI mock;
 
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported API version: 1.1.142"
+    });
+#endif
+
     mock.SetInstanceExtensions(nullptr, {
         VK_EXT(VK_KHR_SURFACE),
         VK_EXT(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2),
@@ -94,6 +113,12 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_unsupported_version) {
 
 TEST(mocked_api_get_instance_profile_support, vulkan10_unsupported_extension) {
     MockVulkanAPI mock;
+
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported extension: VK_KHR_get_surface_capabilities2"
+    });
+#endif
 
     mock.SetInstanceExtensions(nullptr, {
         VK_EXT(VK_KHR_DISPLAY),
@@ -146,6 +171,12 @@ TEST(mocked_api_get_instance_profile_support, vulkan11_supported) {
 TEST(mocked_api_get_instance_profile_support, vulkan11_unsupported_version) {
     MockVulkanAPI mock;
 
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported API version: 1.3.203"
+    });
+#endif
+
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_1);
 
     mock.SetInstanceExtensions(nullptr, {
@@ -168,6 +199,12 @@ TEST(mocked_api_get_instance_profile_support, vulkan11_unsupported_version) {
 
 TEST(mocked_api_get_instance_profile_support, vulkan11_unsupported_extension) {
     MockVulkanAPI mock;
+
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported extension: VK_KHR_android_surface"
+    });
+#endif
 
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_1);
 
@@ -221,6 +258,19 @@ TEST(mocked_api_get_instance_profile_support, layer_supported) {
 
 TEST(mocked_api_get_instance_profile_support, layer_unsupported) {
     MockVulkanAPI mock;
+
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Unsupported extension: VK_EXT_swapchain_colorspace",
+        "Unsupported extension: VK_KHR_android_surface",
+        "Unsupported extension: VK_KHR_external_fence_capabilities",
+        "Unsupported extension: VK_KHR_external_memory_capabilities",
+        "Unsupported extension: VK_KHR_external_semaphore_capabilities",
+        "Unsupported extension: VK_KHR_get_physical_device_properties2",
+        "Unsupported extension: VK_KHR_get_surface_capabilities2",
+        "Unsupported mandatory extension VK_KHR_get_physical_device_properties2 on Vulkan 1.0"
+    });
+#endif
 
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_1);
 

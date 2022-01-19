@@ -41,6 +41,21 @@ COPYRIGHT_HEADER = '''/**
  */
 '''
 
+DEBUG_MSG_CB_DEFINE = '''
+#include <stdio.h>
+
+#ifndef VP_DEBUG_MESSAGE_CALLBACK
+#define VP_DEBUG_MESSAGE_CALLBACK(MSG) fprintf(stderr, MSG)
+#else
+void VP_DEBUG_MESSAGE_CALLBACK(const char*);
+#endif
+
+#define VP_DEBUG_MSG(MSG) VP_DEBUG_MESSAGE_CALLBACK(MSG)
+#define VP_DEBUG_MSGF(MSGFMT, ...) { char msg[1024]; snprintf(msg, sizeof(msg) - 1, (MSGFMT), __VA_ARGS__); VP_DEBUG_MESSAGE_CALLBACK(msg); }
+#define VP_DEBUG_COND_MSG(COND, MSG) if (COND) VP_DEBUG_MSG(MSG)
+#define VP_DEBUG_COND_MSGF(COND, MSGFMT, ...) if (COND) VP_DEBUG_MSGF(MSGFMT, __VA_ARGS__)
+'''
+
 H_HEADER = '''
 #ifndef VULKAN_PROFILES_H_
 #define VULKAN_PROFILES_H_ 1
@@ -311,14 +326,16 @@ VPAPI_ATTR bool vpCheckVersion(uint32_t actual, uint32_t expected) {
 
 VPAPI_ATTR bool vpCheckExtension(const VkExtensionProperties *supportedProperties, size_t supportedSize,
                                  const char *requestedExtension, uint32_t expectedVersion = 0) {
+    bool found = false;
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
         if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) {
-            return true;
+            found = true;
             // Drivers don't actually update their spec version, so we cannot rely on this
-            // return supportedProperties[i].specVersion >= expectedVersion;
+            // if (supportedProperties[i].specVersion >= expectedVersion) found = true;
         }
     }
-    return false;
+    VP_DEBUG_COND_MSGF(!found, "Unsupported extension: %s", requestedExtension);
+    return found;
 }
 
 VPAPI_ATTR void vpGetExtensions(uint32_t requestedExtensionCount, const char *const *ppRequestedExtensionNames,
@@ -430,21 +447,23 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
-    *pSupported = VK_FALSE;
+    *pSupported = VK_TRUE;
 
     if (pDesc->props.specVersion < pProfile->specVersion) {
-        return result;
+        VP_DEBUG_MSGF("Unsupported profile version: %u", pProfile->specVersion);
+        *pSupported = VK_FALSE;
     }
 
     if (!detail::vpCheckVersion(apiVersion, pDesc->minApiVersion)) {
-        return result;
+        VP_DEBUG_MSGF("Unsupported API version: %u.%u.%u", VK_API_VERSION_MAJOR(pDesc->minApiVersion), VK_API_VERSION_MINOR(pDesc->minApiVersion), VK_API_VERSION_PATCH(pDesc->minApiVersion));
+        *pSupported = VK_FALSE;
     }
 
     for (uint32_t i = 0; i < pDesc->instanceExtensionCount; ++i) {
         if (!detail::vpCheckExtension(ext.data(), ext.size(),
             pDesc->pInstanceExtensions[i].extensionName,
             pDesc->pInstanceExtensions[i].specVersion)) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
@@ -458,11 +477,11 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
             }
         }
         if (!foundGPDP2) {
-            return result;
+            VP_DEBUG_MSG("Unsupported mandatory extension VK_KHR_get_physical_device_properties2 on Vulkan 1.0");
+            *pSupported = VK_FALSE;
         }
     }
 
-    *pSupported = VK_TRUE;
     return result;
 }
 
@@ -595,17 +614,19 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 
-    *pSupported = VK_FALSE;
+    *pSupported = VK_TRUE;
 
     if (pDesc->props.specVersion < pProfile->specVersion) {
-        return result;
+        VP_DEBUG_MSGF("Unsupported profile version: %u", pProfile->specVersion);
+        *pSupported = VK_FALSE;
     }
 
     {
         VkPhysicalDeviceProperties props{};
         vkGetPhysicalDeviceProperties(physicalDevice, &props);
         if (!detail::vpCheckVersion(props.apiVersion, pDesc->minApiVersion)) {
-            return result;
+            VP_DEBUG_MSGF("Unsupported API version: %u.%u.%u", VK_API_VERSION_MAJOR(pDesc->minApiVersion), VK_API_VERSION_MINOR(pDesc->minApiVersion), VK_API_VERSION_PATCH(pDesc->minApiVersion));
+            *pSupported = VK_FALSE;
         }
     }
 
@@ -613,7 +634,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
         if (!detail::vpCheckExtension(ext.data(), ext.size(),
             pDesc->pDeviceExtensions[i].extensionName,
             pDesc->pDeviceExtensions[i].specVersion)) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
@@ -628,14 +649,13 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                 while (p != nullptr) {
                     if (!pUserData->pDesc->feature.pfnComparator(p)) {
                         pUserData->supported = false;
-                        break;
                     }
                     p = p->pNext;
                 }
             }
         );
         if (!userData.supported) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
@@ -650,14 +670,13 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                 while (p != nullptr) {
                     if (!pUserData->pDesc->property.pfnComparator(p)) {
                         pUserData->supported = false;
-                        break;
                     }
                     p = p->pNext;
                 }
             }
         );
         if (!userData.supported) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
@@ -674,14 +693,13 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                 while (p != nullptr) {
                     if (!pUserData->pDesc->pFormats[pUserData->index].pfnComparator(p)) {
                         pUserData->supported = false;
-                        break;
                     }
                     p = p->pNext;
                 }
             }
         );
         if (!userData.supported) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
@@ -700,7 +718,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                                                                             &pUserData->count,
                                                                             static_cast<VkQueueFamilyProperties2KHR*>(static_cast<void*>(p)));
                 for (uint32_t i = 0; i < pUserData->pDesc->queueFamilyCount; ++i) {
-                    pUserData->supported = false;
+                    bool found = false;
                     for (uint32_t j = 0; j < pUserData->count; ++j) {
                         bool propsMatch = true;
                         while (p != nullptr) {
@@ -711,12 +729,13 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                             p = p->pNext;
                         }
                         if (propsMatch) {
-                            pUserData->supported = true;
+                            found = true;
                             break;
                         }
                     }
-                    if (!pUserData->supported) {
-                        return;
+                    if (!found) {
+                        VP_DEBUG_MSGF("Unsupported queue family defined at profile data index #%u", i);
+                        pUserData->supported = false;
                     }
                 }
             }
@@ -725,11 +744,10 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
 
         pDesc->chainers.pfnQueueFamily(static_cast<VkBaseOutStructure*>(static_cast<void*>(props.data())), &userData, callback);
         if (!userData.supported) {
-            return result;
+            *pSupported = VK_FALSE;
         }
     }
 
-    *pSupported = VK_TRUE;
     return result;
 }
 
@@ -1587,7 +1605,7 @@ class VulkanProfile():
             Log.f("Struct '{0}' in profile '{1}' does not exist in the registry".format(structName, self.name))
 
 
-    def generatePrivateImpl(self):
+    def generatePrivateImpl(self, debugMessages):
         uname = self.name.upper()
         gen = '\n'
         gen += ('#ifdef {0}\n'
@@ -1596,7 +1614,7 @@ class VulkanProfile():
         gen += self.gen_extensionData('device')
         gen += self.gen_fallbackData()
         gen += self.gen_structTypeData()
-        gen += self.gen_structDesc()
+        gen += self.gen_structDesc(debugMessages)
         gen += ('\n'
                 '}} // namespace {0}\n'
                 '#endif\n').format(uname)
@@ -1848,13 +1866,18 @@ class VulkanProfile():
 
 
 
-    def gen_structDesc(self):
+    def gen_structDesc(self, debugMessages):
         gen = ''
 
         fillFmt = '{0};\n'
         cmpFmt = 'ret = ret && {0};\n'
 
         # Feature descriptor
+        if debugMessages:
+            cmpFmtFeatures = 'ret = ret && {0}; VP_DEBUG_COND_MSG(!{0}, "Unsupported feature condition {0}");\n'
+        else:
+            cmpFmtFeatures = cmpFmt
+
         gen += ('\n'
                 'static const VpFeatureDesc featureDesc = {\n'
                 '    [](VkBaseOutStructure* p) {\n')
@@ -1862,12 +1885,17 @@ class VulkanProfile():
         gen += ('    },\n'
                 '    [](VkBaseOutStructure* p) -> bool {\n'
                 '        bool ret = true;\n')
-        gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structCompare, cmpFmt)
+        gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structCompare, cmpFmtFeatures)
         gen += ('        return ret;\n'
                 '    }\n'
                 '};\n')
 
         # Property descriptor
+        if debugMessages:
+            cmpFmtProperties = 'ret = ret && {0}; VP_DEBUG_COND_MSG(!{0}, "Unsupported properties condition {0}");\n'
+        else:
+            cmpFmtProperties = cmpFmt
+
         gen += ('\n'
                 'static const VpPropertyDesc propertyDesc = {\n'
                 '    [](VkBaseOutStructure* p) {\n')
@@ -1875,7 +1903,7 @@ class VulkanProfile():
         gen += ('    },\n'
                 '    [](VkBaseOutStructure* p) -> bool {\n'
                 '        bool ret = true;\n')
-        gen += self.gen_structFunc(self.structs.property, self.capabilities.properties, self.gen_structCompare, cmpFmt)
+        gen += self.gen_structFunc(self.structs.property, self.capabilities.properties, self.gen_structCompare, cmpFmtProperties)
         gen += ('        return ret;\n'
                 '    }\n'
                 '};\n')
@@ -1902,6 +1930,11 @@ class VulkanProfile():
             gen += ('\n'
                     'static const VpFormatDesc formatDesc[] = {\n')
             for formatName, formatCaps in sorted(self.capabilities.formats.items()):
+                if debugMessages:
+                    cmpFmtFormat = 'ret = ret && {0}; VP_DEBUG_COND_MSG(!{0}, "Unsupported format condition for ' + formatName + ' {0}");\n'
+                else:
+                    cmpFmtFormat = cmpFmt
+
                 gen += ('    {{\n'
                         '        {0},\n'
                         '        [](VkBaseOutStructure* p) {{\n').format(formatName)
@@ -1909,7 +1942,7 @@ class VulkanProfile():
                 gen += ('        },\n'
                         '        [](VkBaseOutStructure* p) -> bool {\n'
                         '            bool ret = true;\n')
-                gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structCompare, cmpFmt)
+                gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structCompare, cmpFmtFormat)
                 gen += ('            return ret;\n'
                         '        }\n'
                         '    },\n')
@@ -1949,9 +1982,23 @@ class VulkanProfiles():
 
 
 class VulkanProfilesBuilder():
-    def __init__(self, registry, profiles):
+    def __init__(self, registry, profiles, debugMessages):
         self.registry = registry
         self.profiles = profiles
+        self.debugMessages = debugMessages
+
+
+    def patch_code(self, code):
+        # Removes lines with debug messages if they aren't needed
+        if self.debugMessages:
+            return code
+        else:
+            lines = code.split('\n')
+            patched_lines = []
+            for line in lines:
+                if not 'VP_DEBUG' in line:
+                    patched_lines.append(line)
+            return '\n'.join(patched_lines)
 
 
     def generate(self, outIncDir, outSrcDir):
@@ -1977,6 +2024,8 @@ class VulkanProfilesBuilder():
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
             f.write(CPP_HEADER)
+            if self.debugMessages:
+                f.write(DEBUG_MSG_CB_DEFINE)
             f.write(self.gen_privateImpl())
             f.write(self.gen_publicImpl())
 
@@ -1989,6 +2038,8 @@ class VulkanProfilesBuilder():
             f.write(HPP_HEADER)
             f.write(self.gen_profileDefs())
             f.write(API_DEFS)
+            if self.debugMessages:
+                f.write(DEBUG_MSG_CB_DEFINE)
             f.write(self.gen_privateImpl())
             f.write(self.gen_publicImpl())
             f.write(HPP_FOOTER)
@@ -2035,13 +2086,13 @@ class VulkanProfilesBuilder():
         gen += self.gen_profileDescTable()
         gen += PRIVATE_IMPL_BODY
         gen += '\n} // namespace detail\n'
-        return gen
+        return self.patch_code(gen)
 
 
     def gen_profilePrivateImpl(self):
         gen = ''
         for _, profile in sorted(self.profiles.items()):
-            gen += profile.generatePrivateImpl()
+            gen += profile.generatePrivateImpl(self.debugMessages)
         return gen
 
 
@@ -2086,7 +2137,7 @@ class VulkanProfilesBuilder():
 
     def gen_publicImpl(self):
         gen = PUBLIC_IMPL_BODY
-        return gen
+        return self.patch_code(gen)
 
 
 if __name__ == '__main__':
@@ -2100,10 +2151,12 @@ if __name__ == '__main__':
                         help='Output include directory')
     parser.add_argument('-outSrcDir', action='store', required=True,
                         help='Output source directory')
+    parser.add_argument('-debugMessages', action='store_true',
+                        help='Generate library with debug messages')
 
     args = parser.parse_args()
 
     registry = VulkanRegistry(args.registry)
     profiles = VulkanProfiles.loadFromDir(registry, args.profiles)
-    builder = VulkanProfilesBuilder(registry, profiles)
+    builder = VulkanProfilesBuilder(registry, profiles, args.debugMessages)
     builder.generate(args.outIncDir, args.outSrcDir)
