@@ -306,6 +306,11 @@ struct VpProfileDesc {
 
     VpStructChainerDesc             chainers;
 };
+
+template <typename T>
+VPAPI_ATTR bool vpCheckFlags(const T& actual, const uint64_t expected) {
+    return (actual & expected) == expected;
+}
 '''
 
 PRIVATE_IMPL_BODY = '''
@@ -1743,19 +1748,19 @@ class VulkanProfile():
                     continue
                 if limittype == 'bitmask':
                     # Compare bitmask by checking if device value contains every bit of profile value
-                    comparePredFmt = '(({0} & {1}) == {1})'
+                    comparePredFmt = 'vpCheckFlags({0}, {1})'
                 elif limittype == 'max':
                     # Compare max limit by checking if device value is greater than or equal to profile value
-                    comparePredFmt = '({0} >= {1})'
+                    comparePredFmt = '{0} >= {1}'
                 elif limittype == 'min':
                     # Compare min limit by checking if device value is less than or equal to profile value
-                    comparePredFmt = '({0} <= {1})'
+                    comparePredFmt = '{0} <= {1}'
                 elif limittype == 'range':
                     # Compare range limit by checking if device range is larger than or equal to profile range
-                    comparePredFmt = [ '({0} <= {1})', '({0} >= {1})' ]
+                    comparePredFmt = [ '{0} <= {1}', '{0} >= {1}' ]
                 elif limittype is None or limittype == 'noauto' or limittype == 'struct':
                     # Compare everything else with equality
-                    comparePredFmt = '({0} == {1})'
+                    comparePredFmt = '{0} == {1}'
                 else:
                     Log.f("Unsupported limittype '{0}' in member '{1}' of structure '{2}'".format(limittype, member, structDef.name))
 
@@ -1876,11 +1881,11 @@ class VulkanProfile():
         gen = ''
 
         fillFmt = '{0};\n'
-        cmpFmt = 'ret = ret && {0};\n'
+        cmpFmt = 'ret = ret && ({0});\n'
 
         # Feature descriptor
         if debugMessages:
-            cmpFmtFeatures = 'ret = ret && {0}; VP_DEBUG_COND_MSG(!{0}, "Unsupported feature condition {0}");\n'
+            cmpFmtFeatures = 'ret = ret && ({0}); VP_DEBUG_COND_MSG(!({0}), "Unsupported feature condition: {0}");\n'
         else:
             cmpFmtFeatures = cmpFmt
 
@@ -1898,7 +1903,7 @@ class VulkanProfile():
 
         # Property descriptor
         if debugMessages:
-            cmpFmtProperties = 'ret = ret && {0}; VP_DEBUG_COND_MSG(!{0}, "Unsupported properties condition {0}");\n'
+            cmpFmtProperties = 'ret = ret && ({0}); VP_DEBUG_COND_MSG(!({0}), "Unsupported properties condition: {0}");\n'
         else:
             cmpFmtProperties = cmpFmt
 
@@ -1937,7 +1942,7 @@ class VulkanProfile():
                     'static const VpFormatDesc formatDesc[] = {\n')
             for formatName, formatCaps in sorted(self.capabilities.formats.items()):
                 if debugMessages:
-                    cmpFmtFormat = 'ret = ret && {0}; VP_DEBUG_COND_MSG(!{0}, "Unsupported format condition for ' + formatName + ' {0}");\n'
+                    cmpFmtFormat = 'ret = ret && ({0}); VP_DEBUG_COND_MSG(!({0}), "Unsupported format condition for ' + formatName + ': {0}");\n'
                 else:
                     cmpFmtFormat = cmpFmt
 

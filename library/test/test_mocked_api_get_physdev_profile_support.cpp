@@ -422,7 +422,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_feature) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported feature condition (pVkPhysicalDeviceFeatures2KHR->features.sampleRateShading == VK_TRUE)"
+        "Unsupported feature condition: pVkPhysicalDeviceFeatures2KHR->features.sampleRateShading == VK_TRUE"
     });
 #endif
 
@@ -514,7 +514,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_property) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported properties condition (pVkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension2D >= 8192)"
+        "Unsupported properties condition: pVkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension2D >= 8192"
     });
 #endif
 
@@ -605,13 +605,8 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_format) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported format condition for VK_FORMAT_E5B9G9R9_UFLOAT_PACK32 "
-            "((pVkFormatProperties2KHR->formatProperties.optimalTilingFeatures & "
-            "(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | "
-            "VK_FORMAT_FEATURE_BLIT_SRC_BIT | "
-            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | "
-            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | "
-            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT)) == "
+        "Unsupported format condition for VK_FORMAT_E5B9G9R9_UFLOAT_PACK32: "
+            "vpCheckFlags(pVkFormatProperties2KHR->formatProperties.optimalTilingFeatures, "
             "(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | "
             "VK_FORMAT_FEATURE_BLIT_SRC_BIT | "
             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | "
@@ -1038,7 +1033,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_feature) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported feature condition (pVkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE)"
+        "Unsupported feature condition: pVkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE"
     });
 #endif
 
@@ -1165,7 +1160,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_property) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported properties condition (pVkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindInputAttachments >= 8)"
+        "Unsupported properties condition: pVkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindInputAttachments >= 8"
     });
 #endif
 
@@ -1291,13 +1286,8 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_format) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported format condition for VK_FORMAT_E5B9G9R9_UFLOAT_PACK32 "
-            "((pVkFormatProperties2KHR->formatProperties.optimalTilingFeatures & "
-            "(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | "
-            "VK_FORMAT_FEATURE_BLIT_SRC_BIT | "
-            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | "
-            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | "
-            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT)) == "
+        "Unsupported format condition for VK_FORMAT_E5B9G9R9_UFLOAT_PACK32: "
+            "vpCheckFlags(pVkFormatProperties2KHR->formatProperties.optimalTilingFeatures, "
             "(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | "
             "VK_FORMAT_FEATURE_BLIT_SRC_BIT | "
             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | "
