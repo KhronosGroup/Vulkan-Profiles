@@ -296,10 +296,8 @@ TEST(profiles, TestFloatControlsProperties) {
     gpu_props.pNext = &float_control_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_EQ(float_control_properties.denormBehaviorIndependence & VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL,
-              VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL);
-    EXPECT_EQ(float_control_properties.roundingModeIndependence & VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL,
-              VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL);
+    EXPECT_EQ(float_control_properties.denormBehaviorIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL);
+    EXPECT_EQ(float_control_properties.roundingModeIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL);
     EXPECT_EQ(float_control_properties.shaderSignedZeroInfNanPreserveFloat16, VK_TRUE);
     EXPECT_EQ(float_control_properties.shaderSignedZeroInfNanPreserveFloat32, VK_TRUE);
     EXPECT_EQ(float_control_properties.shaderSignedZeroInfNanPreserveFloat64, VK_TRUE);
