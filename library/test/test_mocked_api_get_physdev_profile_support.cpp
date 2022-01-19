@@ -865,12 +865,11 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_extension) {
         VK_EXT(VK_KHR_8BIT_STORAGE),
         VK_EXT(VK_KHR_CREATE_RENDERPASS_2),
         VK_EXT(VK_KHR_DEPTH_STENCIL_RESOLVE),
-        VK_EXT(VK_KHR_DRIVER_PROPERTIES),
+        // Unsupported extension: VK_EXT(VK_KHR_DRIVER_PROPERTIES),
         VK_EXT(VK_KHR_IMAGE_FORMAT_LIST),
         VK_EXT(VK_KHR_IMAGELESS_FRAMEBUFFER),
         VK_EXT(VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE),
         VK_EXT(VK_KHR_SHADER_FLOAT16_INT8),
-        // Unsupported extension: VK_KHR_shader_subgroup_extended_types
         VK_EXT(VK_KHR_TIMELINE_SEMAPHORE),
         VK_EXT(VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT),
         VK_EXT(VK_EXT_DESCRIPTOR_INDEXING),
@@ -891,8 +890,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_extension) {
     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
     VkPhysicalDeviceShaderDrawParametersFeatures sdpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETER_FEATURES, &sf16i8Features };
     VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR ubslFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR, &sdpFeatures };
-    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR ssgetFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR, &ubslFeatures };
-    VkPhysicalDeviceHostQueryResetFeaturesEXT hqResetFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &ssgetFeatures };
+    VkPhysicalDeviceHostQueryResetFeaturesEXT hqResetFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &ubslFeatures};
     VkPhysicalDeviceDescriptorIndexingFeaturesEXT descIndFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT, &hqResetFeatures };
     VkPhysicalDevice8BitStorageFeatures storage8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES, &descIndFeatures };
     VkPhysicalDevice16BitStorageFeatures storage16Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES, &storage8Features };
@@ -910,7 +908,6 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_extension) {
         VK_STRUCT(storage8Features),
         VK_STRUCT(descIndFeatures),
         VK_STRUCT(hqResetFeatures),
-        VK_STRUCT(ssgetFeatures),
         VK_STRUCT(ubslFeatures),
         VK_STRUCT(sdpFeatures),
         VK_STRUCT(sf16i8Features),
@@ -1013,8 +1010,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_feature) {
     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
     VkPhysicalDeviceShaderDrawParametersFeatures sdpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETER_FEATURES, &sf16i8Features };
     VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR ubslFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR, &sdpFeatures };
-    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR ssgetFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR, &ubslFeatures };
-    VkPhysicalDeviceHostQueryResetFeaturesEXT hqResetFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &ssgetFeatures };
+    VkPhysicalDeviceHostQueryResetFeaturesEXT hqResetFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &ubslFeatures};
     VkPhysicalDeviceDescriptorIndexingFeaturesEXT descIndFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT, &hqResetFeatures };
     VkPhysicalDevice8BitStorageFeatures storage8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES, &descIndFeatures };
     VkPhysicalDevice16BitStorageFeatures storage16Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES, &storage8Features };
@@ -1033,7 +1029,6 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_feature) {
         VK_STRUCT(storage8Features),
         VK_STRUCT(descIndFeatures),
         VK_STRUCT(hqResetFeatures),
-        VK_STRUCT(ssgetFeatures),
         VK_STRUCT(ubslFeatures),
         VK_STRUCT(sdpFeatures),
         VK_STRUCT(sf16i8Features),
@@ -1115,7 +1110,6 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_property) {
         VK_EXT(VK_KHR_IMAGELESS_FRAMEBUFFER),
         VK_EXT(VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE),
         VK_EXT(VK_KHR_SHADER_FLOAT16_INT8),
-        VK_EXT(VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES),
         VK_EXT(VK_KHR_TIMELINE_SEMAPHORE),
         VK_EXT(VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT),
         VK_EXT(VK_EXT_DESCRIPTOR_INDEXING),
@@ -1136,8 +1130,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_property) {
     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
     VkPhysicalDeviceShaderDrawParametersFeatures sdpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETER_FEATURES, &sf16i8Features };
     VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR ubslFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR, &sdpFeatures };
-    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR ssgetFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR, &ubslFeatures };
-    VkPhysicalDeviceHostQueryResetFeaturesEXT hqResetFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &ssgetFeatures };
+    VkPhysicalDeviceHostQueryResetFeaturesEXT hqResetFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &ubslFeatures};
     VkPhysicalDeviceDescriptorIndexingFeaturesEXT descIndFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT, &hqResetFeatures };
     VkPhysicalDevice8BitStorageFeatures storage8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES, &descIndFeatures };
     VkPhysicalDevice16BitStorageFeatures storage16Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES, &storage8Features };
@@ -1155,7 +1148,6 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_property) {
         VK_STRUCT(storage8Features),
         VK_STRUCT(descIndFeatures),
         VK_STRUCT(hqResetFeatures),
-        VK_STRUCT(ssgetFeatures),
         VK_STRUCT(ubslFeatures),
         VK_STRUCT(sdpFeatures),
         VK_STRUCT(sf16i8Features),
@@ -1238,7 +1230,6 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_format) {
         VK_EXT(VK_KHR_IMAGELESS_FRAMEBUFFER),
         VK_EXT(VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE),
         VK_EXT(VK_KHR_SHADER_FLOAT16_INT8),
-        VK_EXT(VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES),
         VK_EXT(VK_KHR_TIMELINE_SEMAPHORE),
         VK_EXT(VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT),
         VK_EXT(VK_EXT_DESCRIPTOR_INDEXING),
@@ -1259,8 +1250,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_format) {
     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
     VkPhysicalDeviceShaderDrawParametersFeatures sdpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETER_FEATURES, &sf16i8Features };
     VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR ubslFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR, &sdpFeatures };
-    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR ssgetFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR, &ubslFeatures };
-    VkPhysicalDeviceHostQueryResetFeaturesEXT hqResetFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &ssgetFeatures };
+    VkPhysicalDeviceHostQueryResetFeaturesEXT hqResetFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &ubslFeatures};
     VkPhysicalDeviceDescriptorIndexingFeaturesEXT descIndFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT, &hqResetFeatures };
     VkPhysicalDevice8BitStorageFeatures storage8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES, &descIndFeatures };
     VkPhysicalDevice16BitStorageFeatures storage16Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES, &storage8Features };
@@ -1278,7 +1268,6 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_format) {
         VK_STRUCT(storage8Features),
         VK_STRUCT(descIndFeatures),
         VK_STRUCT(hqResetFeatures),
-        VK_STRUCT(ssgetFeatures),
         VK_STRUCT(ubslFeatures),
         VK_STRUCT(sdpFeatures),
         VK_STRUCT(sf16i8Features),
@@ -1363,7 +1352,6 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_queue_family) 
         VK_EXT(VK_KHR_IMAGELESS_FRAMEBUFFER),
         VK_EXT(VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE),
         VK_EXT(VK_KHR_SHADER_FLOAT16_INT8),
-        VK_EXT(VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES),
         VK_EXT(VK_KHR_TIMELINE_SEMAPHORE),
         VK_EXT(VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT),
         VK_EXT(VK_EXT_DESCRIPTOR_INDEXING),
@@ -1384,8 +1372,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_queue_family) 
     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
     VkPhysicalDeviceShaderDrawParametersFeatures sdpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETER_FEATURES, &sf16i8Features };
     VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR ubslFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR, &sdpFeatures };
-    VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR ssgetFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR, &ubslFeatures };
-    VkPhysicalDeviceHostQueryResetFeaturesEXT hqResetFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &ssgetFeatures };
+    VkPhysicalDeviceHostQueryResetFeaturesEXT hqResetFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &ubslFeatures };
     VkPhysicalDeviceDescriptorIndexingFeaturesEXT descIndFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT, &hqResetFeatures };
     VkPhysicalDevice8BitStorageFeatures storage8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES, &descIndFeatures };
     VkPhysicalDevice16BitStorageFeatures storage16Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES, &storage8Features };
@@ -1403,7 +1390,6 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_queue_family) 
         VK_STRUCT(storage8Features),
         VK_STRUCT(descIndFeatures),
         VK_STRUCT(hqResetFeatures),
-        VK_STRUCT(ssgetFeatures),
         VK_STRUCT(ubslFeatures),
         VK_STRUCT(sdpFeatures),
         VK_STRUCT(sf16i8Features),

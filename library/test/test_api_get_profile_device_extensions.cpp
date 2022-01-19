@@ -32,20 +32,19 @@ TEST(api_get_profile_device_extension_properties, full) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(20, propertyCount);
+    EXPECT_EQ(19, propertyCount);
 
     propertyCount = 23;
 
     std::vector<VkExtensionProperties> properties(propertyCount);
     VkResult result1 = vpGetProfileDeviceExtensionProperties(&profile, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(20, propertyCount);
+    EXPECT_EQ(19, propertyCount);
 
     EXPECT_STREQ(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, properties[0].extensionName);
     EXPECT_STREQ(VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, properties[1].extensionName);
     EXPECT_STREQ(VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, properties[2].extensionName);
     EXPECT_STREQ(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, properties[3].extensionName);
-    EXPECT_STREQ(VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, properties[4].extensionName);
 }
 
 TEST(api_get_profile_device_extension_properties, partial) {
@@ -54,7 +53,7 @@ TEST(api_get_profile_device_extension_properties, partial) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(20, propertyCount);
+    EXPECT_EQ(19, propertyCount);
 
     propertyCount = 5;
 
@@ -67,5 +66,4 @@ TEST(api_get_profile_device_extension_properties, partial) {
     EXPECT_STREQ(VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, properties[1].extensionName);
     EXPECT_STREQ(VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, properties[2].extensionName);
     EXPECT_STREQ(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, properties[3].extensionName);
-    EXPECT_STREQ(VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, properties[4].extensionName);
 }
