@@ -158,6 +158,7 @@ set(CONFIG_DEFINES ${CONFIG_DEFINES}
 )
 
 add_custom_target(VkLayer_${TARGET_NAME}-json ALL COMMAND ${CMAKE_COMMAND} ${CONFIG_DEFINES} -P "${CMAKE_CURRENT_BINARY_DIR}/generator.cmake")
+set_target_properties(VkLayer_${TARGET_NAME}-json PROPERTIES FOLDER "Profiles layer")
 
 # Add target for JSON file install.
 if(NOT WIN32)
@@ -170,6 +171,7 @@ if(NOT WIN32)
         VERBATIM
         DEPENDS VkLayer_${TARGET_NAME}-json
         )
+    set_target_properties(VkLayer_${TARGET_NAME}-staging-json PROPERTIES FOLDER "Profiles layer")
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/staging-json/VkLayer_${TARGET_NAME}.json DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/vulkan/explicit_layer.d)
 endif()
 

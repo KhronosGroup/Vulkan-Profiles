@@ -166,12 +166,15 @@ add_subdirectory(vku)
 if (WIN32)
     macro(add_vk_layer target)
     FILE(TO_NATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/VkLayer_${target}.def DEF_FILE)
-    add_custom_target(copy-${target}-def-file ALL
+    add_custom_target(VkLayer_copy-${target}-def-file ALL
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DEF_FILE} VkLayer_${target}.def
         VERBATIM
     )
+    set_target_properties(VkLayer_copy-${target}-def-file PROPERTIES FOLDER "Profiles layer")
+
     add_library(VkLayer_${target} SHARED ${ARGN} VkLayer_${target}.def)
     target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} vku)
+    set_target_properties(VkLayer_${target} PROPERTIES FOLDER "Profiles layer")
     endmacro()
 else()
     macro(add_vk_layer target)
@@ -184,6 +187,7 @@ else()
     if (NOT APPLE)
         set_target_properties(VkLayer_${target} PROPERTIES LINK_FLAGS "-Wl,-Bsymbolic")
     endif ()
+    set_target_properties(VkLayer_${target} PROPERTIES FOLDER "Profiles layer")
     install(TARGETS VkLayer_${target} DESTINATION ${CMAKE_INSTALL_LIBDIR})
     endmacro()
 endif()

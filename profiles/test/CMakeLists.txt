@@ -21,3 +21,5 @@ add_custom_command(TARGET ${TEST_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E co
 
 target_link_libraries(${TEST_NAME} PRIVATE gtest gtest_main)
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} --gtest_catch_exceptions=0)
+
+set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles schema")

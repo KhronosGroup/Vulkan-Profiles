@@ -36,6 +36,7 @@ function(LayerTest NAME)
     endif()
 
     set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "${run_environment}")
+    set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles layer")
 endfunction(LayerTest)
 
 LayerTest(tests)
