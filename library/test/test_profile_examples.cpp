@@ -27,15 +27,28 @@
 
 #define countof(arr) sizeof(arr) / sizeof(arr[0])
 
+static TestScaffold* scaffold = nullptr;
+
+int main(int argc, char** argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+
+    ::scaffold = new TestScaffold;
+
+    int result = RUN_ALL_TESTS();
+
+    delete ::scaffold;
+    ::scaffold = nullptr;
+
+    return result;
+}
+
 #if defined(VK_VERSION_1_2) || defined(VK_KHR_maintenance3)
 // In this example, a typical usage of profiles with additional features and extensions
 TEST(test_profile, example_add_features_add_extensions) {
-    TestScaffold scaffold;
-
     VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold.instance, scaffold.physicalDevice, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
     static const char* extensions[] = {VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, VK_KHR_MAINTENANCE3_EXTENSION_NAME};
@@ -50,7 +63,7 @@ TEST(test_profile, example_add_features_add_extensions) {
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     info.pNext = &deviceFeatures2;
     info.queueCreateInfoCount = 1;
-    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.pQueueCreateInfos = &scaffold->queueCreateInfo;
     info.pEnabledFeatures = nullptr;
     info.enabledExtensionCount = countof(extensions);
     info.ppEnabledExtensionNames = extensions;
@@ -61,7 +74,7 @@ TEST(test_profile, example_add_features_add_extensions) {
     profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT | VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_EQ(VK_SUCCESS, res);
 }
 #endif
@@ -69,12 +82,10 @@ TEST(test_profile, example_add_features_add_extensions) {
 #if defined(VK_VERSION_1_1) || defined(VK_EXT_subgroup_size_control)
 // In this example, we are using vpGetProfileStructures to initialize each application structure individually
 TEST(test_profile, example_individual_override_features) {
-    TestScaffold scaffold;
-
     VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold.instance, scaffold.physicalDevice, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
     // This structure is not part of the profile, so it will remains unchanged by vpGetProfileStructures
@@ -94,7 +105,7 @@ TEST(test_profile, example_individual_override_features) {
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     info.pNext = &deviceFeatures2;
     info.queueCreateInfoCount = 1;
-    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.pQueueCreateInfos = &scaffold->queueCreateInfo;
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
@@ -102,7 +113,7 @@ TEST(test_profile, example_individual_override_features) {
     profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_EQ(VK_SUCCESS, res);
 }
 #endif
@@ -110,12 +121,10 @@ TEST(test_profile, example_individual_override_features) {
 #if defined(VK_VERSION_1_1) || defined(VK_EXT_subgroup_size_control)
 // In this example, we are using vpGetProfileStructures to initial the entire application structure chain
 TEST(test_profile, example_collective_override_features) {
-    TestScaffold scaffold;
-
     VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold.instance, scaffold.physicalDevice, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
     // This structure is not part of the profile, so it will remains unchanged by vpGetProfileStructures
@@ -137,7 +146,7 @@ TEST(test_profile, example_collective_override_features) {
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     info.pNext = &deviceFeatures2;
     info.queueCreateInfoCount = 1;
-    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.pQueueCreateInfos = &scaffold->queueCreateInfo;
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
@@ -145,19 +154,17 @@ TEST(test_profile, example_collective_override_features) {
     profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_EQ(VK_SUCCESS, res);
 }
 #endif
 
 // In this example, we are using VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT to disable robustBufferAccess
 TEST(test_profile, example_flag_disable_robust_access) {
-    TestScaffold scaffold;
-
     VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold.instance, scaffold.physicalDevice, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 
     // Regardness of robustBufferAccess = VK_TRUE in the profile, because of VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT is set
@@ -166,7 +173,7 @@ TEST(test_profile, example_flag_disable_robust_access) {
     VkDeviceCreateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     info.queueCreateInfoCount = 1;
-    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.pQueueCreateInfos = &scaffold->queueCreateInfo;
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
@@ -174,6 +181,6 @@ TEST(test_profile, example_flag_disable_robust_access) {
     profileInfo.flags = VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_EQ(VK_SUCCESS, res);
 }

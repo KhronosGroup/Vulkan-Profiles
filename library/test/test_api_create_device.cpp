@@ -33,16 +33,29 @@
 
 #define countof(arr) sizeof(arr) / sizeof(arr[0])
 
+static TestScaffold* scaffold = nullptr;
+
+int main(int argc, char** argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+
+    ::scaffold = new TestScaffold;
+
+    int result = RUN_ALL_TESTS();
+
+    delete ::scaffold;
+    ::scaffold = nullptr;
+
+    return result;
+}
+
 TEST(api_create_device_profile, overrite_with_profile_only) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
-
-    TestScaffold scaffold;
 
     VkDeviceCreateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     info.pNext = nullptr;
     info.queueCreateInfoCount = 1;
-    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.pQueueCreateInfos = &scaffold->queueCreateInfo;
     info.enabledExtensionCount = 0;
     info.ppEnabledExtensionNames = nullptr;
     info.pEnabledFeatures = nullptr;
@@ -52,7 +65,7 @@ TEST(api_create_device_profile, overrite_with_profile_only) {
     profileInfo.pProfile = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res == VK_SUCCESS);
     EXPECT_TRUE(device != VK_NULL_HANDLE);
 }
@@ -60,15 +73,13 @@ TEST(api_create_device_profile, overrite_with_profile_only) {
 TEST(api_create_device_profile, overrite_with_supported_extensions) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
-    TestScaffold scaffold;
-
     static const char* extensions[] = {"VK_KHR_image_format_list", "VK_KHR_maintenance3", "VK_KHR_imageless_framebuffer"};
 
     VkDeviceCreateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     info.pNext = nullptr;
     info.queueCreateInfoCount = 1;
-    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.pQueueCreateInfos = &scaffold->queueCreateInfo;
     info.enabledExtensionCount = countof(extensions);
     info.ppEnabledExtensionNames = extensions;
     info.pEnabledFeatures = nullptr;
@@ -79,15 +90,13 @@ TEST(api_create_device_profile, overrite_with_supported_extensions) {
     profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res == VK_SUCCESS);
     EXPECT_TRUE(device != VK_NULL_HANDLE);
 }
 
 TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
-
-    TestScaffold scaffold;
 
     static const char* extensions[] = {"VK_LUNARG_doesnot_exist", "VK_GTRUC_automagic_rendering",
                                        "VK_GTRUC_portability_everywhere"};
@@ -96,7 +105,7 @@ TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     info.pNext = nullptr;
     info.queueCreateInfoCount = 1;
-    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.pQueueCreateInfos = &scaffold->queueCreateInfo;
     info.enabledExtensionCount = countof(extensions);
     info.ppEnabledExtensionNames = extensions;
     info.pEnabledFeatures = nullptr;
@@ -107,7 +116,7 @@ TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
     profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res != VK_SUCCESS);
     EXPECT_TRUE(device == VK_NULL_HANDLE);
 }
@@ -116,8 +125,6 @@ TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
 TEST(api_create_device_profile, overrite_with_enabled_features) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
-    TestScaffold scaffold;
-
     VkPhysicalDeviceFeatures enabledFeatures = {};
     enabledFeatures.robustBufferAccess = VK_TRUE;
 
@@ -125,7 +132,7 @@ TEST(api_create_device_profile, overrite_with_enabled_features) {
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     info.pNext = nullptr;
     info.queueCreateInfoCount = 1;
-    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.pQueueCreateInfos = &scaffold->queueCreateInfo;
     info.enabledExtensionCount = 0;
     info.ppEnabledExtensionNames = nullptr;
     info.pEnabledFeatures = &enabledFeatures;
@@ -135,15 +142,13 @@ TEST(api_create_device_profile, overrite_with_enabled_features) {
     profileInfo.pProfile = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res == VK_SUCCESS);
     EXPECT_TRUE(device != VK_NULL_HANDLE);
 }
 
 TEST(api_create_device_profile, overrite_with_pnext_features) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
-
-    TestScaffold scaffold;
 
     VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceFeatures = {};
     deviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
@@ -155,7 +160,7 @@ TEST(api_create_device_profile, overrite_with_pnext_features) {
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     info.pNext = &deviceFeatures;
     info.queueCreateInfoCount = 1;
-    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.pQueueCreateInfos = &scaffold->queueCreateInfo;
     info.enabledExtensionCount = 0;
     info.ppEnabledExtensionNames = nullptr;
     info.pEnabledFeatures = nullptr;
@@ -165,14 +170,12 @@ TEST(api_create_device_profile, overrite_with_pnext_features) {
     profileInfo.pProfile = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res == VK_SUCCESS);
     EXPECT_TRUE(device != VK_NULL_HANDLE);
 }
 
 TEST(api_create_device_profile, with_extensions_flag) {
-    TestScaffold scaffold;
-
     const VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
 
     static const char* extensions[] = {VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME};
@@ -181,7 +184,7 @@ TEST(api_create_device_profile, with_extensions_flag) {
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     info.pNext = nullptr;
     info.queueCreateInfoCount = 1;
-    info.pQueueCreateInfos = &scaffold.queueCreateInfo;
+    info.pQueueCreateInfos = &scaffold->queueCreateInfo;
     info.pEnabledFeatures = nullptr;
 
     VpDeviceCreateInfo profileInfo = {};
@@ -195,7 +198,7 @@ TEST(api_create_device_profile, with_extensions_flag) {
         profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
         VkDevice device = VK_NULL_HANDLE;
-        VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+        VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
         EXPECT_TRUE(res == VK_SUCCESS);
         EXPECT_TRUE(device != VK_NULL_HANDLE);
     }
@@ -207,7 +210,7 @@ TEST(api_create_device_profile, with_extensions_flag) {
         profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
 
         VkDevice device = VK_NULL_HANDLE;
-        VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+        VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
         EXPECT_TRUE(res == VK_SUCCESS);
         EXPECT_TRUE(device != VK_NULL_HANDLE);
     }
@@ -219,7 +222,7 @@ TEST(api_create_device_profile, with_extensions_flag) {
         profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
 
         VkDevice device = VK_NULL_HANDLE;
-        VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+        VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
         EXPECT_TRUE(res == VK_SUCCESS);
         EXPECT_TRUE(device != VK_NULL_HANDLE);
     }
