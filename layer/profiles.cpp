@@ -1973,11 +1973,8 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, const std::string &member, const char *name, VkExtent2D *dest,
                   std::function<bool(const char *, uint32_t, uint32_t)> warn_func);
     bool GetValue(const Json::Value &parent, const std::string &member, const char *name, VkExtent3D *dest);
-    void GetValue(const Json::Value &parent, int index, VkQueueFamilyProperties *dest);
     void GetValue(const Json::Value &parent, int index, VkLayerProperties *dest);
     void GetValue(const Json::Value &parent, int index, VkExtensionProperties *dest);
-    void GetValue(const Json::Value &parent, int index, VkSurfaceFormatKHR *dest);
-    void GetValue(const Json::Value &parent, int index, VkPresentModeKHR *dest);
     void GetValue(const Json::Value &parent, int index, VkPhysicalDevice *dest);
     void GetValue(const Json::Value &parent, int index, VkDeviceSize *dest);
 
@@ -6245,19 +6242,6 @@ bool JsonLoader::GetValue(const Json::Value &pparent, const std::string &member,
     return true;
 }
 
-void JsonLoader::GetValue(const Json::Value &parent, int index, VkQueueFamilyProperties *dest) {
-    const Json::Value value = parent[index];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
-    for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE(prop, queueFlags);
-        GET_VALUE(prop, queueCount);
-        GET_VALUE(prop, timestampValidBits);
-        GET_VALUE(prop, minImageTransferGranularity);
-    }
-}
-
 void JsonLoader::GetValue(const Json::Value &parent, int index, VkMemoryType *dest) {
     const Json::Value value = parent[index];
     if (value.type() != Json::objectValue) {
@@ -6339,25 +6323,6 @@ void JsonLoader::GetValue(const Json::Value &parent, int index, VkExtensionPrope
         GET_ARRAY(extensionName);  // size < VK_MAX_EXTENSION_NAME_SIZE
         GET_VALUE(prop, specVersion);
     }
-}
-
-void JsonLoader::GetValue(const Json::Value &parent, int index, VkSurfaceFormatKHR *dest) {
-    const Json::Value value = parent[index];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
-    for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE(prop, format);
-        GET_VALUE(prop, colorSpace);
-    }
-}
-
-void JsonLoader::GetValue(const Json::Value &parent, int index, VkPresentModeKHR *dest) {
-    const Json::Value value = parent[index];
-    if (!value.isInt()) {
-        return;
-    }
-    *dest = static_cast<VkPresentModeKHR>(value.asInt());
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, int index, VkPhysicalDevice *dest) {
