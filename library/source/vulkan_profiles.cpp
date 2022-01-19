@@ -16,13 +16,12 @@
  * DO NOT EDIT: This file is generated.
  */
 
-#include <vulkan/vulkan_profiles.h>
 #include <stddef.h>
 #include <string.h>
 #include <stdint.h>
 #include <vector>
 #include <algorithm>
-
+#include <vulkan/debug/vulkan_profiles.h>
 namespace detail {
 
 

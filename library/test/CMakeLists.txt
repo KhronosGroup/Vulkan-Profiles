@@ -63,7 +63,7 @@ function(add_unit_test_with_debug_messages_variant NAME)
     target_compile_definitions(${TEST_NAME_DEBUG_MESSAGES} PUBLIC "WITH_DEBUG_MESSAGES=1")
     target_include_directories(${TEST_NAME_DEBUG_MESSAGES} PUBLIC "${vulkan-headers_SOURCE_DIR}/include")
     target_link_libraries(${TEST_NAME_DEBUG_MESSAGES} PRIVATE ${test_libraries})
-    add_dependencies(${TEST_NAME_DEBUG_MESSAGES} library_profiles_debug)
+    add_dependencies(${TEST_NAME_DEBUG_MESSAGES} library_profiles)
     add_test(NAME ${TEST_NAME_DEBUG_MESSAGES} COMMAND ${TEST_NAME_DEBUG_MESSAGES} --gtest_catch_exceptions=0)
 endfunction(add_unit_test)
 

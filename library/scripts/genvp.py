@@ -78,7 +78,6 @@ H_FOOTER = '''
 '''
 
 CPP_HEADER = '''
-#include <vulkan/vulkan_profiles.h>
 #include <stddef.h>
 #include <string.h>
 #include <stdint.h>
@@ -1839,9 +1838,9 @@ class VulkanProfile():
             if structDef.name in caps:
                 paramList.append((structDef, '->', caps[structDef.name]))
 
-            # Use pretty variable names in the debug version of the library
+            # Use variable names in the debug version of the library that can be later prettified
             if debugMessages:
-                varName = 'p' + structDef.name
+                varName = 'prettify_' + structDef.name
             else:
                 varName = 's'
 
@@ -1968,6 +1967,13 @@ class VulkanProfile():
         gen += self.gen_structChainerFunc(self.structs.format, 'VkFormatProperties2KHR')
         gen += '};\n'
 
+        # If debug messages are needed do further prettifying (warning: obscure regular expressions follow)
+        if debugMessages:
+            # Prettify structure references in non-bitmask comparisons
+            gen = re.sub(r"(VP_DEBUG_COND_MSG\([^,]+[^:]+: )prettify_Vk([^\-]+)\->([^\)]+\))", r"\1Vk\2::\3", gen)
+            # Prettify bitmask comparisons
+            gen = re.sub(r"(VP_DEBUG_COND_MSG\([^,]+[^:]+: )vpCheckFlags\(prettify_Vk([^\-]+)\->([^,]+), ([^\)]+)\)", r"\1Vk\2::\3 contains \4", gen)
+
         return gen
 
 
@@ -1993,10 +1999,9 @@ class VulkanProfiles():
 
 
 class VulkanProfilesBuilder():
-    def __init__(self, registry, profiles, debugMessages):
+    def __init__(self, registry, profiles):
         self.registry = registry
         self.profiles = profiles
-        self.debugMessages = debugMessages
 
 
     def patch_code(self, code):
@@ -2012,7 +2017,8 @@ class VulkanProfilesBuilder():
             return '\n'.join(patched_lines)
 
 
-    def generate(self, outIncDir, outSrcDir):
+    def generate(self, outIncDir, outSrcDir, debugMessages = False):
+        self.debugMessages = debugMessages
         self.generate_h(outIncDir)
         self.generate_cpp(outSrcDir)
         self.generate_hpp(outIncDir)
@@ -2024,6 +2030,8 @@ class VulkanProfilesBuilder():
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
             f.write(H_HEADER)
+            if self.debugMessages:
+                f.write(DEBUG_MSG_CB_DEFINE)
             f.write(self.gen_profileDefs())
             f.write(API_DEFS)
             f.write(H_FOOTER)
@@ -2036,7 +2044,9 @@ class VulkanProfilesBuilder():
             f.write(COPYRIGHT_HEADER)
             f.write(CPP_HEADER)
             if self.debugMessages:
-                f.write(DEBUG_MSG_CB_DEFINE)
+                f.write('#include <vulkan/vulkan_profiles.h>')
+            else:
+                f.write('#include <vulkan/debug/vulkan_profiles.h>')
             f.write(self.gen_privateImpl())
             f.write(self.gen_publicImpl())
 
@@ -2162,12 +2172,14 @@ if __name__ == '__main__':
                         help='Output include directory')
     parser.add_argument('-outSrcDir', action='store', required=True,
                         help='Output source directory')
-    parser.add_argument('-debugMessages', action='store_true',
-                        help='Generate library with debug messages')
+    parser.add_argument('-generateDebugLibrary', action='store_true',
+                        help='Also generate library variant with debug messages')
 
     args = parser.parse_args()
 
     registry = VulkanRegistry(args.registry)
     profiles = VulkanProfiles.loadFromDir(registry, args.profiles)
-    builder = VulkanProfilesBuilder(registry, profiles, args.debugMessages)
+    builder = VulkanProfilesBuilder(registry, profiles)
     builder.generate(args.outIncDir, args.outSrcDir)
+    if args.generateDebugLibrary:
+        builder.generate(args.outIncDir + '/debug', args.outSrcDir + '/debug', True)

@@ -27,6 +27,19 @@
 
 #include <vulkan/vulkan.h>
 
+#include <stdio.h>
+
+#ifndef VP_DEBUG_MESSAGE_CALLBACK
+#define VP_DEBUG_MESSAGE_CALLBACK(MSG) fprintf(stderr, MSG)
+#else
+void VP_DEBUG_MESSAGE_CALLBACK(const char*);
+#endif
+
+#define VP_DEBUG_MSG(MSG) VP_DEBUG_MESSAGE_CALLBACK(MSG)
+#define VP_DEBUG_MSGF(MSGFMT, ...) { char msg[1024]; snprintf(msg, sizeof(msg) - 1, (MSGFMT), __VA_ARGS__); VP_DEBUG_MESSAGE_CALLBACK(msg); }
+#define VP_DEBUG_COND_MSG(COND, MSG) if (COND) VP_DEBUG_MSG(MSG)
+#define VP_DEBUG_COND_MSGF(COND, MSGFMT, ...) if (COND) VP_DEBUG_MSGF(MSGFMT, __VA_ARGS__)
+
 #if defined(VK_VERSION_1_0) && \
     defined(VK_EXT_swapchain_colorspace) && \
     defined(VK_GOOGLE_display_timing) && \
