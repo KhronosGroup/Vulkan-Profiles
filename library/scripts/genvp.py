@@ -1796,7 +1796,7 @@ class VulkanProfile():
         return gen
 
 
-    def gen_structFunc(self, structDefs, caps, func, fmt):
+    def gen_structFunc(self, structDefs, caps, func, fmt, debugMessages = False):
         gen = ''
 
         hasData = False
@@ -1810,35 +1810,41 @@ class VulkanProfile():
             if structDef.name in ['VkPhysicalDeviceFeatures2', 'VkPhysicalDeviceFeatures2KHR']:
                 innerCap = caps.get('VkPhysicalDeviceFeatures')
                 if innerCap:
-                    paramList.append((self.registry.structs['VkPhysicalDeviceFeatures'], 's->features.', innerCap))
+                    paramList.append((self.registry.structs['VkPhysicalDeviceFeatures'], '->features.', innerCap))
 
             # Fill VkPhysicalDeviceProperties into VkPhysicalDeviceProperties2[KHR]
             if structDef.name in ['VkPhysicalDeviceProperties2', 'VkPhysicalDeviceProperties2KHR']:
                 innerCap = caps.get('VkPhysicalDeviceProperties')
                 if innerCap:
-                    paramList.append((self.registry.structs['VkPhysicalDeviceProperties'], 's->properties.', innerCap))
+                    paramList.append((self.registry.structs['VkPhysicalDeviceProperties'], '->properties.', innerCap))
 
             # Fill VkQueueFamilyProperties into VkQueueFamilyProperties2[KHR]
             if structDef.name in ['VkQueueFamilyProperties2', 'VkQueueFamilyProperties2KHR']:
                 innerCap = caps.get('VkQueueFamilyProperties')
                 if innerCap:
-                    paramList.append((self.registry.structs['VkQueueFamilyProperties'], 's->queueFamilyProperties.', innerCap))
+                    paramList.append((self.registry.structs['VkQueueFamilyProperties'], '->queueFamilyProperties.', innerCap))
 
             # Fill VkFormatProperties into VkFormatProperties2[KHR]
             if structDef.name in ['VkFormatProperties2', 'VkFormatProperties2KHR']:
                 innerCap = caps.get('VkFormatProperties')
                 if innerCap:
-                    paramList.append((self.registry.structs['VkFormatProperties'], 's->formatProperties.', innerCap))
+                    paramList.append((self.registry.structs['VkFormatProperties'], '->formatProperties.', innerCap))
 
             # Fill all other structures directly
             if structDef.name in caps:
-                paramList.append((structDef, 's->', caps[structDef.name]))
+                paramList.append((structDef, '->', caps[structDef.name]))
+
+            # Use pretty variable names in the debug version of the library
+            if debugMessages:
+                varName = 'p' + structDef.name
+            else:
+                varName = 's'
 
             if paramList:
                 gen += '                case {0}: {{\n'.format(structDef.sType)
-                gen += '                    {0}* s = static_cast<{0}*>(static_cast<void*>(p));\n'.format(structDef.name)
+                gen += '                    {0}* {1} = static_cast<{0}*>(static_cast<void*>(p));\n'.format(structDef.name, varName)
                 for params in paramList:
-                    genAssign = func('                    ' + fmt, params[0], params[1], params[2])
+                    genAssign = func('                    ' + fmt, params[0], varName + params[1], params[2])
                     if genAssign != '':
                         hasData = True
                         gen += genAssign
@@ -1885,7 +1891,7 @@ class VulkanProfile():
         gen += ('    },\n'
                 '    [](VkBaseOutStructure* p) -> bool {\n'
                 '        bool ret = true;\n')
-        gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structCompare, cmpFmtFeatures)
+        gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structCompare, cmpFmtFeatures, debugMessages)
         gen += ('        return ret;\n'
                 '    }\n'
                 '};\n')
@@ -1903,7 +1909,7 @@ class VulkanProfile():
         gen += ('    },\n'
                 '    [](VkBaseOutStructure* p) -> bool {\n'
                 '        bool ret = true;\n')
-        gen += self.gen_structFunc(self.structs.property, self.capabilities.properties, self.gen_structCompare, cmpFmtProperties)
+        gen += self.gen_structFunc(self.structs.property, self.capabilities.properties, self.gen_structCompare, cmpFmtProperties, debugMessages)
         gen += ('        return ret;\n'
                 '    }\n'
                 '};\n')
@@ -1942,7 +1948,7 @@ class VulkanProfile():
                 gen += ('        },\n'
                         '        [](VkBaseOutStructure* p) -> bool {\n'
                         '            bool ret = true;\n')
-                gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structCompare, cmpFmtFormat)
+                gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structCompare, cmpFmtFormat, debugMessages)
                 gen += ('            return ret;\n'
                         '        }\n'
                         '    },\n')
