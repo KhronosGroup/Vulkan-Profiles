@@ -11,4 +11,4 @@
 
 # Vulkan Profiles Tools Design Overview
 
-![Vulkan Profiles](https://github.com/LunarG/VulkanProfiles/blob/master/docs/overview.png)
+![Vulkan Profiles](https://github.com/LunarG/VulkanProfiles/blob/master/images/overview.png)
