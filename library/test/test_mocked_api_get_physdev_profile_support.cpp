@@ -908,7 +908,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_extension) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported extension: VK_KHR_shader_subgroup_extended_types"
+        "Unsupported extension: VK_KHR_driver_properties"
     });
 #endif
 
