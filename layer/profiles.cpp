@@ -1965,10 +1965,6 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipControlFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceLinearColorAttachmentFeaturesNV *dest);
-    void GetValue(const Json::Value &parent, int index, VkMemoryType *dest);
-    bool GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest);
-    bool GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryProperties *dest);
-    bool GetValue(const Json::Value &parent, VkSurfaceCapabilitiesKHR *dest);
     bool GetValue(const Json::Value &parent, const std::string &member, const char *name, VkExtent2D *dest);
     bool GetValue(const Json::Value &parent, const std::string &member, const char *name, VkExtent2D *dest,
                   std::function<bool(const char *, uint32_t, uint32_t)> warn_func);
@@ -2332,30 +2328,6 @@ class JsonLoader {
         if (new_value) {
             count = static_cast<int>(strlen(new_value));
             strcpy(dest, new_value);
-        }
-        return count;
-    }
-
-    int GetArray(const Json::Value &parent, const char *name, VkMemoryType *dest) {
-        const Json::Value value = parent[name];
-        if (value.type() != Json::arrayValue) {
-            return -1;
-        }
-        const int count = static_cast<int>(value.size());
-        for (int i = 0; i < count; ++i) {
-            GetValue(value, i, &dest[i]);
-        }
-        return count;
-    }
-
-    int GetArray(const Json::Value &parent, const char *name, VkMemoryHeap *dest) {
-        const Json::Value value = parent[name];
-        if (value.type() != Json::arrayValue) {
-            return -1;
-        }
-        const int count = static_cast<int>(value.size());
-        for (int i = 0; i < count; ++i) {
-            GetValue(value, i, &dest[i]);
         }
         return count;
     }
@@ -3256,10 +3228,6 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &proper
         return GetValue(prop, &pdd_.physical_device_fragment_density_map_2_properties_);
     } else if (property_name == "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM") {
         return GetValue(prop, &pdd_.physical_device_fragment_density_map_offset_properties_);
-    } else if (property_name == "VkPhysicalDeviceMemoryProperties") {
-        return GetValue(prop, &pdd_.physical_device_memory_properties_);
-    } else if (property_name == "VkSurfaceCapabilitiesKHR") {
-        return GetValue(prop, &pdd_.surface_capabilities_);
     } else if (property_name == "Vulkan12Properties") {
         return GetValue(prop, &pdd_.physical_device_vulkan_1_2_properties_);
     } else if (property_name == "Vulkan13Properties") {
@@ -6230,65 +6198,6 @@ bool JsonLoader::GetValue(const Json::Value &pparent, const std::string &member,
         GET_VALUE(prop, depth);
     }
     return true;
-}
-
-void JsonLoader::GetValue(const Json::Value &parent, int index, VkMemoryType *dest) {
-    const Json::Value value = parent[index];
-    if (value.type() != Json::objectValue) {
-        return;
-    }
-    for (const auto &prop : parent.getMemberNames()) {
-        GET_VALUE(prop, propertyFlags);
-        GET_VALUE(prop, heapIndex);
-    }
-}
-
-bool JsonLoader::GetValue(const Json::Value &parent, int index, VkMemoryHeap *dest) {
-    const Json::Value value = parent[index];
-    if (value.type() != Json::objectValue) {
-        return true;
-    }
-    bool valid = true;
-    for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, size, WarnIfGreater);
-        GET_MEMBER_VALUE(member, flags);
-    }
-    return valid;
-}
-
-bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryProperties *dest) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMemoryProperties)\n");
-    const int heap_count = GET_ARRAY(memoryHeaps);  // size <= VK_MAX_MEMORY_HEAPS
-    if (heap_count >= 0) {
-        dest->memoryHeapCount = heap_count;
-    }
-    const int type_count = GET_ARRAY(memoryTypes);  // size <= VK_MAX_MEMORY_TYPES
-    if (type_count >= 0) {
-        dest->memoryTypeCount = type_count;
-        for (int i = 0; i < type_count; ++i) {
-            if (dest->memoryTypes[i].heapIndex >= dest->memoryHeapCount) {
-                LogMessage(DEBUG_REPORT_ERROR_BIT, format("WARN \"memoryType[%" PRIu32 "].heapIndex\" (%" PRIu32
-                                                          ") exceeds memoryHeapCount (%" PRIu32 ")\n",
-                                                          i, dest->memoryTypes[i].heapIndex, dest->memoryHeapCount));
-            }
-        }
-    }
-    return true;
-}
-
-bool JsonLoader::GetValue(const Json::Value &parent, VkSurfaceCapabilitiesKHR *dest) {
-    bool valid = true;
-    for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, minImageCount, WarnIfLesser);
-        GET_VALUE_WARN(member, maxImageCount, WarnIfGreater);
-        GET_VALUE_WARN(member, minImageExtent, WarnIfLesser);
-        GET_VALUE_WARN(member, maxImageExtent, WarnIfGreater);
-        GET_VALUE_WARN(member, maxImageArrayLayers, WarnIfGreater);
-        GET_VALUE(member, supportedTransforms);
-        GET_VALUE(member, supportedCompositeAlpha);
-        GET_VALUE(member, supportedUsageFlags);
-    }
-    return valid;
 }
 
 void JsonLoader::GetValue(const Json::Value &parent, int index, VkLayerProperties *dest) {
