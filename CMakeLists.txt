@@ -154,6 +154,8 @@ if (NOT ANDROID)
     endif()
 endif()
 
+include_directories(external)
+
 set(API_NAME "Vulkan" CACHE STRING "API name to use when building")
 string(TOLOWER ${API_NAME} API_LOWERCASE)
 add_definitions(-DAPI_NAME="${API_NAME}")
@@ -192,7 +194,5 @@ else()
     endmacro()
 endif()
 add_subdirectory(layer)
-
-include_directories(external)
 
 add_subdirectory(profiles/test)

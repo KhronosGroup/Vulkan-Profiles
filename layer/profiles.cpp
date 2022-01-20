@@ -53,6 +53,12 @@
 #include <mutex>
 #include <sstream>
 
+#include <valijson/adapters/jsoncpp_adapter.hpp>
+#include <valijson/schema.hpp>
+#include <valijson/schema_parser.hpp>
+#include <valijson/validation_results.hpp>
+#include <valijson/validator.hpp>
+
 #include <json/json.h>  // https://github.com/open-source-parsers/jsoncpp
 
 #include "vulkan/vk_layer.h"
@@ -60,6 +66,12 @@
 #include <vk_layer_config.h>
 #include "vk_layer_table.h"
 #include "../vku/vk_layer_settings.h"
+
+using valijson::Schema;
+using valijson::SchemaParser;
+using valijson::ValidationResults;
+using valijson::Validator;
+using valijson::adapters::JsonCppAdapter;
 
 namespace {
 
@@ -111,6 +123,7 @@ const uint32_t kDeviceExtensionPropertiesCount = static_cast<uint32_t>(kDeviceEx
 
 const char *const kLayerSettingsProfileFile = "profile_file";
 const char *const kLayerSettingsProfileName = "profile_name";
+const char *const kLayerSettingsProfileValidation = "profile_validation";
 const char *const kLayerSettingsEmulatePortability = "emulate_portability";
 const char *const kLayerSettingsSimulateCapabilities = "simulate_capabilities";
 const char *const kLayerSettingsDebugActions = "debug_actions";
@@ -180,11 +193,12 @@ static std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags) {
     return result;
 }
 
-enum DebugAction { 
-    DEBUG_ACTION_FILE_BIT = (1 << 0), 
-    DEBUG_ACTION_STDOUT_BIT = (1 << 1), 
-    DEBUG_ACTION_OUTPUT_BIT = (1 << 2), 
-    DEBUG_ACTION_BREAKPOINT_BIT = (1 << 3) };
+enum DebugAction {
+    DEBUG_ACTION_FILE_BIT = (1 << 0),
+    DEBUG_ACTION_STDOUT_BIT = (1 << 1),
+    DEBUG_ACTION_OUTPUT_BIT = (1 << 2),
+    DEBUG_ACTION_BREAKPOINT_BIT = (1 << 3)
+};
 typedef int DebugActionFlags;
 
 static DebugActionFlags GetDebugActionFlags(const vku::Strings &values) {
@@ -367,6 +381,7 @@ static std::string GetFormatFeature2String(VkFormatFeatureFlagBits2 flags) {
 struct LayerSettings {
     std::string profile_file;
     std::string profile_name;
+    bool profile_validation;
     bool emulate_portability;
     SimulateCapabilityFlags simulate_capabilities;
     DebugActionFlags debug_actions;
@@ -3438,7 +3453,7 @@ bool JsonLoader::GetDrmFormatModifierProperties(const Json::Value &formats, cons
     (*dest)[format] = list;
     const VkDrmFormatModifierPropertiesList2EXT &device_list = pdd_.device_drm_format_modifier_properties_[format];
     for (uint32_t i = 0; i < list.drmFormatModifierCount; ++i) {
-        const auto& profile_properties = list.pDrmFormatModifierProperties[i];
+        const auto &profile_properties = list.pDrmFormatModifierProperties[i];
         bool found = false;
         for (uint32_t j = 0; j < device_list.drmFormatModifierCount; ++j) {
             const auto &device_properties = list.pDrmFormatModifierProperties[j];
@@ -3681,6 +3696,88 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
     return VK_SUCCESS;
 }
 
+static Json::Value ParseJsonFile(const char *filename) {
+    Json::Value root = Json::nullValue;
+
+    std::ifstream file;
+    file.open(filename);
+    if (!file.is_open()) {
+        return root;
+    }
+
+    Json::Reader reader;
+    bool success = reader.parse(file, root, false);
+    file.close();
+
+    return root;
+}
+
+struct JsonValidator {
+    JsonValidator() {}
+
+    bool Init() {
+        const std::string env(std::getenv("VULKAN_SDK"));
+        if (env.empty()) return false;
+
+        if (!schema) {
+            const Json::Value schema_document = ParseJsonFile((env + "/share/vulkan/registry/profile_schema.json").c_str());
+            if (schema_document == Json::nullValue) {
+                return false;            
+            }
+
+            schema.reset(new Schema);
+
+            SchemaParser parser;
+            JsonCppAdapter schema_adapter(schema_document);
+            parser.populateSchema(schema_adapter, *schema);
+        }
+
+        return true;
+    }
+
+    bool Check(const Json::Value &json_document) {
+        assert(!json_document.empty());
+
+        if (schema.get() == nullptr) return false;
+
+        Validator validator(Validator::kWeakTypes);
+        JsonCppAdapter document_adapter(json_document);
+
+        ValidationResults results;
+        if (!validator.validate(*schema, document_adapter, &results)) {
+            ValidationResults::Error error;
+            unsigned int error_num = 1;
+            while (results.popError(error)) {
+                std::string context;
+                std::vector<std::string>::iterator itr = error.context.begin();
+                for (; itr != error.context.end(); itr++) {
+                    context += *itr;
+                }
+
+                if (error_num <= 3) {
+                    std::string log = format("Error #%d\n", error_num);
+                    log += "\t context: " + context + "\n";
+                    log += "\t desc:    " + error.description + "\n\n";
+
+                    message += log.c_str();
+                }
+
+                ++error_num;
+            }
+
+            message += format("Total Error Count: %d\n", error_num).c_str();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    std::string message;
+    std::unique_ptr<Schema> schema;
+    std::unique_ptr<Validator> validator;
+};
+
 VkResult JsonLoader::LoadFile(const char *filename) {
     std::ifstream json_file(filename);
     if (!json_file) {
@@ -3742,9 +3839,22 @@ VkResult JsonLoader::LoadFile(const char *filename) {
     std::sscanf(version.c_str(), "%d.%d.%d", &version_major, &version_minor, &version_patch);
     if (VK_HEADER_VERSION < version_patch) {
         LogMessage(DEBUG_REPORT_WARNING_BIT, format("%s is built againt Vulkan Header %d but the profile is written againt Vulkan "
-                                                    "Header %d. All newer capabilities in the "
+                                                    "Header %d.\n\t- All newer capabilities in the "
                                                     "profile will be ignored by the layer.\n",
                                                     kOurLayerName, VK_HEADER_VERSION, version_patch));
+    } else if (layer_settings.profile_validation) {
+        JsonValidator validator;
+        if (!validator.Init()) {
+            LogMessage(DEBUG_REPORT_WARNING_BIT, format("%s count not find the profile schema file to validate filename.\n\t- This "
+                                                        "operation requires the Vulkan SDK to be install.\n\t- Skipping profile file validation.",
+                                                        kOurLayerName, filename));
+        } else if (!validator.Check(root)) {
+            LogMessage(DEBUG_REPORT_ERROR_BIT,
+                       format("%s is not a valid JSON profile file.\n", filename));
+            if (layer_settings.debug_fail_on_error) {
+                return VK_ERROR_INITIALIZATION_FAILED;
+            }
+        }
     }
 
     VkResult result = VK_SUCCESS;
@@ -6507,6 +6617,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Fea
 static void InitSettings() {
     layer_settings.profile_file.clear();
     layer_settings.profile_name.clear();
+    layer_settings.profile_validation = true;
     layer_settings.emulate_portability = false;
     layer_settings.simulate_capabilities = 0;
     layer_settings.debug_actions = 0;
@@ -6521,6 +6632,10 @@ static void InitSettings() {
 
     if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileName)) {
         layer_settings.profile_name = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileName);
+    }
+
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileValidation)) {
+        layer_settings.profile_validation = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsProfileValidation);
     }
 
     if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsEmulatePortability)) {
@@ -6559,12 +6674,10 @@ static void InitSettings() {
             layer_settings.debug_actions |= DEBUG_ACTION_STDOUT_BIT;
             LogMessage(DEBUG_REPORT_ERROR_BIT, format("Could not open %s, log to file is being overridden by log to stdout.\n",
                                                       layer_settings.debug_filename.c_str()));
-        }
-        else {
+        } else {
             LogMessage(DEBUG_REPORT_DEBUG_BIT, format("Log file %s opened\n", layer_settings.debug_filename.c_str()));
         }
-    }
-    else {
+    } else {
         LogMessage(DEBUG_REPORT_DEBUG_BIT, format("No need to open the log file %s\n", layer_settings.debug_filename.c_str()));
     }
 
@@ -6575,6 +6688,7 @@ static void InitSettings() {
     std::string settings_log;
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileFile, layer_settings.profile_file.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileName, layer_settings.profile_name.c_str());
+    settings_log += format("\t%s: %s\n", kLayerSettingsProfileValidation, layer_settings.profile_validation ? "true" : "false");
     settings_log += format("\t%s: %s\n", kLayerSettingsEmulatePortability, layer_settings.emulate_portability ? "true" : "false");
     settings_log += format("\t%s: %s\n", kLayerSettingsSimulateCapabilities, simulation_capabilities_log.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugActions, debug_actions_log.c_str());
@@ -8041,7 +8155,6 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
 }
 
 void FillFormatPropertiesPNextChain(PhysicalDeviceData *physicalDeviceData, void *place, VkFormat format) {
-
     while (place) {
         VkBaseOutStructure *structure = (VkBaseOutStructure *)place;
 
@@ -8346,7 +8459,8 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolPropertiesEXT(VkPhysicalDevi
 // VK_VULKAN_1_1
 
 // Properties
-void TransferValue(VkPhysicalDeviceVulkan11Properties *dest, VkPhysicalDevicePointClippingPropertiesKHR *src, bool promoted_written) {
+void TransferValue(VkPhysicalDeviceVulkan11Properties *dest, VkPhysicalDevicePointClippingPropertiesKHR *src,
+                   bool promoted_written) {
     TRANSFER_VALUE(pointClippingBehavior);
 }
 
@@ -9925,7 +10039,8 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             result = json_loader.LoadFile(layer_settings.profile_file.c_str());
 
             // VK_VULKAN_1_1
-            TransferValue(&(pdd.physical_device_vulkan_1_1_properties_), &(pdd.physical_device_multiview_properties_), pdd.vulkan_1_1_properties_written_);
+            TransferValue(&(pdd.physical_device_vulkan_1_1_properties_), &(pdd.physical_device_multiview_properties_),
+                          pdd.vulkan_1_1_properties_written_);
             TransferValue(&(pdd.physical_device_vulkan_1_1_properties_), &(pdd.physical_device_maintenance_3_properties_),
                           pdd.vulkan_1_1_properties_written_);
             TransferValue(&(pdd.physical_device_vulkan_1_1_properties_), &(pdd.physical_device_protected_memory_properties_),

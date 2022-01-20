@@ -113,6 +113,13 @@
                             "type": "ENUM",
                             "flags": [],
                             "default": "${VK_PROFILES}"
+                        },
+                        {
+                            "key": "profile_validation",
+                            "label": "Schema Validation",
+                            "description": "Validate the profile file against the Vulkan SDK profile schema if the file is found.",
+                            "type": "BOOL",
+                            "default": true
                         }
                     ]
                 },
