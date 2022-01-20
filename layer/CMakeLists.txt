@@ -100,6 +100,7 @@ set(VulkanHeaders_VERSION_MAJOR "0")
 set(VulkanHeaders_VERSION_MINOR "0")
 set(VulkanHeaders_VERSION_PATCH "0")
 set(VulkanHeaders_main_header ${VulkanHeaders_INCLUDE_DIR}/vulkan/vulkan_core.h)
+message(STATUS "Parsing ${VulkanHeaders_main_header} to get Vulkan Version")
 
 # Find all lines in the header file that contain any version we may be interested in
 #  NOTE: They start with #define and then have other keywords
