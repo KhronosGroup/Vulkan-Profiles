@@ -3606,6 +3606,10 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         uint32_t apiVersion = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
         AddPromotedExtensions(apiVersion);
 
+        if (layer_settings.simulate_capabilities & SIMULATE_API_VERSION_BIT) {
+            pdd_.physical_device_properties_.apiVersion = apiVersion;
+        }
+
         if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
             const auto &extensions = c["extensions"];
 

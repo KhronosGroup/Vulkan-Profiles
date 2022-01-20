@@ -138,7 +138,7 @@
                         {
                             "key": "SIMULATE_API_VERSION_BIT",
                             "label": "Version",
-                            "description": "The Vulkan device will report the API version from the selected Profile."
+                            "description": "The Vulkan device will report the API version from the selected Profile. It also overrides the `api-version` set in VkPhysicalDeviceProperties."
                         },
                         {
                             "key": "SIMULATE_FEATURES_BIT",
