@@ -89,7 +89,7 @@
                         },
                         {
                             "key": "simulate_capabilities",
-                            "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT", "SIMULATE_FORMATS_BIT", "SIMULATE_FORMAT_PROPERTIES_BIT" ]
+                            "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT", "SIMULATE_FORMATS_BIT" ]
                         }
                     ]
                 }
@@ -331,7 +331,6 @@
                         }
                     ],
                     "default": [
-                        "DEBUG_REPORT_NOTIFICATION_BIT",
                         "DEBUG_REPORT_WARNING_BIT",
                         "DEBUG_REPORT_ERROR_BIT"
                     ]
