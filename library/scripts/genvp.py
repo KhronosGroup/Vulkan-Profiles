@@ -1177,8 +1177,8 @@ class VulkanEnum():
         self.name = name
         self.aliases = [ name ]
         self.isAlias = False
-        self.values = set()
-        self.valueAliases = dict()
+        self.values = []
+        self.aliasValues = dict()
 
 
 class VulkanBitmask():
@@ -1438,15 +1438,13 @@ class VulkanRegistry():
             values = xml.find("./enums[@name='" + enumDef.name + "']")
             if values:
                 for value in values.findall("./enum"):
-                    enumDef.values.add(value.get('name'))
-                    if value.get('alias') != None:
-                        enumDef.values.add(value.get('alias'))
+                    if value.get('alias') is None:
+                        enumDef.values.append(value.get('name'))
 
             # Then find extension values
             for value in xml.findall(".//enum[@extends='" + enumDef.name + "']"):
-                enumDef.values.add(value.get('name'))
-                if value.get('alias') != None:
-                    enumDef.values.add(value.get('alias'))
+                if value.get('alias') is None:
+                    enumDef.values.append(value.get('name'))
 
             # Finally store it in the registry
             self.enums[enumDef.name] = enumDef
@@ -1550,10 +1548,11 @@ class VulkanRegistry():
                     aliasEnumDef.aliases = baseEnumDef.aliases
                     aliasEnumDef.aliases.append(enum.get('name'))
 
-                    # Merge values
-                    mergedValues = set.union(baseEnumDef.values, aliasEnumDef.values)
-                    baseEnumDef.values = mergedValues
-                    aliasEnumDef.values = mergedValues
+                    # Merge values respecting original order
+                    for value in aliasEnumDef.values:
+                        if not value in baseEnumDef.values:
+                            baseEnumDef.values.append(value)
+                    aliasEnumDef.values = baseEnumDef.values
                 else:
                     Log.f("Failed to find alias '{0}' of enum '{1}'".format(alias, enum.get('name')))
 
@@ -1564,16 +1563,15 @@ class VulkanRegistry():
                 for aliasValue in enum.findall("./enum[@alias]"):
                     name = aliasValue.get('name')
                     alias = aliasValue.get('alias')
-                    if not alias in enumDef.valueAliases.keys():
-                        enumDef.valueAliases[alias] = []
-                    enumDef.valueAliases[alias].append(name)
-        for aliasValue in xml.findall("./extensions/extension/require/enum[@extends]"):
-            enumDef = self.enums[aliasValue.get('extends')]
-            name = aliasValue.get('name')
-            alias = aliasValue.get('alias')
-            if not alias in enumDef.valueAliases.keys():
-                enumDef.valueAliases[alias] = []
-            enumDef.valueAliases[alias].append(name)
+                    enumDef.values.append(name)
+                    enumDef.aliasValues[name] = alias
+        for aliasValue in xml.findall("./extensions/extension/require/enum[@alias]"):
+            if aliasValue.get('extends'):
+                enumDef = self.enums[aliasValue.get('extends')]
+                name = aliasValue.get('name')
+                alias = aliasValue.get('alias')
+                enumDef.values.append(name)
+                enumDef.aliasValues[name] = alias
 
         # Find any bitmask (flags) aliases
         for bitmask in xml.findall("./types/type[@category='bitmask']"):
@@ -1826,7 +1824,6 @@ class VulkanProfileCapabilities():
         self.properties = dict()
         self.formats = dict()
         self.queueFamiliesProperties = []
-        self.memoryProperties = dict()
         for capName in data['capabilities']:
             if capName in caps:
                 self.mergeCaps(registry, caps[capName])
@@ -1840,7 +1837,6 @@ class VulkanProfileCapabilities():
         self.mergeProfileProperties(caps)
         self.mergeProfileFormats(caps)
         self.mergeProfileQueueFamiliesProperties(caps)
-        self.mergeProfileMemoryProperties(caps)
 
 
     def mergeProfileCapData(self, dst, src):
@@ -1900,11 +1896,6 @@ class VulkanProfileCapabilities():
     def mergeProfileQueueFamiliesProperties(self, data):
         if data.get('queueFamiliesProperties') != None:
             self.queueFamiliesProperties.extend(data['queueFamiliesProperties'])
-
-
-    def mergeProfileMemoryProperties(self, data):
-        if data.get('memoryProperties') != None:
-            self.mergeProfileCapData(self.memoryProperties, data['memoryProperties'])
 
 
 class VulkanProfileStructs():
@@ -2018,9 +2009,6 @@ class VulkanProfile():
         for queueFamilyData in self.capabilities.queueFamiliesProperties:
             for queueFamilyProp in queueFamilyData:
                 self.validateStructDependency(queueFamilyProp)
-
-        for memoryProp in self.capabilities.memoryProperties:
-            self.validateStructDependency(memoryProp)
 
 
     def validateStructDependency(self, structName):
@@ -3108,6 +3096,7 @@ class VulkanProfilesDocGenerator():
         gen += self.gen_features()
         gen += self.gen_limits()
         gen += self.gen_queueFamilies()
+        gen += self.gen_formats()
         return gen
 
 
@@ -3205,7 +3194,7 @@ class VulkanProfilesDocGenerator():
         if struct in profile.capabilities.features:
             featureStruct = profile.capabilities.features[struct]
             if member in featureStruct and featureStruct[member]:
-                return ':heavy_check_mark: (in {0})'.format(struct)
+                return ':heavy_check_mark:'
 
         # If the struct is VkPhysicalDeviceFeatures then check if the feature is defined in
         # VkPhysicalDeviceFeatures2 or VkPhysicalDeviceFeatures2KHR for the profile and then
@@ -3215,7 +3204,7 @@ class VulkanProfilesDocGenerator():
                 if wrapperStruct in profile.capabilities.features:
                     featureStruct = profile.capabilities.features[wrapperStruct]['features']
                     if member in featureStruct and featureStruct[member]:
-                        return ':heavy_check_mark: (in {0})'.format(wrapperStruct)
+                        return ':heavy_check_mark:'
 
         # If the struct has aliases and the feature struct member is defined in the profile in
         # one of those, consider it supported
@@ -3224,7 +3213,7 @@ class VulkanProfilesDocGenerator():
             if alias in profile.capabilities.features:
                 featureStruct = profile.capabilities.features[alias]
                 if member in featureStruct and featureStruct[member]:
-                    return ':heavy_check_mark: (in {0})'.format(alias)
+                    return ':heavy_check_mark:'
 
         return ':x:'
 
@@ -3244,7 +3233,7 @@ class VulkanProfilesDocGenerator():
                     # different feature with the same name)
                     if definedFeatureStructName in feature.structs:
                         if not sectionHeader in tableData:
-                            tableData[sectionHeader] = OrderedDict({})
+                            tableData[sectionHeader] = OrderedDict()
                         # Feature is defined, add it to the table
                         tableData[sectionHeader][definedFeature] = functools.partial(self.gen_feature, definedFeatureStructName)
 
@@ -3256,7 +3245,7 @@ class VulkanProfilesDocGenerator():
             for featureStructName, features in profile.capabilities.features.items():
                 # VkPhysicalDeviceFeatures2 is an exception, as it contains a nested structure
                 # No other structure is allowed to have this
-                if featureStructName == 'VkPhysicalDeviceFeatures2' or featureStructName == 'VkPhysicalDeviceFeatures2KHR':
+                if featureStructName in [ 'VkPhysicalDeviceFeatures2', 'VkPhysicalDeviceFeatures2KHR' ]:
                     featureStructName = 'VkPhysicalDeviceFeatures'
                     features = features['features']
                 elif self.has_nestedFeatureData(features):
@@ -3268,7 +3257,7 @@ class VulkanProfilesDocGenerator():
                     definedFeatures[featureStructName] = []
                 definedFeatures[featureStructName].extend(features.keys())
 
-        tableData = OrderedDict({})
+        tableData = OrderedDict()
 
         # First, go through core features
         for version in sorted(self.registry.versions.values(), key = lambda version: version.number):
@@ -3319,30 +3308,34 @@ class VulkanProfilesDocGenerator():
             return str(value)
 
 
+    def formatLimitName(self, struct, member):
+        structDef = self.registry.structs[struct]
+        memberDef = structDef.members[member]
+        limittype = memberDef.limittype
+
+        if limittype in [ None, 'noauto' ]:
+            return member
+        elif limittype == 'max':
+            return member + ' (max)'
+        elif limittype in [ 'min', 'bitmask' ]:
+            return member + ' (min)'
+        elif limittype == 'range':
+            return member + ' (min,max)'
+        else:
+            Log.f("Unexpected limittype '{0}'".format(limittype))
+
+
     def gen_limit(self, struct, member, profile = None):
         # If no profile was specified then this is the first column so return the member name
         # decorated with the corresponding limittype specific info
         if profile is None:
-            structDef = self.registry.structs[struct]
-            memberDef = structDef.members[member]
-            limittype = memberDef.limittype
-
-            if limittype in [ None, 'noauto' ]:
-                return member
-            elif limittype == 'max':
-                return member + ' (max)'
-            elif limittype in [ 'min', 'bitmask' ]:
-                return member + ' (min)'
-            elif limittype == 'range':
-                return member + ' (min,max)'
-            else:
-                Log.f("Unexpected limittype '{0}'".format(limittype))
+            return self.formatLimitName(struct, member)
 
         # If this limit/property struct member is defined in the profile as is, include it
         if struct in profile.capabilities.properties:
             limitStruct = profile.capabilities.properties[struct]
             if member in limitStruct:
-                return '{0} (in {1})'.format(self.formatValue(limitStruct[member]), struct)
+                return self.formatValue(limitStruct[member])
 
         # If the struct is VkPhysicalDeviceLimits or VkPhysicalDeviceSparseProperties then check
         # if the limit/property is defined somewhere nested in VkPhysicalDeviceProperties,
@@ -3364,7 +3357,7 @@ class VulkanProfilesDocGenerator():
             if propertyStruct != None:
                 limitStruct = propertyStruct[memberStruct]
                 if member in limitStruct:
-                    return '{0} (in {1})'.format(self.formatValue(limitStruct[member]), propertyStructName)
+                    return self.formatValue(limitStruct[member])
 
         # If the struct has aliases and the limit/property struct member is defined in the profile
         # in one of those then include it
@@ -3373,7 +3366,7 @@ class VulkanProfilesDocGenerator():
             if alias in profile.capabilities.properties:
                 limitStruct = profile.capabilities.properties[alias]
                 if member in limitStruct and limitStruct[member]:
-                    return '{0} (in {1})'.format(self.formatValue(limitStruct[member]), alias)
+                    return self.formatValue(limitStruct[member])
 
         return '-'
 
@@ -3393,7 +3386,7 @@ class VulkanProfilesDocGenerator():
                     # or a completely different limit/property with the same name)
                     if definedLimitStructName in limit.structs:
                         if not sectionHeader in tableData:
-                            tableData[sectionHeader] = OrderedDict({})
+                            tableData[sectionHeader] = OrderedDict()
                         # Limit/property is defined, add it to the table
                         tableData[sectionHeader][definedLimit] = functools.partial(self.gen_limit, definedLimitStructName)
 
@@ -3405,7 +3398,7 @@ class VulkanProfilesDocGenerator():
             for propertyStructName, properties in profile.capabilities.properties.items():
                 # VkPhysicalDeviceProperties and VkPhysicalDeviceProperties2 are exceptions,
                 # need custom handling due to only using their nested structures
-                if propertyStructName == 'VkPhysicalDeviceProperties2' or propertyStructName == 'VkPhysicalDeviceProperties2KHR':
+                if propertyStructName in [ 'VkPhysicalDeviceProperties2', 'VkPhysicalDeviceProperties2KHR' ]:
                     propertyStructName = 'VkPhysicalDeviceProperties'
                     properties = properties['properties']
                 if propertyStructName == 'VkPhysicalDeviceProperties':
@@ -3421,7 +3414,7 @@ class VulkanProfilesDocGenerator():
                     definedLimits[propertyStructName] = []
                 definedLimits[propertyStructName].extend(properties.keys())
 
-        tableData = OrderedDict({})
+        tableData = OrderedDict()
 
         # First, go through core limits/properties
         for version in sorted(self.registry.versions.values(), key = lambda version: version.number):
@@ -3453,8 +3446,9 @@ class VulkanProfilesDocGenerator():
 
     def gen_queueFamily(self, index, struct, member, profile = None):
         # If no profile was specified then this is the first column so return the member name
+        # decorated with the corresponding limittype specific info
         if profile is None:
-            return member
+            return self.formatLimitName(struct, member)
 
         # If this profile doesn't even define this queue family index then early out
         if len(profile.capabilities.queueFamiliesProperties) <= index:
@@ -3464,7 +3458,7 @@ class VulkanProfilesDocGenerator():
         if struct in profile.capabilities.queueFamiliesProperties[index]:
             propertyStruct = profile.capabilities.queueFamiliesProperties[index][struct]
             if member in propertyStruct:
-                return '{0} (in {1})'.format(self.formatValue(propertyStruct[member]), struct)
+                return self.formatValue(propertyStruct[member])
 
         # If the struct is VkPhysicalDeviceQueueFamilyProperties then check if the feature is
         # defined in VkPhysicalDeviceQueueFamilyProperties2 or VkPhysicalDeviceQueueFamilyProperties2KHR
@@ -3474,7 +3468,7 @@ class VulkanProfilesDocGenerator():
                 if wrapperStruct in profile.capabilities.queueFamiliesProperties[index]:
                     propertyStruct = profile.capabilities.queueFamiliesProperties[index][wrapperStruct]['queueFamilyProperties']
                     if member in propertyStruct and propertyStruct[member]:
-                        return '{0} (in {1})'.format(self.formatValue(propertyStruct[member]), wrapperStruct)
+                        return self.formatValue(propertyStruct[member])
 
         # If the struct has aliases and the property struct member is defined in the profile
         # in one of those then include it
@@ -3483,7 +3477,7 @@ class VulkanProfilesDocGenerator():
             if alias in profile.capabilities.queueFamiliesProperties[index]:
                 propertyStruct = profile.capabilities.queueFamiliesProperties[index][alias]
                 if member in propertyStruct and propertyStruct[member]:
-                    return '{0} (in {1})'.format(self.formatValue(propertyStruct[member]), alias)
+                    return self.formatValue(propertyStruct[member])
 
         return '-'
 
@@ -3494,11 +3488,11 @@ class VulkanProfilesDocGenerator():
         definedQueueFamilies = []
         for profile in self.profiles:
             for index, queueFamily in enumerate(profile.capabilities.queueFamiliesProperties):
-                definedQueueFamilyProperties = dict()
+                definedQueueFamilyProperties = OrderedDict()
                 for structName, properties in queueFamily.items():
                     # VkPhysicalDeviceQueueFamilies2 is an exception, as it contains a nested structure
                     # No other structure is allowed to have this
-                    if structName == 'VkPhysicalDeviceQueueFamilyProperties2' or structName == 'VkPhysicalDeviceQueueFamilyProperties2KHR':
+                    if structName in [ 'VkPhysicalDeviceQueueFamilyProperties2', 'VkPhysicalDeviceQueueFamilyProperties2KHR']:
                         structName = 'VkPhysicalDeviceQueueFamilyProperties'
                         properties = properties['queueFamilyProperties']
                     # If this is an alias structure then find the non-alias one and use that
@@ -3506,16 +3500,16 @@ class VulkanProfilesDocGenerator():
                     # Copy defined limit/property structure data
                     if not structName in definedQueueFamilyProperties:
                         definedQueueFamilyProperties[structName] = []
-                    definedQueueFamilyProperties[structName].extend(properties.keys())
+                    definedQueueFamilyProperties[structName].extend(sorted(properties.keys()))
                 # Add queue family to the list
                 if len(definedQueueFamilies) <= index:
                     definedQueueFamilies.append(dict())
-                definedQueueFamilies[index] = definedQueueFamilyProperties
+                definedQueueFamilies[index].update(definedQueueFamilyProperties)
 
         # Construct table data
-        tableData = OrderedDict({})
+        tableData = OrderedDict()
         for index, queueFamilyProperties in enumerate(definedQueueFamilies):
-            section = tableData['Queue family #' + str(index)] = OrderedDict({})
+            section = tableData['Queue family #' + str(index)] = OrderedDict()
             for structName, members in queueFamilyProperties.items():
                 section.update({ row: functools.partial(self.gen_queueFamily, index, structName) for row in members })
 
@@ -3524,42 +3518,136 @@ class VulkanProfilesDocGenerator():
         return '\n## Vulkan Profile Queue Families\n\n{0}\n'.format(table)
 
 
+    def gen_format(self, format, struct, member, profile = None):
+        # If no profile was specified then this is the first column so return the member name
+        # decorated with the corresponding limittype specific info
+        if profile is None:
+            # Only do so if the struct is not 'VkFormatProperties', as we use custom names
+            # there that also include the tested bit
+            return member if struct == 'VkFormatProperties' else self.formatLimitName(struct, member)
+
+        # If this profile doesn't even define this format then early out
+        if not format in profile.capabilities.formats:
+            # Before doing so, though, we have to check whether any of the aliases of the format
+            # are defined by the profile
+            formatAliases = self.registry.enums['VkFormat'].aliasValues
+            if not format in formatAliases or not formatAliases[format] in profile.capabilities.formats:
+                return ''
+
+        # If this format property struct member is defined in the profile as is, include it
+        if struct in profile.capabilities.formats[format]:
+            propertyStruct = profile.capabilities.formats[format][struct]
+            if member in propertyStruct:
+                return self.formatValue(propertyStruct[member])
+
+        # If the struct is VkFormatProperties then 'member' also contains the trimmed name of
+        # the flag bit to check for, so we check for that, or any of its aliases
+        if struct == 'VkFormatProperties':
+            for alternative in [ 'VkFormatProperties', 'VkFormatProperties2', 'VkFormatProperties2KHR', 'VkFormatProperties3', 'VkFormatProperties3KHR' ]:
+                if alternative in profile.capabilities.formats[format]:
+                    propertyStruct = profile.capabilities.formats[format][alternative]
+                    # VkFormatProperties2[KHR] wrap the real structure in a member
+                    if 'formatProperties' in propertyStruct:
+                        propertyStruct = propertyStruct['formatProperties']
+                    if member in propertyStruct:
+                        return self.formatValue(propertyStruct[member])
+
+        # If the struct has aliases and the property struct member is defined in the profile
+        # in one of those then include it
+        structDef = self.registry.structs[struct]
+        for alias in structDef.aliases:
+            if alias in profile.capabilities.formats[format]:
+                propertyStruct = profile.capabilities.formats[format][alias]
+                if member in propertyStruct and propertyStruct[member]:
+                    return self.formatValue(propertyStruct[member])
+
+        return '-'
+
+
+    def gen_formats(self):
+        formatFeaturesMembers = [ 'linearTilingFeatures', 'optimalTilingFeatures', 'bufferFeatures' ]
+
+        # Merge all format property references across the profiles to collect the relevant
+        # properties to look at for each format
+        definedFormats = dict()
+        for profile in self.profiles:
+            for format, formatProperties in profile.capabilities.formats.items():
+                # This may be an alias of a format name, so get the real name
+                formatAliases = self.registry.enums['VkFormat'].aliasValues
+                format = formatAliases[format] if format in formatAliases else format
+
+                definedFormatProperties = OrderedDict()
+                for structName, properties in formatProperties.items():
+                    # VkFormatProperties, VkFormatProperties2, and VkFormatProperties3 are special
+                    if structName in [ 'VkFormatProperties2', 'VkFormatProperties2KHR' ]:
+                        structName = 'VkFormatProperties'
+                        properties = properties['formatProperties']
+                    if structName in [ 'VkFormatProperties3', 'VkFormatProperties3KHR' ]:
+                        structName = 'VkFormatProperties'
+                    # If this is an alias structure then find the non-alias one and use that
+                    structName = self.registry.getNonAliasTypeName(structName, self.registry.structs)
+                    # Copy defined format property structure data
+                    if not structName in definedFormatProperties:
+                        definedFormatProperties[structName] = []
+                    definedFormatProperties[structName].extend(sorted(properties.keys()))
+
+                # Add format information
+                if not format in definedFormats:
+                    definedFormats[format] = OrderedDict()
+                definedFormats[format].update(definedFormatProperties)
+
+
+        # Construct table data
+        tableData = OrderedDict()
+        for format in sorted(definedFormats.keys()):
+            section = tableData[format] = OrderedDict()
+            for structName, members in definedFormats[format].items():
+                section.update({ row: functools.partial(self.gen_format, format, structName) for row in members })
+
+        # Generate table
+        table = self.gen_sectionedTable(tableData)
+        return '\n## Vulkan Profile Formats\n\n{0}\n'.format(table)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-registry', action='store', default='vk.xml',
+    parser.add_argument('-registry', action='store',
                         help='Use specified registry file instead of vk.xml')
-    parser.add_argument('-profiles', action='store', default='./profiles',
+    parser.add_argument('-profiles', action='store',
                         help='Generate based on profiles in the specified directory')
-    parser.add_argument('-outIncDir', action='store', default='./library/include/vulkan',
+    parser.add_argument('-outIncDir', action='store',
                         help='Output include directory for profile library')
-    parser.add_argument('-outSrcDir', action='store', default='./library/source',
+    parser.add_argument('-outSrcDir', action='store',
                         help='Output source directory for profile library')
-    parser.add_argument('-outSchema', action='store', default='./schema/profile_schema.json',
+    parser.add_argument('-outSchema', action='store',
                         help='Output file for JSON profile schema')
-    parser.add_argument('-outDoc', action='store', default='./PROFILES.md',
+    parser.add_argument('-outDoc', action='store',
                         help='Output file for profiles documentation')
-    parser.add_argument('-validate', action='store_true', default=True,
+    parser.add_argument('-validate', action='store_true',
                         help='Validate generated JSON profile schema and JSON profiles against the schema')
     parser.add_argument('-generateDebugLibrary', action='store_true',
                         help='Also generate library variant with debug messages')
 
     args = parser.parse_args()
 
-    if args.outIncDir is not None or args.outSrcDir is not None:
+    if args.outIncDir is None and args.outSchema is None and args.outDoc is None:
+        parser.print_help()
+        exit()
+
+    if args.outIncDir != None or args.outSrcDir != None:
         if args.registry is None or args.profiles is None or args.outIncDir is None or args.outSrcDir is None:
             Log.e("Generating the profile library requires specifying -registry, -profiles, -outIncDir and -outSrcDir arguments")
             parser.print_help()
             exit()
 
-    if args.outSchema is not None:
+    if args.outSchema != None:
         if args.registry is None:
             Log.e("Generating the profile schema requires specifying -registry and -outSchema arguments")
             parser.print_help()
             exit()
 
-    if args.outDoc is not None:
+    if args.outDoc != None:
         if args.registry is None or args.profiles is None:
             Log.e("Generating the profile schema requires specifying -registry, -profiles and -outDoc arguments")
             parser.print_help()
@@ -3567,10 +3655,10 @@ if __name__ == '__main__':
 
     schema = None
 
-    if args.registry is not None:
+    if args.registry != None:
         registry = VulkanRegistry(args.registry)
 
-    if args.outSchema is not None or args.validate:
+    if args.outSchema != None or args.validate:
         generator = VulkanProfilesSchemaGenerator(registry)
         if args.outSchema is not None:
             generator.generate(args.outSchema)
@@ -3578,16 +3666,16 @@ if __name__ == '__main__':
             generator.validate()
             schema = generator.schema
 
-    if args.profiles is not None:
+    if args.profiles != None:
         profiles = VulkanProfiles.loadFromDir(registry, args.profiles, args.validate, schema)
 
-    if args.outIncDir is not None:
+    if args.outIncDir != None:
         generator = VulkanProfilesLibraryGenerator(registry, profiles)
         generator.generate(args.outIncDir, args.outSrcDir)
         if args.generateDebugLibrary:
             generator = VulkanProfilesLibraryGenerator(registry, profiles, True)
             generator.generate(args.outIncDir + '/debug', args.outSrcDir + '/debug')
 
-    if args.outDoc is not None:
+    if args.outDoc != None:
         generator = VulkanProfilesDocGenerator(registry, profiles)
         generator.generate(args.outDoc)
