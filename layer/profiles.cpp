@@ -3674,6 +3674,18 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         AddPromotedExtensions(apiVersion);
 
         if (layer_settings.simulate_capabilities & SIMULATE_API_VERSION_BIT) {
+            if (apiVersion > pdd_.physical_device_properties_.apiVersion) {
+                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                           format("JSON apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32
+                                  ") is greater than the device apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ")\n",
+                                  VK_VERSION_MAJOR(apiVersion), VK_VERSION_MINOR(apiVersion), VK_VERSION_PATCH(apiVersion),
+                                  VK_VERSION_MAJOR(pdd_.physical_device_properties_.apiVersion),
+                                  VK_VERSION_MINOR(pdd_.physical_device_properties_.apiVersion),
+                                  VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)));
+                if (layer_settings.debug_fail_on_error) {
+                    return VK_ERROR_INITIALIZATION_FAILED;
+                }
+            }
             pdd_.physical_device_properties_.apiVersion = apiVersion;
         }
 
