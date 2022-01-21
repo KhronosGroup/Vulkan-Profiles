@@ -1566,14 +1566,14 @@ class VulkanRegistry():
                     alias = aliasValue.get('alias')
                     if not alias in enumDef.valueAliases.keys():
                         enumDef.valueAliases[alias] = []
-                    enumDef.valueAliases[alias].extend(name)
+                    enumDef.valueAliases[alias].append(name)
         for aliasValue in xml.findall("./extensions/extension/require/enum[@extends]"):
             enumDef = self.enums[aliasValue.get('extends')]
             name = aliasValue.get('name')
             alias = aliasValue.get('alias')
             if not alias in enumDef.valueAliases.keys():
                 enumDef.valueAliases[alias] = []
-            enumDef.valueAliases[alias].extend(name)
+            enumDef.valueAliases[alias].append(name)
 
         # Find any bitmask (flags) aliases
         for bitmask in xml.findall("./types/type[@category='bitmask']"):
@@ -1806,6 +1806,15 @@ class VulkanRegistry():
                 Log.f("Invalid array size '{0}'".format(arraySize))
         else:
             return arraySize
+
+    def getNonAliasTypeName(self, alias, types):
+        typeDef = types[alias]
+        if typeDef.isAlias:
+            for alias in typeDef.aliases:
+                if not types[alias].isAlias:
+                    return alias
+        else:
+            return alias
 
 
 class VulkanProfileCapabilities():
@@ -3098,6 +3107,7 @@ class VulkanProfilesDocGenerator():
         gen += self.gen_extensions()
         gen += self.gen_features()
         gen += self.gen_limits()
+        gen += self.gen_queueFamilies()
         return gen
 
 
@@ -3241,7 +3251,7 @@ class VulkanProfilesDocGenerator():
 
     def gen_features(self):
         # Merge all feature references across the profiles to collect the relevant features to look at
-        definedFeatures = {}
+        definedFeatures = dict()
         for profile in self.profiles:
             for featureStructName, features in profile.capabilities.features.items():
                 # VkPhysicalDeviceFeatures2 is an exception, as it contains a nested structure
@@ -3252,11 +3262,7 @@ class VulkanProfilesDocGenerator():
                 elif self.has_nestedFeatureData(features):
                     Log.f("Unexpected nested feature data in profile '{0}' structure '{1}'".format(profile.name, featureStructName))
                 # If this is an alias structure then find the non-alias one and use that
-                structDef = self.registry.structs[featureStructName]
-                if structDef.isAlias:
-                    for alias in structDef.aliases:
-                        if not self.registry.structs[alias].isAlias:
-                            featureStructName = alias
+                featureStructName = self.registry.getNonAliasTypeName(featureStructName, self.registry.structs)
                 # Copy defined feature structure data
                 if not featureStructName in definedFeatures:
                     definedFeatures[featureStructName] = []
@@ -3394,7 +3400,7 @@ class VulkanProfilesDocGenerator():
 
     def gen_limits(self):
         # Merge all limit/property references across the profiles to collect the relevant limits to look at
-        definedLimits = {}
+        definedLimits = dict()
         for profile in self.profiles:
             for propertyStructName, properties in profile.capabilities.properties.items():
                 # VkPhysicalDeviceProperties and VkPhysicalDeviceProperties2 are exceptions,
@@ -3409,11 +3415,7 @@ class VulkanProfilesDocGenerator():
                     continue
 
                 # If this is an alias structure then find the non-alias one and use that
-                structDef = self.registry.structs[propertyStructName]
-                if structDef.isAlias:
-                    for alias in structDef.aliases:
-                        if not self.registry.structs[alias].isAlias:
-                            propertyStructName = alias
+                propertyStructName = self.registry.getNonAliasTypeName(propertyStructName, self.registry.structs)
                 # Copy defined limit/property structure data
                 if not propertyStructName in definedLimits:
                     definedLimits[propertyStructName] = []
@@ -3447,6 +3449,80 @@ class VulkanProfilesDocGenerator():
         # Generate table
         table = self.gen_sectionedTable(tableData)
         return '\n## Vulkan Profile Limits (Properties)\n\n{0}\n\n{1}\n'.format(disclaimer, table)
+
+
+    def gen_queueFamily(self, index, struct, member, profile = None):
+        # If no profile was specified then this is the first column so return the member name
+        if profile is None:
+            return member
+
+        # If this profile doesn't even define this queue family index then early out
+        if len(profile.capabilities.queueFamiliesProperties) <= index:
+            return ''
+
+        # If this queue family property struct member is defined in the profile as is, include it
+        if struct in profile.capabilities.queueFamiliesProperties[index]:
+            propertyStruct = profile.capabilities.queueFamiliesProperties[index][struct]
+            if member in propertyStruct:
+                return '{0} (in {1})'.format(self.formatValue(propertyStruct[member]), struct)
+
+        # If the struct is VkPhysicalDeviceQueueFamilyProperties then check if the feature is
+        # defined in VkPhysicalDeviceQueueFamilyProperties2 or VkPhysicalDeviceQueueFamilyProperties2KHR
+        # for the profile and then include it
+        if struct == 'VkPhysicalDeviceQueueFamilyProperties':
+            for wrapperStruct in [ 'VkPhysicalDeviceQueueFamilyProperties2', 'VkPhysicalDeviceQueueFamilyProperties2KHR' ]:
+                if wrapperStruct in profile.capabilities.queueFamiliesProperties[index]:
+                    propertyStruct = profile.capabilities.queueFamiliesProperties[index][wrapperStruct]['queueFamilyProperties']
+                    if member in propertyStruct and propertyStruct[member]:
+                        return '{0} (in {1})'.format(self.formatValue(propertyStruct[member]), wrapperStruct)
+
+        # If the struct has aliases and the property struct member is defined in the profile
+        # in one of those then include it
+        structDef = self.registry.structs[struct]
+        for alias in structDef.aliases:
+            if alias in profile.capabilities.queueFamiliesProperties[index]:
+                propertyStruct = profile.capabilities.queueFamiliesProperties[index][alias]
+                if member in propertyStruct and propertyStruct[member]:
+                    return '{0} (in {1})'.format(self.formatValue(propertyStruct[member]), alias)
+
+        return '-'
+
+
+    def gen_queueFamilies(self):
+        # Merge all queue family property references across the profiles to collect the relevant
+        # properties to look at for each queue family definition index
+        definedQueueFamilies = []
+        for profile in self.profiles:
+            for index, queueFamily in enumerate(profile.capabilities.queueFamiliesProperties):
+                definedQueueFamilyProperties = dict()
+                for structName, properties in queueFamily.items():
+                    # VkPhysicalDeviceQueueFamilies2 is an exception, as it contains a nested structure
+                    # No other structure is allowed to have this
+                    if structName == 'VkPhysicalDeviceQueueFamilyProperties2' or structName == 'VkPhysicalDeviceQueueFamilyProperties2KHR':
+                        structName = 'VkPhysicalDeviceQueueFamilyProperties'
+                        properties = properties['queueFamilyProperties']
+                    # If this is an alias structure then find the non-alias one and use that
+                    structName = self.registry.getNonAliasTypeName(structName, self.registry.structs)
+                    # Copy defined limit/property structure data
+                    if not structName in definedQueueFamilyProperties:
+                        definedQueueFamilyProperties[structName] = []
+                    definedQueueFamilyProperties[structName].extend(properties.keys())
+                # Add queue family to the list
+                if len(definedQueueFamilies) <= index:
+                    definedQueueFamilies.append(dict())
+                definedQueueFamilies[index] = definedQueueFamilyProperties
+
+        # Construct table data
+        tableData = OrderedDict({})
+        for index, queueFamilyProperties in enumerate(definedQueueFamilies):
+            section = tableData['Queue family #' + str(index)] = OrderedDict({})
+            for structName, members in queueFamilyProperties.items():
+                section.update({ row: functools.partial(self.gen_queueFamily, index, structName) for row in members })
+
+        # Generate table
+        table = self.gen_sectionedTable(tableData)
+        return '\n## Vulkan Profile Queue Families\n\n{0}\n'.format(table)
+
 
 
 if __name__ == '__main__':

@@ -475,3 +475,13 @@
 | maxInlineUniformBlockSize (max) | 256 (in VkPhysicalDeviceVulkan13Properties) | - | - | - |
 | maxPerStageDescriptorInlineUniformBlocks (max) | 4 (in VkPhysicalDeviceVulkan13Properties) | - | - | - |
 | maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks (max) | 4 (in VkPhysicalDeviceVulkan13Properties) | - | - | - |
+
+## Vulkan Profile Queue Families
+
+| Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_portability_2021 | VP_LUNARG_desktop_portability_2021_subset |
+|----------|---------------------|--------------------------|------------------------------------|-------------------------------------------|
+| **Queue family #0** |
+| queueFlags |  |  | (VK_QUEUE_GRAPHICS_BIT \| VK_QUEUE_COMPUTE_BIT \| VK_QUEUE_TRANSFER_BIT \| VK_QUEUE_SPARSE_BINDING_BIT) (in VkQueueFamilyProperties) | (VK_QUEUE_GRAPHICS_BIT \| VK_QUEUE_COMPUTE_BIT \| VK_QUEUE_TRANSFER_BIT \| VK_QUEUE_SPARSE_BINDING_BIT) (in VkQueueFamilyProperties) |
+| queueCount |  |  | 1 (in VkQueueFamilyProperties) | 1 (in VkQueueFamilyProperties) |
+| timestampValidBits |  |  | 36 (in VkQueueFamilyProperties) | 36 (in VkQueueFamilyProperties) |
+| minImageTransferGranularity |  |  | (1,1,1) (in VkQueueFamilyProperties) | (1,1,1) (in VkQueueFamilyProperties) |
