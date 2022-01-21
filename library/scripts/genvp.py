@@ -1178,6 +1178,7 @@ class VulkanEnum():
         self.aliases = [ name ]
         self.isAlias = False
         self.values = set()
+        self.valueAliases = dict()
 
 
 class VulkanBitmask():
@@ -1555,6 +1556,24 @@ class VulkanRegistry():
                     aliasEnumDef.values = mergedValues
                 else:
                     Log.f("Failed to find alias '{0}' of enum '{1}'".format(alias, enum.get('name')))
+
+        # Find any enum value aliases
+        for enum in xml.findall("./enums"):
+            if enum.get('name') in self.enums.keys():
+                enumDef = self.enums[enum.get('name')]
+                for aliasValue in enum.findall("./enum[@alias]"):
+                    name = aliasValue.get('name')
+                    alias = aliasValue.get('alias')
+                    if not alias in enumDef.valueAliases.keys():
+                        enumDef.valueAliases[alias] = []
+                    enumDef.valueAliases[alias].extend(name)
+        for aliasValue in xml.findall("./extensions/extension/require/enum[@extends]"):
+            enumDef = self.enums[aliasValue.get('extends')]
+            name = aliasValue.get('name')
+            alias = aliasValue.get('alias')
+            if not alias in enumDef.valueAliases.keys():
+                enumDef.valueAliases[alias] = []
+            enumDef.valueAliases[alias].extend(name)
 
         # Find any bitmask (flags) aliases
         for bitmask in xml.findall("./types/type[@category='bitmask']"):
@@ -3437,13 +3456,13 @@ if __name__ == '__main__':
                         help='Use specified registry file instead of vk.xml')
     parser.add_argument('-profiles', action='store', default='./profiles',
                         help='Generate based on profiles in the specified directory')
-    parser.add_argument('-outIncDir', action='store',
+    parser.add_argument('-outIncDir', action='store', default='./library/include/vulkan',
                         help='Output include directory for profile library')
-    parser.add_argument('-outSrcDir', action='store',
+    parser.add_argument('-outSrcDir', action='store', default='./library/source',
                         help='Output source directory for profile library')
-    parser.add_argument('-outSchema', action='store', default='profile_schema.json',
+    parser.add_argument('-outSchema', action='store', default='./schema/profile_schema.json',
                         help='Output file for JSON profile schema')
-    parser.add_argument('-outDoc', action='store', default='profile_doc.md',
+    parser.add_argument('-outDoc', action='store', default='./PROFILES.md',
                         help='Output file for profiles documentation')
     parser.add_argument('-validate', action='store_true', default=True,
                         help='Validate generated JSON profile schema and JSON profiles against the schema')
