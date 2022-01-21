@@ -1829,6 +1829,8 @@ class JsonLoader {
         int specVersion;
     };
 
+    bool WarnDuplicatedFeature(const Json::Value &parent);
+    bool WarnDuplicatedProperty(const Json::Value &parent);
     bool GetFeature(const Json::Value &features, const std::string &feature_name);
     bool GetProperty(const Json::Value &props, const std::string &property_name);
     bool GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest,
@@ -2899,453 +2901,532 @@ static inline VkFormatFeatureFlags2 StringToVkFormatFeatureFlags2(const std::str
     return 0;
 }
 
-static bool WarnIfRepeated(const std::string& name, const std::string& promoted, bool promoted_used) {
-    if (promoted_used) {
-        LogMessage(DEBUG_REPORT_WARNING_BIT, format("JSON file sets variables for %s while also using %s", name.c_str(), promoted.c_str()));
+bool WarnDuplicated(const Json::Value &parent, const std::string &first, const std::string &second,
+                    const std::string promoted = {}) {
+    bool promoted_member = !promoted.empty() && parent.isMember(promoted);
+    bool first_member = parent.isMember(first);
+    bool second_member = !second.empty() && parent.isMember(second);
+    if (promoted_member) {
+        if (first_member) {
+            LogMessage(DEBUG_REPORT_WARNING_BIT,
+                       format("JSON file sets variables for %s while also using %s", promoted.c_str(), first.c_str()));
+            return false;
+        } else if (second_member) {
+            LogMessage(DEBUG_REPORT_WARNING_BIT,
+                       format("JSON file sets variables for %s while also using %s", promoted.c_str(), second.c_str()));
+            return false;
+        }
+    } else if (first_member && second_member) {
+        LogMessage(DEBUG_REPORT_WARNING_BIT,
+                   format("JSON file sets variables for %s while also using %s", first.c_str(), second.c_str()));
         return false;
     }
     return true;
 }
 
+bool JsonLoader::WarnDuplicatedFeature(const Json::Value &parent) {
+    bool valid = true;
+
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceHostQueryResetFeatures", "VkPhysicalDeviceHostQueryResetFeaturesEXT",
+                            "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceMaintenance4Features", "VkPhysicalDeviceMaintenance4FeaturesKHR",
+                            "VkPhysicalDeviceVulkan13Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDevice16BitStorageFeatures", "VkPhysicalDevice16BitStorageFeaturesKHR",
+                            "VkPhysicalDeviceVulkan11Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDevice8BitStorageFeatures", "VkPhysicalDevice8BitStorageFeaturesKHR",
+                            "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceBufferDeviceAddressFeatures", "VkPhysicalDeviceBufferDeviceAddressFeaturesKHR",
+                            "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceBufferDeviceAddressFeatures", "VkPhysicalDeviceBufferDeviceAddressFeaturesEXT",
+                            "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceBufferDeviceAddressFeaturesKHR",
+                            "VkPhysicalDeviceBufferDeviceAddressFeaturesEXT", "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceDescriptorIndexingFeatures", "VkPhysicalDeviceDescriptorIndexingFeaturesEXT",
+                            "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceImagelessFramebufferFeatures",
+                            "VkPhysicalDeviceImagelessFramebufferFeaturesKHR", "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceMultiviewFeatures", "VkPhysicalDeviceMultiviewFeaturesKHR",
+                            "VkPhysicalDeviceVulkan11Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceProtectedMemoryFeatures", {}, "VkPhysicalDeviceVulkan11Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceSamplerYcbcrConversionFeatures",
+                            "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR", "VkPhysicalDeviceVulkan11Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceScalarBlockLayoutFeatures", "VkPhysicalDeviceScalarBlockLayoutFeaturesEXT",
+                            "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures",
+                            "VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR", "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceShaderAtomicInt64Features", "VkPhysicalDeviceShaderAtomicInt64FeaturesKHR",
+                            "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceVulkan11Features", {}, "VkPhysicalDeviceVulkan11Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceShaderFloat16Int8Features", "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR",
+                            "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures",
+                            "VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR", "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceTimelineSemaphoreFeatures", "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR",
+                            "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceUniformBufferStandardLayoutFeatures",
+                            "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR", "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceVariablePointersFeatures", "VkPhysicalDeviceVariablePointersFeaturesKHR",
+                            "VkPhysicalDeviceVulkan11Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceVulkanMemoryModelFeatures", "VkPhysicalDeviceVulkanMemoryModelFeaturesKHR",
+                            "VkPhysicalDeviceVulkan12Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures",
+                            "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR", "VkPhysicalDeviceVulkan13Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceShaderIntegerDotProductFeatures",
+                            "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR", "VkPhysicalDeviceVulkan13Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceShaderTerminateInvocationFeatures",
+                            "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR", "VkPhysicalDeviceVulkan13Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceSynchronization2Features", "VkPhysicalDeviceSynchronization2FeaturesKHR",
+                            "VkPhysicalDeviceVulkan13Features");
+    valid &=
+        WarnDuplicated(parent, "VkPhysicalDeviceGlobalPriorityQueryFeaturesKHR", "VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceImageRobustnessFeatures", "VkPhysicalDeviceImageRobustnessFeaturesEXT",
+                            "VkPhysicalDeviceVulkan13Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceInlineUniformBlockFeatures", "VkPhysicalDeviceInlineUniformBlockFeaturesEXT",
+                            "VkPhysicalDeviceVulkan13Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDevicePipelineCreationCacheControlFeatures",
+                            "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT", "VkPhysicalDeviceVulkan13Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDevicePrivateDataFeatures", "VkPhysicalDevicePrivateDataFeaturesEXT",
+                            "VkPhysicalDeviceVulkan13Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures",
+                            "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT", "VkPhysicalDeviceVulkan13Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceSubgroupSizeControlFeatures", "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT",
+                            "VkPhysicalDeviceVulkan13Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceTextureCompressionASTCHDRFeatures",
+                            "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT", "VkPhysicalDeviceVulkan13Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceDynamicRenderingFeatures", "VkPhysicalDeviceDynamicRenderingFeaturesKHR",
+                            "VkPhysicalDeviceVulkan13Features");
+
+    return valid;
+}
+
+bool JsonLoader::WarnDuplicatedProperty(const Json::Value &parent) {
+    bool valid = true;
+
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceDepthStencilResolveProperties",
+                            "VkPhysicalDeviceDepthStencilResolvePropertiesKHR", "VkPhysicalDeviceVulkan12Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceDepthStencilResolveProperties", {}, "VkPhysicalDeviceVulkan11Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceDescriptorIndexingProperties",
+                            "VkPhysicalDeviceDescriptorIndexingPropertiesEXT", "VkPhysicalDeviceVulkan12Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceFloatControlsProperties", "VkPhysicalDeviceFloatControlsPropertiesKHR",
+                            "VkPhysicalDeviceVulkan12Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceMaintenance3Properties", "VkPhysicalDeviceMaintenance3PropertiesKHR",
+                            "VkPhysicalDeviceVulkan11Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceMaintenance4Properties", "VkPhysicalDeviceMaintenance4PropertiesKHR",
+                            "VkPhysicalDeviceVulkan13Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceMultiviewProperties", "VkPhysicalDeviceMultiviewPropertiesKHR",
+                            "VkPhysicalDeviceVulkan11Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceProtectedMemoryProperties", {}, "VkPhysicalDeviceVulkan11Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceTimelineSemaphoreProperties", "VkPhysicalDeviceTimelineSemaphorePropertiesKHR",
+                            "VkPhysicalDeviceVulkan12Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceSamplerFilterMinmaxProperties",
+                            "VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT", "VkPhysicalDeviceVulkan12Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceShaderIntegerDotProductProperties",
+                            "VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR", "VkPhysicalDeviceVulkan13Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceInlineUniformBlockProperties",
+                            "VkPhysicalDeviceInlineUniformBlockPropertiesEXT", "VkPhysicalDeviceVulkan13Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceSubgroupSizeControlProperties",
+                            "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT", "VkPhysicalDeviceVulkan13Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceTexelBufferAlignmentProperties",
+                            "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT", "VkPhysicalDeviceVulkan13Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDevicePointClippingProperties", "VkPhysicalDevicePointClippingPropertiesKHR",
+                            "VkPhysicalDeviceVulkan11Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceDriverProperties", "VkPhysicalDeviceDriverPropertiesKHR",
+                            "VkPhysicalDeviceVulkan12Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceIDProperties", "VkPhysicalDeviceIDPropertiesKHR",
+                            "VkPhysicalDeviceVulkan11Properties");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceToolProperties", "VkPhysicalDeviceToolPropertiesEXT");
+
+    return valid;
+}
+
 bool JsonLoader::GetFeature(const Json::Value &features, const std::string &feature_name) {
     const Json::Value &feature = features[feature_name];
 
-    bool valid = true;
     if (feature_name == "VkPhysicalDeviceFeatures") {
-        valid &= GetValue(feature, &pdd_.physical_device_features_);
+        return GetValue(feature, &pdd_.physical_device_features_);
     } else if (feature_name == "VkPhysicalDeviceHostQueryResetFeatures" ||
                feature_name == "VkPhysicalDeviceHostQueryResetFeaturesEXT") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan12Features", pdd_.vulkan_1_2_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_host_query_reset_features_);
+        return GetValue(feature, &pdd_.physical_device_host_query_reset_features_);
     } else if (feature_name == "VkPhysicalDeviceMaintenance4Features" ||
                feature_name == "VkPhysicalDeviceMaintenance4FeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan13Features", pdd_.vulkan_1_3_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_maintenance_4_features_);
+        return GetValue(feature, &pdd_.physical_device_maintenance_4_features_);
     } else if (feature_name == "VkPhysicalDevice16BitStorageFeatures" ||
                feature_name == "VkPhysicalDevice16BitStorageFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan11Features", pdd_.vulkan_1_1_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_16bit_storage_features_);
+        return GetValue(feature, &pdd_.physical_device_16bit_storage_features_);
     } else if (feature_name == "VkPhysicalDevice8BitStorageFeatures" || feature_name == "VkPhysicalDevice8BitStorageFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan12Features", pdd_.vulkan_1_2_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_8bit_storage_features_);
+        return GetValue(feature, &pdd_.physical_device_8bit_storage_features_);
     } else if (feature_name == "VkPhysicalDeviceBufferDeviceAddressFeatures" ||
                feature_name == "VkPhysicalDeviceBufferDeviceAddressFeaturesKHR" ||
                feature_name == "VkPhysicalDeviceBufferDeviceAddressFeaturesEXT") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan12Features", pdd_.vulkan_1_2_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_buffer_device_address_features_);
+        return GetValue(feature, &pdd_.physical_device_buffer_device_address_features_);
     } else if (feature_name == "VkPhysicalDeviceDescriptorIndexingFeatures" ||
                feature_name == "VkPhysicalDeviceDescriptorIndexingFeaturesEXT") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan12Features", pdd_.vulkan_1_2_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_descriptor_indexing_features_);
+        return GetValue(feature, &pdd_.physical_device_descriptor_indexing_features_);
     } else if (feature_name == "VkPhysicalDeviceImagelessFramebufferFeatures" ||
                feature_name == "VkPhysicalDeviceImagelessFramebufferFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan12Features", pdd_.vulkan_1_2_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_imageless_framebuffer_features_);
+        return GetValue(feature, &pdd_.physical_device_imageless_framebuffer_features_);
     } else if (feature_name == "VkPhysicalDeviceMultiviewFeatures" || feature_name == "VkPhysicalDeviceMultiviewFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan11Features", pdd_.vulkan_1_1_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_multiview_features_);
+        return GetValue(feature, &pdd_.physical_device_multiview_features_);
     } else if (feature_name == "VkPhysicalDeviceProtectedMemoryFeatures") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan11Features", pdd_.vulkan_1_1_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_protected_memory_features_);
+        return GetValue(feature, &pdd_.physical_device_protected_memory_features_);
     } else if (feature_name == "VkPhysicalDeviceSamplerYcbcrConversionFeatures" ||
                feature_name == "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan11Features", pdd_.vulkan_1_1_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_sampler_ycbcr_conversion_features_);
+        return GetValue(feature, &pdd_.physical_device_sampler_ycbcr_conversion_features_);
     } else if (feature_name == "VkPhysicalDeviceScalarBlockLayoutFeatures" ||
                feature_name == "VkPhysicalDeviceScalarBlockLayoutFeaturesEXT") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan12Features", pdd_.vulkan_1_2_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_scalar_block_layout_features_);
+        return GetValue(feature, &pdd_.physical_device_scalar_block_layout_features_);
     } else if (feature_name == "VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures" ||
                feature_name == "VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan12Features", pdd_.vulkan_1_2_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_separate_depth_stencil_layouts_features_);
+        return GetValue(feature, &pdd_.physical_device_separate_depth_stencil_layouts_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderAtomicInt64Features" ||
                feature_name == "VkPhysicalDeviceShaderAtomicInt64FeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan12Features", pdd_.vulkan_1_2_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_shader_atomic_int64_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_atomic_int64_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderDrawParametersFeatures") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan11Features", pdd_.vulkan_1_1_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_shader_draw_parameters_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_draw_parameters_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderFloat16Int8Features" ||
                feature_name == "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan12Features", pdd_.vulkan_1_2_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_shader_float16_int8_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_float16_int8_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures" ||
                feature_name == "VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan12Features", pdd_.vulkan_1_2_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_shader_subgroup_extended_types_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_subgroup_extended_types_features_);
     } else if (feature_name == "VkPhysicalDeviceTimelineSemaphoreFeatures" ||
                feature_name == "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan12Features", pdd_.vulkan_1_2_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_timeline_semaphore_features_);
+        return GetValue(feature, &pdd_.physical_device_timeline_semaphore_features_);
     } else if (feature_name == "VkPhysicalDeviceUniformBufferStandardLayoutFeatures" ||
                feature_name == "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan12Features", pdd_.vulkan_1_2_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_uniform_buffer_standard_layout_features_);
+        return GetValue(feature, &pdd_.physical_device_uniform_buffer_standard_layout_features_);
     } else if (feature_name == "VkPhysicalDeviceVariablePointersFeatures" ||
                feature_name == "VkPhysicalDeviceVariablePointersFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan11Features", pdd_.vulkan_1_1_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_variable_pointers_features_);
+        return GetValue(feature, &pdd_.physical_device_variable_pointers_features_);
     } else if (feature_name == "VkPhysicalDeviceVulkanMemoryModelFeatures" ||
                feature_name == "VkPhysicalDeviceVulkanMemoryModelFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan12Features", pdd_.vulkan_1_2_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_vulkan_memory_model_features_);
+        return GetValue(feature, &pdd_.physical_device_vulkan_memory_model_features_);
     } else if (feature_name == "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures" ||
                feature_name == "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan13Features", pdd_.vulkan_1_3_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_zero_initialize_workgroup_memory_features_);
+        return GetValue(feature, &pdd_.physical_device_zero_initialize_workgroup_memory_features_);
     } else if (feature_name == "VkPhysicalDeviceAccelerationStructureFeaturesKHR") {
-        valid &= GetValue(feature, &pdd_.physical_device_acceleration_structure_features_);
+        return GetValue(feature, &pdd_.physical_device_acceleration_structure_features_);
     } else if (feature_name == "VkPhysicalDevicePerformanceQueryFeaturesKHR") {
-        valid &= GetValue(feature, &pdd_.physical_device_performance_query_features_);
+        return GetValue(feature, &pdd_.physical_device_performance_query_features_);
     } else if (feature_name == "VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR") {
-        valid &= GetValue(feature, &pdd_.physical_device_pipeline_executable_properties_features_);
+        return GetValue(feature, &pdd_.physical_device_pipeline_executable_properties_features_);
     } else if (feature_name == "VkPhysicalDevicePresentIdFeaturesKHR") {
-        valid &= GetValue(feature, &pdd_.physical_device_present_id_features_);
+        return GetValue(feature, &pdd_.physical_device_present_id_features_);
     } else if (feature_name == "VkPhysicalDevicePresentWaitFeaturesKHR") {
-        valid &= GetValue(feature, &pdd_.physical_device_present_wait_features_);
+        return GetValue(feature, &pdd_.physical_device_present_wait_features_);
     } else if (feature_name == "VkPhysicalDeviceRayQueryFeaturesKHR") {
-        valid &= GetValue(feature, &pdd_.physical_device_ray_query_features_);
+        return GetValue(feature, &pdd_.physical_device_ray_query_features_);
     } else if (feature_name == "VkPhysicalDeviceRayTracingPipelineFeaturesKHR") {
-        valid &= GetValue(feature, &pdd_.physical_device_ray_tracing_pipeline_features_);
+        return GetValue(feature, &pdd_.physical_device_ray_tracing_pipeline_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderClockFeaturesKHR") {
-        valid &= GetValue(feature, &pdd_.physical_device_shader_clock_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_clock_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderIntegerDotProductFeatures" ||
                feature_name == "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan13Features", pdd_.vulkan_1_3_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_shader_integer_dot_product_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_integer_dot_product_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR") {
-        valid &= GetValue(feature, &pdd_.physical_device_shader_subgroup_uniform_control_flow_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_subgroup_uniform_control_flow_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderTerminateInvocationFeatures" ||
                feature_name == "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan13Features", pdd_.vulkan_1_3_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_shader_terminate_invocation_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_terminate_invocation_features_);
     } else if (feature_name == "VkPhysicalDeviceSynchronization2Features" ||
                feature_name == "VkPhysicalDeviceSynchronization2FeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan13Features", pdd_.vulkan_1_3_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_synchronization2_features_);
+        return GetValue(feature, &pdd_.physical_device_synchronization2_features_);
     } else if (feature_name == "VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR") {
-        valid &= GetValue(feature, &pdd_.physical_device_workgroup_memory_explicit_layout_features_);
+        return GetValue(feature, &pdd_.physical_device_workgroup_memory_explicit_layout_features_);
     } else if (feature_name == "VkPhysicalDevice4444FormatsFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_4444_formats_features_);
+        return GetValue(feature, &pdd_.physical_device_4444_formats_features_);
     } else if (feature_name == "VkPhysicalDeviceASTCDecodeFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_astc_decode_features_);
+        return GetValue(feature, &pdd_.physical_device_astc_decode_features_);
     } else if (feature_name == "VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_blend_operation_advanced_features_);
+        return GetValue(feature, &pdd_.physical_device_blend_operation_advanced_features_);
     } else if (feature_name == "VkPhysicalDeviceBorderColorSwizzleFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_border_color_swizzle_features_);
+        return GetValue(feature, &pdd_.physical_device_border_color_swizzle_features_);
     } else if (feature_name == "VkPhysicalDeviceColorWriteEnableFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_color_write_enable_features_);
+        return GetValue(feature, &pdd_.physical_device_color_write_enable_features_);
     } else if (feature_name == "VkPhysicalDeviceConditionalRenderingFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_conditional_rendering_features_);
+        return GetValue(feature, &pdd_.physical_device_conditional_rendering_features_);
     } else if (feature_name == "VkPhysicalDeviceCustomBorderColorFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_custom_border_color_features_);
+        return GetValue(feature, &pdd_.physical_device_custom_border_color_features_);
     } else if (feature_name == "VkPhysicalDeviceDepthClipEnableFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_depth_clip_enable_features_ext_);
+        return GetValue(feature, &pdd_.physical_device_depth_clip_enable_features_ext_);
     } else if (feature_name == "VkPhysicalDeviceDeviceMemoryReportFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_device_memory_report_features_);
+        return GetValue(feature, &pdd_.physical_device_device_memory_report_features_);
     } else if (feature_name == "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_extended_dynamic_state_features_);
+        return GetValue(feature, &pdd_.physical_device_extended_dynamic_state_features_);
     } else if (feature_name == "VkPhysicalDeviceExtendedDynamicState2FeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_extended_dynamic_state2_features_);
+        return GetValue(feature, &pdd_.physical_device_extended_dynamic_state2_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentDensityMapFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_fragment_density_map_features_);
+        return GetValue(feature, &pdd_.physical_device_fragment_density_map_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_fragment_shader_interlock_features_);
+        return GetValue(feature, &pdd_.physical_device_fragment_shader_interlock_features_);
     } else if (feature_name == "VkPhysicalDeviceGlobalPriorityQueryFeaturesKHR" ||
                feature_name == "VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_global_priority_query_features_);
+        return GetValue(feature, &pdd_.physical_device_global_priority_query_features_);
     } else if (feature_name == "VkPhysicalDeviceImageRobustnessFeatures" ||
                feature_name == "VkPhysicalDeviceImageRobustnessFeaturesEXT") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan13Features", pdd_.vulkan_1_3_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_image_robustness_features_);
+        return GetValue(feature, &pdd_.physical_device_image_robustness_features_);
     } else if (feature_name == "VkPhysicalDeviceIndexTypeUint8FeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_index_type_uint8_features_);
+        return GetValue(feature, &pdd_.physical_device_index_type_uint8_features_);
     } else if (feature_name == "VkPhysicalDeviceInlineUniformBlockFeatures" ||
                feature_name == "VkPhysicalDeviceInlineUniformBlockFeaturesEXT") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan13Features", pdd_.vulkan_1_3_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_inline_uniform_block_features_);
+        return GetValue(feature, &pdd_.physical_device_inline_uniform_block_features_);
     } else if (feature_name == "VkPhysicalDeviceLineRasterizationFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_line_rasterization_features_);
+        return GetValue(feature, &pdd_.physical_device_line_rasterization_features_);
     } else if (feature_name == "VkPhysicalDeviceMemoryPriorityFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_memory_priority_features_);
+        return GetValue(feature, &pdd_.physical_device_memory_priority_features_);
     } else if (feature_name == "VkPhysicalDeviceMultiDrawFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_multi_draw_features_);
+        return GetValue(feature, &pdd_.physical_device_multi_draw_features_);
     } else if (feature_name == "VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_pageable_device_local_memory_features_);
+        return GetValue(feature, &pdd_.physical_device_pageable_device_local_memory_features_);
     } else if (feature_name == "VkPhysicalDevicePipelineCreationCacheControlFeatures" ||
                feature_name == "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan13Features", pdd_.vulkan_1_3_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_pipeline_creation_cache_control_features_);
+        return GetValue(feature, &pdd_.physical_device_pipeline_creation_cache_control_features_);
     } else if (feature_name == "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_primitive_topology_list_restart_features_);
+        return GetValue(feature, &pdd_.physical_device_primitive_topology_list_restart_features_);
     } else if (feature_name == "VkPhysicalDevicePrivateDataFeatures" || feature_name == "VkPhysicalDevicePrivateDataFeaturesEXT") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan13Features", pdd_.vulkan_1_3_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_private_data_features_);
+        return GetValue(feature, &pdd_.physical_device_private_data_features_);
     } else if (feature_name == "VkPhysicalDeviceProvokingVertexFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_provoking_vertex_features_);
+        return GetValue(feature, &pdd_.physical_device_provoking_vertex_features_);
     } else if (feature_name == "VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_rgba10x6_formats_features_);
+        return GetValue(feature, &pdd_.physical_device_rgba10x6_formats_features_);
     } else if (feature_name == "VkPhysicalDeviceRobustness2FeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_robustness_2_features_);
+        return GetValue(feature, &pdd_.physical_device_robustness_2_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderAtomicFloatFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_shader_atomic_float_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_atomic_float_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_shader_atomic_float2_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_atomic_float2_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures" ||
                feature_name == "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan13Features", pdd_.vulkan_1_3_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_shader_demote_to_helper_invocation_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_demote_to_helper_invocation_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_shader_image_atomic_int64_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_image_atomic_int64_features_);
     } else if (feature_name == "VkPhysicalDeviceSubgroupSizeControlFeatures" ||
                feature_name == "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan13Features", pdd_.vulkan_1_3_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_subgroup_size_control_features_);
+        return GetValue(feature, &pdd_.physical_device_subgroup_size_control_features_);
     } else if (feature_name == "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_texel_buffer_alignment_features_);
+        return GetValue(feature, &pdd_.physical_device_texel_buffer_alignment_features_);
     } else if (feature_name == "VkPhysicalDeviceTextureCompressionASTCHDRFeatures" ||
                feature_name == "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan13Features", pdd_.vulkan_1_3_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_texture_compression_astc_hdr_features_);
+        return GetValue(feature, &pdd_.physical_device_texture_compression_astc_hdr_features_);
     } else if (feature_name == "VkPhysicalDeviceTransformFeedbackFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_transform_feedback_features_);
+        return GetValue(feature, &pdd_.physical_device_transform_feedback_features_);
     } else if (feature_name == "VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_vertex_attribute_divisor_features_);
+        return GetValue(feature, &pdd_.physical_device_vertex_attribute_divisor_features_);
     } else if (feature_name == "VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_vertex_input_dynamic_state_features_);
+        return GetValue(feature, &pdd_.physical_device_vertex_input_dynamic_state_features_);
     } else if (feature_name == "VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_ycbcr_2plane_444_formats_features_);
+        return GetValue(feature, &pdd_.physical_device_ycbcr_2plane_444_formats_features_);
     } else if (feature_name == "VkPhysicalDeviceYcbcrImageArraysFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_ycbcr_image_arrays_features_);
+        return GetValue(feature, &pdd_.physical_device_ycbcr_image_arrays_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentShadingRateFeaturesKHR") {
-        valid &= GetValue(feature, &pdd_.physical_device_fragment_shading_rate_features_);
+        return GetValue(feature, &pdd_.physical_device_fragment_shading_rate_features_);
     } else if (feature_name == "VkPhysicalDeviceCoherentMemoryFeaturesAMD") {
-        valid &= GetValue(feature, &pdd_.physical_device_coherent_memory_features_);
+        return GetValue(feature, &pdd_.physical_device_coherent_memory_features_);
     } else if (feature_name == "VkPhysicalDeviceInvocationMaskFeaturesHUAWEI") {
-        valid &= GetValue(feature, &pdd_.physical_device_invocation_mask_features_);
+        return GetValue(feature, &pdd_.physical_device_invocation_mask_features_);
     } else if (feature_name == "VkPhysicalDeviceSubpassShadingFeaturesHUAWEI") {
-        valid &= GetValue(feature, &pdd_.physical_device_subpass_shading_features_);
+        return GetValue(feature, &pdd_.physical_device_subpass_shading_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL") {
-        valid &= GetValue(feature, &pdd_.physical_device_shader_integer_functions_2_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_integer_functions_2_features_);
     } else if (feature_name == "VkPhysicalDeviceComputeShaderDerivativesFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_compute_shader_derivatives_features_);
+        return GetValue(feature, &pdd_.physical_device_compute_shader_derivatives_features_);
     } else if (feature_name == "VkPhysicalDeviceCooperativeMatrixFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_cooperative_matrix_features_);
+        return GetValue(feature, &pdd_.physical_device_cooperative_matrix_features_);
     } else if (feature_name == "VkPhysicalDeviceCornerSampledImageFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_corner_sampled_image_features_);
+        return GetValue(feature, &pdd_.physical_device_corner_sampled_image_features_);
     } else if (feature_name == "VkPhysicalDeviceCoverageReductionModeFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_coverage_reduction_mode_features_);
+        return GetValue(feature, &pdd_.physical_device_coverage_reduction_mode_features_);
     } else if (feature_name == "VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_dedicated_allocation_image_aliasing_features_);
+        return GetValue(feature, &pdd_.physical_device_dedicated_allocation_image_aliasing_features_);
     } else if (feature_name == "VkPhysicalDeviceDiagnosticsConfigFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_diagnostics_config_features_);
+        return GetValue(feature, &pdd_.physical_device_diagnostics_config_features_);
     } else if (feature_name == "VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_device_generated_commands_features_);
+        return GetValue(feature, &pdd_.physical_device_device_generated_commands_features_);
     } else if (feature_name == "VkPhysicalDeviceExternalMemoryRDMAFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_external_memory_rdma_features_);
+        return GetValue(feature, &pdd_.physical_device_external_memory_rdma_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_fragment_shader_barycentric_features_);
+        return GetValue(feature, &pdd_.physical_device_fragment_shader_barycentric_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_fragment_shading_rate_enums_features_);
+        return GetValue(feature, &pdd_.physical_device_fragment_shading_rate_enums_features_);
     } else if (feature_name == "VkPhysicalDeviceInheritedViewportScissorFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_inherited_viewport_scissor_features_);
+        return GetValue(feature, &pdd_.physical_device_inherited_viewport_scissor_features_);
     } else if (feature_name == "VkPhysicalDeviceMeshShaderFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_mesh_shader_features_);
+        return GetValue(feature, &pdd_.physical_device_mesh_shader_features_);
     } else if (feature_name == "VkPhysicalDeviceRayTracingMotionBlurFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_ray_tracing_motiuon_blur_features_);
+        return GetValue(feature, &pdd_.physical_device_ray_tracing_motiuon_blur_features_);
     } else if (feature_name == "VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_representative_fragment_test_features_);
+        return GetValue(feature, &pdd_.physical_device_representative_fragment_test_features_);
     } else if (feature_name == "VkPhysicalDeviceExclusiveScissorFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_exclusive_scissor_features_);
+        return GetValue(feature, &pdd_.physical_device_exclusive_scissor_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderImageFootprintFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_shader_image_footprint_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_image_footprint_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderSMBuiltinsFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_shader_sm_builtins_features_);
+        return GetValue(feature, &pdd_.physical_device_shader_sm_builtins_features_);
     } else if (feature_name == "VkPhysicalDeviceShadingRateImageFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_shading_rate_image_features_);
+        return GetValue(feature, &pdd_.physical_device_shading_rate_image_features_);
     } else if (feature_name == "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE") {
-        valid &= GetValue(feature, &pdd_.physical_device_mutable_descriptor_type_features_);
+        return GetValue(feature, &pdd_.physical_device_mutable_descriptor_type_features_);
     } else if (feature_name == "VkPhysicalDeviceDynamicRenderingFeatures" ||
                feature_name == "VkPhysicalDeviceDynamicRenderingFeaturesKHR") {
-        valid &= WarnIfRepeated(feature_name, "VkPhysicalDeviceVulkan13Features", pdd_.vulkan_1_3_features_written_);
-        valid &= GetValue(feature, &pdd_.physical_device_dynamic_rendering_features_);
+        return GetValue(feature, &pdd_.physical_device_dynamic_rendering_features_);
     } else if (feature_name == "VkPhysicalDeviceImageViewMinLodFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_image_view_min_lod_features_);
+        return GetValue(feature, &pdd_.physical_device_image_view_min_lod_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentDensityMap2FeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_fragment_density_map_2_features_);
+        return GetValue(feature, &pdd_.physical_device_fragment_density_map_2_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM") {
-        valid &= GetValue(feature, &pdd_.physical_device_fragment_density_map_offset_features_);
+        return GetValue(feature, &pdd_.physical_device_fragment_density_map_offset_features_);
     } else if (feature_name == "VkPhysicalDeviceDepthClipControlFeaturesEXT") {
-        valid &= GetValue(feature, &pdd_.physical_device_depth_clip_control_features_);
+        return GetValue(feature, &pdd_.physical_device_depth_clip_control_features_);
     } else if (feature_name == "VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM") {
-        valid &= GetValue(feature, &pdd_.physical_device_rasterization_order_attachment_access_features_);
+        return GetValue(feature, &pdd_.physical_device_rasterization_order_attachment_access_features_);
     } else if (feature_name == "VkPhysicalDeviceLinearColorAttachmentFeaturesNV") {
-        valid &= GetValue(feature, &pdd_.physical_device_linear_color_attachment_features_);
+        return GetValue(feature, &pdd_.physical_device_linear_color_attachment_features_);
     } else if (feature_name == "VkPhysicalDeviceVulkan11Features") {
-        valid &= GetValue(feature, &pdd_.physical_device_vulkan_1_1_features_);
+        return GetValue(feature, &pdd_.physical_device_vulkan_1_1_features_);
     } else if (feature_name == "VkPhysicalDeviceVulkan12Features") {
-        valid &= GetValue(feature, &pdd_.physical_device_vulkan_1_2_features_);
+        return GetValue(feature, &pdd_.physical_device_vulkan_1_2_features_);
     } else if (feature_name == "VkPhysicalDeviceVulkan13Features") {
-        valid &= GetValue(feature, &pdd_.physical_device_vulkan_1_3_features_);
+        return GetValue(feature, &pdd_.physical_device_vulkan_1_3_features_);
     } else if (feature_name == "VkPhysicalDevicePortabilitySubsetFeaturesKHR") {
-        valid &= GetValue(feature, &pdd_.physical_device_portability_subset_features_);
+        return GetValue(feature, &pdd_.physical_device_portability_subset_features_);
     }
-    return valid;
+    return true;
 }
 
 bool JsonLoader::GetProperty(const Json::Value &props, const std::string &property_name) {
     const Json::Value &prop = props[property_name];
 
-    bool valid = true;
     if (property_name == "VkPhysicalDeviceProperties") {
-        valid &= GetValue(prop, &pdd_.physical_device_properties_);
+        return GetValue(prop, &pdd_.physical_device_properties_);
     } else if (property_name == "VkPhysicalDeviceLimits") {
-        valid &= GetValue(prop, &pdd_.physical_device_properties_.limits);
+        return GetValue(prop, &pdd_.physical_device_properties_.limits);
     } else if (property_name == "VkPhysicalDeviceSparseProperties") {
-        valid &= GetValue(prop, &pdd_.physical_device_properties_.sparseProperties);
+        return GetValue(prop, &pdd_.physical_device_properties_.sparseProperties);
     } else if (property_name == "VkPhysicalDeviceDepthStencilResolveProperties" ||
                property_name == "VkPhysicalDeviceDepthStencilResolvePropertiesKHR") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan12Properties", pdd_.vulkan_1_2_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_depth_stencil_resolve_properties_);
+        return GetValue(prop, &pdd_.physical_device_depth_stencil_resolve_properties_);
     } else if (property_name == "VkPhysicalDeviceSubgroupProperties") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan11Properties", pdd_.vulkan_1_1_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_subgroup_properties_);
+        return GetValue(prop, &pdd_.physical_device_subgroup_properties_);
     } else if (property_name == "VkPhysicalDeviceDescriptorIndexingProperties" ||
                property_name == "VkPhysicalDeviceDescriptorIndexingPropertiesEXT") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan12Properties", pdd_.vulkan_1_2_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_descriptor_indexing_properties_);
+        return GetValue(prop, &pdd_.physical_device_descriptor_indexing_properties_);
     } else if (property_name == "VkPhysicalDeviceFloatControlsProperties" ||
                property_name == "VkPhysicalDeviceFloatControlsPropertiesKHR") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan12Properties", pdd_.vulkan_1_2_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_float_controls_properties_);
+        return GetValue(prop, &pdd_.physical_device_float_controls_properties_);
     } else if (property_name == "VkPhysicalDeviceMaintenance3Properties" ||
                property_name == "VkPhysicalDeviceMaintenance3PropertiesKHR") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan11Properties", pdd_.vulkan_1_1_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_maintenance_3_properties_);
+        return GetValue(prop, &pdd_.physical_device_maintenance_3_properties_);
     } else if (property_name == "VkPhysicalDeviceMaintenance4Properties" ||
                property_name == "VkPhysicalDeviceMaintenance4PropertiesKHR") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan13Properties", pdd_.vulkan_1_3_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_maintenance_4_properties_);
+        return GetValue(prop, &pdd_.physical_device_maintenance_4_properties_);
     } else if (property_name == "VkPhysicalDeviceMultiviewProperties" ||
                property_name == "VkPhysicalDeviceMultiviewPropertiesKHR") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan11Properties", pdd_.vulkan_1_1_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_multiview_properties_);
+        return GetValue(prop, &pdd_.physical_device_multiview_properties_);
     } else if (property_name == "VkPhysicalDeviceProtectedMemoryProperties") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan11Properties", pdd_.vulkan_1_1_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_protected_memory_properties_);
+        return GetValue(prop, &pdd_.physical_device_protected_memory_properties_);
     } else if (property_name == "VkPhysicalDeviceTimelineSemaphoreProperties" ||
                property_name == "VkPhysicalDeviceTimelineSemaphorePropertiesKHR") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan12Properties", pdd_.vulkan_1_2_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_timeline_semaphore_properties_);
+        return GetValue(prop, &pdd_.physical_device_timeline_semaphore_properties_);
     } else if (property_name == "VkPhysicalDeviceSamplerFilterMinmaxProperties" ||
                property_name == "VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan12Properties", pdd_.vulkan_1_2_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_sampler_filter_minmax_properties_);
+        return GetValue(prop, &pdd_.physical_device_sampler_filter_minmax_properties_);
     } else if (property_name == "VkPhysicalDeviceAccelerationStructurePropertiesKHR") {
-        valid &= GetValue(prop, &pdd_.physical_device_acceleration_structure_properties_);
+        return GetValue(prop, &pdd_.physical_device_acceleration_structure_properties_);
     } else if (property_name == "VkPhysicalDevicePerformanceQueryPropertiesKHR") {
-        valid &= GetValue(prop, &pdd_.physical_device_performance_query_properties_);
+        return GetValue(prop, &pdd_.physical_device_performance_query_properties_);
     } else if (property_name == "VkPhysicalDevicePushDescriptorPropertiesKHR") {
-        valid &= GetValue(prop, &pdd_.physical_device_push_descriptor_properites_);
+        return GetValue(prop, &pdd_.physical_device_push_descriptor_properites_);
     } else if (property_name == "VkPhysicalDeviceRayTracingPipelinePropertiesKHR") {
-        valid &= GetValue(prop, &pdd_.physical_device_ray_tracing_pipeline_properties_);
+        return GetValue(prop, &pdd_.physical_device_ray_tracing_pipeline_properties_);
     } else if (property_name == "VkPhysicalDeviceShaderIntegerDotProductProperties" ||
                property_name == "VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan13Properties", pdd_.vulkan_1_3_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_shader_integer_dot_products_properties_);
+        return GetValue(prop, &pdd_.physical_device_shader_integer_dot_products_properties_);
     } else if (property_name == "VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_blend_operation_advanced_properties_);
+        return GetValue(prop, &pdd_.physical_device_blend_operation_advanced_properties_);
     } else if (property_name == "VkPhysicalDeviceConservativeRasterizationPropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_conservative_rasterization_properties_);
+        return GetValue(prop, &pdd_.physical_device_conservative_rasterization_properties_);
     } else if (property_name == "VkPhysicalDeviceCustomBorderColorPropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_custom_border_color_properties_);
+        return GetValue(prop, &pdd_.physical_device_custom_border_color_properties_);
     } else if (property_name == "VkPhysicalDeviceDiscardRectanglePropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_discard_rectangle_properties_);
+        return GetValue(prop, &pdd_.physical_device_discard_rectangle_properties_);
     } else if (property_name == "VkPhysicalDeviceExternalMemoryHostPropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_external_memory_host_properties_);
+        return GetValue(prop, &pdd_.physical_device_external_memory_host_properties_);
     } else if (property_name == "VkPhysicalDeviceFragmentDensityMapPropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_fragment_density_map_properties_);
+        return GetValue(prop, &pdd_.physical_device_fragment_density_map_properties_);
     } else if (property_name == "VkPhysicalDeviceInlineUniformBlockProperties" ||
                property_name == "VkPhysicalDeviceInlineUniformBlockPropertiesEXT") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan13Properties", pdd_.vulkan_1_3_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_inline_uniform_block_properties_);
+        return GetValue(prop, &pdd_.physical_device_inline_uniform_block_properties_);
     } else if (property_name == "VkPhysicalDeviceLineRasterizationPropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_line_rasterization_properties_);
+        return GetValue(prop, &pdd_.physical_device_line_rasterization_properties_);
     } else if (property_name == "VkPhysicalDeviceMultiDrawPropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_multi_draw_properties_);
+        return GetValue(prop, &pdd_.physical_device_multi_draw_properties_);
     } else if (property_name == "VkPhysicalDeviceProvokingVertexPropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_provoking_vertex_properties_);
+        return GetValue(prop, &pdd_.physical_device_provoking_vertex_properties_);
     } else if (property_name == "VkPhysicalDeviceRobustness2PropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_robustness_2_properties_);
+        return GetValue(prop, &pdd_.physical_device_robustness_2_properties_);
     } else if (property_name == "VkPhysicalDeviceSampleLocationsPropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_sample_locations_properties_);
+        return GetValue(prop, &pdd_.physical_device_sample_locations_properties_);
     } else if (property_name == "VkPhysicalDeviceSubgroupSizeControlProperties" ||
                property_name == "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan13Properties", pdd_.vulkan_1_3_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_subgroup_size_control_properties_);
+        return GetValue(prop, &pdd_.physical_device_subgroup_size_control_properties_);
     } else if (property_name == "VkPhysicalDeviceTexelBufferAlignmentProperties" ||
                property_name == "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan13Properties", pdd_.vulkan_1_3_properties_written_);
-        valid &= GetValue(prop, &pdd_.physical_device_texel_buffer_alignment_properties_);
+        return GetValue(prop, &pdd_.physical_device_texel_buffer_alignment_properties_);
     } else if (property_name == "VkPhysicalDeviceTransformFeedbackPropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_transform_feedback_properties_);
+        return GetValue(prop, &pdd_.physical_device_transform_feedback_properties_);
     } else if (property_name == "VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_vertex_attirbute_divisor_properties_);
+        return GetValue(prop, &pdd_.physical_device_vertex_attirbute_divisor_properties_);
     } else if (property_name == "VkPhysicalDeviceFragmentShadingRatePropertiesKHR") {
-        valid &= GetValue(prop, &pdd_.physical_device_fragment_shading_rate_properties_);
+        return GetValue(prop, &pdd_.physical_device_fragment_shading_rate_properties_);
     } else if (property_name == "VkPhysicalDeviceShaderCorePropertiesAMD") {
-        valid &= GetValue(prop, &pdd_.physical_device_shader_core_properties_);
+        return GetValue(prop, &pdd_.physical_device_shader_core_properties_);
     } else if (property_name == "VkPhysicalDeviceShaderCoreProperties2AMD") {
-        valid &= GetValue(prop, &pdd_.physical_device_shader_core_properties_2_);
+        return GetValue(prop, &pdd_.physical_device_shader_core_properties_2_);
     } else if (property_name == "VkPhysicalDeviceSubpassShadingPropertiesHUAWEI") {
-        valid &= GetValue(prop, &pdd_.physical_device_subpass_shading_properties_);
+        return GetValue(prop, &pdd_.physical_device_subpass_shading_properties_);
     } else if (property_name == "VkPhysicalDeviceCooperativeMatrixPropertiesNV") {
-        valid &= GetValue(prop, &pdd_.physical_device_cooperative_matrix_properties_);
+        return GetValue(prop, &pdd_.physical_device_cooperative_matrix_properties_);
     } else if (property_name == "VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV") {
-        valid &= GetValue(prop, &pdd_.physical_device_device_generated_commands_properties_);
+        return GetValue(prop, &pdd_.physical_device_device_generated_commands_properties_);
     } else if (property_name == "VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV") {
-        valid &= GetValue(prop, &pdd_.physical_device_fragment_shading_rate_enums_properties_);
+        return GetValue(prop, &pdd_.physical_device_fragment_shading_rate_enums_properties_);
     } else if (property_name == "VkPhysicalDeviceMeshShaderPropertiesNV") {
-        valid &= GetValue(prop, &pdd_.physical_device_mesh_shader_properties_);
+        return GetValue(prop, &pdd_.physical_device_mesh_shader_properties_);
     } else if (property_name == "VkPhysicalDeviceRayTracingPropertiesNV") {
-        valid &= GetValue(prop, &pdd_.physical_device_ray_tracing_properties_);
+        return GetValue(prop, &pdd_.physical_device_ray_tracing_properties_);
     } else if (property_name == "VkPhysicalDeviceShaderSMBuiltinsPropertiesNV") {
-        valid &= GetValue(prop, &pdd_.physical_device_shader_sm_builtins_properties_);
+        return GetValue(prop, &pdd_.physical_device_shader_sm_builtins_properties_);
     } else if (property_name == "VkPhysicalDeviceShadingRateImagePropertiesNV") {
-        valid &= GetValue(prop, &pdd_.physical_device_shading_rate_image_properties_);
+        return GetValue(prop, &pdd_.physical_device_shading_rate_image_properties_);
     } else if (property_name == "VkPhysicalDeviceFragmentDensityMap2PropertiesEXT") {
-        valid &= GetValue(prop, &pdd_.physical_device_fragment_density_map_2_properties_);
+        return GetValue(prop, &pdd_.physical_device_fragment_density_map_2_properties_);
     } else if (property_name == "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM") {
-        valid &= GetValue(prop, &pdd_.physical_device_fragment_density_map_offset_properties_);
+        return GetValue(prop, &pdd_.physical_device_fragment_density_map_offset_properties_);
     } else if (property_name == "VkPhysicalDeviceVulkan11Properties") {
-        valid &= GetValue(prop, &pdd_.physical_device_vulkan_1_1_properties_);
+        return GetValue(prop, &pdd_.physical_device_vulkan_1_1_properties_);
     } else if (property_name == "VkPhysicalDeviceVulkan12Properties") {
-        valid &= GetValue(prop, &pdd_.physical_device_vulkan_1_2_properties_);
+        return GetValue(prop, &pdd_.physical_device_vulkan_1_2_properties_);
     } else if (property_name == "VkPhysicalDeviceVulkan13Properties") {
-        valid &= GetValue(prop, &pdd_.physical_device_vulkan_1_3_properties_);
+        return GetValue(prop, &pdd_.physical_device_vulkan_1_3_properties_);
     } else if (property_name == "VkPhysicalDevicePortabilitySubsetPropertiesKHR") {
-        valid &= GetValue(prop, &pdd_.physical_device_portability_subset_properties_);
+        return GetValue(prop, &pdd_.physical_device_portability_subset_properties_);
     } else if (property_name == "VkPhysicalDevicePointClippingProperties" ||
                property_name == "VkPhysicalDevicePointClippingPropertiesKHR") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan11Properties", pdd_.vulkan_1_1_properties_written_);
-        valid &= GetValuePhysicalDevicePointClippingPropertiesKHR(prop);
+        return GetValuePhysicalDevicePointClippingPropertiesKHR(prop);
     } else if (property_name == "VkPhysicalDeviceDriverProperties" || property_name == "VkPhysicalDeviceDriverPropertiesKHR") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan12Properties", pdd_.vulkan_1_2_properties_written_);
-        valid &= GetValuePhysicalDeviceDriverProperties(prop);
+        return GetValuePhysicalDeviceDriverProperties(prop);
     } else if (property_name == "VkPhysicalDeviceIDProperties" || property_name == "VkPhysicalDeviceIDPropertiesKHR") {
-        valid &= WarnIfRepeated(property_name, "VkPhysicalDeviceVulkan11Properties", pdd_.vulkan_1_1_properties_written_);
-        valid &= GetValuePhysicalDeviceIDProperties(prop);
+        return GetValuePhysicalDeviceIDProperties(prop);
     } else if (property_name == "VkPhysicalDeviceMemoryBudgetPropertiesEXT") {
-        valid &= GetValuePhysicalDeviceMemoryBudgetPropertiesEXT(prop);
+        return GetValuePhysicalDeviceMemoryBudgetPropertiesEXT(prop);
     } else if (property_name == "VkPhysicalDevicePCIBusInfoPropertiesEXT") {
-        valid &= GetValuePhysicalDevicePCIBusInfoPropertiesEXT(prop);
+        return GetValuePhysicalDevicePCIBusInfoPropertiesEXT(prop);
     } else if (property_name == "VkPhysicalDeviceDrmPropertiesEXT") {
-        valid &= GetValuePhysicalDeviceDrmPropertiesEXT(prop);
+        return GetValuePhysicalDeviceDrmPropertiesEXT(prop);
     } else if (property_name == "VkPhysicalDeviceToolProperties" || property_name == "VkPhysicalDeviceToolPropertiesEXT") {
-        valid &= GetValuePhysicalDeviceToolPropertiesEXT(prop);
+        return GetValuePhysicalDeviceToolPropertiesEXT(prop);
     }
-    return valid;
+    return true;
 }
 
 bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest,
@@ -3728,6 +3809,11 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         if (layer_settings.simulate_capabilities & SIMULATE_FEATURES_BIT) {
             const auto &features = c["features"];
 
+            bool duplicated = !WarnDuplicatedFeature(features);
+            if (duplicated && layer_settings.debug_fail_on_error) {
+                return VK_ERROR_INITIALIZATION_FAILED;
+            }
+
             for (const auto &feature : features.getMemberNames()) {
                 if (features.isMember("VkPhysicalDeviceVulkan11Features")) {
                     pdd_.vulkan_1_1_features_written_ = true;
@@ -3746,6 +3832,11 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         }
 
         if (layer_settings.simulate_capabilities & SIMULATE_PROPERTIES_BIT) {
+            bool duplicated = !WarnDuplicatedProperty(properties);
+            if (duplicated && layer_settings.debug_fail_on_error) {
+                return VK_ERROR_INITIALIZATION_FAILED;
+            }
+
             if (properties.isMember("VkPhysicalDeviceVulkan11Properties")) {
                 pdd_.vulkan_1_1_properties_written_ = true;
             }
@@ -3804,7 +3895,7 @@ struct JsonValidator {
         if (!schema) {
             const Json::Value schema_document = ParseJsonFile((env + "/share/vulkan/registry/profile_schema.json").c_str());
             if (schema_document == Json::nullValue) {
-                return false;            
+                return false;
             }
 
             schema.reset(new Schema);
@@ -3927,12 +4018,12 @@ VkResult JsonLoader::LoadFile(const char *filename) {
     } else if (layer_settings.profile_validation) {
         JsonValidator validator;
         if (!validator.Init()) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT, format("%s count not find the profile schema file to validate filename.\n\t- This "
-                                                        "operation requires the Vulkan SDK to be install.\n\t- Skipping profile file validation.",
-                                                        kOurLayerName, filename));
+            LogMessage(DEBUG_REPORT_WARNING_BIT,
+                       format("%s count not find the profile schema file to validate filename.\n\t- This "
+                              "operation requires the Vulkan SDK to be install.\n\t- Skipping profile file validation.",
+                              kOurLayerName, filename));
         } else if (!validator.Check(root)) {
-            LogMessage(DEBUG_REPORT_ERROR_BIT,
-                       format("%s is not a valid JSON profile file.\n", filename));
+            LogMessage(DEBUG_REPORT_ERROR_BIT, format("%s is not a valid JSON profile file.\n", filename));
             if (layer_settings.debug_fail_on_error) {
                 return VK_ERROR_INITIALIZATION_FAILED;
             }
