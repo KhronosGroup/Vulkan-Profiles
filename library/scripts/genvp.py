@@ -3491,7 +3491,7 @@ if __name__ == '__main__':
         generator.generate(args.outIncDir, args.outSrcDir)
         if args.generateDebugLibrary:
             generator = VulkanProfilesLibraryGenerator(registry, profiles, True)
-            generator.generate(args.outIncDir, args.outSrcDir)
+            generator.generate(args.outIncDir + '/debug', args.outSrcDir + '/debug')
 
     if args.outDoc is not None:
         generator = VulkanProfilesDocGenerator(registry, profiles)
