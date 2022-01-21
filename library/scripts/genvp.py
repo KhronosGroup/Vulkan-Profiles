@@ -1903,7 +1903,7 @@ class VulkanProfileStructs():
         # Feature struct types
         self.feature = []
         for name in caps.features:
-            if name == 'VkPhysicalDeviceFeatures' or name == 'VkPHysicalDeviceFeatures2KHR':
+            if name in [ 'VkPhysicalDeviceFeatures', 'VkPhysicalDeviceFeatures2KHR' ]:
                 # Special case, add both as VkPhysicalDeviceFeatures2KHR
                 self.feature.append(registry.structs['VkPhysicalDeviceFeatures2KHR'])
             else:
@@ -1913,7 +1913,7 @@ class VulkanProfileStructs():
         # Property struct types
         self.property = []
         for name in caps.properties:
-            if name == 'VkPhysicalDeviceProperties' or name == 'VkPhysicalDeviceProperties2KHR':
+            if name in [ 'VkPhysicalDeviceProperties', 'VkPhysicalDeviceProperties2KHR' ]:
                 # Special case, add both as VkPhysicalDeviceProperties2KHR
                 self.property.append(registry.structs['VkPhysicalDeviceProperties2KHR'])
             else:
@@ -1926,7 +1926,7 @@ class VulkanProfileStructs():
         for queueFamilyProps in caps.queueFamiliesProperties:
             queueFamilyStructs.update(queueFamilyProps)
         for name in queueFamilyStructs:
-            if name == 'VkQueueFamilyProperties' or name == 'VkQueueFamilyProperties2KHR':
+            if name in [ 'VkQueueFamilyProperties', 'VkQueueFamilyProperties2KHR' ]:
                 # Special case, add both as VkQueueFamilyProperties2KHR
                 self.queueFamily.append(registry.structs['VkQueueFamilyProperties2KHR'])
             else:
@@ -1939,7 +1939,7 @@ class VulkanProfileStructs():
         for formatProps in caps.formats.values():
             formatStructs.update(formatProps)
         for name in formatStructs:
-            if name == 'VkFormatProperties' or name == 'VkFormatProperties2KHR' or name == 'VkFormatProperties3KHR':
+            if name in [ 'VkFormatProperties', 'VkFormatProperties2KHR', 'VkFormatProperties3KHR' ]:
                 # Special case, add all as VkFormatProperties2KHR and VkFormatProperties3KHR
                 self.format.append(registry.structs['VkFormatProperties2KHR'])
                 self.format.append(registry.structs['VkFormatProperties3KHR'])
