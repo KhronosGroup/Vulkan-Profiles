@@ -1012,3 +1012,29 @@ TEST(profiles, TestVulkan13Features) {
     EXPECT_EQ(vulkan_13_features.maintenance4, VK_TRUE);
 #endif
 }
+
+TEST(profiles, TestDuplicatedMembers) {
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    const std::string filepath = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_duplicated.json";
+    profiles_test::setProfilesFilename(filepath);
+    profiles_test::setProfilesProfileName("VP_LUNARG_test_duplicated");
+    profiles_test::setProfilesSimulateAllCapabilities();
+    profiles_test::setProfilesFailOnError(true);
+
+    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+
+    err = inst_builder.makeInstance();
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkInstance instance = inst_builder.getInstance();
+
+    VkPhysicalDevice physical_device;
+    err = inst_builder.getPhysicalDevice(&physical_device);
+    ASSERT_EQ(err, VK_ERROR_INITIALIZATION_FAILED);
+}
