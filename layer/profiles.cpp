@@ -487,6 +487,34 @@ void LogFlush() {
     }
 }
 
+std::string format_device_support_string(VkFormatFeatureFlags format_features) {
+    if (format_features == 0) return std::string("does not support it");
+    return ::format("only supports:\n\t\"%s\"", GetFormatFeatureString(format_features).c_str());
+}
+
+std::string format_device_support_string(VkFormatFeatureFlags2 format_features) {
+    if (format_features == 0) return std::string("does not support it");
+    return ::format("only supports:\n\t\"%s\"", GetFormatFeature2String(format_features).c_str());
+}
+
+void WarnMissingFormatFeatures(const std::string &format_name, const std::string &features, VkFormatFeatureFlags profile_features,
+                               VkFormatFeatureFlags device_features) {
+    LogMessage(DEBUG_REPORT_WARNING_BIT,
+               ::format("For %s `%s`,\nthe Profile requires:\n\t\"%s\"\nbut the Device %s.\nThe "
+                        "`%s` can't be simulated on this Device.\n",
+                        format_name.c_str(), features.c_str(), GetFormatFeatureString(profile_features).c_str(),
+                        format_device_support_string(device_features).c_str(), features.c_str()));
+}
+
+void WarnMissingFormatFeatures2(const std::string &format_name, const std::string &features, VkFormatFeatureFlags2 profile_features,
+                               VkFormatFeatureFlags2 device_features) {
+    LogMessage(DEBUG_REPORT_WARNING_BIT,
+               ::format("For %s `%s`,\nthe Profile requires:\n\t\"%s\"\nbut the Device %s.\nThe "
+                        "`%s` can't be simulated on this Device.\n",
+                        format_name.c_str(), features.c_str(), GetFormatFeature2String(profile_features).c_str(),
+                        format_device_support_string(device_features).c_str(), features.c_str()));
+}
+
 #define FORMAT_TO_STRING(format) \
     case format:                 \
         return #format
@@ -3492,31 +3520,22 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
 
     const VkFormatProperties &device_properties = pdd_.device_formats_[format];
     if (!HasFlags(device_properties.linearTilingFeatures, profile_properties.linearTilingFeatures)) {
-        LogMessage(DEBUG_REPORT_WARNING_BIT,
-                   ::format("For %s `linearTilingFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
-                            "supports:\n\t\"%s\".\nThe `linearTilingFeatures` can't be simulated on this Device.\n",
-                            format_name.c_str(), GetFormatFeatureString(profile_properties.linearTilingFeatures).c_str(),
-                            GetFormatFeatureString(device_properties.linearTilingFeatures).c_str()));
+        WarnMissingFormatFeatures(format_name, "linearTilingFeatures", profile_properties.linearTilingFeatures,
+                                  device_properties.linearTilingFeatures);
         if (layer_settings.debug_fail_on_error) {
             return false;
         }
     }
     if (!HasFlags(device_properties.optimalTilingFeatures, profile_properties.optimalTilingFeatures)) {
-        LogMessage(DEBUG_REPORT_WARNING_BIT,
-                   ::format("For %s `optimalTilingFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
-                            "supports:\n\t\"%s\".\nThe `optimalTilingFeatures` can't be simulated on this Device.\n",
-                            format_name.c_str(), GetFormatFeatureString(profile_properties.optimalTilingFeatures).c_str(),
-                            GetFormatFeatureString(device_properties.optimalTilingFeatures).c_str()));
+        WarnMissingFormatFeatures(format_name, "optimalTilingFeatures", profile_properties.optimalTilingFeatures,
+                                  device_properties.optimalTilingFeatures);
         if (layer_settings.debug_fail_on_error) {
             return false;
         }
     }
     if (!HasFlags(device_properties.bufferFeatures, profile_properties.bufferFeatures)) {
-        LogMessage(DEBUG_REPORT_WARNING_BIT,
-                   ::format("For %s `bufferFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
-                            "supports:\n\t\"%s\".\nThe `bufferFeatures` can't be simulated on this Device.\n",
-                            format_name.c_str(), GetFormatFeatureString(profile_properties.bufferFeatures).c_str(),
-                            GetFormatFeatureString(device_properties.bufferFeatures).c_str()));
+        WarnMissingFormatFeatures(format_name, "bufferFeatures", profile_properties.bufferFeatures,
+                                  device_properties.bufferFeatures);
         if (layer_settings.debug_fail_on_error) {
             return false;
         }
@@ -3524,31 +3543,22 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
 
     const VkFormatProperties3 &device_properties_3 = pdd_.device_formats_3_[format];
     if (!HasFlags(device_properties_3.linearTilingFeatures, profile_properties_3.linearTilingFeatures)) {
-        LogMessage(DEBUG_REPORT_WARNING_BIT,
-                   ::format("For %s `linearTilingFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
-                            "supports:\n\t\"%s\".\nThe `linearTilingFeatures` can't be simulated on this Device.\n",
-                            format_name.c_str(), GetFormatFeature2String(profile_properties_3.linearTilingFeatures).c_str(),
-                            GetFormatFeature2String(device_properties_3.linearTilingFeatures).c_str()));
+        WarnMissingFormatFeatures2(format_name, "linearTilingFeatures", profile_properties_3.linearTilingFeatures,
+                                   device_properties_3.linearTilingFeatures);
         if (layer_settings.debug_fail_on_error) {
             return false;
         }
     }
     if (!HasFlags(device_properties_3.optimalTilingFeatures, profile_properties_3.optimalTilingFeatures)) {
-        LogMessage(DEBUG_REPORT_WARNING_BIT,
-                   ::format("For %s `optimalTilingFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
-                            "supports:\n\t\"%s\".\nThe `optimalTilingFeatures` can't be simulated on this Device.\n",
-                            format_name.c_str(), GetFormatFeature2String(profile_properties_3.optimalTilingFeatures).c_str(),
-                            GetFormatFeature2String(device_properties_3.optimalTilingFeatures).c_str()));
+        WarnMissingFormatFeatures2(format_name, "optimalTilingFeatures", profile_properties_3.optimalTilingFeatures,
+                                   device_properties_3.optimalTilingFeatures);
         if (layer_settings.debug_fail_on_error) {
             return false;
         }
     }
     if (!HasFlags(device_properties_3.bufferFeatures, profile_properties_3.bufferFeatures)) {
-        LogMessage(DEBUG_REPORT_WARNING_BIT,
-                   ::format("For %s `bufferFeatures`,\nthe Profile requires:\n\t\"%s\"\nbut the Device only "
-                            "supports:\n\t\"%s\".\nThe `bufferFeatures` can't be simulated on this Device.\n",
-                            format_name.c_str(), GetFormatFeature2String(profile_properties_3.bufferFeatures).c_str(),
-                            GetFormatFeature2String(device_properties_3.bufferFeatures).c_str()));
+        WarnMissingFormatFeatures2(format_name, "bufferFeatures", profile_properties_3.bufferFeatures,
+                                   device_properties_3.bufferFeatures);
         if (layer_settings.debug_fail_on_error) {
             return false;
         }
