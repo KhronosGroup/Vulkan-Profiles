@@ -1832,7 +1832,7 @@ PhysicalDeviceData::Map PhysicalDeviceData::map_;
 
 class JsonLoader {
    public:
-    JsonLoader(PhysicalDeviceData &pdd) : pdd_(pdd) {}
+    JsonLoader(PhysicalDeviceData &pdd) : pdd_(pdd), profile_api_version(0) {}
     JsonLoader() = delete;
     JsonLoader(const JsonLoader &) = delete;
     JsonLoader &operator=(const JsonLoader &) = delete;
@@ -1841,6 +1841,8 @@ class JsonLoader {
     VkResult ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities);
 
    private:
+    std::uint32_t profile_api_version;
+
     struct Extension {
         std::string name;
         int specVersion;
@@ -3710,23 +3712,30 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         const auto &c = caps[capability];
 
         const auto &properties = c["properties"];
-        uint32_t apiVersion = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
-        AddPromotedExtensions(apiVersion);
-
-        if (layer_settings.simulate_capabilities & SIMULATE_API_VERSION_BIT) {
-            if (apiVersion > pdd_.physical_device_properties_.apiVersion) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
-                           format("JSON apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32
-                                  ") is greater than the device apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ")\n",
-                                  VK_VERSION_MAJOR(apiVersion), VK_VERSION_MINOR(apiVersion), VK_VERSION_PATCH(apiVersion),
-                                  VK_VERSION_MAJOR(pdd_.physical_device_properties_.apiVersion),
-                                  VK_VERSION_MINOR(pdd_.physical_device_properties_.apiVersion),
-                                  VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)));
-                if (layer_settings.debug_fail_on_error) {
-                    return VK_ERROR_INITIALIZATION_FAILED;
-                }
+        if (properties.isMember("VkPhysicalDeviceProperties")) {
+            if (properties["VkPhysicalDeviceProperties"].isMember("apiVersion")) {
+                this->profile_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
             }
-            pdd_.physical_device_properties_.apiVersion = apiVersion;
+        }
+
+        AddPromotedExtensions(this->profile_api_version);
+
+        if (this->profile_api_version > pdd_.physical_device_properties_.apiVersion) {
+            LogMessage(DEBUG_REPORT_ERROR_BIT,
+                format("JSON apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32
+                        ") is greater than the device apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ")\n",
+                            VK_VERSION_MAJOR(this->profile_api_version), 
+                            VK_VERSION_MINOR(this->profile_api_version),
+                            VK_VERSION_PATCH(this->profile_api_version),
+                        VK_VERSION_MAJOR(pdd_.physical_device_properties_.apiVersion),
+                        VK_VERSION_MINOR(pdd_.physical_device_properties_.apiVersion),
+                        VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)));
+            if (layer_settings.debug_fail_on_error) {
+                return VK_ERROR_INITIALIZATION_FAILED;
+            }
+        }
+        if (layer_settings.simulate_capabilities & SIMULATE_API_VERSION_BIT) {
+            pdd_.physical_device_properties_.apiVersion = this->profile_api_version;
         }
 
         if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
@@ -3938,6 +3947,15 @@ VkResult JsonLoader::LoadFile(const char *filename) {
     for (const auto &profile : profiles.getMemberNames()) {
         if (profile_name.empty() || profile == profile_name) {
             const auto &caps = profiles[profile]["capabilities"];
+
+            const std::string version_string = profiles[profile]["api-version"].asCString();
+
+            uint32_t api_major = 0;
+            uint32_t api_minor = 0;
+            uint32_t api_patch = 0;
+            std::sscanf(version_string.c_str(), "%d.%d.%d", &api_major, &api_minor, &api_patch);
+            this->profile_api_version = VK_MAKE_API_VERSION(0, api_major, api_minor, api_patch);
+
             for (const auto &cap : caps) {
                 capabilities.push_back(cap.asString());
             }
