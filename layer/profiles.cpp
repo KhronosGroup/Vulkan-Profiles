@@ -272,33 +272,22 @@ DebugReportFlags GetDebugReportFlags(const vku::Strings &values) {
     return result;
 }
 
-static std::string GetDebugReportsLog(DebugActionFlags flags) {
-    std::string result = {};
-    bool need_comma = false;
-
-    if (flags & DEBUG_REPORT_NOTIFICATION_BIT) {
-        result += "DEBUG_REPORT_NOTIFICATION_BIT";
-        need_comma = true;
-    }
-    if (flags & DEBUG_REPORT_WARNING_BIT) {
-        if (need_comma) result += ", ";
-        result += "DEBUG_REPORT_WARNING_BIT";
-        need_comma = true;
-    }
-    if (flags & DEBUG_REPORT_ERROR_BIT) {
-        if (need_comma) result += ", ";
-        result += "DEBUG_REPORT_ERROR_BIT";
-        need_comma = true;
-    }
-
-    return result;
-}
-
 #define APPEND(name)                         \
     if (flags & name) {                      \
         if (!result.empty()) result += ", "; \
         result += #name;                     \
     }
+
+static std::string GetDebugReportsLog(DebugActionFlags flags) {
+    std::string result = {};
+
+    APPEND(DEBUG_REPORT_NOTIFICATION_BIT);
+    APPEND(DEBUG_REPORT_WARNING_BIT);
+    APPEND(DEBUG_REPORT_ERROR_BIT);
+    APPEND(DEBUG_REPORT_DEBUG_BIT);
+
+    return result;
+}
 
 static std::string GetFormatFeatureString(VkFormatFeatureFlags flags) {
     std::string result = {};
