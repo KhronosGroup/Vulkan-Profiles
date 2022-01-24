@@ -3717,10 +3717,11 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         if (properties.isMember("VkPhysicalDeviceProperties")) {
             if (properties["VkPhysicalDeviceProperties"].isMember("apiVersion")) {
                 properties_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
+                AddPromotedExtensions(properties_api_version);
             }
+        } else if (layer_settings.simulate_capabilities & SIMULATE_API_VERSION_BIT) {
+            AddPromotedExtensions(this->profile_api_version);        
         }
-
-        AddPromotedExtensions(this->profile_api_version);
 
         if (this->profile_api_version > pdd_.physical_device_properties_.apiVersion) {
             LogMessage(DEBUG_REPORT_ERROR_BIT,
