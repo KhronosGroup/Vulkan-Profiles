@@ -12,6 +12,9 @@ add_custom_target(VpLibrary_generator
 		-profiles ${CMAKE_CURRENT_SOURCE_DIR}/../profiles
 		-outIncDir ${CMAKE_CURRENT_SOURCE_DIR}/include/vulkan
 		-outSrcDir ${CMAKE_CURRENT_SOURCE_DIR}/source
+		-outSchema ${CMAKE_CURRENT_SOURCE_DIR}/../schema/profile_schema.json
+		-outDoc ${CMAKE_CURRENT_SOURCE_DIR}/../PROFILES.md
+		-validate
 		-generateDebugLibrary
 	SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/genvp.py)
 

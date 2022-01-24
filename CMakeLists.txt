@@ -11,8 +11,8 @@ set(VULKAN_TAG v1.2.199)
 # Define GNU standard installation directories.
 include(GNUInstallDirs)
 
-# Using Python 3
-find_package(PythonInterp 3 REQUIRED)
+# Using Python 3.7.2 or better (required for typing.OrderedDict)
+find_package(PythonInterp 3.7.2 REQUIRED)
 
 # Third-party libraries
 include(FetchContent)
@@ -79,7 +79,7 @@ endif()
 FetchContent_MakeAvailable(googletest)
 FetchContent_MakeAvailable(json)
 FetchContent_MakeAvailable(jsoncpp)
-execute_process(COMMAND python ${jsoncpp_SOURCE_DIR}/amalgamate.py WORKING_DIRECTORY ${jsoncpp_SOURCE_DIR})
+execute_process(COMMAND ${PYTHON_EXECUTABLE} ${jsoncpp_SOURCE_DIR}/amalgamate.py WORKING_DIRECTORY ${jsoncpp_SOURCE_DIR})
 
 set(UPDATE_DEPS ON)
 set(BUILD_TESTS OFF)

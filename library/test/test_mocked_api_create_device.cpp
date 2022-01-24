@@ -464,6 +464,53 @@ TEST(mocked_api_create_device, legacy_enabled_features) {
     EXPECT_TRUE(device == mock.vkDevice);
 }
 
+TEST(mocked_api_create_device, legacy_enabled_features_override_all) {
+    MockVulkanAPI mock;
+
+    VpProfileProperties profile{ VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION };
+
+    VkDeviceQueueCreateInfo queueCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
+    queueCreateInfo.queueFamilyIndex = 0;
+    queueCreateInfo.queueCount = 1;
+
+    VkPhysicalDeviceVulkan13Features features13{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES };
+    features13.maintenance4 = VK_TRUE;
+    VkPhysicalDeviceMultiviewFeaturesKHR multiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR, &features13 };
+    multiviewFeatures.multiview = VK_TRUE;
+
+    VkPhysicalDeviceFeatures inFeatures;
+    inFeatures.fragmentStoresAndAtomics = VK_TRUE;
+    inFeatures.occlusionQueryPrecise = VK_TRUE;
+
+    VkDeviceCreateInfo inCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO, &multiviewFeatures };
+    inCreateInfo.queueCreateInfoCount = 1;
+    inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+    inCreateInfo.pEnabledFeatures = &inFeatures;
+
+    std::vector<const char*> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions) /
+                                           sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions[0]));
+    for (size_t i = 0; i < outExtensions.size(); ++i) {
+        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::deviceExtensions[i].extensionName;
+    }
+
+    VkDeviceCreateInfo outCreateInfo = inCreateInfo;
+    outCreateInfo.enabledExtensionCount = static_cast<uint32_t>(outExtensions.size());
+    outCreateInfo.ppEnabledExtensionNames = outExtensions.data();
+
+    mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
+        VK_STRUCT(features13),
+        VK_STRUCT(multiviewFeatures)
+    });
+
+    VpDeviceCreateInfo createInfo{ &inCreateInfo, &profile, VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT };
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
+
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_TRUE(device == mock.vkDevice);
+}
+
 TEST(mocked_api_create_device, disable_robust_buffer_access) {
     MockVulkanAPI mock;
 
@@ -510,6 +557,7 @@ TEST(mocked_api_create_device, disable_robust_buffer_access) {
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(device == mock.vkDevice);
 }
+
 
 TEST(mocked_api_create_device, disable_robust_image_access) {
     MockVulkanAPI mock;
