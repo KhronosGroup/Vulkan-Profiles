@@ -3707,6 +3707,8 @@ void JsonLoader::AddPromotedExtensions(uint32_t api_version) {
 }
 
 VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities) {
+    std::uint32_t properties_api_version = 0;
+
     const auto &caps = root["capabilities"];
     for (const auto &capability : capabilities) {
         const auto &c = caps[capability];
@@ -3714,7 +3716,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         const auto &properties = c["properties"];
         if (properties.isMember("VkPhysicalDeviceProperties")) {
             if (properties["VkPhysicalDeviceProperties"].isMember("apiVersion")) {
-                this->profile_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
+                properties_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
             }
         }
 
@@ -3722,20 +3724,13 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
 
         if (this->profile_api_version > pdd_.physical_device_properties_.apiVersion) {
             LogMessage(DEBUG_REPORT_ERROR_BIT,
-                format("JSON apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32
-                        ") is greater than the device apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ")\n",
-                            VK_VERSION_MAJOR(this->profile_api_version), 
-                            VK_VERSION_MINOR(this->profile_api_version),
-                            VK_VERSION_PATCH(this->profile_api_version),
-                        VK_VERSION_MAJOR(pdd_.physical_device_properties_.apiVersion),
-                        VK_VERSION_MINOR(pdd_.physical_device_properties_.apiVersion),
-                        VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)));
+                format("JSON apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ") is greater than the device apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ")\n",
+                    VK_VERSION_MAJOR(this->profile_api_version), VK_VERSION_MINOR(this->profile_api_version), VK_VERSION_PATCH(this->profile_api_version),
+                    VK_VERSION_MAJOR(pdd_.physical_device_properties_.apiVersion), VK_VERSION_MINOR(pdd_.physical_device_properties_.apiVersion), VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)));
+
             if (layer_settings.debug_fail_on_error) {
                 return VK_ERROR_INITIALIZATION_FAILED;
             }
-        }
-        if (layer_settings.simulate_capabilities & SIMULATE_API_VERSION_BIT) {
-            pdd_.physical_device_properties_.apiVersion = this->profile_api_version;
         }
 
         if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
@@ -3834,6 +3829,23 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
             }
         }
     }
+
+    if (properties_api_version != 0) {
+        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+            format("VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the API version specified by the profile VkPhysicalDeviceProperties structure.\n",
+            VK_VERSION_MAJOR(properties_api_version), VK_VERSION_MINOR(properties_api_version), VK_VERSION_PATCH(properties_api_version)));
+    } else if (layer_settings.simulate_capabilities & SIMULATE_API_VERSION_BIT) {
+        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+            format("VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the API version specified by the profile.\n",
+            VK_VERSION_MAJOR(this->profile_api_version), VK_VERSION_MINOR(this->profile_api_version), VK_VERSION_PATCH(this->profile_api_version)));
+
+        pdd_.physical_device_properties_.apiVersion = this->profile_api_version;
+    } else {
+        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+            format("VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the device version.\n",
+            VK_VERSION_MAJOR(pdd_.physical_device_properties_.apiVersion), VK_VERSION_MINOR(pdd_.physical_device_properties_.apiVersion), VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)));      
+    }
+
     return VK_SUCCESS;
 }
 
