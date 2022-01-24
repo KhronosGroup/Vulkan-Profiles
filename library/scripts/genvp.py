@@ -3122,9 +3122,9 @@ class VulkanProfilesDocGenerator():
         for section, sectionRowHandlers in rowHandlers.items():
             gen += '\n| **{0}** |'.format(section)
             for row, rowHandler in sectionRowHandlers.items():
-                gen += '\n| {0} |'.format(rowHandler(row))
+                gen += '\n| {0} |'.format(rowHandler(section, row))
                 for profile in self.profiles:
-                    gen += cellFmt.format(rowHandler(row, profile))
+                    gen += cellFmt.format(rowHandler(section, row, profile))
         return gen
 
 
@@ -3138,7 +3138,7 @@ class VulkanProfilesDocGenerator():
         })))
 
 
-    def gen_extension(self, extension, profile = None):
+    def gen_extension(self, section, extension, profile = None):
         # If no profile was specified then this is the first column so return the extension name
         if profile is None:
             return extension
@@ -3185,7 +3185,31 @@ class VulkanProfilesDocGenerator():
         return None
 
 
-    def gen_feature(self, struct, member, profile = None):
+    def formatFeatureSupport(self, supported, struct, section):
+        structDef = self.registry.structs[struct]
+        # VkPhysicalDeviceVulkan11Features is defined in Vulkan 1.2, but actually it defines Vulkan 1.1 features
+        if struct == 'VkPhysicalDeviceVulkan11Features':
+            where = 'Vulkan 1.1'
+            isExactMatch = (section == where)
+        elif structDef.definedByVersion:
+            where = 'Vulkan {0}'.format(structDef.definedByVersion)
+            isExactMatch = (section == where)
+        elif structDef.definedByExtensions:
+            where = '/'.join(structDef.definedByExtensions)
+            isExactMatch = (section in structDef.definedByExtensions)
+        else:
+            where = 'Vulkan 1.0'
+            isExactMatch = (section == where)
+        if supported:
+            if isExactMatch:
+                return '<span title="defined in {0} ({1})">:heavy_check_mark:</span>'.format(struct, where)
+            else:
+                return '<span title="equivalent defined in {0} ({1})">:warning:</span>'.format(struct, where)
+        else:
+            return ':x:'
+
+
+    def gen_feature(self, struct, section, member, profile = None):
         # If no profile was specified then this is the first column so return the member name
         if profile is None:
             return member
@@ -3194,7 +3218,7 @@ class VulkanProfilesDocGenerator():
         if struct in profile.capabilities.features:
             featureStruct = profile.capabilities.features[struct]
             if member in featureStruct and featureStruct[member]:
-                return ':heavy_check_mark:'
+                return self.formatFeatureSupport(True, struct, section)
 
         # If the struct is VkPhysicalDeviceFeatures then check if the feature is defined in
         # VkPhysicalDeviceFeatures2 or VkPhysicalDeviceFeatures2KHR for the profile and then
@@ -3204,7 +3228,7 @@ class VulkanProfilesDocGenerator():
                 if wrapperStruct in profile.capabilities.features:
                     featureStruct = profile.capabilities.features[wrapperStruct]['features']
                     if member in featureStruct and featureStruct[member]:
-                        return ':heavy_check_mark:'
+                        return self.formatFeatureSupport(True, struct, section)
 
         # If the struct has aliases and the feature struct member is defined in the profile in
         # one of those, consider it supported
@@ -3213,7 +3237,7 @@ class VulkanProfilesDocGenerator():
             if alias in profile.capabilities.features:
                 featureStruct = profile.capabilities.features[alias]
                 if member in featureStruct and featureStruct[member]:
-                    return ':heavy_check_mark:'
+                    return self.formatFeatureSupport(True, alias, section)
 
         return ':x:'
 
@@ -3308,6 +3332,27 @@ class VulkanProfilesDocGenerator():
             return str(value)
 
 
+    def formatProperty(self, value, struct, section = None):
+        structDef = self.registry.structs[struct]
+        # VkPhysicalDeviceVulkan11Properties is defined in Vulkan 1.2, but actually it defines Vulkan 1.1 features
+        if struct == 'VkPhysicalDeviceVulkan11Properties':
+            where = 'Vulkan 1.1'
+            isExactMatch = (section == where)
+        elif structDef.definedByVersion:
+            where = 'Vulkan {0}'.format(structDef.definedByVersion)
+            isExactMatch = (section == where)
+        elif structDef.definedByExtensions:
+            where = '/'.join(structDef.definedByExtensions)
+            isExactMatch = (section in structDef.definedByExtensions)
+        else:
+            where = 'Vulkan 1.0'
+            isExactMatch = (section == where)
+        if isExactMatch or section == None:
+            return '<span title="defined in {0} ({1})">{2}</span>'.format(struct, where, self.formatValue(value))
+        else:
+            return '<span title="equivalent defined in {0} ({1})">_{2}_</span>'.format(struct, where, self.formatValue(value))
+
+
     def formatLimitName(self, struct, member):
         structDef = self.registry.structs[struct]
         memberDef = structDef.members[member]
@@ -3325,7 +3370,7 @@ class VulkanProfilesDocGenerator():
             Log.f("Unexpected limittype '{0}'".format(limittype))
 
 
-    def gen_limit(self, struct, member, profile = None):
+    def gen_limit(self, struct, section, member, profile = None):
         # If no profile was specified then this is the first column so return the member name
         # decorated with the corresponding limittype specific info
         if profile is None:
@@ -3335,7 +3380,7 @@ class VulkanProfilesDocGenerator():
         if struct in profile.capabilities.properties:
             limitStruct = profile.capabilities.properties[struct]
             if member in limitStruct:
-                return self.formatValue(limitStruct[member])
+                return self.formatProperty(limitStruct[member], struct, section)
 
         # If the struct is VkPhysicalDeviceLimits or VkPhysicalDeviceSparseProperties then check
         # if the limit/property is defined somewhere nested in VkPhysicalDeviceProperties,
@@ -3357,7 +3402,7 @@ class VulkanProfilesDocGenerator():
             if propertyStruct != None:
                 limitStruct = propertyStruct[memberStruct]
                 if member in limitStruct:
-                    return self.formatValue(limitStruct[member])
+                    return self.formatProperty(limitStruct[member], propertyStructName, section)
 
         # If the struct has aliases and the limit/property struct member is defined in the profile
         # in one of those then include it
@@ -3366,7 +3411,7 @@ class VulkanProfilesDocGenerator():
             if alias in profile.capabilities.properties:
                 limitStruct = profile.capabilities.properties[alias]
                 if member in limitStruct and limitStruct[member]:
-                    return self.formatValue(limitStruct[member])
+                    return self.formatProperty(limitStruct[member], alias, section)
 
         return '-'
 
@@ -3444,7 +3489,7 @@ class VulkanProfilesDocGenerator():
         return '\n## Vulkan Profile Limits (Properties)\n\n{0}\n\n{1}\n'.format(disclaimer, table)
 
 
-    def gen_queueFamily(self, index, struct, member, profile = None):
+    def gen_queueFamily(self, index, struct, section, member, profile = None):
         # If no profile was specified then this is the first column so return the member name
         # decorated with the corresponding limittype specific info
         if profile is None:
@@ -3458,7 +3503,7 @@ class VulkanProfilesDocGenerator():
         if struct in profile.capabilities.queueFamiliesProperties[index]:
             propertyStruct = profile.capabilities.queueFamiliesProperties[index][struct]
             if member in propertyStruct:
-                return self.formatValue(propertyStruct[member])
+                return self.formatProperty(propertyStruct[member], struct)
 
         # If the struct is VkPhysicalDeviceQueueFamilyProperties then check if the feature is
         # defined in VkPhysicalDeviceQueueFamilyProperties2 or VkPhysicalDeviceQueueFamilyProperties2KHR
@@ -3468,7 +3513,7 @@ class VulkanProfilesDocGenerator():
                 if wrapperStruct in profile.capabilities.queueFamiliesProperties[index]:
                     propertyStruct = profile.capabilities.queueFamiliesProperties[index][wrapperStruct]['queueFamilyProperties']
                     if member in propertyStruct and propertyStruct[member]:
-                        return self.formatValue(propertyStruct[member])
+                        return self.formatProperty(propertyStruct[member], wrapperStruct)
 
         # If the struct has aliases and the property struct member is defined in the profile
         # in one of those then include it
@@ -3477,7 +3522,7 @@ class VulkanProfilesDocGenerator():
             if alias in profile.capabilities.queueFamiliesProperties[index]:
                 propertyStruct = profile.capabilities.queueFamiliesProperties[index][alias]
                 if member in propertyStruct and propertyStruct[member]:
-                    return self.formatValue(propertyStruct[member])
+                    return self.formatProperty(propertyStruct[member], alias)
 
         return '-'
 
@@ -3518,7 +3563,7 @@ class VulkanProfilesDocGenerator():
         return '\n## Vulkan Profile Queue Families\n\n{0}\n'.format(table)
 
 
-    def gen_format(self, format, struct, member, profile = None):
+    def gen_format(self, format, struct, section, member, profile = None):
         # If no profile was specified then this is the first column so return the member name
         # decorated with the corresponding limittype specific info
         if profile is None:
@@ -3538,7 +3583,7 @@ class VulkanProfilesDocGenerator():
         if struct in profile.capabilities.formats[format]:
             propertyStruct = profile.capabilities.formats[format][struct]
             if member in propertyStruct:
-                return self.formatValue(propertyStruct[member])
+                return self.formatProperty(propertyStruct[member], struct)
 
         # If the struct is VkFormatProperties then 'member' also contains the trimmed name of
         # the flag bit to check for, so we check for that, or any of its aliases
@@ -3550,7 +3595,7 @@ class VulkanProfilesDocGenerator():
                     if 'formatProperties' in propertyStruct:
                         propertyStruct = propertyStruct['formatProperties']
                     if member in propertyStruct:
-                        return self.formatValue(propertyStruct[member])
+                        return self.formatProperty(propertyStruct[member], alternative)
 
         # If the struct has aliases and the property struct member is defined in the profile
         # in one of those then include it
@@ -3559,14 +3604,12 @@ class VulkanProfilesDocGenerator():
             if alias in profile.capabilities.formats[format]:
                 propertyStruct = profile.capabilities.formats[format][alias]
                 if member in propertyStruct and propertyStruct[member]:
-                    return self.formatValue(propertyStruct[member])
+                    return self.formatProperty(propertyStruct[member], alias)
 
         return '-'
 
 
     def gen_formats(self):
-        formatFeaturesMembers = [ 'linearTilingFeatures', 'optimalTilingFeatures', 'bufferFeatures' ]
-
         # Merge all format property references across the profiles to collect the relevant
         # properties to look at for each format
         definedFormats = dict()
