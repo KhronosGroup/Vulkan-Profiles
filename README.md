@@ -11,13 +11,13 @@
 
 # Vulkan Profiles Tools (BETA)
 
-The *Vulkan Profiles Tools* are a collection of tools for Vulkan application developers to leverage *Vulkan Profiles* while developing a Vulkan application.
+The *Vulkan Profiles Tools* are a collection of tools delivered with the [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/) for Vulkan application developers to leverage *Vulkan Profiles* while developing a Vulkan application.
 
-* **[Change Log](./CHANGELOG.md)**: The history of *Vulkan Profiles Tools* releases.
-* **[Using Vulkan Profiles Tools](./TUTORIAL.md)**: How to use the *Vulkan Profiles Tools*.
+* **[Vulkan Profiles Tools Overview](./OVERVIEW.md)**: Discover the components and how they work together.
 * **[Vulkan Profiles Documentation](./PROFILES.md)**: *Tables to compare profiles capabilities*.
-* **[Bug reports](https://github.com/LunarG/VulkanProfiles/issues)**: Open a GitHub issue when you encounter a bug.
+* **[Change Log](./CHANGELOG.md)**: The history of *Vulkan Profiles Tools* releases.
 * **[Contributing](./CONTRIBUTING.md)**: How to contribute to the *Vulkan Profiles* repository.
+* **[Bug reports](https://github.com/KhronosGroup/Vulkan-Profiles)**: Open a GitHub issue when you encounter a bug.
 
 --------------
 ## Contact Information
