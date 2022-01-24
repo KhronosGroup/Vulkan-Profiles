@@ -496,7 +496,7 @@ void WarnMissingFormatFeatures(const std::string &format_name, const std::string
 }
 
 void WarnMissingFormatFeatures2(const std::string &format_name, const std::string &features, VkFormatFeatureFlags2 profile_features,
-                               VkFormatFeatureFlags2 device_features) {
+                                VkFormatFeatureFlags2 device_features) {
     LogMessage(DEBUG_REPORT_WARNING_BIT,
                ::format("For %s `%s`,\nthe Profile requires:\n\t\"%s\"\nbut the Device %s.\nThe "
                         "`%s` can't be simulated on this Device.\n",
@@ -2250,7 +2250,7 @@ class JsonLoader {
 
     template <typename T>  // for Vulkan enum types
     bool GetValueFlag(const Json::Value &parent, const std::string &member, const char *name, T *dest,
-                       std::function<bool(const char *, T, T)> warn_func = nullptr) {
+                      std::function<bool(const char *, T, T)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -2273,7 +2273,7 @@ class JsonLoader {
 
     template <typename T>  // for Vulkan enum types
     bool GetValueEnum(const Json::Value &parent, const std::string &member, const char *name, T *dest,
-                       std::function<bool(const char *, T, T)> warn_func = nullptr) {
+                      std::function<bool(const char *, T, T)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -3970,16 +3970,17 @@ VkResult JsonLoader::LoadFile(const char *filename) {
     uint32_t version_patch = 0;
     std::sscanf(version.c_str(), "%d.%d.%d", &version_major, &version_minor, &version_patch);
     if (VK_HEADER_VERSION < version_patch) {
-        LogMessage(DEBUG_REPORT_WARNING_BIT, format("%s is built againt Vulkan Header %d but the profile is written againt Vulkan "
-                                                    "Header %d.\n\t- All newer capabilities in the "
-                                                    "profile will be ignored by the layer.\n",
-                                                    kOurLayerName, VK_HEADER_VERSION, version_patch));
+        LogMessage(DEBUG_REPORT_WARNING_BIT,
+                   format("%s is built against Vulkan Header %d but the profile is written against Vulkan "
+                          "Header %d.\n\t- All newer capabilities in the "
+                          "profile will be ignored by the layer.\n",
+                          kOurLayerName, VK_HEADER_VERSION, version_patch));
     } else if (layer_settings.profile_validation) {
         JsonValidator validator;
         if (!validator.Init()) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       format("%s count not find the profile schema file to validate filename.\n\t- This "
-                              "operation requires the Vulkan SDK to be install.\n\t- Skipping profile file validation.",
+                       format("%s could not find the profile schema file to validate filename.\n\t- This "
+                              "operation requires the Vulkan SDK to be installed.\n\t- Skipping profile file validation.",
                               kOurLayerName, filename));
         } else if (!validator.Check(root)) {
             LogMessage(DEBUG_REPORT_ERROR_BIT, format("%s is not a valid JSON profile file.\n", filename));
