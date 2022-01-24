@@ -1832,7 +1832,7 @@ PhysicalDeviceData::Map PhysicalDeviceData::map_;
 
 class JsonLoader {
    public:
-    JsonLoader(PhysicalDeviceData &pdd) : pdd_(pdd) {}
+    JsonLoader(PhysicalDeviceData &pdd) : pdd_(pdd), api_version(0) {}
     JsonLoader() = delete;
     JsonLoader(const JsonLoader &) = delete;
     JsonLoader &operator=(const JsonLoader &) = delete;
@@ -1841,6 +1841,8 @@ class JsonLoader {
     VkResult ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities);
 
    private:
+    std::uint32_t api_version;
+
     struct Extension {
         std::string name;
         int specVersion;
@@ -3710,23 +3712,12 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         const auto &c = caps[capability];
 
         const auto &properties = c["properties"];
-        uint32_t apiVersion = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
-        AddPromotedExtensions(apiVersion);
 
         if (layer_settings.simulate_capabilities & SIMULATE_API_VERSION_BIT) {
-            if (apiVersion > pdd_.physical_device_properties_.apiVersion) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
-                           format("JSON apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32
-                                  ") is greater than the device apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ")\n",
-                                  VK_VERSION_MAJOR(apiVersion), VK_VERSION_MINOR(apiVersion), VK_VERSION_PATCH(apiVersion),
-                                  VK_VERSION_MAJOR(pdd_.physical_device_properties_.apiVersion),
-                                  VK_VERSION_MINOR(pdd_.physical_device_properties_.apiVersion),
-                                  VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)));
-                if (layer_settings.debug_fail_on_error) {
-                    return VK_ERROR_INITIALIZATION_FAILED;
-                }
-            }
-            pdd_.physical_device_properties_.apiVersion = apiVersion;
+            AddPromotedExtensions(this->api_version);
+        } else if (properties["VkPhysicalDeviceProperties"].isMember("apiVersion")) {
+            uint32_t json_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
+            AddPromotedExtensions(json_api_version);
         }
 
         if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
@@ -3932,11 +3923,15 @@ VkResult JsonLoader::LoadFile(const char *filename) {
         return layer_settings.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
+    this->api_version = 0;
+
     const std::string profile_name = layer_settings.profile_name;
     const auto &profiles = root["profiles"];
     std::vector<std::string> capabilities;
     for (const auto &profile : profiles.getMemberNames()) {
         if (profile_name.empty() || profile == profile_name) {
+            this->api_version = profiles[profile]["api-version"].asInt();
+
             const auto &caps = profiles[profile]["capabilities"];
             for (const auto &cap : caps) {
                 capabilities.push_back(cap.asString());
@@ -3996,6 +3991,10 @@ VkResult JsonLoader::LoadFile(const char *filename) {
     }
 
     result = ReadProfile(root, capabilities);
+
+    if (layer_settings.simulate_capabilities & SIMULATE_API_VERSION_BIT) {
+        pdd_.physical_device_properties_.apiVersion = this->api_version;
+    }
 
     return result;
 }
