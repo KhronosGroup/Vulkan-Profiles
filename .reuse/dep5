@@ -1,0 +1,59 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Vulkan-Profiles
+Source: https://github.com/KhronosGroup/Vulkan-Profiles
+
+Files: external/compat/optional.hpp
+Copyright: 2011 - 2012 Andrzej Krzemienski
+License: BSL-1.0
+
+Files: layer/*
+Copyright: 2020-2022 LunarG, Inc.
+           2020-2022 Valve Corporation
+License: Apache-2.0
+
+Files: library/*
+Copyright: 2015-2022 LunarG, Inc.
+License: Apache-2.0
+
+Files: schema/*
+Copyright: 2015-2022 LunarG, Inc.
+License: Apache-2.0
+
+Files: profiles/*.json
+       profiles/*.cpp
+       profiles/*.hpp
+       profiles/*.txt
+Copyright: 2015-2022 LunarG, Inc.
+           2020-2022 Valve Corporation
+License: Apache-2.0
+
+Files: vku/*.txt
+       vku/*.cpp
+       vku/*.h
+Copyright: 2015-2022 The Khronos Group, Inc.
+           2015-2022 LunarG, Inc.
+           2015-2022 Valve Corporation
+License: Apache-2.0
+
+Files: external/valijson/*
+Copyright: 2016, Tristan Penman
+           2016, Akamai Technolgies, Inc.
+License: BSD-2-Clause
+
+Files: images/*
+Copyright: 2022 The Khronos Group, Inc.
+License: CC-BY-4.0
+
+Files: CMakeLists.txt
+Copyright: 2015-2022 LunarG, Inc.
+License: CC-BY-4.0
+
+Files: .clang-format
+       .gitignore
+Copyright: 2015-2022 LunarG, Inc.
+License: CC-BY-4.0
+
+Files: *.md
+Copyright: 2015-2022 LunarG, Inc.
+License: CC-BY-4.0
+
