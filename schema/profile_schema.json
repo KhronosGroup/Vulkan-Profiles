@@ -2610,6 +2610,7 @@
                 "VK_DRIVER_ID_MESA_RADV_KHR",
                 "VK_DRIVER_ID_MESA_TURNIP",
                 "VK_DRIVER_ID_MESA_V3DV",
+                "VK_DRIVER_ID_MESA_VENUS",
                 "VK_DRIVER_ID_MOLTENVK",
                 "VK_DRIVER_ID_NVIDIA_PROPRIETARY",
                 "VK_DRIVER_ID_NVIDIA_PROPRIETARY_KHR",
