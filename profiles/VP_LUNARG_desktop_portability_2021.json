@@ -695,7 +695,7 @@
             "queueFamiliesProperties": [
                 {
                     "VkQueueFamilyProperties": {
-                        "queueFlags": [ "VK_QUEUE_GRAPHICS_BIT", "VK_QUEUE_COMPUTE_BIT", "VK_QUEUE_TRANSFER_BIT", "VK_QUEUE_SPARSE_BINDING_BIT" ],
+                        "queueFlags": [ "VK_QUEUE_GRAPHICS_BIT", "VK_QUEUE_COMPUTE_BIT", "VK_QUEUE_TRANSFER_BIT" ],
                         "queueCount": 1,
                         "timestampValidBits": 36,
                         "minImageTransferGranularity": {

@@ -483,7 +483,7 @@
 | **Queue family #0** |
 | minImageTransferGranularity (min) |  |  | <span title="defined in VkQueueFamilyProperties (Vulkan 1.0)">(1,1,1)</span> | <span title="defined in VkQueueFamilyProperties (Vulkan 1.0)">(1,1,1)</span> |
 | queueCount (max) |  |  | <span title="defined in VkQueueFamilyProperties (Vulkan 1.0)">1</span> | <span title="defined in VkQueueFamilyProperties (Vulkan 1.0)">1</span> |
-| queueFlags (min) |  |  | <span title="defined in VkQueueFamilyProperties (Vulkan 1.0)">(VK_QUEUE_GRAPHICS_BIT \| VK_QUEUE_COMPUTE_BIT \| VK_QUEUE_TRANSFER_BIT \| VK_QUEUE_SPARSE_BINDING_BIT)</span> | <span title="defined in VkQueueFamilyProperties (Vulkan 1.0)">(VK_QUEUE_GRAPHICS_BIT \| VK_QUEUE_COMPUTE_BIT \| VK_QUEUE_TRANSFER_BIT \| VK_QUEUE_SPARSE_BINDING_BIT)</span> |
+| queueFlags (min) |  |  | <span title="defined in VkQueueFamilyProperties (Vulkan 1.0)">(VK_QUEUE_GRAPHICS_BIT \| VK_QUEUE_COMPUTE_BIT \| VK_QUEUE_TRANSFER_BIT)</span> | <span title="defined in VkQueueFamilyProperties (Vulkan 1.0)">(VK_QUEUE_GRAPHICS_BIT \| VK_QUEUE_COMPUTE_BIT \| VK_QUEUE_TRANSFER_BIT)</span> |
 | timestampValidBits (max) |  |  | <span title="defined in VkQueueFamilyProperties (Vulkan 1.0)">36</span> | <span title="defined in VkQueueFamilyProperties (Vulkan 1.0)">36</span> |
 
 ## Vulkan Profile Formats

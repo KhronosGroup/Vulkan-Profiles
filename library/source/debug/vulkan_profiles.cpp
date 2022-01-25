@@ -3610,7 +3610,7 @@ static const VpQueueFamilyDesc queueFamilyDesc[] = {
                     s->queueFamilyProperties.minImageTransferGranularity.height = 1;
                     s->queueFamilyProperties.minImageTransferGranularity.width = 1;
                     s->queueFamilyProperties.queueCount = 1;
-                    s->queueFamilyProperties.queueFlags |= (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT);
+                    s->queueFamilyProperties.queueFlags |= (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT);
                     s->queueFamilyProperties.timestampValidBits = 36;
                 } break;
                 default: break;
@@ -3625,7 +3625,7 @@ static const VpQueueFamilyDesc queueFamilyDesc[] = {
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.height <= 1);
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.width <= 1);
                     ret = ret && (s->queueFamilyProperties.queueCount >= 1);
-                    ret = ret && (vpCheckFlags(s->queueFamilyProperties.queueFlags, (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT)));
+                    ret = ret && (vpCheckFlags(s->queueFamilyProperties.queueFlags, (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT)));
                     ret = ret && (s->queueFamilyProperties.timestampValidBits >= 36);
                 } break;
                 default: break;
@@ -5923,7 +5923,7 @@ static const VpQueueFamilyDesc queueFamilyDesc[] = {
                     s->queueFamilyProperties.minImageTransferGranularity.height = 1;
                     s->queueFamilyProperties.minImageTransferGranularity.width = 1;
                     s->queueFamilyProperties.queueCount = 1;
-                    s->queueFamilyProperties.queueFlags |= (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT);
+                    s->queueFamilyProperties.queueFlags |= (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT);
                     s->queueFamilyProperties.timestampValidBits = 36;
                 } break;
                 default: break;
@@ -5938,7 +5938,7 @@ static const VpQueueFamilyDesc queueFamilyDesc[] = {
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.height <= 1);
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.width <= 1);
                     ret = ret && (s->queueFamilyProperties.queueCount >= 1);
-                    ret = ret && (vpCheckFlags(s->queueFamilyProperties.queueFlags, (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT)));
+                    ret = ret && (vpCheckFlags(s->queueFamilyProperties.queueFlags, (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT)));
                     ret = ret && (s->queueFamilyProperties.timestampValidBits >= 36);
                 } break;
                 default: break;
