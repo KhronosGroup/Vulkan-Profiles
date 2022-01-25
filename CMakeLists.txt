@@ -6,7 +6,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment ve
 set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION_MAXIMUM FALSE) # Workaround to fix C.I. build on VS2015
 
 project(VULKAN_PROFILES)
-set(VULKAN_TAG v1.2.199)
+set(VULKAN_TAG v1.3.204)
 
 # Define GNU standard installation directories.
 include(GNUInstallDirs)
@@ -53,10 +53,8 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_OBJECT_LIBS OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
 	vulkan-headers
-#	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers
-#	GIT_TAG ${VULKAN_TAG}
-	GIT_REPOSITORY git@gitlab.khronos.org:vulkan/Vulkan-Headers.git
-	GIT_TAG 13staging
+	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers
+	GIT_TAG ${VULKAN_TAG}
 )
 FetchContent_Declare(
 	vulkan-validationlayers
