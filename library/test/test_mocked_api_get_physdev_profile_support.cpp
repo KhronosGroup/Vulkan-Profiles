@@ -514,7 +514,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_property) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimension2D >= 8192"
+        "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimension2D >= 4096"
     });
 #endif
 
