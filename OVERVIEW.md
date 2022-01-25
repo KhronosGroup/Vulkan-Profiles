@@ -29,7 +29,7 @@ All *the Vulkan Profiles Tools* remains under development and are delivered as p
 
 The *Vulkan Profiles Tools* are the following components:
 - ***The Vulkan Profiles JSON Schemas***
-  - A data format to exchange Vulkan Capabilities: extensions, features, properties and formats.
+  - A data format to exchange Vulkan Capabilities: extensions, features, properties, formats and queue properties.
   - Each revision of Vulkan API is represented by a schema that supersed older version of Vulkan API.
   - The currently schema covers all Vulkan 1.3 and extensions.
 - [***The Vulkan Profiles API library***](./library/TUTORIAL.md)
@@ -78,9 +78,9 @@ The Profiles layer builds its internal data tables by querying the capabilities 
                 "VkPhysicalDeviceProperties": {
                     "limits": {
                         "maxViewportDimensions": [ 169, 170 ],
-					}
-				}
-			},
+                    }
+                }
+			 },
             "formats": {},
             "queueFamiliesProperties": []
         }
