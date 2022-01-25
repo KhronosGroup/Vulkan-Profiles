@@ -19,7 +19,7 @@
   - Add *Vulkan Profiles schema* generator using `vk.xml`
 - Add *Profiles API library* to use profile in a Vulkan application code
   - Add API to check profile support by Vulkan devices
-  - Add API to create VkDevice using a profile
+  - Add API to create `VkDevice` using a profile
   - Add APIs for profile reflection
   - Add *Profiles API library* generator using `vk.xml`
 - Add *Profiles layer* to load profile
