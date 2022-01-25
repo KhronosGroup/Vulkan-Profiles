@@ -64,10 +64,10 @@ This design allows any Vulkan developer to regenerate the entier *Vulkan Profile
             "label": "LunarG Profiles Structure unit test",
             "description": "For schema unit test on C.I.",
             "contributors": {
-                "Christophe Riccio": {
+                "A Person": {
                     "company": "LunarG",
-                    "email": "christophe@lunarg.com",
-                    "github": "christophe-lunarg",
+                    "email": "a.person@lunarg.com",
+                    "github": "lunarg",
                     "contact": true
                 }
             },
@@ -75,7 +75,7 @@ This design allows any Vulkan developer to regenerate the entier *Vulkan Profile
                 {
                     "revision": 1,
                     "date": "2021-12-08",
-                    "author": "Christophe Riccio",
+                    "author": "A Person",
                     "comment": "Initial revision"
                 }
             ],
