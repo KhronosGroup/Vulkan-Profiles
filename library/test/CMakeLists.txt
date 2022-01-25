@@ -68,7 +68,7 @@ function(add_unit_test_with_debug_messages_variant NAME)
     add_dependencies(${TEST_NAME_DEBUG_MESSAGES} VpLibrary_generator)
     add_test(NAME ${TEST_NAME_DEBUG_MESSAGES} COMMAND ${TEST_NAME_DEBUG_MESSAGES} --gtest_catch_exceptions=0)
     set_target_properties(${TEST_NAME_DEBUG_MESSAGES} PROPERTIES FOLDER "Profiles API library")
-endfunction(add_unit_test)
+endfunction(add_unit_test_with_debug_messages_variant)
 
 add_unit_test_with_debug_messages_variant(test_mocked_api_get_instance_profile_support)
 add_unit_test_simple(test_mocked_api_create_instance)
