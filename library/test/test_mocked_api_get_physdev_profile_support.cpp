@@ -557,7 +557,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_property) {
     VkPhysicalDeviceMultiviewPropertiesKHR multiviewProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR };
     VkPhysicalDeviceProperties2KHR props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, &multiviewProps };
     vpGetProfileProperties(&profile, &props);
-    props.properties.limits.maxImageDimension2D = 4096; // Unsupported property
+    props.properties.limits.maxImageDimension2D = 2048; // Unsupported property
     props.properties.limits.maxBoundDescriptorSets = 8;
     props.properties.limits.subPixelPrecisionBits = 8;
     props.properties.limits.maxViewports = 4;
