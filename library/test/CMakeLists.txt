@@ -51,8 +51,8 @@ add_unit_test_simple(test_api_get_profiles_core)
 
 function(add_unit_test_with_debug_messages_variant NAME)
 	set(TEST_FILE ./${NAME}.cpp)
-    set(TEST_NAME library_${NAME})
-    set(TEST_NAME_DEBUG_MESSAGES library_${NAME}_dbgmsg)
+    set(TEST_NAME VpLibrary_${NAME})
+    set(TEST_NAME_DEBUG_MESSAGES VpLibrary_${NAME}_dbgmsg)
 
     add_executable(${TEST_NAME} ${TEST_FILE})
     target_include_directories(${TEST_NAME} PUBLIC "${vulkan-headers_SOURCE_DIR}/include")
