@@ -7,7 +7,7 @@
 [3]: https://i.creativecommons.org/l/by-nd/4.0/88x31.png "Creative Commons License"
 [4]: https://creativecommons.org/licenses/by-nd/4.0/
 
-# Vulkan Profiles library
+# Vulkan Profiles API library
 
 - [Vulkan Profiles library](#vulkan-profiles-library)
   - [Overview](#overview)
