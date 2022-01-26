@@ -41,4 +41,6 @@ endfunction(LayerTest)
 
 LayerTest(tests)
 LayerTest(tests_promoted)
+LayerTest(tests_mechanism)
+LayerTest(tests_desktop_portability)
 LayerTest(tests_capabilities)

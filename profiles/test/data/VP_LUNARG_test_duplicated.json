@@ -5,15 +5,11 @@
             "features": {
                 "VkPhysicalDevice16BitStorageFeaturesKHR": {
                     "storageBuffer16BitAccess": true,
-                    "uniformAndStorageBuffer16BitAccess": true,
-                    "storagePushConstant16": true,
-                    "storageInputOutput16": true
+                    "uniformAndStorageBuffer16BitAccess": true
                 },
                 "VkPhysicalDevice16BitStorageFeatures": {
                     "storageBuffer16BitAccess": true,
-                    "uniformAndStorageBuffer16BitAccess": true,
-                    "storagePushConstant16": true,
-                    "storageInputOutput16": true
+                    "uniformAndStorageBuffer16BitAccess": true
                 }
 			}
 		}
@@ -23,7 +19,7 @@
             "version": 1,
             "api-version": "1.2.198",
             "label": "LunarG Profiles Structure unit test",
-            "description": "For schema unit test on C.I.",
+            "description": "This JSON file is valid but incorrect as a capability set should not have duplicated structures or structures alias",
             "contributors": {
                 "Christophe Riccio": {
                     "company": "LunarG",
