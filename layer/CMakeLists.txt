@@ -43,6 +43,7 @@ set(TARGET_NAME khronos_profiles)
 if (APPLE)
     include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../layer-utils
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_BINARY_DIR}
         ${jsoncpp_SOURCE_DIR}/include
@@ -53,6 +54,7 @@ if (APPLE)
 else ()
     include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../layer-utils
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_BINARY_DIR}
         ${jsoncpp_SOURCE_DIR}/include

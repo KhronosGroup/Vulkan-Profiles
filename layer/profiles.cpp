@@ -65,7 +65,7 @@
 #include "vulkan/vulkan_beta.h"
 #include <vk_layer_config.h>
 #include "vk_layer_table.h"
-#include "../vku/vk_layer_settings.h"
+#include "vk_layer_settings.h"
 
 using valijson::Schema;
 using valijson::SchemaParser;
