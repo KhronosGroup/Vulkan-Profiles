@@ -6986,13 +6986,13 @@ static void InitSettings() {
     layer_settings.profile_file.clear();
     layer_settings.profile_name.clear();
     layer_settings.profile_validation = true;
-    layer_settings.emulate_portability = false;
-    layer_settings.simulate_capabilities = 0;
-    layer_settings.debug_actions = 0;
-    layer_settings.debug_filename.clear();
+    layer_settings.emulate_portability = true;
+    layer_settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT;
+    layer_settings.debug_actions = DEBUG_ACTION_STDOUT_BIT;
+    layer_settings.debug_filename = "profiles_layer_log.txt";
     layer_settings.debug_file_discard = true;
-    layer_settings.debug_reports = 0;
-    layer_settings.debug_fail_on_error = 0;
+    layer_settings.debug_reports = DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_ERROR_BIT;
+    layer_settings.debug_fail_on_error = false;
 
     if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileFile)) {
         layer_settings.profile_file = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileFile);

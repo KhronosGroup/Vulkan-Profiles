@@ -26,7 +26,7 @@ To enable, use a setting with the path of profiles file to load:
 ```
 adb shell settings put global debug.vulkan.khronos_profiles.profile_file <path/to/profiles/JSON/file>
 ```
-Example of a Profiles layer JSON profiles file: [tiny1.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/VP_LUNARG_desktop_portability_2021.json)
+Example of a Profiles layer JSON profiles file: [VP_LUNARG_test_structure_simple.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/test/data/VP_LUNARG_test_structure_simple.json)
 
 Optional: use settings to enable debugging output and exit-on-error:
 ```
@@ -98,11 +98,19 @@ Name of the profiles file to load.
 
 Name of the profile to load from the profiles file.
 
+#### Profiles JSON file
+- Environment Variable: `VK_KHRONOS_PROFILES_PROFILE_VALIDATION`
+- `vk_layer_settings.txt` Option: `khronos_profiles.profile_validation`
+- Android Option: `debug.vulkan.khronos_profiles.profile_validation`
+- Default Value: true
+
+Validate the profile file against the Vulkan SDK profile schema if the file is found. 
+
 #### Emulate `VK_KHR_portability_subset`
 - Environment Variable: `VK_KHRONOS_PROFILES_EMULATE_PORTABILITY`
 - `vk_layer_settings.txt` Option: `khronos_profiles.emulate_portability`
 - Android Option: `debug.vulkan.khronos_profiles.emulate_portability`
-- Default Value: false
+- Default Value: true
 
 Enables emulation of the `VK_KHR_portability_subset` extension.
 
@@ -110,7 +118,7 @@ Enables emulation of the `VK_KHR_portability_subset` extension.
 - Environment Variable: `VK_KHRONOS_PROFILES_SIMULATE_CAPABILITIES`
 - `vk_layer_settings.txt` Option: `khronos_profiles.simulate_capabilities`
 - Android Option: `debug.vulkan.khronos_profiles.simulate_capabilities`
-- Options: SIMULATE_API_VERSION_BIT, SIMULATE_FEATURES_BIT, SIMULATE_PROPERTIES_BIT, SIMULATE_EXTENSIONS_BIT, SIMULATE_FORMATS_BIT, SIMULATE_FORMAT_PROPERTIES_BIT
+- Options: SIMULATE_API_VERSION_BIT, SIMULATE_EXTENSIONS_BIT, SIMULATE_FEATURES_BIT, SIMULATE_PROPERTIES_BIT, SIMULATE_FORMATS_BIT
 - Default Value: SIMULATE_API_VERSION_BIT, SIMULATE_FEATURES_BIT, SIMULATE_PROPERTIES_BIT
 
 Enables modification of device capabilities.
@@ -119,8 +127,8 @@ Enables modification of device capabilities.
 - Environment Variable: `VK_KHRONOS_PROFILES_DEBUG_ACTIONS`
 - `vk_layer_settings.txt` Option: `khronos_profiles.debug_actions`
 - Android Option: `debug.vulkan.khronos_profiles.debug_actions`
-- Options: DEBUG_ACTION_LOG_BIT, DEBUG_ACTION_OUTPUT_BIT, DEBUG_ACTION_BREAKPOINT_BIT
-- Default Value: LOG
+- Options: DEBUG_ACTION_FILE_BIT, DEBUG_ACTION_STDOUT_BIT, DEBUG_ACTION_OUTPUT_BIT, DEBUG_ACTION_BREAKPOINT_BIT
+- Default Value: DEBUG_ACTION_STDOUT_BIT
 
 Enables different debugging actions.
 
@@ -128,9 +136,17 @@ Enables different debugging actions.
 - Environment Variable: `VK_KHRONOS_PROFILES_DEBUG_FILENAME`
 - `vk_layer_settings.txt` Option: `khronos_profiles.debug_filename`
 - Android Option: `debug.vulkan.khronos_profiles.debug_filename`
-- Default Value: stdout
+- Default Value: profiles_layer_log.txt
 
 Sets the output location.
+
+#### Debug file discard
+- Environment Variable: `VK_KHRONOS_PROFILES_DEBUG_FILE_DISCARD`
+- `vk_layer_settings.txt` Option: `khronos_profiles.debug_file_discard`
+- Android Option: `debug.vulkan.khronos_profiles.debug_file_discard`
+- Default Value: true
+
+Discard the content of the log file between each layer run.
 
 #### Debug fail on error
 - Environment Variable: `VK_KHRONOS_PROFILES_DEBUG_FAIL_ON_ERROR`
@@ -145,7 +161,7 @@ Enabled failing if an error occurs.
 - `vk_layer_settings.txt` Option: `khronos_profiles.debug_reports`
 - Android Option: `debug.vulkan.khronos_profiles.debug_reports`
 - Options: DEBUG_REPORT_NOTIFICATION_BIT, DEBUG_REPORT_WARNING_BIT, DEBUG_REPORT_ERROR_BIT, DEBUG_REPORT_DEBUG_BIT
-- Default Value: 0
+- Default Value: Not set
 
 Enabled reports level.
 
