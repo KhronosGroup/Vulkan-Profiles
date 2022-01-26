@@ -35,11 +35,7 @@ FetchContent_Declare(
 	GIT_TAG release-1.11.0
 )
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_Declare(
-	json
-	GIT_REPOSITORY https://github.com/nlohmann/json
-	GIT_TAG v3.10.0
-)
+
 FetchContent_Declare(
 	jsoncpp
 	GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp
@@ -75,7 +71,6 @@ endif()
 
 # After all the content is declared, it can safely be made available.
 FetchContent_MakeAvailable(googletest)
-FetchContent_MakeAvailable(json)
 FetchContent_MakeAvailable(jsoncpp)
 execute_process(COMMAND ${PYTHON_EXECUTABLE} ${jsoncpp_SOURCE_DIR}/amalgamate.py WORKING_DIRECTORY ${jsoncpp_SOURCE_DIR})
 
