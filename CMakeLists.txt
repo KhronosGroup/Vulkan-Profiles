@@ -155,7 +155,7 @@ add_definitions(-DAPI_NAME="${API_NAME}")
 
 add_subdirectory(library)
 
-add_subdirectory(vku)
+add_subdirectory(layer-utils)
 
 # add_vk_layer macro is used by layer/.
 if (WIN32)
