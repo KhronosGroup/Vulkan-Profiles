@@ -286,7 +286,7 @@ TEST(api_get_profile_queue_families, full) {
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(1, count);
 
-    EXPECT_EQ(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT,
+    EXPECT_EQ(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT,
               data[0].queueFamilyProperties.queueFlags);
     EXPECT_EQ(1, data[0].queueFamilyProperties.queueCount);
     EXPECT_EQ(36, data[0].queueFamilyProperties.timestampValidBits);
