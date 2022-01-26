@@ -174,7 +174,7 @@
                         "maxViewportDimensions": [ 16384, 16384 ],
                         "viewportBoundsRange": [ -32768, 32767 ],
                         "minMemoryMapAlignment": 4096,
-                        "minTexelBufferOffsetAlignment": 64,
+                        "minTexelBufferOffsetAlignment": 256,
                         "minUniformBufferOffsetAlignment": 256,
                         "minStorageBufferOffsetAlignment": 64,
                         "minTexelOffset": -8,
@@ -232,7 +232,7 @@
                 },
                 "VkPhysicalDeviceMaintenance3Properties": {
                     "maxPerSetDescriptors": 700,
-                    "maxMemoryAllocationSize": 2147483648
+                    "maxMemoryAllocationSize": 1073741824
                 }
             },
             "formats": {
@@ -569,13 +569,6 @@
                     "VkFormatProperties": {
                         "linearTilingFeatures": [],
                         "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
-                        "bufferFeatures": []
-                    }
-                },
-                "VK_FORMAT_D32_SFLOAT_S8_UINT": {
-                    "VkFormatProperties": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
                         "bufferFeatures": []
                     }
                 },
