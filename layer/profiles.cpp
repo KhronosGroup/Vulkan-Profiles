@@ -4060,11 +4060,16 @@ struct JsonValidator {
     JsonValidator() {}
 
     bool Init() {
-        const std::string env(std::getenv("VULKAN_SDK"));
-        if (env.empty()) return false;
+#ifdef __APPLE__
+        std::string schema_path = "/usr/local/share/vulkan/registry/profile_schema.json";
+#else
+        const char *sdk_path = std::getenv("VULKAN_SDK");
+        if (sdk_path == nullptr) return false;
+        std::string schema_path = std::string(sdk_path) + "/share/vulkan/registry/profile_schema.json";
+#endif
 
         if (!schema) {
-            const Json::Value schema_document = ParseJsonFile((env + "/share/vulkan/registry/profile_schema.json").c_str());
+            const Json::Value schema_document = ParseJsonFile(schema_path.c_str());
             if (schema_document == Json::nullValue) {
                 return false;
             }
