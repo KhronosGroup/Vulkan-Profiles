@@ -45,7 +45,6 @@ function(add_unit_test_simple NAME)
 endfunction(add_unit_test_simple)
 
 add_unit_test_simple(test_util)
-add_unit_test_simple(test_profile_support)
 add_unit_test_simple(test_profile_examples)
 add_unit_test_simple(test_api_get_profiles_core)
 
