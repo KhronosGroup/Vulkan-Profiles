@@ -171,14 +171,14 @@ TEST(api_get_profile_formats, full) {
     uint32_t formatCount = 0;
     VkResult result0 = vpGetProfileFormats(&profile, &formatCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(65, formatCount);
+    EXPECT_EQ(64, formatCount);
 
     formatCount = 67;
 
     std::vector<VkFormat> formats(formatCount);
     VkResult result1 = vpGetProfileFormats(&profile, &formatCount, &formats[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(65, formatCount);
+    EXPECT_EQ(64, formatCount);
 
     EXPECT_EQ(VK_FORMAT_A2B10G10R10_UINT_PACK32, formats[0]);
     EXPECT_EQ(VK_FORMAT_A2B10G10R10_UNORM_PACK32, formats[1]);
@@ -191,7 +191,7 @@ TEST(api_get_profile_formats, partial) {
     uint32_t formatCount = 0;
     VkResult result0 = vpGetProfileFormats(&profile, &formatCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(65, formatCount);
+    EXPECT_EQ(64, formatCount);
 
     formatCount = 3;
 
