@@ -69,7 +69,7 @@ if (NOT ANDROID)
     FetchContent_Declare(
         vulkan-loader
         GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Loader.git
-        GIT_TAG ${VULKAN_TAG}
+        GIT_TAG stabilized_release
     )
 endif()
 
