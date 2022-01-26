@@ -252,7 +252,7 @@ VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *
 #include <stdio.h>
 
 #ifndef VP_DEBUG_MESSAGE_CALLBACK
-#define VP_DEBUG_MESSAGE_CALLBACK(MSG) fprintf(stderr, MSG)
+#define VP_DEBUG_MESSAGE_CALLBACK(MSG) fprintf(stderr, "%s\n", MSG)
 #else
 void VP_DEBUG_MESSAGE_CALLBACK(const char*);
 #endif
