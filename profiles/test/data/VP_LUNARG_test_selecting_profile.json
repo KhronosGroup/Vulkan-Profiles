@@ -5,7 +5,7 @@
             "properties": {
                 "VkPhysicalDeviceProperties": {
                     "limits": {
-                        "maxImageDimension1D": 16384
+                        "maxImageDimension1D": 4096
                     }
                 }
             }
@@ -14,7 +14,7 @@
             "properties": {
                 "VkPhysicalDeviceProperties": {
                     "limits": {
-                        "maxImageDimension1D": 4096
+                        "maxImageDimension1D": 2048
                     }
                 }
             }
