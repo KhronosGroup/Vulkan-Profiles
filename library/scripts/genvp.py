@@ -1757,6 +1757,7 @@ class VulkanRegistry():
         self.structs['VkFormatProperties3'].members['linearTilingFeatures'].limittype = 'bitmask'
         self.structs['VkFormatProperties3'].members['optimalTilingFeatures'].limittype = 'bitmask'
         self.structs['VkFormatProperties3'].members['bufferFeatures'].limittype = 'bitmask'
+        self.structs['VkQueueFamilyProperties'].members['queueFlags'].limittype = 'bitmask'
         self.structs['VkQueueFamilyProperties'].members['queueCount'].limittype = 'max'
         self.structs['VkQueueFamilyProperties'].members['timestampValidBits'].limittype = 'max'
         self.structs['VkQueueFamilyProperties'].members['minImageTransferGranularity'].limittype = 'min' # should be maxmul
