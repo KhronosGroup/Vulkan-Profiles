@@ -3627,7 +3627,7 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.minInterpolationOffset = -0.5;
                     s->properties.limits.minMemoryMapAlignment = 4096;
                     s->properties.limits.minStorageBufferOffsetAlignment = 64;
-                    s->properties.limits.minTexelBufferOffsetAlignment = 64;
+                    s->properties.limits.minTexelBufferOffsetAlignment = 256;
                     s->properties.limits.minTexelGatherOffset = -8;
                     s->properties.limits.minTexelOffset = -8;
                     s->properties.limits.minUniformBufferOffsetAlignment = 256;
@@ -3674,7 +3674,7 @@ static const VpPropertyDesc propertyDesc = {
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES: {
                     VkPhysicalDeviceMaintenance3Properties* s = static_cast<VkPhysicalDeviceMaintenance3Properties*>(static_cast<void*>(p));
-                    s->maxMemoryAllocationSize = 2147483648;
+                    s->maxMemoryAllocationSize = 1073741824;
                     s->maxPerSetDescriptors = 700;
                 } break;
                 default: break;
@@ -3770,7 +3770,7 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minInterpolationOffset <= -0.5); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minInterpolationOffset <= -0.5), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minInterpolationOffset <= -0.5");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minMemoryMapAlignment <= 4096); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minMemoryMapAlignment <= 4096), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minMemoryMapAlignment <= 4096");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minStorageBufferOffsetAlignment <= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minStorageBufferOffsetAlignment <= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minStorageBufferOffsetAlignment <= 64");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment <= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment <= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minTexelBufferOffsetAlignment <= 64");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment <= 256); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment <= 256), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minTexelBufferOffsetAlignment <= 256");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelGatherOffset <= -8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelGatherOffset <= -8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minTexelGatherOffset <= -8");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelOffset <= -8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelOffset <= -8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minTexelOffset <= -8");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minUniformBufferOffsetAlignment <= 256); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minUniformBufferOffsetAlignment <= 256), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minUniformBufferOffsetAlignment <= 256");
@@ -3817,7 +3817,7 @@ static const VpPropertyDesc propertyDesc = {
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES: {
                     VkPhysicalDeviceMaintenance3Properties* prettify_VkPhysicalDeviceMaintenance3Properties = static_cast<VkPhysicalDeviceMaintenance3Properties*>(static_cast<void*>(p));
-                    ret = ret && (prettify_VkPhysicalDeviceMaintenance3Properties->maxMemoryAllocationSize >= 2147483648); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceMaintenance3Properties->maxMemoryAllocationSize >= 2147483648), "Unsupported properties condition: VkPhysicalDeviceMaintenance3Properties::maxMemoryAllocationSize >= 2147483648");
+                    ret = ret && (prettify_VkPhysicalDeviceMaintenance3Properties->maxMemoryAllocationSize >= 1073741824); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceMaintenance3Properties->maxMemoryAllocationSize >= 1073741824), "Unsupported properties condition: VkPhysicalDeviceMaintenance3Properties::maxMemoryAllocationSize >= 1073741824");
                     ret = ret && (prettify_VkPhysicalDeviceMaintenance3Properties->maxPerSetDescriptors >= 700); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceMaintenance3Properties->maxPerSetDescriptors >= 700), "Unsupported properties condition: VkPhysicalDeviceMaintenance3Properties::maxPerSetDescriptors >= 700");
                 } break;
                 default: break;
@@ -4480,29 +4480,6 @@ static const VpFormatDesc formatDesc[] = {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
                     VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
                     ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_D32_SFLOAT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
-                } break;
-                default: break;
-            }
-            return ret;
-        }
-    },
-    {
-        VK_FORMAT_D32_SFLOAT_S8_UINT,
-        [](VkBaseOutStructure* p) {
-            switch (p->sType) {
-                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
-                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
-                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
-                } break;
-                default: break;
-            }
-        },
-        [](VkBaseOutStructure* p) -> bool {
-            bool ret = true;
-            switch (p->sType) {
-                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
-                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
-                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_D32_SFLOAT_S8_UINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
                 } break;
                 default: break;
             }
@@ -5932,7 +5909,7 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.minInterpolationOffset = -0.5;
                     s->properties.limits.minMemoryMapAlignment = 4096;
                     s->properties.limits.minStorageBufferOffsetAlignment = 64;
-                    s->properties.limits.minTexelBufferOffsetAlignment = 64;
+                    s->properties.limits.minTexelBufferOffsetAlignment = 256;
                     s->properties.limits.minTexelGatherOffset = -8;
                     s->properties.limits.minTexelOffset = -8;
                     s->properties.limits.minUniformBufferOffsetAlignment = 256;
@@ -5979,7 +5956,7 @@ static const VpPropertyDesc propertyDesc = {
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES: {
                     VkPhysicalDeviceMaintenance3Properties* s = static_cast<VkPhysicalDeviceMaintenance3Properties*>(static_cast<void*>(p));
-                    s->maxMemoryAllocationSize = 2147483648;
+                    s->maxMemoryAllocationSize = 1073741824;
                     s->maxPerSetDescriptors = 700;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR: {
@@ -6079,7 +6056,7 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minInterpolationOffset <= -0.5); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minInterpolationOffset <= -0.5), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minInterpolationOffset <= -0.5");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minMemoryMapAlignment <= 4096); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minMemoryMapAlignment <= 4096), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minMemoryMapAlignment <= 4096");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minStorageBufferOffsetAlignment <= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minStorageBufferOffsetAlignment <= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minStorageBufferOffsetAlignment <= 64");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment <= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment <= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minTexelBufferOffsetAlignment <= 64");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment <= 256); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment <= 256), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minTexelBufferOffsetAlignment <= 256");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelGatherOffset <= -8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelGatherOffset <= -8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minTexelGatherOffset <= -8");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelOffset <= -8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelOffset <= -8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minTexelOffset <= -8");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minUniformBufferOffsetAlignment <= 256); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minUniformBufferOffsetAlignment <= 256), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minUniformBufferOffsetAlignment <= 256");
@@ -6126,7 +6103,7 @@ static const VpPropertyDesc propertyDesc = {
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES: {
                     VkPhysicalDeviceMaintenance3Properties* prettify_VkPhysicalDeviceMaintenance3Properties = static_cast<VkPhysicalDeviceMaintenance3Properties*>(static_cast<void*>(p));
-                    ret = ret && (prettify_VkPhysicalDeviceMaintenance3Properties->maxMemoryAllocationSize >= 2147483648); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceMaintenance3Properties->maxMemoryAllocationSize >= 2147483648), "Unsupported properties condition: VkPhysicalDeviceMaintenance3Properties::maxMemoryAllocationSize >= 2147483648");
+                    ret = ret && (prettify_VkPhysicalDeviceMaintenance3Properties->maxMemoryAllocationSize >= 1073741824); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceMaintenance3Properties->maxMemoryAllocationSize >= 1073741824), "Unsupported properties condition: VkPhysicalDeviceMaintenance3Properties::maxMemoryAllocationSize >= 1073741824");
                     ret = ret && (prettify_VkPhysicalDeviceMaintenance3Properties->maxPerSetDescriptors >= 700); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceMaintenance3Properties->maxPerSetDescriptors >= 700), "Unsupported properties condition: VkPhysicalDeviceMaintenance3Properties::maxPerSetDescriptors >= 700");
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR: {
@@ -6793,29 +6770,6 @@ static const VpFormatDesc formatDesc[] = {
                 case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
                     VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
                     ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_D32_SFLOAT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
-                } break;
-                default: break;
-            }
-            return ret;
-        }
-    },
-    {
-        VK_FORMAT_D32_SFLOAT_S8_UINT,
-        [](VkBaseOutStructure* p) {
-            switch (p->sType) {
-                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
-                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
-                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
-                } break;
-                default: break;
-            }
-        },
-        [](VkBaseOutStructure* p) -> bool {
-            bool ret = true;
-            switch (p->sType) {
-                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
-                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
-                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_D32_SFLOAT_S8_UINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
                 } break;
                 default: break;
             }
