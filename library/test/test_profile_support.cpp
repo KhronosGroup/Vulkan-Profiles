@@ -21,7 +21,7 @@
 #define VK_ENABLE_BETA_EXTENSIONS 1
 #include "test.hpp"
 
-#include <vulkan/vulkan_profiles.hpp>
+#include <vulkan/debug/vulkan_profiles.hpp>
 
 
 TEST(test_profile, VP_KHR_1_2_roadmap_2022_support) { 
