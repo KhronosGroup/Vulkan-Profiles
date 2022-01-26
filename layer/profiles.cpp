@@ -3977,6 +3977,11 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
 static Json::Value ParseJsonFile(std::string filename) {
     Json::Value root = Json::nullValue;
 
+    // Remove newline from filename
+    if (int(filename.back() == 0xa) ) {
+        filename.pop_back();
+    }
+
     std::ifstream file;
     file.open(filename.c_str());
     if (!file.is_open()) {
