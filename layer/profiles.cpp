@@ -2021,7 +2021,7 @@ class JsonLoader {
     JsonLoader(const JsonLoader &) = delete;
     JsonLoader &operator=(const JsonLoader &) = delete;
 
-    VkResult LoadFile(const char *filename);
+    VkResult LoadFile(std::string filename);
     VkResult ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities);
 
    private:
@@ -3974,11 +3974,11 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
     return VK_SUCCESS;
 }
 
-static Json::Value ParseJsonFile(const char *filename) {
+static Json::Value ParseJsonFile(std::string filename) {
     Json::Value root = Json::nullValue;
 
     std::ifstream file;
-    file.open(filename);
+    file.open(filename.c_str());
     if (!file.is_open()) {
         return root;
     }
@@ -4061,14 +4061,14 @@ struct JsonValidator {
     std::unique_ptr<Validator> validator;
 };
 
-VkResult JsonLoader::LoadFile(const char *filename) {
+VkResult JsonLoader::LoadFile(std::string filename) {
     std::ifstream json_file(filename);
     if (!json_file) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, format("JsonLoader failed to open file \"%s\"\n", filename));
+        LogMessage(DEBUG_REPORT_ERROR_BIT, format("JsonLoader failed to open file \"%s\"\n", filename.c_str()));
         return layer_settings.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, format("JsonLoader::LoadFile(\"%s\")\n", filename));
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, format("JsonLoader::LoadFile(\"%s\")\n", filename.c_str()));
     Json::Reader reader;
     Json::Value root = Json::nullValue;
     bool success = reader.parse(json_file, root, false);
@@ -4079,7 +4079,7 @@ VkResult JsonLoader::LoadFile(const char *filename) {
     json_file.close();
 
     if (root.type() != Json::objectValue) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, format("Json document root is not an object in file \"%s\"\n", filename));
+        LogMessage(DEBUG_REPORT_ERROR_BIT, format("Json document root is not an object in file \"%s\"\n", filename.c_str()));
         return layer_settings.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
@@ -4141,9 +4141,9 @@ VkResult JsonLoader::LoadFile(const char *filename) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
                        format("%s could not find the profile schema file to validate filename.\n\t- This "
                               "operation requires the Vulkan SDK to be installed.\n\t- Skipping profile file validation.",
-                              kOurLayerName, filename));
+                              kOurLayerName, filename.c_str()));
         } else if (!validator.Check(root)) {
-            LogMessage(DEBUG_REPORT_ERROR_BIT, format("%s is not a valid JSON profile file.\n", filename));
+            LogMessage(DEBUG_REPORT_ERROR_BIT, format("%s is not a valid JSON profile file.\n", filename.c_str()));
             if (layer_settings.debug_fail_on_error) {
                 return VK_ERROR_INITIALIZATION_FAILED;
             }
@@ -10325,7 +10325,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
 
             // Override PDD members with values from configuration file(s).
             JsonLoader json_loader(pdd);
-            result = json_loader.LoadFile(layer_settings.profile_file.c_str());
+            result = json_loader.LoadFile(layer_settings.profile_file);
 
             // VK_VULKAN_1_1
             TransferValue(&(pdd.physical_device_vulkan_1_1_properties_), &(pdd.physical_device_multiview_properties_),
