@@ -192,9 +192,14 @@ VK_LAYER_EXPORT const char *GetLayerEnvVar(const char *setting_env) {
 }
 
 static std::string TrimPrefix(const std::string &layer_key) {
-    assert(layer_key.find("VK_LAYER_") == 0);
-    std::size_t prefix = std::strlen("VK_LAYER_");
-    return layer_key.substr(prefix, layer_key.size() - prefix);
+    std::string key {};
+    if (layer_key.find("VK_LAYER_") == 0) {
+        std::size_t prefix = std::strlen("VK_LAYER_");
+        key = layer_key.substr(prefix, layer_key.size() - prefix);
+    } else {
+        key = layer_key;
+    }
+    return key;
 }
 
 static std::string GetSettingKey(const char *layer_key, const char *setting_key) {
