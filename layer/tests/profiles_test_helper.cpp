@@ -64,6 +64,7 @@ std::string profiles_test::getAbsolutePath(std::string filepath) {
 
 void profiles_test::setProfilesFilename(const std::string& filepath) {
     profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_PROFILE_FILE", filepath.c_str());
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_PROFILE_VALIDATION", "false"); // Never validate profile files, it's done by a dedicated test.
 }
 
 void profiles_test::setProfilesDebugEnable(bool enable) {

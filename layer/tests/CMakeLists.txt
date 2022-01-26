@@ -40,4 +40,5 @@ function(LayerTest NAME)
 endfunction(LayerTest)
 
 LayerTest(tests)
+LayerTest(tests_promoted)
 LayerTest(tests_capabilities)
