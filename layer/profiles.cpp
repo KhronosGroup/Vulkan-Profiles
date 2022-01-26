@@ -10305,9 +10305,9 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_vulkan_1_3_features_);
                 }
 
-                dt->GetPhysicalDeviceProperties2KHR(physical_device, &property_chain);
-                dt->GetPhysicalDeviceFeatures2KHR(physical_device, &feature_chain);
-                dt->GetPhysicalDeviceMemoryProperties2KHR(physical_device, &memory_chain);
+                dt->GetPhysicalDeviceProperties2(physical_device, &property_chain);
+                dt->GetPhysicalDeviceFeatures2(physical_device, &feature_chain);
+                dt->GetPhysicalDeviceMemoryProperties2(physical_device, &memory_chain);
 
                 pdd.physical_device_properties_ = property_chain.properties;
                 pdd.physical_device_features_ = feature_chain.features;
