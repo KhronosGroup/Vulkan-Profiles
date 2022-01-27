@@ -60,6 +60,24 @@ void VP_DEBUG_MESSAGE_CALLBACK(const char*);
 #define VP_DEBUG_COND_MSGF(COND, MSGFMT, ...) if (COND) VP_DEBUG_MSGF(MSGFMT, __VA_ARGS__)
 '''
 
+DEBUG_MSG_UTIL_IMPL = '''
+#include <string>
+
+namespace detail {
+
+VPAPI_ATTR std::string vpGetDeviceAndDriverInfoString(VkPhysicalDevice physicalDevice,
+                                                      PFN_vkGetPhysicalDeviceProperties2KHR pfnGetPhysicalDeviceProperties2) {
+    VkPhysicalDeviceDriverPropertiesKHR driverProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR };
+    VkPhysicalDeviceProperties2KHR deviceProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, &driverProps };
+    pfnGetPhysicalDeviceProperties2(physicalDevice, &deviceProps);
+    return std::string("(deviceName=") + std::string(&deviceProps.properties.deviceName[0])
+                    + ", driverName=" + std::string(&driverProps.driverName[0])
+                    + ", driverInfo=" + std::string(&driverProps.driverInfo[0]) + ")";
+}
+
+}
+'''
+
 H_HEADER = '''
 #ifndef VULKAN_PROFILES_H_
 #define VULKAN_PROFILES_H_ 1
@@ -623,6 +641,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
     }
 
     *pSupported = VK_TRUE;
+    VP_DEBUG_MSGF("Checking device support for profile %s (%s). You may find the details of the capabilities of this device on https://vulkan.gpuinfo.org/", pProfile->profileName, detail::vpGetDeviceAndDriverInfoString(physicalDevice, userData.gpdp2.pfnGetPhysicalDeviceProperties2).c_str());
 
     if (pDesc->props.specVersion < pProfile->specVersion) {
         VP_DEBUG_MSGF("Unsupported profile version: %u", pProfile->specVersion);
@@ -2475,6 +2494,7 @@ class VulkanProfilesLibraryGenerator():
             if self.debugMessages:
                 f.write('#include <vulkan/debug/vulkan_profiles.h>\n')
                 f.write(DEBUG_MSG_CB_DEFINE)
+                f.write(DEBUG_MSG_UTIL_IMPL)
             else:
                 f.write('#include <vulkan/vulkan_profiles.h>\n')
             f.write(self.gen_privateImpl())
@@ -2491,6 +2511,7 @@ class VulkanProfilesLibraryGenerator():
             f.write(API_DEFS)
             if self.debugMessages:
                 f.write(DEBUG_MSG_CB_DEFINE)
+                f.write(DEBUG_MSG_UTIL_IMPL)
             f.write(self.gen_privateImpl())
             f.write(self.gen_publicImpl())
             f.write(HPP_FOOTER)

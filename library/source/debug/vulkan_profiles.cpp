@@ -36,6 +36,22 @@ void VP_DEBUG_MESSAGE_CALLBACK(const char*);
 #define VP_DEBUG_COND_MSG(COND, MSG) if (COND) VP_DEBUG_MSG(MSG)
 #define VP_DEBUG_COND_MSGF(COND, MSGFMT, ...) if (COND) VP_DEBUG_MSGF(MSGFMT, __VA_ARGS__)
 
+#include <string>
+
+namespace detail {
+
+VPAPI_ATTR std::string vpGetDeviceAndDriverInfoString(VkPhysicalDevice physicalDevice,
+                                                      PFN_vkGetPhysicalDeviceProperties2KHR pfnGetPhysicalDeviceProperties2) {
+    VkPhysicalDeviceDriverPropertiesKHR driverProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR };
+    VkPhysicalDeviceProperties2KHR deviceProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, &driverProps };
+    pfnGetPhysicalDeviceProperties2(physicalDevice, &deviceProps);
+    return std::string("(deviceName=") + std::string(&deviceProps.properties.deviceName[0])
+                    + ", driverName=" + std::string(&driverProps.driverName[0])
+                    + ", driverInfo=" + std::string(&driverProps.driverInfo[0]) + ")";
+}
+
+}
+
 namespace detail {
 
 
@@ -7993,6 +8009,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
     }
 
     *pSupported = VK_TRUE;
+    VP_DEBUG_MSGF("Checking device support for profile %s (%s). You may find the details of the capabilities of this device on https://vulkan.gpuinfo.org/", pProfile->profileName, detail::vpGetDeviceAndDriverInfoString(physicalDevice, userData.gpdp2.pfnGetPhysicalDeviceProperties2).c_str());
 
     if (pDesc->props.specVersion < pProfile->specVersion) {
         VP_DEBUG_MSGF("Unsupported profile version: %u", pProfile->specVersion);
