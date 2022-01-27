@@ -1089,12 +1089,6 @@ class PhysicalDeviceData {
 
     static void Destroy(const VkPhysicalDevice pd) {
         LogMessage(DEBUG_REPORT_DEBUG_BIT, "PhysicalDeviceData::Destroy()\n");
-
-        auto pdd = Find(pd);
-        assert(pdd);
-        for (auto &e : pdd->array_of_drm_format_modifier_properties_) {
-            delete[] e.second.pDrmFormatModifierProperties;
-        }
         map_.erase(pd);
     }
 
@@ -1139,7 +1133,7 @@ class PhysicalDeviceData {
     ArrayOfVkExtensionProperties device_extensions_;
     ArrayOfVkFormatProperties device_formats_;
     ArrayOfVkFormatProperties3 device_formats_3_;
-    ArrayOfVkDrmFormatModifierProperties device_drm_format_modifier_properties_;
+    //ArrayOfVkDrmFormatModifierProperties device_drm_format_modifier_properties_;
     ArrayOfVkExtensionProperties simulation_extensions_;
     VkPhysicalDeviceProperties physical_device_properties_;
     VkPhysicalDeviceFeatures physical_device_features_;
@@ -1147,7 +1141,7 @@ class PhysicalDeviceData {
     VkSurfaceCapabilitiesKHR surface_capabilities_;
     ArrayOfVkFormatProperties arrayof_format_properties_;
     ArrayOfVkFormatProperties3 arrayof_format_properties_3_;
-    ArrayOfVkDrmFormatModifierProperties array_of_drm_format_modifier_properties_;
+    //ArrayOfVkDrmFormatModifierProperties array_of_drm_format_modifier_properties_;
     ArrayOfVkExtensionProperties arrayof_extension_properties_;
 
     // Vulkan 1.3 structs
@@ -3708,65 +3702,6 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
     return true;
 }
 
-bool JsonLoader::GetDrmFormatModifierProperties(const Json::Value &formats, const std::string &format_name,
-                                                ArrayOfVkDrmFormatModifierProperties *dest) {
-    VkFormat format = StringToFormat(format_name);
-    VkDrmFormatModifierPropertiesList2EXT list = {};
-    const auto &member = formats[format_name];
-    for (const auto &name : member.getMemberNames()) {
-        const auto &props = member[name];
-        if (name == "VkDrmFormatModifierPropertiesList2EXT") {
-            list.drmFormatModifierCount = props["pDrmFormatModifierProperties"].size();
-            if (list.drmFormatModifierCount > 0) {
-                list.pDrmFormatModifierProperties = new VkDrmFormatModifierProperties2EXT[list.drmFormatModifierCount];
-                for (uint32_t i = 0; i < list.drmFormatModifierCount; ++i) {
-                    list.pDrmFormatModifierProperties[i].drmFormatModifier =
-                        props["pDrmFormatModifierProperties"][i]["drmFormatModifier"].asInt();
-                    list.pDrmFormatModifierProperties[i].drmFormatModifierPlaneCount =
-                        props["pDrmFormatModifierProperties"][i]["drmFormatModifierPlaneCount"].asInt();
-                    list.pDrmFormatModifierProperties[i].drmFormatModifierTilingFeatures = 0;
-                    for (const auto &feature : props["pDrmFormatModifierProperties"][i]["drmFormatModifierTilingFeatures"]) {
-                        list.pDrmFormatModifierProperties[i].drmFormatModifierTilingFeatures |=
-                            StringToVkFormatFeatureFlags2(feature.asString());
-                    }
-                }
-            }
-        }
-    }
-
-    (*dest)[format] = list;
-    const VkDrmFormatModifierPropertiesList2EXT &device_list = pdd_.device_drm_format_modifier_properties_[format];
-    for (uint32_t i = 0; i < list.drmFormatModifierCount; ++i) {
-        const auto &profile_properties = list.pDrmFormatModifierProperties[i];
-        bool found = false;
-        for (uint32_t j = 0; j < device_list.drmFormatModifierCount; ++j) {
-            const auto &device_properties = list.pDrmFormatModifierProperties[j];
-            if (profile_properties.drmFormatModifier == device_properties.drmFormatModifier &&
-                profile_properties.drmFormatModifierPlaneCount == device_properties.drmFormatModifierPlaneCount &&
-                profile_properties.drmFormatModifierTilingFeatures == device_properties.drmFormatModifierTilingFeatures) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            LogMessage(
-                DEBUG_REPORT_WARNING_BIT,
-                ::format("The Profile requires:\n\tVkDrmFormatModifierProperties2EXT for format \"%s\"\n\twith: "
-                         "'drmFormatModifier' = %" PRIu64 ", 'drmFormatModifierPlaneCount' = %" PRIu32
-                         ", and 'drmFormatModifierTilingFeatures' = %s,\nbut the Device does not support it.\nThe requested "
-                         "`VkDrmFormatModifierProperties2EXT` can't be "
-                         "simulated on this Device.\n",
-                         format_name.c_str(), profile_properties.drmFormatModifier, profile_properties.drmFormatModifierPlaneCount,
-                         GetFormatFeature2String(profile_properties.drmFormatModifierTilingFeatures).c_str()));
-            if (layer_settings.debug_fail_on_error) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
 bool JsonLoader::CheckExtensionSupport(const char *extension) {
     if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
         if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, extension)) {
@@ -4013,7 +3948,6 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
 
             for (const auto &format : formats.getMemberNames()) {
                 bool success = GetFormat(formats, format, &pdd_.arrayof_format_properties_, &pdd_.arrayof_format_properties_3_);
-                success &= GetDrmFormatModifierProperties(formats, format, &pdd_.array_of_drm_format_modifier_properties_);
                 if (!success && layer_settings.debug_fail_on_error) {
                     return VK_ERROR_INITIALIZATION_FAILED;
                 }
@@ -8536,13 +8470,6 @@ void FillFormatPropertiesPNextChain(PhysicalDeviceData *physicalDeviceData, void
                 *sp = physicalDeviceData->arrayof_format_properties_3_[format];
                 sp->pNext = pNext;
             } break;
-            case VK_STRUCTURE_TYPE_DRM_FORMAT_MODIFIER_PROPERTIES_LIST_2_EXT: {
-                VkDrmFormatModifierPropertiesList2EXT *sp = (VkDrmFormatModifierPropertiesList2EXT *)place;
-                void *pNext = sp->pNext;
-                *sp = physicalDeviceData->array_of_drm_format_modifier_properties_[format];
-                sp->pNext = pNext;
-            } break;
-                break;
             default:
                 break;
         }
@@ -9173,8 +9100,7 @@ void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceMaint
 
 #undef TRANSFER_VALUE
 
-void LoadDeviceFormats(VkInstance instance, VkPhysicalDevice pd, ArrayOfVkFormatProperties *dest, ArrayOfVkFormatProperties3 *dest3,
-                       ArrayOfVkDrmFormatModifierProperties *drm_dest) {
+void LoadDeviceFormats(VkInstance instance, VkPhysicalDevice pd, ArrayOfVkFormatProperties *dest, ArrayOfVkFormatProperties3 *dest3) {
     std::vector<VkFormat> formats = {
         VK_FORMAT_R4G4_UNORM_PACK8,
         VK_FORMAT_R4G4B4A4_UNORM_PACK16,
@@ -9425,12 +9351,9 @@ void LoadDeviceFormats(VkInstance instance, VkPhysicalDevice pd, ArrayOfVkFormat
     };
     const auto dt = instance_dispatch_table(instance);
     for (const auto format : formats) {
-        VkDrmFormatModifierPropertiesList2EXT drm_format_modifier_properties = {};
-        drm_format_modifier_properties.sType = VK_STRUCTURE_TYPE_DRM_FORMAT_MODIFIER_PROPERTIES_LIST_2_EXT;
 
         VkFormatProperties3KHR format_properties_3 = {};
         format_properties_3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR;
-        format_properties_3.pNext = &drm_format_modifier_properties;
 
         VkFormatProperties2 format_properties = {};
         format_properties.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
@@ -9439,7 +9362,6 @@ void LoadDeviceFormats(VkInstance instance, VkPhysicalDevice pd, ArrayOfVkFormat
         dt->GetPhysicalDeviceFormatProperties2(pd, format, &format_properties);
         (*dest)[format] = format_properties.formatProperties;
         (*dest3)[format] = format_properties_3;
-        (*drm_dest)[format] = drm_format_modifier_properties;
     }
 }
 
@@ -10395,8 +10317,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             ::device_has_etc2 = pdd.physical_device_features_.textureCompressionETC2;
 
             if (layer_settings.simulate_capabilities & SIMULATE_FORMATS_BIT) {
-                LoadDeviceFormats(instance, physical_device, &pdd.device_formats_, &pdd.device_formats_3_,
-                                  &pdd.device_drm_format_modifier_properties_);
+                LoadDeviceFormats(instance, physical_device, &pdd.device_formats_, &pdd.device_formats_3_);
             }
 
             LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
