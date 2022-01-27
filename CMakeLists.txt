@@ -54,10 +54,10 @@ FetchContent_Declare(
 )
 FetchContent_Declare(
 	vulkan-validationlayers
-#	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-ValidationLayers
-#	GIT_TAG ${VULKAN_TAG}
-	GIT_REPOSITORY git@gitlab.khronos.org:vulkan/Vulkan-ValidationLayers.git
-	GIT_TAG tony-13staging-gitlab
+	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-ValidationLayers
+	GIT_TAG v1.2.203
+#	GIT_REPOSITORY git@gitlab.khronos.org:vulkan/Vulkan-ValidationLayers.git
+#	GIT_TAG tony-13staging-gitlab
 )
 # Desktop builds link against the loader vulkan library.  Android
 # builds just link against the system vulkan library.
