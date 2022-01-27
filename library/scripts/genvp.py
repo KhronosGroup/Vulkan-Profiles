@@ -3171,12 +3171,23 @@ class VulkanProfilesDocGenerator():
         ]))
         deviceExtensions.sort(key = self.sort_KHR_EXT_first)
 
+        # Generate table legend
+        legend = (
+            '* :heavy_check_mark: indicates that the extension is defined in the profile\n'
+            '* "X.X Core" indicates that the extension is not defined in the profile but '
+            'the extension is promoted to the specified core API version that is smaller than '
+            'or equal to the minimum required API version of the profile\n'
+            '* :x: indicates that the extension is neither defined in the profile nor it is '
+            'promoted to a core API version that is smaller than or equal to the minimum '
+            'required API version of the profile\n'
+        )
+
         # Generate table
         table = self.gen_sectionedTable(OrderedDict({
             'Instance extensions': OrderedDict({ row: self.gen_extension for row in instanceExtensions }),
             'Device extensions': OrderedDict({ row: self.gen_extension for row in deviceExtensions })
         }))
-        return '\n## Vulkan Profiles Extensions\n\n{0}\n'.format(table)
+        return '\n## Vulkan Profiles Extensions\n\n{0}\n{1}\n'.format(legend, table)
 
 
     def has_nestedFeatureData(self, data):
@@ -3307,9 +3318,22 @@ class VulkanProfilesDocGenerator():
             'of the appropriate version of the Vulkan API Specification.'
         )
 
+        # Generate table legend
+        legend = (
+            '* :heavy_check_mark: indicates that the feature is defined in the profile (hover '
+            'over the symbol to view the structure and corresponding extension or core API '
+            'version where the feature is defined in the profile)\n'
+            '* :warning: indicates that the feature is not defined in the profile but an '
+            'equivalent feature is (hover over the symbol to view the structure and '
+            'corresponding extension or core API version where the feature is defined in the '
+            'profile)\n'
+            '* :x: indicates that neither the feature nor an equivalent feature is defined in '
+            'the profile\n'
+        )
+
         # Generate table
         table = self.gen_sectionedTable(tableData)
-        return '\n## Vulkan Profile Features\n\n{0}\n\n{1}\n'.format(disclaimer, table)
+        return '\n## Vulkan Profile Features\n\n{0}\n\n{1}\n{2}\n'.format(disclaimer, legend, table)
 
 
     def formatValue(self, value):
@@ -3485,9 +3509,22 @@ class VulkanProfilesDocGenerator():
             'section of the appropriate version of the Vulkan API Specification.'
         )
 
+        # Generate table legend
+        legend = (
+            '* "valueWithRegularFont" indicates that the limit/property is defined in the profile '
+            '(hover over the value to view the structure and corresponding extension or core API '
+            'version where the limit/property is defined in the profile)\n'
+            '* "_valueWithItalicFont_" indicates that the limit/property is not defined in the profile '
+            'but an equivalent limit/property is (hover over the symbol to view the structure '
+            'and corresponding extension or core API version where the limit/property is defined '
+            'in the profile)\n'
+            '* "-" indicates that neither the limit/property nor an equivalent limit/property is '
+            'defined in the profile\n'
+        )
+
         # Generate table
         table = self.gen_sectionedTable(tableData)
-        return '\n## Vulkan Profile Limits (Properties)\n\n{0}\n\n{1}\n'.format(disclaimer, table)
+        return '\n## Vulkan Profile Limits (Properties)\n\n{0}\n\n{1}\n{2}\n'.format(disclaimer, legend, table)
 
 
     def gen_queueFamily(self, index, struct, section, member, profile = None):
@@ -3559,9 +3596,24 @@ class VulkanProfilesDocGenerator():
             for structName, members in queueFamilyProperties.items():
                 section.update({ row: functools.partial(self.gen_queueFamily, index, structName) for row in members })
 
+        # Generate table legend
+        legend = (
+            '* "valueWithRegularFont" indicates that the queue family property is defined in the '
+            'profile (hover over the value to view the structure and corresponding extension or '
+            'core API version where the queue family property is defined in the profile)\n'
+            '* "_valueWithItalicFont_" indicates that the queue family property is not defined in the '
+            'profile but an equivalent queue family property is (hover over the symbol to view '
+            'the structure and corresponding extension or core API version where the queue family '
+            'property is defined in the profile)\n'
+            '* "-" indicates that neither the queue family property nor an equivalent queue '
+            'family property is defined in the profile\n'
+            '* Empty cells next to the properties of a particular queue family definition section '
+            'indicate that the profile does not have a corresponding queue family definition\n'
+        )
+
         # Generate table
         table = self.gen_sectionedTable(tableData)
-        return '\n## Vulkan Profile Queue Families\n\n{0}\n'.format(table)
+        return '\n## Vulkan Profile Queue Families\n\n{0}\n{1}\n'.format(legend, table)
 
 
     def gen_format(self, format, struct, section, member, profile = None):
@@ -3648,9 +3700,35 @@ class VulkanProfilesDocGenerator():
             for structName, members in definedFormats[format].items():
                 section.update({ row: functools.partial(self.gen_format, format, structName) for row in members })
 
+        # TODO: Currently we don't include format properties that are required by the minimum
+        # required API version of a profile, or those required by extensions required by the
+        # profile, as that would necessitate the inclusion of information currently only
+        # available textually in the "Required Format Support" section of the Vulkan Specification
+        disclaimer = (
+            '> **NOTE**: The table below only contains formats and properties explicitly defined '
+            'by the corresponding profile. Further formats and properties may be supported by the '
+            'profiles in accordance to the requirements defined in the "Required Format Support" '
+            'section of the appropriate version of the Vulkan API Specification.'
+        )
+
+        # Generate table legend
+        legend = (
+            '* "valueWithRegularFont" indicates that the format property is defined in the '
+            'profile (hover over the value to view the structure and corresponding extension or '
+            'core API version where the format property is defined in the profile)\n'
+            '* "_valueWithItalicFont_" indicates that the format property is not defined in the '
+            'profile but an equivalent format property is (hover over the symbol to view the '
+            'structure and corresponding extension or core API version where the format property '
+            'is defined in the profile)\n'
+            '* "-" indicates that neither the format property nor an equivalent format property '
+            'is defined in the profile\n'
+            '* Empty cells next to the properties of a particular format definition section '
+            'indicate that the profile does not have a corresponding format definition\n'
+        )
+
         # Generate table
         table = self.gen_sectionedTable(tableData)
-        return '\n## Vulkan Profile Formats\n\n{0}\n'.format(table)
+        return '\n## Vulkan Profile Formats\n\n{0}\n{1}\n'.format(legend, table)
 
 
 if __name__ == '__main__':
