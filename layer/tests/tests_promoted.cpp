@@ -61,6 +61,10 @@ struct TestInit {
 
         this->instance = inst_builder.getInstance();
 
+        GetPhysicalDeviceProperties2 = (PFN_vkGetPhysicalDeviceProperties2)vkGetInstanceProcAddr(
+            instance, "vkGetPhysicalDeviceProperties2");
+        assert(GetPhysicalDeviceProperties2);
+
         err = inst_builder.getPhysicalDevice(&this->physical_device);
         ASSERT_EQ(err, VK_SUCCESS);
     }
@@ -68,6 +72,7 @@ struct TestInit {
     VkInstance instance;
     VkPhysicalDevice physical_device;
     profiles_test::VulkanInstanceBuilder inst_builder;
+    PFN_vkGetPhysicalDeviceProperties2 GetPhysicalDeviceProperties2;
 };
 
 static TestInit test;
@@ -107,7 +112,7 @@ TEST(layer_promoted, TestVulkan11Properties) {
     VkPhysicalDeviceProperties2 gpu_props{};
     gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     gpu_props.pNext = &vulkan_11_properties;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+    test.GetPhysicalDeviceProperties2(gpu, &gpu_props);
 
     EXPECT_EQ(vulkan_11_properties.subgroupSize, 211);
     EXPECT_EQ(vulkan_11_properties.subgroupSupportedStages & VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_VERTEX_BIT);
@@ -160,7 +165,7 @@ TEST(layer_promoted, TestVulkan12Properties) {
     VkPhysicalDeviceProperties2 gpu_props{};
     gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     gpu_props.pNext = &vulkan_12_properties;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+    test.GetPhysicalDeviceProperties2(gpu, &gpu_props);
 
     EXPECT_EQ(vulkan_12_properties.denormBehaviorIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL);
     EXPECT_EQ(vulkan_12_properties.roundingModeIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL);
@@ -287,7 +292,7 @@ TEST(layer_promoted, TestVulkan13Properties) {
     VkPhysicalDeviceProperties2 gpu_props{};
     gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     gpu_props.pNext = &vulkan_13_properties;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+    test.GetPhysicalDeviceProperties2(gpu, &gpu_props);
 
     EXPECT_EQ(vulkan_13_properties.minSubgroupSize, 338);
     EXPECT_EQ(vulkan_13_properties.maxSubgroupSize, 339);

@@ -13,6 +13,15 @@ static const char* CONFIG_PATH = "bin/Release";
 static const char* CONFIG_PATH = "lib";
 #endif
 
+
+VkPhysicalDeviceProperties2 *GetPhysicalDeviceProperties2(VkInstance instance, VkPhysicalDevice gpu, VkPhysicalDeviceProperties2 *gpu_props) {
+    PFN_vkGetPhysicalDeviceProperties2 pfn_vkGetPhysicalDeviceProperties2 = (PFN_vkGetPhysicalDeviceProperties2)vkGetInstanceProcAddr(
+        instance, "vkGetPhysicalDeviceProperties2");
+    assert(pfn_vkGetPhysicalDeviceProperties2);
+    pfn_vkGetPhysicalDeviceProperties2(gpu, gpu_props);
+    return gpu_props;
+};
+
 TEST(layer, selecting_profile) {
     VkResult err = VK_SUCCESS;
 
@@ -127,7 +136,7 @@ TEST(layer, reading_flags) {
     VkPhysicalDeviceProperties2 gpu_props{};
     gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     gpu_props.pNext = &float_control_properties;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+    GetPhysicalDeviceProperties2(instance, gpu, &gpu_props);
 
     EXPECT_EQ(float_control_properties.denormBehaviorIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY);
     EXPECT_EQ(float_control_properties.roundingModeIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY);
