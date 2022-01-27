@@ -3913,7 +3913,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
             AddPromotedExtensions(this->profile_api_version);        
         }
 
-        if (this->profile_api_version > pdd_.physical_device_properties_.apiVersion) {
+        if (VK_VERSION_PATCH(this->profile_api_version) > VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)) {
             LogMessage(DEBUG_REPORT_ERROR_BIT,
                 format("JSON apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ") is greater than the device apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ")\n",
                     VK_VERSION_MAJOR(this->profile_api_version), VK_VERSION_MINOR(this->profile_api_version), VK_VERSION_PATCH(this->profile_api_version),
