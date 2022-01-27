@@ -29,13 +29,17 @@ All *the Vulkan Profiles Tools* remains under development and are delivered as p
 
 The *Vulkan Profiles Tools* are the following components:
 - ***The Vulkan Profiles JSON Schemas***
-  - A data format to exchange Vulkan Capabilities: extensions, features, properties, formats and queue properties.
+  - A data format to exchange Vulkan capabilities: extensions, features, properties, formats and queue properties.
   - Each revision of Vulkan API is represented by a schema that supersed older version of Vulkan API.
   - The currently schema covers all Vulkan 1.3 and extensions.
 - [***The Vulkan Profiles API library***](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/library/TUTORIAL.md)
-  -  A header-only C++ library to use Vulkan Profiles in Vulkan applications compatible with Vulkan 1.0 + `VK_KHR_get_physical_device_properties2` drivers.
+  - A header-only C++ library to use *Vulkan Profiles* in Vulkan applications.
+  - The library allows checking Profiles support on a device and creating a `VkDevice` instance with the profile features and extensions enabled.
+  - The library requires Vulkan 1.0 + `VK_KHR_get_physical_device_properties2` drivers.
 - [***The Vulkan Profiles Layer***](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/layer/TUTORIAL.md)
   - A layer to help developing Vulkan Applications which respect the requirements of a chosen *Vulkan Profile*.
+  - It simulates but doesn't emulate Vulkan capabilities. Hence, it used with the [Validation layer](https://github.com/KhronosGroup/Vulkan-ValidationLayers) to clamp available capabilities on the Vulkan developer system.
+  - The layer requires Vulkan 1.0 + `VK_KHR_get_physical_device_properties2` drivers.
 - [***The Vulkan Profiles Documentation***](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/PROFILES.md)
   - A table to compare *Vulkan Profiles* capabilities against each other.
 
@@ -59,7 +63,7 @@ The following diagram shows the Vulkan Profiles Tools generation pipeline with e
 Note that the *Profiles layer* is not yet code generated but this is in the roadmap.
 
 ## Future Work:
-  - [GPUInfo.org](https://gpuinfo.org/) will allow downloading profiles files for any Vulkan drivers report.
+  - [GPUInfo.org](https://gpuinfo.org/) will allow downloading profiles JSON files for any Vulkan drivers report.
   - [`vulkaninfo`](https://vulkan.lunarg.com/doc/view/latest/windows/vulkaninfo.html) will allow generating profiles files.
   - The [Khronos Vulkan-Samples](https://github.com/KhronosGroup/Vulkan-Samples) repository will include a sample that use the *Vulkan Profiles API Library*.
 
