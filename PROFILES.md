@@ -24,6 +24,10 @@
 
 ## Vulkan Profiles Extensions
 
+* :heavy_check_mark: indicates that the extension is defined in the profile
+* "X.X Core" indicates that the extension is not defined in the profile but the extension is promoted to the specified core API version that is smaller than or equal to the minimum required API version of the profile
+* :x: indicates that the extension is neither defined in the profile nor it is promoted to a core API version that is smaller than or equal to the minimum required API version of the profile
+
 | Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_portability_2021 | VP_LUNARG_desktop_portability_2021_subset |
 |----------|---------------------|--------------------------|------------------------------------|-------------------------------------------|
 | **Instance extensions** |
@@ -117,6 +121,10 @@
 ## Vulkan Profile Features
 
 > **NOTE**: The table below only contains features explicitly defined by the corresponding profile. Further features may be supported by the profiles in accordance to the requirements defined in the "Feature Requirements" section of the appropriate version of the Vulkan API Specification.
+
+* :heavy_check_mark: indicates that the feature is defined in the profile (hover over the symbol to view the structure and corresponding extension or core API version where the feature is defined in the profile)
+* :warning: indicates that the feature is not defined in the profile but an equivalent feature is (hover over the symbol to view the structure and corresponding extension or core API version where the feature is defined in the profile)
+* :x: indicates that neither the feature nor an equivalent feature is defined in the profile
 
 | Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_portability_2021 | VP_LUNARG_desktop_portability_2021_subset |
 |----------|---------------------|--------------------------|------------------------------------|-------------------------------------------|
@@ -299,6 +307,10 @@
 
 > **NOTE**: The table below only contains properties/limits explicitly defined by the corresponding profile. Further properties/limits may be supported by the profiles in accordance to the requirements defined in the "Limit Requirements" section of the appropriate version of the Vulkan API Specification.
 
+* "valueWithRegularFont" indicates that the limit/property is defined in the profile (hover over the value to view the structure and corresponding extension or core API version where the limit/property is defined in the profile)
+* "_valueWithItalicFont_" indicates that the limit/property is not defined in the profile but an equivalent limit/property is (hover over the symbol to view the structure and corresponding extension or core API version where the limit/property is defined in the profile)
+* "-" indicates that neither the limit/property nor an equivalent limit/property is defined in the profile
+
 | Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_portability_2021 | VP_LUNARG_desktop_portability_2021_subset |
 |----------|---------------------|--------------------------|------------------------------------|-------------------------------------------|
 | **Vulkan 1.0** |
@@ -478,6 +490,11 @@
 
 ## Vulkan Profile Queue Families
 
+* "valueWithRegularFont" indicates that the queue family property is defined in the profile (hover over the value to view the structure and corresponding extension or core API version where the queue family property is defined in the profile)
+* "_valueWithItalicFont_" indicates that the queue family property is not defined in the profile but an equivalent queue family property is (hover over the symbol to view the structure and corresponding extension or core API version where the queue family property is defined in the profile)
+* "-" indicates that neither the queue family property nor an equivalent queue family property is defined in the profile
+* Empty cells next to the properties of a particular queue family definition section indicate that the profile does not have a corresponding queue family definition
+
 | Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_portability_2021 | VP_LUNARG_desktop_portability_2021_subset |
 |----------|---------------------|--------------------------|------------------------------------|-------------------------------------------|
 | **Queue family #0** |
@@ -487,6 +504,11 @@
 | timestampValidBits (max) |  |  | <span title="defined in VkQueueFamilyProperties (Vulkan 1.0)">36</span> | <span title="defined in VkQueueFamilyProperties (Vulkan 1.0)">36</span> |
 
 ## Vulkan Profile Formats
+
+* "valueWithRegularFont" indicates that the format property is defined in the profile (hover over the value to view the structure and corresponding extension or core API version where the format property is defined in the profile)
+* "_valueWithItalicFont_" indicates that the format property is not defined in the profile but an equivalent format property is (hover over the symbol to view the structure and corresponding extension or core API version where the format property is defined in the profile)
+* "-" indicates that neither the format property nor an equivalent format property is defined in the profile
+* Empty cells next to the properties of a particular format definition section indicate that the profile does not have a corresponding format definition
 
 | Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_portability_2021 | VP_LUNARG_desktop_portability_2021_subset |
 |----------|---------------------|--------------------------|------------------------------------|-------------------------------------------|
