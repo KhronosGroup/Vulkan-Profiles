@@ -32,17 +32,17 @@ The *Vulkan Profiles Tools* are the following components:
   - A data format to exchange Vulkan Capabilities: extensions, features, properties, formats and queue properties.
   - Each revision of Vulkan API is represented by a schema that supersed older version of Vulkan API.
   - The currently schema covers all Vulkan 1.3 and extensions.
-- [***The Vulkan Profiles API library***](./library/TUTORIAL.md)
+- [***The Vulkan Profiles API library***](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/library/TUTORIAL.md)
   -  A header-only C++ library to use Vulkan Profiles in Vulkan applications compatible with Vulkan 1.0 + `VK_KHR_get_physical_device_properties2` drivers.
-- [***The Vulkan Profiles Layer***](./layer/TUTORIAL.md)
+- [***The Vulkan Profiles Layer***](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/layer/TUTORIAL.md)
   - A layer to help developing Vulkan Applications which respect the requirements of a chosen *Vulkan Profile*.
-- [***The Vulkan Profiles Documentation***](./PROFILES.md)
+- [***The Vulkan Profiles Documentation***](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/PROFILES.md)
   - A table to compare *Vulkan Profiles* capabilities against each other.
 
 Furthermore, the repository includes implementions of some *Vulkan Profiles* using the *Vulkan Profiles JSON Schema*, currently:
-- [VP_KHR_roadmap_2022.json](./profiles/VP_KHR_roadmap_2022.json)
-- [VP_ANDROID_baseline_2021.json](./profiles/VP_ANDROID_baseline_2021.json)
-- [VP_LUNARG_desktop_portability_2021.json](./profiles/VP_LUNARG_desktop_portability_2021.json)
+- [VP_KHR_roadmap_2022.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/VP_KHR_roadmap_2022.json)
+- [VP_ANDROID_baseline_2021.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/VP_ANDROID_baseline_2021.json)
+- [VP_LUNARG_desktop_portability_2021.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/VP_LUNARG_desktop_portability_2021.json)
 
 ## Vulkan Profiles Tools Code Generation
 
@@ -51,10 +51,10 @@ Considering the complexcity of the Vulkan ecosystem, there isn't a single *Vulka
 The *Vulkan Profiles Tools* are generated against [`vk.xml`](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/vk.xml)(the canonical representation of the Vulkan specification) and [*Vulkan Profiles*](https://github.com/KhronosGroup/Vulkan-Profiles/tree/master/profiles) written against the Vulkan Profiles JSON Schemas.
 This design allows any Vulkan developer to regenerate the entier *Vulkan Profiles Tools* solution with any [Vulkan Header](https://github.com/KhronosGroup/Vulkan-Headers) update and with Vulkan developer-defined profiles.
 
-[BUILD.md](./BUILD.md) provides instructions to build the repository, which allows regenerating the *Vulkan Profiles Tools* with supports of new profiles or updated profiles.
+[BUILD.md](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/BUILD.md) provides instructions to build the repository, which allows regenerating the *Vulkan Profiles Tools* with supports of new profiles or updated profiles.
 
 The following diagram shows the Vulkan Profiles Tools generation pipeline with every produced components:
-![Vulkan Profiles](./images/overview.png)
+![Vulkan Profiles](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/images/overview.png)
 
 Note that the *Profiles layer* is not yet code generated but this is in the roadmap.
 
