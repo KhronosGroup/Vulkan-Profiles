@@ -65,6 +65,10 @@ struct TestInit {
             instance, "vkGetPhysicalDeviceProperties2");
         assert(GetPhysicalDeviceProperties2);
 
+        GetPhysicalDeviceFeatures2 = (PFN_vkGetPhysicalDeviceFeatures2)vkGetInstanceProcAddr(
+            instance, "vkGetPhysicalDeviceFeatures2");
+        assert(GetPhysicalDeviceFeatures2);
+
         err = inst_builder.getPhysicalDevice(&this->physical_device);
         ASSERT_EQ(err, VK_SUCCESS);
     }
@@ -73,6 +77,7 @@ struct TestInit {
     VkPhysicalDevice physical_device;
     profiles_test::VulkanInstanceBuilder inst_builder;
     PFN_vkGetPhysicalDeviceProperties2 GetPhysicalDeviceProperties2;
+    PFN_vkGetPhysicalDeviceFeatures2 GetPhysicalDeviceFeatures2;
 };
 
 static TestInit test;
@@ -137,7 +142,7 @@ TEST(layer_promoted, TestVulkan11Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &vulkan_11_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(vulkan_11_features.storageBuffer16BitAccess, VK_TRUE);
     EXPECT_EQ(vulkan_11_features.uniformAndStorageBuffer16BitAccess, VK_TRUE);
@@ -229,7 +234,7 @@ TEST(layer_promoted, TestVulkan12Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &vulkan_12_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(vulkan_12_features.samplerMirrorClampToEdge, VK_TRUE);
     EXPECT_EQ(vulkan_12_features.drawIndirectCount, VK_TRUE);
@@ -354,7 +359,7 @@ TEST(layer_promoted, TestVulkan13Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &vulkan_13_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(vulkan_13_features.robustImageAccess, VK_TRUE);
     EXPECT_EQ(vulkan_13_features.inlineUniformBlock, VK_TRUE);

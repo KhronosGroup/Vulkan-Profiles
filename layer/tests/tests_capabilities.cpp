@@ -65,6 +65,10 @@ struct TestInit {
             instance, "vkGetPhysicalDeviceProperties2");
         assert(GetPhysicalDeviceProperties2);
 
+        GetPhysicalDeviceFeatures2 = (PFN_vkGetPhysicalDeviceFeatures2)vkGetInstanceProcAddr(
+            instance, "vkGetPhysicalDeviceFeatures2");
+        assert(GetPhysicalDeviceFeatures2);
+
         err = inst_builder.getPhysicalDevice(&this->physical_device);
         ASSERT_EQ(err, VK_SUCCESS);
     }
@@ -73,6 +77,7 @@ struct TestInit {
     VkPhysicalDevice physical_device;
     profiles_test::VulkanInstanceBuilder inst_builder;
     PFN_vkGetPhysicalDeviceProperties2 GetPhysicalDeviceProperties2;
+    PFN_vkGetPhysicalDeviceFeatures2 GetPhysicalDeviceFeatures2;
 };
 
 static TestInit test;
@@ -1212,7 +1217,7 @@ TEST(profiles, TestPhysicalDeviceFeatures) {
 
     VkPhysicalDeviceFeatures2 features{};
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(features.features.robustBufferAccess, VK_TRUE);
     EXPECT_EQ(features.features.fullDrawIndexUint32, VK_TRUE);
@@ -1282,7 +1287,7 @@ TEST(profiles, TestHostQueryResetFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &host_query_reset_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(host_query_reset_features.hostQueryReset, VK_TRUE);
 
@@ -1300,7 +1305,7 @@ TEST(profiles, TestMaintenance4Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &maintenance_4_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(maintenance_4_features.maintenance4, VK_TRUE);
 
@@ -1318,7 +1323,7 @@ TEST(profiles, Test16BitStorageFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &f_16_bit_storage_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(f_16_bit_storage_features.storageBuffer16BitAccess, VK_TRUE);
     EXPECT_EQ(f_16_bit_storage_features.uniformAndStorageBuffer16BitAccess, VK_TRUE);
@@ -1339,7 +1344,7 @@ TEST(profiles, Test8BitStorageFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &f_8_bit_storage_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(f_8_bit_storage_features.storageBuffer8BitAccess, VK_TRUE);
     EXPECT_EQ(f_8_bit_storage_features.uniformAndStorageBuffer8BitAccess, VK_TRUE);
@@ -1359,7 +1364,7 @@ TEST(profiles, TestBufferDeviceAddressFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &buffer_device_address_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(buffer_device_address_features.bufferDeviceAddress, VK_TRUE);
     EXPECT_EQ(buffer_device_address_features.bufferDeviceAddressCaptureReplay, VK_TRUE);
@@ -1379,7 +1384,7 @@ TEST(profiles, TestDescriptorIndexingFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &descriptor_indexing_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(descriptor_indexing_features.shaderInputAttachmentArrayDynamicIndexing, VK_TRUE);
     EXPECT_EQ(descriptor_indexing_features.shaderUniformTexelBufferArrayDynamicIndexing, VK_TRUE);
@@ -1416,7 +1421,7 @@ TEST(profiles, TestImagelessFramebufferFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &imageless_framebuffer_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(imageless_framebuffer_features.imagelessFramebuffer, VK_TRUE);
 
@@ -1434,7 +1439,7 @@ TEST(profiles, TestMultiviewFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &multiview_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(multiview_features.multiview, VK_TRUE);
     EXPECT_EQ(multiview_features.multiviewGeometryShader, VK_TRUE);
@@ -1454,7 +1459,7 @@ TEST(profiles, TestProtectedMemoryFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &protected_memory_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(protected_memory_features.protectedMemory, VK_TRUE);
 
@@ -1472,7 +1477,7 @@ TEST(profiles, TestSamplerYcbcrConversionFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &sampler_ycbcr_conversion_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(sampler_ycbcr_conversion_features.samplerYcbcrConversion, VK_TRUE);
 
@@ -1490,7 +1495,7 @@ TEST(profiles, TestScalarBlockLayoutFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &scalar_block_layout_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(scalar_block_layout_features.scalarBlockLayout, VK_TRUE);
 
@@ -1508,7 +1513,7 @@ TEST(profiles, TestSeparateDepthStencilLayoutsFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &separate_depth_stencil_layout_featuers;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(separate_depth_stencil_layout_featuers.separateDepthStencilLayouts, VK_TRUE);
 
@@ -1526,7 +1531,7 @@ TEST(profiles, TestShaderAtomicInt64Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_atomic_int64_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_atomic_int64_features.shaderBufferInt64Atomics, VK_TRUE);
     EXPECT_EQ(shader_atomic_int64_features.shaderSharedInt64Atomics, VK_TRUE);
@@ -1545,7 +1550,7 @@ TEST(profiles, TestShaderDrawParametersFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_draw_paramenters_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_draw_paramenters_features.shaderDrawParameters, VK_TRUE);
 
@@ -1563,7 +1568,7 @@ TEST(profiles, TestShaderFloat16Int8Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_float16_int8_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_float16_int8_features.shaderFloat16, VK_TRUE);
     EXPECT_EQ(shader_float16_int8_features.shaderInt8, VK_TRUE);
@@ -1582,7 +1587,7 @@ TEST(profiles, TestShaderSubgroupExtendedTypesFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_subgroup_extended_types_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_subgroup_extended_types_features.shaderSubgroupExtendedTypes, VK_TRUE);
 
@@ -1600,7 +1605,7 @@ TEST(profiles, TestTimelineSemaphoreFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &timeline_semaphore_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(timeline_semaphore_features.timelineSemaphore, VK_TRUE);
 
@@ -1618,7 +1623,7 @@ TEST(profiles, TestUniformBufferStandardLayoutFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &uniform_buffer_standard_layout_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(uniform_buffer_standard_layout_features.uniformBufferStandardLayout, VK_TRUE);
 
@@ -1636,7 +1641,7 @@ TEST(profiles, TestVariablePointersFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &variable_pointer_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(variable_pointer_features.variablePointersStorageBuffer, VK_TRUE);
     EXPECT_EQ(variable_pointer_features.variablePointers, VK_TRUE);
@@ -1655,7 +1660,7 @@ TEST(profiles, TestVulkanMemoryModelFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &vulkan_memory_model_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(vulkan_memory_model_features.vulkanMemoryModel, VK_TRUE);
     EXPECT_EQ(vulkan_memory_model_features.vulkanMemoryModelDeviceScope, VK_TRUE);
@@ -1676,7 +1681,7 @@ TEST(profiles, TestZeroInitializeWorkgroupMemoryFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &zero_initialize_workgroup_memory_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(zero_initialize_workgroup_memory_features.shaderZeroInitializeWorkgroupMemory, VK_TRUE);
 
@@ -1694,7 +1699,7 @@ TEST(profiles, TestAccelerationStructureFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &acceleration_structure_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(acceleration_structure_features.accelerationStructure, VK_TRUE);
     EXPECT_EQ(acceleration_structure_features.accelerationStructureCaptureReplay, VK_TRUE);
@@ -1716,7 +1721,7 @@ TEST(profiles, TestPerformanceQueryFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &performance_query_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(performance_query_features.performanceCounterQueryPools, VK_TRUE);
     EXPECT_EQ(performance_query_features.performanceCounterMultipleQueryPools, VK_TRUE);
@@ -1735,7 +1740,7 @@ TEST(profiles, TestPipelineExecutablePropertiesFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &pipeline_executable_properties_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(pipeline_executable_properties_features.pipelineExecutableInfo, VK_TRUE);
 
@@ -1753,7 +1758,7 @@ TEST(profiles, TestPresentIdFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &present_id_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(present_id_features.presentId, VK_TRUE);
 
@@ -1771,7 +1776,7 @@ TEST(profiles, TestPresentWaitFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &present_wait_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(present_wait_features.presentWait, VK_TRUE);
 
@@ -1789,7 +1794,7 @@ TEST(profiles, TestRayQueryFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &ray_query_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(ray_query_features.rayQuery, VK_TRUE);
 
@@ -1807,7 +1812,7 @@ TEST(profiles, TestRayTracingPipelineFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &ray_tracing_pipeline_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(ray_tracing_pipeline_features.rayTracingPipeline, VK_TRUE);
     EXPECT_EQ(ray_tracing_pipeline_features.rayTracingPipelineShaderGroupHandleCaptureReplay, VK_TRUE);
@@ -1829,7 +1834,7 @@ TEST(profiles, TestShaderClockFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_clock_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_clock_features.shaderSubgroupClock, VK_TRUE);
     EXPECT_EQ(shader_clock_features.shaderDeviceClock, VK_TRUE);
@@ -1848,7 +1853,7 @@ TEST(profiles, TestShaderIntegerDotProductFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_integer_dot_product_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_integer_dot_product_features.shaderIntegerDotProduct, VK_TRUE);
 
@@ -1867,7 +1872,7 @@ TEST(profiles, TestShaderSubgroupUniformControlFlowFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_subgroup_uniform_control_flow_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_subgroup_uniform_control_flow_features.shaderSubgroupUniformControlFlow, VK_TRUE);
 
@@ -1885,7 +1890,7 @@ TEST(profiles, TestShaderTerminateInvocationFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_terminate_invocation_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_terminate_invocation_features.shaderTerminateInvocation, VK_TRUE);
 
@@ -1903,7 +1908,7 @@ TEST(profiles, TestSynchronization2Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &synchronization_2_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(synchronization_2_features.synchronization2, VK_TRUE);
 
@@ -1922,7 +1927,7 @@ TEST(profiles, TestWorkgroupMemoryExplicitLayoutFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &workgroup_memory_explicit_layout_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(workgroup_memory_explicit_layout_features.workgroupMemoryExplicitLayout, VK_TRUE);
     EXPECT_EQ(workgroup_memory_explicit_layout_features.workgroupMemoryExplicitLayoutScalarBlockLayout, VK_TRUE);
@@ -1943,7 +1948,7 @@ TEST(profiles, Test4444FormatsFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &f_4444_formats_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(f_4444_formats_features.formatA4R4G4B4, VK_TRUE);
     EXPECT_EQ(f_4444_formats_features.formatA4B4G4R4, VK_TRUE);
@@ -1962,7 +1967,7 @@ TEST(profiles, TestASTCDecodeFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &astc_decode_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(astc_decode_features.decodeModeSharedExponent, VK_TRUE);
 
@@ -1980,7 +1985,7 @@ TEST(profiles, TestBlendOperationAdvancedFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &blend_operation_advanced_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(blend_operation_advanced_features.advancedBlendCoherentOperations, VK_TRUE);
 
@@ -1998,7 +2003,7 @@ TEST(profiles, TestBorderColorSwizzleFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &border_color_swizzle_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(border_color_swizzle_features.borderColorSwizzle, VK_TRUE);
     EXPECT_EQ(border_color_swizzle_features.borderColorSwizzleFromImage, VK_TRUE);
@@ -2017,7 +2022,7 @@ TEST(profiles, TestColorWriteEnableFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &color_write_enable_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(color_write_enable_features.colorWriteEnable, VK_TRUE);
 
@@ -2035,7 +2040,7 @@ TEST(profiles, TestConditionalRenderingFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &conditional_rendering_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(conditional_rendering_features.conditionalRendering, VK_TRUE);
     EXPECT_EQ(conditional_rendering_features.inheritedConditionalRendering, VK_TRUE);
@@ -2054,7 +2059,7 @@ TEST(profiles, TestCustomBorderColorFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &custom_border_color_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(custom_border_color_features.customBorderColors, VK_TRUE);
     EXPECT_EQ(custom_border_color_features.customBorderColorWithoutFormat, VK_TRUE);
@@ -2073,7 +2078,7 @@ TEST(profiles, TestDepthClipEnableFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &depth_clip_enable_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(depth_clip_enable_features.depthClipEnable, VK_TRUE);
 
@@ -2091,7 +2096,7 @@ TEST(profiles, TestDeviceMemoryReportFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &device_memory_report_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(device_memory_report_features.deviceMemoryReport, VK_TRUE);
 
@@ -2109,7 +2114,7 @@ TEST(profiles, TestExtendedDynamicStateFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &extended_dynamic_state_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(extended_dynamic_state_features.extendedDynamicState, VK_TRUE);
 
@@ -2127,7 +2132,7 @@ TEST(profiles, TestExtendedDynamicState2Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &extended_dynamic_state_2_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(extended_dynamic_state_2_features.extendedDynamicState2, VK_TRUE);
     EXPECT_EQ(extended_dynamic_state_2_features.extendedDynamicState2LogicOp, VK_TRUE);
@@ -2147,7 +2152,7 @@ TEST(profiles, TestFragmentDensityMapFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &fragment_density_map_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(fragment_density_map_features.fragmentDensityMap, VK_TRUE);
     EXPECT_EQ(fragment_density_map_features.fragmentDensityMapDynamic, VK_TRUE);
@@ -2167,7 +2172,7 @@ TEST(profiles, TestFragmentShaderInterlockFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &fragment_shader_interlock_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(fragment_shader_interlock_features.fragmentShaderSampleInterlock, VK_TRUE);
     EXPECT_EQ(fragment_shader_interlock_features.fragmentShaderPixelInterlock, VK_TRUE);
@@ -2187,7 +2192,7 @@ TEST(profiles, TestGlobalPriorityQueryFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &global_priority_query_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(global_priority_query_features.globalPriorityQuery, VK_TRUE);
 
@@ -2205,7 +2210,7 @@ TEST(profiles, TestImageRobustnessFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &image_robustness_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(image_robustness_features.robustImageAccess, VK_TRUE);
 
@@ -2223,7 +2228,7 @@ TEST(profiles, TestIndexTypeUint8Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &index_type_uint8_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(index_type_uint8_features.indexTypeUint8, VK_TRUE);
 
@@ -2241,7 +2246,7 @@ TEST(profiles, TestInlineUniformBlockFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &inline_uniform_block_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(inline_uniform_block_features.inlineUniformBlock, VK_TRUE);
     EXPECT_EQ(inline_uniform_block_features.descriptorBindingInlineUniformBlockUpdateAfterBind, VK_TRUE);
@@ -2259,7 +2264,7 @@ TEST(profiles, TestLineRasterizationFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &line_rasterization_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(line_rasterization_features.rectangularLines, VK_TRUE);
     EXPECT_EQ(line_rasterization_features.bresenhamLines, VK_TRUE);
@@ -2281,7 +2286,7 @@ TEST(profiles, TestMemoryPriorityFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &memory_priority_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(memory_priority_features.memoryPriority, VK_TRUE);
 #endif
@@ -2298,7 +2303,7 @@ TEST(profiles, TestMultiDrawFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &multi_draw_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(multi_draw_features.multiDraw, VK_TRUE);
 #endif
@@ -2315,7 +2320,7 @@ TEST(profiles, TestPageableDeviceLocalMemoryFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &pageable_device_local_memory_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(pageable_device_local_memory_features.pageableDeviceLocalMemory, VK_TRUE);
 #endif
@@ -2332,7 +2337,7 @@ TEST(profiles, TestPipelineCreationCacheControlFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &pipeline_creation_cache_control_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(pipeline_creation_cache_control_features.pipelineCreationCacheControl, VK_TRUE);
 #endif
@@ -2349,7 +2354,7 @@ TEST(profiles, TestPrimitiveTopologyListRestartFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &primitive_topology_list_restart_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(primitive_topology_list_restart_features.primitiveTopologyListRestart, VK_TRUE);
     EXPECT_EQ(primitive_topology_list_restart_features.primitiveTopologyPatchListRestart, VK_TRUE);
@@ -2367,7 +2372,7 @@ TEST(profiles, TestPrivateDataFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &private_data_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(private_data_features.privateData, VK_TRUE);
 #endif
@@ -2384,7 +2389,7 @@ TEST(profiles, TestProvokingVertexFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &provoking_vertex_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(provoking_vertex_features.provokingVertexLast, VK_TRUE);
     EXPECT_EQ(provoking_vertex_features.transformFeedbackPreservesProvokingVertex, VK_TRUE);
@@ -2402,7 +2407,7 @@ TEST(profiles, TestRGBA10X6FormatsFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &rgba10x6_formats_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(rgba10x6_formats_features.formatRgba10x6WithoutYCbCrSampler, VK_TRUE);
 #endif
@@ -2419,7 +2424,7 @@ TEST(profiles, TestRobustness2Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &robustness_2_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(robustness_2_features.robustBufferAccess2, VK_TRUE);
     EXPECT_EQ(robustness_2_features.robustImageAccess2, VK_TRUE);
@@ -2438,7 +2443,7 @@ TEST(profiles, TestShaderAtomicFloatFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_atomic_float_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_atomic_float_features.shaderBufferFloat32Atomics, VK_TRUE);
     EXPECT_EQ(shader_atomic_float_features.shaderBufferFloat32AtomicAdd, VK_TRUE);
@@ -2466,7 +2471,7 @@ TEST(profiles, TestShaderAtomicFloat2Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_atomic_float_2_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_atomic_float_2_features.shaderBufferFloat16Atomics, VK_TRUE);
     EXPECT_EQ(shader_atomic_float_2_features.shaderBufferFloat16AtomicAdd, VK_TRUE);
@@ -2495,7 +2500,7 @@ TEST(profiles, TestShaderDemoteToHelperInvocationFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_demote_to_helper_invocation_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_demote_to_helper_invocation_features.shaderDemoteToHelperInvocation, VK_TRUE);
 #endif
@@ -2512,7 +2517,7 @@ TEST(profiles, TestShaderImageAtomicInt64Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_image_atomic_int_64_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_image_atomic_int_64_features.shaderImageInt64Atomics, VK_TRUE);
     EXPECT_EQ(shader_image_atomic_int_64_features.sparseImageInt64Atomics, VK_TRUE);
@@ -2530,7 +2535,7 @@ TEST(profiles, TestSubgroupSizeControlFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &subgroup_size_control_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(subgroup_size_control_features.subgroupSizeControl, VK_TRUE);
     EXPECT_EQ(subgroup_size_control_features.computeFullSubgroups, VK_TRUE);
@@ -2548,7 +2553,7 @@ TEST(profiles, TestTexelBufferAlignmentFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &texel_buffer_alignment_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(texel_buffer_alignment_features.texelBufferAlignment, VK_TRUE);
 #endif
@@ -2565,7 +2570,7 @@ TEST(profiles, TestTextureCompressionASTCHDRFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &texture_compression_astchdr_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(texture_compression_astchdr_features.textureCompressionASTC_HDR, VK_TRUE);
 #endif
@@ -2582,7 +2587,7 @@ TEST(profiles, TestTransformFeedbackFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &transform_feedback_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(transform_feedback_features.transformFeedback, VK_TRUE);
     EXPECT_EQ(transform_feedback_features.geometryStreams, VK_TRUE);
@@ -2600,7 +2605,7 @@ TEST(profiles, TestVertexAttributeDivisorFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &vertex_attribute_divisor_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(vertex_attribute_divisor_features.vertexAttributeInstanceRateDivisor, VK_TRUE);
     EXPECT_EQ(vertex_attribute_divisor_features.vertexAttributeInstanceRateZeroDivisor, VK_TRUE);
@@ -2618,7 +2623,7 @@ TEST(profiles, TestVertexInputDynamicStateFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &vertex_input_dynamic_state_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(vertex_input_dynamic_state_features.vertexInputDynamicState, VK_TRUE);
 #endif
@@ -2635,7 +2640,7 @@ TEST(profiles, TestYcbcr2Plane444FormatsFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &ycbcr_2_plane_444_formats_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(ycbcr_2_plane_444_formats_features.ycbcr2plane444Formats, VK_TRUE);
 #endif
@@ -2652,7 +2657,7 @@ TEST(profiles, TestYcbcrImageArraysFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &ycbcr_image_arrays_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(ycbcr_image_arrays_features.ycbcrImageArrays, VK_TRUE);
 #endif
@@ -2669,7 +2674,7 @@ TEST(profiles, TestFragmentShadingRateFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &fragment_shading_rate_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(fragment_shading_rate_features.pipelineFragmentShadingRate, VK_TRUE);
     EXPECT_EQ(fragment_shading_rate_features.primitiveFragmentShadingRate, VK_TRUE);
@@ -2688,7 +2693,7 @@ TEST(profiles, TestCoherentMemoryFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &coherent_memory_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(coherent_memory_features.deviceCoherentMemory, VK_TRUE);
 #endif
@@ -2705,7 +2710,7 @@ TEST(profiles, TestInvocationMaskFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &invocation_mask_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(invocation_mask_features.invocationMask, VK_TRUE);
 #endif
@@ -2722,7 +2727,7 @@ TEST(profiles, TestSubpassShadingFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &subpass_shading_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(subpass_shading_features.subpassShading, VK_TRUE);
 #endif
@@ -2739,7 +2744,7 @@ TEST(profiles, TestShaderIntegerFunctions2Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_integer_functions_2_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_integer_functions_2_features.shaderIntegerFunctions2, VK_TRUE);
 #endif
@@ -2756,7 +2761,7 @@ TEST(profiles, TestComputeShaderDerivativesFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &compute_shader_derivatives_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(compute_shader_derivatives_features.computeDerivativeGroupQuads, VK_TRUE);
     EXPECT_EQ(compute_shader_derivatives_features.computeDerivativeGroupLinear, VK_TRUE);
@@ -2774,7 +2779,7 @@ TEST(profiles, TestCooperativeMatrixFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &cooperative_matrix_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(cooperative_matrix_features.cooperativeMatrix, VK_TRUE);
     EXPECT_EQ(cooperative_matrix_features.cooperativeMatrixRobustBufferAccess, VK_TRUE);
@@ -2792,7 +2797,7 @@ TEST(profiles, TestCornerSampledImageFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &corner_sampled_image_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(corner_sampled_image_features.cornerSampledImage, VK_TRUE);
 #endif
@@ -2809,7 +2814,7 @@ TEST(profiles, TestCoverageReductionModeFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &coverage_reduction_mode_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(coverage_reduction_mode_features.coverageReductionMode, VK_TRUE);
 #endif
@@ -2827,7 +2832,7 @@ TEST(profiles, TestDedicatedAllocationImageAliasingFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &dedicated_allocation_image_aliasing_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(dedicated_allocation_image_aliasing_features.dedicatedAllocationImageAliasing, VK_TRUE);
 #endif
@@ -2844,7 +2849,7 @@ TEST(profiles, TestDiagnosticsConfigFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &diagnostic_config_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(diagnostic_config_features.diagnosticsConfig, VK_TRUE);
 #endif
@@ -2861,7 +2866,7 @@ TEST(profiles, TestDeviceGeneratedCommandsFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &device_generated_commmands_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(device_generated_commmands_features.deviceGeneratedCommands, VK_TRUE);
 #endif
@@ -2878,7 +2883,7 @@ TEST(profiles, TestExternalMemoryRDMAFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &external_memory_rdma_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(external_memory_rdma_features.externalMemoryRDMA, VK_TRUE);
 #endif
@@ -2895,7 +2900,7 @@ TEST(profiles, TestFragmentShaderBarycentricFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &fragment_shader_barycentric_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(fragment_shader_barycentric_features.fragmentShaderBarycentric, VK_TRUE);
 #endif
@@ -2912,7 +2917,7 @@ TEST(profiles, TestFragmentShadingRateEnumsFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &fragment_shading_rate_enums_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(fragment_shading_rate_enums_features.fragmentShadingRateEnums, VK_TRUE);
     EXPECT_EQ(fragment_shading_rate_enums_features.supersampleFragmentShadingRates, VK_TRUE);
@@ -2931,7 +2936,7 @@ TEST(profiles, TestInheritedViewportScissorFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &inherited_viewport_scissor_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(inherited_viewport_scissor_features.inheritedViewportScissor2D, VK_TRUE);
 #endif
@@ -2948,7 +2953,7 @@ TEST(profiles, TestMeshShaderFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &mesh_shader_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(mesh_shader_features.taskShader, VK_TRUE);
     EXPECT_EQ(mesh_shader_features.meshShader, VK_TRUE);
@@ -2966,7 +2971,7 @@ TEST(profiles, TestRayTracingMotionBlurFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &ray_tracing_motion_blur_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(ray_tracing_motion_blur_features.rayTracingMotionBlur, VK_TRUE);
     EXPECT_EQ(ray_tracing_motion_blur_features.rayTracingMotionBlurPipelineTraceRaysIndirect, VK_TRUE);
@@ -2984,7 +2989,7 @@ TEST(profiles, TestRepresentativeFragmentTestFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &representative_fragment_test_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(representative_fragment_test_features.representativeFragmentTest, VK_TRUE);
 #endif
@@ -3001,7 +3006,7 @@ TEST(profiles, TestExclusiveScissorFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &exclusive_scissor_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(exclusive_scissor_features.exclusiveScissor, VK_TRUE);
 #endif
@@ -3018,7 +3023,7 @@ TEST(profiles, TesthaderImageFootprintFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_image_footprint_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_image_footprint_features.imageFootprint, VK_TRUE);
 #endif
@@ -3035,7 +3040,7 @@ TEST(profiles, TestShaderSMBuiltinsFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shader_sm_builtins_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shader_sm_builtins_features.shaderSMBuiltins, VK_TRUE);
 #endif
@@ -3052,7 +3057,7 @@ TEST(profiles, TestShadingRateImageFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &shading_rate_image_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(shading_rate_image_features.shadingRateImage, VK_TRUE);
     EXPECT_EQ(shading_rate_image_features.shadingRateCoarseSampleOrder, VK_TRUE);
@@ -3070,7 +3075,7 @@ TEST(profiles, TestMutableDescriptorTypeFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &mutable_descriptor_type_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(mutable_descriptor_type_features.mutableDescriptorType, VK_TRUE);
 #endif
@@ -3087,7 +3092,7 @@ TEST(profiles, TestDynamicRenderingFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &dynamic_rendering_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(dynamic_rendering_features.dynamicRendering, VK_TRUE);
 #endif
@@ -3104,7 +3109,7 @@ TEST(profiles, TestImageViewMinLodFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &image_view_min_lod_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(image_view_min_lod_features.minLod, VK_TRUE);
 #endif
@@ -3121,7 +3126,7 @@ TEST(profiles, TestFragmentDensityMap2Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &fragment_density_map_2_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(fragment_density_map_2_features.fragmentDensityMapDeferred, VK_TRUE);
 #endif
@@ -3138,7 +3143,7 @@ TEST(profiles, TestFragmentDensityMapOffsetFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &fragment_density_map_offset_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(fragment_density_map_offset_features.fragmentDensityMapOffset, VK_TRUE);
 #endif
@@ -3155,7 +3160,7 @@ TEST(profiles, TestFragmentDepthClipControlFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &depth_clip_control_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(depth_clip_control_features.depthClipControl, VK_TRUE);
 #endif
@@ -3173,7 +3178,7 @@ TEST(profiles, TestRasterizationOrderAttachmentAccessFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &rasterization_order_attachment_access_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     // Todo: needs spec fix and profiles update
     /*EXPECT_EQ(rasterization_order_attachment_access_features.rasterizationOrderColorAttachmentAccess, VK_TRUE);
@@ -3193,7 +3198,7 @@ TEST(profiles, TestLinearColorAttachmentFeatures) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &linear_color_attachment_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    test.GetPhysicalDeviceFeatures2(gpu, &features);
 
     EXPECT_EQ(linear_color_attachment_features.linearColorAttachment, VK_TRUE);
 #endif
