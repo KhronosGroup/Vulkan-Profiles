@@ -123,7 +123,7 @@ TEST(layer, TestDesktopPortability2022Limits) {
     EXPECT_LE(gpu_props.limits.viewportBoundsRange[0], -32768.0f);
     EXPECT_GE(gpu_props.limits.viewportBoundsRange[1], 32767.0f);
     EXPECT_GE(gpu_props.limits.minMemoryMapAlignment, 64u);
-    EXPECT_LE(gpu_props.limits.minTexelBufferOffsetAlignment, 64u);
+    EXPECT_LE(gpu_props.limits.minTexelBufferOffsetAlignment, 256u);
     EXPECT_LE(gpu_props.limits.minUniformBufferOffsetAlignment, 256u);
     EXPECT_LE(gpu_props.limits.minStorageBufferOffsetAlignment, 64u);
     EXPECT_LE(gpu_props.limits.minTexelOffset, -8);
