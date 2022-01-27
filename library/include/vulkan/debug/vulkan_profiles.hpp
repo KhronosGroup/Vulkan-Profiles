@@ -271,9 +271,9 @@ VPAPI_ATTR std::string vpGetDeviceAndDriverInfoString(VkPhysicalDevice physicalD
     VkPhysicalDeviceDriverPropertiesKHR driverProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR };
     VkPhysicalDeviceProperties2KHR deviceProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, &driverProps };
     pfnGetPhysicalDeviceProperties2(physicalDevice, &deviceProps);
-    return std::string("(deviceName=") + std::string(&deviceProps.properties.deviceName[0])
+    return std::string("deviceName=") + std::string(&deviceProps.properties.deviceName[0])
                     + ", driverName=" + std::string(&driverProps.driverName[0])
-                    + ", driverInfo=" + std::string(&driverProps.driverInfo[0]) + ")";
+                    + ", driverInfo=" + std::string(&driverProps.driverInfo[0]);
 }
 
 }
