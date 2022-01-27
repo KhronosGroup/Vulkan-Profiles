@@ -31,6 +31,14 @@
 TEST(mocked_api_get_physdev_profile_support, vulkan10_supported) {
     MockVulkanAPI mock;
 
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Checking device support for profile VP_ANDROID_baseline_2021 "
+            "((deviceName=, driverName=, driverInfo=)). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/"
+    });
+#endif
+
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_0);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_0);
 
@@ -203,6 +211,9 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_version) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
+        "Checking device support for profile VP_LUNARG_desktop_portability_2021 "
+            "((deviceName=, driverName=, driverInfo=)). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
         "Unsupported API version: 1.1.142"
     });
 #endif
@@ -331,6 +342,9 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_extension) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
+        "Checking device support for profile VP_ANDROID_baseline_2021 "
+            "((deviceName=, driverName=, driverInfo=)). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
         "Unsupported extension: VK_GOOGLE_display_timing"
     });
 #endif
@@ -422,6 +436,9 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_feature) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
+        "Checking device support for profile VP_ANDROID_baseline_2021 "
+            "((deviceName=, driverName=, driverInfo=)). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
         "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.sampleRateShading == VK_TRUE"
     });
 #endif
@@ -514,6 +531,9 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_property) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
+        "Checking device support for profile VP_ANDROID_baseline_2021 "
+            "((deviceName=, driverName=, driverInfo=)). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
         "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimension2D >= 4096"
     });
 #endif
@@ -605,6 +625,9 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_format) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
+        "Checking device support for profile VP_ANDROID_baseline_2021 "
+            "((deviceName=, driverName=, driverInfo=)). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
         "Unsupported format condition for VK_FORMAT_E5B9G9R9_UFLOAT_PACK32: "
             "VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains "
             "(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | "
@@ -702,6 +725,14 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_format) {
 
 TEST(mocked_api_get_physdev_profile_support, vulkan11_supported) {
     MockVulkanAPI mock;
+
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Checking device support for profile VP_LUNARG_desktop_portability_2021 "
+            "((deviceName=, driverName=, driverInfo=)). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/"
+    });
+#endif
 
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_1);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_1);
@@ -827,6 +858,9 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_version) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
+        "Checking device support for profile VP_KHR_roadmap_2022 "
+            "((deviceName=, driverName=, driverInfo=)). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
         "Unsupported API version: 1.3.203"
     });
 #endif
@@ -908,6 +942,9 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_extension) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
+        "Checking device support for profile VP_LUNARG_desktop_portability_2021 "
+            "((deviceName=, driverName=, driverInfo=)). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
         "Unsupported extension: VK_KHR_driver_properties"
     });
 #endif
@@ -1033,6 +1070,9 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_feature) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
+        "Checking device support for profile VP_LUNARG_desktop_portability_2021 "
+            "((deviceName=, driverName=, driverInfo=)). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
         "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE"
     });
 #endif
@@ -1160,6 +1200,9 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_property) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
+        "Checking device support for profile VP_LUNARG_desktop_portability_2021 "
+            "((deviceName=, driverName=, driverInfo=)). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
         "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxDescriptorSetUpdateAfterBindInputAttachments >= 8"
     });
 #endif
@@ -1286,6 +1329,9 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_format) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
+        "Checking device support for profile VP_LUNARG_desktop_portability_2021 "
+            "((deviceName=, driverName=, driverInfo=)). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
         "Unsupported format condition for VK_FORMAT_E5B9G9R9_UFLOAT_PACK32: "
             "VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains "
             "(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | "
@@ -1420,6 +1466,9 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_queue_family) 
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
+        "Checking device support for profile VP_LUNARG_desktop_portability_2021 "
+            "((deviceName=, driverName=, driverInfo=)). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
         "Unsupported queue family defined at profile data index #0"
     });
 #endif
