@@ -22,6 +22,15 @@ VkPhysicalDeviceProperties2 *GetPhysicalDeviceProperties2(VkInstance instance, V
     return gpu_props;
 };
 
+VkFormatProperties2 *GetPhysicalDeviceFromatProperties2(VkInstance instance, VkPhysicalDevice gpu, VkFormat format,
+    VkFormatProperties2 *format_properties2) {
+    PFN_vkGetPhysicalDeviceFormatProperties2 pfn_vkGetPhysicalDeviceFormatProperties2 =
+        (PFN_vkGetPhysicalDeviceFormatProperties2)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceFormatProperties2");
+    assert(pfn_vkGetPhysicalDeviceFormatProperties2);
+    pfn_vkGetPhysicalDeviceFormatProperties2(gpu, format, format_properties2);
+    return format_properties2;
+};
+
 TEST(layer, selecting_profile) {
     VkResult err = VK_SUCCESS;
 
@@ -222,7 +231,7 @@ TEST(layer, TestParsingAllFormatProperties) {
         VkFormat format = VK_FORMAT_R4G4B4A4_UNORM_PACK16;
         VkFormatProperties2 format_properties2 = {};
         format_properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
-        vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
+        GetPhysicalDeviceFromatProperties2(inst_builder.getInstance(), gpu, format, &format_properties2);
 
         const VkFormatProperties& format_properties = format_properties2.formatProperties;
 
@@ -243,7 +252,7 @@ TEST(layer, TestParsingAllFormatProperties) {
         VkFormatProperties3 format_properties3 = {};
         format_properties3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3;
         format_properties2.pNext = &format_properties3;
-        vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
+        GetPhysicalDeviceFromatProperties2(inst_builder.getInstance(), gpu, format, &format_properties2);
 
         VkFormatFeatureFlags2KHR linear_tiling_features = VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT_KHR;
         VkFormatFeatureFlags2KHR optimal_tiling_features = VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT_KHR;
