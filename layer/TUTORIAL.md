@@ -14,19 +14,19 @@
 ### Extend your Vulkan test coverage with the Khronos Profiles Layer
 The Khronos Profiles Layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device. It can be applied without modifying any application binaries, and in a fully automated fashion. The Profiles layer is a Vulkan layer that can override the values returned by your application’s queries of the GPU. Profiles layer uses a JSON text configuration file to make your application see a different driver/GPU than is actually in your system. This capability is useful to verify that your application both a) properly queries the limits from Vulkan, and b) obeys those limits.
 
-The Profiles layer library is available pre-built in the Vulkan SDK, and continues to evolve. It works for all Vulkan platforms (Linux, Windows, macOS, and Android), and is open-source software hosted on GitHub. The Profiles layer can be enabled and configured using the [Vulkan Configurator](https://vulkan.lunarg.com/doc/sdk/latest/windows/vkconfig.html) included with the Vulkan SDK.
+The Profiles layer library is available pre-built in the Vulkan SDK, and continues to evolve. It works for all Vulkan platforms (Linux, Windows, macOS, and Android). The Profiles layer can be enabled and configured using the [Vulkan Configurator](https://vulkan.lunarg.com/doc/sdk/latest/windows/vkconfig.html) included with the Vulkan SDK.
 
-The role of the Profiles layer is to "simulate" a Vulkan implementation by modifying the features and resources of a more-capable implementation. Profiles layer does not add capabilities to your existing Vulkan implementation by "emulating" additional capabilities with software; e.g. Profiles layer cannot add geometry shader capability to an actual device that doesn’t already provide it. Also, Profiles layer does not "enforce" the features being simulated. For enforcement, you would continue to use the Validation Layers as usual, in conjunction with Profiles layer.
+The role of the Profiles layer is to "simulate" a Vulkan implementation by modifying the features and resources of a more-capable implementation. Profiles layer does not add capabilities to your existing Vulkan implementation by "emulating" additional capabilities with software; e.g. Profiles layer cannot add geometry shader capability to an actual device that doesn’t already provide it. Also, Profiles layer does not "enforce" the features being simulated. You can use the Validation Layer in conjunction with the Profiles Layer to identify where your application is not adhering to the features being simulated by the Profiles Layer.
 
-### Using Profiles layer
-The Profiles layer supports a flexible file format using JSON syntax. The profiles file format is defined by a formal JSON schema, so any profile file may be verified to be correct using freely available JSON validators. Browsing through the schema file, you can see the extent of parameters that are available for your configuration.
+### Using the Profiles layer
+The Profiles layer supports a flexible file format using JSON syntax called a profile file. The profile file format is defined by a formal JSON schema, so any profile file may be verified to be correct using freely available JSON validators. Browsing through the schema file, you can see the extent of parameters that are available for your configuration.
 
 ### Android
-To enable, use a setting with the path of profiles file to load:
+To enable, use a setting with the path to the profile file to load:
 ```
 adb shell settings put global debug.vulkan.khronos_profiles.profile_file <path/to/profiles/JSON/file>
 ```
-Example of a Profiles layer JSON profiles file: [VP_LUNARG_test_structure_simple.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/test/data/VP_LUNARG_test_structure_simple.json)
+Example profile file: [VP_LUNARG_test_structure_simple.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/test/data/VP_LUNARG_test_structure_simple.json)
 
 Optional: use settings to enable debugging output and exit-on-error:
 ```
@@ -36,11 +36,11 @@ adb shell settings put global debug.vulkan.khronos_profiles.debug_fail_on_error 
 
 # Technical Details
 
-The Profiles Layer is a Vulkan layer that can modify the results of Vulkan PhysicalDevice queries based on a JSON profiles file, thus simulating some of the capabilities of device by overriding the capabilities of the actual device under test.
+The Profiles Layer is a Vulkan layer that can modify the results of Vulkan PhysicalDevice queries based on a profile file (JSON format), thus simulating some of the capabilities of a device by overriding the capabilities of the actual device under test.
 
-Please note that this device simulation layer "simulates", rather than "emulates", another device.
-By that we mean that the layer cannot add emulated capabilities that do not already exist in the system's underlying actual device;
-Profiles layer will not enable a less-capable device to emulate a more-capable device.
+Please note that this device simulation layer "simulates", rather than "emulates".
+By that we mean that the layer cannot add emulated capabilities that do not already exist in the system's underlying actual device.
+The Profiles layer will not enable a less-capable device to emulate a more-capable device.
 
 Application code can be tested to verify it responds correctly to the capabilities reported by the simulated device.
 That could include:
@@ -53,26 +53,26 @@ The `fail_on_error` option can be used to make sure the device supports the requ
 In this case if an application erroneously attempts to overcommit a resource, or use a disabled feature, the Profiles layer will return `VK_ERROR_INITIALIZATION_FAILED` from `vkEnumeratePhysicalDevices()`.
 
 The Profiles layer will work together with other Vulkan layers, such as the Validation layer.
-When configuring the order of the layers list, the Profiles layer should be "last";
+When configuring the order of the layers, the Profiles layer should be "last";
 i.e.: closest to the driver, farthest from the application.
-That allows the Validation layer to see the results of the Profiles layer, and permit Validation to enforce the simulated capabilities.
+That allows the Validation layer to see the results of the Profiles layer, and enable Validation to flag incorrect API usage beyond the simulated capabilities.
 
-Please report issues to [Khronos's Vulkan-Profiles GitHub repository](https://github.com/KhronosGroup/Vulkan-Profiles/issues).
+If you find issues, please report to [Khronos's Vulkan-Profiles GitHub repository](https://github.com/KhronosGroup/Vulkan-Profiles/issues).
 
 ### Profiles Layer operation and profiles file
-At application startup, during `vkEnumeratePhysicalDevices()`, the Profiles layer initializes its internal tables from the actual physical device in the system, then loads its profiles file, which specifies override values to apply to those internal tables.
+At application startup, during `vkEnumeratePhysicalDevices()`, the Profiles layer initializes its internal tables from the actual physical device in the system, then loads the profile, which specifies override values to apply to those internal tables.
 
 JSON file formats consumed by the Profiles layer are specified by the following JSON schema https://schema.khronos.org/vulkan/profiles-1.3.204.json#
 
 The schema permits additional top-level sections to be optionally included in profiles files;
-any additional top-level sections will be ignored by Profiles layer.
+any additional top-level sections will be ignored by the Profiles layer.
 
-The schemas define basic range checking for common Vulkan data types, but they cannot detect whether a particular profile is ilogical.
+The schemas define basic range checking for common Vulkan data types, but they cannot detect whether a particular profile is illogical.
 If a profile defines capabilities beyond what the actual device is natively capable of providing and the `fail_on_error` option is not used, the results are undefined.
 The Profiles layer has some simple checking of profile values and writes debug messages (if enabled) for values that are incompatible with the capabilities of the actual device.
 
-This version of Profiles layer currently supports Vulkan v1.3 and below including all Vulkan extensions.
-If the application requests an unsupported version of the Vulkan API, Profiles layer will emit an error message.
+This version of the Profiles layer currently supports Vulkan v1.3 and below including all Vulkan extensions.
+If the application requests an unsupported version of the Vulkan API, the Profiles layer will emit an error message.
 
 ### `VK_KHR_portability_subset` Emulation
 
@@ -189,6 +189,3 @@ export `VK_KHRONOS_PROFILES_SIMULATE_CAPABILITIES="SIMULATE_API_VERSION_BIT,SIMU
 vulkaninfo
 # Compare the results with that app running without the Profiles layer.
 ```
-See also
-* [${VulkanTools}/tests/devsim_layer_test.sh](https://github.com/LunarG/VulkanTools/blob/master/tests/devsim_layer_test.sh) - a test runner script.
-* [${VulkanTools}/tests/devsim_test1.json](https://github.com/LunarG/VulkanTools/blob/master/tests/devsim_test1_in.json) - an example configuration file, containing bogus test data.
