@@ -164,7 +164,7 @@ TEST(layer, TestSetCombinationMode) {
             std::vector<VkExtensionProperties> extensions(count);
             vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, extensions.data());
 
-            ASSERT_EQ(extensions.size(), 234);
+            ASSERT_GE(extensions.size(), 234);
         }
 
         vkDestroyInstance(test_inst, nullptr);
