@@ -3101,6 +3101,12 @@ class VulkanProfilesDocGenerator():
         return gen
 
 
+    def gen_manPageLink(self, entry, text):
+        # The version is irrelevant currently in the man page base link as it gets redirected to
+        # the latest version's corresponding page, so we simply use version 1.1 as convention
+        return '[{0}](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/{1}.html)'.format(text, entry)
+
+
     def gen_table(self, rowHandlers):
         gen = '| Profiles |'
         cellFmt = ' {0} |'
@@ -3141,8 +3147,9 @@ class VulkanProfilesDocGenerator():
 
     def gen_extension(self, section, extension, profile = None):
         # If no profile was specified then this is the first column so return the extension name
+        # with a link to the extension's manual page
         if profile is None:
-            return extension
+            return self.gen_manPageLink(extension, extension)
 
         # If it's an extension explicitly required by the profile then this is a supported extension
         if extension in profile.capabilities.extensions:
@@ -3203,10 +3210,10 @@ class VulkanProfilesDocGenerator():
         if struct == 'VkPhysicalDeviceVulkan11Features':
             where = 'Vulkan 1.1'
             isExactMatch = (section == where)
-        elif structDef.definedByVersion:
-            where = 'Vulkan {0}'.format(structDef.definedByVersion)
+        elif structDef.definedByVersion != None:
+            where = 'Vulkan {0}'.format(str(structDef.definedByVersion))
             isExactMatch = (section == where)
-        elif structDef.definedByExtensions:
+        elif len(structDef.definedByExtensions) > 0:
             where = '/'.join(structDef.definedByExtensions)
             isExactMatch = (section in structDef.definedByExtensions)
         else:
@@ -3221,16 +3228,52 @@ class VulkanProfilesDocGenerator():
             return ':x:'
 
 
+    def getFeatureStructSynonyms(self, struct, member):
+        structDef = self.registry.structs[struct]
+        if structDef.definedByVersion != None:
+            # For 1.1+ core features we always have two structures defining the feature, one is
+            # the feature specific structure, the other is VkPhysicalDeviceVulkanXXFeatures
+            if struct == 'VkPhysicalDeviceVulkan11Features':
+                # VkPhysicalDeviceVulkan11Features is defined in Vulkan 1.2, but actually it
+                # defines Vulkan 1.1 features
+                version = self.registry.versions['VK_VERSION_1_1']
+            else:
+                # For other structures find the version defining the structure
+                for version in self.registry.versions.values():
+                    if version.number == structDef.definedByVersion:
+                        break
+            # Return all the structures defining this feature member
+            return version.features[member].structs
+        else:
+            # In all other cases we're talking about a non-promoted extension, as the structure
+            # we receive here is always a non-alias structure, so we can simply return the
+            # aliases of the structure
+            return structDef.aliases
+
+
+    def getFeatureStructForManPageLink(self, struct, member):
+        # We don't want to link to the man page VkPhysicalDeviceVulkanXXFeatures structures,
+        # instead we prefer to use the more specific non-alias structure if possible
+        for alias in self.getFeatureStructSynonyms(struct, member):
+            if re.match(r"^VkPhysicalDeviceVulkan[0-9]+Features$", alias) is None:
+                structDef = self.registry.structs[alias]
+                if not structDef.isAlias:
+                    struct = alias
+        return struct
+
+
     def gen_feature(self, struct, section, member, profile = None):
         # If no profile was specified then this is the first column so return the member name
+        # with a link to the encompassing structure's manual page
         if profile is None:
-            return member
+            return self.gen_manPageLink(self.getFeatureStructForManPageLink(struct, member),
+                                        member)
 
         # If this feature struct member is defined in the profile as is, consider it supported
         if struct in profile.capabilities.features:
             featureStruct = profile.capabilities.features[struct]
-            if member in featureStruct and featureStruct[member]:
-                return self.formatFeatureSupport(True, struct, section)
+            if member in featureStruct:
+                return self.formatFeatureSupport(featureStruct[member], struct, section)
 
         # If the struct is VkPhysicalDeviceFeatures then check if the feature is defined in
         # VkPhysicalDeviceFeatures2 or VkPhysicalDeviceFeatures2KHR for the profile and then
@@ -3239,19 +3282,18 @@ class VulkanProfilesDocGenerator():
             for wrapperStruct in [ 'VkPhysicalDeviceFeatures2', 'VkPhysicalDeviceFeatures2KHR' ]:
                 if wrapperStruct in profile.capabilities.features:
                     featureStruct = profile.capabilities.features[wrapperStruct]['features']
-                    if member in featureStruct and featureStruct[member]:
-                        return self.formatFeatureSupport(True, struct, section)
+                    if member in featureStruct:
+                        return self.formatFeatureSupport(featureStruct[member], struct, section)
 
         # If the struct has aliases and the feature struct member is defined in the profile in
         # one of those, consider it supported
-        structDef = self.registry.structs[struct]
-        for alias in structDef.aliases:
+        for alias in self.getFeatureStructSynonyms(struct, member):
             if alias in profile.capabilities.features:
                 featureStruct = profile.capabilities.features[alias]
-                if member in featureStruct and featureStruct[member]:
-                    return self.formatFeatureSupport(True, alias, section)
+                if member in featureStruct:
+                    return self.formatFeatureSupport(featureStruct[member], alias, section)
 
-        return ':x:'
+        return self.formatFeatureSupport(False, struct, section)
 
 
     def gen_featuresSection(self, features, definedFeatures, sectionHeader, tableData):
@@ -3363,10 +3405,10 @@ class VulkanProfilesDocGenerator():
         if struct == 'VkPhysicalDeviceVulkan11Properties':
             where = 'Vulkan 1.1'
             isExactMatch = (section == where)
-        elif structDef.definedByVersion:
-            where = 'Vulkan {0}'.format(structDef.definedByVersion)
+        elif structDef.definedByVersion != None:
+            where = 'Vulkan {0}'.format(str(structDef.definedByVersion))
             isExactMatch = (section == where)
-        elif structDef.definedByExtensions:
+        elif len(structDef.definedByExtensions) > 0:
             where = '/'.join(structDef.definedByExtensions)
             isExactMatch = (section in structDef.definedByExtensions)
         else:
@@ -3395,11 +3437,55 @@ class VulkanProfilesDocGenerator():
             Log.f("Unexpected limittype '{0}'".format(limittype))
 
 
+    def getLimitStructSynonyms(self, struct, member):
+        structDef = self.registry.structs[struct]
+        if structDef.definedByVersion != None:
+            # For 1.1+ core limits we always have two structures defining the limit, one is
+            # the limit specific structure, the other is VkPhysicalDeviceVulkanXXProperties
+            if struct == 'VkPhysicalDeviceVulkan11Properties':
+                # VkPhysicalDeviceVulkan11Properties is defined in Vulkan 1.2, but actually it
+                # defines Vulkan 1.1 limits
+                version = self.registry.versions['VK_VERSION_1_1']
+            else:
+                # For other structures find the version defining the structure
+                for version in self.registry.versions.values():
+                    if version.number == structDef.definedByVersion:
+                        break
+            # Return all the structures defining this limit member
+            return version.limits[member].structs
+        else:
+            # In all other cases we're talking about a non-promoted extension, as the structure
+            # we receive here is always a non-alias structure, so we can simply return the
+            # aliases of the structure
+            return structDef.aliases
+
+
+    def getLimitStructForManPageLink(self, struct, member):
+        # If the structure at hand is VkPhysicalDeviceProperties then we should rather link
+        # to the underlying nested structure that actually defines the limit
+        if struct == 'VkPhysicalDeviceProperties':
+            structs = self.registry.versions['VK_VERSION_1_0'].limits[member].structs
+            for nestedStruct in [ 'VkPhysicalDeviceLimits', 'VkPhysicalDeviceSparseProperties' ]:
+                if nestedStruct in structs:
+                    return nestedStruct
+
+        # We don't want to link to the man page VkPhysicalDeviceVulkanXXProperties structures,
+        # instead we prefer to use the more specific non-alias structure if possible
+        for alias in self.getLimitStructSynonyms(struct, member):
+            if re.match(r"^VkPhysicalDeviceVulkan[0-9]+Properties$", alias) is None:
+                structDef = self.registry.structs[alias]
+                if not structDef.isAlias:
+                    struct = alias
+        return struct
+
+
     def gen_limit(self, struct, section, member, profile = None):
         # If no profile was specified then this is the first column so return the member name
-        # decorated with the corresponding limittype specific info
+        # decorated with the corresponding limittype specific info and a link to the
+        # encompassing structure's manual page
         if profile is None:
-            return self.formatLimitName(struct, member)
+            return self.gen_manPageLink(self.getLimitStructForManPageLink(struct, member),
+                                        self.formatLimitName(struct, member))
 
         # If this limit/property struct member is defined in the profile as is, include it
         if struct in profile.capabilities.properties:
@@ -3431,8 +3517,7 @@ class VulkanProfilesDocGenerator():
 
         # If the struct has aliases and the limit/property struct member is defined in the profile
         # in one of those then include it
-        structDef = self.registry.structs[struct]
-        for alias in structDef.aliases:
+        for alias in self.getLimitStructSynonyms(struct, member):
             if alias in profile.capabilities.properties:
                 limitStruct = profile.capabilities.properties[alias]
                 if member in limitStruct and limitStruct[member]:
@@ -3529,9 +3614,10 @@ class VulkanProfilesDocGenerator():
 
     def gen_queueFamily(self, index, struct, section, member, profile = None):
         # If no profile was specified then this is the first column so return the member name
-        # decorated with the corresponding limittype specific info
+        # decorated with the corresponding limittype specific info and a link to the
+        # encompassing structure's manual page
         if profile is None:
-            return self.formatLimitName(struct, member)
+            return self.gen_manPageLink(struct, self.formatLimitName(struct, member))
 
         # If this profile doesn't even define this queue family index then early out
         if len(profile.capabilities.queueFamiliesProperties) <= index:
@@ -3616,13 +3702,21 @@ class VulkanProfilesDocGenerator():
         return '\n## Vulkan Profile Queue Families\n\n{0}\n{1}\n'.format(legend, table)
 
 
+    def getFormatStructForManPageLink(self, struct):
+        # We prefer returning VkFormatProperties3 instead of VkFormatProperties as even though
+        # they are technically not strictly aliases, the former is the one that should be used
+        # going forward and the feature flags are anyway defined to be usable as synonyms for
+        # the legacy 32-bit flags
+        return 'VkFormatProperties3' if struct == 'VkFormatProperties' else struct
+
+
     def gen_format(self, format, struct, section, member, profile = None):
         # If no profile was specified then this is the first column so return the member name
-        # decorated with the corresponding limittype specific info
+        # decorated with the corresponding limittype specific info and a link to the
+        # encompassing structure's manual page
         if profile is None:
-            # Only do so if the struct is not 'VkFormatProperties', as we use custom names
-            # there that also include the tested bit
-            return member if struct == 'VkFormatProperties' else self.formatLimitName(struct, member)
+            return self.gen_manPageLink(self.getFormatStructForManPageLink(struct),
+                                        self.formatLimitName(struct, member))
 
         # If this profile doesn't even define this format then early out
         if not format in profile.capabilities.formats:
@@ -3728,7 +3822,7 @@ class VulkanProfilesDocGenerator():
 
         # Generate table
         table = self.gen_sectionedTable(tableData)
-        return '\n## Vulkan Profile Formats\n\n{0}\n{1}\n'.format(legend, table)
+        return '\n## Vulkan Profile Formats\n\n{0}\n\n{1}\n{2}\n'.format(disclaimer, legend, table)
 
 
 if __name__ == '__main__':
