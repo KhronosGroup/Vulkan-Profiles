@@ -4196,12 +4196,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProperties 
     if (!GetValue(parent["limits"], &dest->limits)) {
         valid = false;
     }
-    for (const auto &prop : parent) {
-        GET_VALUE("apiVersion", apiVersion);
-        GET_VALUE("driverVersion", driverVersion);
-        GET_VALUE("vendorID", vendorID);
-        GET_VALUE("deviceID", deviceID);
-        GET_VALUE_ENUM_WARN("deviceType", deviceType);
+    for (const auto &prop : parent.getMemberNames()) {
+        GET_VALUE(prop, apiVersion);
+        GET_VALUE(prop, driverVersion);
+        GET_VALUE(prop, vendorID);
+        GET_VALUE(prop, deviceID);
+        GET_VALUE_ENUM_WARN(prop, deviceType);
         GET_ARRAY(deviceName);         // size < VK_MAX_PHYSICAL_DEVICE_NAME_SIZE
         GET_ARRAY(pipelineCacheUUID);  // size == VK_UUID_SIZE*/
     }
