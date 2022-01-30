@@ -8749,6 +8749,11 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolPropertiesEXT(VkPhysicalDevi
     return result;
 }
 
+VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolProperties(VkPhysicalDevice physicalDevice, uint32_t *pToolCount,
+                                                               VkPhysicalDeviceToolProperties *pToolProperties) {
+    return GetPhysicalDeviceToolPropertiesEXT(physicalDevice, pToolCount, pToolProperties);
+}
+
 #define TRANSFER_VALUE(name)    \
     if (promoted_written) {     \
         src->name = dest->name; \
@@ -10461,24 +10466,14 @@ VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL GetInstanceProcAddr(VkInstance instance
     GET_PROC_ADDR(GetPhysicalDeviceFeatures);
     GET_PROC_ADDR(GetPhysicalDeviceFeatures2);
     GET_PROC_ADDR(GetPhysicalDeviceFeatures2KHR);
-    /*GET_PROC_ADDR(GetPhysicalDeviceMemoryProperties);
-    GET_PROC_ADDR(GetPhysicalDeviceMemoryProperties2);
-    GET_PROC_ADDR(GetPhysicalDeviceMemoryProperties2KHR);
-    GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties);
-    GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties2);
-    GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties2KHR);*/
     GET_PROC_ADDR(GetPhysicalDeviceFormatProperties);
     GET_PROC_ADDR(GetPhysicalDeviceFormatProperties2);
     GET_PROC_ADDR(GetPhysicalDeviceFormatProperties2KHR);
     GET_PROC_ADDR(GetPhysicalDeviceImageFormatProperties);
     GET_PROC_ADDR(GetPhysicalDeviceImageFormatProperties2);
     GET_PROC_ADDR(GetPhysicalDeviceImageFormatProperties2KHR);
-    /*GET_PROC_ADDR(GetPhysicalDeviceSurfaceCapabilitiesKHR);
-    GET_PROC_ADDR(GetPhysicalDeviceSurfaceCapabilities2KHR);
-    GET_PROC_ADDR(GetPhysicalDeviceSurfaceFormatsKHR);
-    GET_PROC_ADDR(GetPhysicalDeviceSurfaceFormats2KHR);
-    GET_PROC_ADDR(GetPhysicalDeviceSurfacePresentModesKHR);
-    GET_PROC_ADDR(GetPhysicalDeviceToolPropertiesEXT);*/
+    GET_PROC_ADDR(GetPhysicalDeviceToolProperties);
+    GET_PROC_ADDR(GetPhysicalDeviceToolPropertiesEXT);
 #undef GET_PROC_ADDR
 
     if (!instance) {
