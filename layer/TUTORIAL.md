@@ -13,17 +13,24 @@
 
 ## Overview
 
-### Extend your Vulkan test coverage with the Khronos Profiles Layer
-The Khronos Profiles Layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device. It can be applied without modifying any application binaries, and in a fully automated fashion. The Profiles layer is a Vulkan layer that can override the values returned by your application’s queries of the GPU. Profiles layer uses a JSON text configuration file to make your application see a different driver/GPU than is actually in your system. This capability is useful to verify that your application both a) properly queries the limits from Vulkan, and b) obeys those limits.
+### Vulkan capabilities test coverage with the Khronos Profiles Layer
+The Khronos Profiles Layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device. It can be applied without modifying any application binaries, and in a fully automated fashion. The *Profiles layer* is a Vulkan layer that can override the values returned by your application’s queries of the GPU. Profiles layer uses a JSON text configuration file to make your application see a different driver/GPU than is actually in your system. This capability is useful to verify that your application both a) properly queries the limits from Vulkan, and b) obeys those limits.
 
-The Profiles layer library is available pre-built in the Vulkan SDK, and continues to evolve. It works for all Vulkan platforms (Linux, Windows, macOS, and Android). The Profiles layer can be enabled and configured using the [Vulkan Configurator](https://vulkan.lunarg.com/doc/sdk/latest/windows/vkconfig.html) included with the Vulkan SDK.
+The *Profiles layer* is available pre-built in the [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/), and continues to evolve. It works for all Vulkan platforms (Linux, Windows, macOS, and Android). The *Profiles layer* can be enabled and configured using the [Vulkan Configurator](https://vulkan.lunarg.com/doc/sdk/latest/windows/vkconfig.html) included with the Vulkan SDK.
 
-The role of the Profiles layer is to "simulate" a Vulkan implementation by modifying the features and resources of a more-capable implementation. Profiles layer does not add capabilities to your existing Vulkan implementation by "emulating" additional capabilities with software; e.g. Profiles layer cannot add geometry shader capability to an actual device that doesn’t already provide it. Also, the Profiles layer does not "enforce" the features being simulated. You can use the Validation Layer in conjunction with the Profiles Layer to identify where your application is not adhering to the features being simulated by the Profiles Layer.
+The role of the *Profiles layer* is to "simulate" a Vulkan implementation by modifying the features and resources of a more-capable implementation. The *Profiles layer* does not add capabilities to your existing Vulkan implementation by "emulating" additional capabilities with software; e.g. The *Profiles layer* cannot add geometry shader capability to an actual device that doesn’t already provide it. Also, the Profiles layer does not "enforce" the features being simulated. You can use the Validation Layer in conjunction with the Profiles Layer to identify where your application is not adhering to the features being simulated by the Profiles Layer.
 
 ### Using the Profiles layer
-The input to the Profiles layer is a profiles file that is using the flexible JSON syntax. The profiles file format is defined by a formal JSON schema, so any profiles file may be verified to be correct using freely available JSON validators. Browsing through the schema file, you can see the extent of parameters that are available for your configuration.
+The *Profiles Layer* can be used using environment variables or more intuitively using the *Vulkan Configurator* GUI application.
 
-Example of a Profiles layer JSON profiles file: [VP_LUNARG_test_structure_simple.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/test/data/VP_LUNARG_test_structure_simple.json)
+![Vulkan Configurator](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/images/vkconfig.png)
+*The built-in Portability layers configurations in Vulkan Configurator using the Validation and the Profiles layers*
+
+The *Portability* layers configuration in *Vulkan Configurator* allows checking that a Vulkan application follows the requirements of a *Vulkan Profile*. This layers configuration relies on the *Vulkan Profiles* layer to override the Vulkan device capabilities and the *Vulkan Validation Layer* to check that the Vulkan application doesn't rely on capabilities not supported by the selected profile.
+
+The input to the *Profiles layer* is a profiles file that is using the flexible JSON syntax. The profiles file format is defined by a formal JSON schema, so any profiles file may be verified to be correct using freely available JSON validators. Browsing through the schema file, we can see the extent of parameters that are available for our configuration.
+
+Example of a *Profiles layer* JSON profiles file: [VP_LUNARG_test_structure_simple.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/test/data/VP_LUNARG_test_structure_simple.json)
 
 ### Android
 To enable, use a setting with the path of the profiles file to load:
@@ -37,7 +44,7 @@ adb shell settings put global debug.vulkan.khronos_profiles.debug_reports DEBUG_
 adb shell settings put global debug.vulkan.khronos_profiles.debug_fail_on_error true
 ```
 
-# Technical Details
+## Technical Details
 
 The Profiles Layer is a Vulkan layer that can modify the results of Vulkan PhysicalDevice queries based on a profiles file (JSON format), thus simulating some of the capabilities of a device by overriding the capabilities of the actual device under test.
 
@@ -83,7 +90,7 @@ The Profiles layer provides the ability to emulate the `VK_KHR_portability_subse
 This feature allows users to test their application with limitations found on non-conformant Vulkan implementations.
 To turn on this feature, set the `VK_KHRONOS_PROFILES_EMULATE_PORTABILITY_SUBSET_EXTENSION` environment variable (or the corresponding `vk_layer_settings.txt` option `khronos_profiles.emulate_portability`) to a positive integer.
 
-### Profiles Layer Options
+### Profiles Layer Settings
 
 #### Profiles JSON file
 - Environment Variable: `VK_KHRONOS_PROFILES_PROFILE_FILE`
@@ -173,9 +180,9 @@ Enabled reports level.
 ### Example using the Profiles layer using Linux environment variables
 ```bash
 # Configure bash to find the Vulkan SDK.
-source $VKSDK/setup-env.sh
+source $VULKAN_SDK/setup-env.sh
 
-# Set loader parameters to find and load the Profiles layer from your local Vulkan-Profiles build.
+# Set loader parameters to find and load the *Profiles layer* from our local `Vulkan-Profiles` build.
 export VK_LAYER_PATH="${Vulkan-Profiles}/build/bin"
 export VK_INSTANCE_LAYERS="VK_LAYER_KHRONOS_profiles"
 
