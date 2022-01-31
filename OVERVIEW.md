@@ -20,7 +20,7 @@ The *Vulkan Profiles* can help addressing for multiple use cases:
 - *Engine profiles*: To express some rendering code paths requirements of an engine.
 - Etc.
 
-Conceptually, *Vulkan Profiles* can be understood as the explicit expression and formalization of Vulkan requirements and supports by different actors of the Vulkan ecosystem.
+Conceptually, *Vulkan Profiles* can be understood as the explicit expression and formalization of Vulkan requirements and provides clear communication within the *Vulkan Community*.
 
 *The Vulkan Profiles Toolset* delivered in the [***Vulkan SDK***](https://www.lunarg.com/vulkan-sdk/) is still under development at the **BETA** stage.
 
