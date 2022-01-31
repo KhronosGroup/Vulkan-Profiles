@@ -9,13 +9,13 @@
 [3]: https://i.creativecommons.org/l/by-nd/4.0/88x31.png "Creative Commons License"
 [4]: https://creativecommons.org/licenses/by-nd/4.0/
 
-# Vulkan Profiles Tools (BETA)
+# Vulkan Profiles Toolet (BETA)
 
-The *Vulkan Profiles Tools* are a collection of tools delivered with the [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/) for Vulkan application developers to leverage *Vulkan Profiles* while developing a Vulkan application.
+The *Vulkan Profiles Toolset* is a collection of tools delivered with the [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/) for Vulkan application developers to leverage *Vulkan Profiles* while developing a Vulkan application.
 
 * **[Vulkan Profiles Tools Overview](./OVERVIEW.md)**: Discover the components and how they work together.
 * **[Vulkan Profiles Documentation](./PROFILES.md)**: *Tables to compare profiles capabilities*.
-* **[Change Log](./CHANGELOG.md)**: The history of *Vulkan Profiles Tools* releases.
+* **[Change Log](./CHANGELOG.md)**: The history of *Vulkan Profiles Toolset* releases.
 * **[Contributing](./CONTRIBUTING.md)**: How to contribute to the *Vulkan Profiles* repository.
 * **[Bug reports](https://github.com/KhronosGroup/Vulkan-Profiles)**: Open a GitHub issue when you encounter a bug.
 
@@ -30,7 +30,7 @@ Please see the [CONTRIBUTING.md](./CONTRIBUTING.md) file in this repository for 
 
 --------------
 ## How to Build and Run
-[BUILD.md](./BUILD.md) Includes directions for building all components as well as running tests.
+[BUILD.md](./BUILD.md) provides instructions to build the repository, which allows regenerating the *Vulkan Profiles Toolset* against new Vulkan Header API version and with supports of new profiles or updated profiles.
 
 --------------
 ## Version Tagging Scheme
