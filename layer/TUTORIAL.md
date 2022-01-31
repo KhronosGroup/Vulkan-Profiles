@@ -7,6 +7,8 @@
 [3]: https://i.creativecommons.org/l/by-nd/4.0/88x31.png "Creative Commons License"
 [4]: https://creativecommons.org/licenses/by-nd/4.0/
 
+<p align="center"><img src="./images/logo.png" width=400 /></p>
+
 # VK\_LAYER\_KHRONOS\_profiles
 
 ## Overview
@@ -79,7 +81,7 @@ If the application requests an unsupported version of the Vulkan API, the Profil
 
 The Profiles layer provides the ability to emulate the `VK_KHR_portability_subset` extension on devices that do not implement this extension.
 This feature allows users to test their application with limitations found on non-conformant Vulkan implementations.
-To turn on this feature, set the `VK_KHRONOS_PROFILES_EMULATE_PORTABILITY_SUBSET_EXTENSION` environment variable (or the corresponding vk_layer_settings.txt option `khronos_profiles.emulate_portability`) to a positive integer.
+To turn on this feature, set the `VK_KHRONOS_PROFILES_EMULATE_PORTABILITY_SUBSET_EXTENSION` environment variable (or the corresponding `vk_layer_settings.txt` option `khronos_profiles.emulate_portability`) to a positive integer.
 
 ### Profiles Layer Options
 
@@ -174,7 +176,7 @@ Enabled reports level.
 source $VKSDK/setup-env.sh
 
 # Set loader parameters to find and load the Profiles layer from your local Vulkan-Profiles build.
-export VK_LAYER_PATH="${Vulkan-Profiles}/build/lib"
+export VK_LAYER_PATH="${Vulkan-Profiles}/build/bin"
 export VK_INSTANCE_LAYERS="VK_LAYER_KHRONOS_profiles"
 
 # Specify the simulated device's profiles file.
