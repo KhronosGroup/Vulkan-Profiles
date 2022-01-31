@@ -7,9 +7,11 @@
 [3]: https://i.creativecommons.org/l/by-nd/4.0/88x31.png "Creative Commons License"
 [4]: https://creativecommons.org/licenses/by-nd/4.0/
 
-# Release notes
+<p align="center"><img src="./images/logo.png" width=400 /></p>
 
-## [Vulkan Profiles Tools 1.3.204](https://github.com/LunarG/VulkanProfiles/tree/master) - February 2022
+# Release Notes
+
+## [Vulkan Profiles Toolset 1.3.204](https://github.com/LunarG/VulkanProfiles/tree/master) - February 2022
 
 ### Features:
 - Add *Vulkan Profiles schema*
@@ -22,7 +24,8 @@
   - Add API to create `VkDevice` using a profile
   - Add APIs for profile reflection
   - Add *Profiles API library* generator using `vk.xml`
-- Add *Profiles layer* to load profile
+- Add *Profiles layer* to simulate profiles during application development
   - Add support of Vulkan 1.3 and all extensions
-  - Add support of the *Vulkan Profiles Schema*
+  - Add support of the *Vulkan Profiles JSON Schema*
+- Add *Profiles Comparison Table*
 
