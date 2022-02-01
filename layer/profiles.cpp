@@ -66,6 +66,7 @@
 #include <vk_layer_config.h>
 #include "vk_layer_table.h"
 #include "vk_layer_settings.h"
+#include "profiles.h"
 
 using valijson::Schema;
 using valijson::SchemaParser;
@@ -131,15 +132,6 @@ const char *const kLayerSettingsDebugFilename = "debug_filename";
 const char *const kLayerSettingsDebugFileClear = "debug_file_clear";
 const char *const kLayerSettingsDebugFailOnError = "debug_fail_on_error";
 const char *const kLayerSettingsDebugReports = "debug_reports";
-
-enum SimulateCapabilityFlag {
-    SIMULATE_API_VERSION_BIT = 1 << 0,
-    SIMULATE_FEATURES_BIT = 1 << 1,
-    SIMULATE_PROPERTIES_BIT = 1 << 2,
-    SIMULATE_EXTENSIONS_BIT = 1 << 3,
-    SIMULATE_FORMATS_BIT = 1 << 4
-};
-typedef int SimulateCapabilityFlags;
 
 static SimulateCapabilityFlags GetSimulateCapabilityFlags(const vku::Strings &values) {
     SimulateCapabilityFlags result = 0;

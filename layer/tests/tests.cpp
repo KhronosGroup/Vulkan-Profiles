@@ -94,7 +94,7 @@ TEST(layer, TestSetCombinationMode) {
         profiles_test::setProfilesFilename(filepath);
         profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
         profiles_test::setProfilesProfileName("VP_LUNARG_test_api_1_2_198");
-        profiles_test::setProfilesSimulateCapabilities(profiles_test::SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT);
+        profiles_test::setProfilesSimulateCapabilities(SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT);
         profiles_test::setProfilesFailOnError(false);
 
         err = inst_builder.makeInstance();
@@ -139,7 +139,7 @@ TEST(layer, TestSetCombinationMode) {
         profiles_test::setProfilesFilename(filepath);
         profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
         profiles_test::setProfilesProfileName("VP_LUNARG_test_api");
-        profiles_test::setProfilesSimulateCapabilities(profiles_test::SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT);
+        profiles_test::setProfilesSimulateCapabilities(SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT);
         profiles_test::setProfilesFailOnError(false);
 
         err = inst_builder.makeInstance();
@@ -206,7 +206,7 @@ TEST(layer, TestExtensionNotSupported) {
         profiles_test::setProfilesFilename(filepath);
         profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
         profiles_test::setProfilesProfileName("VP_LUNARG_test_api");
-        profiles_test::setProfilesSimulateCapabilities(profiles_test::SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT);
+        profiles_test::setProfilesSimulateCapabilities(SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT);
         profiles_test::setProfilesFailOnError(true);
 
         err = inst_builder.makeInstance();
