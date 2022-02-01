@@ -22,6 +22,7 @@
 #include <vector>
 
 #include <vulkan/vulkan.h>
+#include "../profiles.h"
 
 namespace profiles_test {
 
@@ -29,16 +30,6 @@ void setEnvironmentSetting(std::string setting, const char* val);
 void unsetEnvironmentSetting(std::string setting);
 
 std::string getAbsolutePath(std::string filepath);
-
-enum SimulateCapabilityFlag {
-    SIMULATE_API_VERSION_BIT = 1 << 0,
-    SIMULATE_FEATURES_BIT = 1 << 1,
-    SIMULATE_PROPERTIES_BIT = 1 << 2,
-    SIMULATE_EXTENSIONS_BIT = 1 << 3,
-    SIMULATE_FORMATS_BIT = 1 << 4,
-    SIMULATE_FORMAT_PROPERTIES_BIT = 1 << 5
-};
-typedef int SimulateCapabilityFlags;
 
 void setProfilesFilename(const std::string& filepath);
 void setProfilesDebugEnable(bool enable);

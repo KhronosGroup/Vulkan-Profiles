@@ -26,8 +26,8 @@ TEST(layer, selecting_profile) {
         profiles_test::setProfilesFilename(filepath);
         profiles_test::setProfilesProfileName("VP_LUNARG_test_selecting_profile");
         profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
-        profiles_test::setProfilesSimulateCapabilities(profiles_test::SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
-                                                       profiles_test::SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT);
+        profiles_test::setProfilesSimulateCapabilities(SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
+                                                       SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT);
 
         inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
@@ -57,8 +57,8 @@ TEST(layer, selecting_profile) {
         profiles_test::setProfilesFilename(filepath);
         profiles_test::setProfilesProfileName("VP_LUNARG_test_selecting_profile_subset");
         profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
-        profiles_test::setProfilesSimulateCapabilities(profiles_test::SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
-                                                       profiles_test::SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT);
+        profiles_test::setProfilesSimulateCapabilities(SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
+                                                       SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT);
 
         inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
