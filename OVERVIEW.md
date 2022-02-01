@@ -13,7 +13,7 @@
 
 The *Vulkan Profiles Toolset* is a collection of components for Vulkan application developers to build **portable** Vulkan applications using *Vulkan Profiles*.
 
-The *Vulkan Profiles* can help addressing for multiple use cases:
+*Vulkan Profiles* have multiple use cases:
 - *Roadmap profiles*: To express guidance on the future direction of Vulkan devices.
 - *Platform profiles*: To express the Vulkan support available on different platforms.
 - *Device profiles*: To express the Vulkan support of a single Vulkan driver for a Vulkan device.
@@ -31,15 +31,15 @@ The *Vulkan Profiles Toolset* includes the following components:
   - A data format to exchange Vulkan capabilities: extensions, features, properties, formats and queue properties.
   - Each revision of Vulkan API is represented by a schema that supersedes older versions of Vulkan API.
   - The schema covers Vulkan 1.3 and all extensions.
-- [***The Vulkan Profiles API library***](https://vulkan.lunarg.com/doc/sdk/master/windows/profiles_api_library.html)
+- [***The Vulkan Profiles API library***](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_api_library.html)
   - A header-only C++ library to use *Vulkan Profiles* in Vulkan applications.
   - The library allows checking Profiles support on a device and creating a `VkDevice` instance with the profile features and extensions enabled.
   - The library requires Vulkan 1.0 + `VK_KHR_get_physical_device_properties2` drivers.
-- [***The Vulkan Profiles Layer***](https://vulkan.lunarg.com/doc/sdk/master/windows/profiles_layer.html)
+- [***The Vulkan Profiles Layer***](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html)
   - A layer used during application development to ensure adherence to the requirements of a chosen *Vulkan Profile*.
-  - It simulates but doesn't emulate Vulkan capabilities. Hence, it used with the [Validation layer](https://github.com/KhronosGroup/Vulkan-ValidationLayers) to clamp available capabilities on the Vulkan developer system.
+  - It simulates but doesn't emulate Vulkan capabilities. Hence, it is used with the [Validation layer](https://github.com/KhronosGroup/Vulkan-ValidationLayers) to clamp available capabilities on the Vulkan developer system.
   - The layer requires Vulkan 1.0 + `VK_KHR_get_physical_device_properties2` drivers.
-- [***The Vulkan Profiles Comparison Table***](https://vulkan.lunarg.com/doc/sdk/master/windows/profiles_definitions.html)
+- [***The Vulkan Profiles Comparison Table***](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_definitions.html)
   - Human readable format of *Vulkan Profiles* in a table to enable comparison.
 
 Furthermore, the *Vulkan SDK* includes implementations of some *Vulkan Profiles* using the *Vulkan Profiles JSON Schema*:
@@ -47,7 +47,7 @@ Furthermore, the *Vulkan SDK* includes implementations of some *Vulkan Profiles*
 - [VP_ANDROID_baseline_2021.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/VP_ANDROID_baseline_2021.json)
 - [VP_LUNARG_desktop_portability_2021.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/VP_LUNARG_desktop_portability_2021.json)
 
-Each profile files may contain multiple variants of a profile. For example `VP_LUNARG_desktop_portability_2021.json` specifies `VP_LUNARG_desktop_portability_2021` profile for Windows and Linux but also `VP_LUNARG_desktop_portability_2021_subset` profile for macOS which as specific requirements.
+Each profiles file may contain multiple variants of a profile. For example `VP_LUNARG_desktop_portability_2021.json` specifies `VP_LUNARG_desktop_portability_2021` profile for Windows and Linux but also `VP_LUNARG_desktop_portability_2021_subset` profile for macOS which has specific requirements.
 
 Within the *Vulkan SDK*, the Vulkan Profiles files are located at `$(VULKAN_SDK)/Config/VK_LAYER_KHRONOS_profiles`.
 
