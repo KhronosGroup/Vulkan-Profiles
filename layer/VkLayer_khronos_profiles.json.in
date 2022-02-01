@@ -105,12 +105,14 @@
                     "filter": "*.json",
                     "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2021.json",
                     "expanded": true,
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS", "ANDROID" ],
                     "settings": [
                         {
                             "key": "profile_name",
                             "label": "Profile",
                             "description": "Name of the profile specified by the profile file to use. If set to ${VP_DEFAULT}, the layer will load the first profile in the file.",
                             "type": "ENUM",
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS", "ANDROID" ],
                             "flags": [],
                             "default": "${VP_DEFAULT}"
                         },
@@ -119,7 +121,8 @@
                             "label": "Schema Validation",
                             "description": "Validate the profile file against the Vulkan SDK profile schema if the file is found.",
                             "type": "BOOL",
-                            "default": false
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ]
                         }
                     ]
                 },
@@ -130,7 +133,8 @@
                     "status": "STABLE",
                     "platforms": [
                         "WINDOWS",
-                        "LINUX"
+                        "LINUX",
+                        "ANDROID"
                     ],
                     "type": "BOOL",
                     "default": true
@@ -141,6 +145,7 @@
                     "description": "Control of the simulated capabilities of the Vulkan physical device from the selected Vulkan Profile.",
                     "status": "STABLE",
                     "type": "FLAGS",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS", "ANDROID" ],
                     "flags": [
                         {
                             "key": "SIMULATE_API_VERSION_BIT",
@@ -676,6 +681,7 @@
                     "description": "This indicates what action is to be taken when a layer wants to report information",
                     "status": "STABLE",
                     "type": "FLAGS",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS", "ANDROID" ],
                     "flags": [
                         {
                             "key": "DEBUG_ACTION_STDOUT_BIT",
@@ -799,6 +805,7 @@
                     "description": "If the device doesn't support the capabilities of the selected Profile, the layer fail to load. When enabled, vkEnumeratePhysicalDevices will fail when the selected Profile is not supported.",
                     "status": "STABLE",
                     "type": "BOOL",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS", "ANDROID" ],
                     "default": false
                 },
                 {
@@ -807,6 +814,7 @@
                     "description": "This is a comma-delineated list of options telling the layer what types of messages it should report back",
                     "status": "STABLE",
                     "type": "FLAGS",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS", "ANDROID" ],
                     "flags": [
                         {
                             "key": "DEBUG_REPORT_NOTIFICATION_BIT",
