@@ -84,6 +84,9 @@ The Profiles layer has some simple checking of profile values and writes debug m
 This version of the Profiles layer currently supports Vulkan v1.3 and below including all Vulkan extensions.
 If the application requests an unsupported version of the Vulkan API, the Profiles layer will emit an error message.
 
+When a Vulkan extension gets promoted so can the structures it defines. It is invalid for a profile to specify a structure and its promoted version at the same time.
+In this case the Profiles layer will use the promoted version of the structure and emit a warning.
+
 ### `VK_KHR_portability_subset` Emulation
 
 The Profiles layer provides the ability to emulate the `VK_KHR_portability_subset` extension on devices that do not implement this extension.
