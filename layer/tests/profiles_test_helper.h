@@ -39,6 +39,7 @@ void setProfilesSimulateCapabilities(SimulateCapabilityFlags flags);
 void setProfilesSimulateAllCapabilities();
 void setProfilesProfileName(const std::string& profile);
 void setProfilesFailOnError(bool fail);
+void setDisableExtensions(const std::vector<std::string>& extensions);
 
 VkApplicationInfo GetDefaultApplicationInfo();
 
