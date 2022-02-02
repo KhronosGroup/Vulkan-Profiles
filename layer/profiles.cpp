@@ -8633,6 +8633,17 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
                                                              VkFormatProperties *pFormatProperties) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "GetPhysicalDeviceFormatProperties\n");
 
+    // Check if Format was excluded
+    for (std::size_t j = 0, m = layer_settings.exclude_formats.size(); j < m; ++j) {
+        const std::string &excluded_format = layer_settings.exclude_formats[j].first;
+        if (excluded_format.empty()) continue;
+
+        if (StringToFormat(excluded_format) == format) {
+            *pFormatProperties = VkFormatProperties{};
+            return;
+        }
+    }
+
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
 
