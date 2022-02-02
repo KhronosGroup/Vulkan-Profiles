@@ -132,7 +132,7 @@ const char *const kLayerSettingsDebugFilename = "debug_filename";
 const char *const kLayerSettingsDebugFileClear = "debug_file_clear";
 const char *const kLayerSettingsDebugFailOnError = "debug_fail_on_error";
 const char *const kLayerSettingsDebugReports = "debug_reports";
-const char *const kLayerSettingsDisableExtensions = "disable_extensions";
+const char *const kLayerSettingsExcludeExtensions = "exclude_extensions";
 
 static SimulateCapabilityFlags GetSimulateCapabilityFlags(const vku::Strings &values) {
     SimulateCapabilityFlags result = 0;
@@ -561,7 +561,7 @@ struct LayerSettings {
     bool debug_file_discard;
     DebugReportFlags debug_reports;
     bool debug_fail_on_error;
-    std::string disable_extensions;
+    vku::List exclude_extensions;
 } layer_settings;
 
 bool HasFlags(VkFlags deviceFlags, VkFlags profileFlags) { return (deviceFlags & profileFlags) == profileFlags; }
@@ -6925,6 +6925,15 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Fea
 #undef GET_VALUE
 #undef GET_ARRAY
 
+std::string GetString(const vku::List& list) {
+    std::string result;
+    for (std::size_t i = 0, n = list.size(); i < n; ++i) {
+        result += list[i].first;
+        if (i < n - 1) result += ", ";
+    }
+    return result;
+}
+
 static void InitSettings() {
     layer_settings.profile_file.clear();
     layer_settings.profile_name.clear();
@@ -6936,7 +6945,7 @@ static void InitSettings() {
     layer_settings.debug_file_discard = true;
     layer_settings.debug_reports = DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_ERROR_BIT;
     layer_settings.debug_fail_on_error = false;
-    layer_settings.disable_extensions.clear();
+    layer_settings.exclude_extensions.clear();
 
     if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileFile)) {
         layer_settings.profile_file = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileFile);
@@ -6993,8 +7002,8 @@ static void InitSettings() {
         LogMessage(DEBUG_REPORT_DEBUG_BIT, format("No need to open the log file %s\n", layer_settings.debug_filename.c_str()));
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDisableExtensions)) {
-        layer_settings.disable_extensions = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDisableExtensions);
+    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeExtensions)) {
+        layer_settings.exclude_extensions = vku::GetLayerSettingList(kOurLayerName, kLayerSettingsExcludeExtensions);
     }
 
     const std::string simulation_capabilities_log = GetSimulateCapabilitiesLog(layer_settings.simulate_capabilities);
@@ -7012,7 +7021,7 @@ static void InitSettings() {
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugFileClear, layer_settings.debug_file_discard ? "true" : "false");
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugFailOnError, layer_settings.debug_fail_on_error ? "true" : "false");
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugReports, debug_reports_log.c_str());
-    settings_log += format("\t%s: %s\n", kLayerSettingsDisableExtensions, layer_settings.disable_extensions.c_str());
+    settings_log += format("\t%s: %s\n", kLayerSettingsExcludeExtensions, GetString(layer_settings.exclude_extensions).c_str());
 
     LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, format("Profile Layers Settings: {\n%s}\n", settings_log.c_str()));
 }
@@ -8590,7 +8599,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
         else
             result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
     } else if (src_count == 0 ||
-               !(layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) && layer_settings.disable_extensions.empty()) {
+               !(layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) && layer_settings.exclude_extensions.empty()) {
         result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
     } else {
         result = EnumerateProperties(src_count, pdd->simulation_extensions_.data(), pCount, pProperties);
@@ -10453,17 +10462,14 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 pdd.simulation_extensions_ = pdd.device_extensions_;
             }
 
-            const std::string &disable_extensions = layer_settings.disable_extensions;
-            const char delimiter = ';';
-            std::stringstream ss_list(disable_extensions);
-            std::string extension;
-            while (std::getline(ss_list, extension, delimiter)) {
-                if (!extension.empty()) {
-                    for (size_t i = 0; i < pdd.simulation_extensions_.size(); ++i) {
-                        if (extension == pdd.simulation_extensions_[i].extensionName) {
-                            pdd.simulation_extensions_.erase(pdd.simulation_extensions_.begin() + i);
-                            break;
-                        }
+            for (std::size_t j = 0, m = layer_settings.exclude_extensions.size(); j < m; ++j) {
+                const std::string &extension = layer_settings.exclude_extensions[j].first;
+                if (extension.empty()) continue;
+
+                for (size_t i = 0; i < pdd.simulation_extensions_.size(); ++i) {
+                    if (extension == pdd.simulation_extensions_[i].extensionName) {
+                        pdd.simulation_extensions_.erase(pdd.simulation_extensions_.begin() + i);
+                        break;
                     }
                 }
             }
