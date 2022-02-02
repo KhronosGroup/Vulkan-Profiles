@@ -225,3 +225,70 @@ TEST(layer, TestExtensionNotSupported) {
         inst_builder.reset();
     }
 }
+
+TEST(layer, TestDisablingExtensions) {
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    const std::string filepath = TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json";
+    profiles_test::setProfilesFilename(filepath);
+    profiles_test::setProfilesProfileName("VP_LUNARG_desktop_portability_2021");
+    profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
+    profiles_test::setProfilesFailOnError(false);
+    std::vector<std::string> disable = {
+        VK_KHR_MAINTENANCE_1_EXTENSION_NAME,
+        VK_KHR_MAINTENANCE_2_EXTENSION_NAME,
+        VK_KHR_MAINTENANCE_3_EXTENSION_NAME,
+        VK_KHR_MAINTENANCE_4_EXTENSION_NAME,
+    };
+    profiles_test::setDisableExtensions(disable);
+
+    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+
+    err = inst_builder.makeInstance();
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkInstance test_inst = inst_builder.getInstance();
+
+    VkPhysicalDevice gpu;
+    err = inst_builder.getPhysicalDevice(&gpu);
+    if (err != VK_SUCCESS) {
+        printf("Profile not supported on device, skipping test.\n");
+        vkDestroyInstance(test_inst, nullptr);
+        return;
+    }
+
+    uint32_t count = 0;
+    vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
+    std::vector<VkExtensionProperties> device_extensions(count);
+    vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, device_extensions.data());
+
+    bool maintenance1 = false;
+    bool maintenance2 = false;
+    bool maintenance3 = false;
+    bool maintenance4 = false;
+
+    for (const auto& ext : device_extensions) {
+        if (strcmp(ext.extensionName, VK_KHR_MAINTENANCE_1_EXTENSION_NAME) == 0) {
+            maintenance1 = true;
+        }
+        if (strcmp(ext.extensionName, VK_KHR_MAINTENANCE_2_EXTENSION_NAME) == 0) {
+            maintenance2 = true;
+        }
+        if (strcmp(ext.extensionName, VK_KHR_MAINTENANCE_3_EXTENSION_NAME) == 0) {
+            maintenance3 = true;
+        }
+        if (strcmp(ext.extensionName, VK_KHR_MAINTENANCE_4_EXTENSION_NAME) == 0) {
+            maintenance4 = true;
+        }
+    }
+
+    ASSERT_FALSE(maintenance1);
+    ASSERT_FALSE(maintenance2);
+    ASSERT_FALSE(maintenance3);
+    ASSERT_FALSE(maintenance4);
+}

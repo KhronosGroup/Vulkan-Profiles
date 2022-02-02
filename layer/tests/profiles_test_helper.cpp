@@ -135,6 +135,15 @@ void profiles_test::setProfilesFailOnError(bool fail) {
     profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DEBUG_FAIL_ON_ERROR", fail ? "true" : "false");
 }
 
+void profiles_test::setDisableExtensions(const std::vector<std::string>& extensions) {
+    std::string combined = {};
+    for (const auto& ext : extensions) {
+        if (!combined.empty()) combined += ';';
+        combined += ext;
+    }
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DISABLE_EXTENSIONS", combined.c_str());
+}
+
 VkApplicationInfo profiles_test::GetDefaultApplicationInfo() {
     VkApplicationInfo out{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
     out.apiVersion = VK_API_VERSION_1_1;
