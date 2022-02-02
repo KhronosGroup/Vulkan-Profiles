@@ -171,6 +171,14 @@
                     "default": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
                 },
                 {
+                    "key": "disable_extensions",
+                    "label": "Disable extensions",
+                    "description": "Removes the extensions from being reported by the Vulkan physical device.",
+                    "status": "STABLE",
+                    "type": "EXTENSIONS",
+                    "format": "EXTENSION"
+                },
+                {
                     "key": "debug_actions",
                     "label": "Debug Actions",
                     "description": "This indicates what action is to be taken when a layer wants to report information",
