@@ -226,7 +226,7 @@ TEST(layer, TestExtensionNotSupported) {
     }
 }
 
-TEST(layer, TestDisablingExtensions) {
+TEST(layer, TestExcludingDeviceExtensions) {
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -245,7 +245,7 @@ TEST(layer, TestDisablingExtensions) {
         VK_KHR_MAINTENANCE_3_EXTENSION_NAME,
         VK_KHR_MAINTENANCE_4_EXTENSION_NAME,
     };
-    profiles_test::setDisableExtensions(disable);
+    profiles_test::setExcludeDeviceExtensions(disable);
 
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
@@ -291,4 +291,45 @@ TEST(layer, TestDisablingExtensions) {
     ASSERT_FALSE(maintenance2);
     ASSERT_FALSE(maintenance3);
     ASSERT_FALSE(maintenance4);
+}
+
+TEST(layer, TestExcludingFormats) {
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    const std::string filepath = TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json";
+    profiles_test::setProfilesFilename(filepath);
+    profiles_test::setProfilesProfileName("VP_LUNARG_desktop_portability_2021");
+    profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
+    profiles_test::setProfilesFailOnError(false);
+    std::vector<std::string> disable = {
+        "VK_FORMAT_R8G8B8A8_UNORM",
+    };
+    profiles_test::setExcludeFormats(disable);
+
+    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+
+    err = inst_builder.makeInstance();
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkInstance test_inst = inst_builder.getInstance();
+
+    VkPhysicalDevice gpu;
+    err = inst_builder.getPhysicalDevice(&gpu);
+    if (err != VK_SUCCESS) {
+        printf("Profile not supported on device, skipping test.\n");
+        vkDestroyInstance(test_inst, nullptr);
+        return;
+    }
+
+    VkFormatProperties format_properties = {};
+    vkGetPhysicalDeviceFormatProperties(gpu, VK_FORMAT_R8G8B8A8_UNORM, &format_properties);
+
+    ASSERT_EQ(format_properties.linearTilingFeatures, 0);
+    ASSERT_EQ(format_properties.optimalTilingFeatures, 0);
+    ASSERT_EQ(format_properties.bufferFeatures, 0);
 }

@@ -135,13 +135,22 @@ void profiles_test::setProfilesFailOnError(bool fail) {
     profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DEBUG_FAIL_ON_ERROR", fail ? "true" : "false");
 }
 
-void profiles_test::setDisableExtensions(const std::vector<std::string>& extensions) {
+void profiles_test::setExcludeDeviceExtensions(const std::vector<std::string>& extensions) {
     std::string combined = {};
     for (const auto& ext : extensions) {
         if (!combined.empty()) combined += ';';
         combined += ext;
     }
-    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_DISABLE_EXTENSIONS", combined.c_str());
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EXCLUDE_DEVICE_EXTENSIONS", combined.c_str());
+}
+
+void profiles_test::setExcludeFormats(const std::vector<std::string>& formats) {
+    std::string combined = {};
+    for (const auto& format : formats) {
+        if (!combined.empty()) combined += ';';
+        combined += format;
+    }
+    profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EXCLUDE_FORMATS", combined.c_str());
 }
 
 VkApplicationInfo profiles_test::GetDefaultApplicationInfo() {
