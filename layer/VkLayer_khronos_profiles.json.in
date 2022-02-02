@@ -171,12 +171,12 @@
                     "default": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
                 },
                 {
-                    "key": "disable_extensions",
-                    "label": "Disable extensions",
+                    "key": "exclude_extensions",
+                    "label": "Exclude Extensions",
                     "description": "Removes the extensions from being reported by the Vulkan physical device.",
                     "status": "STABLE",
-                    "type": "EXTENSIONS",
-                    "format": "EXTENSION"
+                    "type": "LIST",
+                    "default": []
                 },
                 {
                     "key": "debug_actions",
