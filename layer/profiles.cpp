@@ -3992,11 +3992,11 @@ struct JsonValidator {
 
     bool Init() {
 #ifdef __APPLE__
-        std::string schema_path = "/usr/local/share/vulkan/registry/profile_schema.json";
+        const std::string schema_path = "/usr/local/share/vulkan/registry/profile_schema.json";
 #else
         const char *sdk_path = std::getenv("VULKAN_SDK");
         if (sdk_path == nullptr) return false;
-        std::string schema_path = std::string(sdk_path) + "/share/vulkan/registry/profile_schema.json";
+        const std::string schema_path = std::string(sdk_path) + "/share/vulkan/registry/profile_schema.json";
 #endif
 
         if (!schema) {
@@ -4012,13 +4012,13 @@ struct JsonValidator {
             parser.populateSchema(schema_adapter, *schema);
         }
 
-        return true;
+        return schema.get() != nullptr;
     }
 
     bool Check(const Json::Value &json_document) {
         assert(!json_document.empty());
 
-        if (schema.get() == nullptr) return false;
+        if (schema.get() == nullptr) return true;
 
         Validator validator(Validator::kWeakTypes);
         JsonCppAdapter document_adapter(json_document);
@@ -6916,7 +6916,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Fea
 static void InitSettings() {
     layer_settings.profile_file.clear();
     layer_settings.profile_name.clear();
-    layer_settings.profile_validation = true;
+    layer_settings.profile_validation = false;
     layer_settings.emulate_portability = true;
     layer_settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT;
     layer_settings.debug_actions = DEBUG_ACTION_STDOUT_BIT;
