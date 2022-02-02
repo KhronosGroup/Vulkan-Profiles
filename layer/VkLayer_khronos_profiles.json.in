@@ -197,8 +197,7 @@
                         "VK_FORMAT_R8_SNORM",
                         "VK_FORMAT_R8_USCALED",
                         "VK_FORMAT_R8_SSCALED",
-                        "VK_FORMAT_R8_UINT",
-
+                        "VK_FORMAT_R8_UINT"
                     ],
                     "default": []
                 },
