@@ -179,6 +179,14 @@
                     "default": []
                 },
                 {
+                    "key": "exclude_formats",
+                    "label": "Exclude Formats",
+                    "description": "Removes the format feature flags from being reported by the Vulkan physical device.",
+                    "status": "STABLE",
+                    "type": "LIST",
+                    "default": []
+                },
+                {
                     "key": "debug_actions",
                     "label": "Debug Actions",
                     "description": "This indicates what action is to be taken when a layer wants to report information",
