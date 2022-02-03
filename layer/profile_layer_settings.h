@@ -21,7 +21,7 @@
 #include <string>
 #include "vulkan/vulkan.h"
 #include "profiles.h"
-#include "../layer_utils/vk_layer_settings.h"
+#include "../layer-utils/vk_layer_settings.h"
 
 static const VkStructureType VK_STRUCTURE_TYPE_PROFILES_LAYER_SETTINGS_EXT = static_cast<VkStructureType>(3000300005);
 

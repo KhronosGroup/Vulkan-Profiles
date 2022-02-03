@@ -6973,9 +6973,10 @@ static void InitSettings(const void *pnext) {
         layer_settings.profile_file = settings->profile_file;
         layer_settings.profile_name = settings->profile_name;
         layer_settings.profile_validation = settings->profile_validation;
-        layer_settings.profile_validation = settings->profile_validation;
         layer_settings.simulate_capabilities = settings->simulate_capabilities;
         layer_settings.debug_fail_on_error = settings->debug_fail_on_error;
+        layer_settings.exclude_device_extensions = settings->exclude_device_extensions;
+        layer_settings.exclude_formats = settings->exclude_formats;
     } else {
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileFile)) {
@@ -7001,6 +7002,22 @@ static void InitSettings(const void *pnext) {
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugFailOnError)) {
             layer_settings.debug_fail_on_error = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDebugFailOnError);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeDeviceExtensions)) {
+            layer_settings.exclude_device_extensions = vku::GetLayerSettingList(kOurLayerName, kLayerSettingsExcludeDeviceExtensions);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeFormats)) {
+            layer_settings.exclude_formats = vku::GetLayerSettingList(kOurLayerName, kLayerSettingsExcludeFormats);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeDeviceExtensions)) {
+            layer_settings.exclude_device_extensions = vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsExcludeDeviceExtensions);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeFormats)) {
+            layer_settings.exclude_formats = vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsExcludeFormats);
         }
     }
 
@@ -7033,14 +7050,6 @@ static void InitSettings(const void *pnext) {
         }
     } else {
         LogMessage(DEBUG_REPORT_DEBUG_BIT, format("No need to open the log file %s\n", layer_settings.debug_filename.c_str()));
-    }
-
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeDeviceExtensions)) {
-        layer_settings.exclude_device_extensions = vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsExcludeDeviceExtensions);
-    }
-
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeFormats)) {
-        layer_settings.exclude_formats = vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsExcludeFormats);
     }
 
     const std::string simulation_capabilities_log = GetSimulateCapabilitiesLog(layer_settings.simulate_capabilities);
