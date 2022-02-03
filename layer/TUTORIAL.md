@@ -178,6 +178,22 @@ Enabled failing if an error occurs.
 
 Enabled reports level.
 
+#### Exclude device extensions
+- Environment Variable: `VK_KHRONOS_PROFILES_EXCLUDE_DEVICE_EXTENSIONS`
+- `vk_layer_settings.txt` Option: `khronos_profiles.exclude_device_extensions`
+- Android Option: `debug.vulkan.khronos_profiles.exclude_device_extensions`
+- Default Value: Not set
+
+Removes device extensions from being reported by the Vulkan physical device.
+
+#### Exclude formats
+- Environment Variable: `VK_KHRONOS_PROFILES_EXCLUDE_FORMATS`
+- `vk_layer_settings.txt` Option: `khronos_profiles.exclude_formats`
+- Android Option: `debug.vulkan.khronos_profiles.exclude_formats`
+- Default Value: Not set
+
+Removes image formats from being reported as supported by the Vulkan physical device.
+
 **Note:** Environment variables take precedence over `vk_layer_settings.txt` options.
 
 ### Example using the Profiles layer using Linux environment variables
