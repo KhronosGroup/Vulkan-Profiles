@@ -17,6 +17,8 @@
  * Author: Mark Lobodzinski <mark@lunarg.com>
  */
 
+#pragma once
+
 enum SimulateCapabilityFlag {
     SIMULATE_API_VERSION_BIT = 1 << 0,
     SIMULATE_FEATURES_BIT = 1 << 1,
