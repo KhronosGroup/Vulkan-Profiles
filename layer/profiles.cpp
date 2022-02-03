@@ -66,6 +66,7 @@
 #include <vk_layer_config.h>
 #include "vk_layer_table.h"
 #include "vk_layer_settings.h"
+#include "profile_layer_settings.h"
 #include "profiles.h"
 
 using valijson::Schema;
@@ -6920,6 +6921,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Fea
 #undef GET_VALUE
 #undef GET_ARRAY
 
+
 std::string GetString(const vku::List& list) {
     std::string result;
     for (std::size_t i = 0, n = list.size(); i < n; ++i) {
@@ -6938,7 +6940,21 @@ std::string GetString(const vku::Strings& strings) {
     return result;
 }
 
-static void InitSettings() {
+const VkProfileLayerSettingsEXT *FindSettingsInChain(const void *next) {
+    const VkBaseOutStructure *current = reinterpret_cast<const VkBaseOutStructure *>(next);
+    const VkProfileLayerSettingsEXT *found = nullptr;
+    while (current) {
+        if (VK_STRUCTURE_TYPE_PROFILES_LAYER_SETTINGS_EXT == static_cast<uint32_t>(current->sType)) {
+            found = reinterpret_cast<const VkProfileLayerSettingsEXT *>(current);
+            current = nullptr;
+        } else {
+            current = current->pNext;
+        }
+    }
+    return found;
+}
+
+static void InitSettings(const void *pnext) {
     layer_settings.profile_file.clear();
     layer_settings.profile_name.clear();
     layer_settings.profile_validation = false;
@@ -6952,25 +6968,41 @@ static void InitSettings() {
     layer_settings.exclude_device_extensions.clear();
     layer_settings.exclude_formats.clear();
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileFile)) {
-        layer_settings.profile_file = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileFile);
-    }
+    const VkProfileLayerSettingsEXT *settings;
+    // Programmatically specified settings override ENV vars or layer settings file settings
+    if ((pnext) && (settings = FindSettingsInChain(pnext))) {
+        layer_settings.profile_file = settings->profile_file;
+        layer_settings.profile_name = settings->profile_name;
+        layer_settings.profile_validation = settings->profile_validation;
+        layer_settings.profile_validation = settings->profile_validation;
+        layer_settings.simulate_capabilities = settings->simulate_capabilities;
+        layer_settings.debug_fail_on_error = settings->debug_fail_on_error;
+    } else {
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileName)) {
-        layer_settings.profile_name = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileName);
-    }
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileFile)) {
+            layer_settings.profile_file = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileFile);
+        }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileValidation)) {
-        layer_settings.profile_validation = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsProfileValidation);
-    }
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileName)) {
+            layer_settings.profile_name = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileName);
+        }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsEmulatePortability)) {
-        layer_settings.emulate_portability = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsEmulatePortability);
-    }
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileValidation)) {
+            layer_settings.profile_validation = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsProfileValidation);
+        }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsSimulateCapabilities)) {
-        layer_settings.simulate_capabilities =
-            GetSimulateCapabilityFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsSimulateCapabilities));
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsEmulatePortability)) {
+            layer_settings.emulate_portability = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsEmulatePortability);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsSimulateCapabilities)) {
+            layer_settings.simulate_capabilities =
+                GetSimulateCapabilityFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsSimulateCapabilities));
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugFailOnError)) {
+            layer_settings.debug_fail_on_error = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDebugFailOnError);
+        }
     }
 
     if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugActions)) {
@@ -6989,9 +7021,6 @@ static void InitSettings() {
         layer_settings.debug_reports = GetDebugReportFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsDebugReports));
     }
 
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugFailOnError)) {
-        layer_settings.debug_fail_on_error = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDebugFailOnError);
-    }
 
     if (layer_settings.debug_actions & DEBUG_ACTION_FILE_BIT && profiles_log_file == nullptr) {
         profiles_log_file = fopen(layer_settings.debug_filename.c_str(), layer_settings.debug_file_discard ? "w" : "w+");
@@ -7039,7 +7068,7 @@ static void InitSettings() {
 // Generic layer dispatch table setup, see [LALI].
 static VkResult LayerSetupCreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
                                          VkInstance *pInstance) {
-    InitSettings();
+    InitSettings(pCreateInfo->pNext);
 
     VkLayerInstanceCreateInfo *chain_info = get_chain_info(pCreateInfo, VK_LAYER_LINK_INFO);
     assert(chain_info->u.pLayerInfo);
