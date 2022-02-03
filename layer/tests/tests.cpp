@@ -46,13 +46,14 @@ TEST(layer, TestSetCombinationMode) {
 
     {
         inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-        const std::string filepath = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_api.json";
-        profiles_test::setProfilesFilename(filepath);
-        profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
-        profiles_test::setProfilesProfileName("VP_LUNARG_test_api");
-        profiles_test::setProfilesSimulateCapabilities(0);
 
-        err = inst_builder.makeInstance();
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_api.json";
+        settings.emulate_portability = true;
+        settings.profile_name = "VP_LUNARG_test_api";
+        settings.simulate_capabilities = 0;
+
+        err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkInstance test_inst = inst_builder.getInstance();
@@ -90,14 +91,14 @@ TEST(layer, TestSetCombinationMode) {
 
     {
         inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-        const std::string filepath = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_api.json";
-        profiles_test::setProfilesFilename(filepath);
-        profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
-        profiles_test::setProfilesProfileName("VP_LUNARG_test_api_1_2_198");
-        profiles_test::setProfilesSimulateCapabilities(SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT);
-        profiles_test::setProfilesFailOnError(false);
 
-        err = inst_builder.makeInstance();
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_api.json";
+        settings.emulate_portability = true;
+        settings.profile_name = "VP_LUNARG_test_api_1_2_198";
+        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT;
+
+        err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkInstance test_inst = inst_builder.getInstance();
@@ -135,14 +136,14 @@ TEST(layer, TestSetCombinationMode) {
 
     {
         inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-        const std::string filepath = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_api.json";
-        profiles_test::setProfilesFilename(filepath);
-        profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
-        profiles_test::setProfilesProfileName("VP_LUNARG_test_api");
-        profiles_test::setProfilesSimulateCapabilities(SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT);
-        profiles_test::setProfilesFailOnError(false);
 
-        err = inst_builder.makeInstance();
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_api.json";
+        settings.emulate_portability = true;
+        settings.profile_name = "VP_LUNARG_test_api";
+        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT;
+
+        err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkInstance test_inst = inst_builder.getInstance();
@@ -170,6 +171,7 @@ TEST(layer, TestSetCombinationMode) {
         vkDestroyInstance(test_inst, nullptr);
         inst_builder.reset();
     }
+
 }
 
 TEST(layer, TestExtensionNotSupported) {
@@ -202,14 +204,15 @@ TEST(layer, TestExtensionNotSupported) {
 
     {
         inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-        const std::string filepath = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_api.json";
-        profiles_test::setProfilesFilename(filepath);
-        profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
-        profiles_test::setProfilesProfileName("VP_LUNARG_test_api");
-        profiles_test::setProfilesSimulateCapabilities(SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT);
-        profiles_test::setProfilesFailOnError(true);
 
-        err = inst_builder.makeInstance();
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_api.json";
+        settings.emulate_portability = true;
+        settings.profile_name = "VP_LUNARG_test_api";
+        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT;
+        settings.debug_fail_on_error = true;
+
+        err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkInstance test_inst = inst_builder.getInstance();
@@ -234,22 +237,20 @@ TEST(layer, TestExcludingDeviceExtensions) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    const std::string filepath = TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json";
-    profiles_test::setProfilesFilename(filepath);
-    profiles_test::setProfilesProfileName("VP_LUNARG_desktop_portability_2021");
-    profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
-    profiles_test::setProfilesFailOnError(false);
-    std::vector<std::string> disable = {
+    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+
+    VkProfileLayerSettingsEXT settings;
+    settings.profile_file = TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json";
+    settings.profile_name = "VP_LUNARG_desktop_portability_2021";
+    settings.emulate_portability = true;
+    settings.debug_fail_on_error = false;
+    settings.exclude_device_extensions = {
         VK_KHR_MAINTENANCE_1_EXTENSION_NAME,
         VK_KHR_MAINTENANCE_2_EXTENSION_NAME,
         VK_KHR_MAINTENANCE_3_EXTENSION_NAME,
-        VK_KHR_MAINTENANCE_4_EXTENSION_NAME,
-    };
-    profiles_test::setExcludeDeviceExtensions(disable);
+        VK_KHR_MAINTENANCE_4_EXTENSION_NAME};
 
-    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-
-    err = inst_builder.makeInstance();
+    err = inst_builder.makeInstance(&settings);
     ASSERT_EQ(err, VK_SUCCESS);
 
     VkInstance test_inst = inst_builder.getInstance();
@@ -301,20 +302,16 @@ TEST(layer, TestExcludingFormats) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    const std::string filepath = TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json";
-    profiles_test::setProfilesFilename(filepath);
-    profiles_test::setProfilesProfileName("VP_LUNARG_desktop_portability_2021");
-    profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
-    profiles_test::setProfilesFailOnError(false);
-    std::vector<std::string> disable = {
-        "VK_FORMAT_R8G8B8A8_UNORM",
-    };
-    profiles_test::setExcludeFormats(disable);
-
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
-    err = inst_builder.makeInstance();
-    ASSERT_EQ(err, VK_SUCCESS);
+    VkProfileLayerSettingsEXT settings;
+    settings.profile_file = TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json";
+    settings.profile_name = "VP_LUNARG_desktop_portability_2021";
+    settings.emulate_portability = true;
+    settings.debug_fail_on_error = false;
+    settings.exclude_formats = {"VK_FORMAT_R8G8B8A8_UNORM"};
+
+    err = inst_builder.makeInstance(&settings);    ASSERT_EQ(err, VK_SUCCESS);
 
     VkInstance test_inst = inst_builder.getInstance();
 
@@ -343,16 +340,17 @@ TEST(layer, TestMissingPhysDevProps2) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    const std::string filepath = TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json";
-    profiles_test::setProfilesFilename(filepath);
-    profiles_test::setProfilesProfileName("VP_LUNARG_desktop_portability_2021");
-    profiles_test::setProfilesEmulatePortabilitySubsetExtension(false);
-    profiles_test::setProfilesFailOnError(false);
-    profiles_test::setProfilesSimulateAllCapabilities();
-
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
     inst_builder.setApiVersion(VK_API_VERSION_1_0);
-    err = inst_builder.makeInstance();
+
+    VkProfileLayerSettingsEXT settings;
+    settings.profile_file = TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json";
+    settings.profile_name = "VP_LUNARG_desktop_portability_2021";
+    settings.emulate_portability = false;
+    settings.debug_fail_on_error = false;
+    settings.simulate_capabilities = SIMULATE_ALL_CAPABILITIES;
+
+    err = inst_builder.makeInstance(&settings);    ASSERT_EQ(err, VK_SUCCESS);
 
     VkPhysicalDevice gpu;
     err = inst_builder.getPhysicalDevice(&gpu);
