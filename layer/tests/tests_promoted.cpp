@@ -49,14 +49,14 @@ struct TestInit {
         const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
         profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
-        const std::string filepath = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_promoted_api.json";
-        profiles_test::setProfilesFilename(filepath);
-        profiles_test::setProfilesProfileName("VP_LUNARG_test_api");
-        profiles_test::setProfilesSimulateAllCapabilities();
-
         inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
-        err = inst_builder.makeInstance();
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_promoted_api.json";
+        settings.profile_name = "VP_LUNARG_test_api";
+        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
+
+        err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         this->instance = inst_builder.getInstance();
