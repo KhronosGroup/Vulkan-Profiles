@@ -196,6 +196,13 @@ VkResult profiles_test::VulkanInstanceBuilder::makeInstance() {
     return vkCreateInstance(&_inst_create_info, nullptr, &_instance);
 }
 
+VkResult profiles_test::VulkanInstanceBuilder::makeInstance(void* pnext) {
+    _inst_create_info.pNext = pnext;
+    makeInstance();
+
+    return vkCreateInstance(&_inst_create_info, nullptr, &_instance);
+}
+
 void profiles_test::VulkanInstanceBuilder::reset() {
     _app_info = GetDefaultApplicationInfo();
     _inst_create_info = { VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
