@@ -21,16 +21,15 @@ TEST(layer, TestDesktopPortability2022Limits) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    const std::string filepath = TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json";
-    profiles_test::setProfilesFilename(filepath);
-    profiles_test::setProfilesProfileName("VP_LUNARG_desktop_portability_2021");
-    profiles_test::setProfilesEmulatePortabilitySubsetExtension(true);
-    profiles_test::setProfilesFailOnError(false);
-    profiles_test::setProfilesSimulateAllCapabilities();
-
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
-    err = inst_builder.makeInstance();
+    VkProfileLayerSettingsEXT settings;
+    settings.profile_file = TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json";
+    settings.emulate_portability = true;
+    settings.profile_name = "VP_LUNARG_desktop_portability_2021";
+    settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
+
+    err = inst_builder.makeInstance(&settings);
     ASSERT_EQ(err, VK_SUCCESS);
 
     VkInstance test_inst = inst_builder.getInstance();
