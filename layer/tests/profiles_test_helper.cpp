@@ -198,9 +198,8 @@ VkResult profiles_test::VulkanInstanceBuilder::makeInstance() {
 
 VkResult profiles_test::VulkanInstanceBuilder::makeInstance(void* pnext) {
     _inst_create_info.pNext = pnext;
-    makeInstance();
 
-    return vkCreateInstance(&_inst_create_info, nullptr, &_instance);
+    return makeInstance();
 }
 
 void profiles_test::VulkanInstanceBuilder::reset() {
