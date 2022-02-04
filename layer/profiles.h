@@ -124,4 +124,6 @@ typedef struct VkProfileLayerSettingsEXT {
     bool debug_file_discard{true};
     DebugReportFlags debug_reports{DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_ERROR_BIT};
     bool debug_fail_on_error{false};
+    vku::Strings exclude_device_extensions;
+    vku::Strings exclude_formats;
 } VkProfileLayerSettingsEXT;
