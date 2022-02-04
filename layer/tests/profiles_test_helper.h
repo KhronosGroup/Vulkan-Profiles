@@ -23,7 +23,6 @@
 
 #include <vulkan/vulkan.h>
 #include "../profiles.h"
-#include "../profile_layer_settings.h"
 
 namespace profiles_test {
 

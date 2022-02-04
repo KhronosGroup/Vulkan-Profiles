@@ -104,3 +104,24 @@ static DebugReportFlags GetDebugReportFlags(const vku::Strings &values) {
 
     return result;
 }
+
+
+static const VkStructureType VK_STRUCTURE_TYPE_PROFILES_LAYER_SETTINGS_EXT = static_cast<VkStructureType>(3000300005);
+
+typedef struct VkProfileLayerSettingsEXT {
+    VkProfileLayerSettingsEXT()
+    : sType(VK_STRUCTURE_TYPE_PROFILES_LAYER_SETTINGS_EXT) {}
+
+    VkStructureType sType;
+    void* pNext{};
+    std::string profile_file{};
+    std::string profile_name{};
+    bool profile_validation{false};
+    bool emulate_portability{true};
+    SimulateCapabilityFlags simulate_capabilities{SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT};
+    DebugActionFlags debug_actions{DEBUG_ACTION_STDOUT_BIT};
+    std::string debug_filename{"profiles_layer_log.txt"};
+    bool debug_file_discard{true};
+    DebugReportFlags debug_reports{DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_ERROR_BIT};
+    bool debug_fail_on_error{false};
+} VkProfileLayerSettingsEXT;
