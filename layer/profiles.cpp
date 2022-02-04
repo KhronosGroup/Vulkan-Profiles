@@ -6866,21 +6866,8 @@ const VkProfileLayerSettingsEXT *FindSettingsInChain(const void *next) {
 }
 
 static void InitSettings(const void *pnext) {
-    layer_settings->profile_file.clear();
-    layer_settings->profile_name.clear();
-    layer_settings->profile_validation = false;
-    layer_settings->emulate_portability = true;
-    layer_settings->simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT;
-    layer_settings->debug_actions = DEBUG_ACTION_STDOUT_BIT;
-    layer_settings->debug_filename = "profiles_layer_log.txt";
-    layer_settings->debug_file_discard = true;
-    layer_settings->debug_reports = DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_ERROR_BIT;
-    layer_settings->debug_fail_on_error = false;
-    layer_settings->exclude_device_extensions.clear();
-    layer_settings->exclude_formats.clear();
-
     const VkProfileLayerSettingsEXT *user_settings;
-    // Programmatically specified settings override ENV vars or layer settings file settings
+    // Programmatically-specified settings override ENV vars or layer settings file settings
     if ((pnext) && (user_settings = FindSettingsInChain(pnext))) {
         layer_settings->profile_file = user_settings->profile_file;
         layer_settings->profile_name = user_settings->profile_name;
@@ -6894,7 +6881,6 @@ static void InitSettings(const void *pnext) {
         layer_settings->exclude_device_extensions = user_settings->exclude_device_extensions;
         layer_settings->exclude_formats = user_settings->exclude_formats;
     } else {
-
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileFile)) {
             layer_settings->profile_file = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileFile);
         }
@@ -6921,38 +6907,29 @@ static void InitSettings(const void *pnext) {
         }
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeDeviceExtensions)) {
-            layer_settings->exclude_device_extensions = vku::GetLayerSettingList(kOurLayerName, kLayerSettingsExcludeDeviceExtensions);
+            layer_settings->exclude_device_extensions = vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsExcludeDeviceExtensions);
         }
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeFormats)) {
-            layer_settings->exclude_formats = vku::GetLayerSettingList(kOurLayerName, kLayerSettingsExcludeFormats);
+            layer_settings->exclude_formats = vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsExcludeFormats);
         }
 
-        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeDeviceExtensions)) {
-            layer_settings.exclude_device_extensions = vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsExcludeDeviceExtensions);
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugActions)) {
+            layer_settings->debug_actions = GetDebugActionFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsDebugActions));
         }
 
-        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeFormats)) {
-            layer_settings.exclude_formats = vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsExcludeFormats);
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugFilename)) {
+            layer_settings->debug_filename = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDebugFilename);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugFileClear)) {
+            layer_settings->debug_file_discard = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDebugFileClear);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugReports)) {
+            layer_settings->debug_reports = GetDebugReportFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsDebugReports));
         }
     }
-
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugActions)) {
-        layer_settings->debug_actions = GetDebugActionFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsDebugActions));
-    }
-
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugFilename)) {
-        layer_settings->debug_filename = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDebugFilename);
-    }
-
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugFileClear)) {
-        layer_settings->debug_file_discard = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDebugFileClear);
-    }
-
-    if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugReports)) {
-        layer_settings->debug_reports = GetDebugReportFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsDebugReports));
-    }
-
 
     if (layer_settings->debug_actions & DEBUG_ACTION_FILE_BIT && profiles_log_file == nullptr) {
         profiles_log_file = fopen(layer_settings->debug_filename.c_str(), layer_settings->debug_file_discard ? "w" : "w+");
@@ -6973,6 +6950,9 @@ static void InitSettings(const void *pnext) {
     const std::string debug_reports_log = GetDebugReportsLog(layer_settings->debug_reports);
 
     std::string settings_log;
+    if (user_settings) {
+        settings_log += format("NOTE: Settings originate from a user-supplied settings structure: environment variables and layer settings file were ignored.\n");
+    }
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileFile, layer_settings->profile_file.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileName, layer_settings->profile_name.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileValidation, layer_settings->profile_validation ? "true" : "false");
