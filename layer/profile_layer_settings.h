@@ -33,14 +33,14 @@ typedef struct VkProfileLayerSettingsEXT {
     void* pNext{};
     std::string profile_file{};
     std::string profile_name{};
-    bool profile_validation{};
-    bool emulate_portability{};
-    SimulateCapabilityFlags simulate_capabilities{};
-    // VK_KHRONOS_PROFILES_DEBUG_ACTIONS
-    // VK_KHRONOS_PROFILES_DEBUG_FILENAME
-    // VK_KHRONOS_PROFILES_DEBUG_FILE_DISCARD
-    bool debug_fail_on_error{};
-    // VK_KHRONOS_PROFILES_DEBUG_REPORTS
+    bool profile_validation{false};
+    bool emulate_portability{true};
+    SimulateCapabilityFlags simulate_capabilities{SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT};
+    // VK_KHRONOS_PROFILES_DEBUG_ACTIONS  -- default is DEBUG_ACTION_STDOUT_BIT
+    // VK_KHRONOS_PROFILES_DEBUG_FILENAME -- default is profiles_layer_log.txt
+    // VK_KHRONOS_PROFILES_DEBUG_FILE_DISCARD -- default is DEBUG_FILE_DISCARD
+    bool debug_fail_on_error{false};
+    // VK_KHRONOS_PROFILES_DEBUG_REPORTS -- default is not set
     vku::Strings exclude_device_extensions;
     vku::Strings exclude_formats;
 } VkProfileLayerSettingsEXT;
