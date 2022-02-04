@@ -6870,17 +6870,7 @@ static void InitSettings(const void *pnext) {
     const VkProfileLayerSettingsEXT *user_settings;
     // Programmatically-specified settings override ENV vars or layer settings file settings
     if ((pnext) && (user_settings = FindSettingsInChain(pnext))) {
-        layer_settings->profile_file = user_settings->profile_file;
-        layer_settings->profile_name = user_settings->profile_name;
-        layer_settings->profile_validation = user_settings->profile_validation;
-        layer_settings->simulate_capabilities = user_settings->simulate_capabilities;
-        layer_settings->debug_actions = user_settings->debug_actions;
-        layer_settings->debug_filename = user_settings->debug_filename;
-        layer_settings->debug_file_discard = user_settings->debug_file_discard;
-        layer_settings->debug_reports = user_settings->debug_reports;
-        layer_settings->debug_fail_on_error = user_settings->debug_fail_on_error;
-        layer_settings->exclude_device_extensions = user_settings->exclude_device_extensions;
-        layer_settings->exclude_formats = user_settings->exclude_formats;
+        *layer_settings = *user_settings;
     } else {
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileFile)) {
             layer_settings->profile_file = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileFile);
@@ -6952,7 +6942,8 @@ static void InitSettings(const void *pnext) {
 
     std::string settings_log;
     if (user_settings) {
-        settings_log += format("NOTE: Settings originate from a user-supplied settings structure: environment variables and layer settings file were ignored.\n");
+        settings_log += format("NOTE: Settings originate from a user-supplied settings structure: environment variables and "
+                               "layer settings file were ignored.\n");
     }
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileFile, layer_settings->profile_file.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileName, layer_settings->profile_name.c_str());
