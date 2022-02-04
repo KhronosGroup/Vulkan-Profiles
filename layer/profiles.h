@@ -18,6 +18,7 @@
  */
 
 #pragma once
+#include "vk_layer_settings.h"
 
 enum SimulateCapabilityFlag {
     SIMULATE_API_VERSION_BIT = 1 << 0,
@@ -29,3 +30,77 @@ enum SimulateCapabilityFlag {
     SIMULATE_ALL_CAPABILITIES = 0xFFFFFFFF
 };
 typedef int SimulateCapabilityFlags;
+
+enum DebugAction {
+    DEBUG_ACTION_FILE_BIT = (1 << 0),
+    DEBUG_ACTION_STDOUT_BIT = (1 << 1),
+    DEBUG_ACTION_OUTPUT_BIT = (1 << 2),
+    DEBUG_ACTION_BREAKPOINT_BIT = (1 << 3)
+};
+typedef int DebugActionFlags;
+
+static DebugActionFlags GetDebugActionFlags(const vku::Strings &values) {
+    DebugActionFlags result = 0;
+
+    for (std::size_t i = 0, n = values.size(); i < n; ++i) {
+        if (values[i] == "DEBUG_ACTION_FILE_BIT") {
+            result |= DEBUG_ACTION_FILE_BIT;
+        } else if (values[i] == "DEBUG_ACTION_STDOUT_BIT") {
+            result |= DEBUG_ACTION_STDOUT_BIT;
+        } else if (values[i] == "DEBUG_ACTION_OUTPUT_BIT") {
+            result |= DEBUG_ACTION_OUTPUT_BIT;
+        } else if (values[i] == "DEBUG_ACTION_BREAKPOINT_BIT") {
+            result |= DEBUG_ACTION_BREAKPOINT_BIT;
+        }
+    }
+
+    return result;
+}
+
+static std::string GetDebugActionsLog(DebugActionFlags flags) {
+    std::string result = {};
+
+    if (flags & DEBUG_ACTION_FILE_BIT) {
+        result += "DEBUG_ACTION_FILE_BIT";
+    }
+    if (flags & DEBUG_ACTION_STDOUT_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "DEBUG_ACTION_STDOUT_BIT";
+    }
+    if (flags & DEBUG_ACTION_OUTPUT_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "DEBUG_ACTION_OUTPUT_BIT";
+    }
+    if (flags & DEBUG_ACTION_BREAKPOINT_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "DEBUG_ACTION_BREAKPOINT_BIT";
+    }
+
+    return result;
+}
+
+enum DebugReport {
+    DEBUG_REPORT_NOTIFICATION_BIT = (1 << 0),
+    DEBUG_REPORT_WARNING_BIT = (1 << 1),
+    DEBUG_REPORT_ERROR_BIT = (1 << 2),
+    DEBUG_REPORT_DEBUG_BIT = (1 << 3)
+};
+typedef int DebugReportFlags;
+
+static DebugReportFlags GetDebugReportFlags(const vku::Strings &values) {
+    DebugReportFlags result = 0;
+
+    for (std::size_t i = 0, n = values.size(); i < n; ++i) {
+        if (values[i] == "DEBUG_REPORT_NOTIFICATION_BIT") {
+            result |= DEBUG_REPORT_NOTIFICATION_BIT;
+        } else if (values[i] == "DEBUG_REPORT_WARNING_BIT") {
+            result |= DEBUG_REPORT_WARNING_BIT;
+        } else if (values[i] == "DEBUG_REPORT_ERROR_BIT") {
+            result |= DEBUG_REPORT_ERROR_BIT;
+        } else if (values[i] == "DEBUG_REPORT_DEBUG_BIT") {
+            result |= DEBUG_REPORT_DEBUG_BIT;
+        }
+    }
+
+    return result;
+}
