@@ -66,7 +66,6 @@
 #include <vk_layer_config.h>
 #include "vk_layer_table.h"
 #include "vk_layer_settings.h"
-#include "profile_layer_settings.h"
 #include "profiles.h"
 
 using valijson::Schema;
