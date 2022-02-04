@@ -19,10 +19,14 @@ function(LayerTest NAME)
     if(ANDROID)
         # Android executables generally need these libraries.
         target_link_libraries(${TEST_NAME} log android dl vulkan)
+        target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="/sdcard/Android/data/com.example.VulkanProfilesLayerTests/files/")
     else()
         # Everyone else links to the built loader.
         target_link_libraries(${TEST_NAME} Vulkan::Vulkan)
+        target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="${CMAKE_BINARY_DIR}/profiles/test/")
     endif()
+
+    # TODO: Remove after all tests have been converted to new definition
     target_compile_definitions(${TEST_NAME} PUBLIC TEST_SOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
     target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="${CMAKE_BINARY_DIR}/")
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
