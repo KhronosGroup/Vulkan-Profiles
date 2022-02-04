@@ -3629,69 +3629,59 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
     (*dest3)[format] = profile_properties_3;
 
     if (IsASTCHDRFormat(format) && !device_has_astc_hdr) {
-        // We already notified that ASTC HDR is not supported, no spaming
-        return layer_settings.debug_fail_on_error ? false : true;
+        // We already notified that ASTC HDR is not supported, no spamming
+        return false;
     }
     if (IsASTCFormat(format) && !device_has_astc) {
-        // We already notified that ASTC is not supported, no spaming
-        return layer_settings.debug_fail_on_error ? false : true;
+        // We already notified that ASTC is not supported, no spamming
+        return false;
     }
     if (IsETC2Format(format) && !device_has_etc2) {
-        // We already notified that ETC2 is not supported, no spaming
-        return layer_settings.debug_fail_on_error ? false : true;
+        // We already notified that ETC2 is not supported, no spamming
+        return false;
     }
     if (IsBCFormat(format) && !device_has_bc) {
-        // We already notified that BC is not supported, no spaming
-        return layer_settings.debug_fail_on_error ? false : true;
+        // We already notified that BC is not supported, no spamming
+        return false;
     }
+
+    bool valid = true;
 
     const VkFormatProperties &device_properties = pdd_.device_formats_[format];
     if (!HasFlags(device_properties.linearTilingFeatures, profile_properties.linearTilingFeatures)) {
         WarnMissingFormatFeatures(format_name, "linearTilingFeatures", profile_properties.linearTilingFeatures,
                                   device_properties.linearTilingFeatures);
-        if (layer_settings.debug_fail_on_error) {
-            return false;
-        }
+        valid = false;
     }
     if (!HasFlags(device_properties.optimalTilingFeatures, profile_properties.optimalTilingFeatures)) {
         WarnMissingFormatFeatures(format_name, "optimalTilingFeatures", profile_properties.optimalTilingFeatures,
                                   device_properties.optimalTilingFeatures);
-        if (layer_settings.debug_fail_on_error) {
-            return false;
-        }
+        valid = false;
     }
     if (!HasFlags(device_properties.bufferFeatures, profile_properties.bufferFeatures)) {
         WarnMissingFormatFeatures(format_name, "bufferFeatures", profile_properties.bufferFeatures,
                                   device_properties.bufferFeatures);
-        if (layer_settings.debug_fail_on_error) {
-            return false;
-        }
+        valid = false;
     }
 
     const VkFormatProperties3 &device_properties_3 = pdd_.device_formats_3_[format];
     if (!HasFlags(device_properties_3.linearTilingFeatures, profile_properties_3.linearTilingFeatures)) {
         WarnMissingFormatFeatures2(format_name, "linearTilingFeatures", profile_properties_3.linearTilingFeatures,
                                    device_properties_3.linearTilingFeatures);
-        if (layer_settings.debug_fail_on_error) {
-            return false;
-        }
+        valid = false;
     }
     if (!HasFlags(device_properties_3.optimalTilingFeatures, profile_properties_3.optimalTilingFeatures)) {
         WarnMissingFormatFeatures2(format_name, "optimalTilingFeatures", profile_properties_3.optimalTilingFeatures,
                                    device_properties_3.optimalTilingFeatures);
-        if (layer_settings.debug_fail_on_error) {
-            return false;
-        }
+        valid = false;
     }
     if (!HasFlags(device_properties_3.bufferFeatures, profile_properties_3.bufferFeatures)) {
         WarnMissingFormatFeatures2(format_name, "bufferFeatures", profile_properties_3.bufferFeatures,
                                    device_properties_3.bufferFeatures);
-        if (layer_settings.debug_fail_on_error) {
-            return false;
-        }
+        valid = false;
     }
 
-    return true;
+    return valid;
 }
 
 bool JsonLoader::CheckExtensionSupport(const char *extension) {
@@ -3824,6 +3814,8 @@ void JsonLoader::AddPromotedExtensions(uint32_t api_version) {
 }
 
 VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities) {
+    bool failed = false;
+
     std::uint32_t properties_api_version = 0;
 
     const auto &caps = root["capabilities"];
@@ -3846,9 +3838,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
                     VK_VERSION_MAJOR(this->profile_api_version), VK_VERSION_MINOR(this->profile_api_version), VK_VERSION_PATCH(this->profile_api_version),
                     VK_VERSION_MAJOR(pdd_.physical_device_properties_.apiVersion), VK_VERSION_MINOR(pdd_.physical_device_properties_.apiVersion), VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)));
 
-            if (layer_settings.debug_fail_on_error) {
-                return VK_ERROR_INITIALIZATION_FAILED;
-            }
+            failed = true;
         }
 
         if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
@@ -3874,8 +3864,8 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
                             break;
                         }
                     }
-                    if (!supported_on_device && layer_settings.debug_fail_on_error) {
-                        return VK_ERROR_INITIALIZATION_FAILED;
+                    if (!supported_on_device) {
+                        failed = true;
                     }
                     pdd_.arrayof_extension_properties_.push_back(extension);
                     if (layer_settings.simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
@@ -3891,8 +3881,8 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
             const auto &features = c["features"];
 
             bool duplicated = !WarnDuplicatedFeature(features);
-            if (duplicated && layer_settings.debug_fail_on_error) {
-                return VK_ERROR_INITIALIZATION_FAILED;
+            if (duplicated) {
+                failed = true;
             }
 
             for (const auto &feature : features.getMemberNames()) {
@@ -3906,16 +3896,16 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
                     pdd_.vulkan_1_3_features_written_ = true;
                 }
                 bool success = GetFeature(features, feature);
-                if (!success && layer_settings.debug_fail_on_error) {
-                    return VK_ERROR_INITIALIZATION_FAILED;
+                if (!success) {
+                    failed = true;
                 }
             }
         }
 
         if (layer_settings.simulate_capabilities & SIMULATE_PROPERTIES_BIT) {
             bool duplicated = !WarnDuplicatedProperty(properties);
-            if (duplicated && layer_settings.debug_fail_on_error) {
-                return VK_ERROR_INITIALIZATION_FAILED;
+            if (duplicated) {
+                failed = true;
             }
 
             if (properties.isMember("VkPhysicalDeviceVulkan11Properties")) {
@@ -3929,8 +3919,8 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
             }
             for (const auto &prop : properties.getMemberNames()) {
                 bool success = GetProperty(properties, prop);
-                if (!success && layer_settings.debug_fail_on_error) {
-                    return VK_ERROR_INITIALIZATION_FAILED;
+                if (!success) {
+                    failed = true;
                 }
             }
         }
@@ -3940,8 +3930,8 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
 
             for (const auto &format : formats.getMemberNames()) {
                 bool success = GetFormat(formats, format, &pdd_.arrayof_format_properties_, &pdd_.arrayof_format_properties_3_);
-                if (!success && layer_settings.debug_fail_on_error) {
-                    return VK_ERROR_INITIALIZATION_FAILED;
+                if (!success) {
+                    failed = true;
                 }
             }
         }
@@ -3961,6 +3951,10 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
             format("VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the device version.\n",
             VK_VERSION_MAJOR(pdd_.physical_device_properties_.apiVersion), VK_VERSION_MINOR(pdd_.physical_device_properties_.apiVersion), VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)));      
+    }
+
+    if (failed && layer_settings.debug_fail_on_error) {
+        return VK_ERROR_INITIALIZATION_FAILED;
     }
 
     return VK_SUCCESS;
