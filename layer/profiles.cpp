@@ -9454,7 +9454,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 VkPhysicalDeviceFeatures2KHR feature_chain = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR};
                 VkPhysicalDeviceMemoryProperties2KHR memory_chain = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2_KHR};
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
                     property_chain.pNext = &(pdd.physical_device_portability_subset_properties_);
                     feature_chain.pNext = &(pdd.physical_device_portability_subset_features_);
                 } else if (layer_settings.emulate_portability) {
@@ -9480,31 +9480,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                         VK_TRUE};
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_8BIT_STORAGE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_8BIT_STORAGE_EXTENSION_NAME)) {
                     pdd.physical_device_8bit_storage_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_8bit_storage_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_16BIT_STORAGE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_16BIT_STORAGE_EXTENSION_NAME)) {
                     pdd.physical_device_16bit_storage_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_16bit_storage_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
                     pdd.physical_device_buffer_device_address_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_buffer_device_address_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)) {
                     pdd.physical_device_depth_stencil_resolve_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_depth_stencil_resolve_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
                     pdd.physical_device_descriptor_indexing_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_descriptor_indexing_properties_);
@@ -9514,25 +9514,25 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_descriptor_indexing_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME)) {
                     pdd.physical_device_host_query_reset_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_host_query_reset_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME)) {
                     pdd.physical_device_imageless_framebuffer_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_imageless_framebuffer_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
                     pdd.physical_device_maintenance_3_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_maintenance_3_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
                     pdd.physical_device_maintenance_4_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_maintenance_4_features_);
@@ -9542,7 +9542,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_maintenance_4_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
                     pdd.physical_device_multiview_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_multiview_properties_);
@@ -9552,57 +9552,55 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_multiview_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME)) {
                     pdd.physical_device_sampler_filter_minmax_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_sampler_filter_minmax_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME)) {
                     pdd.physical_device_sampler_ycbcr_conversion_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_sampler_ycbcr_conversion_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
                     pdd.physical_device_scalar_block_layout_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_scalar_block_layout_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME)) {
                     pdd.physical_device_separate_depth_stencil_layouts_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_separate_depth_stencil_layouts_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME)) {
                     pdd.physical_device_shader_atomic_int64_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_atomic_int64_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
                     pdd.physical_device_float_controls_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_float_controls_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)) {
                     pdd.physical_device_shader_float16_int8_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_float16_int8_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
                     pdd.physical_device_shader_subgroup_extended_types_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_subgroup_extended_types_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
                     pdd.physical_device_timeline_semaphore_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_timeline_semaphore_properties_);
@@ -9612,33 +9610,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_timeline_semaphore_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME)) {
                     pdd.physical_device_uniform_buffer_standard_layout_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_uniform_buffer_standard_layout_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
                     pdd.physical_device_variable_pointers_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_variable_pointers_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME)) {
                     pdd.physical_device_vulkan_memory_model_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_vulkan_memory_model_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
                     pdd.physical_device_zero_initialize_workgroup_memory_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_zero_initialize_workgroup_memory_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
                     pdd.physical_device_acceleration_structure_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_acceleration_structure_features_);
@@ -9648,7 +9644,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_acceleration_structure_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
                     pdd.physical_device_performance_query_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_performance_query_features_);
@@ -9658,38 +9654,37 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_performance_query_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
                     pdd.physical_device_pipeline_executable_properties_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_pipeline_executable_properties_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_PRESENT_ID_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_PRESENT_ID_EXTENSION_NAME)) {
                     pdd.physical_device_present_id_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_present_id_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
                     pdd.physical_device_present_wait_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_present_wait_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
                     pdd.physical_device_push_descriptor_properites_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_push_descriptor_properites_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
                     pdd.physical_device_ray_query_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_ray_query_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
                     pdd.physical_device_ray_tracing_pipeline_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_ray_tracing_pipeline_features_);
@@ -9699,13 +9694,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_ray_tracing_pipeline_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
                     pdd.physical_device_shader_clock_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_clock_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
                     pdd.physical_device_shader_integer_dot_product_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_integer_dot_product_features_);
@@ -9715,45 +9710,43 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_shader_integer_dot_products_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
                     pdd.physical_device_shader_subgroup_uniform_control_flow_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_subgroup_uniform_control_flow_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
                     pdd.physical_device_shader_terminate_invocation_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_terminate_invocation_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)) {
                     pdd.physical_device_synchronization2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_synchronization2_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME)) {
                     pdd.physical_device_workgroup_memory_explicit_layout_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_workgroup_memory_explicit_layout_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
                     pdd.physical_device_4444_formats_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_4444_formats_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME)) {
                     pdd.physical_device_astc_decode_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_astc_decode_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
                     pdd.physical_device_blend_operation_advanced_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_blend_operation_advanced_features_);
@@ -9763,31 +9756,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_blend_operation_advanced_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
                     pdd.physical_device_border_color_swizzle_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_border_color_swizzle_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME)) {
                     pdd.physical_device_color_write_enable_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_color_write_enable_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
                     pdd.physical_device_conditional_rendering_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_conditional_rendering_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
                     pdd.physical_device_conservative_rasterization_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_conservative_rasterization_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
                     pdd.physical_device_custom_border_color_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_custom_border_color_features_);
@@ -9797,43 +9790,43 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_custom_border_color_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
                     pdd.physical_device_depth_clip_enable_features_ext_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_depth_clip_enable_features_ext_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME)) {
                     pdd.physical_device_device_memory_report_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_device_memory_report_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
                     pdd.physical_device_discard_rectangle_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_discard_rectangle_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
                     pdd.physical_device_extended_dynamic_state_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_extended_dynamic_state_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
                     pdd.physical_device_extended_dynamic_state2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_extended_dynamic_state2_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME)) {
                     pdd.physical_device_external_memory_host_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_external_memory_host_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
                     pdd.physical_device_fragment_density_map_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_fragment_density_map_features_);
@@ -9843,31 +9836,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_fragment_density_map_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
                     pdd.physical_device_fragment_shader_interlock_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_fragment_shader_interlock_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
                     pdd.physical_device_global_priority_query_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_global_priority_query_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
                     pdd.physical_device_image_robustness_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_image_robustness_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME)) {
                     pdd.physical_device_index_type_uint8_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_index_type_uint8_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
                     pdd.physical_device_inline_uniform_block_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_inline_uniform_block_features_);
@@ -9877,7 +9870,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_inline_uniform_block_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
                     pdd.physical_device_line_rasterization_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_line_rasterization_features_);
@@ -9887,13 +9880,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_line_rasterization_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME)) {
                     pdd.physical_device_memory_priority_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_memory_priority_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
                     pdd.physical_device_multi_draw_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_multi_draw_features_);
@@ -9903,34 +9896,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_multi_draw_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
                     pdd.physical_device_pageable_device_local_memory_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_pageable_device_local_memory_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
                     pdd.physical_device_pipeline_creation_cache_control_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_pipeline_creation_cache_control_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME)) {
                     pdd.physical_device_primitive_topology_list_restart_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_primitive_topology_list_restart_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
                     pdd.physical_device_private_data_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_private_data_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
                     pdd.physical_device_provoking_vertex_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_provoking_vertex_features_);
@@ -9940,13 +9930,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_provoking_vertex_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME)) {
                     pdd.physical_device_rgba10x6_formats_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_rgba10x6_formats_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
                     pdd.physical_device_robustness_2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_robustness_2_features_);
@@ -9956,38 +9946,37 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_robustness_2_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME)) {
                     pdd.physical_device_sample_locations_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_sample_locations_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME)) {
                     pdd.physical_device_shader_atomic_float_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_atomic_float_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
                     pdd.physical_device_shader_atomic_float2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_atomic_float2_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME)) {
                     pdd.physical_device_shader_demote_to_helper_invocation_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_demote_to_helper_invocation_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME)) {
                     pdd.physical_device_shader_image_atomic_int64_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_image_atomic_int64_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
                     pdd.physical_device_subgroup_size_control_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_subgroup_size_control_features_);
@@ -9997,7 +9986,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_subgroup_size_control_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
                     pdd.physical_device_texel_buffer_alignment_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_texel_buffer_alignment_features_);
@@ -10007,14 +9996,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_texel_buffer_alignment_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
                     pdd.physical_device_texture_compression_astc_hdr_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_texture_compression_astc_hdr_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
                     pdd.physical_device_transform_feedback_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_transform_feedback_features_);
@@ -10024,7 +10012,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_transform_feedback_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
                     pdd.physical_device_vertex_attribute_divisor_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_vertex_attribute_divisor_features_);
@@ -10034,25 +10022,25 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_vertex_attirbute_divisor_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME)) {
                     pdd.physical_device_vertex_input_dynamic_state_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_vertex_input_dynamic_state_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
                     pdd.physical_device_ycbcr_2plane_444_formats_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_ycbcr_2plane_444_formats_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
                     pdd.physical_device_ycbcr_image_arrays_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_ycbcr_image_arrays_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
                     pdd.physical_device_fragment_shading_rate_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_fragment_shading_rate_features_);
@@ -10062,31 +10050,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_fragment_shading_rate_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
                     pdd.physical_device_coherent_memory_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_coherent_memory_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
                     pdd.physical_device_shader_core_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_shader_core_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME)) {
                     pdd.physical_device_shader_core_properties_2_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_shader_core_properties_2_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
                     pdd.physical_device_invocation_mask_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_invocation_mask_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
                     pdd.physical_device_subpass_shading_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_subpass_shading_features_);
@@ -10096,20 +10084,19 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_subpass_shading_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME)) {
                     pdd.physical_device_shader_integer_functions_2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_integer_functions_2_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
                     pdd.physical_device_compute_shader_derivatives_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_compute_shader_derivatives_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
                     pdd.physical_device_cooperative_matrix_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_cooperative_matrix_features_);
@@ -10119,32 +10106,31 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_cooperative_matrix_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
                     pdd.physical_device_corner_sampled_image_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_corner_sampled_image_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME)) {
                     pdd.physical_device_coverage_reduction_mode_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_coverage_reduction_mode_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_NV_DEDICATED_ALLOCATION_IMAGE_ALIASING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_DEDICATED_ALLOCATION_IMAGE_ALIASING_EXTENSION_NAME)) {
                     pdd.physical_device_dedicated_allocation_image_aliasing_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_dedicated_allocation_image_aliasing_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
                     pdd.physical_device_diagnostics_config_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_diagnostics_config_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
                     pdd.physical_device_device_generated_commands_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_device_generated_commands_features_);
@@ -10154,19 +10140,19 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_device_generated_commands_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME)) {
                     pdd.physical_device_external_memory_rdma_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_external_memory_rdma_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
                     pdd.physical_device_fragment_shader_barycentric_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_fragment_shader_barycentric_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
                     pdd.physical_device_fragment_shading_rate_enums_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_fragment_shading_rate_enums_features_);
@@ -10176,13 +10162,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_fragment_shading_rate_enums_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME)) {
                     pdd.physical_device_inherited_viewport_scissor_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_inherited_viewport_scissor_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
                     pdd.physical_device_mesh_shader_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_mesh_shader_features_);
@@ -10192,37 +10178,37 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_mesh_shader_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_RAY_TRACING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_RAY_TRACING_EXTENSION_NAME)) {
                     pdd.physical_device_ray_tracing_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_ray_tracing_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
                     pdd.physical_device_ray_tracing_motiuon_blur_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_ray_tracing_motiuon_blur_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME)) {
                     pdd.physical_device_representative_fragment_test_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_representative_fragment_test_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME)) {
                     pdd.physical_device_exclusive_scissor_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_exclusive_scissor_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
                     pdd.physical_device_shader_image_footprint_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_image_footprint_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
                     pdd.physical_device_shader_sm_builtins_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_sm_builtins_features_);
@@ -10232,7 +10218,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_shader_sm_builtins_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
                     pdd.physical_device_shading_rate_image_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shading_rate_image_features_);
@@ -10242,25 +10228,25 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_shading_rate_image_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME)) {
                     pdd.physical_device_mutable_descriptor_type_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_mutable_descriptor_type_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
                     pdd.physical_device_dynamic_rendering_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_dynamic_rendering_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_IMAGE_VIEW_MIN_LOD_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_IMAGE_VIEW_MIN_LOD_EXTENSION_NAME)) {
                     pdd.physical_device_image_view_min_lod_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_image_view_min_lod_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
                     pdd.physical_device_fragment_density_map_2_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_fragment_density_map_2_features_);
@@ -10270,8 +10256,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_fragment_density_map_2_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME)) {
                     pdd.physical_device_fragment_density_map_offset_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_fragment_density_map_offset_features_);
@@ -10281,20 +10266,19 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_fragment_density_map_offset_properties_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_EXT_DEPTH_CLIP_CONTROL_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_DEPTH_CLIP_CONTROL_EXTENSION_NAME)) {
                     pdd.physical_device_depth_clip_control_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_depth_clip_control_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device,
-                                                              VK_ARM_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_ARM_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_EXTENSION_NAME)) {
                     pdd.physical_device_rasterization_order_attachment_access_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_rasterization_order_attachment_access_features_);
                 }
 
-                if (PhysicalDeviceData::HasSimulatedExtension(physical_device, VK_NV_LINEAR_COLOR_ATTACHMENT_EXTENSION_NAME)) {
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_LINEAR_COLOR_ATTACHMENT_EXTENSION_NAME)) {
                     pdd.physical_device_linear_color_attachment_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_linear_color_attachment_features_);
