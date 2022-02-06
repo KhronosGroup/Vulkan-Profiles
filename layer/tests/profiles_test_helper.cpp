@@ -136,9 +136,14 @@ void profiles_test::setProfilesFailOnError(bool fail) {
 }
 
 void profiles_test::setExcludeDeviceExtensions(const std::vector<std::string>& extensions) {
+#ifdef _WIN32
+    const char* delimiter = ";";
+#else
+    const char* delimiter = ":";
+#endif
     std::string combined = {};
     for (const auto& ext : extensions) {
-        if (!combined.empty()) combined += ';';
+        if (!combined.empty()) combined += delimiter;
         combined += ext;
     }
     profiles_test::setEnvironmentSetting("VK_KHRONOS_PROFILES_EXCLUDE_DEVICE_EXTENSIONS", combined.c_str());
