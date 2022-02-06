@@ -30,6 +30,8 @@ The *Portability* layers configuration in *Vulkan Configurator* allows checking 
 
 The input to the *Profiles layer* is a profiles file that is using the flexible JSON syntax. The profiles file format is defined by a formal JSON schema, so any profiles file may be verified to be correct using freely available JSON validators. Browsing through the schema file, we can see the extent of parameters that are available for our configuration.
 
+To use the Profiles Layer Vulkan version 1.0 and the `VK_KHR_get_physical_device_properties2` extension are required.
+
 Example of a *Profiles layer* JSON profiles file: [VP_LUNARG_test_structure_simple.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/test/data/VP_LUNARG_test_structure_simple.json)
 
 ### Android

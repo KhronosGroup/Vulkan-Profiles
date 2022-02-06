@@ -333,3 +333,31 @@ TEST(layer, TestExcludingFormats) {
     ASSERT_EQ(format_properties.optimalTilingFeatures, 0);
     ASSERT_EQ(format_properties.bufferFeatures, 0);
 }
+
+
+TEST(layer, TestMissingPhysDevProps2) {
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    const std::string filepath = TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json";
+    profiles_test::setProfilesFilename(filepath);
+    profiles_test::setProfilesProfileName("VP_LUNARG_desktop_portability_2021");
+    profiles_test::setProfilesEmulatePortabilitySubsetExtension(false);
+    profiles_test::setProfilesFailOnError(false);
+    profiles_test::setProfilesSimulateAllCapabilities();
+
+    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+    inst_builder.setApiVersion(VK_API_VERSION_1_0);
+    err = inst_builder.makeInstance();
+
+    VkPhysicalDevice gpu;
+    err = inst_builder.getPhysicalDevice(&gpu);
+
+    uint32_t count = 0;
+    vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
+    ASSERT_EQ(count, 19);
+}
