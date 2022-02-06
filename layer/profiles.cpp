@@ -107,8 +107,6 @@ const char *kOurLayerName = kLayerProperties[0].layerName;
 const std::array<VkExtensionProperties, 0> kInstanceExtensionProperties = {};
 const uint32_t kInstanceExtensionPropertiesCount = static_cast<uint32_t>(kInstanceExtensionProperties.size());
 
-bool get_physical_device_properties2_active = false;
-
 bool device_has_astc_hdr = false;
 bool device_has_astc = false;
 bool device_has_etc2 = false;
@@ -7065,6 +7063,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
 
     std::lock_guard<std::recursive_mutex> lock(global_lock);
 
+    bool get_physical_device_properties2_active = false;
     if (VK_VERSION_MINOR(requested_version) > 0) {
         get_physical_device_properties2_active = true;
     } else {
@@ -7077,7 +7076,29 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
         }
     }
 
-    return LayerSetupCreateInstance(pCreateInfo, pAllocator, pInstance);
+    if (get_physical_device_properties2_active) {
+        return LayerSetupCreateInstance(pCreateInfo, pAllocator, pInstance);
+    }
+
+    LogMessage(DEBUG_REPORT_WARNING_BIT, ::format("The Profiles Layer requires the %s extension, but it was not included in "
+                                                  "VkInstanceCreateInfo::ppEnabledExtensionNames, adding the extension.\n",
+                                                  VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME));
+    // Add VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
+    VkInstanceCreateInfo create_info;
+    create_info.sType = pCreateInfo->sType;
+    create_info.pNext = pCreateInfo->pNext;
+    create_info.flags = pCreateInfo->flags;
+    create_info.pApplicationInfo = pCreateInfo->pApplicationInfo;
+    create_info.enabledLayerCount = pCreateInfo->enabledLayerCount;
+    create_info.ppEnabledLayerNames = pCreateInfo->ppEnabledLayerNames;
+    create_info.enabledExtensionCount = pCreateInfo->enabledExtensionCount + 1;
+    std::vector<char *> extension_names(create_info.enabledExtensionCount);
+    for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; ++i) {
+        strcpy(extension_names[i], pCreateInfo->ppEnabledExtensionNames[i]);
+    }
+    extension_names[pCreateInfo->enabledExtensionCount] = VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME;
+    create_info.ppEnabledExtensionNames = extension_names.data();
+    return LayerSetupCreateInstance(&create_info, pAllocator, pInstance);
 }
 
 VKAPI_ATTR void VKAPI_CALL DestroyInstance(VkInstance instance, const VkAllocationCallbacks *pAllocator) {
@@ -9449,7 +9470,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             ::device_has_astc_hdr = ::PhysicalDeviceData::HasExtension(&pdd, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME);
 
             // Initialize PDD members to the actual Vulkan implementation's defaults.
-            if (get_physical_device_properties2_active) {
+            {
                 VkPhysicalDeviceProperties2KHR property_chain = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR};
                 VkPhysicalDeviceFeatures2KHR feature_chain = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR};
                 VkPhysicalDeviceMemoryProperties2KHR memory_chain = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2_KHR};
@@ -10334,9 +10355,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 pdd.physical_device_properties_ = property_chain.properties;
                 pdd.physical_device_features_ = feature_chain.features;
                 pdd.physical_device_memory_properties_ = memory_chain.memoryProperties;
-            } else {
-                dt->GetPhysicalDeviceFeatures(physical_device, &pdd.physical_device_features_);
-                dt->GetPhysicalDeviceMemoryProperties(physical_device, &pdd.physical_device_memory_properties_);
             }
 
             ::device_has_astc = pdd.physical_device_features_.textureCompressionASTC_LDR;
