@@ -560,8 +560,8 @@ struct LayerSettings {
     bool debug_file_discard;
     DebugReportFlags debug_reports;
     bool debug_fail_on_error;
-    vku::List exclude_device_extensions;
-    vku::List exclude_formats;
+    vku::Strings exclude_device_extensions;
+    vku::Strings exclude_formats;
 } layer_settings;
 
 bool HasFlags(VkFlags deviceFlags, VkFlags profileFlags) { return (deviceFlags & profileFlags) == profileFlags; }
@@ -6928,6 +6928,15 @@ std::string GetString(const vku::List& list) {
     return result;
 }
 
+std::string GetString(const vku::Strings& strings) {
+    std::string result;
+    for (std::size_t i = 0, n = strings.size(); i < n; ++i) {
+        result += strings[i];
+        if (i < n - 1) result += ", ";
+    }
+    return result;
+}
+
 static void InitSettings() {
     layer_settings.profile_file.clear();
     layer_settings.profile_name.clear();
@@ -6998,11 +7007,11 @@ static void InitSettings() {
     }
 
     if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeDeviceExtensions)) {
-        layer_settings.exclude_device_extensions = vku::GetLayerSettingList(kOurLayerName, kLayerSettingsExcludeDeviceExtensions);
+        layer_settings.exclude_device_extensions = vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsExcludeDeviceExtensions);
     }
 
     if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeFormats)) {
-        layer_settings.exclude_formats = vku::GetLayerSettingList(kOurLayerName, kLayerSettingsExcludeFormats);
+        layer_settings.exclude_formats = vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsExcludeFormats);
     }
 
     const std::string simulation_capabilities_log = GetSimulateCapabilitiesLog(layer_settings.simulate_capabilities);
@@ -8650,7 +8659,7 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
 
     // Check if Format was excluded
     for (std::size_t j = 0, m = layer_settings.exclude_formats.size(); j < m; ++j) {
-        const std::string &excluded_format = layer_settings.exclude_formats[j].first;
+        const std::string &excluded_format = layer_settings.exclude_formats[j];
         if (excluded_format.empty()) continue;
 
         if (StringToFormat(excluded_format) == format) {
@@ -10478,7 +10487,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             }
 
             for (std::size_t j = 0, m = layer_settings.exclude_device_extensions.size(); j < m; ++j) {
-                const std::string &extension = layer_settings.exclude_device_extensions[j].first;
+                const std::string &extension = layer_settings.exclude_device_extensions[j];
                 if (extension.empty()) continue;
 
                 for (size_t i = 0; i < pdd.simulation_extensions_.size(); ++i) {
