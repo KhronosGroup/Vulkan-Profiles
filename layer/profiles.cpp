@@ -107,6 +107,7 @@ const char *kOurLayerName = kLayerProperties[0].layerName;
 const std::array<VkExtensionProperties, 0> kInstanceExtensionProperties = {};
 const uint32_t kInstanceExtensionPropertiesCount = static_cast<uint32_t>(kInstanceExtensionProperties.size());
 
+bool version_1_1 = false;
 bool device_has_astc_hdr = false;
 bool device_has_astc = false;
 bool device_has_etc2 = false;
@@ -7074,6 +7075,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
 
     bool get_physical_device_properties2_active = false;
     if (VK_VERSION_MINOR(requested_version) > 0) {
+        version_1_1 = true;
         get_physical_device_properties2_active = true;
     } else {
         for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; i++) {
@@ -10357,9 +10359,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_vulkan_1_3_features_);
                 }
 
-                dt->GetPhysicalDeviceProperties2(physical_device, &property_chain);
-                dt->GetPhysicalDeviceFeatures2(physical_device, &feature_chain);
-                dt->GetPhysicalDeviceMemoryProperties2(physical_device, &memory_chain);
+                if (version_1_1) {
+                    dt->GetPhysicalDeviceProperties2(physical_device, &property_chain);
+                    dt->GetPhysicalDeviceFeatures2(physical_device, &feature_chain);
+                    dt->GetPhysicalDeviceMemoryProperties2(physical_device, &memory_chain);
+                } else {
+                    dt->GetPhysicalDeviceProperties2KHR(physical_device, &property_chain);
+                    dt->GetPhysicalDeviceFeatures2KHR(physical_device, &feature_chain);
+                    dt->GetPhysicalDeviceMemoryProperties2KHR(physical_device, &memory_chain);
+
+                }
 
                 pdd.physical_device_properties_ = property_chain.properties;
                 pdd.physical_device_features_ = feature_chain.features;
