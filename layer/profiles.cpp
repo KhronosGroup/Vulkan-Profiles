@@ -7034,7 +7034,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; ++i) {
         strcpy(extension_names[i], pCreateInfo->ppEnabledExtensionNames[i]);
     }
-    extension_names[pCreateInfo->enabledExtensionCount] = VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME;
+    strcpy(extension_names[pCreateInfo->enabledExtensionCount], VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
     create_info.ppEnabledExtensionNames = extension_names.data();
     return LayerSetupCreateInstance(&create_info, pAllocator, pInstance);
 }
