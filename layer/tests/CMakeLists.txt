@@ -26,8 +26,6 @@ function(LayerTest NAME)
         target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="${CMAKE_BINARY_DIR}/profiles/test/")
     endif()
 
-    # TODO: Remove after all tests have been converted to new definition
-    target_compile_definitions(${TEST_NAME} PUBLIC TEST_SOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
     target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="${CMAKE_BINARY_DIR}/")
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
