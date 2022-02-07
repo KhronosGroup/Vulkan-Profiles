@@ -2980,16 +2980,16 @@ bool WarnDuplicated(const Json::Value &parent, const std::string &first, const s
     if (promoted_member) {
         if (first_member) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       format("JSON file sets variables for %s while also using %s", promoted.c_str(), first.c_str()));
+                       format("JSON file sets variables for %s while also using %s\n", promoted.c_str(), first.c_str()));
             return false;
         } else if (second_member) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       format("JSON file sets variables for %s while also using %s", promoted.c_str(), second.c_str()));
+                       format("JSON file sets variables for %s while also using %s\n", promoted.c_str(), second.c_str()));
             return false;
         }
     } else if (first_member && second_member) {
         LogMessage(DEBUG_REPORT_WARNING_BIT,
-                   format("JSON file sets variables for %s while also using %s", first.c_str(), second.c_str()));
+                   format("JSON file sets variables for %s while also using %s\n", first.c_str(), second.c_str()));
         return false;
     }
     return true;
