@@ -24,7 +24,7 @@ TEST(layer, TestDesktopPortability2022Limits) {
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
     VkProfileLayerSettingsEXT settings;
-    settings.profile_file = TEST_SOURCE_PATH "/../../profiles/VP_LUNARG_desktop_portability_2021.json";
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_desktop_portability_2021.json";
     settings.emulate_portability = true;
     settings.profile_name = "VP_LUNARG_desktop_portability_2021";
     settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
