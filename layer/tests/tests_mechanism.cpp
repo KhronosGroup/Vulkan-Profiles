@@ -25,7 +25,7 @@ TEST(layer, selecting_profile) {
         inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
         VkProfileLayerSettingsEXT settings;
-        settings.profile_file = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_selecting_profile.json";
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_test_selecting_profile";
         settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
@@ -56,7 +56,7 @@ TEST(layer, selecting_profile) {
         inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
         VkProfileLayerSettingsEXT settings;
-        settings.profile_file = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_selecting_profile.json";
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_test_selecting_profile_subset";
         settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
@@ -96,7 +96,7 @@ TEST(layer, reading_flags) {
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
     VkProfileLayerSettingsEXT settings;
-    settings.profile_file = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_api_alternate.json";
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_alternate.json";
     settings.emulate_portability = true;
     settings.profile_name = "VP_LUNARG_test_api";
     settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
@@ -150,7 +150,7 @@ TEST(layer, reading_duplicated_members) {
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
     VkProfileLayerSettingsEXT settings;
-    settings.profile_file = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_duplicated.json";
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_duplicated.json";
     settings.emulate_portability = true;
     settings.profile_name = "VP_LUNARG_test_duplicated";
     settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
@@ -178,7 +178,7 @@ TEST(layer, TestParsingAllFormatProperties) {
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
     VkProfileLayerSettingsEXT settings;
-    settings.profile_file = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_formats.json";
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_formats.json";
     settings.emulate_portability = true;
     settings.profile_name = "VP_LUNARG_test_formats";
     settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
