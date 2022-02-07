@@ -52,7 +52,7 @@ struct TestInit {
         inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
 
         VkProfileLayerSettingsEXT settings;
-        settings.profile_file = TEST_SOURCE_PATH "/../../profiles/test/data/VP_LUNARG_test_promoted_api.json";
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_promoted_api.json";
         settings.profile_name = "VP_LUNARG_test_api";
         settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
 
