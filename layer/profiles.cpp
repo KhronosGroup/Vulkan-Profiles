@@ -107,7 +107,7 @@ const char *kOurLayerName = kLayerProperties[0].layerName;
 const std::array<VkExtensionProperties, 0> kInstanceExtensionProperties = {};
 const uint32_t kInstanceExtensionPropertiesCount = static_cast<uint32_t>(kInstanceExtensionProperties.size());
 
-bool version_1_1 = false;
+uint32_t requested_version = 0;
 bool device_has_astc_hdr = false;
 bool device_has_astc = false;
 bool device_has_etc2 = false;
@@ -6994,7 +6994,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
                format("%s version %d.%d.%d\n", kOurLayerName, kVersionProfilesMajor, kVersionProfilesMinor, kVersionProfilesPatch));
 
     const VkApplicationInfo *app_info = pCreateInfo->pApplicationInfo;
-    const uint32_t requested_version = (app_info && app_info->apiVersion) ? app_info->apiVersion : VK_API_VERSION_1_0;
+    requested_version = (app_info && app_info->apiVersion) ? app_info->apiVersion : VK_API_VERSION_1_0;
     if (requested_version > VK_API_VERSION_1_3) {
         LogMessage(DEBUG_REPORT_ERROR_BIT, format("%s currently only supports VK_API_VERSION_1_3 and lower.\n", kOurLayerName));
     }
@@ -7003,7 +7003,6 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
 
     bool get_physical_device_properties2_active = false;
     if (VK_VERSION_MINOR(requested_version) > 0) {
-        version_1_1 = true;
         get_physical_device_properties2_active = true;
     } else {
         for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; i++) {
@@ -9405,9 +9404,9 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             pdd.simulation_extensions_ = pdd.device_extensions_;
 
             dt->GetPhysicalDeviceProperties(physical_device, &pdd.physical_device_properties_);
-            bool api_version_above_1_1 = pdd.physical_device_properties_.apiVersion >= VK_API_VERSION_1_1;
-            bool api_version_above_1_2 = pdd.physical_device_properties_.apiVersion >= VK_API_VERSION_1_2;
-            bool api_version_above_1_3 = pdd.physical_device_properties_.apiVersion >= VK_API_VERSION_1_3;
+            bool api_version_above_1_1 = requested_version >= VK_API_VERSION_1_1;
+            bool api_version_above_1_2 = requested_version >= VK_API_VERSION_1_2;
+            bool api_version_above_1_3 = requested_version >= VK_API_VERSION_1_3;
 
             ::device_has_astc_hdr = ::PhysicalDeviceData::HasExtension(&pdd, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME);
 
@@ -10290,7 +10289,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_vulkan_1_3_features_);
                 }
 
-                if (version_1_1) {
+                if (VK_VERSION_MINOR(requested_version)) {
                     dt->GetPhysicalDeviceProperties2(physical_device, &property_chain);
                     dt->GetPhysicalDeviceFeatures2(physical_device, &feature_chain);
                     dt->GetPhysicalDeviceMemoryProperties2(physical_device, &memory_chain);
