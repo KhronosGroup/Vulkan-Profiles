@@ -9364,7 +9364,11 @@ void LoadDeviceFormats(VkInstance instance, VkPhysicalDevice pd, ArrayOfVkFormat
         format_properties.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
         format_properties.pNext = &format_properties_3;
 
-        dt->GetPhysicalDeviceFormatProperties2(pd, format, &format_properties);
+        if (requested_version >= VK_API_VERSION_1_1) {
+            dt->GetPhysicalDeviceFormatProperties2(pd, format, &format_properties);
+        } else {
+            dt->GetPhysicalDeviceFormatProperties2KHR(pd, format, &format_properties);
+        }
         (*dest)[format] = format_properties.formatProperties;
         (*dest3)[format] = format_properties_3;
     }
