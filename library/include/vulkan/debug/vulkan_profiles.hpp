@@ -252,7 +252,12 @@ VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *
 #include <stdio.h>
 
 #ifndef VP_DEBUG_MESSAGE_CALLBACK
+#if defined(ANDROID) || defined(__ANDROID__)
+#include <android/log.h>
+#define VP_DEBUG_MESSAGE_CALLBACK(MSG) __android_log_print(ANDROID_LOG_DEBUG, "Profiles", "%s", MSG)
+#else
 #define VP_DEBUG_MESSAGE_CALLBACK(MSG) fprintf(stderr, "%s\n", MSG)
+#endif
 #else
 void VP_DEBUG_MESSAGE_CALLBACK(const char*);
 #endif
