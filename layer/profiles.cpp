@@ -4025,6 +4025,15 @@ VkResult JsonLoader::LoadFile(std::string filename) {
             break;  // load a single profile
         }
     }
+
+    if (VK_VERSION_MINOR(this->profile_api_version) > VK_VERSION_MINOR(requested_version)) {
+        LogMessage(DEBUG_REPORT_WARNING_BIT,
+            format("The application requested a Vulkan 1.%d instance however the selected profile requires Vulkan 1.%d. Some profile capabilities might not be applied, we recommand changing the Vulkan application to request a Vulkan 1.%d instance.\n",
+                VK_VERSION_MINOR(requested_version), 
+                VK_VERSION_MINOR(this->profile_api_version),
+                VK_VERSION_MINOR(this->profile_api_version)).c_str());
+    }
+
     if (capabilities.empty()) {
         return VK_SUCCESS;
     }
@@ -10337,10 +10346,11 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             }
 
             LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
-                format("Running on \"%s\" with Vulkan %d.%d.%d driver.\n", pdd.physical_device_properties_.deviceName,
-                    VK_VERSION_MAJOR(pdd.physical_device_properties_.apiVersion),
-                    VK_VERSION_MINOR(pdd.physical_device_properties_.apiVersion),
-                    VK_VERSION_PATCH(pdd.physical_device_properties_.apiVersion)).c_str());
+                       format("Running on \"%s\" with Vulkan %d.%d.%d driver.\n", pdd.physical_device_properties_.deviceName,
+                              VK_VERSION_MAJOR(pdd.physical_device_properties_.apiVersion),
+                              VK_VERSION_MINOR(pdd.physical_device_properties_.apiVersion),
+                              VK_VERSION_PATCH(pdd.physical_device_properties_.apiVersion))
+                           .c_str());
 
             // Override PDD members with values from configuration file(s).
             JsonLoader json_loader(pdd);
