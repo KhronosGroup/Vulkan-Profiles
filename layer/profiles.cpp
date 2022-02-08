@@ -3027,7 +3027,8 @@ bool JsonLoader::WarnDuplicatedFeature(const Json::Value &parent) {
                             "VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR", "VkPhysicalDeviceVulkan12Features");
     valid &= WarnDuplicated(parent, "VkPhysicalDeviceShaderAtomicInt64Features", "VkPhysicalDeviceShaderAtomicInt64FeaturesKHR",
                             "VkPhysicalDeviceVulkan12Features");
-    valid &= WarnDuplicated(parent, "VkPhysicalDeviceShaderDrawParametersFeatures", {}, "VkPhysicalDeviceVulkan11Features");
+    valid &= WarnDuplicated(parent, "VkPhysicalDeviceShaderDrawParametersFeatures", "VkPhysicalDeviceShaderDrawParameterFeatures",
+                            "VkPhysicalDeviceVulkan11Features");
     valid &= WarnDuplicated(parent, "VkPhysicalDeviceShaderFloat16Int8Features", "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR",
                             "VkPhysicalDeviceVulkan12Features");
     valid &= WarnDuplicated(parent, "VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures",
@@ -3152,7 +3153,8 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &feat
     } else if (feature_name == "VkPhysicalDeviceShaderAtomicInt64Features" ||
                feature_name == "VkPhysicalDeviceShaderAtomicInt64FeaturesKHR") {
         return GetValue(feature, &pdd_.physical_device_shader_atomic_int64_features_);
-    } else if (feature_name == "VkPhysicalDeviceShaderDrawParametersFeatures") {
+    } else if (feature_name == "VkPhysicalDeviceShaderDrawParametersFeatures" ||
+               feature_name == "VkPhysicalDeviceShaderDrawParameterFeatures") {
         return GetValue(feature, &pdd_.physical_device_shader_draw_parameters_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderFloat16Int8Features" ||
                feature_name == "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR") {
@@ -4801,7 +4803,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawParametersFeatures *dest) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicInt64FeaturesKHR)\n");
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderDrawParametersFeatures)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderDrawParameters, WarnIfNotEqualBool);
@@ -10324,10 +10326,8 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 LoadDeviceFormats(instance, physical_device, &pdd.device_formats_, &pdd.device_formats_3_);
             }
 
-            LogMessage(
-                DEBUG_REPORT_NOTIFICATION_BIT,
-                format("Running on \"%s\" with Vulkan %d.%d.%d driver.\n",
-                    pdd.physical_device_properties_.deviceName, 
+            LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+                format("Running on \"%s\" with Vulkan %d.%d.%d driver.\n", pdd.physical_device_properties_.deviceName,
                     VK_VERSION_MAJOR(pdd.physical_device_properties_.apiVersion),
                     VK_VERSION_MINOR(pdd.physical_device_properties_.apiVersion),
                     VK_VERSION_PATCH(pdd.physical_device_properties_.apiVersion)).c_str());
