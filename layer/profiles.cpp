@@ -4001,10 +4001,10 @@ VkResult JsonLoader::LoadFile(std::string filename) {
     }
 
     const std::string &profile_name = layer_settings->profile_name;
-    const auto &profiles = root["profiles"];
+    const Json::Value &profiles = root["profiles"];
     std::vector<std::string> capabilities;
     for (const auto &profile : profiles.getMemberNames()) {
-        if (profile_name.empty() || profile == profile_name) {
+        if (profile_name.empty() || profile_name == "${VP_DEFAULT}" || profile == profile_name) {
             const auto &caps = profiles[profile]["capabilities"];
 
             const std::string version_string = profiles[profile]["api-version"].asCString();
@@ -4018,7 +4018,9 @@ VkResult JsonLoader::LoadFile(std::string filename) {
             for (const auto &cap : caps) {
                 capabilities.push_back(cap.asString());
             }
-            break;
+
+            LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, format("Loading \"%s\" profile\n", profile.c_str()).c_str());
+            break;  // load a single profile
         }
     }
     if (capabilities.empty()) {
@@ -4344,7 +4346,8 @@ bool JsonLoader::GetValuePhysicalDeviceToolPropertiesEXT(const Json::Value &pare
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetPropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && !layer_settings->emulate_portability) {
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) &&
+        !layer_settings->emulate_portability) {
         LogMessage(
             DEBUG_REPORT_ERROR_BIT,
             format("JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
@@ -4708,7 +4711,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFe
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) && !layer_settings->emulate_portability) {
+    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) &&
+        !layer_settings->emulate_portability) {
         LogMessage(
             DEBUG_REPORT_ERROR_BIT,
             format("JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
@@ -6833,8 +6837,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Fea
 #undef GET_VALUE
 #undef GET_ARRAY
 
-
-std::string GetString(const vku::List& list) {
+std::string GetString(const vku::List &list) {
     std::string result;
     for (std::size_t i = 0, n = list.size(); i < n; ++i) {
         result += list[i].first;
@@ -6843,7 +6846,7 @@ std::string GetString(const vku::List& list) {
     return result;
 }
 
-std::string GetString(const vku::Strings& strings) {
+std::string GetString(const vku::Strings &strings) {
     std::string result;
     for (std::size_t i = 0, n = strings.size(); i < n; ++i) {
         result += strings[i];
@@ -6867,7 +6870,7 @@ const VkProfileLayerSettingsEXT *FindSettingsInChain(const void *next) {
 }
 
 static void InitSettings(const void *pnext) {
-    const VkProfileLayerSettingsEXT *user_settings;
+    const VkProfileLayerSettingsEXT *user_settings = nullptr;
     // Programmatically-specified settings override ENV vars or layer settings file settings
     if ((pnext) && (user_settings = FindSettingsInChain(pnext))) {
         *layer_settings = *user_settings;
@@ -6898,7 +6901,8 @@ static void InitSettings(const void *pnext) {
         }
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeDeviceExtensions)) {
-            layer_settings->exclude_device_extensions = vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsExcludeDeviceExtensions);
+            layer_settings->exclude_device_extensions =
+                vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsExcludeDeviceExtensions);
         }
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsExcludeFormats)) {
@@ -6906,7 +6910,8 @@ static void InitSettings(const void *pnext) {
         }
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugActions)) {
-            layer_settings->debug_actions = GetDebugActionFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsDebugActions));
+            layer_settings->debug_actions =
+                GetDebugActionFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsDebugActions));
         }
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugFilename)) {
@@ -6918,7 +6923,8 @@ static void InitSettings(const void *pnext) {
         }
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugReports)) {
-            layer_settings->debug_reports = GetDebugReportFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsDebugReports));
+            layer_settings->debug_reports =
+                GetDebugReportFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsDebugReports));
         }
     }
 
@@ -6942,8 +6948,9 @@ static void InitSettings(const void *pnext) {
 
     std::string settings_log;
     if (user_settings) {
-        settings_log += format("NOTE: Settings originate from a user-supplied settings structure: environment variables and "
-                               "layer settings file were ignored.\n");
+        settings_log += format(
+            "NOTE: Settings originate from a user-supplied settings structure: environment variables and "
+            "layer settings file were ignored.\n");
     }
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileFile, layer_settings->profile_file.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileName, layer_settings->profile_name.c_str());
@@ -6955,7 +6962,8 @@ static void InitSettings(const void *pnext) {
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugFileClear, layer_settings->debug_file_discard ? "true" : "false");
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugFailOnError, layer_settings->debug_fail_on_error ? "true" : "false");
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugReports, debug_reports_log.c_str());
-    settings_log += format("\t%s: %s\n", kLayerSettingsExcludeDeviceExtensions, GetString(layer_settings->exclude_device_extensions).c_str());
+    settings_log +=
+        format("\t%s: %s\n", kLayerSettingsExcludeDeviceExtensions, GetString(layer_settings->exclude_device_extensions).c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsExcludeFormats, GetString(layer_settings->exclude_formats).c_str());
 
     LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, format("Profile Layers Settings: {\n%s}\n", settings_log.c_str()));
@@ -8562,8 +8570,8 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
             result = EnumerateProperties(kDeviceExtensionPropertiesCount, kDeviceExtensionProperties.data(), pCount, pProperties);
         else
             result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
-    } else if (src_count == 0 ||
-               !(layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) && layer_settings->exclude_device_extensions.empty()) {
+    } else if (src_count == 0 || !(layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) &&
+                                     layer_settings->exclude_device_extensions.empty()) {
         result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
     } else {
         result = EnumerateProperties(src_count, pdd->simulation_extensions_.data(), pCount, pProperties);
@@ -10297,7 +10305,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     dt->GetPhysicalDeviceProperties2KHR(physical_device, &property_chain);
                     dt->GetPhysicalDeviceFeatures2KHR(physical_device, &feature_chain);
                     dt->GetPhysicalDeviceMemoryProperties2KHR(physical_device, &memory_chain);
-
                 }
 
                 pdd.physical_device_properties_ = property_chain.properties;
@@ -10313,8 +10320,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 LoadDeviceFormats(instance, physical_device, &pdd.device_formats_, &pdd.device_formats_3_);
             }
 
-            LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
-                       format("deviceName \"%s\"\n", pdd.physical_device_properties_.deviceName).c_str());
+            LogMessage(
+                DEBUG_REPORT_NOTIFICATION_BIT,
+                format("Running on \"%s\" with Vulkan %d.%d.%d driver.\n",
+                    pdd.physical_device_properties_.deviceName, 
+                    VK_VERSION_MAJOR(pdd.physical_device_properties_.apiVersion),
+                    VK_VERSION_MINOR(pdd.physical_device_properties_.apiVersion),
+                    VK_VERSION_PATCH(pdd.physical_device_properties_.apiVersion)).c_str());
 
             // Override PDD members with values from configuration file(s).
             JsonLoader json_loader(pdd);

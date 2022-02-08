@@ -115,7 +115,7 @@ typedef struct VkProfileLayerSettingsEXT {
     VkStructureType sType;
     void* pNext{};
     std::string profile_file{};
-    std::string profile_name{};
+    std::string profile_name{"${VP_DEFAULT}"};
     bool profile_validation{false};
     bool emulate_portability{true};
     SimulateCapabilityFlags simulate_capabilities{SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT};
