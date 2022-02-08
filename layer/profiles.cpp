@@ -4746,6 +4746,9 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryFeatures *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceProtectedMemoryFeatures)\n");
+    if (requested_version < VK_API_VERSION_1_1) {
+        return false;
+    }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, protectedMemory, WarnIfNotEqualBool);
@@ -4804,6 +4807,10 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawParametersFeatures *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderDrawParametersFeatures)\n");
+    if (requested_version < VK_API_VERSION_1_1) {
+        return false;
+    }
+
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderDrawParameters, WarnIfNotEqualBool);
@@ -8388,6 +8395,9 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     void *pNext = sdpf->pNext;
                     *sdpf = physicalDeviceData->physical_device_shader_draw_parameters_features_;
                     sdpf->pNext = pNext;
+                    LogMessage(DEBUG_REPORT_WARNING_BIT, "DRAW_PARAMETERS LOADED");
+                } else {
+                    LogMessage(DEBUG_REPORT_WARNING_BIT, "DRAW_PARAMETERS NOT LOADED");
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES:
