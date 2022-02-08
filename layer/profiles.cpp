@@ -7030,9 +7030,9 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     create_info.enabledLayerCount = pCreateInfo->enabledLayerCount;
     create_info.ppEnabledLayerNames = pCreateInfo->ppEnabledLayerNames;
     create_info.enabledExtensionCount = pCreateInfo->enabledExtensionCount + 1;
-    std::vector<char *> extension_names(create_info.enabledExtensionCount);
+    std::vector<const char *> extension_names(create_info.enabledExtensionCount);
     for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; ++i) {
-        strcpy(extension_names[i], pCreateInfo->ppEnabledExtensionNames[i]);
+        extension_names[i] = pCreateInfo->ppEnabledExtensionNames[i];
     }
     extension_names[pCreateInfo->enabledExtensionCount] = VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME;
     create_info.ppEnabledExtensionNames = extension_names.data();
