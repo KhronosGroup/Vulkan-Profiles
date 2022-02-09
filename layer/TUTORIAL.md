@@ -46,11 +46,6 @@ adb shell settings put global debug.vulkan.khronos_profiles.debug_reports DEBUG_
 adb shell settings put global debug.vulkan.khronos_profiles.debug_fail_on_error true
 ```
 
-Other Android profiles layer settings can be set by:
-```
-adb shell settings put global debug.vulkan.khronos_profiles.<settingname> <settingvalue>
-```
-
 ## Technical Details
 
 The *Profiles Layer* is a Vulkan layer that can modify the results of Vulkan PhysicalDevice queries based on a profiles file (JSON format), thus simulating some of the capabilities of a device by overriding the capabilities of the actual device under test.
@@ -100,7 +95,6 @@ The Profiles layer provides the ability to emulate the `VK_KHR_portability_subse
 This feature allows users to test their application with limitations found on non-conformant Vulkan implementations.
 To turn on this feature, enable it as described [below](#emulate-vk_khr_portability_subset).
 
-<<<<<<< HEAD
 ### Profiles Layer Settings
 
 #### Profiles JSON file
@@ -232,6 +226,3 @@ export VK_KHRONOS_PROFILES_SIMULATE_CAPABILITIES="SIMULATE_FEATURES_BIT,SIMULATE
 vulkaninfo
 # Compare the results with that app running without the Profiles layer.
 ```
-## Layer Options
-
-The options for this layer are specified in VK_LAYER_KHRONOS_profiles.json. The option details are in [profiles_layer.html](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html#user-content-layer-details).
