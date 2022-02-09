@@ -97,6 +97,7 @@
             "settings": [
                 {
                     "key": "profile_file",
+                    "env": "VK_KHRONOS_PROFILES_PROFILE_FILE",
                     "label": "Profile Selection",
                     "description": "Path of a profile file and the name of the profile to load.",
                     "status": "STABLE",
@@ -109,6 +110,7 @@
                     "settings": [
                         {
                             "key": "profile_name",
+                            "env": "VK_KHRONOS_PROFILES_PROFILE_NAME",
                             "label": "Profile",
                             "description": "Name of the profile specified by the profile file to use. If set to ${VP_DEFAULT}, the layer will load the first profile in the file.",
                             "type": "ENUM",
@@ -118,6 +120,7 @@
                         },
                         {
                             "key": "profile_validation",
+                            "env": "VK_KHRONOS_PROFILES_PROFILE_VALIDATION",
                             "label": "Schema Validation",
                             "description": "Validate the profile file against the Vulkan SDK profile schema if the file is found.",
                             "type": "BOOL",
@@ -128,6 +131,7 @@
                 },
                 {
                     "key": "emulate_portability",
+                    "env": "VK_KHRONOS_PROFILES_EMULATE_PORTABILITY",
                     "label": "Emulate VK_KHR_portability_subset",
                     "description": "Emulate the VK_KHR_portability_subset extension on the device.",
                     "status": "STABLE",
@@ -141,6 +145,7 @@
                 },
                 {
                     "key": "simulate_capabilities",
+                    "env": "VK_KHRONOS_PROFILES_SIMULATE_CAPABILITIES",
                     "label": "Simulate Profile Capabilities",
                     "description": "Control of the simulated capabilities of the Vulkan physical device from the selected Vulkan Profile.",
                     "status": "STABLE",
@@ -177,6 +182,7 @@
                 },
                 {
                     "key": "exclude_device_extensions",
+                    "env": "VK_KHRONOS_PROFILES_EXCLUDE_DEVICE_EXTENSIONS",
                     "label": "Exclude Device Extensions",
                     "description": "Removes the listed device extensions from being reported by the Vulkan physical device.",
                     "status": "STABLE",
@@ -421,6 +427,7 @@
                 },
                 {
                     "key": "exclude_formats",
+                    "env": "VK_KHRONOS_PROFILES_EXCLUDE_FORMATS",
                     "label": "Exclude Formats",
                     "description": "Removes the format feature flags from being reported by the Vulkan physical device.",
                     "status": "STABLE",
@@ -677,6 +684,7 @@
                 },
                 {
                     "key": "debug_actions",
+                    "env": "VK_KHRONOS_PROFILES_DEBUG_ACTIONS",
                     "label": "Debug Actions",
                     "description": "This indicates what action is to be taken when a layer wants to report information",
                     "status": "STABLE",
@@ -701,6 +709,7 @@
                             "settings": [
                                 {
                                     "key": "debug_filename",
+                                    "env": "VK_KHRONOS_PROFILES_DEBUG_FILENAME",
                                     "label": "Log Filename",
                                     "description": "Specifies the output filename",
                                     "type": "SAVE_FILE",
@@ -745,6 +754,7 @@
                                 },
                                 {
                                     "key": "debug_file_clear",
+                                    "env": "VK_KHRONOS_PROFILES_DEBUG_FILE_CLEAR",
                                     "label": "Clear Log at Launch",
                                     "description": "Discard the content of the log file between each layer run",
                                     "type": "BOOL",
@@ -801,6 +811,7 @@
                 },
                 {
                     "key": "debug_fail_on_error",
+                    "env": "VK_KHRONOS_PROFILES_DEBUG_FAIL_ON_ERROR",
                     "label": "Fail on Error",
                     "description": "If the device doesn't support the capabilities of the selected Profile, the layer fail to load. When enabled, vkEnumeratePhysicalDevices will fail when the selected Profile is not supported.",
                     "status": "STABLE",
@@ -810,6 +821,7 @@
                 },
                 {
                     "key": "debug_reports",
+                    "env": "VK_KHRONOS_PROFILES_DEBUG_REPORTS",
                     "label": "Message Types",
                     "description": "This is a comma-delineated list of options telling the layer what types of messages it should report back",
                     "status": "STABLE",
