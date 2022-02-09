@@ -2973,16 +2973,16 @@ bool WarnDuplicated(const Json::Value &parent, const std::string &first, const s
     if (promoted_member) {
         if (first_member) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       format("JSON file sets variables for %s while also using %s\n", promoted.c_str(), first.c_str()));
+                       format("Profile sets variables for %s while also using %s\n", promoted.c_str(), first.c_str()));
             return false;
         } else if (second_member) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       format("JSON file sets variables for %s while also using %s\n", promoted.c_str(), second.c_str()));
+                       format("Profile sets variables for %s while also using %s\n", promoted.c_str(), second.c_str()));
             return false;
         }
     } else if (first_member && second_member) {
         LogMessage(DEBUG_REPORT_WARNING_BIT,
-                   format("JSON file sets variables for %s while also using %s\n", first.c_str(), second.c_str()));
+                   format("Profile sets variables for %s while also using %s\n", first.c_str(), second.c_str()));
         return false;
     }
     return true;
@@ -3599,7 +3599,7 @@ bool JsonLoader::CheckExtensionSupport(const char *extension) {
     if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
         if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, extension)) {
             LogMessage(DEBUG_REPORT_ERROR_BIT,
-                       ::format("JSON file sets variables for structs provided by %s, but %s is not enabled by the profile.\n",
+                       ::format("Profile sets variables for structs provided by %s, but %s is not enabled by the profile.\n",
                                 extension, extension));
             if (layer_settings->debug_fail_on_error) {
                 return false;
@@ -3608,7 +3608,7 @@ bool JsonLoader::CheckExtensionSupport(const char *extension) {
     } else {
         if (!PhysicalDeviceData::HasExtension(&pdd_, extension)) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       ::format("JSON file sets variables for structs provided by %s, but %s is not supported by the device.\n",
+                       ::format("Profile sets variables for structs provided by %s, but %s is not supported by the device.\n",
                                 extension, extension));
         }
     }
@@ -3746,7 +3746,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         if (VK_VERSION_PATCH(this->profile_api_version) > VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)) {
             LogMessage(
                 DEBUG_REPORT_ERROR_BIT,
-                format("JSON apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ") is greater than the device apiVersion (%" PRIu32
+                format("Profile apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ") is greater than the device apiVersion (%" PRIu32
                        ".%" PRIu32 ".%" PRIu32 ")\n",
                        VK_VERSION_MAJOR(this->profile_api_version), VK_VERSION_MINOR(this->profile_api_version),
                        VK_VERSION_PATCH(this->profile_api_version), VK_VERSION_MAJOR(pdd_.physical_device_properties_.apiVersion),
@@ -4354,7 +4354,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
         !layer_settings->emulate_portability) {
         LogMessage(
             DEBUG_REPORT_ERROR_BIT,
-            format("JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
+            format("Profile sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
                    "not supported by the device and emulation is not turned on.\nIf you wish to emulate "
                    "VK_KHR_portability_subset, please enable %s variable.\n",
                    kLayerSettingsEmulatePortability));
@@ -4719,7 +4719,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
         !layer_settings->emulate_portability) {
         LogMessage(
             DEBUG_REPORT_ERROR_BIT,
-            format("JSON file sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
+            format("Profile sets variables for structs provided by VK_KHR_portability_subset, but VK_KHR_portability_subset is "
                    "not supported by the device and emulation is not turned on.\nIf you wish to emulate "
                    "VK_KHR_portability_subset, please enable %s variable.\n",
                    kLayerSettingsEmulatePortability));
