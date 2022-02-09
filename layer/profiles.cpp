@@ -186,12 +186,6 @@ static std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags) {
     return result;
 }
 
-#define APPEND(name)                         \
-    if (flags & name) {                      \
-        if (!result.empty()) result += ", "; \
-        result += #name;                     \
-    }
-
 static std::string GetDebugReportsLog(DebugActionFlags flags) {
     std::string result = {};
 
@@ -473,8 +467,6 @@ static std::string GetFormatFeature2String(VkFormatFeatureFlagBits2 flags) {
 
     return result;
 }
-
-#undef APPEND
 
 static VkProfileLayerSettingsEXT *layer_settings;
 
