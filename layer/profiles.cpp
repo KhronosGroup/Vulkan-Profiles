@@ -8778,6 +8778,373 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolProperties(VkPhysicalDevice 
     return GetPhysicalDeviceToolPropertiesEXT(physicalDevice, pToolCount, pToolProperties);
 }
 
+void TransferDeviceValues(PhysicalDeviceData *pdd) {
+    // VkPhysicalDeviceVulkan11Features
+    pdd->physical_device_vulkan_1_1_features_.storageBuffer16BitAccess =
+        pdd->physical_device_16bit_storage_features_.storageBuffer16BitAccess;
+    pdd->physical_device_vulkan_1_1_features_.uniformAndStorageBuffer16BitAccess =
+        pdd->physical_device_16bit_storage_features_.uniformAndStorageBuffer16BitAccess;
+    pdd->physical_device_vulkan_1_1_features_.storagePushConstant16 =
+        pdd->physical_device_16bit_storage_features_.storagePushConstant16;
+    pdd->physical_device_vulkan_1_1_features_.storageInputOutput16 =
+        pdd->physical_device_16bit_storage_features_.storageInputOutput16;
+    pdd->physical_device_vulkan_1_1_features_.multiview = pdd->physical_device_multiview_features_.multiview;
+    pdd->physical_device_vulkan_1_1_features_.multiviewGeometryShader =
+        pdd->physical_device_multiview_features_.multiviewGeometryShader;
+    pdd->physical_device_vulkan_1_1_features_.multiviewTessellationShader =
+        pdd->physical_device_multiview_features_.multiviewTessellationShader;
+    pdd->physical_device_vulkan_1_1_features_.variablePointersStorageBuffer =
+        pdd->physical_device_variable_pointers_features_.variablePointersStorageBuffer;
+    pdd->physical_device_vulkan_1_1_features_.variablePointers = pdd->physical_device_variable_pointers_features_.variablePointers;
+    pdd->physical_device_vulkan_1_1_features_.protectedMemory = pdd->physical_device_protected_memory_features_.protectedMemory;
+    pdd->physical_device_vulkan_1_1_features_.samplerYcbcrConversion =
+        pdd->physical_device_sampler_ycbcr_conversion_features_.samplerYcbcrConversion;
+    pdd->physical_device_vulkan_1_1_features_.shaderDrawParameters =
+        pdd->physical_device_shader_draw_parameters_features_.shaderDrawParameters;
+
+    // VkPhysicalDeviceVulkan11Properties
+    // These are non modifiable
+    // pdd->physical_device_vulkan_1_1_properties_.deviceUUID[VK_UUID_SIZE];
+    // pdd->physical_device_vulkan_1_1_properties_.driverUUID[VK_UUID_SIZE];
+    // pdd->physical_device_vulkan_1_1_properties_.deviceLUID[VK_LUID_SIZE];
+    // pdd->physical_device_vulkan_1_1_properties_.deviceNodeMask;
+    // pdd->physical_device_vulkan_1_1_properties_.deviceLUIDValid;
+    pdd->physical_device_vulkan_1_1_properties_.subgroupSize = pdd->physical_device_subgroup_properties_.subgroupSize;
+    pdd->physical_device_vulkan_1_1_properties_.subgroupSupportedStages = pdd->physical_device_subgroup_properties_.supportedStages;
+    pdd->physical_device_vulkan_1_1_properties_.subgroupSupportedOperations =
+        pdd->physical_device_subgroup_properties_.supportedOperations;
+    pdd->physical_device_vulkan_1_1_properties_.subgroupQuadOperationsInAllStages =
+        pdd->physical_device_subgroup_properties_.quadOperationsInAllStages;
+    // pdd->physical_device_vulkan_1_1_properties_.pointClippingBehavior;
+    pdd->physical_device_vulkan_1_1_properties_.maxMultiviewViewCount =
+        pdd->physical_device_multiview_properties_.maxMultiviewViewCount;
+    pdd->physical_device_vulkan_1_1_properties_.maxMultiviewInstanceIndex =
+        pdd->physical_device_multiview_properties_.maxMultiviewInstanceIndex;
+    pdd->physical_device_vulkan_1_1_properties_.protectedNoFault =
+        pdd->physical_device_protected_memory_properties_.protectedNoFault;
+    pdd->physical_device_vulkan_1_1_properties_.maxPerSetDescriptors =
+        pdd->physical_device_maintenance_3_properties_.maxPerSetDescriptors;
+    pdd->physical_device_vulkan_1_1_properties_.maxMemoryAllocationSize =
+        pdd->physical_device_maintenance_3_properties_.maxMemoryAllocationSize;
+
+    // VkPhysicalDeviceVulkan12Features
+    // These do not come from an extension
+    // pdd->physical_device_vulkan_1_2_features_.samplerMirrorClampToEdge;
+    // pdd->physical_device_vulkan_1_2_features_.drawIndirectCount;
+    pdd->physical_device_vulkan_1_2_features_.storageBuffer8BitAccess =
+        pdd->physical_device_8bit_storage_features_.storageBuffer8BitAccess;
+    pdd->physical_device_vulkan_1_2_features_.uniformAndStorageBuffer8BitAccess =
+        pdd->physical_device_8bit_storage_features_.uniformAndStorageBuffer8BitAccess;
+    pdd->physical_device_vulkan_1_2_features_.storagePushConstant8 =
+        pdd->physical_device_8bit_storage_features_.storagePushConstant8;
+    pdd->physical_device_vulkan_1_2_features_.shaderBufferInt64Atomics =
+        pdd->physical_device_shader_atomic_int64_features_.shaderBufferInt64Atomics;
+    pdd->physical_device_vulkan_1_2_features_.shaderSharedInt64Atomics =
+        pdd->physical_device_shader_atomic_int64_features_.shaderSharedInt64Atomics;
+    pdd->physical_device_vulkan_1_2_features_.shaderFloat16 = pdd->physical_device_shader_float16_int8_features_.shaderFloat16;
+    pdd->physical_device_vulkan_1_2_features_.shaderInt8 = pdd->physical_device_shader_float16_int8_features_.shaderInt8;
+    // pdd->physical_device_vulkan_1_2_features_.descriptorIndexing;
+    pdd->physical_device_vulkan_1_2_features_.shaderInputAttachmentArrayDynamicIndexing =
+        pdd->physical_device_descriptor_indexing_features_.shaderInputAttachmentArrayDynamicIndexing;
+    pdd->physical_device_vulkan_1_2_features_.shaderUniformTexelBufferArrayDynamicIndexing =
+        pdd->physical_device_descriptor_indexing_features_.shaderUniformTexelBufferArrayDynamicIndexing;
+    pdd->physical_device_vulkan_1_2_features_.shaderStorageTexelBufferArrayDynamicIndexing =
+        pdd->physical_device_descriptor_indexing_features_.shaderStorageTexelBufferArrayDynamicIndexing;
+    pdd->physical_device_vulkan_1_2_features_.shaderUniformBufferArrayNonUniformIndexing =
+        pdd->physical_device_descriptor_indexing_features_.shaderUniformBufferArrayNonUniformIndexing;
+    pdd->physical_device_vulkan_1_2_features_.shaderSampledImageArrayNonUniformIndexing =
+        pdd->physical_device_descriptor_indexing_features_.shaderSampledImageArrayNonUniformIndexing;
+    pdd->physical_device_vulkan_1_2_features_.shaderStorageBufferArrayNonUniformIndexing =
+        pdd->physical_device_descriptor_indexing_features_.shaderStorageBufferArrayNonUniformIndexing;
+    pdd->physical_device_vulkan_1_2_features_.shaderStorageImageArrayNonUniformIndexing =
+        pdd->physical_device_descriptor_indexing_features_.shaderStorageImageArrayNonUniformIndexing;
+    pdd->physical_device_vulkan_1_2_features_.shaderInputAttachmentArrayNonUniformIndexing =
+        pdd->physical_device_descriptor_indexing_features_.shaderInputAttachmentArrayNonUniformIndexing;
+    pdd->physical_device_vulkan_1_2_features_.shaderUniformTexelBufferArrayNonUniformIndexing =
+        pdd->physical_device_descriptor_indexing_features_.shaderUniformTexelBufferArrayNonUniformIndexing;
+    pdd->physical_device_vulkan_1_2_features_.shaderStorageTexelBufferArrayNonUniformIndexing =
+        pdd->physical_device_descriptor_indexing_features_.shaderStorageTexelBufferArrayNonUniformIndexing;
+    pdd->physical_device_vulkan_1_2_features_.descriptorBindingUniformBufferUpdateAfterBind =
+        pdd->physical_device_descriptor_indexing_features_.descriptorBindingUniformBufferUpdateAfterBind;
+    pdd->physical_device_vulkan_1_2_features_.descriptorBindingSampledImageUpdateAfterBind =
+        pdd->physical_device_descriptor_indexing_features_.descriptorBindingSampledImageUpdateAfterBind;
+    pdd->physical_device_vulkan_1_2_features_.descriptorBindingStorageImageUpdateAfterBind =
+        pdd->physical_device_descriptor_indexing_features_.descriptorBindingStorageImageUpdateAfterBind;
+    pdd->physical_device_vulkan_1_2_features_.descriptorBindingStorageBufferUpdateAfterBind =
+        pdd->physical_device_descriptor_indexing_features_.descriptorBindingStorageBufferUpdateAfterBind;
+    pdd->physical_device_vulkan_1_2_features_.descriptorBindingUniformTexelBufferUpdateAfterBind =
+        pdd->physical_device_descriptor_indexing_features_.descriptorBindingUniformTexelBufferUpdateAfterBind;
+    pdd->physical_device_vulkan_1_2_features_.descriptorBindingStorageTexelBufferUpdateAfterBind =
+        pdd->physical_device_descriptor_indexing_features_.descriptorBindingStorageTexelBufferUpdateAfterBind;
+    pdd->physical_device_vulkan_1_2_features_.descriptorBindingUpdateUnusedWhilePending =
+        pdd->physical_device_descriptor_indexing_features_.descriptorBindingUpdateUnusedWhilePending;
+    pdd->physical_device_vulkan_1_2_features_.descriptorBindingPartiallyBound =
+        pdd->physical_device_descriptor_indexing_features_.descriptorBindingPartiallyBound;
+    pdd->physical_device_vulkan_1_2_features_.descriptorBindingVariableDescriptorCount =
+        pdd->physical_device_descriptor_indexing_features_.descriptorBindingVariableDescriptorCount;
+    pdd->physical_device_vulkan_1_2_features_.runtimeDescriptorArray =
+        pdd->physical_device_descriptor_indexing_features_.runtimeDescriptorArray;
+    // pdd->physical_device_vulkan_1_2_features_.samplerFilterMinmax;
+    pdd->physical_device_vulkan_1_2_features_.scalarBlockLayout =
+        pdd->physical_device_scalar_block_layout_features_.scalarBlockLayout;
+    pdd->physical_device_vulkan_1_2_features_.imagelessFramebuffer =
+        pdd->physical_device_imageless_framebuffer_features_.imagelessFramebuffer;
+    pdd->physical_device_vulkan_1_2_features_.uniformBufferStandardLayout =
+        pdd->physical_device_uniform_buffer_standard_layout_features_.uniformBufferStandardLayout;
+    pdd->physical_device_vulkan_1_2_features_.shaderSubgroupExtendedTypes =
+        pdd->physical_device_shader_subgroup_extended_types_features_.shaderSubgroupExtendedTypes;
+    pdd->physical_device_vulkan_1_2_features_.separateDepthStencilLayouts =
+        pdd->physical_device_separate_depth_stencil_layouts_features_.separateDepthStencilLayouts;
+    pdd->physical_device_vulkan_1_2_features_.hostQueryReset = pdd->physical_device_host_query_reset_features_.hostQueryReset;
+    pdd->physical_device_vulkan_1_2_features_.timelineSemaphore =
+        pdd->physical_device_timeline_semaphore_features_.timelineSemaphore;
+    pdd->physical_device_vulkan_1_2_features_.bufferDeviceAddress =
+        pdd->physical_device_buffer_device_address_features_.bufferDeviceAddress;
+    pdd->physical_device_vulkan_1_2_features_.bufferDeviceAddressCaptureReplay =
+        pdd->physical_device_buffer_device_address_features_.bufferDeviceAddressCaptureReplay;
+    pdd->physical_device_vulkan_1_2_features_.bufferDeviceAddressMultiDevice =
+        pdd->physical_device_buffer_device_address_features_.bufferDeviceAddressMultiDevice;
+    pdd->physical_device_vulkan_1_2_features_.vulkanMemoryModel =
+        pdd->physical_device_vulkan_memory_model_features_.vulkanMemoryModel;
+    pdd->physical_device_vulkan_1_2_features_.vulkanMemoryModelDeviceScope =
+        pdd->physical_device_vulkan_memory_model_features_.vulkanMemoryModelDeviceScope;
+    pdd->physical_device_vulkan_1_2_features_.vulkanMemoryModelAvailabilityVisibilityChains =
+        pdd->physical_device_vulkan_memory_model_features_.vulkanMemoryModelAvailabilityVisibilityChains;
+    // pdd->physical_device_vulkan_1_2_features_.shaderOutputViewportIndex;
+    // pdd->physical_device_vulkan_1_2_features_.shaderOutputLayer;
+    // pdd->physical_device_vulkan_1_2_features_.subgroupBroadcastDynamicId;
+
+    // VkPhysicalDeviceVulkan12Properties
+    // These are non-modifiable
+    // pdd->physical_device_vulkan_1_2_properties_.driverID;
+    // pdd->physical_device_vulkan_1_2_properties_.driverName;
+    // pdd->physical_device_vulkan_1_2_properties_.driverInfo;
+    // pdd->physical_device_vulkan_1_2_properties_.conformanceVersion;
+    pdd->physical_device_vulkan_1_2_properties_.denormBehaviorIndependence =
+        pdd->physical_device_float_controls_properties_.denormBehaviorIndependence;
+    pdd->physical_device_vulkan_1_2_properties_.roundingModeIndependence =
+        pdd->physical_device_float_controls_properties_.roundingModeIndependence;
+    pdd->physical_device_vulkan_1_2_properties_.shaderSignedZeroInfNanPreserveFloat16 =
+        pdd->physical_device_float_controls_properties_.shaderSignedZeroInfNanPreserveFloat16;
+    pdd->physical_device_vulkan_1_2_properties_.shaderSignedZeroInfNanPreserveFloat32 =
+        pdd->physical_device_float_controls_properties_.shaderSignedZeroInfNanPreserveFloat32;
+    pdd->physical_device_vulkan_1_2_properties_.shaderSignedZeroInfNanPreserveFloat64 =
+        pdd->physical_device_float_controls_properties_.shaderSignedZeroInfNanPreserveFloat64;
+    pdd->physical_device_vulkan_1_2_properties_.shaderDenormPreserveFloat16 =
+        pdd->physical_device_float_controls_properties_.shaderDenormPreserveFloat16;
+    pdd->physical_device_vulkan_1_2_properties_.shaderDenormPreserveFloat32 =
+        pdd->physical_device_float_controls_properties_.shaderDenormPreserveFloat32;
+    pdd->physical_device_vulkan_1_2_properties_.shaderDenormPreserveFloat64 =
+        pdd->physical_device_float_controls_properties_.shaderDenormPreserveFloat64;
+    pdd->physical_device_vulkan_1_2_properties_.shaderDenormFlushToZeroFloat16 =
+        pdd->physical_device_float_controls_properties_.shaderDenormFlushToZeroFloat16;
+    pdd->physical_device_vulkan_1_2_properties_.shaderDenormFlushToZeroFloat32 =
+        pdd->physical_device_float_controls_properties_.shaderDenormFlushToZeroFloat32;
+    pdd->physical_device_vulkan_1_2_properties_.shaderDenormFlushToZeroFloat64 =
+        pdd->physical_device_float_controls_properties_.shaderDenormFlushToZeroFloat64;
+    pdd->physical_device_vulkan_1_2_properties_.shaderRoundingModeRTEFloat16 =
+        pdd->physical_device_float_controls_properties_.shaderRoundingModeRTEFloat16;
+    pdd->physical_device_vulkan_1_2_properties_.shaderRoundingModeRTEFloat32 =
+        pdd->physical_device_float_controls_properties_.shaderRoundingModeRTEFloat32;
+    pdd->physical_device_vulkan_1_2_properties_.shaderRoundingModeRTEFloat64 =
+        pdd->physical_device_float_controls_properties_.shaderRoundingModeRTEFloat64;
+    pdd->physical_device_vulkan_1_2_properties_.shaderRoundingModeRTZFloat16 =
+        pdd->physical_device_float_controls_properties_.shaderRoundingModeRTZFloat16;
+    pdd->physical_device_vulkan_1_2_properties_.shaderRoundingModeRTZFloat32 =
+        pdd->physical_device_float_controls_properties_.shaderRoundingModeRTZFloat32;
+    pdd->physical_device_vulkan_1_2_properties_.shaderRoundingModeRTZFloat64 =
+        pdd->physical_device_float_controls_properties_.shaderRoundingModeRTZFloat64;
+    pdd->physical_device_vulkan_1_2_properties_.maxUpdateAfterBindDescriptorsInAllPools =
+        pdd->physical_device_descriptor_indexing_properties_.maxUpdateAfterBindDescriptorsInAllPools;
+    pdd->physical_device_vulkan_1_2_properties_.shaderUniformBufferArrayNonUniformIndexingNative =
+        pdd->physical_device_descriptor_indexing_properties_.shaderUniformBufferArrayNonUniformIndexingNative;
+    pdd->physical_device_vulkan_1_2_properties_.shaderSampledImageArrayNonUniformIndexingNative =
+        pdd->physical_device_descriptor_indexing_properties_.shaderSampledImageArrayNonUniformIndexingNative;
+    pdd->physical_device_vulkan_1_2_properties_.shaderStorageBufferArrayNonUniformIndexingNative =
+        pdd->physical_device_descriptor_indexing_properties_.shaderStorageBufferArrayNonUniformIndexingNative;
+    pdd->physical_device_vulkan_1_2_properties_.shaderStorageImageArrayNonUniformIndexingNative =
+        pdd->physical_device_descriptor_indexing_properties_.shaderStorageImageArrayNonUniformIndexingNative;
+    pdd->physical_device_vulkan_1_2_properties_.shaderInputAttachmentArrayNonUniformIndexingNative =
+        pdd->physical_device_descriptor_indexing_properties_.shaderInputAttachmentArrayNonUniformIndexingNative;
+    pdd->physical_device_vulkan_1_2_properties_.robustBufferAccessUpdateAfterBind =
+        pdd->physical_device_descriptor_indexing_properties_.robustBufferAccessUpdateAfterBind;
+    pdd->physical_device_vulkan_1_2_properties_.quadDivergentImplicitLod =
+        pdd->physical_device_descriptor_indexing_properties_.quadDivergentImplicitLod;
+    pdd->physical_device_vulkan_1_2_properties_.maxPerStageDescriptorUpdateAfterBindSamplers =
+        pdd->physical_device_descriptor_indexing_properties_.maxPerStageDescriptorUpdateAfterBindSamplers;
+    pdd->physical_device_vulkan_1_2_properties_.maxPerStageDescriptorUpdateAfterBindUniformBuffers =
+        pdd->physical_device_descriptor_indexing_properties_.maxPerStageDescriptorUpdateAfterBindUniformBuffers;
+    pdd->physical_device_vulkan_1_2_properties_.maxPerStageDescriptorUpdateAfterBindStorageBuffers =
+        pdd->physical_device_descriptor_indexing_properties_.maxPerStageDescriptorUpdateAfterBindStorageBuffers;
+    pdd->physical_device_vulkan_1_2_properties_.maxPerStageDescriptorUpdateAfterBindSampledImages =
+        pdd->physical_device_descriptor_indexing_properties_.maxPerStageDescriptorUpdateAfterBindSampledImages;
+    pdd->physical_device_vulkan_1_2_properties_.maxPerStageDescriptorUpdateAfterBindStorageImages =
+        pdd->physical_device_descriptor_indexing_properties_.maxPerStageDescriptorUpdateAfterBindStorageImages;
+    pdd->physical_device_vulkan_1_2_properties_.maxPerStageDescriptorUpdateAfterBindInputAttachments =
+        pdd->physical_device_descriptor_indexing_properties_.maxPerStageDescriptorUpdateAfterBindInputAttachments;
+    pdd->physical_device_vulkan_1_2_properties_.maxPerStageUpdateAfterBindResources =
+        pdd->physical_device_descriptor_indexing_properties_.maxPerStageUpdateAfterBindResources;
+    pdd->physical_device_vulkan_1_2_properties_.maxDescriptorSetUpdateAfterBindSamplers =
+        pdd->physical_device_descriptor_indexing_properties_.maxDescriptorSetUpdateAfterBindSamplers;
+    pdd->physical_device_vulkan_1_2_properties_.maxDescriptorSetUpdateAfterBindUniformBuffers =
+        pdd->physical_device_descriptor_indexing_properties_.maxDescriptorSetUpdateAfterBindUniformBuffers;
+    pdd->physical_device_vulkan_1_2_properties_.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic =
+        pdd->physical_device_descriptor_indexing_properties_.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic;
+    pdd->physical_device_vulkan_1_2_properties_.maxDescriptorSetUpdateAfterBindStorageBuffers =
+        pdd->physical_device_descriptor_indexing_properties_.maxDescriptorSetUpdateAfterBindStorageBuffers;
+    pdd->physical_device_vulkan_1_2_properties_.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic =
+        pdd->physical_device_descriptor_indexing_properties_.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic;
+    pdd->physical_device_vulkan_1_2_properties_.maxDescriptorSetUpdateAfterBindSampledImages =
+        pdd->physical_device_descriptor_indexing_properties_.maxDescriptorSetUpdateAfterBindSampledImages;
+    pdd->physical_device_vulkan_1_2_properties_.maxDescriptorSetUpdateAfterBindStorageImages =
+        pdd->physical_device_descriptor_indexing_properties_.maxDescriptorSetUpdateAfterBindStorageImages;
+    pdd->physical_device_vulkan_1_2_properties_.maxDescriptorSetUpdateAfterBindInputAttachments =
+        pdd->physical_device_descriptor_indexing_properties_.maxDescriptorSetUpdateAfterBindInputAttachments;
+    pdd->physical_device_vulkan_1_2_properties_.supportedDepthResolveModes =
+        pdd->physical_device_depth_stencil_resolve_properties_.supportedDepthResolveModes;
+    pdd->physical_device_vulkan_1_2_properties_.supportedStencilResolveModes =
+        pdd->physical_device_depth_stencil_resolve_properties_.supportedStencilResolveModes;
+    pdd->physical_device_vulkan_1_2_properties_.independentResolveNone =
+        pdd->physical_device_depth_stencil_resolve_properties_.independentResolveNone;
+    pdd->physical_device_vulkan_1_2_properties_.independentResolve =
+        pdd->physical_device_depth_stencil_resolve_properties_.independentResolve;
+    pdd->physical_device_vulkan_1_2_properties_.filterMinmaxSingleComponentFormats =
+        pdd->physical_device_sampler_filter_minmax_properties_.filterMinmaxSingleComponentFormats;
+    pdd->physical_device_vulkan_1_2_properties_.filterMinmaxImageComponentMapping =
+        pdd->physical_device_sampler_filter_minmax_properties_.filterMinmaxImageComponentMapping;
+    pdd->physical_device_vulkan_1_2_properties_.maxTimelineSemaphoreValueDifference =
+        pdd->physical_device_timeline_semaphore_properties_.maxTimelineSemaphoreValueDifference;
+    // pdd->physical_device_vulkan_1_2_properties_.framebufferIntegerColorSampleCounts;
+
+    // VkPhysicalDeviceVulkan13Features
+    pdd->physical_device_vulkan_1_3_features_.robustImageAccess = pdd->physical_device_image_robustness_features_.robustImageAccess;
+    pdd->physical_device_vulkan_1_3_features_.inlineUniformBlock =
+        pdd->physical_device_inline_uniform_block_features_.inlineUniformBlock;
+    pdd->physical_device_vulkan_1_3_features_.descriptorBindingInlineUniformBlockUpdateAfterBind =
+        pdd->physical_device_inline_uniform_block_features_.descriptorBindingInlineUniformBlockUpdateAfterBind =
+            pdd->physical_device_pipeline_creation_cache_control_features_.pipelineCreationCacheControl;
+    pdd->physical_device_vulkan_1_3_features_.pipelineCreationCacheControl =
+        pdd->physical_device_pipeline_creation_cache_control_features_.pipelineCreationCacheControl;
+    pdd->physical_device_vulkan_1_3_features_.privateData = pdd->physical_device_private_data_features_.privateData;
+    pdd->physical_device_vulkan_1_3_features_.shaderDemoteToHelperInvocation =
+        pdd->physical_device_shader_demote_to_helper_invocation_features_.shaderDemoteToHelperInvocation;
+    pdd->physical_device_vulkan_1_3_features_.shaderTerminateInvocation =
+        pdd->physical_device_shader_terminate_invocation_features_.shaderTerminateInvocation;
+    pdd->physical_device_vulkan_1_3_features_.subgroupSizeControl =
+        pdd->physical_device_subgroup_size_control_features_.subgroupSizeControl;
+    pdd->physical_device_vulkan_1_3_features_.computeFullSubgroups =
+        pdd->physical_device_subgroup_size_control_features_.computeFullSubgroups;
+    pdd->physical_device_vulkan_1_3_features_.synchronization2 = pdd->physical_device_synchronization2_features_.synchronization2;
+    pdd->physical_device_vulkan_1_3_features_.textureCompressionASTC_HDR =
+        pdd->physical_device_texture_compression_astc_hdr_features_.textureCompressionASTC_HDR;
+    pdd->physical_device_vulkan_1_3_features_.shaderZeroInitializeWorkgroupMemory =
+        pdd->physical_device_zero_initialize_workgroup_memory_features_.shaderZeroInitializeWorkgroupMemory;
+    pdd->physical_device_vulkan_1_3_features_.dynamicRendering = pdd->physical_device_dynamic_rendering_features_.dynamicRendering;
+    pdd->physical_device_vulkan_1_3_features_.shaderIntegerDotProduct =
+        pdd->physical_device_shader_integer_dot_product_features_.shaderIntegerDotProduct;
+    pdd->physical_device_vulkan_1_3_features_.maintenance4 = pdd->physical_device_maintenance_4_features_.maintenance4;
+
+    // VkPhysicalDeviceVulkan13Properties
+    pdd->physical_device_vulkan_1_3_properties_.minSubgroupSize =
+        pdd->physical_device_subgroup_size_control_properties_.minSubgroupSize;
+    pdd->physical_device_vulkan_1_3_properties_.maxSubgroupSize =
+        pdd->physical_device_subgroup_size_control_properties_.maxSubgroupSize;
+    pdd->physical_device_vulkan_1_3_properties_.maxComputeWorkgroupSubgroups =
+        pdd->physical_device_subgroup_size_control_properties_.maxComputeWorkgroupSubgroups;
+    pdd->physical_device_vulkan_1_3_properties_.requiredSubgroupSizeStages =
+        pdd->physical_device_subgroup_size_control_properties_.requiredSubgroupSizeStages;
+    pdd->physical_device_vulkan_1_3_properties_.maxInlineUniformBlockSize =
+        pdd->physical_device_inline_uniform_block_properties_.maxInlineUniformBlockSize;
+    pdd->physical_device_vulkan_1_3_properties_.maxPerStageDescriptorInlineUniformBlocks =
+        pdd->physical_device_inline_uniform_block_properties_.maxPerStageDescriptorInlineUniformBlocks;
+    pdd->physical_device_vulkan_1_3_properties_.maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks =
+        pdd->physical_device_inline_uniform_block_properties_.maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks;
+    pdd->physical_device_vulkan_1_3_properties_.maxDescriptorSetInlineUniformBlocks =
+        pdd->physical_device_inline_uniform_block_properties_.maxDescriptorSetInlineUniformBlocks;
+    pdd->physical_device_vulkan_1_3_properties_.maxDescriptorSetUpdateAfterBindInlineUniformBlocks =
+        pdd->physical_device_inline_uniform_block_properties_.maxDescriptorSetUpdateAfterBindInlineUniformBlocks;
+    // pdd->physical_device_vulkan_1_3_properties_.maxInlineUniformTotalSize;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct8BitUnsignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct8BitUnsignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct8BitSignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct8BitSignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct8BitMixedSignednessAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct8BitMixedSignednessAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct4x8BitPackedUnsignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct4x8BitPackedUnsignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct4x8BitPackedSignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct4x8BitPackedSignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct4x8BitPackedMixedSignednessAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct4x8BitPackedMixedSignednessAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct16BitUnsignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct16BitUnsignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct16BitSignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct16BitSignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct16BitMixedSignednessAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct16BitMixedSignednessAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct32BitUnsignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct32BitUnsignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct32BitSignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct32BitSignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct32BitMixedSignednessAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct32BitMixedSignednessAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct64BitUnsignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct64BitUnsignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct64BitSignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct64BitSignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProduct64BitMixedSignednessAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProduct64BitMixedSignednessAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating8BitUnsignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProductAccumulatingSaturating8BitUnsignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating8BitSignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProductAccumulatingSaturating8BitSignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_
+            .integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_
+            .integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_
+            .integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_
+            .integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating16BitUnsignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_
+            .integerDotProductAccumulatingSaturating16BitUnsignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating16BitSignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProductAccumulatingSaturating16BitSignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_
+            .integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating32BitUnsignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_
+            .integerDotProductAccumulatingSaturating32BitUnsignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating32BitSignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProductAccumulatingSaturating32BitSignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_
+            .integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating64BitUnsignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_
+            .integerDotProductAccumulatingSaturating64BitUnsignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating64BitSignedAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_.integerDotProductAccumulatingSaturating64BitSignedAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated =
+        pdd->physical_device_shader_integer_dot_products_properties_
+            .integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated;
+    pdd->physical_device_vulkan_1_3_properties_.storageTexelBufferOffsetAlignmentBytes =
+        pdd->physical_device_texel_buffer_alignment_properties_.storageTexelBufferOffsetAlignmentBytes;
+    pdd->physical_device_vulkan_1_3_properties_.storageTexelBufferOffsetSingleTexelAlignment =
+        pdd->physical_device_texel_buffer_alignment_properties_.storageTexelBufferOffsetSingleTexelAlignment;
+    pdd->physical_device_vulkan_1_3_properties_.uniformTexelBufferOffsetAlignmentBytes =
+        pdd->physical_device_texel_buffer_alignment_properties_.uniformTexelBufferOffsetAlignmentBytes;
+    pdd->physical_device_vulkan_1_3_properties_.uniformTexelBufferOffsetSingleTexelAlignment =
+        pdd->physical_device_texel_buffer_alignment_properties_.uniformTexelBufferOffsetSingleTexelAlignment;
+    pdd->physical_device_vulkan_1_3_properties_.maxBufferSize = pdd->physical_device_maintenance_4_properties_.maxBufferSize;
+}
+
 #define TRANSFER_VALUE(name)    \
     if (promoted_written) {     \
         src->name = dest->name; \
@@ -10335,6 +10702,8 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 pdd.physical_device_properties_ = property_chain.properties;
                 pdd.physical_device_features_ = feature_chain.features;
                 pdd.physical_device_memory_properties_ = memory_chain.memoryProperties;
+
+                TransferDeviceValues(&pdd);
             }
 
             ::device_has_astc = pdd.physical_device_features_.textureCompressionASTC_LDR;
