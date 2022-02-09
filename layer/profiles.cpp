@@ -2146,7 +2146,7 @@ class JsonLoader {
         if (new_value > old_value) {
             LogMessage(
                 DEBUG_REPORT_WARNING_BIT,
-                format("%s JSON value (%" PRIu64 ") is greater than existing value (%" PRIu64 ")\n", name, new_value, old_value));
+                format("%s profile value (%" PRIu64 ") is greater than device value (%" PRIu64 ")\n", name, new_value, old_value));
             return true;
         }
         return false;
@@ -2155,7 +2155,7 @@ class JsonLoader {
     static bool WarnIfGreaterSizet(const char *name, const size_t new_value, const size_t old_value) {
         if (new_value > old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       format("%s JSON value (%" PRIuLEAST64 ") is greater than existing value (%" PRIuLEAST64 ")\n", name,
+                       format("%s profile value (%" PRIuLEAST64 ") is greater than device value (%" PRIuLEAST64 ")\n", name,
                               new_value, old_value));
             return true;
         }
@@ -2165,7 +2165,7 @@ class JsonLoader {
     static bool WarnIfGreaterFloat(const char *name, const float new_value, const float old_value) {
         if (new_value > old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       format("%s JSON value (%3.2f) is greater than existing value (%3.2f)\n", name, new_value, old_value));
+                       format("%s profile value (%3.2f) is greater than device value (%3.2f)\n", name, new_value, old_value));
             return true;
         }
         return false;
@@ -2174,7 +2174,7 @@ class JsonLoader {
     static bool WarnIfNotEqualBool(const char *name, const bool new_value, const bool old_value) {
         if (new_value && !old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       format("%s JSON value is enabled in the profile, but the device does not support it.\n", name));
+                       format("%s profile value is enabled in the profile, but the device does not support it.\n", name));
             return true;
         }
         return false;
@@ -2183,7 +2183,7 @@ class JsonLoader {
     static bool WarnIfNotEqualEnum(const char *name, const uint32_t new_value, const uint32_t old_value) {
         if (new_value != old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       format("%s JSON value (%" PRIu32 ") is different from the existing value (%" PRIu32 ").\n", name, new_value,
+                       format("%s profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\n", name, new_value,
                               old_value));
             return true;
         }
@@ -2193,7 +2193,7 @@ class JsonLoader {
     static bool WarnIfMissingBit(const char *name, const uint32_t new_value, const uint32_t old_value) {
         if ((old_value | new_value) != old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       format("%s JSON value (%" PRIu32 ") has bits set that the existing value (%" PRIu32 ") does not\n", name,
+                       format("%s profile value (%" PRIu32 ") has bits set that the device value (%" PRIu32 ") does not\n", name,
                               new_value, old_value));
             return true;
         }
@@ -2202,8 +2202,9 @@ class JsonLoader {
 
     static bool WarnIfLesser(const char *name, const uint64_t new_value, const uint64_t old_value) {
         if (new_value < old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT, format("%s JSON value (%" PRIu64 ") is lesser than existing value (%" PRIu64 ")\n",
-                                                        name, new_value, old_value));
+            LogMessage(
+                DEBUG_REPORT_WARNING_BIT,
+                format("%s profile value (%" PRIu64 ") is lesser than device value (%" PRIu64 ")\n", name, new_value, old_value));
             return true;
         }
         return false;
@@ -2212,7 +2213,7 @@ class JsonLoader {
     static bool WarnIfLesserSizet(const char *name, const size_t new_value, const size_t old_value) {
         if (new_value < old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       format("%s JSON value (%" PRIuLEAST64 ") is lesser than existing value (%" PRIuLEAST64 ")\n", name,
+                       format("%s profile value (%" PRIuLEAST64 ") is lesser than device value (%" PRIuLEAST64 ")\n", name,
                               new_value, old_value));
             return true;
         }
@@ -2222,7 +2223,7 @@ class JsonLoader {
     static bool WarnIfLesserFloat(const char *name, const float new_value, const float old_value) {
         if (new_value < old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       format("%s JSON value (%3.2f) is lesser than existing value (%3.2f)\n", name, new_value, old_value));
+                       format("%s profile value (%3.2f) is lesser than profile value (%3.2f)\n", name, new_value, old_value));
             return true;
         }
         return false;
