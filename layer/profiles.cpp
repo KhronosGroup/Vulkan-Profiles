@@ -1926,10 +1926,17 @@ class JsonLoader {
 
    private:
     std::uint32_t profile_api_version;
+    std::vector<std::string> excluded_extensions;
 
     struct Extension {
         std::string name;
         int specVersion;
+    };
+
+    enum ExtensionSupport {
+        UNSUPPORTED,
+        EXCLUDED,
+        SUPPORTED,
     };
 
     bool WarnDuplicatedFeature(const Json::Value &parent);
@@ -1940,7 +1947,7 @@ class JsonLoader {
                    ArrayOfVkFormatProperties3 *dest3);
     bool GetDrmFormatModifierProperties(const Json::Value &formats, const std::string &format_name,
                                         ArrayOfVkDrmFormatModifierProperties *dest);
-    bool CheckExtensionSupport(const char *extension);
+    ExtensionSupport CheckExtensionSupport(const char *extension);
     void AddPromotedExtensions(uint32_t api_level);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStencilResolveProperties *dest);
@@ -3595,14 +3602,24 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
     return valid;
 }
 
-bool JsonLoader::CheckExtensionSupport(const char *extension) {
+JsonLoader::ExtensionSupport JsonLoader::CheckExtensionSupport(const char *extension) {
+    for (const auto& ext : excluded_extensions) {
+        if (ext == extension) {
+            LogMessage(
+                DEBUG_REPORT_NOTIFICATION_BIT,
+                ::format(
+                    "Profile sets variables for structs provided by %s, but %s is excluded, device values are used.\n",
+                    extension, extension));
+            return JsonLoader::ExtensionSupport::EXCLUDED;
+        }
+    }
     if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
         if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, extension)) {
             LogMessage(DEBUG_REPORT_ERROR_BIT,
                        ::format("Profile sets variables for structs provided by %s, but %s is not enabled by the profile.\n",
                                 extension, extension));
             if (layer_settings->debug_fail_on_error) {
-                return false;
+                return JsonLoader::ExtensionSupport::UNSUPPORTED;
             }
         }
     } else {
@@ -3612,7 +3629,7 @@ bool JsonLoader::CheckExtensionSupport(const char *extension) {
                                 extension, extension));
         }
     }
-    return true;
+    return JsonLoader::ExtensionSupport::SUPPORTED;
 }
 
 void JsonLoader::AddPromotedExtensions(uint32_t api_version) {
@@ -3995,6 +4012,12 @@ VkResult JsonLoader::LoadFile(std::string filename) {
         return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
+    for (std::size_t j = 0, m = layer_settings->exclude_device_extensions.size(); j < m; ++j) {
+        const auto &extension = layer_settings->exclude_device_extensions[j];
+        if (extension.empty()) continue;
+        excluded_extensions.push_back(extension);
+    }
+
     const std::string &profile_name = layer_settings->profile_name;
     const Json::Value &profiles = root["profiles"];
     std::vector<std::string> capabilities;
@@ -4130,8 +4153,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProperties 
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStencilResolveProperties *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDepthStencilResolveProperties)\n");
-    if (!CheckExtensionSupport(VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -4145,8 +4171,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStenci
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDescriptorIndexingPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -4180,8 +4209,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatControlsPropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFloatControlsPropertiesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -4208,8 +4240,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatContro
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance3PropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance3PropertiesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_MAINTENANCE3_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_MAINTENANCE3_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -4221,8 +4256,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4FeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance4FeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_MAINTENANCE_4_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -4233,8 +4271,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4PropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance4PropertiesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_MAINTENANCE_4_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_MAINTENANCE_4_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -4245,8 +4286,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMultiviewPropertiesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_MULTIVIEW_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -4380,8 +4424,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMe
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -4393,8 +4440,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilt
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphorePropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTimelineSemaphorePropertiesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -4404,6 +4454,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSem
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceLimits)\n");
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, maxImageDimension1D, WarnIfGreater);
@@ -4517,6 +4568,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSparseProperties *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSparseProperties)\n");
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE_WARN(prop, residencyStandard2DBlockShape, WarnIfNotEqualBool);
@@ -4605,8 +4657,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *d
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorageFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevice8BitStorageFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_8BIT_STORAGE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_8BIT_STORAGE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4619,8 +4674,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorage
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorageFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevice16BitStorageFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_16BIT_STORAGE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_16BIT_STORAGE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4634,8 +4692,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorag
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceBufferDeviceAddressFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4648,8 +4709,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDevic
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDescriptorIndexingFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4679,8 +4743,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryResetFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceHostQueryResetFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4691,8 +4758,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryRe
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFramebufferFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceImagelessFramebufferFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4703,8 +4773,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFr
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMultiviewFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_MULTIVIEW_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_MULTIVIEW_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4762,8 +4835,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMe
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4774,8 +4850,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbc
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceScalarBlockLayoutFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4786,8 +4865,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlock
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4798,8 +4880,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDep
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicInt64FeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4824,8 +4909,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawP
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat16Int8FeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderFloat16Int8FeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4836,9 +4924,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *dest) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFeatures)\n");
-    if (!CheckExtensionSupport(VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR)\n");
+    const auto support = CheckExtensionSupport(VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4849,8 +4940,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgr
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTimelineSemaphoreFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4861,8 +4955,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSem
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4873,8 +4970,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBuff
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePointersFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVariablePointersFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4886,8 +4986,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePoi
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVulkanMemoryModelFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4900,8 +5003,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemor
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4912,8 +5018,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitial
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructureFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceAccelerationStructureFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4928,8 +5037,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructurePropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceAccelerationStructurePropertiesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -4947,8 +5059,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePerformanceQueryFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4960,8 +5075,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryPropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePerformanceQueryPropertiesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -4972,8 +5090,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4984,8 +5105,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExe
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePresentIdFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_PRESENT_ID_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_PRESENT_ID_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -4996,8 +5120,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFe
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWaitFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePresentWaitFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_PRESENT_WAIT_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5008,8 +5135,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWait
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescriptorPropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePushDescriptorPropertiesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5020,8 +5150,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescrip
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRayQueryFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_RAY_QUERY_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5032,8 +5165,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFea
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelineFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPipelineFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5048,8 +5184,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelinePropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPipelinePropertiesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5067,8 +5206,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClockFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderClockFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_SHADER_CLOCK_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_SHADER_CLOCK_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5080,8 +5222,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClock
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5092,8 +5237,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5133,8 +5281,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5145,8 +5296,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgr
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5157,8 +5311,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTermi
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchronization2FeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSynchronization2FeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5169,8 +5326,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchroniza
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5183,9 +5343,12 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444FormatsFeaturesEXT *dest) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevice4444FormatsFeaturesEXT)\n");
+    const auto support = CheckExtensionSupport(VK_EXT_4444_FORMATS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5197,8 +5360,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444Formats
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceASTCDecodeFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5209,8 +5375,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeF
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5221,8 +5390,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5238,8 +5410,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceBorderColorSwizzleFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5251,8 +5426,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColor
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceColorWriteEnableFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5263,8 +5441,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteE
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceConditionalRenderingFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5276,8 +5457,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditional
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceConservativeRasterizationPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5296,8 +5480,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativ
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCustomBorderColorFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5309,8 +5496,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorde
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCustomBorderColorPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5321,8 +5511,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorde
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDepthClipEnableFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5333,8 +5526,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEn
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDeviceMemoryReportFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5345,8 +5541,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemor
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDiscardRectanglePropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5357,8 +5556,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRect
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceExtendedDynamicStateFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5369,8 +5571,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceExtendedDynamicState2FeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5383,8 +5588,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryHostPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceExternalMemoryHostPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5395,8 +5603,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5409,8 +5620,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5423,8 +5637,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5437,8 +5654,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5449,8 +5669,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPrior
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobustnessFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceImageRobustnessFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5461,8 +5684,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobust
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUint8FeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceIndexTypeUint8FeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5473,8 +5699,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUi
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceInlineUniformBlockFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5486,8 +5715,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceInlineUniformBlockPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5502,8 +5734,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceLineRasterizationFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5519,8 +5754,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceLineRasterizationPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5531,8 +5769,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPriorityFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMemoryPriorityFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5543,8 +5784,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPrior
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMultiDrawFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_MULTI_DRAW_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5555,8 +5799,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFe
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMultiDrawPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_MULTI_DRAW_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_MULTI_DRAW_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5567,8 +5814,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPr
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5579,8 +5829,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDev
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5591,8 +5844,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCre
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5604,8 +5860,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTo
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateDataFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePrivateDataFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_PRIVATE_DATA_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_PRIVATE_DATA_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5616,8 +5875,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateData
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceProvokingVertexFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5629,8 +5891,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceProvokingVertexPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5642,8 +5907,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5654,8 +5922,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6For
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2FeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRobustness2FeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_ROBUSTNESS_2_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5668,8 +5939,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2PropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRobustness2PropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_ROBUSTNESS_2_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_ROBUSTNESS_2_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5681,8 +5955,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocationsPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSampleLocationsPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5697,8 +5974,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocat
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicFloatFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5720,8 +6000,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5743,8 +6026,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5755,8 +6041,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemot
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5768,8 +6057,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupSizeControlFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5781,8 +6073,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupSizeControlPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5796,8 +6091,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5808,8 +6106,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5823,8 +6124,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5835,8 +6139,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureComp
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTransformFeedbackFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5848,8 +6155,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTransformFeedbackPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5869,8 +6179,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5882,8 +6195,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5894,8 +6210,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5906,8 +6225,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInput
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5918,8 +6240,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceYcbcrImageArraysFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5930,8 +6255,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageA
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5944,8 +6272,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRatePropertiesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -5972,8 +6303,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMemoryFeaturesAMD *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCoherentMemoryFeaturesAMD)\n");
-    if (!CheckExtensionSupport(VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5984,8 +6318,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMem
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCorePropertiesAMD *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderCorePropertiesAMD)\n");
-    if (!CheckExtensionSupport(VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6009,8 +6346,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreProperties2AMD *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderCoreProperties2AMD)\n");
-    if (!CheckExtensionSupport(VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6022,8 +6362,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceInvocationMaskFeaturesHUAWEI)\n");
-    if (!CheckExtensionSupport(VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6034,8 +6377,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationM
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSubpassShadingFeaturesHUAWEI)\n");
-    if (!CheckExtensionSupport(VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6046,8 +6392,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSubpassShadingPropertiesHUAWEI)\n");
-    if (!CheckExtensionSupport(VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6058,8 +6407,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL)\n");
-    if (!CheckExtensionSupport(VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6070,8 +6422,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceComputeShaderDerivativesFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6083,8 +6438,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShad
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCooperativeMatrixFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6096,8 +6454,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixPropertiesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCooperativeMatrixPropertiesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6108,8 +6469,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampledImageFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCornerSampledImageFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6120,8 +6484,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampl
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageReductionModeFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCoverageReductionModeFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6132,8 +6499,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageRed
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_DEDICATED_ALLOCATION_IMAGE_ALIASING_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_DEDICATED_ALLOCATION_IMAGE_ALIASING_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6144,8 +6514,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAl
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDiagnosticsConfigFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6156,8 +6529,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnostics
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6168,8 +6544,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6188,8 +6567,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceExternalMemoryRDMAFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6200,8 +6582,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6212,8 +6597,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6226,8 +6614,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6238,8 +6629,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedViewportScissorFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceInheritedViewportScissorFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6250,8 +6644,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedVi
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_MESH_SHADER_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_MESH_SHADER_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6263,8 +6660,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderF
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderPropertiesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderPropertiesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_MESH_SHADER_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_MESH_SHADER_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6287,8 +6687,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderP
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPropertiesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPropertiesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_RAY_TRACING_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_RAY_TRACING_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6306,8 +6709,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingMotionBlurFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6319,8 +6725,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingM
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6331,8 +6740,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentat
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveScissorFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceExclusiveScissorFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6343,8 +6755,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveSc
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageFootprintFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderImageFootprintFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6355,8 +6770,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderSMBuiltinsFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6367,8 +6785,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBui
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsPropertiesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderSMBuiltinsPropertiesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6380,8 +6801,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBui
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImageFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShadingRateImageFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6393,8 +6817,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImagePropertiesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShadingRateImagePropertiesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6407,8 +6834,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE)\n");
-    if (!CheckExtensionSupport(VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6419,8 +6849,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDesc
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRenderingFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDynamicRenderingFeaturesKHR)\n");
-    if (!CheckExtensionSupport(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6431,8 +6864,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRend
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageViewMinLodFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceImageViewMinLodFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_IMAGE_VIEW_MIN_LOD_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_IMAGE_VIEW_MIN_LOD_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6443,8 +6879,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageViewMi
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMap2FeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6455,8 +6894,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMap2PropertiesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6470,8 +6912,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM)\n");
-    if (!CheckExtensionSupport(VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6482,8 +6927,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM)\n");
-    if (!CheckExtensionSupport(VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6494,8 +6942,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipControlFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDepthClipControlFeaturesEXT)\n");
-    if (!CheckExtensionSupport(VK_EXT_DEPTH_CLIP_CONTROL_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_EXT_DEPTH_CLIP_CONTROL_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6506,8 +6957,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipCo
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM)\n");
-    if (!CheckExtensionSupport(VK_ARM_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_ARM_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
@@ -6520,8 +6974,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRasterizati
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLinearColorAttachmentFeaturesNV *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceLinearColorAttachmentFeaturesNV)\n");
-    if (!CheckExtensionSupport(VK_NV_LINEAR_COLOR_ATTACHMENT_EXTENSION_NAME)) {
+    const auto support = CheckExtensionSupport(VK_NV_LINEAR_COLOR_ATTACHMENT_EXTENSION_NAME);
+    if (support == ExtensionSupport::UNSUPPORTED) {
         return false;
+    } else if (support == ExtensionSupport::EXCLUDED) {
+        return true;
     }
     bool valid = true;
     for (const auto &prop : parent.getMemberNames()) {
