@@ -4415,7 +4415,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_VALUE_WARN(prop, maxPushConstantsSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxMemoryAllocationCount, WarnIfGreater);
         GET_VALUE_WARN(prop, maxSamplerAllocationCount, WarnIfGreater);
-        GET_VALUE_WARN(prop, bufferImageGranularity, WarnIfGreater);
+        GET_VALUE_WARN(prop, bufferImageGranularity, WarnIfLesser);
         GET_VALUE_WARN(prop, sparseAddressSpaceSize, WarnIfGreater);
         GET_VALUE_WARN(prop, maxBoundDescriptorSets, WarnIfGreater);
         GET_VALUE_WARN(prop, maxPerStageDescriptorSamplers, WarnIfGreater);
