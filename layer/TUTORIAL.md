@@ -133,7 +133,7 @@ Enables emulation of the `VK_KHR_portability_subset` extension.
 - Environment Variable: `VK_KHRONOS_PROFILES_SIMULATE_CAPABILITIES`
 - `vk_layer_settings.txt` Option: `khronos_profiles.simulate_capabilities`
 - Android Option: `debug.vulkan.khronos_profiles.simulate_capabilities`
-- Options: SIMULATE_API_VERSION_BIT, SIMULATE_EXTENSIONS_BIT, SIMULATE_FEATURES_BIT, SIMULATE_PROPERTIES_BIT, SIMULATE_FORMATS_BIT
+- Options: SIMULATE_NONE_BIT, SIMULATE_API_VERSION_BIT, SIMULATE_EXTENSIONS_BIT, SIMULATE_FEATURES_BIT, SIMULATE_PROPERTIES_BIT, SIMULATE_FORMATS_BIT
 - Default Value: SIMULATE_API_VERSION_BIT, SIMULATE_FEATURES_BIT, SIMULATE_PROPERTIES_BIT
 
 Enables modification of device capabilities.

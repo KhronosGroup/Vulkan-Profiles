@@ -21,12 +21,12 @@
 #include "vk_layer_settings.h"
 
 enum SimulateCapabilityFlag {
+    SIMULATE_NONE_BIT = 0,
     SIMULATE_API_VERSION_BIT = 1 << 0,
     SIMULATE_FEATURES_BIT = 1 << 1,
     SIMULATE_PROPERTIES_BIT = 1 << 2,
     SIMULATE_EXTENSIONS_BIT = 1 << 3,
     SIMULATE_FORMATS_BIT = 1 << 4,
-    SIMULATE_FORMAT_PROPERTIES_BIT = 1 << 5,
     SIMULATE_ALL_CAPABILITIES = 0xFFFFFFFF
 };
 typedef int SimulateCapabilityFlags;
