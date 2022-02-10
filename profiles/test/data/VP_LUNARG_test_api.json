@@ -2983,13 +2983,26 @@
                             "depth": 381
                         }
                     },
-                    "VkQueueFamilyGlobalPriorityPropertiesEXT": {
+                    "VkQueueFamilyProperties2": {
+                        "queueFamilyProperties": {
+                            "queueFlags": [ "VK_QUEUE_COMPUTE_BIT", "VK_QUEUE_TRANSFER_BIT" ],
+                            "queueCount": 382,
+                            "timestampValidBits": 383,
+                            "minImageTransferGranularity": {
+                                "width": 384,
+                                "height": 385,
+                                "depth": 386
+                            }
+                        }
+                    },
+                    "VkQueueFamilyGlobalPriorityPropertiesKHR": {
                         "priorities": [
                             "VK_QUEUE_GLOBAL_PRIORITY_LOW_EXT",
                             "VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_EXT",
                             "VK_QUEUE_GLOBAL_PRIORITY_HIGH_EXT",
                             "VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT"
-                        ]
+                        ],
+                        "priorityCount": 4
                     },
                     "VkVideoQueueFamilyProperties2KHR": {
                         "videoCodecOperations": [ "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT" ]
@@ -3000,6 +3013,14 @@
                             "VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT",
                             "VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT"
                         ]
+                    },
+                    "VkQueueFamilyCheckpointPropertiesNV": {
+                        "checkpointExecutionStageMask": [
+                            "VK_PIPELINE_STAGE_TRANSFER_BIT"
+                        ]
+                    },
+                    "VkQueueFamilyQueryResultStatusProperties2KHR": {
+                        "supported": true
                     }
                 }
             ]

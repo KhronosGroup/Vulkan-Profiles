@@ -148,6 +148,8 @@ static SimulateCapabilityFlags GetSimulateCapabilityFlags(const vku::Strings &va
             result |= SIMULATE_EXTENSIONS_BIT;
         } else if (values[i] == "SIMULATE_FORMATS_BIT") {
             result |= SIMULATE_FORMATS_BIT;
+        } else if (values[i] == "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT") {
+            result |= SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT;
         }
     }
 
@@ -156,31 +158,29 @@ static SimulateCapabilityFlags GetSimulateCapabilityFlags(const vku::Strings &va
 
 static std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags) {
     std::string result = {};
-    bool need_comma = false;
 
     if (flags & SIMULATE_API_VERSION_BIT) {
         result += "SIMULATE_API_VERSION_BIT";
-        need_comma = true;
     }
     if (flags & SIMULATE_FEATURES_BIT) {
-        if (need_comma) result += ", ";
+        if (!result.empty()) result += ", ";
         result += "SIMULATE_FEATURES_BIT";
-        need_comma = true;
     }
     if (flags & SIMULATE_PROPERTIES_BIT) {
-        if (need_comma) result += ", ";
+        if (!result.empty()) result += ", ";
         result += "SIMULATE_PROPERTIES_BIT";
-        need_comma = true;
     }
     if (flags & SIMULATE_EXTENSIONS_BIT) {
-        if (need_comma) result += ", ";
+        if (!result.empty()) result += ", ";
         result += "SIMULATE_EXTENSIONS_BIT";
-        need_comma = true;
     }
     if (flags & SIMULATE_FORMATS_BIT) {
-        if (need_comma) result += ", ";
+        if (!result.empty()) result += ", ";
         result += "SIMULATE_FORMATS_BIT";
-        need_comma = true;
+    }
+    if (flags & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT";
     }
 
     return result;
@@ -469,6 +469,39 @@ static std::string GetFormatFeature2String(VkFormatFeatureFlagBits2 flags) {
 }
 
 static VkProfileLayerSettingsEXT *layer_settings;
+static std::string GetQueueFlagsToString(VkQueueFlags flags) {
+    std::string result = {};
+
+    if (flags & VK_QUEUE_GRAPHICS_BIT) {
+        result += "VK_QUEUE_GRAPHICS_BIT";
+    }
+    if (flags & VK_QUEUE_COMPUTE_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "VK_QUEUE_COMPUTE_BIT";
+    }
+    if (flags & VK_QUEUE_TRANSFER_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "VK_QUEUE_TRANSFER_BIT";
+    }
+    if (flags & VK_QUEUE_SPARSE_BINDING_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "VK_QUEUE_SPARSE_BINDING_BIT";
+    }
+    if (flags & VK_QUEUE_PROTECTED_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "VK_QUEUE_PROTECTED_BIT";
+    }
+    if (flags & VK_QUEUE_VIDEO_DECODE_BIT_KHR) {
+        if (!result.empty()) result += ", ";
+        result += "VK_QUEUE_VIDEO_DECODE_BIT_KHR";
+    }
+    if (flags & VK_QUEUE_VIDEO_ENCODE_BIT_KHR) {
+        if (!result.empty()) result += ", ";
+        result += "VK_QUEUE_VIDEO_ENCODE_BIT_KHR";
+    }
+
+    return result;
+}
 
 bool HasFlags(VkFlags deviceFlags, VkFlags profileFlags) { return (deviceFlags & profileFlags) == profileFlags; }
 bool HasFlags(VkFlags64 deviceFlags, VkFlags64 profileFlags) { return (deviceFlags & profileFlags) == profileFlags; }
@@ -959,6 +992,25 @@ typedef std::unordered_map<uint32_t /*VkFormat*/, VkFormatProperties3> ArrayOfVk
 typedef std::unordered_map<uint32_t /*VkFormat*/, VkDrmFormatModifierPropertiesList2EXT> ArrayOfVkDrmFormatModifierProperties;
 typedef std::vector<VkExtensionProperties> ArrayOfVkExtensionProperties;
 
+struct QueueFamilyProperties {
+    VkQueueFamilyProperties2 properties_2 = {};
+    VkQueueFamilyGlobalPriorityPropertiesKHR global_priority_properties_ = {};
+    VkVideoQueueFamilyProperties2KHR video_properties_ = {};
+    VkQueueFamilyCheckpointPropertiesNV checkpoint_properties_ = {};
+    VkQueueFamilyCheckpointProperties2NV checkpoint_properties_2_ = {};
+    VkQueueFamilyQueryResultStatusProperties2KHR query_result_status_properties_ = {};
+
+    QueueFamilyProperties() {
+        properties_2.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2;
+        global_priority_properties_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_GLOBAL_PRIORITY_PROPERTIES_EXT;
+        video_properties_.sType = VK_STRUCTURE_TYPE_VIDEO_QUEUE_FAMILY_PROPERTIES_2_KHR;
+        checkpoint_properties_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_CHECKPOINT_PROPERTIES_NV;
+        checkpoint_properties_2_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_CHECKPOINT_PROPERTIES_2_NV;
+        query_result_status_properties_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_QUERY_RESULT_STATUS_PROPERTIES_2_KHR;
+    }
+};
+typedef std::vector<QueueFamilyProperties> ArrayOfVkQueueFamilyProperties;
+
 // FormatProperties utilities ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool IsFormatSupported(const VkFormatProperties &props) {
@@ -1038,7 +1090,7 @@ class PhysicalDeviceData {
     ArrayOfVkExtensionProperties device_extensions_;
     ArrayOfVkFormatProperties device_formats_;
     ArrayOfVkFormatProperties3 device_formats_3_;
-    // ArrayOfVkDrmFormatModifierProperties device_drm_format_modifier_properties_;
+    ArrayOfVkQueueFamilyProperties device_queue_family_properties_;
     ArrayOfVkExtensionProperties simulation_extensions_;
     VkPhysicalDeviceProperties physical_device_properties_;
     VkPhysicalDeviceFeatures physical_device_features_;
@@ -1046,8 +1098,8 @@ class PhysicalDeviceData {
     VkSurfaceCapabilitiesKHR surface_capabilities_;
     ArrayOfVkFormatProperties arrayof_format_properties_;
     ArrayOfVkFormatProperties3 arrayof_format_properties_3_;
-    // ArrayOfVkDrmFormatModifierProperties array_of_drm_format_modifier_properties_;
     ArrayOfVkExtensionProperties arrayof_extension_properties_;
+    ArrayOfVkQueueFamilyProperties arrayof_queue_family_properties_;
 
     // Vulkan 1.3 structs
     bool vulkan_1_3_properties_written_;
@@ -1953,6 +2005,8 @@ class JsonLoader {
     bool CheckVersionSupport(uint32_t version, const std::string& name);
     ExtensionSupport CheckExtensionSupport(const char *extension, const std::string& name);
     bool valid(ExtensionSupport support);
+    bool GetQueueFamilyProperties(const Json::Value &qf_props, QueueFamilyProperties *dest);
+    bool OrderQueueFamilyProperties(ArrayOfVkQueueFamilyProperties *qfp);
     void AddPromotedExtensions(uint32_t api_level);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStencilResolveProperties *dest);
@@ -2198,6 +2252,16 @@ class JsonLoader {
         if ((old_value | new_value) != old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
                        format("%s profile value (%" PRIu32 ") has bits set that the device value (%" PRIu32 ") does not\n", name,
+                              new_value, old_value));
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfMissingBit64(const char *name, const uint64_t new_value, const uint64_t old_value) {
+        if ((old_value | new_value) != old_value) {
+            LogMessage(DEBUG_REPORT_WARNING_BIT,
+                       format("%s JSON value (%" PRIu64 ") has bits set that the existing value (%" PRIu64  ") does not\n", name,
                               new_value, old_value));
             return true;
         }
@@ -2887,6 +2951,176 @@ static inline VkFormatFeatureFlags StringToVkFormatFeatureFlags(const std::strin
         {"VK_FORMAT_FEATURE_DISJOINT_BIT_KHR", VK_FORMAT_FEATURE_DISJOINT_BIT_KHR},
         {"VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR", VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR},
         {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT", VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT},
+    };
+    const auto it = map.find(input_value);
+    if (it != map.end()) {
+        return it->second;
+    }
+    return 0;
+}
+
+static inline VkQueueFlags StringToVkQueueFlags(const std::string &input_value) {
+    static const std::unordered_map<std::string, VkQueueFlags> map = {
+        {"VK_QUEUE_GRAPHICS_BIT", VK_QUEUE_GRAPHICS_BIT},
+        {"VK_QUEUE_COMPUTE_BIT", VK_QUEUE_COMPUTE_BIT},
+        {"VK_QUEUE_TRANSFER_BIT", VK_QUEUE_TRANSFER_BIT},
+        {"VK_QUEUE_SPARSE_BINDING_BIT", VK_QUEUE_SPARSE_BINDING_BIT},
+        {"VK_QUEUE_PROTECTED_BIT", VK_QUEUE_PROTECTED_BIT},
+        {"VK_QUEUE_VIDEO_DECODE_BIT_KHR", VK_QUEUE_VIDEO_DECODE_BIT_KHR},
+        {"VK_QUEUE_VIDEO_ENCODE_BIT_KHR", VK_QUEUE_VIDEO_ENCODE_BIT_KHR},
+    };
+    const auto it = map.find(input_value);
+    if (it != map.end()) {
+        return it->second;
+    }
+    return 0;
+}
+
+static inline VkQueueGlobalPriorityKHR StringToVkQueueGlobalPriority(const std::string &input_value) {
+    static const std::unordered_map<std::string, VkQueueGlobalPriorityKHR> map = {
+        {"VK_QUEUE_GLOBAL_PRIORITY_LOW_KHR", VK_QUEUE_GLOBAL_PRIORITY_LOW_KHR},
+        {"VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_KHR", VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_KHR},
+        {"VK_QUEUE_GLOBAL_PRIORITY_HIGH_KHR", VK_QUEUE_GLOBAL_PRIORITY_HIGH_KHR},
+        {"VK_QUEUE_GLOBAL_PRIORITY_REALTIME_KHR", VK_QUEUE_GLOBAL_PRIORITY_REALTIME_KHR},
+        {"VK_QUEUE_GLOBAL_PRIORITY_LOW_EXT", VK_QUEUE_GLOBAL_PRIORITY_LOW_EXT},
+        {"VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_EXT", VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_EXT},
+        {"VK_QUEUE_GLOBAL_PRIORITY_HIGH_EXT", VK_QUEUE_GLOBAL_PRIORITY_HIGH_EXT},
+        {"VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT", VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT},
+    };
+    const auto it = map.find(input_value);
+    if (it != map.end()) {
+        return it->second;
+    }
+    return VkQueueGlobalPriorityKHR{};
+}
+
+static inline VkVideoCodecOperationFlagsKHR StringToVkVideoCodecOperationFlags(const std::string &input_value) {
+    static const std::unordered_map<std::string, VkVideoCodecOperationFlagsKHR> map = {
+        {"VK_VIDEO_CODEC_OPERATION_INVALID_BIT_KHR", VK_VIDEO_CODEC_OPERATION_INVALID_BIT_KHR},
+        {"VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT", VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT},
+        {"VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT", VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT},
+        {"VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT", VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT},
+        {"VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT", VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT},
+    };
+    const auto it = map.find(input_value);
+    if (it != map.end()) {
+        return it->second;
+    }
+    return VK_VIDEO_CODEC_OPERATION_INVALID_BIT_KHR;
+}
+
+static inline VkPipelineStageFlags StringToVkPipelineStageFlags(const std::string &input_value) {
+    static const std::unordered_map<std::string, VkPipelineStageFlags> map = {
+        {"VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT", VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT},
+        {"VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT", VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT},
+        {"VK_PIPELINE_STAGE_VERTEX_INPUT_BIT", VK_PIPELINE_STAGE_VERTEX_INPUT_BIT},
+        {"VK_PIPELINE_STAGE_VERTEX_SHADER_BIT", VK_PIPELINE_STAGE_VERTEX_SHADER_BIT},
+        {"VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT", VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT},
+        {"VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT", VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT},
+        {"VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT", VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT},
+        {"VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT", VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT},
+        {"VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT", VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT},
+        {"VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT", VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT},
+        {"VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT", VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT},
+        {"VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT", VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT},
+        {"VK_PIPELINE_STAGE_TRANSFER_BIT", VK_PIPELINE_STAGE_TRANSFER_BIT},
+        {"VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT", VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT},
+        {"VK_PIPELINE_STAGE_HOST_BIT", VK_PIPELINE_STAGE_HOST_BIT},
+        {"VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT", VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT},
+        {"VK_PIPELINE_STAGE_ALL_COMMANDS_BIT", VK_PIPELINE_STAGE_ALL_COMMANDS_BIT},
+        {"VK_PIPELINE_STAGE_NONE", VK_PIPELINE_STAGE_NONE},
+        {"VK_PIPELINE_STAGE_TRANSFORM_FEEDBACK_BIT_EXT", VK_PIPELINE_STAGE_TRANSFORM_FEEDBACK_BIT_EXT},
+        {"VK_PIPELINE_STAGE_CONDITIONAL_RENDERING_BIT_EXT", VK_PIPELINE_STAGE_CONDITIONAL_RENDERING_BIT_EXT},
+        {"VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR", VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR},
+        {"VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR", VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR},
+        {"VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV", VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV},
+        {"VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV", VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV},
+        {"VK_PIPELINE_STAGE_FRAGMENT_DENSITY_PROCESS_BIT_EXT", VK_PIPELINE_STAGE_FRAGMENT_DENSITY_PROCESS_BIT_EXT},
+        {"VK_PIPELINE_STAGE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR", VK_PIPELINE_STAGE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR},
+        {"VK_PIPELINE_STAGE_COMMAND_PREPROCESS_BIT_NV", VK_PIPELINE_STAGE_COMMAND_PREPROCESS_BIT_NV},
+        {"VK_PIPELINE_STAGE_SHADING_RATE_IMAGE_BIT_NV", VK_PIPELINE_STAGE_SHADING_RATE_IMAGE_BIT_NV},
+        {"VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_NV", VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_NV},
+        {"VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_NV", VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_NV},
+        {"VK_PIPELINE_STAGE_NONE_KHR", VK_PIPELINE_STAGE_NONE_KHR},
+    };
+    const auto it = map.find(input_value);
+    if (it != map.end()) {
+        return it->second;
+    }
+    return 0;
+}
+
+static inline VkPipelineStageFlags2 StringToVkPipelineStageFlags2(const std::string &input_value) {
+    static const std::unordered_map<std::string, VkPipelineStageFlags2> map = {
+        {"VK_PIPELINE_STAGE_2_NONE", VK_PIPELINE_STAGE_2_NONE},
+        {"VK_PIPELINE_STAGE_2_NONE_KHR", VK_PIPELINE_STAGE_2_NONE_KHR},
+        {"VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT", VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT},
+        {"VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT_KHR", VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT", VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT},
+        {"VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT_KHR", VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_VERTEX_INPUT_BIT", VK_PIPELINE_STAGE_2_VERTEX_INPUT_BIT},
+        {"VK_PIPELINE_STAGE_2_VERTEX_INPUT_BIT_KHR", VK_PIPELINE_STAGE_2_VERTEX_INPUT_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT", VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT},
+        {"VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT_KHR", VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_TESSELLATION_CONTROL_SHADER_BIT", VK_PIPELINE_STAGE_2_TESSELLATION_CONTROL_SHADER_BIT},
+        {"VK_PIPELINE_STAGE_2_TESSELLATION_CONTROL_SHADER_BIT_KHR", VK_PIPELINE_STAGE_2_TESSELLATION_CONTROL_SHADER_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_TESSELLATION_EVALUATION_SHADER_BIT", VK_PIPELINE_STAGE_2_TESSELLATION_EVALUATION_SHADER_BIT},
+        {"VK_PIPELINE_STAGE_2_TESSELLATION_EVALUATION_SHADER_BIT_KHR", VK_PIPELINE_STAGE_2_TESSELLATION_EVALUATION_SHADER_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_GEOMETRY_SHADER_BIT", VK_PIPELINE_STAGE_2_GEOMETRY_SHADER_BIT},
+        {"VK_PIPELINE_STAGE_2_GEOMETRY_SHADER_BIT_KHR", VK_PIPELINE_STAGE_2_GEOMETRY_SHADER_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT", VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT},
+        {"VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT_KHR", VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT", VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT},
+        {"VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT_KHR", VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT", VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT},
+        {"VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT_KHR", VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT", VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT},
+        {"VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR", VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT", VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT},
+        {"VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT_KHR", VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_ALL_TRANSFER_BIT", VK_PIPELINE_STAGE_2_ALL_TRANSFER_BIT},
+        {"VK_PIPELINE_STAGE_2_ALL_TRANSFER_BIT_KHR", VK_PIPELINE_STAGE_2_ALL_TRANSFER_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_TRANSFER_BIT", VK_PIPELINE_STAGE_2_TRANSFER_BIT},
+        {"VK_PIPELINE_STAGE_2_TRANSFER_BIT_KHR", VK_PIPELINE_STAGE_2_TRANSFER_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT", VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT},
+        {"VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT_KHR", VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_HOST_BIT", VK_PIPELINE_STAGE_2_HOST_BIT},
+        {"VK_PIPELINE_STAGE_2_HOST_BIT_KHR", VK_PIPELINE_STAGE_2_HOST_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT", VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT},
+        {"VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT_KHR", VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT", VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT},
+        {"VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT_KHR", VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_COPY_BIT", VK_PIPELINE_STAGE_2_COPY_BIT},
+        {"VK_PIPELINE_STAGE_2_COPY_BIT_KHR", VK_PIPELINE_STAGE_2_COPY_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_RESOLVE_BIT", VK_PIPELINE_STAGE_2_RESOLVE_BIT},
+        {"VK_PIPELINE_STAGE_2_RESOLVE_BIT_KHR", VK_PIPELINE_STAGE_2_RESOLVE_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_BLIT_BIT", VK_PIPELINE_STAGE_2_BLIT_BIT},
+        {"VK_PIPELINE_STAGE_2_BLIT_BIT_KHR", VK_PIPELINE_STAGE_2_BLIT_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_CLEAR_BIT", VK_PIPELINE_STAGE_2_CLEAR_BIT},
+        {"VK_PIPELINE_STAGE_2_CLEAR_BIT_KHR", VK_PIPELINE_STAGE_2_CLEAR_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_INDEX_INPUT_BIT", VK_PIPELINE_STAGE_2_INDEX_INPUT_BIT},
+        {"VK_PIPELINE_STAGE_2_INDEX_INPUT_BIT_KHR", VK_PIPELINE_STAGE_2_INDEX_INPUT_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_VERTEX_ATTRIBUTE_INPUT_BIT", VK_PIPELINE_STAGE_2_VERTEX_ATTRIBUTE_INPUT_BIT},
+        {"VK_PIPELINE_STAGE_2_VERTEX_ATTRIBUTE_INPUT_BIT_KHR", VK_PIPELINE_STAGE_2_VERTEX_ATTRIBUTE_INPUT_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_PRE_RASTERIZATION_SHADERS_BIT", VK_PIPELINE_STAGE_2_PRE_RASTERIZATION_SHADERS_BIT},
+        {"VK_PIPELINE_STAGE_2_PRE_RASTERIZATION_SHADERS_BIT_KHR", VK_PIPELINE_STAGE_2_PRE_RASTERIZATION_SHADERS_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_VIDEO_DECODE_BIT_KHR", VK_PIPELINE_STAGE_2_VIDEO_DECODE_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_VIDEO_ENCODE_BIT_KHR", VK_PIPELINE_STAGE_2_VIDEO_ENCODE_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_TRANSFORM_FEEDBACK_BIT_EXT", VK_PIPELINE_STAGE_2_TRANSFORM_FEEDBACK_BIT_EXT},
+        {"VK_PIPELINE_STAGE_2_CONDITIONAL_RENDERING_BIT_EXT", VK_PIPELINE_STAGE_2_CONDITIONAL_RENDERING_BIT_EXT},
+        {"VK_PIPELINE_STAGE_2_COMMAND_PREPROCESS_BIT_NV", VK_PIPELINE_STAGE_2_COMMAND_PREPROCESS_BIT_NV},
+        {"VK_PIPELINE_STAGE_2_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR",
+         VK_PIPELINE_STAGE_2_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_SHADING_RATE_IMAGE_BIT_NV", VK_PIPELINE_STAGE_2_SHADING_RATE_IMAGE_BIT_NV},
+        {"VK_PIPELINE_STAGE_2_ACCELERATION_STRUCTURE_BUILD_BIT_KHR", VK_PIPELINE_STAGE_2_ACCELERATION_STRUCTURE_BUILD_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR", VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR},
+        {"VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_NV", VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_NV},
+        {"VK_PIPELINE_STAGE_2_ACCELERATION_STRUCTURE_BUILD_BIT_NV", VK_PIPELINE_STAGE_2_ACCELERATION_STRUCTURE_BUILD_BIT_NV},
+        {"VK_PIPELINE_STAGE_2_FRAGMENT_DENSITY_PROCESS_BIT_EXT", VK_PIPELINE_STAGE_2_FRAGMENT_DENSITY_PROCESS_BIT_EXT},
+        {"VK_PIPELINE_STAGE_2_TASK_SHADER_BIT_NV", VK_PIPELINE_STAGE_2_TASK_SHADER_BIT_NV},
+        {"VK_PIPELINE_STAGE_2_MESH_SHADER_BIT_NV", VK_PIPELINE_STAGE_2_MESH_SHADER_BIT_NV},
+        {"VK_PIPELINE_STAGE_2_SUBPASS_SHADING_BIT_HUAWEI", VK_PIPELINE_STAGE_2_SUBPASS_SHADING_BIT_HUAWEI},
+        {"VK_PIPELINE_STAGE_2_INVOCATION_MASK_BIT_HUAWEI", VK_PIPELINE_STAGE_2_INVOCATION_MASK_BIT_HUAWEI},
     };
     const auto it = map.find(input_value);
     if (it != map.end()) {
@@ -4056,6 +4290,271 @@ bool JsonLoader::valid(ExtensionSupport support) {
     return true;
 }
 
+bool QueueFamilyMatch(const VkQueueFamilyProperties &device, const VkQueueFamilyProperties &profile) {
+    if ((device.queueFlags & profile.queueFlags) != profile.queueFlags) {
+        return false;
+    } else if (device.queueCount < profile.queueCount) {
+        return false;
+    } else if (device.timestampValidBits < profile.timestampValidBits) {
+        return false;
+    } else if (profile.minImageTransferGranularity.width > 0 && device.minImageTransferGranularity.width >
+               profile.minImageTransferGranularity.width) {
+        return false;
+    } else if (profile.minImageTransferGranularity.height > 0 && device.minImageTransferGranularity.height >
+               profile.minImageTransferGranularity.height) {
+        return false;
+    } else if (profile.minImageTransferGranularity.depth > 0 && device.minImageTransferGranularity.depth >
+               profile.minImageTransferGranularity.depth) {
+        return false;
+    }
+    return true;
+}
+
+bool GlobalPriorityMatch(const VkQueueFamilyGlobalPriorityPropertiesKHR &device, const VkQueueFamilyGlobalPriorityPropertiesKHR& profile) {
+    if (profile.priorityCount == 0) {
+        return true;
+    } else if (device.priorityCount != profile.priorityCount) {
+        return false;
+    }
+
+    bool match = true;
+    for (uint32_t i = 0; i < device.priorityCount; ++i) {
+        if (device.priorities[i] != profile.priorities[i]) {
+            match = false;
+            break;
+        }
+    }
+    return match;
+}
+
+bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFamilyProperties *dest) {
+    for (const auto &name : qf_props.getMemberNames()) {
+        const auto &props = qf_props[name];
+        if (name == "VkQueueFamilyProperties") {
+            for (const auto &feature : props["queueFlags"]) {
+                dest->properties_2.queueFamilyProperties.queueFlags |= StringToVkQueueFlags(feature.asString());
+            }
+            dest->properties_2.queueFamilyProperties.queueCount = props["queueCount"].asInt();
+            dest->properties_2.queueFamilyProperties.timestampValidBits = props["timestampValidBits"].asUInt();
+            const auto &minImagetransferGranularity = props["minImageTransferGranularity"];
+            dest->properties_2.queueFamilyProperties.minImageTransferGranularity.width =
+                minImagetransferGranularity["width"].asUInt();
+            dest->properties_2.queueFamilyProperties.minImageTransferGranularity.height =
+                minImagetransferGranularity["height"].asUInt();
+            dest->properties_2.queueFamilyProperties.minImageTransferGranularity.depth =
+                minImagetransferGranularity["depth"].asUInt();
+        } else if (name == "VkQueueFamilyProperties2" || name == "VkQueueFamilyProperties2KHR") {
+            const auto &props2 = props["queueFamilyProperties"];
+            for (const auto &feature : props2["queueFlags"]) {
+                dest->properties_2.queueFamilyProperties.queueFlags |= StringToVkQueueFlags(feature.asString());
+            }
+            dest->properties_2.queueFamilyProperties.queueCount = props2["queueCount"].asInt();
+            dest->properties_2.queueFamilyProperties.timestampValidBits = props2["timestampValidBits"].asUInt();
+            const auto &minImagetransferGranularity = props2["minImageTransferGranularity"];
+            dest->properties_2.queueFamilyProperties.minImageTransferGranularity.width =
+                minImagetransferGranularity["width"].asUInt();
+            dest->properties_2.queueFamilyProperties.minImageTransferGranularity.height =
+                minImagetransferGranularity["height"].asUInt();
+            dest->properties_2.queueFamilyProperties.minImageTransferGranularity.depth =
+                minImagetransferGranularity["depth"].asUInt();
+        } else if (name == "VkQueueFamilyGlobalPriorityPropertiesKHR" || name == "VkQueueFamilyGlobalPriorityPropertiesEXT") {
+            uint32_t i = 0;
+            for (const auto &feature : props["priorities"]) {
+                dest->global_priority_properties_.priorities[i++] = StringToVkQueueGlobalPriority(feature.asString());
+            }
+            dest->global_priority_properties_.priorityCount = props["priorityCount"].asUInt();
+        } else if (name == "VkVideoQueueFamilyProperties2KHR") {
+            for (const auto &feature : props["videoCodecOperations"]) {
+                dest->video_properties_.videoCodecOperations |= StringToVkVideoCodecOperationFlags(feature.asString());
+            }
+        } else if (name == "VkQueueFamilyCheckpointProperties2NV") {
+            for (const auto &feature : props["checkpointExecutionStageMask"]) {
+                dest->checkpoint_properties_2_.checkpointExecutionStageMask |= StringToVkPipelineStageFlags2(feature.asString());
+            }
+        } else if (name == "VkQueueFamilyCheckpointPropertiesNV") {
+            for (const auto &feature : props["checkpointExecutionStageMask"]) {
+                dest->checkpoint_properties_.checkpointExecutionStageMask |= StringToVkPipelineStageFlags(feature.asString());
+            }
+        } else if (name == "VkQueueFamilyQueryResultStatusProperties2KHR") {
+            dest->query_result_status_properties_.supported = props["supported"].asBool();
+        }
+    }
+
+    bool valid = true;
+
+    bool supported = false;
+    for (const auto &device_qfp : pdd_.device_queue_family_properties_) {
+        if (!QueueFamilyMatch(device_qfp.properties_2.queueFamilyProperties, dest->properties_2.queueFamilyProperties)) {
+            continue;
+        }
+        if (!GlobalPriorityMatch(device_qfp.global_priority_properties_, dest->global_priority_properties_)) {
+            continue;
+        }
+        if ((device_qfp.video_properties_.videoCodecOperations &
+            dest->video_properties_.videoCodecOperations) != dest->video_properties_.videoCodecOperations) {
+            continue;
+        }
+        if ((device_qfp.checkpoint_properties_.checkpointExecutionStageMask &
+             dest->checkpoint_properties_.checkpointExecutionStageMask) !=
+            dest->checkpoint_properties_.checkpointExecutionStageMask) {
+            continue;
+        }
+        if ((device_qfp.checkpoint_properties_2_.checkpointExecutionStageMask &
+             dest->checkpoint_properties_2_.checkpointExecutionStageMask) !=
+            dest->checkpoint_properties_2_.checkpointExecutionStageMask) {
+            continue;
+        }
+        if (device_qfp.query_result_status_properties_.supported != dest->query_result_status_properties_.supported) {
+            continue;
+        }
+        supported = true;
+        break;
+    }
+    if (!supported) {
+        std::string message = format("Device has no queue family that supports VkQueueFamilyProperties [queueFlags: %s, queueCount: %" PRIu32
+                   ", timestampValidBits: %" PRIu32 ", minImageTransferGranularity: [%" PRIu32 ", %" PRIu32 ", %" PRIu32 "]]",
+                   GetQueueFlagsToString(dest->properties_2.queueFamilyProperties.queueFlags).c_str(),
+                   dest->properties_2.queueFamilyProperties.queueCount, dest->properties_2.queueFamilyProperties.timestampValidBits,
+                   dest->properties_2.queueFamilyProperties.minImageTransferGranularity.width,
+                   dest->properties_2.queueFamilyProperties.minImageTransferGranularity.height,
+                   dest->properties_2.queueFamilyProperties.minImageTransferGranularity.depth);
+        if (dest->global_priority_properties_.priorityCount > 0) {
+            std::string priorities = "[";
+            for (uint32_t i = 0; i < dest->global_priority_properties_.priorityCount; ++i) {
+                if (i > 0) {
+                    priorities += ", ";
+                }
+                priorities += string_VkQueueGlobalPriorityEXT(dest->global_priority_properties_.priorities[i]);
+            }
+            priorities += "]";
+
+            message += format(
+                ", VkQueueFamilyGlobalPriorityPropertiesKHR [priorityCount: %" PRIu32
+                ", priorities: %s]",
+                dest->global_priority_properties_.priorityCount, priorities.c_str());
+        }
+        if (dest->video_properties_.videoCodecOperations > 0) {
+            message += format(", VkVideoQueueFamilyProperties2KHR [videoCodecOperations: %s]",
+                              string_VkVideoCodecOperationFlagsKHR(dest->video_properties_.videoCodecOperations).c_str());
+        }
+        if (dest->checkpoint_properties_.checkpointExecutionStageMask > 0) {
+            message += format(", VkQueueFamilyCheckpointPropertiesNV [checkpointExecutionStageMask: %s]",
+                              string_VkPipelineStageFlags(dest->checkpoint_properties_.checkpointExecutionStageMask).c_str());
+        }
+        if (dest->checkpoint_properties_2_.checkpointExecutionStageMask > 0) {
+            message += format(", VkQueueFamilyCheckpointProperties2NV [checkpointExecutionStageMask: %s]",
+                              string_VkPipelineStageFlags2KHR(dest->checkpoint_properties_2_.checkpointExecutionStageMask).c_str());
+        }
+        if (dest->query_result_status_properties_.supported) {
+            message += format(", VkQueueFamilyQueryResultStatusProperties2KHR [supported: VK_TRUE]");
+        }
+        message += ".\n";
+        LogMessage(DEBUG_REPORT_WARNING_BIT, message);
+        valid = false;
+    }
+
+    return valid;
+}
+
+bool QueueFamilyAndExtensionsMatch(const QueueFamilyProperties &device, const QueueFamilyProperties &profile) {
+    if (!QueueFamilyMatch(device.properties_2.queueFamilyProperties, profile.properties_2.queueFamilyProperties)) {
+        return false;
+    }
+    if (!GlobalPriorityMatch(device.global_priority_properties_, profile.global_priority_properties_)) {
+        return false;
+    }
+    if ((device.video_properties_.videoCodecOperations & profile.video_properties_.videoCodecOperations) !=
+        profile.video_properties_.videoCodecOperations) {
+        return false;
+    }
+    if ((device.checkpoint_properties_.checkpointExecutionStageMask &
+         profile.checkpoint_properties_.checkpointExecutionStageMask) !=
+        profile.checkpoint_properties_.checkpointExecutionStageMask) {
+        return false;
+    }
+    if ((device.checkpoint_properties_2_.checkpointExecutionStageMask &
+         profile.checkpoint_properties_2_.checkpointExecutionStageMask) !=
+        profile.checkpoint_properties_2_.checkpointExecutionStageMask) {
+        return false;
+    }
+    if (device.query_result_status_properties_.supported != profile.query_result_status_properties_.supported) {
+        return false;
+    }
+    return true;
+}
+
+void CopyUnsetQueueFamilyProperties(const QueueFamilyProperties *device, QueueFamilyProperties *profile) {
+    if (profile->properties_2.queueFamilyProperties.queueFlags == 0) {
+        profile->properties_2.queueFamilyProperties.queueFlags = device->properties_2.queueFamilyProperties.queueFlags;
+    }
+    if (profile->properties_2.queueFamilyProperties.queueCount == 0) {
+        profile->properties_2.queueFamilyProperties.queueCount = device->properties_2.queueFamilyProperties.queueCount;
+    }
+    if (profile->properties_2.queueFamilyProperties.timestampValidBits == 0) {
+        profile->properties_2.queueFamilyProperties.timestampValidBits =
+            device->properties_2.queueFamilyProperties.timestampValidBits;
+    }
+    if (profile->properties_2.queueFamilyProperties.minImageTransferGranularity.width == 0) {
+        profile->properties_2.queueFamilyProperties.minImageTransferGranularity.width =
+            device->properties_2.queueFamilyProperties.minImageTransferGranularity.width;
+    }
+    if (profile->properties_2.queueFamilyProperties.minImageTransferGranularity.height == 0) {
+        profile->properties_2.queueFamilyProperties.minImageTransferGranularity.height =
+            device->properties_2.queueFamilyProperties.minImageTransferGranularity.height;
+    }
+    if (profile->properties_2.queueFamilyProperties.minImageTransferGranularity.depth == 0) {
+        profile->properties_2.queueFamilyProperties.minImageTransferGranularity.depth =
+            device->properties_2.queueFamilyProperties.minImageTransferGranularity.depth;
+    }
+}
+
+bool JsonLoader::OrderQueueFamilyProperties(ArrayOfVkQueueFamilyProperties* qfp) {
+    if (qfp->empty()) {
+        return true;
+    }
+    // If device has less queue families than needed we can't load all profile queue families
+    if (pdd_.device_queue_family_properties_.size() < qfp->size()) {
+        return false;
+    }
+    // Find all permutations and see if any of them supports profile queue families
+    std::vector<uint32_t> permutations(pdd_.device_queue_family_properties_.size());
+    uint32_t count = static_cast<uint32_t>(permutations.size());
+    for (uint32_t i = 0; i < count; ++i) {
+        permutations[i] = i;
+    }
+    do {
+        bool match = true;
+        for (uint32_t i = 0; i < count; ++i) {
+            if (permutations[i] < qfp->size() && !QueueFamilyAndExtensionsMatch(pdd_.device_queue_family_properties_[i], (*qfp)[permutations[i]])) {
+                match = false;
+                break;
+            }
+        }
+        if (match) {
+            // Empty queue families at the end are not needed
+            while (permutations[count - 1] >= qfp->size()) {
+                --count;
+            }
+            ArrayOfVkQueueFamilyProperties ordered;
+            for (uint32_t i = 0; i < count; ++i) {
+                if (permutations[i] < qfp->size()) {
+                    ordered.push_back((*qfp)[permutations[i]]);
+                } else {
+                    ordered.push_back(QueueFamilyProperties());
+                }
+            }
+            *qfp = ordered;
+            for (uint32_t i = 0; i < count; ++i) {
+                CopyUnsetQueueFamilyProperties(&pdd_.device_queue_family_properties_[i], &(*qfp)[i]);
+            }
+            return true;
+        }
+    } while (std::next_permutation(permutations.begin(), permutations.end()));
+    LogMessage(DEBUG_REPORT_WARNING_BIT,
+               format("Device supports all individual profile queue families, but not all of them simultaneously.\n"));
+    return false;
+}
+
 void JsonLoader::AddPromotedExtensions(uint32_t api_version) {
     static const std::vector<const char *> promoted_1_1 = {
         VK_KHR_MULTIVIEW_EXTENSION_NAME,
@@ -4286,6 +4785,26 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
 
             for (const auto &format : formats.getMemberNames()) {
                 bool success = GetFormat(formats, format, &pdd_.arrayof_format_properties_, &pdd_.arrayof_format_properties_3_);
+                if (!success) {
+                    failed = true;
+                }
+            }
+        }
+
+        if (layer_settings->simulate_capabilities & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
+            const auto &qf_props = c["queueFamiliesProperties"];
+
+            bool queue_families_supported = true;
+            for (const auto &qfp : qf_props) {
+                pdd_.arrayof_queue_family_properties_.emplace_back();
+                bool success = GetQueueFamilyProperties(qfp, &pdd_.arrayof_queue_family_properties_.back());
+                if (!success) {
+                    queue_families_supported = false;
+                    failed = true;
+                }
+            }
+            if (queue_families_supported) {
+                bool success = OrderQueueFamilyProperties(&pdd_.arrayof_queue_family_properties_);
                 if (!success) {
                     failed = true;
                 }
@@ -8631,6 +9150,118 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
     return result;
 }
 
+void FillQueueFamilyPropertiesPNextChain(PhysicalDeviceData *physicalDeviceData,
+                                         VkQueueFamilyProperties2KHR *pQueueFamilyProperties2, uint32_t count) {
+    for (uint32_t i = 0; i < count; ++i) {
+        void* place = pQueueFamilyProperties2[i].pNext;
+        while (place) {
+            VkBaseOutStructure *structure = (VkBaseOutStructure *)place;
+
+            // These switch statements check which struct is in the pNext chain and, if the physical device has the proper
+            // extension, fill the struct with any override data provided by the PhysicalDeviceData object.
+
+            switch (structure->sType) {
+                case VK_STRUCTURE_TYPE_QUEUE_FAMILY_GLOBAL_PRIORITY_PROPERTIES_KHR: {
+                    VkQueueFamilyGlobalPriorityPropertiesKHR *sp = (VkQueueFamilyGlobalPriorityPropertiesKHR *)place;
+                    void *pNext = sp->pNext;
+                    *sp = physicalDeviceData->arrayof_queue_family_properties_[i].global_priority_properties_;
+                    sp->pNext = pNext;
+                } break;
+                case VK_STRUCTURE_TYPE_VIDEO_QUEUE_FAMILY_PROPERTIES_2_KHR: {
+                    VkVideoQueueFamilyProperties2KHR *sp = (VkVideoQueueFamilyProperties2KHR *)place;
+                    void *pNext = sp->pNext;
+                    *sp = physicalDeviceData->arrayof_queue_family_properties_[i].video_properties_;
+                    sp->pNext = pNext;
+                } break;
+                case VK_STRUCTURE_TYPE_QUEUE_FAMILY_CHECKPOINT_PROPERTIES_NV: {
+                    VkQueueFamilyCheckpointPropertiesNV *sp = (VkQueueFamilyCheckpointPropertiesNV *)place;
+                    void *pNext = sp->pNext;
+                    *sp = physicalDeviceData->arrayof_queue_family_properties_[i].checkpoint_properties_;
+                    sp->pNext = pNext;
+                } break;
+                case VK_STRUCTURE_TYPE_QUEUE_FAMILY_CHECKPOINT_PROPERTIES_2_NV: {
+                    VkQueueFamilyCheckpointProperties2NV *sp = (VkQueueFamilyCheckpointProperties2NV *)place;
+                    void *pNext = sp->pNext;
+                    *sp = physicalDeviceData->arrayof_queue_family_properties_[i].checkpoint_properties_2_;
+                    sp->pNext = pNext;
+                } break;
+                case VK_STRUCTURE_TYPE_QUEUE_FAMILY_QUERY_RESULT_STATUS_PROPERTIES_2_KHR: {
+                    VkQueueFamilyQueryResultStatusProperties2KHR *sp = (VkQueueFamilyQueryResultStatusProperties2KHR *)place;
+                    void *pNext = sp->pNext;
+                    *sp = physicalDeviceData->arrayof_queue_family_properties_[i].query_result_status_properties_;
+                    sp->pNext = pNext;
+                } break;
+                default:
+                    break;
+            }
+
+            place = structure->pNext;
+        }
+    }
+}
+
+VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice physicalDevice,
+                                                                  uint32_t *pQueueFamilyPropertyCount,
+                                                                  VkQueueFamilyProperties *pQueueFamilyProperties) {
+    std::lock_guard<std::recursive_mutex> lock(global_lock);
+    const auto dt = instance_dispatch_table(physicalDevice);
+
+    // Are there JSON overrides, or should we call down to return the original values?
+    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
+    const uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->arrayof_queue_family_properties_.size()) : 0;
+    if (src_count == 0) {
+        dt->GetPhysicalDeviceQueueFamilyProperties(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties);
+        return;
+    }
+
+    // Careful: cannot use EnumerateProperties() here! (because src and dst structs are not the same type)
+    if (!pQueueFamilyProperties) {
+        *pQueueFamilyPropertyCount = src_count;
+        return;
+    }
+    const uint32_t copy_count = (*pQueueFamilyPropertyCount < src_count) ? *pQueueFamilyPropertyCount : src_count;
+    const QueueFamilyProperties *src_props = pdd->arrayof_queue_family_properties_.data();
+    for (uint32_t i = 0; i < copy_count; ++i) {
+        pQueueFamilyProperties[i] = src_props[i].properties_2.queueFamilyProperties;
+    }
+    *pQueueFamilyPropertyCount = copy_count;
+}
+
+VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2KHR(VkPhysicalDevice physicalDevice,
+                                                                      uint32_t *pQueueFamilyPropertyCount,
+                                                                      VkQueueFamilyProperties2KHR *pQueueFamilyProperties2) {
+    std::lock_guard<std::recursive_mutex> lock(global_lock);
+    const auto dt = instance_dispatch_table(physicalDevice);
+
+    // Are there JSON overrides, or should we call down to return the original values?
+    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
+    const uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->arrayof_queue_family_properties_.size()) : 0;
+    if (src_count == 0) {
+        dt->GetPhysicalDeviceQueueFamilyProperties2KHR(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties2);
+        return;
+    }
+
+    if (!pQueueFamilyProperties2) {
+        *pQueueFamilyPropertyCount = src_count;
+        return;
+    }
+
+    // Careful: cannot use EnumerateProperties() here! (because src and dst structs are not the same type)
+    const uint32_t copy_count = (*pQueueFamilyPropertyCount < src_count) ? *pQueueFamilyPropertyCount : src_count;
+    const QueueFamilyProperties *src_props = pdd->arrayof_queue_family_properties_.data();
+    for (uint32_t i = 0; i < copy_count; ++i) {
+        pQueueFamilyProperties2[i].queueFamilyProperties = src_props[i].properties_2.queueFamilyProperties;
+    }
+    *pQueueFamilyPropertyCount = copy_count;
+    FillQueueFamilyPropertiesPNextChain(pdd, pQueueFamilyProperties2, copy_count);
+}
+
+VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2(VkPhysicalDevice physicalDevice,
+                                                                   uint32_t *pQueueFamilyPropertyCount,
+                                                                   VkQueueFamilyProperties2KHR *pQueueFamilyProperties2) {
+    GetPhysicalDeviceQueueFamilyProperties2KHR(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties2);
+}
+
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice physicalDevice, VkFormat format,
                                                              VkFormatProperties *pFormatProperties) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "GetPhysicalDeviceFormatProperties\n");
@@ -9417,6 +10048,50 @@ void LoadDeviceFormats(VkInstance instance, PhysicalDeviceData* pdd, VkPhysicalD
         }
         (*dest)[format] = format_properties.formatProperties;
         (*dest3)[format] = format_properties_3;
+    }
+}
+
+void LoadQueueFamilyProperties(VkInstance instance, VkPhysicalDevice pd, PhysicalDeviceData* pdd) {
+    const auto dt = instance_dispatch_table(instance);
+    uint32_t count = 0;
+    dt->GetPhysicalDeviceQueueFamilyProperties2KHR(pd, &count, nullptr);
+    if (count > 0) {
+        pdd->device_queue_family_properties_.resize(count);
+        std::vector<void *> pNext(count);
+        std::vector<VkQueueFamilyProperties2> props(count);
+        for (uint32_t i = 0; i < count; ++i) {
+            if (PhysicalDeviceData::HasExtension(pdd, VK_KHR_GLOBAL_PRIORITY_EXTENSION_NAME)) {
+                pdd->device_queue_family_properties_[i].global_priority_properties_.pNext = pNext[i];
+
+                pNext[i] = &pdd->device_queue_family_properties_[i].global_priority_properties_;
+            }
+            if (PhysicalDeviceData::HasExtension(pdd, VK_KHR_VIDEO_QUEUE_EXTENSION_NAME)) {
+                pdd->device_queue_family_properties_[i].video_properties_.pNext = pNext[i];
+
+                pNext[i] = &pdd->device_queue_family_properties_[i].video_properties_;
+
+                pdd->device_queue_family_properties_[i].query_result_status_properties_.pNext = pNext[i];
+
+                pNext[i] = &pdd->device_queue_family_properties_[i].query_result_status_properties_;
+            }
+            if (PhysicalDeviceData::HasExtension(pdd, VK_NV_DEVICE_DIAGNOSTIC_CHECKPOINTS_EXTENSION_NAME)) {
+                pdd->device_queue_family_properties_[i].checkpoint_properties_.pNext = pNext[i];
+
+                pNext[i] = &pdd->device_queue_family_properties_[i].checkpoint_properties_;
+
+                if (PhysicalDeviceData::HasExtension(pdd, VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)) {
+                    pdd->device_queue_family_properties_[i].checkpoint_properties_2_.pNext = pNext[i];
+
+                    pNext[i] = &pdd->device_queue_family_properties_[i].checkpoint_properties_2_;
+                }
+            }
+            pdd->device_queue_family_properties_[i].properties_2.pNext = pNext[i];
+            props[i] = pdd->device_queue_family_properties_[i].properties_2;
+        }
+        dt->GetPhysicalDeviceQueueFamilyProperties2KHR(pd, &count, props.data());
+        for (uint32_t i = 0; i < count; ++i) {
+            pdd->device_queue_family_properties_[i].properties_2 = props[i];
+        }
     }
 }
 
@@ -10362,6 +11037,9 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             if (layer_settings->simulate_capabilities & SIMULATE_FORMATS_BIT) {
                 LoadDeviceFormats(instance, &pdd, physical_device, &pdd.device_formats_, &pdd.device_formats_3_);
             }
+            if (layer_settings->simulate_capabilities & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
+                LoadQueueFamilyProperties(instance, physical_device, &pdd);
+            }
 
             LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
                        format("Running on \"%s\" with Vulkan %d.%d.%d driver.\n", pdd.physical_device_properties_.deviceName,
@@ -10523,6 +11201,9 @@ VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL GetInstanceProcAddr(VkInstance instance
     GET_PROC_ADDR(GetPhysicalDeviceImageFormatProperties2KHR);
     GET_PROC_ADDR(GetPhysicalDeviceToolProperties);
     GET_PROC_ADDR(GetPhysicalDeviceToolPropertiesEXT);
+    GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties);
+    GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties2);
+    GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties2KHR);
 #undef GET_PROC_ADDR
 
     if (!instance) {
