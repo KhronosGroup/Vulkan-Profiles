@@ -159,7 +159,7 @@
                         },
                         {
                             "key": "SIMULATE_EXTENSIONS_BIT",
-                            "label": "Extensions",
+                            "label": "Device Extensions",
                             "description": "The Vulkan device will report the extensions from the selected Profile."
                         },
                         {
