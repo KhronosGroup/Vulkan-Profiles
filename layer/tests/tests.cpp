@@ -493,3 +493,237 @@ TEST(layer, TestExcludedExtensions) {
     }
 #endif
 }
+
+TEST(layer, TestQueueFamilyProperties) {
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+    VkProfileLayerSettingsEXT settings = {};
+    settings.profile_file = JSON_TEST_FILES_PATH "test/data/VP_LUNARG_test_vkqueuefamilyproperties.json";
+    settings.profile_name = "VP_LUNARG_test_vkqueuefamilyproperties";
+    settings.emulate_portability = true;
+    settings.debug_fail_on_error = false;
+    settings.debug_reports = 0;
+    settings.simulate_capabilities = SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT;
+
+    err = inst_builder.makeInstance(&settings);
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkInstance test_inst = inst_builder.getInstance();
+
+    VkPhysicalDevice gpu;
+    err = inst_builder.getPhysicalDevice(&gpu);
+
+    uint32_t count = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, nullptr);
+    std::vector<VkQueueFamilyProperties> qf_props(count);
+    vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, qf_props.data());
+
+    ASSERT_EQ(qf_props.size(), 2);
+    ASSERT_EQ(qf_props[0].queueFlags,
+              VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT);
+    ASSERT_EQ(qf_props[0].queueCount, 1);
+    ASSERT_EQ(qf_props[0].timestampValidBits, 36);
+    ASSERT_EQ(qf_props[0].minImageTransferGranularity.width, 1);
+    ASSERT_EQ(qf_props[0].minImageTransferGranularity.height, 1);
+    ASSERT_EQ(qf_props[0].minImageTransferGranularity.depth, 1);
+
+    ASSERT_EQ(qf_props[1].queueFlags, VK_QUEUE_PROTECTED_BIT);
+    ASSERT_EQ(qf_props[1].queueCount, 2);
+    ASSERT_EQ(qf_props[1].timestampValidBits, 42);
+    ASSERT_EQ(qf_props[1].minImageTransferGranularity.width, 16);
+    ASSERT_EQ(qf_props[1].minImageTransferGranularity.height, 32);
+    ASSERT_EQ(qf_props[1].minImageTransferGranularity.depth, 64);
+}
+
+TEST(layer, TestQueueFamilyPropertiesGlobalPriorityProperties) {
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+    VkProfileLayerSettingsEXT settings = {};
+    settings.profile_file = JSON_TEST_FILES_PATH "test/data/VP_LUNARG_test_vkqueuefamilyproperties.json";
+    settings.profile_name = "VP_LUNARG_test_vkqueuefamilyproperties";
+    settings.emulate_portability = true;
+    settings.debug_fail_on_error = false;
+    settings.debug_reports = 0;
+    settings.simulate_capabilities = SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT;
+
+    err = inst_builder.makeInstance(&settings);
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkInstance test_inst = inst_builder.getInstance();
+
+    VkPhysicalDevice gpu;
+    err = inst_builder.getPhysicalDevice(&gpu);
+
+    uint32_t count = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties2(gpu, &count, nullptr);
+    std::vector<VkQueueFamilyProperties2> qf_props2(count);
+
+    VkQueueFamilyGlobalPriorityPropertiesKHR qfgp = {};
+    qfgp.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_GLOBAL_PRIORITY_PROPERTIES_KHR;
+    qf_props2[0].pNext = &qfgp;
+
+    vkGetPhysicalDeviceQueueFamilyProperties2(gpu, &count, qf_props2.data());
+    ASSERT_EQ(qfgp.priorityCount, 4);
+    ASSERT_EQ(qfgp.priorities[0], VK_QUEUE_GLOBAL_PRIORITY_LOW_EXT);
+    ASSERT_EQ(qfgp.priorities[1], VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_EXT);
+    ASSERT_EQ(qfgp.priorities[2], VK_QUEUE_GLOBAL_PRIORITY_HIGH_EXT);
+    ASSERT_EQ(qfgp.priorities[3], VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT);
+}
+
+TEST(layer, TestQueueFamilyCheckpointProperties) {
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+    VkProfileLayerSettingsEXT settings = {};
+    settings.profile_file = JSON_TEST_FILES_PATH "test/data/VP_LUNARG_test_vkqueuefamilyproperties.json";
+    settings.profile_name = "VP_LUNARG_test_vkqueuefamilyproperties";
+    settings.emulate_portability = true;
+    settings.debug_fail_on_error = false;
+    settings.debug_reports = 0;
+    settings.simulate_capabilities = SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT;
+
+    err = inst_builder.makeInstance(&settings);
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkInstance test_inst = inst_builder.getInstance();
+
+    VkPhysicalDevice gpu;
+    err = inst_builder.getPhysicalDevice(&gpu);
+
+    uint32_t count = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties2(gpu, &count, nullptr);
+    std::vector<VkQueueFamilyProperties2> qf_props2(count);
+
+    VkQueueFamilyCheckpointPropertiesNV checkpoint = {};
+    checkpoint.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_CHECKPOINT_PROPERTIES_NV;
+    qf_props2[0].pNext = &checkpoint;
+
+    vkGetPhysicalDeviceQueueFamilyProperties2(gpu, &count, qf_props2.data());
+    ASSERT_EQ(checkpoint.checkpointExecutionStageMask, VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_HOST_BIT);
+}
+
+TEST(layer, TestQueueFamilyCheckpointProperties2) {
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+    VkProfileLayerSettingsEXT settings = {};
+    settings.profile_file = JSON_TEST_FILES_PATH "test/data/VP_LUNARG_test_vkqueuefamilyproperties.json";
+    settings.profile_name = "VP_LUNARG_test_vkqueuefamilyproperties";
+    settings.emulate_portability = true;
+    settings.debug_fail_on_error = false;
+    settings.debug_reports = 0;
+    settings.simulate_capabilities = SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT;
+
+    err = inst_builder.makeInstance(&settings);
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkInstance test_inst = inst_builder.getInstance();
+
+    VkPhysicalDevice gpu;
+    err = inst_builder.getPhysicalDevice(&gpu);
+
+    uint32_t count = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties2(gpu, &count, nullptr);
+    std::vector<VkQueueFamilyProperties2> qf_props2(count);
+
+    VkQueueFamilyCheckpointProperties2NV checkpoint = {};
+    checkpoint.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_CHECKPOINT_PROPERTIES_2_NV;
+    qf_props2[0].pNext = &checkpoint;
+
+    vkGetPhysicalDeviceQueueFamilyProperties2(gpu, &count, qf_props2.data());
+    ASSERT_EQ(checkpoint.checkpointExecutionStageMask, VK_PIPELINE_STAGE_2_NONE_KHR |
+                                                           VK_PIPELINE_STAGE_2_SUBPASS_SHADING_BIT_HUAWEI |
+                                                           VK_PIPELINE_STAGE_2_INVOCATION_MASK_BIT_HUAWEI);
+}
+
+TEST(layer, TestQueueFamilyPropertiesPartial) {
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    std::vector<VkQueueFamilyProperties> device_qf_props;
+    {
+        err = inst_builder.makeInstance();
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkInstance test_inst = inst_builder.getInstance();
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
+
+        uint32_t count = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, nullptr);
+        device_qf_props.resize(count);
+        vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, device_qf_props.data());
+        inst_builder.reset();
+    }
+
+    {
+        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+        VkProfileLayerSettingsEXT settings = {};
+        settings.profile_file = JSON_TEST_FILES_PATH "test/data/VP_LUNARG_test_vkqueuefamilyproperties.json";
+        settings.profile_name = "VP_LUNARG_test_vkqueuefamilyproperties2";
+        settings.emulate_portability = true;
+        settings.debug_fail_on_error = false;
+        // settings.debug_reports = 0;
+        settings.simulate_capabilities = SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT;
+
+        err = inst_builder.makeInstance(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkInstance test_inst = inst_builder.getInstance();
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
+
+        uint32_t count = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, nullptr);
+        std::vector<VkQueueFamilyProperties> qf_props(count);
+        vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, qf_props.data());
+
+        uint32_t device_queue_index = 0;
+        for (uint32_t i = 0; i < device_qf_props.size(); ++i) {
+            if ((device_qf_props[i].queueFlags & VK_QUEUE_COMPUTE_BIT) == VK_QUEUE_COMPUTE_BIT &&
+                device_qf_props[i].minImageTransferGranularity.width <= 4 &&
+                device_qf_props[i].minImageTransferGranularity.height <= 4) {
+                device_queue_index = i;
+                break;
+            }
+        }
+
+        ASSERT_EQ(count, 1u);
+        ASSERT_EQ(qf_props[0].queueFlags, VK_QUEUE_COMPUTE_BIT);
+        ASSERT_EQ(qf_props[0].queueCount, 1u);
+        ASSERT_EQ(qf_props[0].minImageTransferGranularity.width, 4u);
+        ASSERT_EQ(qf_props[0].minImageTransferGranularity.height, 4u);
+
+        ASSERT_EQ(qf_props[0].minImageTransferGranularity.depth,
+                  device_qf_props[device_queue_index].minImageTransferGranularity.depth);
+        ASSERT_EQ(qf_props[0].timestampValidBits, device_qf_props[device_queue_index].timestampValidBits);
+    }
+}

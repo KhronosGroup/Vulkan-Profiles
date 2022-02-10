@@ -91,6 +91,11 @@ std::string profiles_test::GetSimulateCapabilitiesLog(SimulateCapabilityFlags fl
         result += "SIMULATE_FORMATS_BIT";
         need_comma = true;
     }
+    if (flags & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
+        if (need_comma) result += ",";
+        result += "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT";
+        need_comma = true;
+    }
 
     return result;
 }

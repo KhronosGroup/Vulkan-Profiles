@@ -26,6 +26,7 @@ enum SimulateCapabilityFlag {
     SIMULATE_PROPERTIES_BIT = 1 << 2,
     SIMULATE_EXTENSIONS_BIT = 1 << 3,
     SIMULATE_FORMATS_BIT = 1 << 4,
+    SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT = 1 << 5,
     SIMULATE_ALL_CAPABILITIES = 0xFFFFFFFF
 };
 typedef int SimulateCapabilityFlags;
