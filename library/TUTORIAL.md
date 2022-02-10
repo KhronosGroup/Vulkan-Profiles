@@ -53,13 +53,13 @@ The library is primarily designed to be dynamically linked to the Vulkan impleme
 
 In order to enable support for other language bindings, the library is also available in a header + source pair (`vulkan/vulkan_profiles.h` and `vulkan_profiles.cpp`). There is no build configuration for this variant of the library as it's not meant to be used as a standalone static or dynamic library. Instead, developers can drop the files into their own project to build the Vulkan profiles library into it. This may also come handy if the developer would like to optimize compilation times by not having to include the rather large header-only library in multiple source files.
 
-The profile definitions are enabled depending on the pre-processor definitions coming from the Vulkan headers, thus the application has to make sure to configure the right set of pre-processor definitions. As an example, the `VP_ANDROID_baseline_2021` profile depends on the `VK_KHR_android_surface` instance extension, thus in order to use this profile the application must define `VK_USE_PLATFORM_ANDROID_KHR`.
+The profile definitions are enabled depending on the pre-processor definitions coming from the Vulkan headers; thus the application has to make sure to configure the right set of pre-processor definitions. As an example, the `VP_ANDROID_baseline_2021` profile depends on the `VK_KHR_android_surface` instance extension; thus in order to use this profile the application must define `VK_USE_PLATFORM_ANDROID_KHR`.
 
 ## Basic usage
 
-The typically expected usage of the Vulkan Profiles library is for applications to target a specific profile with their application and thus leave it to the Vulkan Profiles library to enable any necessary extensions and features part of the definition of the Vulkan profile in question.
+The typically expected usage of the Vulkan Profiles library is for applications to target a specific profile with their application and leave it to the Vulkan Profiles library to enable any necessary extensions and features required by that profile.
 
-In order to do so, the application first has to make sure that the Vulkan implementation supports the profile in question as follows:
+In order to do so, the application first has to make sure that the Vulkan implementation supports the selected profile as follows:
 
 ```C++
     VkResult result = VK_SUCCESS;
@@ -106,11 +106,11 @@ If the profile is supported by the Vulkan implementation at the instance level, 
     }
 ```
 
-The above code example will create a Vulkan instance with the API version and instance extensions required by the profile (unless the application overrides any of them as explained later).
+The above code example will create a Vulkan instance with the API version and instance extensions required by the profile (unless the application overrides any of them, as explained later).
 
-Make sure to set the `apiVersion` in the `VkApplicationInfo` structure at least to the minimum API version required by the profile, as seen above, to ensure the right Vulkan API version is used.
+Make sure to set the `apiVersion` in the `VkApplicationInfo` structure at least to the minimum API version required by the profile, as seen above, to ensure the correct Vulkan API version is used.
 
-Once a Vulkan instance is created, the application can check whether individual physical devices support the profile in question as follows:
+Once a Vulkan instance is created, the application can check whether individual physical devices support the selected profile as follows:
 
 ```C++
     result = vpGetPhysicalDeviceProfileSupport(instance, physicalDevice,
@@ -159,7 +159,7 @@ Using an older version than the one required by the profile may result in unexpe
 
 By default the application must not provide its own set of instance and/or device extensions when using `vpCreateDevice` and/or `vpCreateInstance`, as the list of enabled extensions comes from the profile definition.
 
-If the application would not like to use the extension list defined by the profile but instead would like to provide its own set of instance or device extensions, then the `VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT` and/or `VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT` flags can be used to request that, as in the examples below:
+If the application needs to provide its own set of instance or device extensions, then the `VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT` and/or `VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT` flags can be used, as in the examples below:
 
 ```C++
     VkInstanceCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
@@ -193,12 +193,12 @@ If the application would not like to use the extension list defined by the profi
 
 ### Merging extensions
 
-If the application would like to specify additional extensions besides the ones defined by the profile, then the `VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT` and/or `VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT` flags can be used to request the merging of the application provided extension list with the profile extensions, as in the examples below:
+If the application would like to specify additional extensions besides the ones defined by the profile, then the `VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT` and/or `VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT` flags can be used to request the merging of the application-provided extension list with the profile extensions, as in the examples below:
 
 ```C++
     VkInstanceCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
     ...
-    // Specify additional extensions to use beyond the profile defined ones
+    // Specify additional extensions to use beyond the profile-defined ones
     vkCreateInfo.enabledExtensionCount = ...
     vkCreateInfo.ppEnabledExtensionNames = ...
 
@@ -213,7 +213,7 @@ If the application would like to specify additional extensions besides the ones 
 ```C++
     VkDeviceCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
     ...
-    // Specify additional extensions to use beyond the profile defined ones
+    // Specify additional extensions to use beyond the profile-defined ones
     vkCreateInfo.enabledExtensionCount = ...
     vkCreateInfo.ppEnabledExtensionNames = ...
 
@@ -227,9 +227,9 @@ If the application would like to specify additional extensions besides the ones 
 
 ### Overriding features
 
-By default, profile defined feature structures must not be specified as part of the `pNext` chain of `VkDeviceCreateInfo` when using `vpCreateDevice`, as the profile defined feature structures are automatically added to the `pNext` chain, and duplicate feature structures would otherwise result in undefined behavior.
+By default, profile-defined feature structures must not be specified as part of the `pNext` chain of `VkDeviceCreateInfo` when using `vpCreateDevice`, as the profile-defined feature structures are automatically added to the `pNext` chain, and duplicate feature structures would otherwise result in undefined behavior.
 
-If the application would like to override any subset of the feature structures otherwise defined by the profile, then the `VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT` flag can be used to request that, as in the example below:
+If the application needs to override any subset of the feature structures otherwise defined by the profile, then the `VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT` flag can be used, as in the example below:
 
 ```C++
     // We want to use our own VkPhysicalDeviceVulkan11Features structure,
@@ -253,21 +253,21 @@ If the application would like to override any subset of the feature structures o
 
 In this case feature structures from the profile are only included in the final `pNext` chain passed to `vkCreateDevice` if a corresponding overriding feature structure isn't provided by the application.
 
-Sometimes the application may want to override all feature structures with its own, i.e. no feature defined in the profile should be automatically enabled. This can be requested using the `VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT` flag, as in the example below:
+Sometimes the application needs to override all feature structures with its own, i.e. no feature defined in the profile should be automatically enabled. This can be requested using the `VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT` flag, as in the example below:
 
 ```C++
     VpDeviceCreateInfo vpCreateInfo{};
     createInfo.pCreateInfo = &vkCreateInfo;
     createInfo.pProfile = &profile;
     // We want to enable only the features we specify, so we override
-    // all profile defined features
+    // all profile-defined features
     createInfo.flags = VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT;
     ...
 ```
 
 ### Merging/overriding individual features
 
-> **NOTE:** Currently there is no `VP_DEVICE_CREATE_MERGE_FEATURES_BIT` that could allow merging individual feature enablement within feature structures due to the constness of the `pNext` chain of `VkDeviceCreateInfo` as reconstructing the `pNext` chain entirely would preclude supporting any structures in the `pNext` chain unknown to the Vulkan Profiles library.
+> **NOTE:** Currently there is no `VP_DEVICE_CREATE_MERGE_FEATURES_BIT` that could allow merging individual feature enablement within feature structures due to the constness of the `pNext` chain of `VkDeviceCreateInfo`, as reconstructing the `pNext` chain entirely would preclude supporting any structures in the `pNext` chain unknown to the Vulkan Profiles library.
 
 While currently there's no way to request the automatic merging of individual feature enablements within feature structures, the application can merge features on its own, potentially disabling features that would be otherwise enabled by the profile, or enabling features that wouldn't be enabled by the profile.
 
@@ -306,7 +306,7 @@ In order to achieve this, any feature structure that the application intends to 
 
 ### Disabling robust access
 
-Many profiles require robust buffer and/or image access, however, applications often prefer to opt out from these features for performance reasons. This can be requested by overriding individual features as explained in the previous section, however, as it's quite a common usage pattern, explicit device creation flags are provided to make it easier to do so.
+Many profiles require robust buffer and/or image access; however, applications often prefer to opt out from these features for performance reasons. This can be requested by overriding individual features as explained in the previous section; however, as it's quite a common usage pattern, explicit device creation flags are provided to make it easier to do so.
 
 If the `VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT` flag is specified, then the `robustBufferAccess` feature (defined by `VkPhysicalDeviceFeatures`) and the `robustBufferAccess2` feature (defined by `VkPhysicalDeviceRobustness2FeaturesEXT`) are disabled, unless the application provides its own overridden feature structures containing the features.
 
@@ -393,13 +393,13 @@ Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile to enable.
 * `flags` contains zero or more of the `VpInstanceCreateFlagBits` values, as described below.
 
-The default behavior of `vpCreateInstance` is to enable only the instance extensions that are required by the profile and the `VkInstanceCreateInfo` provided by the application must not enable any instance extensions itself.
+The default behavior of `vpCreateInstance` is to enable only the instance extensions that are required by the profile; the `VkInstanceCreateInfo` provided by the application must not enable any instance extensions itself.
 
 If the application specifies the `VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT` then only the extensions enabled in the `VkInstanceCreateInfo` provided by the application will be used.
 
 If the application specifies the `VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT` then the extension lists are merged and both the extensions required by the profile and those enabled by the application in the `VkInstanceCreateInfo` structure will be enabled.
 
-If the application provided `VkInstanceCreateInfo` does not specify a `VkApplicationInfo` structure then a `VkApplicationInfo` with an `apiVersion` field equaling the minimum required API version of the profile will be added. If the application does provide a `VkApplicationInfo` it has to make sure that its `apiVersion` field is greater than or equal to the minimum required API version of the profile (e.g. by using the corresponding preprocessor definition).
+If the application-provided `VkInstanceCreateInfo` does not specify a `VkApplicationInfo` structure then a `VkApplicationInfo` with an `apiVersion` field equaling the minimum required API version of the profile will be added. If the application does provide a `VkApplicationInfo` it has to make sure that its `apiVersion` field is greater than or equal to the minimum required API version of the profile (e.g. by using the corresponding preprocessor definition).
 
 #### Check device level support
 
@@ -441,19 +441,19 @@ The default behavior of `vpCreateDevice` is to enable only the device extensions
 
 Similarly, the default behavior of `vpCreateDevice` is to enable features that are required by the profile and the `pNext` chain of `VkDeviceCreateInfo` must not contain any feature structures that are defined by the profile itself.
 
-If the application specifies the `VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT` then only the extensions enabled in the `VkDeviceCreateInfo` provided by the application will be used.
+If the application specifies the `VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT`, then only the extensions enabled in the `VkDeviceCreateInfo` provided by the application will be used.
 
-If the application specifies the `VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT` then the extension lists are merged and both the extensions required by the profile and those enabled by the application in the `VkDeviceCreateInfo` structure will be enabled.
+If the application specifies the `VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT`, then the extension lists are merged and both the extensions required by the profile and those enabled by the application in the `VkDeviceCreateInfo` structure will be enabled.
 
-If the application specifies the `VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT` then if a feature structure is defined by both the profile and the `pNext` chain of `VkDeviceCreateInfo` then the one provided by the application is used, overriding the enable state of any feature that otherwise would come from the profile.
+If the application specifies the `VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT` and if a feature structure is defined by both the profile and the `pNext` chain of `VkDeviceCreateInfo`, then the one provided by the application is used, overriding the enable state of any feature that otherwise would come from the profile.
 
-If the application specifies the `VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT` then only the feature structures provided by the application in the `pNext` chain of `VkDeviceCreateInfo` are used, overriding all profile feature data.
+If the application specifies the `VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT`, then only the feature structures provided by the application in the `pNext` chain of `VkDeviceCreateInfo` are used, overriding all profile feature data.
 
-> **NOTE:** Currently there is no `VP_DEVICE_CREATE_MERGE_FEATURES_BIT` that could allow merging individual feature enablement within feature structures due to the constness of the `pNext` chain of `VkDeviceCreateInfo` as reconstructing the `pNext` chain entirely would preclude supporting any structures in the `pNext` chain unknown to the Vulkan Profiles library.
+> **NOTE:** Currently there is no `VP_DEVICE_CREATE_MERGE_FEATURES_BIT` that could allow merging individual feature enablement within feature structures due to the constness of the `pNext` chain of `VkDeviceCreateInfo`, as reconstructing the `pNext` chain entirely would preclude supporting any structures in the `pNext` chain unknown to the Vulkan Profiles library.
 
 ### Profile queries
 
-The Vulkan Profile library offers a set of APIs to query the capabilities defined in a particular Vulkan profile, and may be used both for development-time checking of profile capabilities or to facilitate the construction of custom extension and feature configurations that use only a subset of the capabilities required by the profile.
+The Vulkan Profile library offers a set of APIs to query the capabilities defined in a particular Vulkan profile, and may be used both for development-time checking of profile capabilities and for facilitating the construction of custom extension and feature configurations that use only a subset of the capabilities required by the profile.
 
 #### Query profiles
 
@@ -473,7 +473,7 @@ If `pProperties` is `NULL`, then the number of profiles available is returned in
 
 #### Query profile fallbacks
 
-Some profiles have recommended fallback profiles, i.e. profiles to use as a fallback in case the original profile is not supported as is. In order to query the list of fallback profiles for a given profile, use the following command:
+Some profiles have recommended fallback profiles, i.e. profiles to use as a fallback in case the original profile is not supported. In order to query the list of fallback profiles for a given profile, use the following command:
 
 ```C++
 VkResult vpGetProfileFallbacks(
@@ -553,9 +553,9 @@ void vpGetProfileFeatures(
 
 Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
-* `pNext` is a `pNext` chain of Vulkan device feature structures (with or without including `VkPhysicalDeviceFeatures2`)
+* `pNext` is a `pNext` chain of Vulkan device feature structures (with or without a `VkPhysicalDeviceFeatures2` feature structure).
 
-If the `pNext` chain contains a Vulkan device feature structure for which the profile defines corresponding feature requirements then the structure is modified to include those features. Other fields of the Vulkan device feature structure not defined by the profile will be left unmodified and structures not defined in the profile will be ignored (left unmodified as a whole).
+If the `pNext` chain contains a Vulkan device feature structure for which the profile defines corresponding feature requirements, then the structure is modified to include those features. Other fields of the Vulkan device feature structure not defined by the profile will be left unmodified, and structures not defined in the profile will be ignored (left unmodified as a whole).
 
 #### Query profile device properties
 
@@ -585,7 +585,7 @@ void vpGetProfileProperties(
 
 Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
-* `pNext` is a `pNext` chain of Vulkan device property structures (with or without including `VkPhysicalDeviceProperties2`)
+* `pNext` is a `pNext` chain of Vulkan device property structures (with or without a `VkPhysicalDeviceProperties2` property structure).
 
 If the `pNext` chain contains a Vulkan device property structure for which the profile defines corresponding property/limit requirements then the structure is modified to include those properties/limits. Other fields of the Vulkan device property structure not defined by the profile will be left unmodified and structures not defined in the profile will be ignored (left unmodified as a whole).
 
@@ -673,6 +673,6 @@ void vpGetProfileFormatProperties(
 Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `format` is the format for which required properties are queried.
-* `pNext` is a `pNext` chain of Vulkan device property structures (with or without including `VkPhysicalDeviceFormatProperties2` or `VkPhysicalDeviceFormatProperties3`)
+* `pNext` is a `pNext` chain of Vulkan device property structures (with or without `VkPhysicalDeviceFormatProperties2` or `VkPhysicalDeviceFormatProperties3` property structures).
 
 If the `pNext` chain contains a Vulkan format property structure for which the profile defines corresponding requirements then the structure is modified to include those properties. Other fields of the Vulkan format property structure not defined by the profile will be left unmodified and structures not defined in the profile will be ignored (left unmodified as a whole).
