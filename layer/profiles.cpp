@@ -3974,6 +3974,14 @@ struct JsonValidator {
 };
 
 VkResult JsonLoader::LoadFile(std::string filename) {
+    if (filename.empty()) {
+        if (!layer_settings->profile_name.empty()) {
+            LogMessage(DEBUG_REPORT_WARNING_BIT,
+                       format("Profile name is set to \"%s\", but profile_file is unset. The profile will not be loaded.\n",
+                              layer_settings->profile_name.c_str()));
+        }
+        return VK_SUCCESS;
+    }
     std::ifstream json_file(filename);
     if (!json_file) {
         LogMessage(DEBUG_REPORT_ERROR_BIT, format("JsonLoader failed to open file \"%s\"\n", filename.c_str()));

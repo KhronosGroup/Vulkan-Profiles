@@ -331,7 +331,6 @@ TEST(layer, TestExcludingFormats) {
     ASSERT_EQ(format_properties.bufferFeatures, 0);
 }
 
-
 TEST(layer, TestMissingPhysDevProps2) {
     VkResult err = VK_SUCCESS;
 
@@ -358,4 +357,62 @@ TEST(layer, TestMissingPhysDevProps2) {
     uint32_t count = 0;
     vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
     ASSERT_EQ(count, 19);
+}
+
+TEST(layer, TestNotSettingProfileFile) {
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    std::vector<VkExtensionProperties> device_extensions;
+    {
+        err = inst_builder.makeInstance();
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkInstance test_inst = inst_builder.getInstance();
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
+
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+        } else {
+            uint32_t count;
+            vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
+            device_extensions.resize(count);
+            vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, device_extensions.data());
+        }
+
+        vkDestroyInstance(test_inst, nullptr);
+        inst_builder.reset();
+    }
+    {
+        const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+        profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+        profiles_test::VulkanInstanceBuilder inst_builder;
+
+        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+        inst_builder.setApiVersion(VK_API_VERSION_1_0);
+
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = {};
+        settings.profile_name = {};
+        settings.emulate_portability = false;
+        settings.debug_fail_on_error = false;
+        settings.simulate_capabilities = SIMULATE_ALL_CAPABILITIES;
+
+        err = inst_builder.makeInstance(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
+
+        uint32_t count = 0;
+        vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
+        ASSERT_EQ(device_extensions.size(), count);
+    }
 }
