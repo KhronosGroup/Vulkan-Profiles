@@ -331,7 +331,6 @@ TEST(layer, TestExcludingFormats) {
     ASSERT_EQ(format_properties.bufferFeatures, 0);
 }
 
-
 TEST(layer, TestMissingPhysDevProps2) {
     VkResult err = VK_SUCCESS;
 
@@ -358,4 +357,80 @@ TEST(layer, TestMissingPhysDevProps2) {
     uint32_t count = 0;
     vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
     ASSERT_EQ(count, 19);
+}
+
+TEST(layer, TestExcludedExtensions) {
+#ifdef VK_EXT_shader_atomic_float2
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    VkPhysicalDeviceTransformFeedbackPropertiesEXT device_features{};
+    device_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT;
+    {
+        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+        inst_builder.setApiVersion(VK_API_VERSION_1_3);
+
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api.json";
+        settings.profile_name = "VP_LUNARG_test_api";
+        settings.emulate_portability = true;
+        settings.debug_fail_on_error = false;
+        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT;
+
+        err = inst_builder.makeInstance(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
+
+        VkPhysicalDeviceFeatures2 features;
+        features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+        features.pNext = &device_features;
+        vkGetPhysicalDeviceFeatures2(gpu, &features);
+        inst_builder.reset();
+    }
+
+    {
+        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+        inst_builder.setApiVersion(VK_API_VERSION_1_3);
+
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api.json";
+        settings.profile_name = "VP_LUNARG_test_api";
+        settings.emulate_portability = true;
+        settings.debug_fail_on_error = false;
+        settings.simulate_capabilities = SIMULATE_FORMAT_PROPERTIES_BIT;
+        settings.exclude_device_extensions.push_back(VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME);
+
+        err = inst_builder.makeInstance(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
+
+        VkPhysicalDeviceTransformFeedbackPropertiesEXT profile_features{};
+        profile_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT;
+
+        VkPhysicalDeviceFeatures2 features;
+        features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+        features.pNext = &profile_features;
+        vkGetPhysicalDeviceFeatures2(gpu, &features);
+
+        ASSERT_EQ(device_features.maxTransformFeedbackStreams, profile_features.maxTransformFeedbackStreams);
+        ASSERT_EQ(device_features.maxTransformFeedbackBuffers, profile_features.maxTransformFeedbackBuffers);
+        ASSERT_EQ(device_features.maxTransformFeedbackBufferSize, profile_features.maxTransformFeedbackBufferSize);
+        ASSERT_EQ(device_features.maxTransformFeedbackStreamDataSize, profile_features.maxTransformFeedbackStreamDataSize);
+        ASSERT_EQ(device_features.maxTransformFeedbackBufferDataSize, profile_features.maxTransformFeedbackBufferDataSize);
+        ASSERT_EQ(device_features.maxTransformFeedbackBufferDataStride, profile_features.maxTransformFeedbackBufferDataStride);
+        ASSERT_EQ(device_features.transformFeedbackQueries, profile_features.transformFeedbackQueries);
+        ASSERT_EQ(device_features.transformFeedbackStreamsLinesTriangles, profile_features.transformFeedbackStreamsLinesTriangles);
+        ASSERT_EQ(device_features.transformFeedbackRasterizationStreamSelect,
+                  profile_features.transformFeedbackRasterizationStreamSelect);
+        ASSERT_EQ(device_features.transformFeedbackDraw, profile_features.transformFeedbackDraw);
+    }
+#endif
 }
