@@ -4844,7 +4844,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderFloat
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *dest) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFeatures)\n");
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR)\n");
     if (!CheckExtensionSupport(VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME)) {
         return false;
     }
@@ -5191,7 +5191,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444FormatsFeaturesEXT *dest) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR)\n");
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevice4444FormatsFeaturesEXT)\n");
     if (!CheckExtensionSupport(VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
         return false;
     }
