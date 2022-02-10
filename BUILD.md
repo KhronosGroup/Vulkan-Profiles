@@ -103,24 +103,43 @@ pip3 install jsonschema
 Install the required tools for Linux and Windows covered above, then add the
 following.
 
-#### Android Studio
-- Install 2.1 or later version of [Android Studio](http://tools.android.com/download/studio/stable)
-- From the "Welcome to Android Studio" splash screen, add the following components using Configure > SDK Manager:
-  - SDK Tools > Android NDK
+#### Install the Android SDK and NDK
 
-#### Add NDK to path
+- With Android Studio
+  - Install [Android Studio 2.3](https://developer.android.com/studio/index.html)
+    or later.
+  - From the "Welcome to Android Studio" splash screen, add the following
+    components using Configure > SDK Manager:
+    - SDK Platforms > Android 8.0.0 and newer
+    - SDK Tools > Android SDK Build-Tools
+    - SDK Tools > Android SDK Platform-Tools
+    - SDK Tools > Android SDK Tools
+    - SDK Tools > NDK
+- [sdkmanager](https://developer.android.com/studio/command-line/sdkmanager) CLI tool
+
+#### Set SDK/NDK Build Environment Variables
+
+Some common locations for the `ANDROID_SDK_HOME` and `ANDROID_NDK_HOME` are:
+
+On Linux:
+
+```bash
+    export ANDROID_SDK_HOME=$HOME/Android/sdk
+    export ANDROID_NDK_HOME=$HOME/Android/sdk/ndk-bundle
+```
 
 On Windows:
+
+```batch
+    set ANDROID_SDK_HOME=%LOCALAPPDATA%\Android\sdk
+    set ANDROID_NDK_HOME=%LOCALAPPDATA%\Android\sdk\ndk-bundle
 ```
-set PATH=%LOCALAPPDATA%\Android\sdk\ndk-bundle;%PATH%
-```
-On Linux:
-```
-export PATH=$HOME/Android/Sdk/ndk-bundle:$PATH
-```
-On macOS:
-```
-export PATH=$HOME/Library/Android/sdk/ndk-bundle:$PATH
+
+On OSX:
+
+```bash
+    export ANDROID_SDK_HOME=$HOME/Library/Android/sdk
+    export ANDROID_NDK_HOME=$HOME/Library/Android/sdk/ndk-bundle
 ```
 
 ## Getting Started Build Instructions
@@ -171,31 +190,17 @@ ctest --parallel 8 --output-on-failure
 ### Android Build
 Use the following to ensure the Android build works.
 
-#### Android Build from Windows
-From Developer Command Prompt for VS2015:
-```
-cd build-android
-update_external_sources_android.bat
-android-generate.bat
-ndk-build
-```
+#### Android Build using CMake For Windows, Linux, and OSX
 
-#### Android Build from Linux
-From your terminal:
-```
-cd build-android
-./update_external_sources_android.sh
-./android-generate.sh
-ndk-build -j $(nproc)
-```
+```bash
+cmake -Bandroid-build \
+  -DCMAKE_TOOLCHAIN_FILE=<ndk-path>/build/cmake/android.toolchain.cmake \
+  -DANDROID_PLATFORM=28 \
+  -DANDROID_BUILD_TOOLS=30.0.3 \
+  -DANDROID_ABI=arm64-v8a
 
-#### Android Build from macOS 
-From your terminal:
-```
-cd build-android
-./update_external_sources_android.sh
-./android-generate.sh
-ndk-build -j $(sysctl -n hw.ncpu)
+cd android-build
+cmake --build . --parallel
 ```
 
 ### Repository Dependencies
