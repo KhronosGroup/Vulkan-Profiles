@@ -4069,6 +4069,8 @@ VkResult JsonLoader::LoadFile(std::string filename) {
             LogMessage(DEBUG_REPORT_ERROR_BIT, format("%s is not a valid JSON profile file.\n", filename.c_str()));
             if (layer_settings->debug_fail_on_error) {
                 return VK_ERROR_INITIALIZATION_FAILED;
+            } else {
+                return VK_SUCCESS;
             }
         }
     }
