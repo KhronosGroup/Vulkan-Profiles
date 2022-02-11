@@ -14,21 +14,21 @@
 ## Overview
 
 ### Vulkan capabilities test coverage with the Khronos Profiles Layer
-The Khronos Profiles Layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device. It can be applied without modifying any application binaries, and in a fully automated fashion. The *Profiles layer* is a Vulkan layer that can override the values returned by your application’s queries of the GPU. Profiles layer uses a JSON text configuration file to make your application see a different driver/GPU than is actually in your system. This capability is useful to verify that your application both a) properly queries the limits from Vulkan, and b) obeys those limits.
+The Khronos Profiles Layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device. It can be applied without modifying any application binaries, and in a fully automated fashion. The *Profiles layer* is a Vulkan layer that can override the values returned by your application's queries of the GPU. Profiles layer uses a JSON text configuration file to make your application see a different driver/GPU than is actually in your system. This capability is useful to verify that your application both a) properly queries the limits from Vulkan, and b) obeys those limits.
 
 The *Profiles layer* is available pre-built in the [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/), and continues to evolve. It works for all Vulkan platforms (Linux, Windows, macOS, and Android). The *Profiles layer* can be enabled and configured using the [Vulkan Configurator](https://vulkan.lunarg.com/doc/sdk/latest/windows/vkconfig.html) included with the Vulkan SDK.
 
-The role of the *Profiles layer* is to "simulate" a Vulkan implementation by modifying the features and resources of a more-capable implementation. The *Profiles layer* does not add capabilities to your existing Vulkan implementation by "emulating" additional capabilities with software; e.g. The *Profiles layer* cannot add geometry shader capability to an actual device that doesn’t already provide it. Also, the Profiles layer does not "enforce" the features being simulated. You can use the Validation Layer in conjunction with the Profiles Layer to identify where your application is not adhering to the features being simulated by the Profiles Layer.
+The role of the *Profiles layer* is to "simulate" a Vulkan implementation by modifying the features and resources of a more-capable implementation. The *Profiles layer* does not add capabilities to your existing Vulkan implementation by "emulating" additional capabilities with software; e.g. the *Profiles layer* cannot add geometry shader capability to an actual device that doesn't already provide it. Also, the Profiles layer does not "enforce" the features being simulated. You can use the Validation Layer in conjunction with the Profiles Layer to identify where your application is not adhering to the features being simulated by the Profiles Layer.
 
 ### Using the Profiles layer
-The *Profiles Layer* can be used using environment variables or more intuitively using the *Vulkan Configurator* GUI application.
+The *Profiles Layer* can be controlled using environment variables or more intuitively using the *Vulkan Configurator* GUI application.
 
 ![Vulkan Configurator](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/images/vkconfig.png)
 *The built-in Portability layers configurations in Vulkan Configurator using the Validation and the Profiles layers*
 
-The *Portability* layers configuration in *Vulkan Configurator* allows checking that a Vulkan application follows the requirements of a *Vulkan Profile*. This layers configuration relies on the *Vulkan Profiles* layer to override the Vulkan device capabilities and the *Vulkan Validation Layer* to check that the Vulkan application doesn't rely on capabilities not supported by the selected profile.
+The *Portability* layers configuration in *Vulkan Configurator* checks that a Vulkan application follows the requirements of a *Vulkan Profile*. This layers configuration relies on the *Vulkan Profiles* layer to override the Vulkan device capabilities and the *Vulkan Validation Layer* to check that the Vulkan application doesn't rely on capabilities not supported by the selected profile.
 
-The input to the *Profiles layer* is a profiles file that is using the flexible JSON syntax. The profiles file format is defined by a formal JSON schema, so any profiles file may be verified to be correct using freely available JSON validators. Browsing through the schema file, we can see the extent of parameters that are available for our configuration.
+The input to the *Profiles layer* is a profiles file that is using the flexible JSON syntax. The profiles file format is defined by a formal JSON schema, so any profiles file may be verified to be correct using freely available JSON validators. Examination of the schema file reveals the extent of parameters that are available for configuration.
 
 To use the Profiles Layer Vulkan version 1.0 and the `VK_KHR_get_physical_device_properties2` extension are required.
 
@@ -48,7 +48,7 @@ adb shell settings put global debug.vulkan.khronos_profiles.debug_fail_on_error 
 
 ## Technical Details
 
-The Profiles Layer is a Vulkan layer that can modify the results of Vulkan PhysicalDevice queries based on a profiles file (JSON format), thus simulating some of the capabilities of a device by overriding the capabilities of the actual device under test.
+The *Profiles Layer* is a Vulkan layer that can modify the results of Vulkan PhysicalDevice queries based on a profiles file (JSON format), thus simulating some of the capabilities of a device by overriding the capabilities of the actual device under test.
 
 Please note that this device simulation layer "simulates", rather than "emulates".
 By that we mean that the layer cannot add emulated capabilities that do not already exist in the system's underlying actual device.
@@ -66,10 +66,10 @@ In this case if an application erroneously attempts to overcommit a resource, or
 
 The Profiles layer will work together with other Vulkan layers, such as the Validation layer.
 When configuring the order of the layers, the Profiles layer should be "last";
-i.e.: closest to the driver, farthest from the application.
+i.e.: closest to the driver, furthest from the application.
 That allows the Validation layer to see the results of the Profiles layer, and enable Validation to flag incorrect API usage beyond the simulated capabilities.
 
-If you find issues, please report to [Khronos's Vulkan-Profiles GitHub repository](https://github.com/KhronosGroup/Vulkan-Profiles/issues).
+If you find issues, please report to [Khronos' Vulkan-Profiles GitHub repository](https://github.com/KhronosGroup/Vulkan-Profiles/issues).
 
 ### Profiles Layer operation and profiles file
 At application startup, during `vkEnumeratePhysicalDevices()`, the Profiles layer initializes its internal tables from the actual physical device in the system, then loads the profiles file, which specifies override values to apply to those internal tables.
@@ -93,122 +93,122 @@ In this case the Profiles layer will use the promoted version of the structure a
 
 The Profiles layer provides the ability to emulate the `VK_KHR_portability_subset` extension on devices that do not implement this extension.
 This feature allows users to test their application with limitations found on non-conformant Vulkan implementations.
-To turn on this feature, set the `VK_KHRONOS_PROFILES_EMULATE_PORTABILITY_SUBSET_EXTENSION` environment variable (or the corresponding `vk_layer_settings.txt` option `khronos_profiles.emulate_portability`) to a positive integer.
+To turn on this feature, enable it as described [below](#emulate-vk_khr_portability_subset).
 
 ### Profiles Layer Settings
 
 #### Profiles JSON file
 - Environment Variable: `VK_KHRONOS_PROFILES_PROFILE_FILE`
-- `vk_layer_settings.txt` Option: `khronos_profiles.profile_file`
-- Android Option: `debug.vulkan.khronos_profiles.profile_file`
-- Default Value: Not set
+- `vk_layer_settings.txt` option: `khronos_profiles.profile_file`
+- Android option: `debug.vulkan.khronos_profiles.profile_file`
+- Default value: Not set
 
 Name of the profiles file to load. 
 
 #### Selecting profile
 - Environment Variable: `VK_KHRONOS_PROFILES_PROFILE_NAME`
-- `vk_layer_settings.txt` Option: `khronos_profiles.profile_name`
-- Android Option: `debug.vulkan.khronos_profiles.profile_name`
-- Default Value: Not set
+- `vk_layer_settings.txt` option: `khronos_profiles.profile_name`
+- Android option: `debug.vulkan.khronos_profiles.profile_name`
+- Default value: Not set
 
 Name of the profile to load from the profiles file.
 
-#### Profiles JSON file
+#### Profiles JSON validation
 - Environment Variable: `VK_KHRONOS_PROFILES_PROFILE_VALIDATION`
-- `vk_layer_settings.txt` Option: `khronos_profiles.profile_validation`
-- Android Option: `debug.vulkan.khronos_profiles.profile_validation`
-- Default Value: true
+- `vk_layer_settings.txt` option: `khronos_profiles.profile_validation`
+- Android option: `debug.vulkan.khronos_profiles.profile_validation`
+- Default value: true
 
 Validate the profiles file against the Vulkan SDK profile schema if the file is found. 
 
 #### Emulate `VK_KHR_portability_subset`
 - Environment Variable: `VK_KHRONOS_PROFILES_EMULATE_PORTABILITY`
-- `vk_layer_settings.txt` Option: `khronos_profiles.emulate_portability`
-- Android Option: `debug.vulkan.khronos_profiles.emulate_portability`
-- Default Value: true
+- `vk_layer_settings.txt` option: `khronos_profiles.emulate_portability`
+- Android option: `debug.vulkan.khronos_profiles.emulate_portability`
+- Default value: true
 
 Enables emulation of the `VK_KHR_portability_subset` extension.
 
 #### Simulating capabilities
 - Environment Variable: `VK_KHRONOS_PROFILES_SIMULATE_CAPABILITIES`
-- `vk_layer_settings.txt` Option: `khronos_profiles.simulate_capabilities`
-- Android Option: `debug.vulkan.khronos_profiles.simulate_capabilities`
-- Options: SIMULATE_API_VERSION_BIT, SIMULATE_EXTENSIONS_BIT, SIMULATE_FEATURES_BIT, SIMULATE_PROPERTIES_BIT, SIMULATE_FORMATS_BIT
-- Default Value: SIMULATE_API_VERSION_BIT, SIMULATE_FEATURES_BIT, SIMULATE_PROPERTIES_BIT
+- `vk_layer_settings.txt` option: `khronos_profiles.simulate_capabilities`
+- Android option: `debug.vulkan.khronos_profiles.simulate_capabilities`
+- Options: `SIMULATE_API_VERSION_BIT`, `SIMULATE_EXTENSIONS_BIT`, `SIMULATE_FEATURES_BIT`, `SIMULATE_PROPERTIES_BIT`, `SIMULATE_FORMATS_BIT`
+- Default value: `SIMULATE_API_VERSION_BIT,SIMULATE_FEATURES_BIT,SIMULATE_PROPERTIES_BIT`
 
 Enables modification of device capabilities.
 
 #### Debug Actions
 - Environment Variable: `VK_KHRONOS_PROFILES_DEBUG_ACTIONS`
-- `vk_layer_settings.txt` Option: `khronos_profiles.debug_actions`
-- Android Option: `debug.vulkan.khronos_profiles.debug_actions`
-- Options: DEBUG_ACTION_FILE_BIT, DEBUG_ACTION_STDOUT_BIT, DEBUG_ACTION_OUTPUT_BIT, DEBUG_ACTION_BREAKPOINT_BIT
-- Default Value: DEBUG_ACTION_STDOUT_BIT
+- `vk_layer_settings.txt` option: `khronos_profiles.debug_actions`
+- Android option: `debug.vulkan.khronos_profiles.debug_actions`
+- Options: `DEBUG_ACTION_FILE_BIT`, `DEBUG_ACTION_STDOUT_BIT`, `DEBUG_ACTION_OUTPUT_BIT`, `DEBUG_ACTION_BREAKPOINT_BIT`
+- Default value: `DEBUG_ACTION_STDOUT_BIT`
 
 Enables different debugging actions.
 
 #### Debug Filename
 - Environment Variable: `VK_KHRONOS_PROFILES_DEBUG_FILENAME`
-- `vk_layer_settings.txt` Option: `khronos_profiles.debug_filename`
-- Android Option: `debug.vulkan.khronos_profiles.debug_filename`
-- Default Value: profiles_layer_log.txt
+- `vk_layer_settings.txt` option: `khronos_profiles.debug_filename`
+- Android option: `debug.vulkan.khronos_profiles.debug_filename`
+- Default value: `profiles_layer_log.txt`
 
 Sets the output location.
 
 #### Debug file discard
 - Environment Variable: `VK_KHRONOS_PROFILES_DEBUG_FILE_DISCARD`
-- `vk_layer_settings.txt` Option: `khronos_profiles.debug_file_discard`
-- Android Option: `debug.vulkan.khronos_profiles.debug_file_discard`
-- Default Value: true
+- `vk_layer_settings.txt` option: `khronos_profiles.debug_file_discard`
+- Android option: `debug.vulkan.khronos_profiles.debug_file_discard`
+- Default value: true
 
 Discard the content of the log file between each layer run.
 
 #### Debug fail on error
 - Environment Variable: `VK_KHRONOS_PROFILES_DEBUG_FAIL_ON_ERROR`
-- `vk_layer_settings.txt` Option: `khronos_profiles.debug_fail_on_error`
-- Android Option: `debug.vulkan.khronos_profiles.debug_fail_on_error`
-- Default Value: Off
+- `vk_layer_settings.txt` option: `khronos_profiles.debug_fail_on_error`
+- Android option: `debug.vulkan.khronos_profiles.debug_fail_on_error`
+- Default value: Off
 
 Enabled failing if an error occurs.
 
 #### Debug reports
 - Environment Variable: `VK_KHRONOS_PROFILES_DEBUG_REPORTS`
-- `vk_layer_settings.txt` Option: `khronos_profiles.debug_reports`
-- Android Option: `debug.vulkan.khronos_profiles.debug_reports`
-- Options: DEBUG_REPORT_NOTIFICATION_BIT, DEBUG_REPORT_WARNING_BIT, DEBUG_REPORT_ERROR_BIT, DEBUG_REPORT_DEBUG_BIT
-- Default Value: Not set
+- `vk_layer_settings.txt` option: `khronos_profiles.debug_reports`
+- Android option: `debug.vulkan.khronos_profiles.debug_reports`
+- Options: `DEBUG_REPORT_NOTIFICATION_BIT`, `DEBUG_REPORT_WARNING_BIT`, `DEBUG_REPORT_ERROR_BIT`, `DEBUG_REPORT_DEBUG_BIT`
+- Default value: Not set
 
 Enabled reports level.
 
 #### Exclude device extensions
 - Environment Variable: `VK_KHRONOS_PROFILES_EXCLUDE_DEVICE_EXTENSIONS`
-- `vk_layer_settings.txt` Option: `khronos_profiles.exclude_device_extensions`
-- Android Option: `debug.vulkan.khronos_profiles.exclude_device_extensions`
-- Default Value: Not set
+- `vk_layer_settings.txt` option: `khronos_profiles.exclude_device_extensions`
+- Android option: `debug.vulkan.khronos_profiles.exclude_device_extensions`
+- Default value: Not set
 
-Removes device extensions from being reported by the Vulkan physical device.
+Prevents device extensions from being reported by the Vulkan physical device.
 
 #### Exclude formats
 - Environment Variable: `VK_KHRONOS_PROFILES_EXCLUDE_FORMATS`
-- `vk_layer_settings.txt` Option: `khronos_profiles.exclude_formats`
-- Android Option: `debug.vulkan.khronos_profiles.exclude_formats`
-- Default Value: Not set
+- `vk_layer_settings.txt` option: `khronos_profiles.exclude_formats`
+- Android option: `debug.vulkan.khronos_profiles.exclude_formats`
+- Default value: Not set
 
-Removes image formats from being reported as supported by the Vulkan physical device.
+Prevents image formats from being reported as supported by the Vulkan physical device.
 
-**Note:** Environment variables take precedence over `vk_layer_settings.txt` options.
+**Note:** In desktop environments, environment variables take precedence over `vk_layer_settings.txt` options.
 
 ### Example using the Profiles layer using Linux environment variables
 ```bash
 # Configure bash to find the Vulkan SDK.
 source $VULKAN_SDK/setup-env.sh
 
-# Set loader parameters to find and load the *Profiles layer* from our local `Vulkan-Profiles` build.
-export VK_LAYER_PATH="${Vulkan-Profiles}/build/bin"
+# Set loader parameters to find and load the Profiles layer from our local Vulkan-Profiles build.
+export VK_LAYER_PATH="${VulkanProfiles}/build/bin"
 export VK_INSTANCE_LAYERS="VK_LAYER_KHRONOS_profiles"
 
 # Specify the simulated device's profiles file.
-export VK_KHRONOS_PROFILES_PROFILE_FILE="${Vulkan-Profiles}/profiles/VP_LUNARG_desktop_portability_2021.json"
+export VK_KHRONOS_PROFILES_PROFILE_FILE="${VulkanProfiles}/profiles/VP_LUNARG_desktop_portability_2021.json"
 
 # Enable notification and debug messages from the Profiles layer.
 export VK_KHRONOS_PROFILES_DEBUG_REPORTS="DEBUG_REPORT_NOTIFICATION_BIT,DEBUG_REPORT_DEBUG_BIT"
