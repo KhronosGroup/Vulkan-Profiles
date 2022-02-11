@@ -87,9 +87,6 @@
                 }
             },
             "properties": {
-                "VkPhysicalDeviceProperties": {
-                    "apiVersion": 4206592
-				},
                 "VkPhysicalDeviceVulkan11Properties": {
                     "deviceNodeMask": 210,
                     "deviceLUIDValid": true,
