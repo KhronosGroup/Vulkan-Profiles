@@ -4468,7 +4468,7 @@ VkResult JsonLoader::LoadFile(std::string filename) {
                 capabilities.push_back(cap.asString());
             }
 
-            LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, format("Loading \"%s\" profile\n", profile.c_str()).c_str());
+            LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, format("Overriding device capbilities with \"%s\" profile capabilities\n", profile.c_str()).c_str());
             break;  // load a single profile
         }
     }
@@ -7031,7 +7031,22 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
                format("%s version %d.%d.%d\n", kOurLayerName, kVersionProfilesMajor, kVersionProfilesMinor, kVersionProfilesPatch));
 
     const VkApplicationInfo *app_info = pCreateInfo->pApplicationInfo;
-    requested_version = (app_info && app_info->apiVersion) ? app_info->apiVersion : VK_API_VERSION_1_0;
+    requested_version = (app_info && app_info->apiVersion) ? app_info->apiVersion : VK_API_VERSION_1_1;
+    if (requested_version < VK_API_VERSION_1_1) {
+        if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
+            LogMessage(DEBUG_REPORT_WARNING_BIT,
+                format("%s currently requires VK_API_VERSION_1_1 or higher but the Vulkan Application requested a Vulkan "
+                        "%d.%d instance. The Vulkan instance is created with Vulkan 1.1 requirement.\n",
+                        kOurLayerName, VK_VERSION_MAJOR(requested_version), VK_VERSION_MINOR(requested_version)));
+        } else {
+            LogMessage(DEBUG_REPORT_WARNING_BIT,
+                format("%s currently requires VK_API_VERSION_1_1 or higher but the Vulkan Application requested a Vulkan "
+                        "%d.%d instance. The Vulkan instance is created with Vulkan 1.0 requirement.\n",
+                        kOurLayerName, VK_VERSION_MAJOR(requested_version), VK_VERSION_MINOR(requested_version)));
+        }
+        requested_version = VK_API_VERSION_1_1;
+    }
+
     if (requested_version > VK_API_VERSION_1_3) {
         LogMessage(DEBUG_REPORT_ERROR_BIT, format("%s currently only supports VK_API_VERSION_1_3 and lower.\n", kOurLayerName));
     }
