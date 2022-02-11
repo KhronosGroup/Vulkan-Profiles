@@ -7032,6 +7032,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
 
     const VkApplicationInfo *app_info = pCreateInfo->pApplicationInfo;
     requested_version = (app_info && app_info->apiVersion) ? app_info->apiVersion : VK_API_VERSION_1_1;
+    bool changed_version = false;
     if (requested_version < VK_API_VERSION_1_1) {
         if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
@@ -7045,6 +7046,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
                         kOurLayerName, VK_VERSION_MAJOR(requested_version), VK_VERSION_MINOR(requested_version)));
         }
         requested_version = VK_API_VERSION_1_1;
+        changed_version = true;
     }
 
     if (requested_version > VK_API_VERSION_1_3) {
@@ -7053,41 +7055,30 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
 
     std::lock_guard<std::recursive_mutex> lock(global_lock);
 
-    bool get_physical_device_properties2_active = false;
-    if (VK_VERSION_MINOR(requested_version) > 0) {
-        get_physical_device_properties2_active = true;
-    } else {
-        for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; i++) {
-            if (strncmp(pCreateInfo->ppEnabledExtensionNames[i], VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
-                        VK_MAX_EXTENSION_NAME_SIZE) == 0) {
-                get_physical_device_properties2_active = true;
-                break;
-            }
-        }
-    }
-
-    if (get_physical_device_properties2_active) {
+    if (!changed_version) {
         return LayerSetupCreateInstance(pCreateInfo, pAllocator, pInstance);
     }
 
-    LogMessage(DEBUG_REPORT_WARNING_BIT, ::format("The Profiles Layer requires the %s extension, but it was not included in "
-                                                  "VkInstanceCreateInfo::ppEnabledExtensionNames, adding the extension.\n",
-                                                  VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME));
-    // Add VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
+    assert(pCreateInfo->pApplicationInfo);
+
+    VkApplicationInfo new_app_info;
+    new_app_info.sType = pCreateInfo->pApplicationInfo->sType;
+    new_app_info.pNext = pCreateInfo->pApplicationInfo->pNext;
+    new_app_info.pApplicationName = pCreateInfo->pApplicationInfo->pApplicationName;
+    new_app_info.applicationVersion = pCreateInfo->pApplicationInfo->applicationVersion;
+    new_app_info.pEngineName = pCreateInfo->pApplicationInfo->pEngineName;
+    new_app_info.engineVersion = pCreateInfo->pApplicationInfo->engineVersion;
+    new_app_info.apiVersion = VK_API_VERSION_1_1;
+
     VkInstanceCreateInfo create_info;
     create_info.sType = pCreateInfo->sType;
     create_info.pNext = pCreateInfo->pNext;
     create_info.flags = pCreateInfo->flags;
-    create_info.pApplicationInfo = pCreateInfo->pApplicationInfo;
+    create_info.pApplicationInfo = &new_app_info;
     create_info.enabledLayerCount = pCreateInfo->enabledLayerCount;
     create_info.ppEnabledLayerNames = pCreateInfo->ppEnabledLayerNames;
-    create_info.enabledExtensionCount = pCreateInfo->enabledExtensionCount + 1;
-    std::vector<const char *> extension_names(create_info.enabledExtensionCount);
-    for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; ++i) {
-        extension_names[i] = pCreateInfo->ppEnabledExtensionNames[i];
-    }
-    extension_names[pCreateInfo->enabledExtensionCount] = VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME;
-    create_info.ppEnabledExtensionNames = extension_names.data();
+    create_info.enabledExtensionCount = pCreateInfo->enabledExtensionCount;
+    create_info.ppEnabledExtensionNames = pCreateInfo->ppEnabledExtensionNames;
     return LayerSetupCreateInstance(&create_info, pAllocator, pInstance);
 }
 
