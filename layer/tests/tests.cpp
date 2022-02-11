@@ -416,3 +416,80 @@ TEST(layer, TestNotSettingProfileFile) {
         ASSERT_EQ(device_extensions.size(), count);
     }
 }
+
+TEST(layer, TestExcludedExtensions) {
+#ifdef VK_EXT_shader_atomic_float2
+    VkResult err = VK_SUCCESS;
+
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    VkPhysicalDeviceTransformFeedbackPropertiesEXT device_properties{};
+    device_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT;
+    {
+        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+        inst_builder.setApiVersion(VK_API_VERSION_1_3);
+
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api.json";
+        settings.profile_name = "VP_LUNARG_test_api";
+        settings.emulate_portability = true;
+        settings.debug_fail_on_error = false;
+        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT;
+
+        err = inst_builder.makeInstance(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
+
+        VkPhysicalDeviceProperties2 properties;
+        properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        properties.pNext = &device_properties;
+        vkGetPhysicalDeviceProperties2(gpu, &properties);
+        inst_builder.reset();
+    }
+
+    {
+        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+        inst_builder.setApiVersion(VK_API_VERSION_1_3);
+
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api.json";
+        settings.profile_name = "VP_LUNARG_test_api";
+        settings.emulate_portability = true;
+        settings.debug_fail_on_error = false;
+        settings.simulate_capabilities = SIMULATE_ALL_CAPABILITIES;
+        settings.exclude_device_extensions.push_back(VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME);
+
+        err = inst_builder.makeInstance(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(&gpu);
+
+        VkPhysicalDeviceTransformFeedbackPropertiesEXT profile_properties{};
+        profile_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT;
+
+        VkPhysicalDeviceProperties2 properties;
+        properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        properties.pNext = &profile_properties;
+        vkGetPhysicalDeviceProperties2(gpu, &properties);
+
+        ASSERT_EQ(device_properties.maxTransformFeedbackStreams, profile_properties.maxTransformFeedbackStreams);
+        ASSERT_EQ(device_properties.maxTransformFeedbackBuffers, profile_properties.maxTransformFeedbackBuffers);
+        ASSERT_EQ(device_properties.maxTransformFeedbackBufferSize, profile_properties.maxTransformFeedbackBufferSize);
+        ASSERT_EQ(device_properties.maxTransformFeedbackStreamDataSize, profile_properties.maxTransformFeedbackStreamDataSize);
+        ASSERT_EQ(device_properties.maxTransformFeedbackBufferDataSize, profile_properties.maxTransformFeedbackBufferDataSize);
+        ASSERT_EQ(device_properties.maxTransformFeedbackBufferDataStride, profile_properties.maxTransformFeedbackBufferDataStride);
+        ASSERT_EQ(device_properties.transformFeedbackQueries, profile_properties.transformFeedbackQueries);
+        ASSERT_EQ(device_properties.transformFeedbackStreamsLinesTriangles,
+                  profile_properties.transformFeedbackStreamsLinesTriangles);
+        ASSERT_EQ(device_properties.transformFeedbackRasterizationStreamSelect,
+                  profile_properties.transformFeedbackRasterizationStreamSelect);
+        ASSERT_EQ(device_properties.transformFeedbackDraw, profile_properties.transformFeedbackDraw);
+    }
+#endif
+}
