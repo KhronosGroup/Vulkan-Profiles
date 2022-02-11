@@ -273,7 +273,7 @@
                 "VK_KHR_global_priority": 1
             },
             "properties": {
-                "VkPhysicalDeviceFloatControlsProperties": {
+                "VkPhysicalDeviceFloatControlsPropertiesKHR": {
                     "denormBehaviorIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY",
                     "roundingModeIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY"
 				},

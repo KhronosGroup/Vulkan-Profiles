@@ -54,7 +54,9 @@ struct TestInit {
         VkProfileLayerSettingsEXT settings;
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_promoted_api.json";
         settings.profile_name = "VP_LUNARG_test_api";
-        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
+        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
+                                         SimulateCapabilityFlag::SIMULATE_FEATURES_BIT |
+                                         SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
 
         err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -80,6 +82,17 @@ VkPhysicalDevice GetPhysicalDevice() {
     return test.physical_device;
 }
 
+bool IsVersionSupported(uint32_t api_version) {
+    VkPhysicalDeviceProperties2 gpu_props{};
+    gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    vkGetPhysicalDeviceProperties2(test.physical_device, &gpu_props);
+    if (gpu_props.properties.apiVersion < api_version) {
+        printf("Profile not supported on device, skipping test.\n");
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
 
@@ -100,6 +113,10 @@ TEST(layer_promoted, TestVulkan11Properties) {
 #ifdef VK_VERSION_1_2
     VkPhysicalDevice gpu = GetPhysicalDevice();
     if (gpu == VK_NULL_HANDLE) return;
+    if (!IsVersionSupported(VK_API_VERSION_1_2)) {
+        printf("Required API version is not supported on device, skipping test.\n");
+        return;
+    }
 
     VkPhysicalDeviceVulkan11Properties vulkan_11_properties{};
     vulkan_11_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
@@ -125,6 +142,10 @@ TEST(layer_promoted, TestVulkan11Features) {
 #ifdef VK_VERSION_1_2
     VkPhysicalDevice gpu = GetPhysicalDevice();
     if (gpu == VK_NULL_HANDLE) return;
+    if (!IsVersionSupported(VK_API_VERSION_1_2)) {
+        printf("Required API version is not supported on device, skipping test.\n");
+        return;
+    }
 
     VkPhysicalDeviceVulkan11Features vulkan_11_features{};
     vulkan_11_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
@@ -153,6 +174,10 @@ TEST(layer_promoted, TestVulkan12Properties) {
 #ifdef VK_VERSION_1_2
     VkPhysicalDevice gpu = GetPhysicalDevice();
     if (gpu == VK_NULL_HANDLE) return;
+    if (!IsVersionSupported(VK_API_VERSION_1_2)) {
+        printf("Required API version is not supported on device, skipping test.\n");
+        return;
+    }
 
     VkPhysicalDeviceVulkan12Properties vulkan_12_properties{};
     vulkan_12_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES;
@@ -217,6 +242,10 @@ TEST(layer_promoted, TestVulkan12Features) {
 #ifdef VK_VERSION_1_2
     VkPhysicalDevice gpu = GetPhysicalDevice();
     if (gpu == VK_NULL_HANDLE) return;
+    if (!IsVersionSupported(VK_API_VERSION_1_2)) {
+        printf("Required API version is not supported on device, skipping test.\n");
+        return;
+    }
 
     VkPhysicalDeviceVulkan12Features vulkan_12_features{};
     vulkan_12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
@@ -280,6 +309,10 @@ TEST(layer_promoted, TestVulkan13Properties) {
 #ifdef VK_VERSION_1_3
     VkPhysicalDevice gpu = GetPhysicalDevice();
     if (gpu == VK_NULL_HANDLE) return;
+    if (!IsVersionSupported(VK_API_VERSION_1_3)) {
+        printf("Required API version is not supported on device, skipping test.\n");
+        return;
+    }
 
     VkPhysicalDeviceVulkan13Properties vulkan_13_properties{};
     vulkan_13_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES;
@@ -342,6 +375,10 @@ TEST(layer_promoted, TestVulkan13Features) {
 #ifdef VK_VERSION_1_2
     VkPhysicalDevice gpu = GetPhysicalDevice();
     if (gpu == VK_NULL_HANDLE) return;
+    if (!IsVersionSupported(VK_API_VERSION_1_3)) {
+        printf("Required API version is not supported on device, skipping test.\n");
+        return;
+    }
 
     VkPhysicalDeviceVulkan13Features vulkan_13_features{};
     vulkan_13_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;

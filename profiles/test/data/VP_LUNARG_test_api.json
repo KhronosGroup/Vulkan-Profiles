@@ -891,7 +891,7 @@
                     "maxPerSetDescriptors": 208,
                     "maxMemoryAllocationSize": 209
                 },
-                "VkPhysicalDeviceFloatControlsProperties": {
+                "VkPhysicalDeviceFloatControlsPropertiesKHR": {
                     "denormBehaviorIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL",
                     "roundingModeIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL",
                     "shaderSignedZeroInfNanPreserveFloat16": true,
@@ -910,7 +910,7 @@
                     "shaderRoundingModeRTZFloat32": true,
                     "shaderRoundingModeRTZFloat64": true
                 },
-                "VkPhysicalDeviceDescriptorIndexingProperties": {
+                "VkPhysicalDeviceDescriptorIndexingPropertiesEXT": {
                     "maxUpdateAfterBindDescriptorsInAllPools": 233,
                     "shaderUniformBufferArrayNonUniformIndexingNative": true,
                     "shaderSampledImageArrayNonUniformIndexingNative": true,
@@ -935,7 +935,7 @@
                     "maxDescriptorSetUpdateAfterBindStorageImages": 247,
                     "maxDescriptorSetUpdateAfterBindInputAttachments": 248
                 },
-                "VkPhysicalDeviceDepthStencilResolveProperties": {
+                "VkPhysicalDeviceDepthStencilResolvePropertiesKHR": {
                     "supportedDepthResolveModes": [ "VK_RESOLVE_MODE_AVERAGE_BIT" ],
                     "supportedStencilResolveModes": [ "VK_RESOLVE_MODE_AVERAGE_BIT" ],
                     "independentResolveNone": true,
@@ -945,7 +945,7 @@
                     "filterMinmaxSingleComponentFormats": true,
                     "filterMinmaxImageComponentMapping": true
                 },
-                "VkPhysicalDeviceTimelineSemaphoreProperties": {
+                "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
                     "maxTimelineSemaphoreValueDifference": 249
                 },
                 "VkPhysicalDevicePushDescriptorPropertiesKHR": {
