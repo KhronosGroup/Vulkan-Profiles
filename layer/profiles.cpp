@@ -7050,7 +7050,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
         changed_version = true;
     }
 
-    if (requested_version > VK_API_VERSION_1_3) {
+    if (VK_VERSION_MAJOR(requested_version) > 1 || VK_VERSION_MINOR(requested_version) > 3) {
         LogMessage(DEBUG_REPORT_ERROR_BIT, format("%s currently only supports VK_API_VERSION_1_3 and lower.\n", kOurLayerName));
     }
 
