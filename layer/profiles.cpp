@@ -8499,10 +8499,12 @@ void FillFormatPropertiesPNextChain(PhysicalDeviceData *physicalDeviceData, void
 
         switch (structure->sType) {
             case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3: {
-                VkFormatProperties3 *sp = (VkFormatProperties3 *)place;
-                void *pNext = sp->pNext;
-                *sp = physicalDeviceData->arrayof_format_properties_3_[format];
-                sp->pNext = pNext;
+                if (!physicalDeviceData->arrayof_format_properties_3_.empty()) {
+                    VkFormatProperties3 *sp = (VkFormatProperties3 *)place;
+                    void *pNext = sp->pNext;
+                    *sp = physicalDeviceData->arrayof_format_properties_3_[format];
+                    sp->pNext = pNext;
+                }
             } break;
             default:
                 break;
