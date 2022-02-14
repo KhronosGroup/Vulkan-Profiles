@@ -8067,17 +8067,23 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
 
         detail::PFN_vpStructChainerCb callback = [](VkBaseOutStructure* p, void* pUser) {
             UserData* pUserData = static_cast<UserData*>(pUser);
+            VkQueueFamilyProperties2KHR* pProps = static_cast<VkQueueFamilyProperties2KHR*>(static_cast<void*>(p));
             if (++pUserData->index < pUserData->count) {
-                pUserData->pDesc->chainers.pfnQueueFamily(++p, pUser, pUserData->pfnCb);
+                pUserData->pDesc->chainers.pfnQueueFamily(static_cast<VkBaseOutStructure*>(static_cast<void*>(++pProps)),
+                                                          pUser, pUserData->pfnCb);
             } else {
-                p -= pUserData->count - 1;
+                pProps -= pUserData->count - 1;
                 pUserData->gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2(pUserData->physicalDevice,
                                                                             &pUserData->count,
-                                                                            static_cast<VkQueueFamilyProperties2KHR*>(static_cast<void*>(p)));
+                                                                            pProps);
+                pUserData->supported = true;
+
+                // Check first that each queue family defined is supported by the device
                 for (uint32_t i = 0; i < pUserData->pDesc->queueFamilyCount; ++i) {
                     bool found = false;
                     for (uint32_t j = 0; j < pUserData->count; ++j) {
                         bool propsMatch = true;
+                        p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProps[j]));
                         while (p != nullptr) {
                             if (!pUserData->pDesc->pQueueFamilies[i].pfnComparator(p)) {
                                 propsMatch = false;
@@ -8092,14 +8098,49 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                     }
                     if (!found) {
                         pUserData->supported = false;
+                        return;
                     }
+                }
+
+                // Then check each permutation to ensure that while order of the queue families
+                // doesn't matter, each queue family property criteria is matched with a separate
+                // queue family of the actual device
+                std::vector<uint32_t> permutation(pUserData->count);
+                for (uint32_t i = 0; i < pUserData->count; ++i) {
+                    permutation[i] = i;
+                }
+                bool found = false;
+                do {
+                    bool propsMatch = true;
+                    for (uint32_t i = 0; i < pUserData->pDesc->queueFamilyCount && propsMatch; ++i) {
+                        p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProps[permutation[i]]));
+                        while (p != nullptr) {
+                            if (!pUserData->pDesc->pQueueFamilies[i].pfnComparator(p)) {
+                                propsMatch = false;
+                                break;
+                            }
+                            p = p->pNext;
+                        }
+                    }
+                    if (propsMatch) {
+                        found = true;
+                        break;
+                    }
+                } while (std::next_permutation(permutation.begin(), permutation.end()));
+
+                if (!found) {
+                    pUserData->supported = false;
                 }
             }
         };
         userData.pfnCb = callback;
 
-        pDesc->chainers.pfnQueueFamily(static_cast<VkBaseOutStructure*>(static_cast<void*>(props.data())), &userData, callback);
-        if (!userData.supported) {
+        if (userData.count >= userData.pDesc->queueFamilyCount) {
+            pDesc->chainers.pfnQueueFamily(static_cast<VkBaseOutStructure*>(static_cast<void*>(props.data())), &userData, callback);
+            if (!userData.supported) {
+                *pSupported = VK_FALSE;
+            }
+        } else {
             *pSupported = VK_FALSE;
         }
     }
