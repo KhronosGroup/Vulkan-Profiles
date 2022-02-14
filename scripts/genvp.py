@@ -2699,6 +2699,7 @@ class VulkanProfilesSchemaGenerator():
                 "profiles": OrderedDict({
                     "description": "The list of profile definitions.",
                     "type": "object",
+                    "additionalProperties": False,
                     "patternProperties": OrderedDict({
                         "^VP_[A-Z0-9]+_[A-Za-z0-9_]+": OrderedDict({
                             "type": "object",
@@ -3873,7 +3874,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if args.outIncDir is None and args.outSchema is None and args.outDoc is None:
+    if args.outIncDir is None and args.outSchema is None and args.outDoc is None and not args.validate:
         parser.print_help()
         exit()
 
