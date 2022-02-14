@@ -2742,7 +2742,6 @@ static const VpFeatureDesc featureDesc = {
                     s->descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE;
                     s->descriptorBindingStorageImageUpdateAfterBind = VK_TRUE;
                     s->descriptorBindingStorageTexelBufferUpdateAfterBind = VK_TRUE;
-                    s->descriptorBindingUniformBufferUpdateAfterBind = VK_TRUE;
                     s->descriptorBindingUniformTexelBufferUpdateAfterBind = VK_TRUE;
                     s->descriptorBindingUpdateUnusedWhilePending = VK_TRUE;
                     s->descriptorBindingVariableDescriptorCount = VK_TRUE;
@@ -2822,7 +2821,6 @@ static const VpFeatureDesc featureDesc = {
                     ret = ret && (s->descriptorBindingStorageBufferUpdateAfterBind == VK_TRUE);
                     ret = ret && (s->descriptorBindingStorageImageUpdateAfterBind == VK_TRUE);
                     ret = ret && (s->descriptorBindingStorageTexelBufferUpdateAfterBind == VK_TRUE);
-                    ret = ret && (s->descriptorBindingUniformBufferUpdateAfterBind == VK_TRUE);
                     ret = ret && (s->descriptorBindingUniformTexelBufferUpdateAfterBind == VK_TRUE);
                     ret = ret && (s->descriptorBindingUpdateUnusedWhilePending == VK_TRUE);
                     ret = ret && (s->descriptorBindingVariableDescriptorCount == VK_TRUE);
