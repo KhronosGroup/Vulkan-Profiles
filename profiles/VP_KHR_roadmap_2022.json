@@ -109,7 +109,6 @@
                     "shaderStorageImageArrayNonUniformIndexing": true,
                     "shaderUniformTexelBufferArrayNonUniformIndexing": true,
                     "shaderStorageTexelBufferArrayNonUniformIndexing": true,
-                    "descriptorBindingUniformBufferUpdateAfterBind": true,
                     "descriptorBindingSampledImageUpdateAfterBind": true,
                     "descriptorBindingStorageImageUpdateAfterBind": true,
                     "descriptorBindingStorageBufferUpdateAfterBind": true,
