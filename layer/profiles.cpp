@@ -468,7 +468,8 @@ static std::string GetFormatFeature2String(VkFormatFeatureFlagBits2 flags) {
     return result;
 }
 
-static VkProfileLayerSettingsEXT *layer_settings;
+static VkProfileLayerSettingsEXT *layer_settings = new VkProfileLayerSettingsEXT{};
+
 static std::string GetQueueFlagsToString(VkQueueFlags flags) {
     std::string result = {};
 
@@ -7546,6 +7547,9 @@ static VkResult LayerSetupCreateInstance(const VkInstanceCreateInfo *pCreateInfo
 VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
                                               VkInstance *pInstance) {
     // This needs to be created before LogMessage is called, as it is dependent on these settings
+    if (layer_settings) {
+        delete layer_settings;
+    }
     layer_settings = new VkProfileLayerSettingsEXT;
 
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "CreateInstance\n");

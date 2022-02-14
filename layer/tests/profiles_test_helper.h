@@ -23,6 +23,33 @@
 
 #include <vulkan/vulkan.h>
 #include "../profiles.h"
+#include "gtest/gtest.h"
+
+#if defined(ANDROID)
+#include "vktestframeworkandroid.h"
+#else
+#include "vktestframework.h"
+#endif
+
+
+void printa(const char *c);
+
+
+//// class ProfilesLayerTests : public ::testing::Test {
+class ProfilesLayerTests : public VkTestFramework {
+  protected:
+
+    ProfilesLayerTests();
+
+    ~ProfilesLayerTests();
+
+    void SetUp() ;
+
+    void TearDown();
+
+};
+
+
 
 namespace profiles_test {
 

@@ -20,12 +20,34 @@
 
 #include <sstream>
 #include <stdlib.h>
+#include <cctype>
 
 #ifdef _WIN32
 #include <Windows.h>
+#elif ANDROID
+#include <android/log.h>
 #endif
 
 #include "profiles_test_helper.h"
+
+void printa(const char *c) {
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+   __android_log_print(ANDROID_LOG_INFO, "VulkanProfilesLayerTests", "%s", c);
+#endif  // VK_USE_PLATFORM_ANDROID_KHR
+}
+
+
+ProfilesLayerTests::ProfilesLayerTests() {
+}
+
+ProfilesLayerTests::~ProfilesLayerTests() {
+}
+
+void ProfilesLayerTests::SetUp() {
+}
+
+void ProfilesLayerTests::TearDown() {
+}
 
 // On Android, VK_MAKE_API_VERSION doesn't yet exist.
 #ifndef VK_MAKE_API_VERSION
