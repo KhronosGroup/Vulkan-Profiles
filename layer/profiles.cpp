@@ -4949,11 +4949,13 @@ VkResult JsonLoader::LoadFile(std::string filename) {
     }
 
     LogMessage(DEBUG_REPORT_DEBUG_BIT, format("JsonLoader::LoadFile(\"%s\")\n", filename.c_str()));
-    Json::Reader reader;
+
     Json::Value root = Json::nullValue;
-    bool success = reader.parse(json_file, root, false);
+    Json::CharReaderBuilder builder;
+    std::string errs;
+    bool success = Json::parseFromStream(builder, json_file, &root, &errs);
     if (!success) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, format("Json::Reader failed {\n%s}\n", reader.getFormattedErrorMessages().c_str()));
+        LogMessage(DEBUG_REPORT_ERROR_BIT, format("Json::parseFromStream failed {\n%s}\n", errs.c_str()));
         return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
     json_file.close();
