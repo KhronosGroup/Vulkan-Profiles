@@ -1327,6 +1327,7 @@ class VulkanRegistry():
         self.parseExternalTypes(xml)
         self.parseFeatures(xml)
         self.parseLimits(xml)
+        self.parseHeaderVersion(xml)
         self.applyWorkarounds()
 
 
@@ -1742,6 +1743,18 @@ class VulkanRegistry():
                     for version in self.versions.values():
                         if memberName in version.limits and version.limits[memberName].structs >= extension.limits[memberName].structs:
                             extension.limits[memberName].structs = version.limits[memberName].structs
+
+
+    def parseHeaderVersion(self, xml):
+        # Find the largest version number
+        maxVersionNumber = self.versions[max(self.versions, key = lambda version: self.versions[version].number)].number
+        self.headerVersionNumber = VulkanVersionNumber(str(maxVersionNumber))
+        # Add patch from VK_HEADER_VERSION define
+        for define in xml.findall("./types/type[@category='define']"):
+            name = define.find('./name')
+            if name != None and name.text == 'VK_HEADER_VERSION':
+                self.headerVersionNumber.patch = int(name.tail.lstrip())
+                return
 
 
     def applyWorkarounds(self):
@@ -2641,11 +2654,12 @@ class VulkanProfilesSchemaGenerator():
         properties = self.gen_properties(definitions)
         formats = self.gen_formats(definitions)
         queueFamilies = self.gen_queueFamilies(definitions)
+        versionStr = str(self.registry.headerVersionNumber)
 
         return OrderedDict({
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "$id": "https://schema.khronos.org/vulkan/profiles-1.3.203.json#",
-            "title": "Vulkan Profiles Schema for Vulkan 1.3.203",
+            "$id": "https://schema.khronos.org/vulkan/profiles-{0}.json#".format(versionStr),
+            "title": "Vulkan Profiles Schema for Vulkan {0}".format(versionStr),
             "additionalProperties": True,
             "required": [
                 "capabilities",
