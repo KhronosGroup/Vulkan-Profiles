@@ -9127,8 +9127,8 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
             result = EnumerateProperties(kDeviceExtensionPropertiesCount, kDeviceExtensionProperties.data(), pCount, pProperties);
         else
             result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
-    } else if (src_count == 0 || !(layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) &&
-                                     layer_settings->exclude_device_extensions.empty()) {
+    } else if (src_count == 0 || (!(layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) &&
+                                     layer_settings->exclude_device_extensions.empty())) {
         result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
     } else {
         result = EnumerateProperties(src_count, pdd->simulation_extensions_.data(), pCount, pProperties);
