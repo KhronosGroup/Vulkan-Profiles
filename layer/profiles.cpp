@@ -4855,8 +4855,9 @@ static Json::Value ParseJsonFile(std::string filename) {
         return root;
     }
 
-    Json::Reader reader;
-    bool success = reader.parse(file, root, false);
+    std::string errs;
+    Json::CharReaderBuilder builder;
+    Json::parseFromStream(builder, file, &root, &errs);
     file.close();
 
     return root;
