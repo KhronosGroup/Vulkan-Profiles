@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.204.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-1.2.154.json#",
     "capabilities": {
         "vulkan11requirements": {
             "features": {
@@ -727,7 +727,7 @@
         "VP_LUNARG_desktop_portability_2021_subset": {
             "version": 1,
             "status": "BETA",
-            "api-version": "1.1.142",
+            "api-version": "1.1.154",
             "label": "LunarG Vulkan Desktop Portability 2021 subset profile",
             "description": "Common desktop platforms with drivers supporting Vulkan 1.1 on macOS.",
             "contributors": {
@@ -739,6 +739,12 @@
                 }
             },
             "history": [
+                {
+                    "revision": 2,
+                    "date": "2022-02-15",
+                    "author": "Christophe Riccio",
+                    "comment": "Fix API version, header 154 is required for portability subset"
+                },
                 {
                     "revision": 1,
                     "date": "2021-12-20",

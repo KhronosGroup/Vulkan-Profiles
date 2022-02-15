@@ -19,7 +19,7 @@
 | Label | Khronos Vulkan Roadmap 2022 profile | Android Vulkan Baseline 2021 profile | LunarG Vulkan Desktop Portability 2021 profile | LunarG Vulkan Desktop Portability 2021 subset profile |
 | Description | This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices. | Collection of functionality that is broadly supported on Android | Common desktop platforms with drivers supporting Vulkan 1.1 on Windows and Linux. | Common desktop platforms with drivers supporting Vulkan 1.1 on macOS. |
 | Version | 1 | 1 | 1 | 1 |
-| Required API version | 1.3.203 | 1.0.68 | 1.1.142 | 1.1.142 |
+| Required API version | 1.3.203 | 1.0.68 | 1.1.142 | 1.1.154 |
 | Fallback profiles | - | - | - | VP_LUNARG_desktop_portability_2021 |
 
 ## Vulkan Profiles Extensions
