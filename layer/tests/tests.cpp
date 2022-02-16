@@ -720,6 +720,10 @@ TEST(layer, TestQueueFamilyPropertiesPartial) {
 
         VkPhysicalDevice gpu;
         err = inst_builder.getPhysicalDevice(&gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            return;
+        }
 
         uint32_t count = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, nullptr);
