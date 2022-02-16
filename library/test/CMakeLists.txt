@@ -6,6 +6,10 @@ else()
     list(APPEND test_libraries Vulkan::Vulkan)
 endif()
 
+# The release source is in ../source/vulkan_profiles.cpp, but the debug source (with
+# verbose messages during profile validation) is in ../source/debug/vulkan_profiles.cpp.
+set(vulkan_profiles_source ../source$<$<CONFIG:Debug>:/debug>/vulkan_profiles.cpp)
+
 function(add_unit_test NAME)
 	set(TEST_FILE ./${NAME}.cpp)
     set(TEST_NAME_HO VpLibrary_${NAME}_header_only)
@@ -19,7 +23,7 @@ function(add_unit_test NAME)
     add_test(NAME ${TEST_NAME_HO} COMMAND ${TEST_NAME_HO} --gtest_catch_exceptions=0)
     set_target_properties(${TEST_NAME_HO} PROPERTIES FOLDER "Profiles API library")
 
-    add_executable(${TEST_NAME_WS} ${TEST_FILE} ../source/vulkan_profiles.cpp)
+    add_executable(${TEST_NAME_WS} ${TEST_FILE} ${vulkan_profiles_source})
     target_compile_definitions(${TEST_NAME_WS} PUBLIC "VULKAN_PROFILES_HEADER_ONLY=1")
     target_compile_definitions(${TEST_NAME_WS} PUBLIC "VK_ENABLE_BETA_EXTENSIONS=1")
     target_include_directories(${TEST_NAME_WS} PUBLIC "${vulkan-headers_SOURCE_DIR}/include")
@@ -93,7 +97,7 @@ function (add_unit_test_simple_android_apk NAME)
     add_definitions(-DVK_USE_PLATFORM_ANDROID_KHR)
     add_library(${TEST_NAME_HO} SHARED
                 ${TEST_FILE}
-                ../source/vulkan_profiles.cpp
+                ${vulkan_profiles_source}
                 )
     create_android_package(${TEST_NAME_HO})
 
