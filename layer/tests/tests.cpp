@@ -709,8 +709,7 @@ TEST(layer, TestQueueFamilyPropertiesPartial) {
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_vkqueuefamilyproperties.json";
         settings.profile_name = "VP_LUNARG_test_vkqueuefamilyproperties2";
         settings.emulate_portability = true;
-        settings.debug_fail_on_error = false;
-        // settings.debug_reports = 0;
+        settings.debug_fail_on_error = true;
         settings.simulate_capabilities = SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT;
 
         err = inst_builder.makeInstance(&settings);
