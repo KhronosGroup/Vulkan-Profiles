@@ -458,6 +458,7 @@ TEST(layer, TestExcludedExtensions) {
         settings.emulate_portability = true;
         settings.debug_fail_on_error = false;
         settings.simulate_capabilities = SIMULATE_API_VERSION_BIT;
+        settings.debug_reports = 0;
 
         err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -483,6 +484,7 @@ TEST(layer, TestExcludedExtensions) {
         settings.debug_fail_on_error = false;
         settings.simulate_capabilities = SIMULATE_ALL_CAPABILITIES;
         settings.exclude_device_extensions.push_back(VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME);
+        settings.debug_reports = 0;
 
         err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);

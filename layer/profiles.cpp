@@ -1973,16 +1973,48 @@ PhysicalDeviceData::Map PhysicalDeviceData::map_;
 
 class JsonLoader {
    public:
-    JsonLoader(PhysicalDeviceData &pdd) : pdd_(pdd), profile_api_version(0) {}
-    JsonLoader() = delete;
+    JsonLoader(VkInstance instance) : instance_(instance), pdd_(nullptr), profile_api_version_(0), root_(Json::nullValue) {}
     JsonLoader(const JsonLoader &) = delete;
     JsonLoader &operator=(const JsonLoader &) = delete;
 
+    static JsonLoader &Create(VkInstance instance) {
+        assert(instance != VK_NULL_HANDLE);
+        assert(!Find(instance));  // Verify this instance does not already exist.
+
+        LogMessage(DEBUG_REPORT_DEBUG_BIT, "PhysicalDeviceData::Create()\n");
+
+        const auto result = profile_map_.emplace(instance, instance);
+        assert(result.second);  // true=insertion, false=replacement
+        auto iter = result.first;
+        JsonLoader *profile = &iter->second;
+        assert(Find(instance) == profile);  // Verify we get the same instance we just inserted.
+        return *profile;
+    }
+
+    static JsonLoader *Find(VkInstance instance) {
+        const auto iter = profile_map_.find(instance);
+        return (iter != profile_map_.end()) ? &iter->second : nullptr;
+    }
+
+    static void Destroy(VkInstance instance) {
+        LogMessage(DEBUG_REPORT_DEBUG_BIT, "JsonLoader::Destroy()\n");
+        profile_map_.erase(instance);
+    }
+
     VkResult LoadFile(std::string filename);
+    void ReadProfileApiVersion();
+    VkResult LoadDevice(PhysicalDeviceData *pdd);
     VkResult ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities);
+    uint32_t GetProfileApiVersion() const { return profile_api_version_; }
 
    private:
-    std::uint32_t profile_api_version;
+    VkInstance instance_;
+    PhysicalDeviceData *pdd_;
+
+    std::string profile_filename_;
+    Json::Value root_;
+
+    std::uint32_t profile_api_version_;
     std::vector<std::string> excluded_extensions;
 
     struct Extension {
@@ -2504,8 +2536,11 @@ class JsonLoader {
         return count;
     }
 
-    PhysicalDeviceData &pdd_;
+    typedef std::unordered_map<VkInstance, JsonLoader> ProfileMap;
+    static ProfileMap profile_map_;
 };
+
+JsonLoader::ProfileMap JsonLoader::profile_map_;
 
 static bool IsASTCHDRFormat(VkFormat format) {
     switch (format) {
@@ -3354,532 +3389,532 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &feat
     const Json::Value &feature = features[feature_name];
 
     if (feature_name == "VkPhysicalDeviceFeatures") {
-        return GetValue(feature, &pdd_.physical_device_features_);
+        return GetValue(feature, &pdd_->physical_device_features_);
     } else if (feature_name == "VkPhysicalDeviceHostQueryResetFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_host_query_reset_features_);
+        return GetValue(feature, &pdd_->physical_device_host_query_reset_features_);
     } else if (feature_name == "VkPhysicalDeviceHostQueryResetFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_host_query_reset_features_);
+        return GetValue(feature, &pdd_->physical_device_host_query_reset_features_);
     } else if (feature_name == "VkPhysicalDeviceMaintenance4Features") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_maintenance_4_features_);
+        return GetValue(feature, &pdd_->physical_device_maintenance_4_features_);
     } else if (feature_name == "VkPhysicalDeviceMaintenance4FeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_MAINTENANCE_4_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_maintenance_4_features_);
+        return GetValue(feature, &pdd_->physical_device_maintenance_4_features_);
     } else if (feature_name == "VkPhysicalDevice16BitStorageFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_1, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_16bit_storage_features_);
+        return GetValue(feature, &pdd_->physical_device_16bit_storage_features_);
     } else if (feature_name == "VkPhysicalDevice16BitStorageFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_16BIT_STORAGE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_16bit_storage_features_);
+        return GetValue(feature, &pdd_->physical_device_16bit_storage_features_);
     } else if (feature_name == "VkPhysicalDevice8BitStorageFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_8bit_storage_features_);
+        return GetValue(feature, &pdd_->physical_device_8bit_storage_features_);
     } else if (feature_name == "VkPhysicalDevice8BitStorageFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_8BIT_STORAGE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_8bit_storage_features_);
+        return GetValue(feature, &pdd_->physical_device_8bit_storage_features_);
     } else if (feature_name == "VkPhysicalDeviceBufferDeviceAddressFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_buffer_device_address_features_);
+        return GetValue(feature, &pdd_->physical_device_buffer_device_address_features_);
     } else if (feature_name == "VkPhysicalDeviceBufferDeviceAddressFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_buffer_device_address_features_);
+        return GetValue(feature, &pdd_->physical_device_buffer_device_address_features_);
     } else if (feature_name == "VkPhysicalDeviceBufferDeviceAddressFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_buffer_device_address_features_);
+        return GetValue(feature, &pdd_->physical_device_buffer_device_address_features_);
     } else if (feature_name == "VkPhysicalDeviceDescriptorIndexingFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_descriptor_indexing_features_);
+        return GetValue(feature, &pdd_->physical_device_descriptor_indexing_features_);
     } else if (feature_name == "VkPhysicalDeviceDescriptorIndexingFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_descriptor_indexing_features_);
+        return GetValue(feature, &pdd_->physical_device_descriptor_indexing_features_);
     } else if (feature_name == "VkPhysicalDeviceImagelessFramebufferFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_imageless_framebuffer_features_);
+        return GetValue(feature, &pdd_->physical_device_imageless_framebuffer_features_);
     } else if (feature_name == "VkPhysicalDeviceImagelessFramebufferFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_imageless_framebuffer_features_);
+        return GetValue(feature, &pdd_->physical_device_imageless_framebuffer_features_);
     } else if (feature_name == "VkPhysicalDeviceMultiviewFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_1, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_multiview_features_);
+        return GetValue(feature, &pdd_->physical_device_multiview_features_);
     } else if (feature_name == "VkPhysicalDeviceMultiviewFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_MULTIVIEW_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_multiview_features_);
+        return GetValue(feature, &pdd_->physical_device_multiview_features_);
     } else if (feature_name == "VkPhysicalDeviceProtectedMemoryFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_1, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_protected_memory_features_);
+        return GetValue(feature, &pdd_->physical_device_protected_memory_features_);
     } else if (feature_name == "VkPhysicalDeviceSamplerYcbcrConversionFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_1, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_sampler_ycbcr_conversion_features_);
+        return GetValue(feature, &pdd_->physical_device_sampler_ycbcr_conversion_features_);
     } else if (feature_name == "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_sampler_ycbcr_conversion_features_);
+        return GetValue(feature, &pdd_->physical_device_sampler_ycbcr_conversion_features_);
     } else if (feature_name == "VkPhysicalDeviceScalarBlockLayoutFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_scalar_block_layout_features_);
+        return GetValue(feature, &pdd_->physical_device_scalar_block_layout_features_);
     } else if (feature_name == "VkPhysicalDeviceScalarBlockLayoutFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_scalar_block_layout_features_);
+        return GetValue(feature, &pdd_->physical_device_scalar_block_layout_features_);
     } else if (feature_name == "VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_separate_depth_stencil_layouts_features_);
+        return GetValue(feature, &pdd_->physical_device_separate_depth_stencil_layouts_features_);
     } else if (feature_name == "VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_separate_depth_stencil_layouts_features_);
+        return GetValue(feature, &pdd_->physical_device_separate_depth_stencil_layouts_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderAtomicInt64Features") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_shader_atomic_int64_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_atomic_int64_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderAtomicInt64FeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_atomic_int64_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_atomic_int64_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderDrawParametersFeatures" ||
                feature_name == "VkPhysicalDeviceShaderDrawParameterFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_1, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_shader_draw_parameters_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_draw_parameters_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderFloat16Int8Features") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_shader_float16_int8_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_float16_int8_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_float16_int8_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_float16_int8_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_shader_subgroup_extended_types_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_subgroup_extended_types_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_subgroup_extended_types_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_subgroup_extended_types_features_);
     } else if (feature_name == "VkPhysicalDeviceTimelineSemaphoreFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_timeline_semaphore_features_);
+        return GetValue(feature, &pdd_->physical_device_timeline_semaphore_features_);
     } else if (feature_name == "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_timeline_semaphore_features_);
+        return GetValue(feature, &pdd_->physical_device_timeline_semaphore_features_);
     } else if (feature_name == "VkPhysicalDeviceUniformBufferStandardLayoutFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_uniform_buffer_standard_layout_features_);
+        return GetValue(feature, &pdd_->physical_device_uniform_buffer_standard_layout_features_);
     } else if (feature_name == "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_uniform_buffer_standard_layout_features_);
+        return GetValue(feature, &pdd_->physical_device_uniform_buffer_standard_layout_features_);
     } else if (feature_name == "VkPhysicalDeviceVariablePointersFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_1, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_variable_pointers_features_);
+        return GetValue(feature, &pdd_->physical_device_variable_pointers_features_);
     } else if (feature_name == "VkPhysicalDeviceVariablePointersFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_variable_pointers_features_);
+        return GetValue(feature, &pdd_->physical_device_variable_pointers_features_);
     } else if (feature_name == "VkPhysicalDeviceVulkanMemoryModelFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_vulkan_memory_model_features_);
+        return GetValue(feature, &pdd_->physical_device_vulkan_memory_model_features_);
     } else if (feature_name == "VkPhysicalDeviceVulkanMemoryModelFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_vulkan_memory_model_features_);
+        return GetValue(feature, &pdd_->physical_device_vulkan_memory_model_features_);
     } else if (feature_name == "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_zero_initialize_workgroup_memory_features_);
+        return GetValue(feature, &pdd_->physical_device_zero_initialize_workgroup_memory_features_);
     } else if (feature_name == "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_zero_initialize_workgroup_memory_features_);
+        return GetValue(feature, &pdd_->physical_device_zero_initialize_workgroup_memory_features_);
     } else if (feature_name == "VkPhysicalDeviceAccelerationStructureFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_acceleration_structure_features_);
+        return GetValue(feature, &pdd_->physical_device_acceleration_structure_features_);
     } else if (feature_name == "VkPhysicalDevicePerformanceQueryFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_performance_query_features_);
+        return GetValue(feature, &pdd_->physical_device_performance_query_features_);
     } else if (feature_name == "VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_pipeline_executable_properties_features_);
+        return GetValue(feature, &pdd_->physical_device_pipeline_executable_properties_features_);
     } else if (feature_name == "VkPhysicalDevicePresentIdFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_PRESENT_ID_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_present_id_features_);
+        return GetValue(feature, &pdd_->physical_device_present_id_features_);
     } else if (feature_name == "VkPhysicalDevicePresentWaitFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_PRESENT_WAIT_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_present_wait_features_);
+        return GetValue(feature, &pdd_->physical_device_present_wait_features_);
     } else if (feature_name == "VkPhysicalDeviceRayQueryFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_RAY_QUERY_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_ray_query_features_);
+        return GetValue(feature, &pdd_->physical_device_ray_query_features_);
     } else if (feature_name == "VkPhysicalDeviceRayTracingPipelineFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_ray_tracing_pipeline_features_);
+        return GetValue(feature, &pdd_->physical_device_ray_tracing_pipeline_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderClockFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_SHADER_CLOCK_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_clock_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_clock_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderIntegerDotProductFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_shader_integer_dot_product_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_integer_dot_product_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_integer_dot_product_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_integer_dot_product_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_subgroup_uniform_control_flow_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_subgroup_uniform_control_flow_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderTerminateInvocationFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_shader_terminate_invocation_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_terminate_invocation_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_terminate_invocation_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_terminate_invocation_features_);
     } else if (feature_name == "VkPhysicalDeviceSynchronization2Features") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_synchronization2_features_);
+        return GetValue(feature, &pdd_->physical_device_synchronization2_features_);
     } else if (feature_name == "VkPhysicalDeviceSynchronization2FeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_synchronization2_features_);
+        return GetValue(feature, &pdd_->physical_device_synchronization2_features_);
     } else if (feature_name == "VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_workgroup_memory_explicit_layout_features_);
+        return GetValue(feature, &pdd_->physical_device_workgroup_memory_explicit_layout_features_);
     } else if (feature_name == "VkPhysicalDevice4444FormatsFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_4444_FORMATS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_4444_formats_features_);
+        return GetValue(feature, &pdd_->physical_device_4444_formats_features_);
     } else if (feature_name == "VkPhysicalDeviceASTCDecodeFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_astc_decode_features_);
+        return GetValue(feature, &pdd_->physical_device_astc_decode_features_);
     } else if (feature_name == "VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_blend_operation_advanced_features_);
+        return GetValue(feature, &pdd_->physical_device_blend_operation_advanced_features_);
     } else if (feature_name == "VkPhysicalDeviceBorderColorSwizzleFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_border_color_swizzle_features_);
+        return GetValue(feature, &pdd_->physical_device_border_color_swizzle_features_);
     } else if (feature_name == "VkPhysicalDeviceColorWriteEnableFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_COLOR_WRITE_ENABLE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_color_write_enable_features_);
+        return GetValue(feature, &pdd_->physical_device_color_write_enable_features_);
     } else if (feature_name == "VkPhysicalDeviceConditionalRenderingFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_CONDITIONAL_RENDERING_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_conditional_rendering_features_);
+        return GetValue(feature, &pdd_->physical_device_conditional_rendering_features_);
     } else if (feature_name == "VkPhysicalDeviceCustomBorderColorFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_custom_border_color_features_);
+        return GetValue(feature, &pdd_->physical_device_custom_border_color_features_);
     } else if (feature_name == "VkPhysicalDeviceDepthClipEnableFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_depth_clip_enable_features_ext_);
+        return GetValue(feature, &pdd_->physical_device_depth_clip_enable_features_ext_);
     } else if (feature_name == "VkPhysicalDeviceDeviceMemoryReportFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_device_memory_report_features_);
+        return GetValue(feature, &pdd_->physical_device_device_memory_report_features_);
     } else if (feature_name == "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_extended_dynamic_state_features_);
+        return GetValue(feature, &pdd_->physical_device_extended_dynamic_state_features_);
     } else if (feature_name == "VkPhysicalDeviceExtendedDynamicState2FeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_extended_dynamic_state2_features_);
+        return GetValue(feature, &pdd_->physical_device_extended_dynamic_state2_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentDensityMapFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_fragment_density_map_features_);
+        return GetValue(feature, &pdd_->physical_device_fragment_density_map_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_fragment_shader_interlock_features_);
+        return GetValue(feature, &pdd_->physical_device_fragment_shader_interlock_features_);
     } else if (feature_name == "VkPhysicalDeviceGlobalPriorityQueryFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_GLOBAL_PRIORITY_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_global_priority_query_features_);
+        return GetValue(feature, &pdd_->physical_device_global_priority_query_features_);
     } else if (feature_name == "VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_global_priority_query_features_);
+        return GetValue(feature, &pdd_->physical_device_global_priority_query_features_);
     } else if (feature_name == "VkPhysicalDeviceImageRobustnessFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_image_robustness_features_);
+        return GetValue(feature, &pdd_->physical_device_image_robustness_features_);
     } else if (feature_name == "VkPhysicalDeviceImageRobustnessFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_image_robustness_features_);
+        return GetValue(feature, &pdd_->physical_device_image_robustness_features_);
     } else if (feature_name == "VkPhysicalDeviceIndexTypeUint8FeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_index_type_uint8_features_);
+        return GetValue(feature, &pdd_->physical_device_index_type_uint8_features_);
     } else if (feature_name == "VkPhysicalDeviceInlineUniformBlockFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_inline_uniform_block_features_);
+        return GetValue(feature, &pdd_->physical_device_inline_uniform_block_features_);
     } else if (feature_name == "VkPhysicalDeviceInlineUniformBlockFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_inline_uniform_block_features_);
+        return GetValue(feature, &pdd_->physical_device_inline_uniform_block_features_);
     } else if (feature_name == "VkPhysicalDeviceLineRasterizationFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_line_rasterization_features_);
+        return GetValue(feature, &pdd_->physical_device_line_rasterization_features_);
     } else if (feature_name == "VkPhysicalDeviceMemoryPriorityFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_memory_priority_features_);
+        return GetValue(feature, &pdd_->physical_device_memory_priority_features_);
     } else if (feature_name == "VkPhysicalDeviceMultiDrawFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_MULTI_DRAW_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_multi_draw_features_);
+        return GetValue(feature, &pdd_->physical_device_multi_draw_features_);
     } else if (feature_name == "VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_PAGEABLE_DEVICE_LOCAL_MEMORY_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_pageable_device_local_memory_features_);
+        return GetValue(feature, &pdd_->physical_device_pageable_device_local_memory_features_);
     } else if (feature_name == "VkPhysicalDevicePipelineCreationCacheControlFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_pipeline_creation_cache_control_features_);
+        return GetValue(feature, &pdd_->physical_device_pipeline_creation_cache_control_features_);
     } else if (feature_name == "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_pipeline_creation_cache_control_features_);
+        return GetValue(feature, &pdd_->physical_device_pipeline_creation_cache_control_features_);
     } else if (feature_name == "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_primitive_topology_list_restart_features_);
+        return GetValue(feature, &pdd_->physical_device_primitive_topology_list_restart_features_);
     } else if (feature_name == "VkPhysicalDevicePrivateDataFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_private_data_features_);
+        return GetValue(feature, &pdd_->physical_device_private_data_features_);
     } else if (feature_name == "VkPhysicalDevicePrivateDataFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_PRIVATE_DATA_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_private_data_features_);
+        return GetValue(feature, &pdd_->physical_device_private_data_features_);
     } else if (feature_name == "VkPhysicalDeviceProvokingVertexFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_provoking_vertex_features_);
+        return GetValue(feature, &pdd_->physical_device_provoking_vertex_features_);
     } else if (feature_name == "VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_RGBA10X6_FORMATS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_rgba10x6_formats_features_);
+        return GetValue(feature, &pdd_->physical_device_rgba10x6_formats_features_);
     } else if (feature_name == "VkPhysicalDeviceRobustness2FeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_robustness_2_features_);
+        return GetValue(feature, &pdd_->physical_device_robustness_2_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderAtomicFloatFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_atomic_float_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_atomic_float_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_atomic_float2_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_atomic_float2_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_shader_demote_to_helper_invocation_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_demote_to_helper_invocation_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_demote_to_helper_invocation_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_demote_to_helper_invocation_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_SHADER_IMAGE_ATOMIC_INT64_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_image_atomic_int64_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_image_atomic_int64_features_);
     } else if (feature_name == "VkPhysicalDeviceSubgroupSizeControlFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_subgroup_size_control_features_);
+        return GetValue(feature, &pdd_->physical_device_subgroup_size_control_features_);
     } else if (feature_name == "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_subgroup_size_control_features_);
+        return GetValue(feature, &pdd_->physical_device_subgroup_size_control_features_);
     } else if (feature_name == "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_texel_buffer_alignment_features_);
+        return GetValue(feature, &pdd_->physical_device_texel_buffer_alignment_features_);
     } else if (feature_name == "VkPhysicalDeviceTextureCompressionASTCHDRFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_texture_compression_astc_hdr_features_);
+        return GetValue(feature, &pdd_->physical_device_texture_compression_astc_hdr_features_);
     } else if (feature_name == "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_texture_compression_astc_hdr_features_);
+        return GetValue(feature, &pdd_->physical_device_texture_compression_astc_hdr_features_);
     } else if (feature_name == "VkPhysicalDeviceTransformFeedbackFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_transform_feedback_features_);
+        return GetValue(feature, &pdd_->physical_device_transform_feedback_features_);
     } else if (feature_name == "VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_vertex_attribute_divisor_features_);
+        return GetValue(feature, &pdd_->physical_device_vertex_attribute_divisor_features_);
     } else if (feature_name == "VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_vertex_input_dynamic_state_features_);
+        return GetValue(feature, &pdd_->physical_device_vertex_input_dynamic_state_features_);
     } else if (feature_name == "VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_ycbcr_2plane_444_formats_features_);
+        return GetValue(feature, &pdd_->physical_device_ycbcr_2plane_444_formats_features_);
     } else if (feature_name == "VkPhysicalDeviceYcbcrImageArraysFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_YCBCR_IMAGE_ARRAYS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_ycbcr_image_arrays_features_);
+        return GetValue(feature, &pdd_->physical_device_ycbcr_image_arrays_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentShadingRateFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_fragment_shading_rate_features_);
+        return GetValue(feature, &pdd_->physical_device_fragment_shading_rate_features_);
     } else if (feature_name == "VkPhysicalDeviceCoherentMemoryFeaturesAMD") {
         auto support = CheckExtensionSupport(VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_coherent_memory_features_);
+        return GetValue(feature, &pdd_->physical_device_coherent_memory_features_);
     } else if (feature_name == "VkPhysicalDeviceInvocationMaskFeaturesHUAWEI") {
         auto support = CheckExtensionSupport(VK_HUAWEI_INVOCATION_MASK_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_invocation_mask_features_);
+        return GetValue(feature, &pdd_->physical_device_invocation_mask_features_);
     } else if (feature_name == "VkPhysicalDeviceSubpassShadingFeaturesHUAWEI") {
         auto support = CheckExtensionSupport(VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_subpass_shading_features_);
+        return GetValue(feature, &pdd_->physical_device_subpass_shading_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL") {
         auto support = CheckExtensionSupport(VK_INTEL_SHADER_INTEGER_FUNCTIONS_2_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_integer_functions_2_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_integer_functions_2_features_);
     } else if (feature_name == "VkPhysicalDeviceComputeShaderDerivativesFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_compute_shader_derivatives_features_);
+        return GetValue(feature, &pdd_->physical_device_compute_shader_derivatives_features_);
     } else if (feature_name == "VkPhysicalDeviceCooperativeMatrixFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_cooperative_matrix_features_);
+        return GetValue(feature, &pdd_->physical_device_cooperative_matrix_features_);
     } else if (feature_name == "VkPhysicalDeviceCornerSampledImageFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_CORNER_SAMPLED_IMAGE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_corner_sampled_image_features_);
+        return GetValue(feature, &pdd_->physical_device_corner_sampled_image_features_);
     } else if (feature_name == "VkPhysicalDeviceCoverageReductionModeFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_COVERAGE_REDUCTION_MODE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_coverage_reduction_mode_features_);
+        return GetValue(feature, &pdd_->physical_device_coverage_reduction_mode_features_);
     } else if (feature_name == "VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_DEDICATED_ALLOCATION_IMAGE_ALIASING_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_dedicated_allocation_image_aliasing_features_);
+        return GetValue(feature, &pdd_->physical_device_dedicated_allocation_image_aliasing_features_);
     } else if (feature_name == "VkPhysicalDeviceDiagnosticsConfigFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_diagnostics_config_features_);
+        return GetValue(feature, &pdd_->physical_device_diagnostics_config_features_);
     } else if (feature_name == "VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_device_generated_commands_features_);
+        return GetValue(feature, &pdd_->physical_device_device_generated_commands_features_);
     } else if (feature_name == "VkPhysicalDeviceExternalMemoryRDMAFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_EXTERNAL_MEMORY_RDMA_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_external_memory_rdma_features_);
+        return GetValue(feature, &pdd_->physical_device_external_memory_rdma_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_fragment_shader_barycentric_features_);
+        return GetValue(feature, &pdd_->physical_device_fragment_shader_barycentric_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_fragment_shading_rate_enums_features_);
+        return GetValue(feature, &pdd_->physical_device_fragment_shading_rate_enums_features_);
     } else if (feature_name == "VkPhysicalDeviceInheritedViewportScissorFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_inherited_viewport_scissor_features_);
+        return GetValue(feature, &pdd_->physical_device_inherited_viewport_scissor_features_);
     } // Blocks nested too deeply, need to break
     if (feature_name == "VkPhysicalDeviceMeshShaderFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_MESH_SHADER_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_mesh_shader_features_);
+        return GetValue(feature, &pdd_->physical_device_mesh_shader_features_);
     } else if (feature_name == "VkPhysicalDeviceRayTracingMotionBlurFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_ray_tracing_motiuon_blur_features_);
+        return GetValue(feature, &pdd_->physical_device_ray_tracing_motiuon_blur_features_);
     } else if (feature_name == "VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_REPRESENTATIVE_FRAGMENT_TEST_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_representative_fragment_test_features_);
+        return GetValue(feature, &pdd_->physical_device_representative_fragment_test_features_);
     } else if (feature_name == "VkPhysicalDeviceExclusiveScissorFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_SCISSOR_EXCLUSIVE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_exclusive_scissor_features_);
+        return GetValue(feature, &pdd_->physical_device_exclusive_scissor_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderImageFootprintFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_image_footprint_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_image_footprint_features_);
     } else if (feature_name == "VkPhysicalDeviceShaderSMBuiltinsFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shader_sm_builtins_features_);
+        return GetValue(feature, &pdd_->physical_device_shader_sm_builtins_features_);
     } else if (feature_name == "VkPhysicalDeviceShadingRateImageFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_shading_rate_image_features_);
+        return GetValue(feature, &pdd_->physical_device_shading_rate_image_features_);
     } else if (feature_name == "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE") {
         auto support = CheckExtensionSupport(VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_mutable_descriptor_type_features_);
+        return GetValue(feature, &pdd_->physical_device_mutable_descriptor_type_features_);
     } else if (feature_name == "VkPhysicalDeviceDynamicRenderingFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_dynamic_rendering_features_);
+        return GetValue(feature, &pdd_->physical_device_dynamic_rendering_features_);
     } else if (feature_name == "VkPhysicalDeviceDynamicRenderingFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_dynamic_rendering_features_);
+        return GetValue(feature, &pdd_->physical_device_dynamic_rendering_features_);
     } else if (feature_name == "VkPhysicalDeviceImageViewMinLodFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_IMAGE_VIEW_MIN_LOD_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_image_view_min_lod_features_);
+        return GetValue(feature, &pdd_->physical_device_image_view_min_lod_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentDensityMap2FeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_fragment_density_map_2_features_);
+        return GetValue(feature, &pdd_->physical_device_fragment_density_map_2_features_);
     } else if (feature_name == "VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM") {
         auto support = CheckExtensionSupport(VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_fragment_density_map_offset_features_);
+        return GetValue(feature, &pdd_->physical_device_fragment_density_map_offset_features_);
     } else if (feature_name == "VkPhysicalDeviceDepthClipControlFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_DEPTH_CLIP_CONTROL_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_depth_clip_control_features_);
+        return GetValue(feature, &pdd_->physical_device_depth_clip_control_features_);
     } else if (feature_name == "VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM") {
         auto support = CheckExtensionSupport(VK_ARM_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_rasterization_order_attachment_access_features_);
+        return GetValue(feature, &pdd_->physical_device_rasterization_order_attachment_access_features_);
     } else if (feature_name == "VkPhysicalDeviceLinearColorAttachmentFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_LINEAR_COLOR_ATTACHMENT_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_.physical_device_linear_color_attachment_features_);
+        return GetValue(feature, &pdd_->physical_device_linear_color_attachment_features_);
     } else if (feature_name == "VkPhysicalDeviceVulkan11Features") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_vulkan_1_1_features_);
+        return GetValue(feature, &pdd_->physical_device_vulkan_1_1_features_);
     } else if (feature_name == "VkPhysicalDeviceVulkan12Features") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_vulkan_1_2_features_);
+        return GetValue(feature, &pdd_->physical_device_vulkan_1_2_features_);
     } else if (feature_name == "VkPhysicalDeviceVulkan13Features") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, feature_name)) return false;
-        return GetValue(feature, &pdd_.physical_device_vulkan_1_3_features_);
+        return GetValue(feature, &pdd_->physical_device_vulkan_1_3_features_);
     } else if (feature_name == "VkPhysicalDevicePortabilitySubsetFeaturesKHR") {
-        return GetValue(feature, &pdd_.physical_device_portability_subset_features_);
+        return GetValue(feature, &pdd_->physical_device_portability_subset_features_);
     }
     return true;
 }
@@ -3888,232 +3923,232 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &proper
     const Json::Value &prop = props[property_name];
 
     if (property_name == "VkPhysicalDeviceProperties") {
-        return GetValue(prop, &pdd_.physical_device_properties_);
+        return GetValue(prop, &pdd_->physical_device_properties_);
     } else if (property_name == "VkPhysicalDeviceLimits") {
-        return GetValue(prop, &pdd_.physical_device_properties_.limits);
+        return GetValue(prop, &pdd_->physical_device_properties_.limits);
     } else if (property_name == "VkPhysicalDeviceSparseProperties") {
-        return GetValue(prop, &pdd_.physical_device_properties_.sparseProperties);
+        return GetValue(prop, &pdd_->physical_device_properties_.sparseProperties);
     } else if (property_name == "VkPhysicalDeviceDepthStencilResolveProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_depth_stencil_resolve_properties_);
+        return GetValue(prop, &pdd_->physical_device_depth_stencil_resolve_properties_);
     } else if (property_name == "VkPhysicalDeviceDepthStencilResolvePropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_depth_stencil_resolve_properties_);
+        return GetValue(prop, &pdd_->physical_device_depth_stencil_resolve_properties_);
     } else if (property_name == "VkPhysicalDeviceSubgroupProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_1, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_subgroup_properties_);
+        return GetValue(prop, &pdd_->physical_device_subgroup_properties_);
     } else if (property_name == "VkPhysicalDeviceDescriptorIndexingProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_descriptor_indexing_properties_);
+        return GetValue(prop, &pdd_->physical_device_descriptor_indexing_properties_);
     } else if (property_name == "VkPhysicalDeviceDescriptorIndexingPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_descriptor_indexing_properties_);
+        return GetValue(prop, &pdd_->physical_device_descriptor_indexing_properties_);
     } else if (property_name == "VkPhysicalDeviceFloatControlsProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_float_controls_properties_);
+        return GetValue(prop, &pdd_->physical_device_float_controls_properties_);
     } else if (property_name == "VkPhysicalDeviceFloatControlsPropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_float_controls_properties_);
+        return GetValue(prop, &pdd_->physical_device_float_controls_properties_);
     } else if (property_name == "VkPhysicalDeviceMaintenance3Properties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_1, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_maintenance_3_properties_);
+        return GetValue(prop, &pdd_->physical_device_maintenance_3_properties_);
     } else if (property_name == "VkPhysicalDeviceMaintenance3PropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_MAINTENANCE3_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_maintenance_3_properties_);
+        return GetValue(prop, &pdd_->physical_device_maintenance_3_properties_);
     } else if (property_name == "VkPhysicalDeviceMaintenance4Properties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_maintenance_4_properties_);
+        return GetValue(prop, &pdd_->physical_device_maintenance_4_properties_);
     } else if (property_name == "VkPhysicalDeviceMaintenance4PropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_MAINTENANCE_4_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_maintenance_4_properties_);
+        return GetValue(prop, &pdd_->physical_device_maintenance_4_properties_);
     } else if (property_name == "VkPhysicalDeviceMultiviewProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_1, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_multiview_properties_);
+        return GetValue(prop, &pdd_->physical_device_multiview_properties_);
     } else if (property_name == "VkPhysicalDeviceMultiviewPropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_MULTIVIEW_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_multiview_properties_);
+        return GetValue(prop, &pdd_->physical_device_multiview_properties_);
     } else if (property_name == "VkPhysicalDeviceProtectedMemoryProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_1, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_protected_memory_properties_);
+        return GetValue(prop, &pdd_->physical_device_protected_memory_properties_);
     } else if (property_name == "VkPhysicalDeviceTimelineSemaphoreProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_timeline_semaphore_properties_);
+        return GetValue(prop, &pdd_->physical_device_timeline_semaphore_properties_);
     } else if (property_name == "VkPhysicalDeviceTimelineSemaphorePropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_timeline_semaphore_properties_);
+        return GetValue(prop, &pdd_->physical_device_timeline_semaphore_properties_);
     } else if (property_name == "VkPhysicalDeviceSamplerFilterMinmaxProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_sampler_filter_minmax_properties_);
+        return GetValue(prop, &pdd_->physical_device_sampler_filter_minmax_properties_);
     } else if (property_name == "VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_sampler_filter_minmax_properties_);
+        return GetValue(prop, &pdd_->physical_device_sampler_filter_minmax_properties_);
     } else if (property_name == "VkPhysicalDeviceAccelerationStructurePropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_acceleration_structure_properties_);
+        return GetValue(prop, &pdd_->physical_device_acceleration_structure_properties_);
     } else if (property_name == "VkPhysicalDevicePerformanceQueryPropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_PERFORMANCE_QUERY_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_performance_query_properties_);
+        return GetValue(prop, &pdd_->physical_device_performance_query_properties_);
     } else if (property_name == "VkPhysicalDevicePushDescriptorPropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_push_descriptor_properites_);
+        return GetValue(prop, &pdd_->physical_device_push_descriptor_properites_);
     } else if (property_name == "VkPhysicalDeviceRayTracingPipelinePropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_ray_tracing_pipeline_properties_);
+        return GetValue(prop, &pdd_->physical_device_ray_tracing_pipeline_properties_);
     } else if (property_name == "VkPhysicalDeviceShaderIntegerDotProductProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_shader_integer_dot_products_properties_);
+        return GetValue(prop, &pdd_->physical_device_shader_integer_dot_products_properties_);
     } else if (property_name == "VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_shader_integer_dot_products_properties_);
+        return GetValue(prop, &pdd_->physical_device_shader_integer_dot_products_properties_);
     } else if (property_name == "VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_blend_operation_advanced_properties_);
+        return GetValue(prop, &pdd_->physical_device_blend_operation_advanced_properties_);
     } else if (property_name == "VkPhysicalDeviceConservativeRasterizationPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_conservative_rasterization_properties_);
+        return GetValue(prop, &pdd_->physical_device_conservative_rasterization_properties_);
     } else if (property_name == "VkPhysicalDeviceCustomBorderColorPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_custom_border_color_properties_);
+        return GetValue(prop, &pdd_->physical_device_custom_border_color_properties_);
     } else if (property_name == "VkPhysicalDeviceDiscardRectanglePropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_discard_rectangle_properties_);
+        return GetValue(prop, &pdd_->physical_device_discard_rectangle_properties_);
     } else if (property_name == "VkPhysicalDeviceExternalMemoryHostPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_external_memory_host_properties_);
+        return GetValue(prop, &pdd_->physical_device_external_memory_host_properties_);
     } else if (property_name == "VkPhysicalDeviceFragmentDensityMapPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_fragment_density_map_properties_);
+        return GetValue(prop, &pdd_->physical_device_fragment_density_map_properties_);
     } else if (property_name == "VkPhysicalDeviceInlineUniformBlockProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_inline_uniform_block_properties_);
+        return GetValue(prop, &pdd_->physical_device_inline_uniform_block_properties_);
     } else if (property_name == "VkPhysicalDeviceInlineUniformBlockPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_inline_uniform_block_properties_);
+        return GetValue(prop, &pdd_->physical_device_inline_uniform_block_properties_);
     } else if (property_name == "VkPhysicalDeviceLineRasterizationPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_line_rasterization_properties_);
+        return GetValue(prop, &pdd_->physical_device_line_rasterization_properties_);
     } else if (property_name == "VkPhysicalDeviceMultiDrawPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_MULTI_DRAW_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_multi_draw_properties_);
+        return GetValue(prop, &pdd_->physical_device_multi_draw_properties_);
     } else if (property_name == "VkPhysicalDeviceProvokingVertexPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_provoking_vertex_properties_);
+        return GetValue(prop, &pdd_->physical_device_provoking_vertex_properties_);
     } else if (property_name == "VkPhysicalDeviceRobustness2PropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_robustness_2_properties_);
+        return GetValue(prop, &pdd_->physical_device_robustness_2_properties_);
     } else if (property_name == "VkPhysicalDeviceSampleLocationsPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_sample_locations_properties_);
+        return GetValue(prop, &pdd_->physical_device_sample_locations_properties_);
     } else if (property_name == "VkPhysicalDeviceSubgroupSizeControlProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_subgroup_size_control_properties_);
+        return GetValue(prop, &pdd_->physical_device_subgroup_size_control_properties_);
     } else if (property_name == "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_subgroup_size_control_properties_);
+        return GetValue(prop, &pdd_->physical_device_subgroup_size_control_properties_);
     } else if (property_name == "VkPhysicalDeviceTexelBufferAlignmentProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_texel_buffer_alignment_properties_);
+        return GetValue(prop, &pdd_->physical_device_texel_buffer_alignment_properties_);
     } else if (property_name == "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_texel_buffer_alignment_properties_);
+        return GetValue(prop, &pdd_->physical_device_texel_buffer_alignment_properties_);
     } else if (property_name == "VkPhysicalDeviceTransformFeedbackPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_transform_feedback_properties_);
+        return GetValue(prop, &pdd_->physical_device_transform_feedback_properties_);
     } else if (property_name == "VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_vertex_attirbute_divisor_properties_);
+        return GetValue(prop, &pdd_->physical_device_vertex_attirbute_divisor_properties_);
     } else if (property_name == "VkPhysicalDeviceFragmentShadingRatePropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_fragment_shading_rate_properties_);
+        return GetValue(prop, &pdd_->physical_device_fragment_shading_rate_properties_);
     } else if (property_name == "VkPhysicalDeviceShaderCorePropertiesAMD") {
         auto support = CheckExtensionSupport(VK_AMD_SHADER_CORE_PROPERTIES_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_shader_core_properties_);
+        return GetValue(prop, &pdd_->physical_device_shader_core_properties_);
     } else if (property_name == "VkPhysicalDeviceShaderCoreProperties2AMD") {
         auto support = CheckExtensionSupport(VK_AMD_SHADER_CORE_PROPERTIES_2_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_shader_core_properties_2_);
+        return GetValue(prop, &pdd_->physical_device_shader_core_properties_2_);
     } else if (property_name == "VkPhysicalDeviceSubpassShadingPropertiesHUAWEI") {
         auto support = CheckExtensionSupport(VK_HUAWEI_SUBPASS_SHADING_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_subpass_shading_properties_);
+        return GetValue(prop, &pdd_->physical_device_subpass_shading_properties_);
     } else if (property_name == "VkPhysicalDeviceCooperativeMatrixPropertiesNV") {
         auto support = CheckExtensionSupport(VK_NV_COOPERATIVE_MATRIX_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_cooperative_matrix_properties_);
+        return GetValue(prop, &pdd_->physical_device_cooperative_matrix_properties_);
     } else if (property_name == "VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV") {
         auto support = CheckExtensionSupport(VK_NV_DEVICE_GENERATED_COMMANDS_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_device_generated_commands_properties_);
+        return GetValue(prop, &pdd_->physical_device_device_generated_commands_properties_);
     } else if (property_name == "VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV") {
         auto support = CheckExtensionSupport(VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_fragment_shading_rate_enums_properties_);
+        return GetValue(prop, &pdd_->physical_device_fragment_shading_rate_enums_properties_);
     } else if (property_name == "VkPhysicalDeviceMeshShaderPropertiesNV") {
         auto support = CheckExtensionSupport(VK_NV_MESH_SHADER_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_mesh_shader_properties_);
+        return GetValue(prop, &pdd_->physical_device_mesh_shader_properties_);
     } else if (property_name == "VkPhysicalDeviceRayTracingPropertiesNV") {
         auto support = CheckExtensionSupport(VK_NV_RAY_TRACING_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_ray_tracing_properties_);
+        return GetValue(prop, &pdd_->physical_device_ray_tracing_properties_);
     } else if (property_name == "VkPhysicalDeviceShaderSMBuiltinsPropertiesNV") {
         auto support = CheckExtensionSupport(VK_NV_SHADER_SM_BUILTINS_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_shader_sm_builtins_properties_);
+        return GetValue(prop, &pdd_->physical_device_shader_sm_builtins_properties_);
     } else if (property_name == "VkPhysicalDeviceShadingRateImagePropertiesNV") {
         auto support = CheckExtensionSupport(VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_shading_rate_image_properties_);
+        return GetValue(prop, &pdd_->physical_device_shading_rate_image_properties_);
     } else if (property_name == "VkPhysicalDeviceFragmentDensityMap2PropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_FRAGMENT_DENSITY_MAP_2_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_fragment_density_map_2_properties_);
+        return GetValue(prop, &pdd_->physical_device_fragment_density_map_2_properties_);
     } else if (property_name == "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM") {
         auto support = CheckExtensionSupport(VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME, property_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(prop, &pdd_.physical_device_fragment_density_map_offset_properties_);
+        return GetValue(prop, &pdd_->physical_device_fragment_density_map_offset_properties_);
     } else if (property_name == "VkPhysicalDeviceVulkan11Properties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_vulkan_1_1_properties_);
+        return GetValue(prop, &pdd_->physical_device_vulkan_1_1_properties_);
     } else if (property_name == "VkPhysicalDeviceVulkan12Properties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_vulkan_1_2_properties_);
+        return GetValue(prop, &pdd_->physical_device_vulkan_1_2_properties_);
     } else if (property_name == "VkPhysicalDeviceVulkan13Properties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, property_name)) return false;
-        return GetValue(prop, &pdd_.physical_device_vulkan_1_3_properties_);
+        return GetValue(prop, &pdd_->physical_device_vulkan_1_3_properties_);
     } else if (property_name == "VkPhysicalDevicePortabilitySubsetPropertiesKHR") {
-        return GetValue(prop, &pdd_.physical_device_portability_subset_properties_);
+        return GetValue(prop, &pdd_->physical_device_portability_subset_properties_);
     } else if (property_name == "VkPhysicalDevicePointClippingProperties" ||
                property_name == "VkPhysicalDevicePointClippingPropertiesKHR") {
         return GetValuePhysicalDevicePointClippingPropertiesKHR(prop);
@@ -4196,7 +4231,7 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
 
     bool valid = true;
 
-    const VkFormatProperties &device_properties = pdd_.device_formats_[format];
+    const VkFormatProperties &device_properties = pdd_->device_formats_[format];
     if (!HasFlags(device_properties.linearTilingFeatures, profile_properties.linearTilingFeatures)) {
         WarnMissingFormatFeatures(format_name, "linearTilingFeatures", profile_properties.linearTilingFeatures,
                                   device_properties.linearTilingFeatures);
@@ -4213,7 +4248,7 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
         valid = false;
     }
 
-    const VkFormatProperties3 &device_properties_3 = pdd_.device_formats_3_[format];
+    const VkFormatProperties3 &device_properties_3 = pdd_->device_formats_3_[format];
     if (!HasFlags(device_properties_3.linearTilingFeatures, profile_properties_3.linearTilingFeatures)) {
         WarnMissingFormatFeatures2(format_name, "linearTilingFeatures", profile_properties_3.linearTilingFeatures,
                                    device_properties_3.linearTilingFeatures);
@@ -4244,11 +4279,11 @@ static inline std::string StringAPIVersion(uint32_t version) {
 }
 
 bool JsonLoader::CheckVersionSupport(uint32_t version, const std::string &name) {
-    if (pdd_.GetEffectiveVersion() < version) {
+    if (pdd_->GetEffectiveVersion() < version) {
         LogMessage(DEBUG_REPORT_ERROR_BIT,
                    ::format("Profile sets %s which is provided by Vulkan version %s, but the "
                             "current effective API version is %s.\n",
-                            name.c_str(), StringAPIVersion(version).c_str(), StringAPIVersion(pdd_.GetEffectiveVersion()).c_str()));
+                            name.c_str(), StringAPIVersion(version).c_str(), StringAPIVersion(pdd_->GetEffectiveVersion()).c_str()));
         return false;
     }
     return true;
@@ -4264,7 +4299,7 @@ JsonLoader::ExtensionSupport JsonLoader::CheckExtensionSupport(const char *exten
         }
     }
     if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
-        if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, extension)) {
+        if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, extension)) {
             LogMessage(
                 DEBUG_REPORT_ERROR_BIT,
                 ::format("Profile requires %s capabilitiess, but %s is not required by the profile, device values are used.\n",
@@ -4274,7 +4309,7 @@ JsonLoader::ExtensionSupport JsonLoader::CheckExtensionSupport(const char *exten
             }
         }
     } else {
-        if (!PhysicalDeviceData::HasExtension(&pdd_, extension)) {
+        if (!PhysicalDeviceData::HasExtension(pdd_, extension)) {
             LogMessage(
                 DEBUG_REPORT_WARNING_BIT,
                 ::format("Profile requires by %s capabilities, but %s is not supported by the device.\n", name.c_str(), extension));
@@ -4383,7 +4418,7 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
     bool valid = true;
 
     bool supported = false;
-    for (const auto &device_qfp : pdd_.device_queue_family_properties_) {
+    for (const auto &device_qfp : pdd_->device_queue_family_properties_) {
         if (!QueueFamilyMatch(device_qfp.properties_2.queueFamilyProperties, dest->properties_2.queueFamilyProperties)) {
             continue;
         }
@@ -4513,11 +4548,11 @@ bool JsonLoader::OrderQueueFamilyProperties(ArrayOfVkQueueFamilyProperties* qfp)
         return true;
     }
     // If device has less queue families than needed we can't load all profile queue families
-    if (pdd_.device_queue_family_properties_.size() < qfp->size()) {
+    if (pdd_->device_queue_family_properties_.size() < qfp->size()) {
         return false;
     }
     // Find all permutations and see if any of them supports profile queue families
-    std::vector<uint32_t> permutations(pdd_.device_queue_family_properties_.size());
+    std::vector<uint32_t> permutations(pdd_->device_queue_family_properties_.size());
     uint32_t count = static_cast<uint32_t>(permutations.size());
     for (uint32_t i = 0; i < count; ++i) {
         permutations[i] = i;
@@ -4525,7 +4560,7 @@ bool JsonLoader::OrderQueueFamilyProperties(ArrayOfVkQueueFamilyProperties* qfp)
     do {
         bool match = true;
         for (uint32_t i = 0; i < count; ++i) {
-            if (permutations[i] < qfp->size() && !QueueFamilyAndExtensionsMatch(pdd_.device_queue_family_properties_[i], (*qfp)[permutations[i]])) {
+            if (permutations[i] < qfp->size() && !QueueFamilyAndExtensionsMatch(pdd_->device_queue_family_properties_[i], (*qfp)[permutations[i]])) {
                 match = false;
                 break;
             }
@@ -4545,7 +4580,7 @@ bool JsonLoader::OrderQueueFamilyProperties(ArrayOfVkQueueFamilyProperties* qfp)
             }
             *qfp = ordered;
             for (uint32_t i = 0; i < count; ++i) {
-                CopyUnsetQueueFamilyProperties(&pdd_.device_queue_family_properties_[i], &(*qfp)[i]);
+                CopyUnsetQueueFamilyProperties(&pdd_->device_queue_family_properties_[i], &(*qfp)[i]);
             }
             return true;
         }
@@ -4634,31 +4669,31 @@ void JsonLoader::AddPromotedExtensions(uint32_t api_version) {
     };
     if (api_version >= VK_API_VERSION_1_1) {
         for (const auto ext : promoted_1_1) {
-            if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, ext)) {
+            if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, ext)) {
                 VkExtensionProperties extension;
                 strcpy(extension.extensionName, ext);
                 extension.specVersion = 1;
-                pdd_.simulation_extensions_.push_back(extension);
+                pdd_->simulation_extensions_.push_back(extension);
             }
         }
     }
     if (api_version >= VK_API_VERSION_1_2) {
         for (const auto ext : promoted_1_2) {
-            if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, ext)) {
+            if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, ext)) {
                 VkExtensionProperties extension;
                 strcpy(extension.extensionName, ext);
                 extension.specVersion = 1;
-                pdd_.simulation_extensions_.push_back(extension);
+                pdd_->simulation_extensions_.push_back(extension);
             }
         }
     }
     if (api_version >= VK_API_VERSION_1_3) {
         for (const auto ext : promoted_1_3) {
-            if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, ext)) {
+            if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, ext)) {
                 VkExtensionProperties extension;
                 strcpy(extension.extensionName, ext);
                 extension.specVersion = 1;
-                pdd_.simulation_extensions_.push_back(extension);
+                pdd_->simulation_extensions_.push_back(extension);
             }
         }
     }
@@ -4680,18 +4715,18 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
                 AddPromotedExtensions(properties_api_version);
             }
         } else if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
-            AddPromotedExtensions(this->profile_api_version);
+            AddPromotedExtensions(this->profile_api_version_);
         }
 
-        if (VK_VERSION_PATCH(this->profile_api_version) > VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)) {
+        if (VK_VERSION_PATCH(this->profile_api_version_) > VK_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)) {
             LogMessage(
                 DEBUG_REPORT_ERROR_BIT,
                 format("Profile apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ") is greater than the device apiVersion (%" PRIu32
                        ".%" PRIu32 ".%" PRIu32 ")\n",
-                       VK_VERSION_MAJOR(this->profile_api_version), VK_VERSION_MINOR(this->profile_api_version),
-                       VK_VERSION_PATCH(this->profile_api_version), VK_VERSION_MAJOR(pdd_.physical_device_properties_.apiVersion),
-                       VK_VERSION_MINOR(pdd_.physical_device_properties_.apiVersion),
-                       VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)));
+                       VK_VERSION_MAJOR(this->profile_api_version_), VK_VERSION_MINOR(this->profile_api_version_),
+                       VK_VERSION_PATCH(this->profile_api_version_), VK_VERSION_MAJOR(pdd_->physical_device_properties_.apiVersion),
+                       VK_VERSION_MINOR(pdd_->physical_device_properties_.apiVersion),
+                       VK_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)));
 
             failed = true;
         }
@@ -4699,13 +4734,13 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
             const auto &extensions = c["extensions"];
 
-            pdd_.arrayof_extension_properties_.reserve(extensions.size());
+            pdd_->arrayof_extension_properties_.reserve(extensions.size());
             for (const auto &e : extensions.getMemberNames()) {
                 VkExtensionProperties extension;
                 strcpy(extension.extensionName, e.c_str());
                 extension.specVersion = extensions[e].asInt();
                 bool found = false;
-                for (const auto &ext : pdd_.arrayof_extension_properties_) {
+                for (const auto &ext : pdd_->arrayof_extension_properties_) {
                     if (strcmp(ext.extensionName, extension.extensionName) == 0) {
                         found = true;
                         break;
@@ -4713,7 +4748,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
                 }
                 if (!found) {
                     bool supported_on_device = false;
-                    for (const auto &device_extension : pdd_.device_extensions_) {
+                    for (const auto &device_extension : pdd_->device_extensions_) {
                         if (strcmp(device_extension.extensionName, extension.extensionName) == 0) {
                             supported_on_device = true;
                             break;
@@ -4722,10 +4757,10 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
                     if (!supported_on_device) {
                         failed = true;
                     }
-                    pdd_.arrayof_extension_properties_.push_back(extension);
+                    pdd_->arrayof_extension_properties_.push_back(extension);
                     if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
-                        if (!PhysicalDeviceData::HasSimulatedExtension(&pdd_, extension.extensionName)) {
-                            pdd_.simulation_extensions_.push_back(extension);
+                        if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, extension.extensionName)) {
+                            pdd_->simulation_extensions_.push_back(extension);
                         }
                     }
                 }
@@ -4742,13 +4777,13 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
 
             for (const auto &feature : features.getMemberNames()) {
                 if (features.isMember("VkPhysicalDeviceVulkan11Features")) {
-                    pdd_.vulkan_1_1_features_written_ = true;
+                    pdd_->vulkan_1_1_features_written_ = true;
                 }
                 if (features.isMember("VkPhysicalDeviceVulkan12Features")) {
-                    pdd_.vulkan_1_2_features_written_ = true;
+                    pdd_->vulkan_1_2_features_written_ = true;
                 }
                 if (features.isMember("VkPhysicalDeviceVulkan13Features")) {
-                    pdd_.vulkan_1_3_features_written_ = true;
+                    pdd_->vulkan_1_3_features_written_ = true;
                 }
                 bool success = GetFeature(features, feature);
                 if (!success) {
@@ -4764,13 +4799,13 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
             }
 
             if (properties.isMember("VkPhysicalDeviceVulkan11Properties")) {
-                pdd_.vulkan_1_1_properties_written_ = true;
+                pdd_->vulkan_1_1_properties_written_ = true;
             }
             if (properties.isMember("VkPhysicalDeviceVulkan12Properties")) {
-                pdd_.vulkan_1_2_properties_written_ = true;
+                pdd_->vulkan_1_2_properties_written_ = true;
             }
             if (properties.isMember("VkPhysicalDeviceVulkan13Properties")) {
-                pdd_.vulkan_1_3_properties_written_ = true;
+                pdd_->vulkan_1_3_properties_written_ = true;
             }
             for (const auto &prop : properties.getMemberNames()) {
                 bool success = GetProperty(properties, prop);
@@ -4784,7 +4819,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
             const auto &formats = c["formats"];
 
             for (const auto &format : formats.getMemberNames()) {
-                bool success = GetFormat(formats, format, &pdd_.arrayof_format_properties_, &pdd_.arrayof_format_properties_3_);
+                bool success = GetFormat(formats, format, &pdd_->arrayof_format_properties_, &pdd_->arrayof_format_properties_3_);
                 if (!success) {
                     failed = true;
                 }
@@ -4796,15 +4831,15 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
 
             bool queue_families_supported = true;
             for (const auto &qfp : qf_props) {
-                pdd_.arrayof_queue_family_properties_.emplace_back();
-                bool success = GetQueueFamilyProperties(qfp, &pdd_.arrayof_queue_family_properties_.back());
+                pdd_->arrayof_queue_family_properties_.emplace_back();
+                bool success = GetQueueFamilyProperties(qfp, &pdd_->arrayof_queue_family_properties_.back());
                 if (!success) {
                     queue_families_supported = false;
                     failed = true;
                 }
             }
             if (queue_families_supported) {
-                bool success = OrderQueueFamilyProperties(&pdd_.arrayof_queue_family_properties_);
+                bool success = OrderQueueFamilyProperties(&pdd_->arrayof_queue_family_properties_);
                 if (!success) {
                     failed = true;
                 }
@@ -4822,16 +4857,16 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
                    format("VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32
                           ". Using the API version specified by the profile.\n",
-                          VK_VERSION_MAJOR(this->profile_api_version), VK_VERSION_MINOR(this->profile_api_version),
-                          VK_VERSION_PATCH(this->profile_api_version)));
+                          VK_VERSION_MAJOR(this->profile_api_version_), VK_VERSION_MINOR(this->profile_api_version_),
+                          VK_VERSION_PATCH(this->profile_api_version_)));
 
-        pdd_.physical_device_properties_.apiVersion = this->profile_api_version;
+        pdd_->physical_device_properties_.apiVersion = this->profile_api_version_;
     } else {
         LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, format("VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32
                                                          ". Using the device version.\n",
-                                                         VK_VERSION_MAJOR(pdd_.physical_device_properties_.apiVersion),
-                                                         VK_VERSION_MINOR(pdd_.physical_device_properties_.apiVersion),
-                                                         VK_VERSION_PATCH(pdd_.physical_device_properties_.apiVersion)));
+                                                         VK_VERSION_MAJOR(pdd_->physical_device_properties_.apiVersion),
+                                                         VK_VERSION_MINOR(pdd_->physical_device_properties_.apiVersion),
+                                                         VK_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)));
     }
 
     if (failed && layer_settings->debug_fail_on_error) {
@@ -4935,6 +4970,7 @@ struct JsonValidator {
 };
 
 VkResult JsonLoader::LoadFile(std::string filename) {
+    profile_filename_ = filename;
     if (filename.empty()) {
         if (!layer_settings->profile_name.empty()) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
@@ -4954,18 +4990,53 @@ VkResult JsonLoader::LoadFile(std::string filename) {
     Json::Value root = Json::nullValue;
     Json::CharReaderBuilder builder;
     std::string errs;
-    bool success = Json::parseFromStream(builder, json_file, &root, &errs);
+    bool success = Json::parseFromStream(builder, json_file, &root_, &errs);
     if (!success) {
         LogMessage(DEBUG_REPORT_ERROR_BIT, format("Json::parseFromStream failed {\n%s}\n", errs.c_str()));
         return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
     json_file.close();
 
-    if (root.type() != Json::objectValue) {
+    if (root_.type() != Json::objectValue) {
         LogMessage(DEBUG_REPORT_ERROR_BIT, format("Json document root is not an object in file \"%s\"\n", filename.c_str()));
         return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
+    ReadProfileApiVersion();
+
+    return VK_SUCCESS;
+}
+
+void JsonLoader::ReadProfileApiVersion() {
+    const std::string &profile_name = layer_settings->profile_name;
+    const Json::Value &profiles = root_["profiles"];
+    for (const auto &profile : profiles.getMemberNames()) {
+        if (profile_name.empty() || profile_name == "${VP_DEFAULT}" || profile == profile_name) {
+            const std::string version_string = profiles[profile]["api-version"].asCString();
+
+            uint32_t api_major = 0;
+            uint32_t api_minor = 0;
+            uint32_t api_patch = 0;
+            std::sscanf(version_string.c_str(), "%d.%d.%d", &api_major, &api_minor, &api_patch);
+            profile_api_version_ = VK_MAKE_API_VERSION(0, api_major, api_minor, api_patch);
+
+            break;
+        }
+    }
+
+    /*if (VK_VERSION_MINOR(this->profile_api_version_) > VK_VERSION_MINOR(requested_version)) {
+        LogMessage(DEBUG_REPORT_WARNING_BIT,
+                   format("The application requested a Vulkan 1.%d instance however the selected profile requires Vulkan 1.%d. "
+                          "Some profile capabilities might not be applied, we recommend changing the Vulkan application to request "
+                          "a Vulkan 1.%d instance.\n",
+                          VK_VERSION_MINOR(requested_version), VK_VERSION_MINOR(this->profile_api_version_),
+                          VK_VERSION_MINOR(this->profile_api_version_))
+                       .c_str());
+    }*/
+}
+
+VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
+    pdd_ = pdd;
     for (std::size_t j = 0, m = layer_settings->exclude_device_extensions.size(); j < m; ++j) {
         const auto &extension = layer_settings->exclude_device_extensions[j];
         if (extension.empty()) continue;
@@ -4973,19 +5044,11 @@ VkResult JsonLoader::LoadFile(std::string filename) {
     }
 
     const std::string &profile_name = layer_settings->profile_name;
-    const Json::Value &profiles = root["profiles"];
+    const Json::Value &profiles = root_["profiles"];
     std::vector<std::string> capabilities;
     for (const auto &profile : profiles.getMemberNames()) {
         if (profile_name.empty() || profile_name == "${VP_DEFAULT}" || profile == profile_name) {
             const auto &caps = profiles[profile]["capabilities"];
-
-            const std::string version_string = profiles[profile]["api-version"].asCString();
-
-            uint32_t api_major = 0;
-            uint32_t api_minor = 0;
-            uint32_t api_patch = 0;
-            std::sscanf(version_string.c_str(), "%d.%d.%d", &api_major, &api_minor, &api_patch);
-            this->profile_api_version = VK_MAKE_API_VERSION(0, api_major, api_minor, api_patch);
 
             for (const auto &cap : caps) {
                 capabilities.push_back(cap.asString());
@@ -4996,19 +5059,11 @@ VkResult JsonLoader::LoadFile(std::string filename) {
         }
     }
 
-    if (VK_VERSION_MINOR(this->profile_api_version) > VK_VERSION_MINOR(requested_version)) {
-        LogMessage(DEBUG_REPORT_WARNING_BIT,
-            format("The application requested a Vulkan 1.%d instance however the selected profile requires Vulkan 1.%d. Some profile capabilities might not be applied, we recommend changing the Vulkan application to request a Vulkan 1.%d instance.\n",
-                VK_VERSION_MINOR(requested_version), 
-                VK_VERSION_MINOR(this->profile_api_version),
-                VK_VERSION_MINOR(this->profile_api_version)).c_str());
-    }
-
     if (capabilities.empty()) {
         return VK_SUCCESS;
     }
 
-    const Json::Value schema_value = root["$schema"];
+    const Json::Value schema_value = root_["$schema"];
     if (!schema_value.isString()) {
         LogMessage(DEBUG_REPORT_ERROR_BIT, "JSON element \"$schema\" is not a string\n");
         return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
@@ -5041,9 +5096,9 @@ VkResult JsonLoader::LoadFile(std::string filename) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
                        format("%s could not find the profile schema file to validate filename.\n\t- This "
                               "operation requires the Vulkan SDK to be installed.\n\t- Skipping profile file validation.",
-                              kOurLayerName, filename.c_str()));
-        } else if (!validator.Check(root)) {
-            LogMessage(DEBUG_REPORT_ERROR_BIT, format("%s is not a valid JSON profile file.\n", filename.c_str()));
+                              kOurLayerName, profile_filename_.c_str()));
+        } else if (!validator.Check(root_)) {
+            LogMessage(DEBUG_REPORT_ERROR_BIT, format("%s is not a valid JSON profile file.\n", profile_filename_.c_str()));
             if (layer_settings->debug_fail_on_error) {
                 return VK_ERROR_INITIALIZATION_FAILED;
             } else {
@@ -5054,10 +5109,10 @@ VkResult JsonLoader::LoadFile(std::string filename) {
 
     VkResult result = VK_SUCCESS;
     if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
-        pdd_.simulation_extensions_.clear();
+        pdd_->simulation_extensions_.clear();
     }
 
-    result = ReadProfile(root, capabilities);
+    result = ReadProfile(root_, capabilities);
 
     return result;
 }
@@ -5308,7 +5363,7 @@ bool JsonLoader::GetValuePhysicalDeviceToolPropertiesEXT(const Json::Value &pare
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetPropertiesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) &&
+    if (!PhysicalDeviceData::HasExtension(pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) &&
         !layer_settings->emulate_portability) {
         LogMessage(
             DEBUG_REPORT_ERROR_BIT,
@@ -5646,7 +5701,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFe
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\n");
-    if (!PhysicalDeviceData::HasExtension(&pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) &&
+    if (!PhysicalDeviceData::HasExtension(pdd_, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) &&
         !layer_settings->emulate_portability) {
         LogMessage(
             DEBUG_REPORT_ERROR_BIT,
@@ -7524,8 +7579,6 @@ static void InitSettings(const void *pnext) {
 // Generic layer dispatch table setup, see [LALI].
 static VkResult LayerSetupCreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
                                          VkInstance *pInstance) {
-    InitSettings(pCreateInfo->pNext);
-
     VkLayerInstanceCreateInfo *chain_info = get_chain_info(pCreateInfo, VK_LAYER_LINK_INFO);
     assert(chain_info->u.pLayerInfo);
 
@@ -7553,55 +7606,96 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
                format("%s version %d.%d.%d\n", kOurLayerName, kVersionProfilesMajor, kVersionProfilesMinor, kVersionProfilesPatch));
 
-    const VkApplicationInfo *app_info = pCreateInfo->pApplicationInfo;
-    requested_version = (app_info && app_info->apiVersion) ? app_info->apiVersion : VK_API_VERSION_1_1;
-    bool changed_version = false;
-    if (requested_version < VK_API_VERSION_1_1) {
-        if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT,
-                format("%s currently requires VK_API_VERSION_1_1 or higher but the Vulkan Application requested a Vulkan "
-                        "%d.%d instance. The Vulkan instance is created with Vulkan 1.1 requirement.\n",
-                        kOurLayerName, VK_VERSION_MAJOR(requested_version), VK_VERSION_MINOR(requested_version)));
-        } else {
-            LogMessage(DEBUG_REPORT_WARNING_BIT,
-                format("%s currently requires VK_API_VERSION_1_1 or higher but the Vulkan Application requested a Vulkan "
-                        "%d.%d instance. The Vulkan instance is created with Vulkan 1.0 requirement.\n",
-                        kOurLayerName, VK_VERSION_MAJOR(requested_version), VK_VERSION_MINOR(requested_version)));
-        }
-        requested_version = VK_API_VERSION_1_1;
-        changed_version = true;
+    InitSettings(pCreateInfo->pNext);
+
+    JsonLoader &json_loader = JsonLoader::Create(*pInstance);
+    VkResult result = json_loader.LoadFile(layer_settings->profile_file);
+    if (result != VK_SUCCESS) {
+        return result;
     }
 
+    const VkApplicationInfo *app_info = pCreateInfo->pApplicationInfo;
+    requested_version = (app_info && app_info->apiVersion) ? app_info->apiVersion : VK_API_VERSION_1_0;
     if (VK_VERSION_MAJOR(requested_version) > 1 || VK_VERSION_MINOR(requested_version) > 3) {
         LogMessage(DEBUG_REPORT_ERROR_BIT, format("%s currently only supports VK_API_VERSION_1_3 and lower.\n", kOurLayerName));
     }
 
+    bool changed_version = false;
+    uint32_t profile_api_version = json_loader.GetProfileApiVersion();
+    if (VK_VERSION_MAJOR(requested_version) < VK_VERSION_MAJOR(profile_api_version) ||
+        VK_VERSION_MINOR(requested_version) < VK_VERSION_MINOR(profile_api_version)) {
+        LogMessage(DEBUG_REPORT_WARNING_BIT,
+                   ::format("The Profiles Layer requires API version %s, but instance is being created "
+                            "with API version %s. The API version will be set to %s.\n",
+                            StringAPIVersion(requested_version).c_str(), StringAPIVersion(profile_api_version).c_str(),
+                            StringAPIVersion(requested_version).c_str()));
+        requested_version = profile_api_version;
+        changed_version = true;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(global_lock);
 
-    if (!changed_version) {
+    bool get_physical_device_properties2_active = false;
+    if (VK_VERSION_MINOR(requested_version) > 0) {
+        get_physical_device_properties2_active = true;
+    } else {
+        for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; i++) {
+            if (strncmp(pCreateInfo->ppEnabledExtensionNames[i], VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+                        VK_MAX_EXTENSION_NAME_SIZE) == 0) {
+                get_physical_device_properties2_active = true;
+                break;
+            }
+        }
+    }
+    if (!changed_version && get_physical_device_properties2_active) {
         return LayerSetupCreateInstance(pCreateInfo, pAllocator, pInstance);
     }
 
-    assert(pCreateInfo->pApplicationInfo);
+    if (!get_physical_device_properties2_active) {
+        LogMessage(DEBUG_REPORT_WARNING_BIT, ::format("The Profiles Layer requires the %s extension, but it was not included in "
+                                                      "VkInstanceCreateInfo::ppEnabledExtensionNames, adding the extension.\n",
+                                                      VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME));
+    }
 
+    // Add VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
     VkApplicationInfo new_app_info;
-    new_app_info.sType = pCreateInfo->pApplicationInfo->sType;
-    new_app_info.pNext = pCreateInfo->pApplicationInfo->pNext;
-    new_app_info.pApplicationName = pCreateInfo->pApplicationInfo->pApplicationName;
-    new_app_info.applicationVersion = pCreateInfo->pApplicationInfo->applicationVersion;
-    new_app_info.pEngineName = pCreateInfo->pApplicationInfo->pEngineName;
-    new_app_info.engineVersion = pCreateInfo->pApplicationInfo->engineVersion;
-    new_app_info.apiVersion = VK_API_VERSION_1_1;
+    if (app_info) {
+        new_app_info.sType = app_info->sType;
+        new_app_info.pNext = app_info->pNext;
+        new_app_info.pApplicationName = app_info->pApplicationName;
+        new_app_info.applicationVersion = app_info->applicationVersion;
+        new_app_info.pEngineName = app_info->pEngineName;
+        new_app_info.engineVersion = app_info->engineVersion;
+        new_app_info.apiVersion = requested_version;
+    } else {
+        new_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+        new_app_info.apiVersion = requested_version;
+    }
 
     VkInstanceCreateInfo create_info;
     create_info.sType = pCreateInfo->sType;
     create_info.pNext = pCreateInfo->pNext;
     create_info.flags = pCreateInfo->flags;
-    create_info.pApplicationInfo = &new_app_info;
+    if (changed_version) {
+        create_info.pApplicationInfo = &new_app_info;
+    } else {
+        create_info.pApplicationInfo = app_info;
+    }
     create_info.enabledLayerCount = pCreateInfo->enabledLayerCount;
     create_info.ppEnabledLayerNames = pCreateInfo->ppEnabledLayerNames;
-    create_info.enabledExtensionCount = pCreateInfo->enabledExtensionCount;
-    create_info.ppEnabledExtensionNames = pCreateInfo->ppEnabledExtensionNames;
+    std::vector<const char *> extension_names;
+    if (!get_physical_device_properties2_active) {
+        create_info.enabledExtensionCount = pCreateInfo->enabledExtensionCount + 1;
+        extension_names.resize(create_info.enabledExtensionCount);
+        for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; ++i) {
+            extension_names[i] = pCreateInfo->ppEnabledExtensionNames[i];
+        }
+        extension_names[pCreateInfo->enabledExtensionCount] = VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME;
+        create_info.ppEnabledExtensionNames = extension_names.data();
+    } else {
+        create_info.enabledExtensionCount = pCreateInfo->enabledExtensionCount;
+        create_info.ppEnabledExtensionNames = pCreateInfo->ppEnabledExtensionNames;
+    }
     return LayerSetupCreateInstance(&create_info, pAllocator, pInstance);
 }
 
@@ -7625,6 +7719,8 @@ VKAPI_ATTR void VKAPI_CALL DestroyInstance(VkInstance instance, const VkAllocati
             dt->DestroyInstance(instance, pAllocator);
         }
         destroy_instance_dispatch_table(get_dispatch_key(instance));
+
+        JsonLoader::Destroy(instance);
     }
 
     if (layer_settings->debug_actions & DEBUG_ACTION_FILE_BIT) {
@@ -11052,8 +11148,10 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                            .c_str());
 
             // Override PDD members with values from configuration file(s).
-            JsonLoader json_loader(pdd);
-            result = json_loader.LoadFile(layer_settings->profile_file);
+            if (result == VK_SUCCESS) {
+                JsonLoader& json_loader = *JsonLoader::Find(instance);
+                result = json_loader.LoadDevice(&pdd);
+            }
 
             // VK_VULKAN_1_1
             TransferValue(&(pdd.physical_device_vulkan_1_1_properties_), &(pdd.physical_device_multiview_properties_),
