@@ -524,7 +524,7 @@ TEST(layer, TestQueueFamilyProperties) {
 
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
     VkProfileLayerSettingsEXT settings = {};
-    settings.profile_file = JSON_TEST_FILES_PATH "test/data/VP_LUNARG_test_vkqueuefamilyproperties.json";
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_vkqueuefamilyproperties.json";
     settings.profile_name = "VP_LUNARG_test_vkqueuefamilyproperties";
     settings.emulate_portability = true;
     settings.debug_fail_on_error = false;
@@ -571,7 +571,7 @@ TEST(layer, TestQueueFamilyPropertiesGlobalPriorityProperties) {
 
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
     VkProfileLayerSettingsEXT settings = {};
-    settings.profile_file = JSON_TEST_FILES_PATH "test/data/VP_LUNARG_test_vkqueuefamilyproperties.json";
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_vkqueuefamilyproperties.json";
     settings.profile_name = "VP_LUNARG_test_vkqueuefamilyproperties";
     settings.emulate_portability = true;
     settings.debug_fail_on_error = false;
@@ -612,7 +612,7 @@ TEST(layer, TestQueueFamilyCheckpointProperties) {
 
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
     VkProfileLayerSettingsEXT settings = {};
-    settings.profile_file = JSON_TEST_FILES_PATH "test/data/VP_LUNARG_test_vkqueuefamilyproperties.json";
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_vkqueuefamilyproperties.json";
     settings.profile_name = "VP_LUNARG_test_vkqueuefamilyproperties";
     settings.emulate_portability = true;
     settings.debug_fail_on_error = false;
@@ -649,7 +649,7 @@ TEST(layer, TestQueueFamilyCheckpointProperties2) {
 
     inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
     VkProfileLayerSettingsEXT settings = {};
-    settings.profile_file = JSON_TEST_FILES_PATH "test/data/VP_LUNARG_test_vkqueuefamilyproperties.json";
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_vkqueuefamilyproperties.json";
     settings.profile_name = "VP_LUNARG_test_vkqueuefamilyproperties";
     settings.emulate_portability = true;
     settings.debug_fail_on_error = false;
@@ -706,7 +706,7 @@ TEST(layer, TestQueueFamilyPropertiesPartial) {
     {
         inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
         VkProfileLayerSettingsEXT settings = {};
-        settings.profile_file = JSON_TEST_FILES_PATH "test/data/VP_LUNARG_test_vkqueuefamilyproperties.json";
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_vkqueuefamilyproperties.json";
         settings.profile_name = "VP_LUNARG_test_vkqueuefamilyproperties2";
         settings.emulate_portability = true;
         settings.debug_fail_on_error = false;
