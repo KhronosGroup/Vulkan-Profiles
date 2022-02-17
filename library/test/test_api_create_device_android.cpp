@@ -25,7 +25,21 @@
 #include <vulkan/vulkan_android.h>
 #include <vulkan/debug/vulkan_profiles.hpp>
 
-#if defined(ANDROID)
+bool IsShieldTv(VkPhysicalDevice pdev) {
+    // This identifier should cover ShieldTV and ShieldTVb devices, but not other Tegra devices
+    std::string shield_tv_identifier = "(nvgpu)";
+
+    VkPhysicalDeviceProperties pdev_props{};
+    vkGetPhysicalDeviceProperties(pdev, &pdev_props);
+
+    bool result = false;
+    std::string device_name = pdev_props.deviceName;
+    if (device_name.find(shield_tv_identifier) != std::string::npos) {
+        result = true;
+    }
+    return result;
+}
+
 #include <android/native_window.h>
 #include <android/log.h>
 #include <android_native_app_glue.h>
@@ -234,23 +248,6 @@ void android_main(struct android_app *app) {
         }
     }
 }
-#else
-
-int main(int argc, char **argv) {
-    int result;
-    ::testing::InitGoogleTest(&argc, argv);
-
-    ::scaffold = new TestScaffold;
-
-    result = RUN_ALL_TESTS();
-
-    delete ::scaffold;
-    ::scaffold = nullptr;
-
-    return result;
-}
-
-#endif
 
 TEST(library_api, vpCreateDevice) {
     TestScaffold scaffold;
@@ -283,14 +280,16 @@ TEST(library_api, vpCreateDevice) {
 TEST(library_api, vpGetPhysicalDeviceProfileSupport) {
     TestScaffold scaffold;
 
+    if (IsShieldTv(scaffold.physicalDevice)) {
+        __android_log_print(ANDROID_LOG_INFO, appTag, "          Shield TV is too old to support the Android profile, skipping test");
+        return;
+    }
+
     VpProfileProperties profile{VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     vpGetPhysicalDeviceProfileSupport(scaffold.instance, scaffold.physicalDevice, &profile, &supported);
 
-#if defined(ANDROID)
     EXPECT_EQ(VK_TRUE, supported);
-#else
-    EXPECT_EQ(VK_FALSE, supported);
-#endif
+
 }
