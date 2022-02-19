@@ -24,6 +24,8 @@
 #include <vulkan/vulkan.h>
 #include "../profiles.h"
 
+#define TEST_DESCRIPTION(desc) RecordProperty("description", desc)
+
 namespace profiles_test {
 
 void setEnvironmentSetting(std::string setting, const char* val);

@@ -56,6 +56,7 @@ struct TestInit {
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_test_api";
         settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
+        settings.debug_reports = 0;
 
         err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);

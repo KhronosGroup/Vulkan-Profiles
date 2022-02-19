@@ -33,7 +33,10 @@ static const char* CONFIG_PATH = "bin/Release";
 static const char* CONFIG_PATH = "lib";
 #endif
 
+// Can be used by tests to record additional details / description of test
+
 TEST(layer, TestSetCombinationMode) {
+    TEST_DESCRIPTION("Test different profile capabilities settings");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -188,6 +191,7 @@ TEST(layer, TestSetCombinationMode) {
 }
 
 TEST(layer, TestExtensionNotSupported) {
+    TEST_DESCRIPTION("Test using a profile with an unsupported extension for the device");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -243,6 +247,7 @@ TEST(layer, TestExtensionNotSupported) {
 }
 
 TEST(layer, TestExcludingDeviceExtensions) {
+    TEST_DESCRIPTION("Test specifying device extensions to be excluded from being reported by the device");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -305,9 +310,12 @@ TEST(layer, TestExcludingDeviceExtensions) {
     ASSERT_FALSE(maintenance2);
     ASSERT_FALSE(maintenance3);
     ASSERT_FALSE(maintenance4);
+
+    vkDestroyInstance(test_inst, nullptr);
 }
 
 TEST(layer, TestExcludingFormats) {
+    TEST_DESCRIPTION("Test specifying image formats to be excluded from being reported by the device");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -342,9 +350,12 @@ TEST(layer, TestExcludingFormats) {
     ASSERT_EQ(format_properties.linearTilingFeatures, 0);
     ASSERT_EQ(format_properties.optimalTilingFeatures, 0);
     ASSERT_EQ(format_properties.bufferFeatures, 0);
+
+    vkDestroyInstance(test_inst, nullptr);
 }
 
 TEST(layer, TestMissingPhysDevProps2) {
+    TEST_DESCRIPTION("Test creating an instance with api version 1.0 and GPDP2 not included");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -362,7 +373,9 @@ TEST(layer, TestMissingPhysDevProps2) {
     settings.debug_fail_on_error = false;
     settings.simulate_capabilities = SIMULATE_ALL_CAPABILITIES;
 
-    err = inst_builder.makeInstance(&settings);    ASSERT_EQ(err, VK_SUCCESS);
+    err = inst_builder.makeInstance(&settings);
+    ASSERT_EQ(err, VK_SUCCESS);
+    VkInstance test_inst = inst_builder.getInstance();
 
     VkPhysicalDevice gpu;
     err = inst_builder.getPhysicalDevice(&gpu);
@@ -370,9 +383,12 @@ TEST(layer, TestMissingPhysDevProps2) {
     uint32_t count = 0;
     vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
     ASSERT_EQ(count, 19);
+
+    vkDestroyInstance(test_inst, nullptr);
 }
 
 TEST(layer, TestNotSettingProfileFile) {
+    TEST_DESCRIPTION("Test missing profile file setting");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -420,6 +436,7 @@ TEST(layer, TestNotSettingProfileFile) {
 
         err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
+        VkInstance test_inst = inst_builder.getInstance();
 
         VkPhysicalDevice gpu;
         err = inst_builder.getPhysicalDevice(&gpu);
@@ -427,10 +444,13 @@ TEST(layer, TestNotSettingProfileFile) {
         uint32_t count = 0;
         vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
         ASSERT_EQ(device_extensions.size(), count);
+
+        vkDestroyInstance(test_inst, nullptr);
     }
 }
 
 TEST(layer, TestExcludedExtensions) {
+    TEST_DESCRIPTION("Test getting properties of an excluded device extension");
 #ifdef VK_EXT_shader_atomic_float2
     VkResult err = VK_SUCCESS;
 
@@ -455,6 +475,7 @@ TEST(layer, TestExcludedExtensions) {
 
         err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
+        VkInstance test_inst = inst_builder.getInstance();
 
         VkPhysicalDevice gpu;
         err = inst_builder.getPhysicalDevice(&gpu);
@@ -463,6 +484,8 @@ TEST(layer, TestExcludedExtensions) {
         properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
         properties.pNext = &device_properties;
         vkGetPhysicalDeviceProperties2(gpu, &properties);
+
+        vkDestroyInstance(test_inst, nullptr);
         inst_builder.reset();
     }
 
@@ -481,6 +504,7 @@ TEST(layer, TestExcludedExtensions) {
 
         err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
+        VkInstance test_inst = inst_builder.getInstance();
 
         VkPhysicalDevice gpu;
         err = inst_builder.getPhysicalDevice(&gpu);
@@ -505,11 +529,14 @@ TEST(layer, TestExcludedExtensions) {
         ASSERT_EQ(device_properties.transformFeedbackRasterizationStreamSelect,
                   profile_properties.transformFeedbackRasterizationStreamSelect);
         ASSERT_EQ(device_properties.transformFeedbackDraw, profile_properties.transformFeedbackDraw);
+
+        vkDestroyInstance(test_inst, nullptr);
     }
 #endif
 }
 
 TEST(layer, TestQueueFamilyProperties) {
+    TEST_DESCRIPTION("Test loading profile with queue family properties");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -554,9 +581,12 @@ TEST(layer, TestQueueFamilyProperties) {
     ASSERT_EQ(qf_props[1].minImageTransferGranularity.width, 16);
     ASSERT_EQ(qf_props[1].minImageTransferGranularity.height, 32);
     ASSERT_EQ(qf_props[1].minImageTransferGranularity.depth, 64);
+
+    vkDestroyInstance(test_inst, nullptr);
 }
 
 TEST(layer, TestQueueFamilyPropertiesGlobalPriorityProperties) {
+    TEST_DESCRIPTION("Test profile with VK_KHR_global_priority extension");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -595,9 +625,12 @@ TEST(layer, TestQueueFamilyPropertiesGlobalPriorityProperties) {
     ASSERT_EQ(qfgp.priorities[1], VK_QUEUE_GLOBAL_PRIORITY_MEDIUM_EXT);
     ASSERT_EQ(qfgp.priorities[2], VK_QUEUE_GLOBAL_PRIORITY_HIGH_EXT);
     ASSERT_EQ(qfgp.priorities[3], VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT);
+
+    vkDestroyInstance(test_inst, nullptr);
 }
 
 TEST(layer, TestQueueFamilyCheckpointProperties) {
+    TEST_DESCRIPTION("Test profile with VK_NV_device_diagnostic_checkpoints extension");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -632,9 +665,12 @@ TEST(layer, TestQueueFamilyCheckpointProperties) {
 
     vkGetPhysicalDeviceQueueFamilyProperties2(gpu, &count, qf_props2.data());
     ASSERT_EQ(checkpoint.checkpointExecutionStageMask, VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_HOST_BIT);
+
+    vkDestroyInstance(test_inst, nullptr);
 }
 
 TEST(layer, TestQueueFamilyCheckpointProperties2) {
+    TEST_DESCRIPTION("Test profile with VK_NV_device_diagnostic_checkpoints extension");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -671,9 +707,12 @@ TEST(layer, TestQueueFamilyCheckpointProperties2) {
     ASSERT_EQ(checkpoint.checkpointExecutionStageMask, VK_PIPELINE_STAGE_2_NONE_KHR |
                                                            VK_PIPELINE_STAGE_2_SUBPASS_SHADING_BIT_HUAWEI |
                                                            VK_PIPELINE_STAGE_2_INVOCATION_MASK_BIT_HUAWEI);
+
+    vkDestroyInstance(test_inst, nullptr);
 }
 
 TEST(layer, TestQueueFamilyPropertiesPartial) {
+    TEST_DESCRIPTION("Test profile with queue family properties that does not specify all members");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -695,6 +734,8 @@ TEST(layer, TestQueueFamilyPropertiesPartial) {
         vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, nullptr);
         device_qf_props.resize(count);
         vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, device_qf_props.data());
+
+        vkDestroyInstance(test_inst, nullptr);
         inst_builder.reset();
     }
 
@@ -743,5 +784,7 @@ TEST(layer, TestQueueFamilyPropertiesPartial) {
         ASSERT_EQ(qf_props[0].minImageTransferGranularity.depth,
                   device_qf_props[device_queue_index].minImageTransferGranularity.depth);
         ASSERT_EQ(qf_props[0].timestampValidBits, device_qf_props[device_queue_index].timestampValidBits);
+
+        vkDestroyInstance(test_inst, nullptr);
     }
 }
