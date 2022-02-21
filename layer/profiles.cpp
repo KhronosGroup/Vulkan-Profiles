@@ -4270,9 +4270,9 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
 
 static inline std::string StringAPIVersion(uint32_t version) {
     std::stringstream version_name;
-    uint32_t major = VK_VERSION_MAJOR(version);
-    uint32_t minor = VK_VERSION_MINOR(version);
-    uint32_t patch = VK_VERSION_PATCH(version);
+    uint32_t major = VK_API_VERSION_MAJOR(version);
+    uint32_t minor = VK_API_VERSION_MINOR(version);
+    uint32_t patch = VK_API_VERSION_PATCH(version);
     version_name << major << "." << minor << "." << patch;
     return version_name.str();
 }
@@ -4716,16 +4716,15 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
             AddPromotedExtensions(this->profile_api_version_);
         }
 
-        if (VK_VERSION_PATCH(this->profile_api_version_) > VK_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)) {
-            LogMessage(
-                DEBUG_REPORT_ERROR_BIT,
-                format("Profile apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ") is greater than the device apiVersion (%" PRIu32
-                       ".%" PRIu32 ".%" PRIu32 ")\n",
-                       VK_VERSION_MAJOR(this->profile_api_version_), VK_VERSION_MINOR(this->profile_api_version_),
-                       VK_VERSION_PATCH(this->profile_api_version_), VK_VERSION_MAJOR(pdd_->physical_device_properties_.apiVersion),
-                       VK_VERSION_MINOR(pdd_->physical_device_properties_.apiVersion),
-                       VK_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)));
-
+        if (VK_API_VERSION_PATCH(this->profile_api_version_) > VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)) {
+            LogMessage(DEBUG_REPORT_ERROR_BIT,
+                format("Profile apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ") is greater than the device apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ")\n",
+                    VK_API_VERSION_MAJOR(this->profile_api_version_),
+                    VK_API_VERSION_MINOR(this->profile_api_version_),
+                    VK_API_VERSION_PATCH(this->profile_api_version_),
+                    VK_API_VERSION_MAJOR(pdd_->physical_device_properties_.apiVersion), 
+                    VK_API_VERSION_MINOR(pdd_->physical_device_properties_.apiVersion),
+                    VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)));
             failed = true;
         }
 
@@ -4847,24 +4846,20 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
 
     if (properties_api_version != 0) {
         LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
-                   format("VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32
-                          ". Using the API version specified by the profile VkPhysicalDeviceProperties structure.\n",
-                          VK_VERSION_MAJOR(properties_api_version), VK_VERSION_MINOR(properties_api_version),
-                          VK_VERSION_PATCH(properties_api_version)));
+            format("VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the API version specified by the profile VkPhysicalDeviceProperties structure.\n",
+                VK_API_VERSION_MAJOR(properties_api_version), VK_API_VERSION_MINOR(properties_api_version), VK_API_VERSION_PATCH(properties_api_version)));
     } else if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
         LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
-                   format("VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32
-                          ". Using the API version specified by the profile.\n",
-                          VK_VERSION_MAJOR(this->profile_api_version_), VK_VERSION_MINOR(this->profile_api_version_),
-                          VK_VERSION_PATCH(this->profile_api_version_)));
+            format("VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the API version specified by the profile.\n",
+                VK_API_VERSION_MAJOR(this->profile_api_version_), VK_API_VERSION_MINOR(this->profile_api_version_), VK_API_VERSION_PATCH(this->profile_api_version_)));
 
         pdd_->physical_device_properties_.apiVersion = this->profile_api_version_;
     } else {
-        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, format("VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32
-                                                         ". Using the device version.\n",
-                                                         VK_VERSION_MAJOR(pdd_->physical_device_properties_.apiVersion),
-                                                         VK_VERSION_MINOR(pdd_->physical_device_properties_.apiVersion),
-                                                         VK_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)));
+        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, 
+            format("VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the device version.\n",
+                VK_API_VERSION_MAJOR(pdd_->physical_device_properties_.apiVersion),
+                VK_API_VERSION_MINOR(pdd_->physical_device_properties_.apiVersion),
+                VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)));
     }
 
     if (failed && layer_settings->debug_fail_on_error) {
@@ -5011,6 +5006,7 @@ VkResult JsonLoader::LoadFile(std::string filename) {
 void JsonLoader::ReadProfileApiVersion() {
     const std::string &profile_name = layer_settings->profile_name;
     const Json::Value &profiles = root_["profiles"];
+    bool found_profile = false;
     for (const auto &profile : profiles.getMemberNames()) {
         if (profile_name.empty() || profile_name == "${VP_DEFAULT}" || profile == profile_name) {
             const std::string version_string = profiles[profile]["api-version"].asCString();
@@ -5020,8 +5016,20 @@ void JsonLoader::ReadProfileApiVersion() {
             uint32_t api_patch = 0;
             std::sscanf(version_string.c_str(), "%d.%d.%d", &api_major, &api_minor, &api_patch);
             profile_api_version_ = VK_MAKE_API_VERSION(0, api_major, api_minor, api_patch);
-
+            found_profile = true;
             break;
+        }
+    }
+    if (!found_profile) {
+        for (const auto &profile : profiles.getMemberNames()) {
+            const std::string version_string = profiles[profile]["api-version"].asCString();
+
+            uint32_t api_major = 0;
+            uint32_t api_minor = 0;
+            uint32_t api_patch = 0;
+            std::sscanf(version_string.c_str(), "%d.%d.%d", &api_major, &api_minor, &api_patch);
+            profile_api_version_ = VK_MAKE_API_VERSION(0, api_major, api_minor, api_patch);
+            break; // Systematically load the first and default profile when the profile is not found
         }
     }
 }
@@ -5053,10 +5061,19 @@ VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
         }
     }
     if (!found_profile) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT,
-            format("\"%s\" profile could not be found in %s file\n", 
-                layer_settings->profile_name.c_str(), layer_settings->profile_file.c_str()));
-        return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
+        for (const auto &profile : profiles.getMemberNames()) {
+            const auto &caps = profiles[profile]["capabilities"];
+
+            for (const auto &cap : caps) {
+                capabilities.push_back(cap.asString());
+            }
+
+            LogMessage(DEBUG_REPORT_WARNING_BIT,
+                format("\"%s\" profile could not be found in \"%s\" file. Loading the default \"%s\" profile of the file.\n",
+                    layer_settings->profile_name.c_str(), layer_settings->profile_file.c_str(), profile.c_str()));
+
+            break; // Systematically load the first and default profile
+        }
     }
 
     if (capabilities.empty()) {
@@ -7616,8 +7633,8 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
 
     const VkApplicationInfo *app_info = pCreateInfo->pApplicationInfo;
     requested_version = (app_info && app_info->apiVersion) ? app_info->apiVersion : VK_API_VERSION_1_0;
-    if (VK_VERSION_MAJOR(requested_version) > VK_VERSION_MAJOR(VK_HEADER_VERSION_COMPLETE) ||
-        VK_VERSION_MINOR(requested_version) > VK_VERSION_MINOR(VK_HEADER_VERSION_COMPLETE)) {
+    if (VK_API_VERSION_MAJOR(requested_version) > VK_API_VERSION_MAJOR(VK_HEADER_VERSION_COMPLETE) ||
+        VK_API_VERSION_MINOR(requested_version) > VK_API_VERSION_MINOR(VK_HEADER_VERSION_COMPLETE)) {
         LogMessage(DEBUG_REPORT_ERROR_BIT,
             ::format("The Vulkan application requested a Vulkan %s instance but the %s was build against %s. Please, update the layer.\n",
                 StringAPIVersion(requested_version).c_str(), kOurLayerName, StringAPIVersion(VK_HEADER_VERSION_COMPLETE).c_str()));
@@ -7629,8 +7646,8 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     bool changed_version = false;
     if (!layer_settings->profile_file.empty()) {
         const uint32_t profile_api_version = json_loader.GetProfileApiVersion();
-        if (VK_VERSION_MAJOR(requested_version) < VK_VERSION_MAJOR(profile_api_version) ||
-            VK_VERSION_MINOR(requested_version) < VK_VERSION_MINOR(profile_api_version)) {
+        if (VK_API_VERSION_MAJOR(requested_version) < VK_API_VERSION_MAJOR(profile_api_version) ||
+            VK_API_VERSION_MINOR(requested_version) < VK_API_VERSION_MINOR(profile_api_version)) {
             if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
                 if (layer_settings->profile_name.empty()) {
                     LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
@@ -7663,7 +7680,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     std::lock_guard<std::recursive_mutex> lock(global_lock);
 
     bool get_physical_device_properties2_active = false;
-    if (VK_VERSION_MINOR(requested_version) > 0) {
+    if (VK_API_VERSION_MINOR(requested_version) > 0) {
         get_physical_device_properties2_active = true;
     } else {
         for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; i++) {
@@ -11141,7 +11158,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_vulkan_1_3_features_);
                 }
 
-                if (VK_VERSION_MINOR(pdd.GetEffectiveVersion())) {
+                if (VK_API_VERSION_MINOR(pdd.GetEffectiveVersion())) {
                     dt->GetPhysicalDeviceProperties2(physical_device, &property_chain);
                     dt->GetPhysicalDeviceFeatures2(physical_device, &feature_chain);
                     dt->GetPhysicalDeviceMemoryProperties2(physical_device, &memory_chain);
@@ -11168,11 +11185,10 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             }
 
             LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
-                       format("Running on \"%s\" with Vulkan %d.%d.%d driver.\n", pdd.physical_device_properties_.deviceName,
-                              VK_VERSION_MAJOR(pdd.physical_device_properties_.apiVersion),
-                              VK_VERSION_MINOR(pdd.physical_device_properties_.apiVersion),
-                              VK_VERSION_PATCH(pdd.physical_device_properties_.apiVersion))
-                           .c_str());
+                format("Running on \"%s\" with Vulkan %d.%d.%d driver.\n", pdd.physical_device_properties_.deviceName,
+                    VK_API_VERSION_MAJOR(pdd.physical_device_properties_.apiVersion),
+                    VK_API_VERSION_MINOR(pdd.physical_device_properties_.apiVersion),
+                    VK_API_VERSION_PATCH(pdd.physical_device_properties_.apiVersion)));
 
             // Override PDD members with values from configuration file(s).
             if (result == VK_SUCCESS) {
