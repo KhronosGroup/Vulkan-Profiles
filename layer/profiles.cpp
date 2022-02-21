@@ -4273,17 +4273,15 @@ static inline std::string StringAPIVersion(uint32_t version) {
     uint32_t major = VK_VERSION_MAJOR(version);
     uint32_t minor = VK_VERSION_MINOR(version);
     uint32_t patch = VK_VERSION_PATCH(version);
-    version_name << major << "." << minor << "." << patch << " (0x" << std::setfill('0') << std::setw(8) << std::hex << version
-                 << ")";
+    version_name << major << "." << minor << "." << patch;
     return version_name.str();
 }
 
 bool JsonLoader::CheckVersionSupport(uint32_t version, const std::string &name) {
     if (pdd_->GetEffectiveVersion() < version) {
         LogMessage(DEBUG_REPORT_ERROR_BIT,
-                   ::format("Profile sets %s which is provided by Vulkan version %s, but the "
-                            "current effective API version is %s.\n",
-                            name.c_str(), StringAPIVersion(version).c_str(), StringAPIVersion(pdd_->GetEffectiveVersion()).c_str()));
+            ::format("Profile sets %s which is provided by Vulkan version %s, but the current effective API version is %s.\n",
+                name.c_str(), StringAPIVersion(version).c_str(), StringAPIVersion(pdd_->GetEffectiveVersion()).c_str()));
         return false;
     }
     return true;
@@ -7614,9 +7612,9 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     layer_settings = new VkProfileLayerSettingsEXT;
 
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "CreateInstance\n");
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, format("JsonCpp version %s\n", JSONCPP_VERSION_STRING));
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, ::format("JsonCpp version %s\n", JSONCPP_VERSION_STRING));
     LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
-               format("%s version %d.%d.%d\n", kOurLayerName, kVersionProfilesMajor, kVersionProfilesMinor, kVersionProfilesPatch));
+        ::format("%s version %d.%d.%d\n", kOurLayerName, kVersionProfilesMajor, kVersionProfilesMinor, kVersionProfilesPatch));
 
     InitSettings(pCreateInfo->pNext);
 
@@ -7628,21 +7626,48 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
 
     const VkApplicationInfo *app_info = pCreateInfo->pApplicationInfo;
     requested_version = (app_info && app_info->apiVersion) ? app_info->apiVersion : VK_API_VERSION_1_0;
-    if (VK_VERSION_MAJOR(requested_version) > 1 || VK_VERSION_MINOR(requested_version) > 3) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, format("%s currently only supports VK_API_VERSION_1_3 and lower.\n", kOurLayerName));
+    if (VK_VERSION_MAJOR(requested_version) > VK_VERSION_MAJOR(VK_HEADER_VERSION_COMPLETE) ||
+        VK_VERSION_MINOR(requested_version) > VK_VERSION_MINOR(VK_HEADER_VERSION_COMPLETE)) {
+        LogMessage(DEBUG_REPORT_ERROR_BIT,
+            ::format("The Vulkan application requested a Vulkan %s instance but the %s was build against %s. Please, update the layer.\n",
+                StringAPIVersion(requested_version).c_str(), kOurLayerName, StringAPIVersion(VK_HEADER_VERSION_COMPLETE).c_str()));
+        if (layer_settings->debug_fail_on_error) {
+            return VK_ERROR_INITIALIZATION_FAILED;
+        }
     }
 
     bool changed_version = false;
-    uint32_t profile_api_version = json_loader.GetProfileApiVersion();
-    if (VK_VERSION_MAJOR(requested_version) < VK_VERSION_MAJOR(profile_api_version) ||
-        VK_VERSION_MINOR(requested_version) < VK_VERSION_MINOR(profile_api_version)) {
-        LogMessage(DEBUG_REPORT_WARNING_BIT,
-                   ::format("The Profiles Layer requires API version %s, but instance is being created "
-                            "with API version %s. The API version will be set to %s.\n",
-                            StringAPIVersion(requested_version).c_str(), StringAPIVersion(profile_api_version).c_str(),
-                            StringAPIVersion(requested_version).c_str()));
-        requested_version = profile_api_version;
-        changed_version = true;
+    if (!layer_settings->profile_file.empty()) {
+        const uint32_t profile_api_version = json_loader.GetProfileApiVersion();
+        if (VK_VERSION_MAJOR(requested_version) < VK_VERSION_MAJOR(profile_api_version) ||
+            VK_VERSION_MINOR(requested_version) < VK_VERSION_MINOR(profile_api_version)) {
+            if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
+                if (layer_settings->profile_name.empty()) {
+                    LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+                        ::format("The Vulkan application requested a Vulkan %s instance but the selected %s file requires %s. The application requested instance version is overridden to %s.\n",
+                            StringAPIVersion(requested_version).c_str(), layer_settings->profile_file.c_str(),
+                            StringAPIVersion(profile_api_version).c_str(), StringAPIVersion(profile_api_version).c_str()));
+                } else {
+                    LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+                        ::format("The Vulkan application requested a Vulkan %s instance but the selected %s profile requires %s. The application requested instance version is overridden to %s.\n",
+                            StringAPIVersion(requested_version).c_str(), layer_settings->profile_name.c_str(),
+                            StringAPIVersion(profile_api_version).c_str(), StringAPIVersion(profile_api_version).c_str()));
+                }
+                requested_version = profile_api_version;
+                changed_version = true;
+            } else {
+                if (layer_settings->profile_name.empty()) {
+                    LogMessage(DEBUG_REPORT_WARNING_BIT,
+                        ::format("The Vulkan application requested a Vulkan %s instance but the selected %s file requires %s. The profile may not be initialized correctly which will produce unexpected warning messages.\n",
+                            StringAPIVersion(requested_version).c_str(), layer_settings->profile_file.c_str(), StringAPIVersion(profile_api_version).c_str()));
+                }
+                else {
+                    LogMessage(DEBUG_REPORT_WARNING_BIT,
+                        ::format("The Vulkan application requested a Vulkan %s instance but the selected %s profile requires %s. The profile may not be initialized correctly which will produce unexpected warning messages.\n",
+                            StringAPIVersion(requested_version).c_str(), layer_settings->profile_name.c_str(), StringAPIVersion(profile_api_version).c_str()));
+                }
+            }
+        }
     }
 
     std::lock_guard<std::recursive_mutex> lock(global_lock);
