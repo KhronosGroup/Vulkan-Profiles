@@ -4970,35 +4970,38 @@ struct JsonValidator {
 };
 
 VkResult JsonLoader::LoadFile(std::string filename) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, format("JsonLoader::LoadFile(\"%s\")\n", filename.c_str()));
+
     profile_filename_ = filename;
     if (filename.empty()) {
         if (!layer_settings->profile_name.empty()) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
-                       format("Profile name is set to \"%s\", but profile_file is unset. The profile will not be loaded.\n",
-                              layer_settings->profile_name.c_str()));
+                format("Profile name is set to \"%s\", but profile_file is unset. The profile will not be loaded.\n",
+                layer_settings->profile_name.c_str()));
         }
         return VK_SUCCESS;
     }
     std::ifstream json_file(filename);
     if (!json_file) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, format("JsonLoader failed to open file \"%s\"\n", filename.c_str()));
+        LogMessage(DEBUG_REPORT_ERROR_BIT, 
+            format("Fail to open file \"%s\"\n", filename.c_str()));
         return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
-
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, format("JsonLoader::LoadFile(\"%s\")\n", filename.c_str()));
 
     Json::Value root = Json::nullValue;
     Json::CharReaderBuilder builder;
     std::string errs;
     bool success = Json::parseFromStream(builder, json_file, &root_, &errs);
     if (!success) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, format("Json::parseFromStream failed {\n%s}\n", errs.c_str()));
+        LogMessage(DEBUG_REPORT_ERROR_BIT,
+            format("Fail to parse file \"%s\" {\n%s}\n", filename.c_str() , errs.c_str()));
         return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
     json_file.close();
 
     if (root_.type() != Json::objectValue) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, format("Json document root is not an object in file \"%s\"\n", filename.c_str()));
+        LogMessage(DEBUG_REPORT_ERROR_BIT, 
+            format("Json document root is not an object in file \"%s\"\n", filename.c_str()));
         return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
@@ -5046,6 +5049,8 @@ VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
     const std::string &profile_name = layer_settings->profile_name;
     const Json::Value &profiles = root_["profiles"];
     std::vector<std::string> capabilities;
+
+    bool found_profile = false;
     for (const auto &profile : profiles.getMemberNames()) {
         if (profile_name.empty() || profile_name == "${VP_DEFAULT}" || profile == profile_name) {
             const auto &caps = profiles[profile]["capabilities"];
@@ -5054,9 +5059,16 @@ VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
                 capabilities.push_back(cap.asString());
             }
 
+            found_profile = true;
             LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, format("Overriding device capbilities with \"%s\" profile capabilities\n", profile.c_str()).c_str());
             break;  // load a single profile
         }
+    }
+    if (!found_profile) {
+        LogMessage(DEBUG_REPORT_ERROR_BIT,
+            format("\"%s\" profile could not be found in %s file\n", 
+                layer_settings->profile_name.c_str(), layer_settings->profile_file.c_str()));
+        return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
     if (capabilities.empty()) {
