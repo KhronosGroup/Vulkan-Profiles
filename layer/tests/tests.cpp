@@ -115,7 +115,7 @@ TEST(layer, TestSetCombinationMode) {
         VkProfileLayerSettingsEXT settings;
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api.json";
         settings.emulate_portability = true;
-        settings.profile_name = "VP_LUNARG_test_api_1_2_198";
+        settings.profile_name = "VP_LUNARG_test_api";
         settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT;
 
         err = inst_builder.makeInstance(&settings);
@@ -140,14 +140,7 @@ TEST(layer, TestSetCombinationMode) {
             std::vector<VkExtensionProperties> extensions(count);
             vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, extensions.data());
 
-            size_t portability_subset_add = 1;
-            for (const auto& ext : device_extensions) {
-                if (strcmp(ext.extensionName, "VK_KHR_portability_subset") == 0) {
-                    portability_subset_add = 0;
-                    break;
-                }
-            }
-            ASSERT_EQ(device_extensions.size() + portability_subset_add, extensions.size());
+            ASSERT_EQ(268, extensions.size()); // Number of extensions in "VP_LUNARG_test_api.json"
         }
 
         vkDestroyInstance(test_inst, nullptr);
