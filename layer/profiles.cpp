@@ -5024,16 +5024,6 @@ void JsonLoader::ReadProfileApiVersion() {
             break;
         }
     }
-
-    /*if (VK_VERSION_MINOR(this->profile_api_version_) > VK_VERSION_MINOR(requested_version)) {
-        LogMessage(DEBUG_REPORT_WARNING_BIT,
-                   format("The application requested a Vulkan 1.%d instance however the selected profile requires Vulkan 1.%d. "
-                          "Some profile capabilities might not be applied, we recommend changing the Vulkan application to request "
-                          "a Vulkan 1.%d instance.\n",
-                          VK_VERSION_MINOR(requested_version), VK_VERSION_MINOR(this->profile_api_version_),
-                          VK_VERSION_MINOR(this->profile_api_version_))
-                       .c_str());
-    }*/
 }
 
 VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
