@@ -7679,9 +7679,9 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     }
 
     if (!get_physical_device_properties2_active) {
-        LogMessage(DEBUG_REPORT_WARNING_BIT, ::format("The Profiles Layer requires the %s extension, but it was not included in "
-                                                      "VkInstanceCreateInfo::ppEnabledExtensionNames, adding the extension.\n",
-                                                      VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME));
+        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, 
+            ::format("The Profiles Layer requires the %s extension, but it was not included in VkInstanceCreateInfo::ppEnabledExtensionNames, adding the extension.\n",
+                VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME));
     }
 
     // Add VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
