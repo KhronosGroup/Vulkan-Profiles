@@ -1382,7 +1382,7 @@ class VulkanRegistry():
 
     def parseVersionInfo(self, xml):
         self.versions = dict()
-        for feature in xml.findall('./feature'):
+        for feature in xml.findall("./feature[@api='vulkan']"):
             if re.search(r"^[1-9][0-9]*\.[0-9]+$", feature.get('number')):
                 self.versions[feature.get('name')] = VulkanVersion(feature)
             else:
@@ -1391,22 +1391,20 @@ class VulkanRegistry():
 
     def parseExtensionInfo(self, xml):
         self.extensions = dict()
-        for ext in xml.findall("./extensions/extension"):
-            # Only care about enabled extensions
-            if ext.get('supported') == "vulkan":
-                name = ext.get('name')
+        for ext in xml.findall("./extensions/extension[@supported='vulkan']"):
+            name = ext.get('name')
 
-                # Find name enum (due to inconsistencies in lower case and upper case names this is non-trivial)
-                foundNameEnum = False
-                matches = ext.findall("./require/enum[@value='\"" + name + "\"']")
-                for match in matches:
-                    if match.get('name').endswith("_EXTENSION_NAME"):
-                        # Add extension definition
-                        self.extensions[name] = VulkanExtension(ext, match.get('name')[:-len("_EXTENSION_NAME")])
-                        foundNameEnum = True
-                        break
-                if not foundNameEnum:
-                    Log.f("Cannot find name enum for extension '{0}'".format(name))
+            # Find name enum (due to inconsistencies in lower case and upper case names this is non-trivial)
+            foundNameEnum = False
+            matches = ext.findall("./require/enum[@value='\"" + name + "\"']")
+            for match in matches:
+                if match.get('name').endswith("_EXTENSION_NAME"):
+                    # Add extension definition
+                    self.extensions[name] = VulkanExtension(ext, match.get('name')[:-len("_EXTENSION_NAME")])
+                    foundNameEnum = True
+                    break
+            if not foundNameEnum:
+                Log.f("Cannot find name enum for extension '{0}'".format(name))
 
 
     def parseStructInfo(self, xml):
@@ -1481,14 +1479,14 @@ class VulkanRegistry():
 
     def parsePrerequisites(self, xml):
         # Check features (i.e. API versions)
-        for feature in xml.findall('./feature'):
+        for feature in xml.findall("./feature[@api='vulkan']"):
             for requireType in feature.findall('./require/type'):
                 # Add feature as the source of the definition of a struct
                 if requireType.get('name') in self.structs:
                     self.structs[requireType.get('name')].definedByVersion = VulkanVersionNumber(feature.get('number'))
 
         # Check extensions
-        for extension in xml.findall('./extensions/extension'):
+        for extension in xml.findall("./extensions/extension[@supported='vulkan']"):
             for requireType in extension.findall('./require/type'):
                 # Add extension as the source of the definition of a struct
                 if requireType.get('name') in self.structs:
@@ -1510,7 +1508,10 @@ class VulkanRegistry():
                         enumDef.values.append(value.get('name'))
 
             # Then find extension values
-            for value in xml.findall(".//enum[@extends='" + enumDef.name + "']"):
+            for value in xml.findall(".//feature[@api='vulkan']/require/enum[@extends='" + enumDef.name + "']"):
+                if value.get('alias') is None:
+                    enumDef.values.append(value.get('name'))
+            for value in xml.findall(".//extension[@supported='vulkan']/require/enum[@extends='" + enumDef.name + "']"):
                 if value.get('alias') is None:
                     enumDef.values.append(value.get('name'))
 
@@ -1633,7 +1634,7 @@ class VulkanRegistry():
                     alias = aliasValue.get('alias')
                     enumDef.values.append(name)
                     enumDef.aliasValues[name] = alias
-        for aliasValue in xml.findall("./extensions/extension/require/enum[@alias]"):
+        for aliasValue in xml.findall("./extensions/extension[@supported='vulkan']/require/enum[@alias]"):
             if aliasValue.get('extends'):
                 enumDef = self.enums[aliasValue.get('extends')]
                 name = aliasValue.get('name')
@@ -1692,7 +1693,7 @@ class VulkanRegistry():
             else:
                 # For all other versions use the feature structures required by it
                 featureStructNames = []
-                xmlVersion = xml.find("./feature[@name='" + version.name + "']")
+                xmlVersion = xml.find("./feature[@api='vulkan'][@name='" + version.name + "']")
                 for type in xmlVersion.findall("./require/type"):
                     name = type.get('name')
                     if name in self.structs and 'VkPhysicalDeviceFeatures2' in self.structs[name].extends:
@@ -1714,7 +1715,7 @@ class VulkanRegistry():
         # Then parse features specific to extensions
         for extension in self.extensions.values():
             featureStructNames = []
-            xmlExtension = xml.find("./extensions/extension[@name='" + extension.name + "']")
+            xmlExtension = xml.find("./extensions/extension[@supported='vulkan'][@name='" + extension.name + "']")
             for type in xmlExtension.findall("./require/type"):
                 name = type.get('name')
                 if name in self.structs and 'VkPhysicalDeviceFeatures2' in self.structs[name].extends:
@@ -1747,7 +1748,7 @@ class VulkanRegistry():
             else:
                 # For all other versions use the property structures required by it
                 limitStructNames = []
-                xmlVersion = xml.find("./feature[@name='" + version.name + "']")
+                xmlVersion = xml.find("./feature[@api='vulkan'][@name='" + version.name + "']")
                 for type in xmlVersion.findall("./require/type"):
                     name = type.get('name')
                     if name in self.structs and 'VkPhysicalDeviceProperties2' in self.structs[name].extends:
@@ -1769,7 +1770,7 @@ class VulkanRegistry():
         # Then parse properties/limits specific to extensions
         for extension in self.extensions.values():
             limitStructNames = []
-            xmlExtension = xml.find("./extensions/extension[@name='" + extension.name + "']")
+            xmlExtension = xml.find("./extensions/extension[@supported='vulkan'][@name='" + extension.name + "']")
             for type in xmlExtension.findall("./require/type"):
                 name = type.get('name')
                 if name in self.structs and 'VkPhysicalDeviceProperties2' in self.structs[name].extends:

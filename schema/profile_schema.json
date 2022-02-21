@@ -4027,10 +4027,6 @@
                 "VK_FORMAT_FEATURE_2_LINEAR_COLOR_ATTACHMENT_BIT_NV",
                 "VK_FORMAT_FEATURE_2_MIDPOINT_CHROMA_SAMPLES_BIT",
                 "VK_FORMAT_FEATURE_2_MIDPOINT_CHROMA_SAMPLES_BIT_KHR",
-                "VK_FORMAT_FEATURE_2_RESERVED_34_BIT_QCOM",
-                "VK_FORMAT_FEATURE_2_RESERVED_35_BIT_QCOM",
-                "VK_FORMAT_FEATURE_2_RESERVED_36_BIT_QCOM",
-                "VK_FORMAT_FEATURE_2_RESERVED_37_BIT_QCOM",
                 "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT",
                 "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT_KHR",
                 "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT",
@@ -4249,7 +4245,6 @@
                 "VK_QUEUE_COMPUTE_BIT",
                 "VK_QUEUE_GRAPHICS_BIT",
                 "VK_QUEUE_PROTECTED_BIT",
-                "VK_QUEUE_RESERVED_7_BIT_QCOM",
                 "VK_QUEUE_SPARSE_BINDING_BIT",
                 "VK_QUEUE_TRANSFER_BIT",
                 "VK_QUEUE_VIDEO_DECODE_BIT_KHR",
@@ -4338,7 +4333,6 @@
                 "VK_PIPELINE_STAGE_2_PRE_RASTERIZATION_SHADERS_BIT_KHR",
                 "VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR",
                 "VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_NV",
-                "VK_PIPELINE_STAGE_2_RESERVED_387_BIT_KHR",
                 "VK_PIPELINE_STAGE_2_RESOLVE_BIT",
                 "VK_PIPELINE_STAGE_2_RESOLVE_BIT_KHR",
                 "VK_PIPELINE_STAGE_2_SHADING_RATE_IMAGE_BIT_NV",
@@ -6139,24 +6133,6 @@
                             "VK_FORMAT_ASTC_12x12_UNORM_BLOCK": {
                                 "$ref": "#/definitions/formatProperties"
                             },
-                            "VK_FORMAT_ASTC_3x3x3_SFLOAT_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_3x3x3_SRGB_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_3x3x3_UNORM_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_4x3x3_SFLOAT_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_4x3x3_SRGB_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_4x3x3_UNORM_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
                             "VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK": {
                                 "$ref": "#/definitions/formatProperties"
                             },
@@ -6167,24 +6143,6 @@
                                 "$ref": "#/definitions/formatProperties"
                             },
                             "VK_FORMAT_ASTC_4x4_UNORM_BLOCK": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_4x4x3_SFLOAT_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_4x4x3_SRGB_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_4x4x3_UNORM_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_4x4x4_SFLOAT_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_4x4x4_SRGB_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_4x4x4_UNORM_BLOCK_EXT": {
                                 "$ref": "#/definitions/formatProperties"
                             },
                             "VK_FORMAT_ASTC_5x4_SFLOAT_BLOCK": {
@@ -6199,15 +6157,6 @@
                             "VK_FORMAT_ASTC_5x4_UNORM_BLOCK": {
                                 "$ref": "#/definitions/formatProperties"
                             },
-                            "VK_FORMAT_ASTC_5x4x4_SFLOAT_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_5x4x4_SRGB_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_5x4x4_UNORM_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
                             "VK_FORMAT_ASTC_5x5_SFLOAT_BLOCK": {
                                 "$ref": "#/definitions/formatProperties"
                             },
@@ -6218,24 +6167,6 @@
                                 "$ref": "#/definitions/formatProperties"
                             },
                             "VK_FORMAT_ASTC_5x5_UNORM_BLOCK": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_5x5x4_SFLOAT_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_5x5x4_SRGB_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_5x5x4_UNORM_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_5x5x5_SFLOAT_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_5x5x5_SRGB_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_5x5x5_UNORM_BLOCK_EXT": {
                                 "$ref": "#/definitions/formatProperties"
                             },
                             "VK_FORMAT_ASTC_6x5_SFLOAT_BLOCK": {
@@ -6250,15 +6181,6 @@
                             "VK_FORMAT_ASTC_6x5_UNORM_BLOCK": {
                                 "$ref": "#/definitions/formatProperties"
                             },
-                            "VK_FORMAT_ASTC_6x5x5_SFLOAT_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_6x5x5_SRGB_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_6x5x5_UNORM_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
                             "VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK": {
                                 "$ref": "#/definitions/formatProperties"
                             },
@@ -6269,24 +6191,6 @@
                                 "$ref": "#/definitions/formatProperties"
                             },
                             "VK_FORMAT_ASTC_6x6_UNORM_BLOCK": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_6x6x5_SFLOAT_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_6x6x5_SRGB_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_6x6x5_UNORM_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_6x6x6_SFLOAT_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_6x6x6_SRGB_BLOCK_EXT": {
-                                "$ref": "#/definitions/formatProperties"
-                            },
-                            "VK_FORMAT_ASTC_6x6x6_UNORM_BLOCK_EXT": {
                                 "$ref": "#/definitions/formatProperties"
                             },
                             "VK_FORMAT_ASTC_8x5_SFLOAT_BLOCK": {
