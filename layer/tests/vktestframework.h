@@ -43,9 +43,16 @@ class VkTestFramework : public ::testing::Test {
 
   protected:
     VkTestFramework();
-    virtual ~VkTestFramework() = 0;
+    ~VkTestFramework() = 0;
 
-  private:
+    // Per-test-suite set-up.
+    // Called before the first test in this test suite.
+    static void SetUpTestSuite();
+
+    // Per-test-suite tear-down.
+    // Called after the last test in this test suite.
+    static void TearDownTestSuite();
+
 };
 
 #endif  // VKTESTFRAMEWORK_H

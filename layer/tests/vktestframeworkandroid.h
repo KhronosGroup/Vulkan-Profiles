@@ -35,6 +35,14 @@ class VkTestFramework : public ::testing::Test {
     ~VkTestFramework();
 
     static ANativeWindow *window;
+
+    // Per-test-suite set-up.
+    // Called before the first test in this test suite.
+    static void SetUpTestSuite();
+
+    // Per-test-suite tear-down.
+    // Called after the last test in this test suite.
+    static void TearDownTestSuite();
 };
 
 #endif

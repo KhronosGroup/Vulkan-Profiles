@@ -33,9 +33,27 @@ static const char* CONFIG_PATH = "bin/Release";
 static const char* CONFIG_PATH = "lib";
 #endif
 
+static VkInstance instance;
+static VkPhysicalDevice gpu;
+static profiles_test::VulkanInstanceBuilder inst_builder;
+
 class layer_promoted : public VkTestFramework {
   public:
-    layer_promoted()  {
+    layer_promoted(){};
+    ~layer_promoted(){};
+
+    bool IsVersionSupported(uint32_t api_version) {
+        VkPhysicalDeviceProperties2 gpu_props{};
+        gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+        if (gpu_props.properties.apiVersion < api_version) {
+            printf("Profile not supported on device, skipping test.\n");
+            return false;
+        }
+        return true;
+    }
+
+    static void SetUpTestSuite() {
         VkResult err = VK_SUCCESS;
 
         const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -52,33 +70,19 @@ class layer_promoted : public VkTestFramework {
 
         err = inst_builder.makeInstance(&settings);
 
-        this->instance = inst_builder.getInstance();
+        instance = inst_builder.getInstance();
 
-        err = inst_builder.getPhysicalDevice(&this->gpu);
+        err = inst_builder.getPhysicalDevice(&gpu);
         EXPECT_TRUE(gpu);
-    }
+    };
 
-    bool IsVersionSupported(uint32_t api_version) {
-        VkPhysicalDeviceProperties2 gpu_props{};
-        gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-        vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
-        if (gpu_props.properties.apiVersion < api_version) {
-            printf("Profile not supported on device, skipping test.\n");
-            return false;
+    static void TearDownTestSuite() {
+        if (instance != VK_NULL_HANDLE) {
+            vkDestroyInstance(instance, nullptr);
+            instance = VK_NULL_HANDLE;
         }
-        return true;
-    }
 
-    ~layer_promoted() {
-        if (this->instance != VK_NULL_HANDLE) {
-            vkDestroyInstance(this->instance, nullptr);
-            this->instance = VK_NULL_HANDLE;
-        }
-    }
-
-    VkInstance instance;
-    VkPhysicalDevice gpu;
-    profiles_test::VulkanInstanceBuilder inst_builder;    
+    };
 };
 
 TEST_F(layer_promoted, TestVulkan11Properties) {

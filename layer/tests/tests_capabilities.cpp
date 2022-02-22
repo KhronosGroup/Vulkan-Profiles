@@ -33,10 +33,17 @@ static const char* CONFIG_PATH = "bin/Release";
 static const char* CONFIG_PATH = "lib";
 #endif
 
+static VkInstance instance;
+static VkPhysicalDevice gpu;
+static profiles_test::VulkanInstanceBuilder inst_builder;
+
 
 class profiles : public VkTestFramework {
   public:
-    profiles() {
+    profiles(){};
+    ~profiles(){};
+
+    static void SetUpTestSuite() {
         VkResult err = VK_SUCCESS;
 
         const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -52,22 +59,19 @@ class profiles : public VkTestFramework {
 
         err = inst_builder.makeInstance(&settings);
 
-        this->instance = inst_builder.getInstance();
+        instance = inst_builder.getInstance();
 
-        err = inst_builder.getPhysicalDevice(&this->gpu);
+        err = inst_builder.getPhysicalDevice(&gpu);
 
-    }
+    };
 
-    ~profiles() {
-        if (this->instance != VK_NULL_HANDLE) {
-            vkDestroyInstance(this->instance, nullptr);
-            this->instance = VK_NULL_HANDLE;
+    static void TearDownTestSuite() {
+        if (instance != VK_NULL_HANDLE) {
+            vkDestroyInstance(instance, nullptr);
+            instance = VK_NULL_HANDLE;
         }
-    }
+    };
 
-    VkInstance instance;
-    VkPhysicalDevice gpu;
-    profiles_test::VulkanInstanceBuilder inst_builder;
 };
 
 TEST_F(profiles, TestPhysicalDeviceProperties) {
