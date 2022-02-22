@@ -3425,7 +3425,8 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &feat
         auto support = CheckExtensionSupport(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_buffer_device_address_features_);
-    } else if (feature_name == "VkPhysicalDeviceBufferDeviceAddressFeaturesEXT") {
+    } else if (feature_name == "VkPhysicalDeviceBufferDeviceAddressFeaturesEXT" ||
+               feature_name == "VkPhysicalDeviceBufferAddressFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_buffer_device_address_features_);
@@ -3840,7 +3841,7 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &feat
         auto support = CheckExtensionSupport(VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_inherited_viewport_scissor_features_);
-    } // Blocks nested too deeply, need to break
+    }  // Blocks nested too deeply, need to break
     if (feature_name == "VkPhysicalDeviceMeshShaderFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_MESH_SHADER_EXTENSION_NAME, feature_name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
