@@ -2025,7 +2025,8 @@ class VulkanProfileStructs():
             if name in [ 'VkFormatProperties', 'VkFormatProperties2KHR', 'VkFormatProperties3KHR' ]:
                 # Special case, add all as VkFormatProperties2KHR and VkFormatProperties3KHR
                 self.format.append(registry.structs['VkFormatProperties2KHR'])
-                self.format.append(registry.structs['VkFormatProperties3KHR'])
+                if 'VkFormatProperties3KHR' in registry.structs:
+                    self.format.append(registry.structs['VkFormatProperties3KHR'])
             else:
                 self.format.append(registry.getChainableStructDef(name, 'VkFormatProperties2'))
         self.eliminateAliases(self.format)
