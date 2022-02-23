@@ -16,6 +16,7 @@
  *
  * Author: Ziga Markus <ziga@lunarg.com>
  * Author: Christophe Riccio <christophe@lunarg.com>
+ * Author: Mark Lobodzinski <mark@lunarg.com>
  */
 
 #include <vulkan/vulkan_core.h>
@@ -33,11 +34,24 @@ static const char* CONFIG_PATH = "bin/Release";
 static const char* CONFIG_PATH = "lib";
 #endif
 
-TEST(layer, TestSetCombinationMode) {
-    VkResult err = VK_SUCCESS;
 
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+class LayerTests : public VkTestFramework {
+  public:
+   LayerTests(){};
+   ~LayerTests(){};
+
+    static void SetUpTestSuite() {
+        const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+        profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+    }
+
+    static void TearDownTestSuite(){};
+};
+
+
+
+TEST_F(LayerTests, TestSetCombinationMode) {
+    VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -187,11 +201,8 @@ TEST(layer, TestSetCombinationMode) {
 
 }
 
-TEST(layer, TestExtensionNotSupported) {
+TEST_F(LayerTests, TestExtensionNotSupported) {
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -242,11 +253,8 @@ TEST(layer, TestExtensionNotSupported) {
     }
 }
 
-TEST(layer, TestExcludingDeviceExtensions) {
+TEST_F(LayerTests, TestExcludingDeviceExtensions) {
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -307,11 +315,8 @@ TEST(layer, TestExcludingDeviceExtensions) {
     ASSERT_FALSE(maintenance4);
 }
 
-TEST(layer, TestExcludingFormats) {
+TEST_F(LayerTests, TestExcludingFormats) {
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -344,11 +349,8 @@ TEST(layer, TestExcludingFormats) {
     ASSERT_EQ(format_properties.bufferFeatures, 0);
 }
 
-TEST(layer, TestMissingPhysDevProps2) {
+TEST_F(LayerTests, TestMissingPhysDevProps2) {
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -372,11 +374,8 @@ TEST(layer, TestMissingPhysDevProps2) {
     ASSERT_EQ(count, 19);
 }
 
-TEST(layer, TestNotSettingProfileFile) {
+TEST_F(LayerTests, TestNotSettingProfileFile) {
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -403,9 +402,6 @@ TEST(layer, TestNotSettingProfileFile) {
         inst_builder.reset();
     }
     {
-        const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-        profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
-
         profiles_test::VulkanInstanceBuilder inst_builder;
 
         inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
@@ -430,12 +426,9 @@ TEST(layer, TestNotSettingProfileFile) {
     }
 }
 
-TEST(layer, TestExcludedExtensions) {
+TEST_F(LayerTests, TestExcludedExtensions) {
 #ifdef VK_EXT_shader_atomic_float2
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -509,11 +502,8 @@ TEST(layer, TestExcludedExtensions) {
 #endif
 }
 
-TEST(layer, TestQueueFamilyProperties) {
+TEST_F(LayerTests, TestQueueFamilyProperties) {
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -556,11 +546,8 @@ TEST(layer, TestQueueFamilyProperties) {
     ASSERT_EQ(qf_props[1].minImageTransferGranularity.depth, 64);
 }
 
-TEST(layer, TestQueueFamilyPropertiesGlobalPriorityProperties) {
+TEST_F(LayerTests, TestQueueFamilyPropertiesGlobalPriorityProperties) {
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -597,11 +584,8 @@ TEST(layer, TestQueueFamilyPropertiesGlobalPriorityProperties) {
     ASSERT_EQ(qfgp.priorities[3], VK_QUEUE_GLOBAL_PRIORITY_REALTIME_EXT);
 }
 
-TEST(layer, TestQueueFamilyCheckpointProperties) {
+TEST_F(LayerTests, TestQueueFamilyCheckpointProperties) {
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -634,11 +618,8 @@ TEST(layer, TestQueueFamilyCheckpointProperties) {
     ASSERT_EQ(checkpoint.checkpointExecutionStageMask, VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_HOST_BIT);
 }
 
-TEST(layer, TestQueueFamilyCheckpointProperties2) {
+TEST_F(LayerTests, TestQueueFamilyCheckpointProperties2) {
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -673,11 +654,8 @@ TEST(layer, TestQueueFamilyCheckpointProperties2) {
                                                            VK_PIPELINE_STAGE_2_INVOCATION_MASK_BIT_HUAWEI);
 }
 
-TEST(layer, TestQueueFamilyPropertiesPartial) {
+TEST_F(LayerTests, TestQueueFamilyPropertiesPartial) {
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
