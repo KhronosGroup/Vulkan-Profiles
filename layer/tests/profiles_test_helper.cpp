@@ -16,13 +16,17 @@
  *
  * Authors:
  * - Jeremy Kniager <jeremyk@lunarg.com>
+ * - Mark Lobodzinski <mark@lunarg.com>
  */
 
 #include <sstream>
 #include <stdlib.h>
+#include <cctype>
 
 #ifdef _WIN32
 #include <Windows.h>
+#elif ANDROID
+#include <android/log.h>
 #endif
 
 #include "profiles_test_helper.h"
