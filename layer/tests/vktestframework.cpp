@@ -1,0 +1,50 @@
+/*
+ * Copyright (c) 2015-2022 The Khronos Group Inc.
+ * Copyright (c) 2015-2022 Valve Corporation
+ * Copyright (c) 2015-2022 LunarG, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Author: Chia-I Wu <olvaffe@gmail.com>
+ * Author: Courtney Goeltzenleuchter <courtney@LunarG.com>
+ * Author: Tony Barbour <tony@LunarG.com>
+ * Author: Mark Lobodzinski <mark@LunarG.com>
+ */
+
+#include "vktestframework.h"
+
+
+#if defined(PATH_MAX) && !defined(MAX_PATH)
+#define MAX_PATH PATH_MAX
+#endif
+
+#ifdef _WIN32
+#define ERR_EXIT(err_msg, err_class)                 \
+    do {                                             \
+        MessageBox(NULL, err_msg, err_class, MB_OK); \
+        exit(1);                                     \
+    } while (0)
+#else  // _WIN32
+
+#define ERR_EXIT(err_msg, err_class) \
+    do {                             \
+        printf(err_msg);             \
+        fflush(stdout);              \
+        exit(1);                     \
+    } while (0)
+#endif  // _WIN32
+
+VkTestFramework::VkTestFramework() {}
+VkTestFramework::~VkTestFramework() {}
+
+
