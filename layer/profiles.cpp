@@ -1973,22 +1973,35 @@ PhysicalDeviceData::Map PhysicalDeviceData::map_;
 
 class JsonLoader {
    public:
-    JsonLoader(VkInstance instance) : instance_(instance), pdd_(nullptr), profile_api_version_(0), root_(Json::nullValue) {}
+    JsonLoader() : pdd_(nullptr), profile_filename_(), root_(Json::nullValue), profile_api_version_(0), excluded_extensions_() {}
     JsonLoader(const JsonLoader &) = delete;
-    JsonLoader &operator=(const JsonLoader &) = delete;
+    JsonLoader &operator=(const JsonLoader &rhs) {
+        if (this == &rhs) {
+            return *this;
+        }
+        pdd_ = rhs.pdd_;
+        profile_filename_ = rhs.profile_filename_;
+        root_ = rhs.root_;
+        profile_api_version_ = rhs.profile_api_version_;
+        excluded_extensions_ = rhs.excluded_extensions_;
 
-    static JsonLoader &Create(VkInstance instance) {
-        assert(instance != VK_NULL_HANDLE);
-        assert(!Find(instance));  // Verify this instance does not already exist.
+        return *this;
+    }
 
-        LogMessage(DEBUG_REPORT_DEBUG_BIT, "PhysicalDeviceData::Create()\n");
+    static JsonLoader &Create() {
+        LogMessage(DEBUG_REPORT_DEBUG_BIT, "JsonLoader::Create()\n");
 
-        const auto result = profile_map_.emplace(instance, instance);
+        VkInstance temporary = VK_NULL_HANDLE;
+        const auto result = profile_map_.emplace(std::piecewise_construct, std::make_tuple(temporary), std::make_tuple());
         assert(result.second);  // true=insertion, false=replacement
         auto iter = result.first;
         JsonLoader *profile = &iter->second;
-        assert(Find(instance) == profile);  // Verify we get the same instance we just inserted.
         return *profile;
+    }
+
+    static void Store(VkInstance instance) {
+        profile_map_[instance] = profile_map_[VK_NULL_HANDLE];
+        profile_map_.erase(VK_NULL_HANDLE);
     }
 
     static JsonLoader *Find(VkInstance instance) {
@@ -2008,14 +2021,13 @@ class JsonLoader {
     uint32_t GetProfileApiVersion() const { return profile_api_version_; }
 
    private:
-    VkInstance instance_;
     PhysicalDeviceData *pdd_;
 
     std::string profile_filename_;
     Json::Value root_;
 
     std::uint32_t profile_api_version_;
-    std::vector<std::string> excluded_extensions;
+    std::vector<std::string> excluded_extensions_;
 
     struct Extension {
         std::string name;
@@ -4289,7 +4301,7 @@ bool JsonLoader::CheckVersionSupport(uint32_t version, const std::string &name) 
 }
 
 JsonLoader::ExtensionSupport JsonLoader::CheckExtensionSupport(const char *extension, const std::string &name) {
-    for (const auto &ext : excluded_extensions) {
+    for (const auto &ext : excluded_extensions_) {
         if (ext == extension) {
             LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
                        ::format("Profile requires %s capabilities, but %s is excluded, device values are used.\n", name.c_str(),
@@ -5040,7 +5052,7 @@ VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
     for (std::size_t j = 0, m = layer_settings->exclude_device_extensions.size(); j < m; ++j) {
         const auto &extension = layer_settings->exclude_device_extensions[j];
         if (extension.empty()) continue;
-        excluded_extensions.push_back(extension);
+        excluded_extensions_.push_back(extension);
     }
 
     const std::string &profile_name = layer_settings->profile_name;
@@ -7610,6 +7622,7 @@ static VkResult LayerSetupCreateInstance(const VkInstanceCreateInfo *pCreateInfo
     VkResult result = fp_create_instance(pCreateInfo, pAllocator, pInstance);
     if (result == VK_SUCCESS) {
         initInstanceTable(*pInstance, fp_get_instance_proc_addr);
+        JsonLoader::Store(*pInstance);
     }
     return result;
 }
@@ -7626,7 +7639,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
 
     InitSettings(pCreateInfo->pNext);
 
-    JsonLoader &json_loader = JsonLoader::Create(*pInstance);
+    JsonLoader &json_loader = JsonLoader::Create();
     VkResult result = json_loader.LoadFile(layer_settings->profile_file);
     if (result != VK_SUCCESS) {
         return result;
