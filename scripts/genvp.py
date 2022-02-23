@@ -1706,11 +1706,12 @@ class VulkanRegistry():
                     featureStructNames.remove('VkPhysicalDeviceVulkan11Features')
                 # For each feature collect all feature structures containing them, and their aliases
                 for featureStructName in featureStructNames:
-                    structDef = self.structs[featureStructName]
-                    for memberName in structDef.members.keys():
-                        if not memberName in version.features:
-                            version.features[memberName] = VulkanFeature(memberName)
-                        version.features[memberName].structs.update(structDef.aliases)
+                    if (featureStructName in self.structs):
+                        structDef = self.structs[featureStructName]
+                        for memberName in structDef.members.keys():
+                            if not memberName in version.features:
+                                version.features[memberName] = VulkanFeature(memberName)
+                            version.features[memberName].structs.update(structDef.aliases)
 
         # Then parse features specific to extensions
         for extension in self.extensions.values():
@@ -1761,11 +1762,12 @@ class VulkanRegistry():
                     limitStructNames.remove('VkPhysicalDeviceVulkan11Properties')
             # For each limit collect all property/limit structures containing them, and their aliases
             for limitStructName in limitStructNames:
-                structDef = self.structs[limitStructName]
-                for memberName in structDef.members.keys():
-                    if not memberName in version.limits:
-                        version.limits[memberName] = VulkanLimit(memberName)
-                    version.limits[memberName].structs.update(structDef.aliases)
+                if (limitStructName in self.structs):
+                    structDef = self.structs[limitStructName]
+                    for memberName in structDef.members.keys():
+                        if not memberName in version.limits:
+                            version.limits[memberName] = VulkanLimit(memberName)
+                        version.limits[memberName].structs.update(structDef.aliases)
 
         # Then parse properties/limits specific to extensions
         for extension in self.extensions.values():
@@ -1819,7 +1821,8 @@ class VulkanRegistry():
         self.structs['VkPhysicalDeviceLimits'].members['maxColorAttachments'].limittype = 'max' # vk.xml declares this with 'bitmask' limittype for some reason
         self.structs['VkPhysicalDeviceLimits'].members['pointSizeGranularity'].limittype = 'min' # should be maxmul
         self.structs['VkPhysicalDeviceLimits'].members['lineWidthGranularity'].limittype = 'min' # should be maxmul
-        self.structs['VkPhysicalDeviceVulkan11Properties'].members['subgroupSize'].limittype = 'max'
+        if 'VkPhysicalDeviceVulkan11Properties' in self.structs:
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['subgroupSize'].limittype = 'max'
         if 'VkPhysicalDevicePortabilitySubsetPropertiesKHR' in self.structs:
             self.structs['VkPhysicalDevicePortabilitySubsetPropertiesKHR'].members['minVertexInputBindingStrideAlignment'].limittype = 'min' # should be maxalign
 
