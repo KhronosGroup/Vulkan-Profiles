@@ -1820,7 +1820,8 @@ class VulkanRegistry():
         self.structs['VkPhysicalDeviceLimits'].members['pointSizeGranularity'].limittype = 'min' # should be maxmul
         self.structs['VkPhysicalDeviceLimits'].members['lineWidthGranularity'].limittype = 'min' # should be maxmul
         self.structs['VkPhysicalDeviceVulkan11Properties'].members['subgroupSize'].limittype = 'max'
-        self.structs['VkPhysicalDevicePortabilitySubsetPropertiesKHR'].members['minVertexInputBindingStrideAlignment'].limittype = 'min' # should be maxalign
+        if 'VkPhysicalDevicePortabilitySubsetPropertiesKHR' in self.structs:
+            self.structs['VkPhysicalDevicePortabilitySubsetPropertiesKHR'].members['minVertexInputBindingStrideAlignment'].limittype = 'min' # should be maxalign
 
         # TODO: There are also some bugs in the vk.xml, like parameters having "bitmask" limittype but actually VkBool32 type
         # This is non-sense, so we patch them
