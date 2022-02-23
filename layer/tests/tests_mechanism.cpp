@@ -16,6 +16,7 @@
  *
  * Author: Ziga Markus <ziga@lunarg.com>
  * Author: Christophe Riccio <christophe@lunarg.com>
+ * Author: Mark Lobodzinski <mark@lunarg.com>
  */
 
 #include <vulkan/vulkan_core.h>
@@ -33,11 +34,23 @@ static const char* CONFIG_PATH = "bin/Release";
 static const char* CONFIG_PATH = "lib";
 #endif
 
-TEST(layer, selecting_profile) {
-    VkResult err = VK_SUCCESS;
 
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
+class TestsMechanism : public VkTestFramework {
+  public:
+   TestsMechanism(){};
+   ~TestsMechanism(){};
+
+    static void SetUpTestSuite() {
+        const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+        profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+    }
+
+    static void TearDownTestSuite(){};
+};
+
+TEST_F(TestsMechanism, selecting_profile) {
+    VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -104,12 +117,9 @@ TEST(layer, selecting_profile) {
     }
 }
 
-TEST(layer, reading_flags) {
+TEST_F(TestsMechanism, reading_flags) {
 #if defined(VK_NV_fragment_shading_rate_enums) && defined(VK_KHR_fragment_shading_rate) && defined(VK_KHR_shader_float_controls)
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -159,11 +169,8 @@ TEST(layer, reading_flags) {
 #endif
 }
 
-TEST(layer, reading_duplicated_members) {
+TEST_F(TestsMechanism, reading_duplicated_members) {
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -187,11 +194,8 @@ TEST(layer, reading_duplicated_members) {
 }
 
 
-TEST(layer, TestParsingAllFormatProperties) {
+TEST_F(TestsMechanism, TestParsingAllFormatProperties) {
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
