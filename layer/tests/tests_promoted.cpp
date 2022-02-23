@@ -16,6 +16,7 @@
  *
  * Author: Ziga Markus <ziga@lunarg.com>
  * Author: Christophe Riccio <christophe@lunarg.com>
+ * Author: Mark Lobodzinski <mark@lunarg.com>
  */
 
 #include <vulkan/vulkan_core.h>
@@ -33,17 +34,27 @@ static const char* CONFIG_PATH = "bin/Release";
 static const char* CONFIG_PATH = "lib";
 #endif
 
-struct TestInit {
-    TestInit() : instance(VK_NULL_HANDLE), physical_device(VK_NULL_HANDLE) {}
+static VkInstance instance;
+static VkPhysicalDevice gpu;
+static profiles_test::VulkanInstanceBuilder inst_builder;
 
-    ~TestInit() {
-        if (this->instance != VK_NULL_HANDLE) {
-            vkDestroyInstance(this->instance, nullptr);
-            this->instance = VK_NULL_HANDLE;
+class TestsPromoted : public VkTestFramework {
+  public:
+    TestsPromoted(){};
+    ~TestsPromoted(){};
+
+    bool IsVersionSupported(uint32_t api_version) {
+        VkPhysicalDeviceProperties2 gpu_props{};
+        gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+        if (gpu_props.properties.apiVersion < api_version) {
+            printf("Profile not supported on device, skipping test.\n");
+            return false;
         }
+        return true;
     }
 
-    void init() {
+    static void SetUpTestSuite() {
         VkResult err = VK_SUCCESS;
 
         const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -59,60 +70,24 @@ struct TestInit {
                                          SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
 
         err = inst_builder.makeInstance(&settings);
-        ASSERT_EQ(err, VK_SUCCESS);
 
-        this->instance = inst_builder.getInstance();
+        instance = inst_builder.getInstance();
 
-        err = inst_builder.getPhysicalDevice(&this->physical_device);
-        ASSERT_EQ(err, VK_SUCCESS);
-    }
+        err = inst_builder.getPhysicalDevice(&gpu);
+        EXPECT_TRUE(gpu);
+    };
 
-    VkInstance instance;
-    VkPhysicalDevice physical_device;
-    profiles_test::VulkanInstanceBuilder inst_builder;
+    static void TearDownTestSuite() {
+        if (instance != VK_NULL_HANDLE) {
+            vkDestroyInstance(instance, nullptr);
+            instance = VK_NULL_HANDLE;
+        }
+
+    };
 };
 
-static TestInit test;
-
-VkPhysicalDevice GetPhysicalDevice() {
-    if (test.instance == VK_NULL_HANDLE) {
-        test.init();
-    }
-
-    return test.physical_device;
-}
-
-bool IsVersionSupported(uint32_t api_version) {
-    VkPhysicalDeviceProperties2 gpu_props{};
-    gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-    vkGetPhysicalDeviceProperties2(test.physical_device, &gpu_props);
-    if (gpu_props.properties.apiVersion < api_version) {
-        printf("Profile not supported on device, skipping test.\n");
-        return false;
-    }
-    return true;
-}
-
-int main(int argc, char** argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return -1;
-
-    int result = RUN_ALL_TESTS();
-
-    if (test.instance != VK_NULL_HANDLE) {
-        vkDestroyInstance(test.instance, nullptr);
-        test.instance = VK_NULL_HANDLE;
-    }
-
-    return result;
-}
-
-TEST(layer_promoted, TestVulkan11Properties) {
+TEST_F(TestsPromoted, TestVulkan11Properties) {
 #ifdef VK_VERSION_1_2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
     if (!IsVersionSupported(VK_API_VERSION_1_2)) {
         printf("Required API version is not supported on device, skipping test.\n");
         return;
@@ -135,13 +110,12 @@ TEST(layer_promoted, TestVulkan11Properties) {
     EXPECT_EQ(vulkan_11_properties.protectedNoFault, VK_TRUE);
     EXPECT_EQ(vulkan_11_properties.maxPerSetDescriptors, 214);
     EXPECT_EQ(vulkan_11_properties.maxMemoryAllocationSize, 215);
+
 #endif
 }
 
-TEST(layer_promoted, TestVulkan11Features) {
+TEST_F(TestsPromoted, TestVulkan11Features) {
 #ifdef VK_VERSION_1_2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
     if (!IsVersionSupported(VK_API_VERSION_1_2)) {
         printf("Required API version is not supported on device, skipping test.\n");
         return;
@@ -170,10 +144,8 @@ TEST(layer_promoted, TestVulkan11Features) {
 #endif
 }
 
-TEST(layer_promoted, TestVulkan12Properties) {
+TEST_F(TestsPromoted, TestVulkan12Properties) {
 #ifdef VK_VERSION_1_2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
     if (!IsVersionSupported(VK_API_VERSION_1_2)) {
         printf("Required API version is not supported on device, skipping test.\n");
         return;
@@ -238,10 +210,8 @@ TEST(layer_promoted, TestVulkan12Properties) {
 #endif
 }
 
-TEST(layer_promoted, TestVulkan12Features) {
+TEST_F(TestsPromoted, TestVulkan12Features) {
 #ifdef VK_VERSION_1_2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
     if (!IsVersionSupported(VK_API_VERSION_1_2)) {
         printf("Required API version is not supported on device, skipping test.\n");
         return;
@@ -305,10 +275,8 @@ TEST(layer_promoted, TestVulkan12Features) {
 #endif
 }
 
-TEST(layer_promoted, TestVulkan13Properties) {
+TEST_F(TestsPromoted, TestVulkan13Properties) {
 #ifdef VK_VERSION_1_3
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
     if (!IsVersionSupported(VK_API_VERSION_1_3)) {
         printf("Required API version is not supported on device, skipping test.\n");
         return;
@@ -371,10 +339,8 @@ TEST(layer_promoted, TestVulkan13Properties) {
 #endif
 }
 
-TEST(layer_promoted, TestVulkan13Features) {
+TEST_F(TestsPromoted, TestVulkan13Features) {
 #ifdef VK_VERSION_1_2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
     if (!IsVersionSupported(VK_API_VERSION_1_3)) {
         printf("Required API version is not supported on device, skipping test.\n");
         return;
@@ -404,5 +370,7 @@ TEST(layer_promoted, TestVulkan13Features) {
     EXPECT_EQ(vulkan_13_features.shaderIntegerDotProduct, VK_TRUE);
     EXPECT_EQ(vulkan_13_features.maintenance4, VK_TRUE);
 #endif
+
 }
+
 

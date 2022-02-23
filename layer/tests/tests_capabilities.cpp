@@ -16,6 +16,7 @@
  *
  * Author: Ziga Markus <ziga@lunarg.com>
  * Author: Christophe Riccio <christophe@lunarg.com>
+ * Author: Mark Lobodzinski <mark@lunarg.com>
  */
 
 #include <vulkan/vulkan_core.h>
@@ -33,17 +34,17 @@ static const char* CONFIG_PATH = "bin/Release";
 static const char* CONFIG_PATH = "lib";
 #endif
 
-struct TestInit {
-    TestInit() : instance(VK_NULL_HANDLE), physical_device(VK_NULL_HANDLE) {}
+static VkInstance instance;
+static VkPhysicalDevice gpu;
+static profiles_test::VulkanInstanceBuilder inst_builder;
 
-    ~TestInit() {
-        if (this->instance != VK_NULL_HANDLE) {
-            vkDestroyInstance(this->instance, nullptr);
-            this->instance = VK_NULL_HANDLE;
-        }
-    }
 
-    void init() {
+class TestsCapabilities : public VkTestFramework {
+  public:
+    TestsCapabilities(){};
+    ~TestsCapabilities(){};
+
+    static void SetUpTestSuite() {
         VkResult err = VK_SUCCESS;
 
         const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -56,50 +57,22 @@ struct TestInit {
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_test_api";
         settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
-
         err = inst_builder.makeInstance(&settings);
-        ASSERT_EQ(err, VK_SUCCESS);
 
-        this->instance = inst_builder.getInstance();
+        instance = inst_builder.getInstance();
+        err = inst_builder.getPhysicalDevice(&gpu);
+    };
 
-        err = inst_builder.getPhysicalDevice(&this->physical_device);
-        ASSERT_EQ(err, VK_SUCCESS);
-    }
+    static void TearDownTestSuite() {
+        if (instance != VK_NULL_HANDLE) {
+            vkDestroyInstance(instance, nullptr);
+            instance = VK_NULL_HANDLE;
+        }
+    };
 
-    VkInstance instance;
-    VkPhysicalDevice physical_device;
-    profiles_test::VulkanInstanceBuilder inst_builder;
 };
 
-static TestInit test;
-
-VkPhysicalDevice GetPhysicalDevice() {
-    if (test.instance == VK_NULL_HANDLE) {
-        test.init();
-    }
-
-    return test.physical_device;
-}
-
-int main(int argc, char** argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return -1;
-
-    int result = RUN_ALL_TESTS();
-
-    if (test.instance != VK_NULL_HANDLE) {
-        vkDestroyInstance(test.instance, nullptr);
-        test.instance = VK_NULL_HANDLE;
-    }
-
-    return result;
-}
-
-TEST(profiles, TestPhysicalDeviceProperties) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestPhysicalDeviceProperties) {
 
     VkPhysicalDeviceProperties2 gpu_props{};
     gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
@@ -222,10 +195,8 @@ TEST(profiles, TestPhysicalDeviceProperties) {
     EXPECT_EQ(limits.nonCoherentAtomSize, 204u);
 }
 
-TEST(profiles, TestDepthStencilResolveProperties) {
+TEST_F(TestsCapabilities, TestDepthStencilResolveProperties) {
 #ifdef VK_KHR_depth_stencil_resolve
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceDepthStencilResolvePropertiesKHR depth_stencil_resolve_properties{};
     depth_stencil_resolve_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR;
@@ -244,10 +215,8 @@ TEST(profiles, TestDepthStencilResolveProperties) {
 #endif
 }
 
-TEST(profiles, TestSubgroupProperties) {
+TEST_F(TestsCapabilities, TestSubgroupProperties) {
 #ifdef VK_VERSION_1_1
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceSubgroupProperties subgroup_properties{};
     subgroup_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES;
@@ -265,10 +234,8 @@ TEST(profiles, TestSubgroupProperties) {
 #endif
 }
 
-TEST(profiles, TestDescriptorIndexingProperties) {
+TEST_F(TestsCapabilities, TestDescriptorIndexingProperties) {
 #ifdef VK_EXT_descriptor_indexing
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceDescriptorIndexingPropertiesEXT descriptor_indexing_properties{};
     descriptor_indexing_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT;
@@ -304,10 +271,8 @@ TEST(profiles, TestDescriptorIndexingProperties) {
 #endif
 }
 
-TEST(profiles, TestFloatControlsProperties) {
+TEST_F(TestsCapabilities, TestFloatControlsProperties) {
 #ifdef VK_KHR_shader_float_controls
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceFloatControlsPropertiesKHR float_control_properties{};
     float_control_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR;
@@ -337,10 +302,8 @@ TEST(profiles, TestFloatControlsProperties) {
 #endif
 }
 
-TEST(profiles, TestMaintenance3Properties) {
+TEST_F(TestsCapabilities, TestMaintenance3Properties) {
 #ifdef VK_KHR_maintenance3
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceMaintenance3PropertiesKHR maintenance_3_properties{};
     maintenance_3_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR;
@@ -355,10 +318,8 @@ TEST(profiles, TestMaintenance3Properties) {
 #endif
 }
 
-TEST(profiles, TestMaintenance4Properties) {
+TEST_F(TestsCapabilities, TestMaintenance4Properties) {
 #ifdef VK_KHR_maintenance4
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceMaintenance4PropertiesKHR maintenance_4_properties{};
     maintenance_4_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_PROPERTIES_KHR;
@@ -372,10 +333,8 @@ TEST(profiles, TestMaintenance4Properties) {
 #endif
 }
 
-TEST(profiles, TestMultiviewProperties) {
+TEST_F(TestsCapabilities, TestMultiviewProperties) {
 #ifdef VK_KHR_multiview
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceMultiviewPropertiesKHR multiview_properties{};
     multiview_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR;
@@ -390,10 +349,8 @@ TEST(profiles, TestMultiviewProperties) {
 #endif
 }
 
-TEST(profiles, TestPointClippingProperties) {
+TEST_F(TestsCapabilities, TestPointClippingProperties) {
 #ifdef VK_KHR_maintenance2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevicePointClippingPropertiesKHR point_clipping_properties{};
     point_clipping_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR;
@@ -408,10 +365,8 @@ TEST(profiles, TestPointClippingProperties) {
 #endif
 }
 
-TEST(profiles, TestProtectedMemoryProperties) {
+TEST_F(TestsCapabilities, TestProtectedMemoryProperties) {
 #ifdef VK_VERSION_1_1
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceProtectedMemoryProperties protected_memory_properties{};
     protected_memory_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES;
@@ -425,10 +380,8 @@ TEST(profiles, TestProtectedMemoryProperties) {
 #endif
 }
 
-TEST(profiles, TestTimelineSemaphoreProperties) {
+TEST_F(TestsCapabilities, TestTimelineSemaphoreProperties) {
 #ifdef VK_KHR_timeline_semaphore
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceTimelineSemaphorePropertiesKHR timeline_semaphore_properties{};
     timeline_semaphore_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES;
@@ -442,10 +395,8 @@ TEST(profiles, TestTimelineSemaphoreProperties) {
 #endif
 }
 
-TEST(profiles, TestSamplerFilterMinmaxProperties) {
+TEST_F(TestsCapabilities, TestSamplerFilterMinmaxProperties) {
 #ifdef VK_EXT_sampler_filter_minmax
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT sampler_filter_minmax_properties{};
     sampler_filter_minmax_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_FILTER_MINMAX_PROPERTIES_EXT;
@@ -460,10 +411,8 @@ TEST(profiles, TestSamplerFilterMinmaxProperties) {
 #endif
 }
 
-TEST(profiles, TestAccelerationStructurePropertiesKHR) {
+TEST_F(TestsCapabilities, TestAccelerationStructurePropertiesKHR) {
 #ifdef VK_KHR_acceleration_structure
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceAccelerationStructurePropertiesKHR acceleration_structure_properties{};
     acceleration_structure_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR;
@@ -484,10 +433,8 @@ TEST(profiles, TestAccelerationStructurePropertiesKHR) {
 #endif
 }
 
-TEST(profiles, TestPerformanceQueryProperties) {
+TEST_F(TestsCapabilities, TestPerformanceQueryProperties) {
 #ifdef VK_KHR_performance_query
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevicePerformanceQueryPropertiesKHR performance_query_properties{};
     performance_query_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PERFORMANCE_QUERY_PROPERTIES_KHR;
@@ -501,10 +448,8 @@ TEST(profiles, TestPerformanceQueryProperties) {
 #endif
 }
 
-TEST(profiles, TestPushDescriptorProperties) {
+TEST_F(TestsCapabilities, TestPushDescriptorProperties) {
 #ifdef VK_KHR_push_descriptor
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevicePushDescriptorPropertiesKHR push_descriptor_properties{};
     push_descriptor_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR;
@@ -518,10 +463,8 @@ TEST(profiles, TestPushDescriptorProperties) {
 #endif
 }
 
-TEST(profiles, TestRayTracingPipelineProperties) {
+TEST_F(TestsCapabilities, TestRayTracingPipelineProperties) {
 #ifdef VK_KHR_ray_tracing_pipeline
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR ray_tracing_pipeline_properties{};
     ray_tracing_pipeline_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
@@ -542,10 +485,8 @@ TEST(profiles, TestRayTracingPipelineProperties) {
 #endif
 }
 
-TEST(profiles, TestShaderIntegerDotProductProperties) {
+TEST_F(TestsCapabilities, TestShaderIntegerDotProductProperties) {
 #ifdef VK_KHR_shader_integer_dot_product
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR shader_integer_dot_product_properties{};
     shader_integer_dot_product_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_INTEGER_DOT_PRODUCT_PROPERTIES_KHR;
@@ -593,10 +534,8 @@ TEST(profiles, TestShaderIntegerDotProductProperties) {
 #endif
 }
 
-TEST(profiles, TestBlendOperationAdvancedProperties) {
+TEST_F(TestsCapabilities, TestBlendOperationAdvancedProperties) {
 #ifdef VK_EXT_blend_operation_advanced
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT blend_operation_advanced_properties{};
     blend_operation_advanced_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_PROPERTIES_EXT;
@@ -615,10 +554,8 @@ TEST(profiles, TestBlendOperationAdvancedProperties) {
 #endif
 }
 
-TEST(profiles, TestConservativeRasterizationProperties) {
+TEST_F(TestsCapabilities, TestConservativeRasterizationProperties) {
 #ifdef VK_EXT_conservative_rasterization
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceConservativeRasterizationPropertiesEXT conservative_rasterization_properties{};
     conservative_rasterization_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONSERVATIVE_RASTERIZATION_PROPERTIES_EXT;
@@ -640,10 +577,8 @@ TEST(profiles, TestConservativeRasterizationProperties) {
 #endif
 }
 
-TEST(profiles, TestCustomBorderColorProperties) {
+TEST_F(TestsCapabilities, TestCustomBorderColorProperties) {
 #ifdef VK_EXT_custom_border_color
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceCustomBorderColorPropertiesEXT custom_border_color_properties{};
     custom_border_color_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_PROPERTIES_EXT;
@@ -657,10 +592,8 @@ TEST(profiles, TestCustomBorderColorProperties) {
 #endif
 }
 
-TEST(profiles, TestDiscardRectangleProperties) {
+TEST_F(TestsCapabilities, TestDiscardRectangleProperties) {
 #ifdef VK_EXT_discard_rectangles
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceDiscardRectanglePropertiesEXT discard_rectangle_properties{};
     discard_rectangle_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DISCARD_RECTANGLE_PROPERTIES_EXT;
@@ -674,10 +607,8 @@ TEST(profiles, TestDiscardRectangleProperties) {
 #endif
 }
 
-TEST(profiles, TestExternalMemoryHostPropertiesEXT) {
+TEST_F(TestsCapabilities, TestExternalMemoryHostPropertiesEXT) {
 #ifdef VK_EXT_external_memory_host
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceExternalMemoryHostPropertiesEXT external_memory_host_properties{};
     external_memory_host_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT;
@@ -691,10 +622,8 @@ TEST(profiles, TestExternalMemoryHostPropertiesEXT) {
 #endif
 }
 
-TEST(profiles, TestFragmentDensityMapProperties) {
+TEST_F(TestsCapabilities, TestFragmentDensityMapProperties) {
 #ifdef VK_EXT_fragment_density_map
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceFragmentDensityMapPropertiesEXT fragment_density_map_properties{};
     fragment_density_map_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_PROPERTIES_EXT;
@@ -712,10 +641,8 @@ TEST(profiles, TestFragmentDensityMapProperties) {
 #endif
 }
 
-TEST(profiles, TestInlineUniformBlockProperties) {
+TEST_F(TestsCapabilities, TestInlineUniformBlockProperties) {
 #ifdef VK_EXT_inline_uniform_block
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceInlineUniformBlockPropertiesEXT inline_uniform_block_properties{};
     inline_uniform_block_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT;
@@ -733,10 +660,8 @@ TEST(profiles, TestInlineUniformBlockProperties) {
 #endif
 }
 
-TEST(profiles, TestLineRasterizationProperties) {
+TEST_F(TestsCapabilities, TestLineRasterizationProperties) {
 #ifdef VK_EXT_line_rasterization
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceLineRasterizationPropertiesEXT line_rasterization_properties{};
     line_rasterization_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT;
@@ -750,10 +675,8 @@ TEST(profiles, TestLineRasterizationProperties) {
 #endif
 }
 
-TEST(profiles, TestMultiDrawProperties) {
+TEST_F(TestsCapabilities, TestMultiDrawProperties) {
 #ifdef VK_EXT_multi_draw
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceMultiDrawPropertiesEXT mutli_draw_properties{};
     mutli_draw_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_PROPERTIES_EXT;
@@ -767,10 +690,8 @@ TEST(profiles, TestMultiDrawProperties) {
 #endif
 }
 
-TEST(profiles, TestProvokingVertexProperties) {
+TEST_F(TestsCapabilities, TestProvokingVertexProperties) {
 #ifdef VK_EXT_provoking_vertex
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceProvokingVertexPropertiesEXT provoking_vertex_properties{};
     provoking_vertex_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROVOKING_VERTEX_PROPERTIES_EXT;
@@ -786,10 +707,8 @@ TEST(profiles, TestProvokingVertexProperties) {
 #endif
 }
 
-TEST(profiles, TestRobustness2Properties) {
+TEST_F(TestsCapabilities, TestRobustness2Properties) {
 #ifdef VK_EXT_robustness2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceRobustness2PropertiesEXT robustness_2_properties{};
     robustness_2_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT;
@@ -805,10 +724,8 @@ TEST(profiles, TestRobustness2Properties) {
 #endif
 }
 
-TEST(profiles, TestSampleLocationsProperties) {
+TEST_F(TestsCapabilities, TestSampleLocationsProperties) {
 #ifdef VK_EXT_sample_locations
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceSampleLocationsPropertiesEXT sample_locations_properties{};
     sample_locations_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLE_LOCATIONS_PROPERTIES_EXT;
@@ -829,10 +746,8 @@ TEST(profiles, TestSampleLocationsProperties) {
 #endif
 }
 
-TEST(profiles, TestSubgroupSizeControlProperties) {
+TEST_F(TestsCapabilities, TestSubgroupSizeControlProperties) {
 #ifdef VK_EXT_subgroup_size_control
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceSubgroupSizeControlPropertiesEXT subgroup_size_control_properties{};
     subgroup_size_control_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT;
@@ -850,10 +765,8 @@ TEST(profiles, TestSubgroupSizeControlProperties) {
 #endif
 }
 
-TEST(profiles, TestTexelBufferAlignmentProperties) {
+TEST_F(TestsCapabilities, TestTexelBufferAlignmentProperties) {
 #ifdef VK_EXT_texel_buffer_alignment
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT texel_buffer_alignment_properties{};
     texel_buffer_alignment_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT;
@@ -871,10 +784,8 @@ TEST(profiles, TestTexelBufferAlignmentProperties) {
 #endif
 }
 
-TEST(profiles, TestTransformFeedbackProperties) {
+TEST_F(TestsCapabilities, TestTransformFeedbackProperties) {
 #ifdef VK_EXT_transform_feedback
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceTransformFeedbackPropertiesEXT transform_feedback_properties{};
     transform_feedback_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT;
@@ -898,10 +809,8 @@ TEST(profiles, TestTransformFeedbackProperties) {
 #endif
 }
 
-TEST(profiles, TestVertexAttributeDivisorProperties) {
+TEST_F(TestsCapabilities, TestVertexAttributeDivisorProperties) {
 #ifdef VK_EXT_vertex_attribute_divisor
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT vertex_attribute_divisor_properties{};
     vertex_attribute_divisor_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT;
@@ -916,10 +825,8 @@ TEST(profiles, TestVertexAttributeDivisorProperties) {
 #endif
 }
 
-TEST(profiles, TestFragmentShadingRateProperties) {
+TEST_F(TestsCapabilities, TestFragmentShadingRateProperties) {
 #ifdef VK_KHR_fragment_shading_rate
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceFragmentShadingRatePropertiesKHR fragment_shading_rate_properties{};
     fragment_shading_rate_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR;
@@ -953,10 +860,8 @@ TEST(profiles, TestFragmentShadingRateProperties) {
 #endif
 }
 
-TEST(profiles, TestShaderCoreProperties) {
+TEST_F(TestsCapabilities, TestShaderCoreProperties) {
 #ifdef VK_AMD_shader_core_properties
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderCorePropertiesAMD shader_core_properties{};
     shader_core_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_PROPERTIES_AMD;
@@ -984,10 +889,8 @@ TEST(profiles, TestShaderCoreProperties) {
 #endif
 }
 
-TEST(profiles, TestShaderCoreProperties2) {
+TEST_F(TestsCapabilities, TestShaderCoreProperties2) {
 #ifdef VK_AMD_shader_core_properties2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderCoreProperties2AMD shader_core_properties_2{};
     shader_core_properties_2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_PROPERTIES_2_AMD;
@@ -1003,10 +906,8 @@ TEST(profiles, TestShaderCoreProperties2) {
 #endif
 }
 
-TEST(profiles, TestSubpassShadingProperties) {
+TEST_F(TestsCapabilities, TestSubpassShadingProperties) {
 #ifdef VK_HUAWEI_subpass_shading
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceSubpassShadingPropertiesHUAWEI subpass_shading_properties{};
     subpass_shading_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBPASS_SHADING_PROPERTIES_HUAWEI;
@@ -1021,10 +922,8 @@ TEST(profiles, TestSubpassShadingProperties) {
 #endif
 }
 
-TEST(profiles, TestCooperativeMatrixProperties) {
+TEST_F(TestsCapabilities, TestCooperativeMatrixProperties) {
 #ifdef VK_NV_cooperative_matrix
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceCooperativeMatrixPropertiesNV cooperative_matrix_properties{};
     cooperative_matrix_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_PROPERTIES_NV;
@@ -1040,10 +939,8 @@ TEST(profiles, TestCooperativeMatrixProperties) {
 #endif
 }
 
-TEST(profiles, TestDeviceGeneratedCommandProperties) {
+TEST_F(TestsCapabilities, TestDeviceGeneratedCommandProperties) {
 #ifdef VK_NV_device_generated_commands
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV device_generated_commands_properties{};
     device_generated_commands_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_PROPERTIES_NV;
@@ -1066,10 +963,8 @@ TEST(profiles, TestDeviceGeneratedCommandProperties) {
 #endif
 }
 
-TEST(profiles, TestFragmentShadingRateEnumsProperties) {
+TEST_F(TestsCapabilities, TestFragmentShadingRateEnumsProperties) {
 #ifdef VK_NV_fragment_shading_rate_enums
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV fragment_shading_rate_enums_properties{};
     fragment_shading_rate_enums_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_ENUMS_PROPERTIES_NV;
@@ -1084,10 +979,8 @@ TEST(profiles, TestFragmentShadingRateEnumsProperties) {
 #endif
 }
 
-TEST(profiles, TestMeshShaderProperties) {
+TEST_F(TestsCapabilities, TestMeshShaderProperties) {
 #ifdef VK_NV_mesh_shader
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceMeshShaderPropertiesNV mesh_shader_properties{};
     mesh_shader_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_NV;
@@ -1118,10 +1011,8 @@ TEST(profiles, TestMeshShaderProperties) {
 #endif
 }
 
-TEST(profiles, TestRayTracingProperties) {
+TEST_F(TestsCapabilities, TestRayTracingProperties) {
 #ifdef VK_NV_ray_tracing
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceRayTracingPropertiesNV ray_tracing_properties{};
     ray_tracing_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PROPERTIES_NV;
@@ -1143,10 +1034,8 @@ TEST(profiles, TestRayTracingProperties) {
 #endif
 }
 
-TEST(profiles, TestShaderSMBuiltinsProperties) {
+TEST_F(TestsCapabilities, TestShaderSMBuiltinsProperties) {
 #ifdef VK_NV_shader_sm_builtins
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderSMBuiltinsPropertiesNV shader_sm_builtins_properties{};
     shader_sm_builtins_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SM_BUILTINS_PROPERTIES_NV;
@@ -1162,10 +1051,8 @@ TEST(profiles, TestShaderSMBuiltinsProperties) {
 #endif
 }
 
-TEST(profiles, TestShadingRateImageProperties) {
+TEST_F(TestsCapabilities, TestShadingRateImageProperties) {
 #ifdef VK_NV_shading_rate_image
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShadingRateImagePropertiesNV shading_rate_image_properties{};
     shading_rate_image_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_PROPERTIES_NV;
@@ -1183,10 +1070,8 @@ TEST(profiles, TestShadingRateImageProperties) {
 #endif
 }
 
-TEST(profiles, TestFragmentDensityMapOffsetProperties) {
+TEST_F(TestsCapabilities, TestFragmentDensityMapOffsetProperties) {
 #ifdef VK_QCOM_fragment_density_map_offset
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM fragment_density_map_offset_properties{};
     fragment_density_map_offset_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_PROPERTIES_QCOM;
@@ -1202,9 +1087,7 @@ TEST(profiles, TestFragmentDensityMapOffsetProperties) {
 #endif
 }
 
-TEST(profiles, TestPhysicalDeviceFeatures) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestPhysicalDeviceFeatures) {
 
     VkPhysicalDeviceFeatures2 features{};
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
@@ -1267,10 +1150,8 @@ TEST(profiles, TestPhysicalDeviceFeatures) {
     EXPECT_EQ(features.features.inheritedQueries, VK_TRUE);
 }
 
-TEST(profiles, TestHostQueryResetFeatures) {
+TEST_F(TestsCapabilities, TestHostQueryResetFeatures) {
 #ifdef VK_EXT_host_query_reset
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceHostQueryResetFeaturesEXT host_query_reset_features{};
     host_query_reset_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT;
@@ -1285,10 +1166,8 @@ TEST(profiles, TestHostQueryResetFeatures) {
 #endif
 }
 
-TEST(profiles, TestMaintenance4Features) {
+TEST_F(TestsCapabilities, TestMaintenance4Features) {
 #ifdef VK_KHR_maintenance4
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceMaintenance4FeaturesKHR maintenance_4_features{};
     maintenance_4_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_FEATURES_KHR;
@@ -1303,10 +1182,8 @@ TEST(profiles, TestMaintenance4Features) {
 #endif
 }
 
-TEST(profiles, Test16BitStorageFeatures) {
+TEST_F(TestsCapabilities, Test16BitStorageFeatures) {
 #ifdef VK_KHR_16bit_storage
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevice16BitStorageFeaturesKHR f_16_bit_storage_features{};
     f_16_bit_storage_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR;
@@ -1324,10 +1201,8 @@ TEST(profiles, Test16BitStorageFeatures) {
 #endif
 }
 
-TEST(profiles, Test8BitStorageFeatures) {
+TEST_F(TestsCapabilities, Test8BitStorageFeatures) {
 #ifdef VK_KHR_8bit_storage
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevice8BitStorageFeaturesKHR f_8_bit_storage_features{};
     f_8_bit_storage_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR;
@@ -1344,10 +1219,8 @@ TEST(profiles, Test8BitStorageFeatures) {
 #endif
 }
 
-TEST(profiles, TestBufferDeviceAddressFeatures) {
+TEST_F(TestsCapabilities, TestBufferDeviceAddressFeatures) {
 #ifdef VK_KHR_buffer_device_address
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceBufferDeviceAddressFeaturesKHR buffer_device_address_features{};
     buffer_device_address_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR;
@@ -1364,10 +1237,8 @@ TEST(profiles, TestBufferDeviceAddressFeatures) {
 #endif
 }
 
-TEST(profiles, TestDescriptorIndexingFeatures) {
+TEST_F(TestsCapabilities, TestDescriptorIndexingFeatures) {
 #ifdef VK_EXT_descriptor_indexing
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceDescriptorIndexingFeaturesEXT descriptor_indexing_features{};
     descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT;
@@ -1401,10 +1272,8 @@ TEST(profiles, TestDescriptorIndexingFeatures) {
 #endif
 }
 
-TEST(profiles, TestImagelessFramebufferFeatures) {
+TEST_F(TestsCapabilities, TestImagelessFramebufferFeatures) {
 #ifdef VK_KHR_imageless_framebuffer
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceImagelessFramebufferFeaturesKHR imageless_framebuffer_features{};
     imageless_framebuffer_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES_KHR;
@@ -1419,10 +1288,8 @@ TEST(profiles, TestImagelessFramebufferFeatures) {
 #endif
 }
 
-TEST(profiles, TestMultiviewFeatures) {
+TEST_F(TestsCapabilities, TestMultiviewFeatures) {
 #ifdef VK_KHR_multiview
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceMultiviewFeaturesKHR multiview_features{};
     multiview_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR;
@@ -1439,10 +1306,8 @@ TEST(profiles, TestMultiviewFeatures) {
 #endif
 }
 
-TEST(profiles, TestProtectedMemoryFeatures) {
+TEST_F(TestsCapabilities, TestProtectedMemoryFeatures) {
 #ifdef VK_VERSION_1_1
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceProtectedMemoryFeatures protected_memory_features{};
     protected_memory_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_FEATURES;
@@ -1457,10 +1322,8 @@ TEST(profiles, TestProtectedMemoryFeatures) {
 #endif
 }
 
-TEST(profiles, TestSamplerYcbcrConversionFeatures) {
+TEST_F(TestsCapabilities, TestSamplerYcbcrConversionFeatures) {
 #ifdef VK_KHR_sampler_ycbcr_conversion
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR sampler_ycbcr_conversion_features{};
     sampler_ycbcr_conversion_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR;
@@ -1475,10 +1338,8 @@ TEST(profiles, TestSamplerYcbcrConversionFeatures) {
 #endif
 }
 
-TEST(profiles, TestScalarBlockLayoutFeatures) {
+TEST_F(TestsCapabilities, TestScalarBlockLayoutFeatures) {
 #ifdef VK_EXT_scalar_block_layout
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceScalarBlockLayoutFeaturesEXT scalar_block_layout_features{};
     scalar_block_layout_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES_EXT;
@@ -1493,10 +1354,8 @@ TEST(profiles, TestScalarBlockLayoutFeatures) {
 #endif
 }
 
-TEST(profiles, TestSeparateDepthStencilLayoutsFeatures) {
+TEST_F(TestsCapabilities, TestSeparateDepthStencilLayoutsFeatures) {
 #ifdef VK_KHR_separate_depth_stencil_layouts
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR separate_depth_stencil_layout_featuers{};
     separate_depth_stencil_layout_featuers.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SEPARATE_DEPTH_STENCIL_LAYOUTS_FEATURES_KHR;
@@ -1511,10 +1370,8 @@ TEST(profiles, TestSeparateDepthStencilLayoutsFeatures) {
 #endif
 }
 
-TEST(profiles, TestShaderAtomicInt64Features) {
+TEST_F(TestsCapabilities, TestShaderAtomicInt64Features) {
 #ifdef VK_KHR_shader_atomic_int64
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderAtomicInt64FeaturesKHR shader_atomic_int64_features{};
     shader_atomic_int64_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_INT64_FEATURES_KHR;
@@ -1530,10 +1387,8 @@ TEST(profiles, TestShaderAtomicInt64Features) {
 #endif
 }
 
-TEST(profiles, TestShaderDrawParametersFeatures) {
+TEST_F(TestsCapabilities, TestShaderDrawParametersFeatures) {
 #ifdef VK_VERSION_1_1
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderDrawParametersFeatures shader_draw_paramenters_features{};
     shader_draw_paramenters_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES;
@@ -1548,10 +1403,8 @@ TEST(profiles, TestShaderDrawParametersFeatures) {
 #endif
 }
 
-TEST(profiles, TestShaderFloat16Int8Features) {
+TEST_F(TestsCapabilities, TestShaderFloat16Int8Features) {
 #ifdef VK_KHR_shader_float16_int8
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR shader_float16_int8_features{};
     shader_float16_int8_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR;
@@ -1567,10 +1420,8 @@ TEST(profiles, TestShaderFloat16Int8Features) {
 #endif
 }
 
-TEST(profiles, TestShaderSubgroupExtendedTypesFeatures) {
+TEST_F(TestsCapabilities, TestShaderSubgroupExtendedTypesFeatures) {
 #ifdef VK_KHR_shader_subgroup_extended_types
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR shader_subgroup_extended_types_features{};
     shader_subgroup_extended_types_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR;
@@ -1585,10 +1436,8 @@ TEST(profiles, TestShaderSubgroupExtendedTypesFeatures) {
 #endif
 }
 
-TEST(profiles, TestTimelineSemaphoreFeatures) {
+TEST_F(TestsCapabilities, TestTimelineSemaphoreFeatures) {
 #ifdef VK_KHR_timeline_semaphore
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceTimelineSemaphoreFeaturesKHR timeline_semaphore_features{};
     timeline_semaphore_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR;
@@ -1603,10 +1452,8 @@ TEST(profiles, TestTimelineSemaphoreFeatures) {
 #endif
 }
 
-TEST(profiles, TestUniformBufferStandardLayoutFeatures) {
+TEST_F(TestsCapabilities, TestUniformBufferStandardLayoutFeatures) {
 #ifdef VK_KHR_uniform_buffer_standard_layout
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR uniform_buffer_standard_layout_features{};
     uniform_buffer_standard_layout_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR;
@@ -1621,10 +1468,8 @@ TEST(profiles, TestUniformBufferStandardLayoutFeatures) {
 #endif
 }
 
-TEST(profiles, TestVariablePointersFeatures) {
+TEST_F(TestsCapabilities, TestVariablePointersFeatures) {
 #ifdef VK_KHR_variable_pointers
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceVariablePointersFeaturesKHR variable_pointer_features{};
     variable_pointer_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES_KHR;
@@ -1640,10 +1485,8 @@ TEST(profiles, TestVariablePointersFeatures) {
 #endif
 }
 
-TEST(profiles, TestVulkanMemoryModelFeatures) {
+TEST_F(TestsCapabilities, TestVulkanMemoryModelFeatures) {
 #ifdef VK_KHR_vulkan_memory_model
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceVulkanMemoryModelFeaturesKHR vulkan_memory_model_features{};
     vulkan_memory_model_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR;
@@ -1660,10 +1503,8 @@ TEST(profiles, TestVulkanMemoryModelFeatures) {
 #endif
 }
 
-TEST(profiles, TestZeroInitializeWorkgroupMemoryFeatures) {
+TEST_F(TestsCapabilities, TestZeroInitializeWorkgroupMemoryFeatures) {
 #ifdef VK_KHR_zero_initialize_workgroup_memory
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR zero_initialize_workgroup_memory_features{};
     zero_initialize_workgroup_memory_features.sType =
@@ -1679,10 +1520,8 @@ TEST(profiles, TestZeroInitializeWorkgroupMemoryFeatures) {
 #endif
 }
 
-TEST(profiles, TestAccelerationStructureFeatures) {
+TEST_F(TestsCapabilities, TestAccelerationStructureFeatures) {
 #ifdef VK_KHR_acceleration_structure
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration_structure_features{};
     acceleration_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
@@ -1701,10 +1540,8 @@ TEST(profiles, TestAccelerationStructureFeatures) {
 #endif
 }
 
-TEST(profiles, TestPerformanceQueryFeatures) {
+TEST_F(TestsCapabilities, TestPerformanceQueryFeatures) {
 #ifdef VK_KHR_performance_query
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevicePerformanceQueryFeaturesKHR performance_query_features{};
     performance_query_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PERFORMANCE_QUERY_FEATURES_KHR;
@@ -1720,10 +1557,8 @@ TEST(profiles, TestPerformanceQueryFeatures) {
 #endif
 }
 
-TEST(profiles, TestPipelineExecutablePropertiesFeatures) {
+TEST_F(TestsCapabilities, TestPipelineExecutablePropertiesFeatures) {
 #ifdef VK_KHR_pipeline_executable_properties
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR pipeline_executable_properties_features{};
     pipeline_executable_properties_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR;
@@ -1738,10 +1573,8 @@ TEST(profiles, TestPipelineExecutablePropertiesFeatures) {
 #endif
 }
 
-TEST(profiles, TestPresentIdFeatures) {
+TEST_F(TestsCapabilities, TestPresentIdFeatures) {
 #ifdef VK_KHR_present_id
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevicePresentIdFeaturesKHR present_id_features{};
     present_id_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_ID_FEATURES_KHR;
@@ -1756,10 +1589,8 @@ TEST(profiles, TestPresentIdFeatures) {
 #endif
 }
 
-TEST(profiles, TestPresentWaitFeatures) {
+TEST_F(TestsCapabilities, TestPresentWaitFeatures) {
 #ifdef VK_KHR_present_wait
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevicePresentWaitFeaturesKHR present_wait_features{};
     present_wait_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_WAIT_FEATURES_KHR;
@@ -1774,10 +1605,8 @@ TEST(profiles, TestPresentWaitFeatures) {
 #endif
 }
 
-TEST(profiles, TestRayQueryFeatures) {
+TEST_F(TestsCapabilities, TestRayQueryFeatures) {
 #ifdef VK_KHR_ray_query
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceRayQueryFeaturesKHR ray_query_features{};
     ray_query_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
@@ -1792,10 +1621,8 @@ TEST(profiles, TestRayQueryFeatures) {
 #endif
 }
 
-TEST(profiles, TestRayTracingPipelineFeatures) {
+TEST_F(TestsCapabilities, TestRayTracingPipelineFeatures) {
 #ifdef VK_TEST
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_pipeline_features{};
     ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
@@ -1814,10 +1641,8 @@ TEST(profiles, TestRayTracingPipelineFeatures) {
 #endif
 }
 
-TEST(profiles, TestShaderClockFeatures) {
+TEST_F(TestsCapabilities, TestShaderClockFeatures) {
 #ifdef VK_KHR_ray_tracing_pipeline
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderClockFeaturesKHR shader_clock_features{};
     shader_clock_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR;
@@ -1833,10 +1658,8 @@ TEST(profiles, TestShaderClockFeatures) {
 #endif
 }
 
-TEST(profiles, TestShaderIntegerDotProductFeatures) {
+TEST_F(TestsCapabilities, TestShaderIntegerDotProductFeatures) {
 #ifdef VK_KHR_shader_integer_dot_product
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR shader_integer_dot_product_features{};
     shader_integer_dot_product_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_INTEGER_DOT_PRODUCT_FEATURES_KHR;
@@ -1851,10 +1674,8 @@ TEST(profiles, TestShaderIntegerDotProductFeatures) {
 #endif
 }
 
-TEST(profiles, TestShaderSubgroupUniformControlFlowFeatures) {
+TEST_F(TestsCapabilities, TestShaderSubgroupUniformControlFlowFeatures) {
 #ifdef VK_KHR_shader_subgroup_uniform_control_flow
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR shader_subgroup_uniform_control_flow_features{};
     shader_subgroup_uniform_control_flow_features.sType =
@@ -1870,10 +1691,8 @@ TEST(profiles, TestShaderSubgroupUniformControlFlowFeatures) {
 #endif
 }
 
-TEST(profiles, TestShaderTerminateInvocationFeatures) {
+TEST_F(TestsCapabilities, TestShaderTerminateInvocationFeatures) {
 #ifdef VK_KHR_shader_terminate_invocation
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR shader_terminate_invocation_features{};
     shader_terminate_invocation_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR;
@@ -1888,10 +1707,8 @@ TEST(profiles, TestShaderTerminateInvocationFeatures) {
 #endif
 }
 
-TEST(profiles, TestSynchronization2Features) {
+TEST_F(TestsCapabilities, TestSynchronization2Features) {
 #ifdef VK_KHR_synchronization2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceSynchronization2FeaturesKHR synchronization_2_features{};
     synchronization_2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR;
@@ -1906,10 +1723,8 @@ TEST(profiles, TestSynchronization2Features) {
 #endif
 }
 
-TEST(profiles, TestWorkgroupMemoryExplicitLayoutFeatures) {
+TEST_F(TestsCapabilities, TestWorkgroupMemoryExplicitLayoutFeatures) {
 #ifdef VK_KHR_workgroup_memory_explicit_layout
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR workgroup_memory_explicit_layout_features{};
     workgroup_memory_explicit_layout_features.sType =
@@ -1928,10 +1743,8 @@ TEST(profiles, TestWorkgroupMemoryExplicitLayoutFeatures) {
 #endif
 }
 
-TEST(profiles, Test4444FormatsFeatures) {
+TEST_F(TestsCapabilities, Test4444FormatsFeatures) {
 #ifdef VK_EXT_4444_formats
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevice4444FormatsFeaturesEXT f_4444_formats_features{};
     f_4444_formats_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_4444_FORMATS_FEATURES_EXT;
@@ -1947,10 +1760,8 @@ TEST(profiles, Test4444FormatsFeatures) {
 #endif
 }
 
-TEST(profiles, TestASTCDecodeFeatures) {
+TEST_F(TestsCapabilities, TestASTCDecodeFeatures) {
 #ifdef VK_EXT_astc_decode_mode
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceASTCDecodeFeaturesEXT astc_decode_features{};
     astc_decode_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ASTC_DECODE_FEATURES_EXT;
@@ -1965,10 +1776,8 @@ TEST(profiles, TestASTCDecodeFeatures) {
 #endif
 }
 
-TEST(profiles, TestBlendOperationAdvancedFeatures) {
+TEST_F(TestsCapabilities, TestBlendOperationAdvancedFeatures) {
 #ifdef VK_EXT_blend_operation_advanced
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT blend_operation_advanced_features{};
     blend_operation_advanced_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_FEATURES_EXT;
@@ -1983,10 +1792,8 @@ TEST(profiles, TestBlendOperationAdvancedFeatures) {
 #endif
 }
 
-TEST(profiles, TestBorderColorSwizzleFeatures) {
+TEST_F(TestsCapabilities, TestBorderColorSwizzleFeatures) {
 #ifdef VK_EXT_border_color_swizzle
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceBorderColorSwizzleFeaturesEXT border_color_swizzle_features{};
     border_color_swizzle_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BORDER_COLOR_SWIZZLE_FEATURES_EXT;
@@ -2002,10 +1809,8 @@ TEST(profiles, TestBorderColorSwizzleFeatures) {
 #endif
 }
 
-TEST(profiles, TestColorWriteEnableFeatures) {
+TEST_F(TestsCapabilities, TestColorWriteEnableFeatures) {
 #ifdef VK_EXT_color_write_enable
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceColorWriteEnableFeaturesEXT color_write_enable_features{};
     color_write_enable_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COLOR_WRITE_ENABLE_FEATURES_EXT;
@@ -2020,10 +1825,8 @@ TEST(profiles, TestColorWriteEnableFeatures) {
 #endif
 }
 
-TEST(profiles, TestConditionalRenderingFeatures) {
+TEST_F(TestsCapabilities, TestConditionalRenderingFeatures) {
 #ifdef VK_EXT_conditional_rendering
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceConditionalRenderingFeaturesEXT conditional_rendering_features{};
     conditional_rendering_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONDITIONAL_RENDERING_FEATURES_EXT;
@@ -2039,10 +1842,8 @@ TEST(profiles, TestConditionalRenderingFeatures) {
 #endif
 }
 
-TEST(profiles, TestCustomBorderColorFeatures) {
+TEST_F(TestsCapabilities, TestCustomBorderColorFeatures) {
 #ifdef VK_EXT_custom_border_color
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceCustomBorderColorFeaturesEXT custom_border_color_features{};
     custom_border_color_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT;
@@ -2058,10 +1859,8 @@ TEST(profiles, TestCustomBorderColorFeatures) {
 #endif
 }
 
-TEST(profiles, TestDepthClipEnableFeatures) {
+TEST_F(TestsCapabilities, TestDepthClipEnableFeatures) {
 #ifdef VK_EXT_depth_clip_enable
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceDepthClipEnableFeaturesEXT depth_clip_enable_features{};
     depth_clip_enable_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT;
@@ -2076,10 +1875,8 @@ TEST(profiles, TestDepthClipEnableFeatures) {
 #endif
 }
 
-TEST(profiles, TestDeviceMemoryReportFeatures) {
+TEST_F(TestsCapabilities, TestDeviceMemoryReportFeatures) {
 #ifdef VK_EXT_device_memory_report
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceDeviceMemoryReportFeaturesEXT device_memory_report_features{};
     device_memory_report_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_MEMORY_REPORT_FEATURES_EXT;
@@ -2094,10 +1891,8 @@ TEST(profiles, TestDeviceMemoryReportFeatures) {
 #endif
 }
 
-TEST(profiles, TestExtendedDynamicStateFeatures) {
+TEST_F(TestsCapabilities, TestExtendedDynamicStateFeatures) {
 #ifdef VK_EXT_extended_dynamic_state
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceExtendedDynamicStateFeaturesEXT extended_dynamic_state_features{};
     extended_dynamic_state_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT;
@@ -2112,10 +1907,8 @@ TEST(profiles, TestExtendedDynamicStateFeatures) {
 #endif
 }
 
-TEST(profiles, TestExtendedDynamicState2Features) {
+TEST_F(TestsCapabilities, TestExtendedDynamicState2Features) {
 #ifdef VK_EXT_extended_dynamic_state2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceExtendedDynamicState2FeaturesEXT extended_dynamic_state_2_features{};
     extended_dynamic_state_2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT;
@@ -2132,10 +1925,8 @@ TEST(profiles, TestExtendedDynamicState2Features) {
 #endif
 }
 
-TEST(profiles, TestFragmentDensityMapFeatures) {
+TEST_F(TestsCapabilities, TestFragmentDensityMapFeatures) {
 #ifdef VK_EXT_fragment_density_map
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceFragmentDensityMapFeaturesEXT fragment_density_map_features{};
     fragment_density_map_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_FEATURES_EXT;
@@ -2152,10 +1943,8 @@ TEST(profiles, TestFragmentDensityMapFeatures) {
 #endif
 }
 
-TEST(profiles, TestFragmentShaderInterlockFeatures) {
+TEST_F(TestsCapabilities, TestFragmentShaderInterlockFeatures) {
 #ifdef VK_EXT_fragment_shader_interlock
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT fragment_shader_interlock_features{};
     fragment_shader_interlock_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT;
@@ -2172,10 +1961,8 @@ TEST(profiles, TestFragmentShaderInterlockFeatures) {
 #endif
 }
 
-TEST(profiles, TestGlobalPriorityQueryFeatures) {
+TEST_F(TestsCapabilities, TestGlobalPriorityQueryFeatures) {
 #ifdef VK_EXT_global_priority_query
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT global_priority_query_features{};
     global_priority_query_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES_EXT;
@@ -2190,10 +1977,8 @@ TEST(profiles, TestGlobalPriorityQueryFeatures) {
 #endif
 }
 
-TEST(profiles, TestImageRobustnessFeatures) {
+TEST_F(TestsCapabilities, TestImageRobustnessFeatures) {
 #ifdef VK_EXT_image_robustness
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceImageRobustnessFeaturesEXT image_robustness_features{};
     image_robustness_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT;
@@ -2208,10 +1993,8 @@ TEST(profiles, TestImageRobustnessFeatures) {
 #endif
 }
 
-TEST(profiles, TestIndexTypeUint8Features) {
+TEST_F(TestsCapabilities, TestIndexTypeUint8Features) {
 #ifdef VK_EXT_index_type_uint8
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceIndexTypeUint8FeaturesEXT index_type_uint8_features{};
     index_type_uint8_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INDEX_TYPE_UINT8_FEATURES_EXT;
@@ -2226,10 +2009,8 @@ TEST(profiles, TestIndexTypeUint8Features) {
 #endif
 }
 
-TEST(profiles, TestInlineUniformBlockFeatures) {
+TEST_F(TestsCapabilities, TestInlineUniformBlockFeatures) {
 #ifdef VK_EXT_inline_uniform_block
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceInlineUniformBlockFeaturesEXT inline_uniform_block_features{};
     inline_uniform_block_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT;
@@ -2244,10 +2025,8 @@ TEST(profiles, TestInlineUniformBlockFeatures) {
 #endif
 }
 
-TEST(profiles, TestLineRasterizationFeatures) {
+TEST_F(TestsCapabilities, TestLineRasterizationFeatures) {
 #ifdef VK_EXT_line_rasterization
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceLineRasterizationFeaturesEXT line_rasterization_features{};
     line_rasterization_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT;
@@ -2266,10 +2045,8 @@ TEST(profiles, TestLineRasterizationFeatures) {
 #endif
 }
 
-TEST(profiles, TestMemoryPriorityFeatures) {
+TEST_F(TestsCapabilities, TestMemoryPriorityFeatures) {
 #ifdef VK_EXT_memory_priority
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceMemoryPriorityFeaturesEXT memory_priority_features{};
     memory_priority_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PRIORITY_FEATURES_EXT;
@@ -2283,10 +2060,8 @@ TEST(profiles, TestMemoryPriorityFeatures) {
 #endif
 }
 
-TEST(profiles, TestMultiDrawFeatures) {
+TEST_F(TestsCapabilities, TestMultiDrawFeatures) {
 #ifdef VK_EXT_multi_draw
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceMultiDrawFeaturesEXT multi_draw_features{};
     multi_draw_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_FEATURES_EXT;
@@ -2300,10 +2075,8 @@ TEST(profiles, TestMultiDrawFeatures) {
 #endif
 }
 
-TEST(profiles, TestPageableDeviceLocalMemoryFeatures) {
+TEST_F(TestsCapabilities, TestPageableDeviceLocalMemoryFeatures) {
 #ifdef VK_EXT_pageable_device_local_memory
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT pageable_device_local_memory_features{};
     pageable_device_local_memory_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PAGEABLE_DEVICE_LOCAL_MEMORY_FEATURES_EXT;
@@ -2317,10 +2090,8 @@ TEST(profiles, TestPageableDeviceLocalMemoryFeatures) {
 #endif
 }
 
-TEST(profiles, TestPipelineCreationCacheControlFeatures) {
+TEST_F(TestsCapabilities, TestPipelineCreationCacheControlFeatures) {
 #ifdef VK_EXT_pipeline_creation_cache_control
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT pipeline_creation_cache_control_features{};
     pipeline_creation_cache_control_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT;
@@ -2334,10 +2105,8 @@ TEST(profiles, TestPipelineCreationCacheControlFeatures) {
 #endif
 }
 
-TEST(profiles, TestPrimitiveTopologyListRestartFeatures) {
+TEST_F(TestsCapabilities, TestPrimitiveTopologyListRestartFeatures) {
 #ifdef VK_EXT_primitive_topology_list_restart
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT primitive_topology_list_restart_features{};
     primitive_topology_list_restart_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIMITIVE_TOPOLOGY_LIST_RESTART_FEATURES_EXT;
@@ -2352,10 +2121,8 @@ TEST(profiles, TestPrimitiveTopologyListRestartFeatures) {
 #endif
 }
 
-TEST(profiles, TestPrivateDataFeatures) {
+TEST_F(TestsCapabilities, TestPrivateDataFeatures) {
 #ifdef VK_EXT_private_data
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDevicePrivateDataFeaturesEXT private_data_features{};
     private_data_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIVATE_DATA_FEATURES_EXT;
@@ -2369,10 +2136,8 @@ TEST(profiles, TestPrivateDataFeatures) {
 #endif
 }
 
-TEST(profiles, TestProvokingVertexFeatures) {
+TEST_F(TestsCapabilities, TestProvokingVertexFeatures) {
 #ifdef VK_EXT_provoking_vertex
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceProvokingVertexFeaturesEXT provoking_vertex_features{};
     provoking_vertex_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROVOKING_VERTEX_FEATURES_EXT;
@@ -2387,10 +2152,8 @@ TEST(profiles, TestProvokingVertexFeatures) {
 #endif
 }
 
-TEST(profiles, TestRGBA10X6FormatsFeatures) {
+TEST_F(TestsCapabilities, TestRGBA10X6FormatsFeatures) {
 #ifdef VK_EXT_rgba10x6_formats
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT rgba10x6_formats_features{};
     rgba10x6_formats_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RGBA10X6_FORMATS_FEATURES_EXT;
@@ -2404,10 +2167,8 @@ TEST(profiles, TestRGBA10X6FormatsFeatures) {
 #endif
 }
 
-TEST(profiles, TestRobustness2Features) {
+TEST_F(TestsCapabilities, TestRobustness2Features) {
 #ifdef VK_EXT_robustness2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceRobustness2FeaturesEXT robustness_2_features{};
     robustness_2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
@@ -2423,10 +2184,8 @@ TEST(profiles, TestRobustness2Features) {
 #endif
 }
 
-TEST(profiles, TestShaderAtomicFloatFeatures) {
+TEST_F(TestsCapabilities, TestShaderAtomicFloatFeatures) {
 #ifdef VK_EXT_shader_atomic_float
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderAtomicFloatFeaturesEXT shader_atomic_float_features{};
     shader_atomic_float_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT_FEATURES_EXT;
@@ -2451,10 +2210,8 @@ TEST(profiles, TestShaderAtomicFloatFeatures) {
 #endif
 }
 
-TEST(profiles, TestShaderAtomicFloat2Features) {
+TEST_F(TestsCapabilities, TestShaderAtomicFloat2Features) {
 #ifdef VK_EXT_shader_atomic_float2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT shader_atomic_float_2_features{};
     shader_atomic_float_2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT_2_FEATURES_EXT;
@@ -2479,10 +2236,8 @@ TEST(profiles, TestShaderAtomicFloat2Features) {
 #endif
 }
 
-TEST(profiles, TestShaderDemoteToHelperInvocationFeatures) {
+TEST_F(TestsCapabilities, TestShaderDemoteToHelperInvocationFeatures) {
 #ifdef VK_EXT_shader_demote_to_helper_invocation
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT shader_demote_to_helper_invocation_features{};
     shader_demote_to_helper_invocation_features.sType =
@@ -2497,10 +2252,8 @@ TEST(profiles, TestShaderDemoteToHelperInvocationFeatures) {
 #endif
 }
 
-TEST(profiles, TestShaderImageAtomicInt64Features) {
+TEST_F(TestsCapabilities, TestShaderImageAtomicInt64Features) {
 #ifdef VK_EXT_shader_image_atomic_int64
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT shader_image_atomic_int_64_features{};
     shader_image_atomic_int_64_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_IMAGE_ATOMIC_INT64_FEATURES_EXT;
@@ -2515,10 +2268,8 @@ TEST(profiles, TestShaderImageAtomicInt64Features) {
 #endif
 }
 
-TEST(profiles, TestSubgroupSizeControlFeatures) {
+TEST_F(TestsCapabilities, TestSubgroupSizeControlFeatures) {
 #ifdef VK_EXT_subgroup_size_control
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceSubgroupSizeControlFeaturesEXT subgroup_size_control_features{};
     subgroup_size_control_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
@@ -2533,10 +2284,8 @@ TEST(profiles, TestSubgroupSizeControlFeatures) {
 #endif
 }
 
-TEST(profiles, TestTexelBufferAlignmentFeatures) {
+TEST_F(TestsCapabilities, TestTexelBufferAlignmentFeatures) {
 #ifdef VK_EXT_texel_buffer_alignment
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT texel_buffer_alignment_features{};
     texel_buffer_alignment_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT;
@@ -2550,10 +2299,8 @@ TEST(profiles, TestTexelBufferAlignmentFeatures) {
 #endif
 }
 
-TEST(profiles, TestTextureCompressionASTCHDRFeatures) {
+TEST_F(TestsCapabilities, TestTextureCompressionASTCHDRFeatures) {
 #ifdef VK_EXT_texture_compression_astc_hdr
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT texture_compression_astchdr_features{};
     texture_compression_astchdr_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXTURE_COMPRESSION_ASTC_HDR_FEATURES_EXT;
@@ -2567,10 +2314,8 @@ TEST(profiles, TestTextureCompressionASTCHDRFeatures) {
 #endif
 }
 
-TEST(profiles, TestTransformFeedbackFeatures) {
+TEST_F(TestsCapabilities, TestTransformFeedbackFeatures) {
 #ifdef VK_EXT_transform_feedback
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceTransformFeedbackFeaturesEXT transform_feedback_features{};
     transform_feedback_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT;
@@ -2585,10 +2330,8 @@ TEST(profiles, TestTransformFeedbackFeatures) {
 #endif
 }
 
-TEST(profiles, TestVertexAttributeDivisorFeatures) {
+TEST_F(TestsCapabilities, TestVertexAttributeDivisorFeatures) {
 #ifdef VK_EXT_vertex_attribute_divisor
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT vertex_attribute_divisor_features{};
     vertex_attribute_divisor_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT;
@@ -2603,10 +2346,8 @@ TEST(profiles, TestVertexAttributeDivisorFeatures) {
 #endif
 }
 
-TEST(profiles, TestVertexInputDynamicStateFeatures) {
+TEST_F(TestsCapabilities, TestVertexInputDynamicStateFeatures) {
 #ifdef VK_EXT_vertex_input_dynamic_state
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT vertex_input_dynamic_state_features{};
     vertex_input_dynamic_state_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_INPUT_DYNAMIC_STATE_FEATURES_EXT;
@@ -2620,10 +2361,8 @@ TEST(profiles, TestVertexInputDynamicStateFeatures) {
 #endif
 }
 
-TEST(profiles, TestYcbcr2Plane444FormatsFeatures) {
+TEST_F(TestsCapabilities, TestYcbcr2Plane444FormatsFeatures) {
 #ifdef VK_EXT_ycbcr_2plane_444_formats
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT ycbcr_2_plane_444_formats_features{};
     ycbcr_2_plane_444_formats_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_2_PLANE_444_FORMATS_FEATURES_EXT;
@@ -2637,10 +2376,8 @@ TEST(profiles, TestYcbcr2Plane444FormatsFeatures) {
 #endif
 }
 
-TEST(profiles, TestYcbcrImageArraysFeatures) {
+TEST_F(TestsCapabilities, TestYcbcrImageArraysFeatures) {
 #ifdef VK_EXT_ycbcr_image_arrays
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceYcbcrImageArraysFeaturesEXT ycbcr_image_arrays_features{};
     ycbcr_image_arrays_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_IMAGE_ARRAYS_FEATURES_EXT;
@@ -2654,10 +2391,8 @@ TEST(profiles, TestYcbcrImageArraysFeatures) {
 #endif
 }
 
-TEST(profiles, TestFragmentShadingRateFeatures) {
+TEST_F(TestsCapabilities, TestFragmentShadingRateFeatures) {
 #ifdef VK_KHR_fragment_shading_rate
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceFragmentShadingRateFeaturesKHR fragment_shading_rate_features{};
     fragment_shading_rate_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_FEATURES_KHR;
@@ -2673,10 +2408,8 @@ TEST(profiles, TestFragmentShadingRateFeatures) {
 #endif
 }
 
-TEST(profiles, TestCoherentMemoryFeatures) {
+TEST_F(TestsCapabilities, TestCoherentMemoryFeatures) {
 #ifdef VK_AMD_device_coherent_memory
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceCoherentMemoryFeaturesAMD coherent_memory_features{};
     coherent_memory_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD;
@@ -2690,10 +2423,8 @@ TEST(profiles, TestCoherentMemoryFeatures) {
 #endif
 }
 
-TEST(profiles, TestInvocationMaskFeatures) {
+TEST_F(TestsCapabilities, TestInvocationMaskFeatures) {
 #ifdef VK_HUAWEI_invocation_mask
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceInvocationMaskFeaturesHUAWEI invocation_mask_features{};
     invocation_mask_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INVOCATION_MASK_FEATURES_HUAWEI;
@@ -2707,10 +2438,8 @@ TEST(profiles, TestInvocationMaskFeatures) {
 #endif
 }
 
-TEST(profiles, TestSubpassShadingFeatures) {
+TEST_F(TestsCapabilities, TestSubpassShadingFeatures) {
 #ifdef VK_HUAWEI_subpass_shading
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceSubpassShadingFeaturesHUAWEI subpass_shading_features{};
     subpass_shading_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBPASS_SHADING_FEATURES_HUAWEI;
@@ -2724,10 +2453,8 @@ TEST(profiles, TestSubpassShadingFeatures) {
 #endif
 }
 
-TEST(profiles, TestShaderIntegerFunctions2Features) {
+TEST_F(TestsCapabilities, TestShaderIntegerFunctions2Features) {
 #ifdef VK_INTEL_shader_integer_functions2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL shader_integer_functions_2_features{};
     shader_integer_functions_2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_INTEGER_FUNCTIONS_2_FEATURES_INTEL;
@@ -2741,10 +2468,8 @@ TEST(profiles, TestShaderIntegerFunctions2Features) {
 #endif
 }
 
-TEST(profiles, TestComputeShaderDerivativesFeatures) {
+TEST_F(TestsCapabilities, TestComputeShaderDerivativesFeatures) {
 #ifdef VK_NV_compute_shader_derivatives
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceComputeShaderDerivativesFeaturesNV compute_shader_derivatives_features{};
     compute_shader_derivatives_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COMPUTE_SHADER_DERIVATIVES_FEATURES_NV;
@@ -2759,10 +2484,8 @@ TEST(profiles, TestComputeShaderDerivativesFeatures) {
 #endif
 }
 
-TEST(profiles, TestCooperativeMatrixFeatures) {
+TEST_F(TestsCapabilities, TestCooperativeMatrixFeatures) {
 #ifdef VK_NV_cooperative_matrix
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceCooperativeMatrixFeaturesNV cooperative_matrix_features{};
     cooperative_matrix_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_NV;
@@ -2777,10 +2500,8 @@ TEST(profiles, TestCooperativeMatrixFeatures) {
 #endif
 }
 
-TEST(profiles, TestCornerSampledImageFeatures) {
+TEST_F(TestsCapabilities, TestCornerSampledImageFeatures) {
 #ifdef VK_NV_corner_sampled_image
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceCornerSampledImageFeaturesNV corner_sampled_image_features{};
     corner_sampled_image_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CORNER_SAMPLED_IMAGE_FEATURES_NV;
@@ -2794,10 +2515,8 @@ TEST(profiles, TestCornerSampledImageFeatures) {
 #endif
 }
 
-TEST(profiles, TestCoverageReductionModeFeatures) {
+TEST_F(TestsCapabilities, TestCoverageReductionModeFeatures) {
 #ifdef VK_NV_coverage_reduction_mode
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceCoverageReductionModeFeaturesNV coverage_reduction_mode_features{};
     coverage_reduction_mode_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COVERAGE_REDUCTION_MODE_FEATURES_NV;
@@ -2811,10 +2530,8 @@ TEST(profiles, TestCoverageReductionModeFeatures) {
 #endif
 }
 
-TEST(profiles, TestDedicatedAllocationImageAliasingFeatures) {
+TEST_F(TestsCapabilities, TestDedicatedAllocationImageAliasingFeatures) {
 #ifdef VK_NV_dedicated_allocation_image_aliasing
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV dedicated_allocation_image_aliasing_features{};
     dedicated_allocation_image_aliasing_features.sType =
@@ -2829,10 +2546,8 @@ TEST(profiles, TestDedicatedAllocationImageAliasingFeatures) {
 #endif
 }
 
-TEST(profiles, TestDiagnosticsConfigFeatures) {
+TEST_F(TestsCapabilities, TestDiagnosticsConfigFeatures) {
 #ifdef VK_NV_device_diagnostics_config
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceDiagnosticsConfigFeaturesNV diagnostic_config_features{};
     diagnostic_config_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DIAGNOSTICS_CONFIG_FEATURES_NV;
@@ -2846,10 +2561,8 @@ TEST(profiles, TestDiagnosticsConfigFeatures) {
 #endif
 }
 
-TEST(profiles, TestDeviceGeneratedCommandsFeatures) {
+TEST_F(TestsCapabilities, TestDeviceGeneratedCommandsFeatures) {
 #ifdef VK_NV_device_generated_commands
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV device_generated_commmands_features{};
     device_generated_commmands_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DIAGNOSTICS_CONFIG_FEATURES_NV;
@@ -2863,10 +2576,8 @@ TEST(profiles, TestDeviceGeneratedCommandsFeatures) {
 #endif
 }
 
-TEST(profiles, TestExternalMemoryRDMAFeatures) {
+TEST_F(TestsCapabilities, TestExternalMemoryRDMAFeatures) {
 #ifdef VK_NV_external_memory_rdma
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceExternalMemoryRDMAFeaturesNV external_memory_rdma_features{};
     external_memory_rdma_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_RDMA_FEATURES_NV;
@@ -2880,10 +2591,8 @@ TEST(profiles, TestExternalMemoryRDMAFeatures) {
 #endif
 }
 
-TEST(profiles, TestFragmentShaderBarycentricFeatures) {
+TEST_F(TestsCapabilities, TestFragmentShaderBarycentricFeatures) {
 #ifdef VK_NV_fragment_shader_barycentric
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV fragment_shader_barycentric_features{};
     fragment_shader_barycentric_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_BARYCENTRIC_FEATURES_NV;
@@ -2897,10 +2606,8 @@ TEST(profiles, TestFragmentShaderBarycentricFeatures) {
 #endif
 }
 
-TEST(profiles, TestFragmentShadingRateEnumsFeatures) {
+TEST_F(TestsCapabilities, TestFragmentShadingRateEnumsFeatures) {
 #ifdef VK_NV_fragment_shading_rate_enums
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV fragment_shading_rate_enums_features{};
     fragment_shading_rate_enums_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_ENUMS_FEATURES_NV;
@@ -2916,10 +2623,8 @@ TEST(profiles, TestFragmentShadingRateEnumsFeatures) {
 #endif
 }
 
-TEST(profiles, TestInheritedViewportScissorFeatures) {
+TEST_F(TestsCapabilities, TestInheritedViewportScissorFeatures) {
 #ifdef VK_NV_inherited_viewport_scissor
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceInheritedViewportScissorFeaturesNV inherited_viewport_scissor_features{};
     inherited_viewport_scissor_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INHERITED_VIEWPORT_SCISSOR_FEATURES_NV;
@@ -2933,10 +2638,8 @@ TEST(profiles, TestInheritedViewportScissorFeatures) {
 #endif
 }
 
-TEST(profiles, TestMeshShaderFeatures) {
+TEST_F(TestsCapabilities, TestMeshShaderFeatures) {
 #ifdef VK_NV_mesh_shader
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceMeshShaderFeaturesNV mesh_shader_features{};
     mesh_shader_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_NV;
@@ -2951,10 +2654,8 @@ TEST(profiles, TestMeshShaderFeatures) {
 #endif
 }
 
-TEST(profiles, TestRayTracingMotionBlurFeatures) {
+TEST_F(TestsCapabilities, TestRayTracingMotionBlurFeatures) {
 #ifdef VK_NV_ray_tracing_motion_blur
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceRayTracingMotionBlurFeaturesNV ray_tracing_motion_blur_features{};
     ray_tracing_motion_blur_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_MOTION_BLUR_FEATURES_NV;
@@ -2969,10 +2670,8 @@ TEST(profiles, TestRayTracingMotionBlurFeatures) {
 #endif
 }
 
-TEST(profiles, TestRepresentativeFragmentTestFeatures) {
+TEST_F(TestsCapabilities, TestRepresentativeFragmentTestFeatures) {
 #ifdef VK_NV_representative_fragment_test
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV representative_fragment_test_features{};
     representative_fragment_test_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_REPRESENTATIVE_FRAGMENT_TEST_FEATURES_NV;
@@ -2986,10 +2685,8 @@ TEST(profiles, TestRepresentativeFragmentTestFeatures) {
 #endif
 }
 
-TEST(profiles, TestExclusiveScissorFeatures) {
+TEST_F(TestsCapabilities, TestExclusiveScissorFeatures) {
 #ifdef VK_NV_scissor_exclusive
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceExclusiveScissorFeaturesNV exclusive_scissor_features{};
     exclusive_scissor_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXCLUSIVE_SCISSOR_FEATURES_NV;
@@ -3003,10 +2700,8 @@ TEST(profiles, TestExclusiveScissorFeatures) {
 #endif
 }
 
-TEST(profiles, TesthaderImageFootprintFeatures) {
+TEST_F(TestsCapabilities, TesthaderImageFootprintFeatures) {
 #ifdef VK_NV_shader_image_footprint
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderImageFootprintFeaturesNV shader_image_footprint_features{};
     shader_image_footprint_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXCLUSIVE_SCISSOR_FEATURES_NV;
@@ -3020,10 +2715,8 @@ TEST(profiles, TesthaderImageFootprintFeatures) {
 #endif
 }
 
-TEST(profiles, TestShaderSMBuiltinsFeatures) {
+TEST_F(TestsCapabilities, TestShaderSMBuiltinsFeatures) {
 #ifdef VK_NV_shader_sm_builtins
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShaderSMBuiltinsFeaturesNV shader_sm_builtins_features{};
     shader_sm_builtins_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SM_BUILTINS_FEATURES_NV;
@@ -3037,10 +2730,8 @@ TEST(profiles, TestShaderSMBuiltinsFeatures) {
 #endif
 }
 
-TEST(profiles, TestShadingRateImageFeatures) {
+TEST_F(TestsCapabilities, TestShadingRateImageFeatures) {
 #ifdef VK_NV_shading_rate_image
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceShadingRateImageFeaturesNV shading_rate_image_features{};
     shading_rate_image_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_FEATURES_NV;
@@ -3055,10 +2746,8 @@ TEST(profiles, TestShadingRateImageFeatures) {
 #endif
 }
 
-TEST(profiles, TestMutableDescriptorTypeFeatures) {
+TEST_F(TestsCapabilities, TestMutableDescriptorTypeFeatures) {
 #ifdef VK_VALVE_mutable_descriptor_type
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE mutable_descriptor_type_features{};
     mutable_descriptor_type_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MUTABLE_DESCRIPTOR_TYPE_FEATURES_VALVE;
@@ -3072,10 +2761,8 @@ TEST(profiles, TestMutableDescriptorTypeFeatures) {
 #endif
 }
 
-TEST(profiles, TestDynamicRenderingFeatures) {
+TEST_F(TestsCapabilities, TestDynamicRenderingFeatures) {
 #ifdef VK_KHR_dynamic_rendering
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamic_rendering_features{};
     dynamic_rendering_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR;
@@ -3089,10 +2776,8 @@ TEST(profiles, TestDynamicRenderingFeatures) {
 #endif
 }
 
-TEST(profiles, TestImageViewMinLodFeatures) {
+TEST_F(TestsCapabilities, TestImageViewMinLodFeatures) {
 #ifdef VK_EXT_image_view_min_lod
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceImageViewMinLodFeaturesEXT image_view_min_lod_features{};
     image_view_min_lod_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_VIEW_MIN_LOD_FEATURES_EXT;
@@ -3106,10 +2791,8 @@ TEST(profiles, TestImageViewMinLodFeatures) {
 #endif
 }
 
-TEST(profiles, TestFragmentDensityMap2Features) {
+TEST_F(TestsCapabilities, TestFragmentDensityMap2Features) {
 #ifdef VK_EXT_fragment_density_map2
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceFragmentDensityMap2FeaturesEXT fragment_density_map_2_features{};
     fragment_density_map_2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_FEATURES_EXT;
@@ -3123,10 +2806,8 @@ TEST(profiles, TestFragmentDensityMap2Features) {
 #endif
 }
 
-TEST(profiles, TestFragmentDensityMapOffsetFeatures) {
+TEST_F(TestsCapabilities, TestFragmentDensityMapOffsetFeatures) {
 #ifdef VK_QCOM_fragment_density_map_offset
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM fragment_density_map_offset_features{};
     fragment_density_map_offset_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_FEATURES_QCOM;
@@ -3140,10 +2821,8 @@ TEST(profiles, TestFragmentDensityMapOffsetFeatures) {
 #endif
 }
 
-TEST(profiles, TestFragmentDepthClipControlFeatures) {
+TEST_F(TestsCapabilities, TestFragmentDepthClipControlFeatures) {
 #ifdef VK_EXT_depth_clip_control
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceDepthClipControlFeaturesEXT depth_clip_control_features{};
     depth_clip_control_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_CONTROL_FEATURES_EXT;
@@ -3157,10 +2836,8 @@ TEST(profiles, TestFragmentDepthClipControlFeatures) {
 #endif
 }
 
-TEST(profiles, TestRasterizationOrderAttachmentAccessFeatures) {
+TEST_F(TestsCapabilities, TestRasterizationOrderAttachmentAccessFeatures) {
 #ifdef VK_ARM_rasterization_order_attachment_access
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM rasterization_order_attachment_access_features{};
     rasterization_order_attachment_access_features.sType =
@@ -3178,10 +2855,8 @@ TEST(profiles, TestRasterizationOrderAttachmentAccessFeatures) {
 #endif
 }
 
-TEST(profiles, TestLinearColorAttachmentFeatures) {
+TEST_F(TestsCapabilities, TestLinearColorAttachmentFeatures) {
 #ifdef VK_NV_linear_color_attachment
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceLinearColorAttachmentFeaturesNV linear_color_attachment_features{};
     linear_color_attachment_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINEAR_COLOR_ATTACHMENT_FEATURES_NV;
@@ -3195,9 +2870,7 @@ TEST(profiles, TestLinearColorAttachmentFeatures) {
 #endif
 }
 
-TEST(profiles, TestFormatR4G4UnormPack8) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR4G4UnormPack8) {
 
     VkFormat format = VK_FORMAT_R4G4_UNORM_PACK8;
     VkFormatProperties format_properties;
@@ -3217,9 +2890,7 @@ TEST(profiles, TestFormatR4G4UnormPack8) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR4G4B4A4UnormPack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR4G4B4A4UnormPack16) {
 
     VkFormat format = VK_FORMAT_R4G4B4A4_UNORM_PACK16;
     VkFormatProperties format_properties;
@@ -3239,9 +2910,7 @@ TEST(profiles, TestFormatR4G4B4A4UnormPack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB4G4R4A4UnormPack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB4G4R4A4UnormPack16) {
 
     VkFormat format = VK_FORMAT_B4G4R4A4_UNORM_PACK16;
     VkFormatProperties format_properties;
@@ -3259,9 +2928,7 @@ TEST(profiles, TestFormatB4G4R4A4UnormPack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR5G6B5UnormPack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR5G6B5UnormPack16) {
 
     VkFormat format = VK_FORMAT_R5G6B5_UNORM_PACK16;
     VkFormatProperties format_properties;
@@ -3281,9 +2948,7 @@ TEST(profiles, TestFormatR5G6B5UnormPack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB5G6R5UnormPack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB5G6R5UnormPack16) {
 
     VkFormat format = VK_FORMAT_B5G6R5_UNORM_PACK16;
     VkFormatProperties format_properties;
@@ -3308,9 +2973,7 @@ TEST(profiles, TestFormatB5G6R5UnormPack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR5G5B5A1UnormPack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR5G5B5A1UnormPack16) {
 
     VkFormat format = VK_FORMAT_R5G5B5A1_UNORM_PACK16;
     VkFormatProperties format_properties;
@@ -3331,9 +2994,7 @@ TEST(profiles, TestFormatR5G5B5A1UnormPack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB5G5R5A1UnormPack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB5G5R5A1UnormPack16) {
 
     VkFormat format = VK_FORMAT_B5G5R5A1_UNORM_PACK16;
     VkFormatProperties format_properties;
@@ -3356,9 +3017,7 @@ TEST(profiles, TestFormatB5G5R5A1UnormPack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA1R5G5B5UnormPack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA1R5G5B5UnormPack16) {
 
     VkFormat format = VK_FORMAT_A1R5G5B5_UNORM_PACK16;
     VkFormatProperties format_properties;
@@ -3380,9 +3039,7 @@ TEST(profiles, TestFormatA1R5G5B5UnormPack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8Unorm) {
 
     VkFormat format = VK_FORMAT_R8_UNORM;
     VkFormatProperties format_properties;
@@ -3406,9 +3063,7 @@ TEST(profiles, TestFormatR8Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8Snorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8Snorm) {
 
     VkFormat format = VK_FORMAT_R8_SNORM;
     VkFormatProperties format_properties;
@@ -3431,9 +3086,7 @@ TEST(profiles, TestFormatR8Snorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8Uscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8Uscaled) {
 
     VkFormat format = VK_FORMAT_R8_USCALED;
     VkFormatProperties format_properties;
@@ -3453,9 +3106,7 @@ TEST(profiles, TestFormatR8Uscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8Sscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8Sscaled) {
 
     VkFormat format = VK_FORMAT_R8_SSCALED;
     VkFormatProperties format_properties;
@@ -3477,9 +3128,7 @@ TEST(profiles, TestFormatR8Sscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8Uint) {
 
     VkFormat format = VK_FORMAT_R8_UINT;
     VkFormatProperties format_properties;
@@ -3499,9 +3148,7 @@ TEST(profiles, TestFormatR8Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8Sint) {
 
     VkFormat format = VK_FORMAT_R8_SINT;
     VkFormatProperties format_properties;
@@ -3522,9 +3169,7 @@ TEST(profiles, TestFormatR8Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8Srgb) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8Srgb) {
 
     VkFormat format = VK_FORMAT_R8_SRGB;
     VkFormatProperties format_properties;
@@ -3546,9 +3191,7 @@ TEST(profiles, TestFormatR8Srgb) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8Unorm) {
 
     VkFormat format = VK_FORMAT_R8G8_UNORM;
     VkFormatProperties format_properties;
@@ -3568,9 +3211,7 @@ TEST(profiles, TestFormatR8G8Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8Snorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8Snorm) {
 
     VkFormat format = VK_FORMAT_R8G8_SNORM;
     VkFormatProperties format_properties;
@@ -3592,9 +3233,7 @@ TEST(profiles, TestFormatR8G8Snorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8Uscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8Uscaled) {
 
     VkFormat format = VK_FORMAT_R8G8_USCALED;
     VkFormatProperties format_properties;
@@ -3616,9 +3255,7 @@ TEST(profiles, TestFormatR8G8Uscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8Sscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8Sscaled) {
 
     VkFormat format = VK_FORMAT_R8G8_SSCALED;
     VkFormatProperties format_properties;
@@ -3641,9 +3278,7 @@ TEST(profiles, TestFormatR8G8Sscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8Uint) {
 
     VkFormat format = VK_FORMAT_R8G8_UINT;
     VkFormatProperties format_properties;
@@ -3666,9 +3301,7 @@ TEST(profiles, TestFormatR8G8Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8Sint) {
 
     VkFormat format = VK_FORMAT_R8G8_SINT;
     VkFormatProperties format_properties;
@@ -3685,9 +3318,7 @@ TEST(profiles, TestFormatR8G8Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8Srgb) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8Srgb) {
 
     VkFormat format = VK_FORMAT_R8G8_SRGB;
     VkFormatProperties format_properties;
@@ -3706,9 +3337,7 @@ TEST(profiles, TestFormatR8G8Srgb) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8Unorm) {
 
     VkFormat format = VK_FORMAT_R8G8B8_UNORM;
     VkFormatProperties format_properties;
@@ -3727,9 +3356,7 @@ TEST(profiles, TestFormatR8G8B8Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8Snorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8Snorm) {
 
     VkFormat format = VK_FORMAT_R8G8B8_SNORM;
     VkFormatProperties format_properties;
@@ -3750,9 +3377,7 @@ TEST(profiles, TestFormatR8G8B8Snorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8Uscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8Uscaled) {
 
     VkFormat format = VK_FORMAT_R8G8B8_USCALED;
     VkFormatProperties format_properties;
@@ -3777,9 +3402,7 @@ TEST(profiles, TestFormatR8G8B8Uscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8Sscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8Sscaled) {
 
     VkFormat format = VK_FORMAT_R8G8B8_SSCALED;
     VkFormatProperties format_properties;
@@ -3797,9 +3420,7 @@ TEST(profiles, TestFormatR8G8B8Sscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8Uint) {
 
     VkFormat format = VK_FORMAT_R8G8B8_UINT;
     VkFormatProperties format_properties;
@@ -3821,9 +3442,7 @@ TEST(profiles, TestFormatR8G8B8Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8Sint) {
 
     VkFormat format = VK_FORMAT_R8G8B8_SINT;
     VkFormatProperties format_properties;
@@ -3842,9 +3461,7 @@ TEST(profiles, TestFormatR8G8B8Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8Srgb) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8Srgb) {
 
     VkFormat format = VK_FORMAT_R8G8B8_SRGB;
     VkFormatProperties format_properties;
@@ -3863,9 +3480,7 @@ TEST(profiles, TestFormatR8G8B8Srgb) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8Unorm) {
 
     VkFormat format = VK_FORMAT_B8G8R8_UNORM;
     VkFormatProperties format_properties;
@@ -3887,9 +3502,7 @@ TEST(profiles, TestFormatB8G8R8Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8Snorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8Snorm) {
 
     VkFormat format = VK_FORMAT_B8G8R8_SNORM;
     VkFormatProperties format_properties;
@@ -3909,9 +3522,7 @@ TEST(profiles, TestFormatB8G8R8Snorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8Uscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8Uscaled) {
 
     VkFormat format = VK_FORMAT_B8G8R8_USCALED;
     VkFormatProperties format_properties;
@@ -3929,9 +3540,7 @@ TEST(profiles, TestFormatB8G8R8Uscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8Sscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8Sscaled) {
 
     VkFormat format = VK_FORMAT_B8G8R8_SSCALED;
     VkFormatProperties format_properties;
@@ -3954,9 +3563,7 @@ TEST(profiles, TestFormatB8G8R8Sscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8Uint) {
 
     VkFormat format = VK_FORMAT_B8G8R8_UINT;
     VkFormatProperties format_properties;
@@ -3976,9 +3583,7 @@ TEST(profiles, TestFormatB8G8R8Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8Sint) {
 
     VkFormat format = VK_FORMAT_B8G8R8_SINT;
     VkFormatProperties format_properties;
@@ -4002,9 +3607,7 @@ TEST(profiles, TestFormatB8G8R8Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8Srgb) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8Srgb) {
 
     VkFormat format = VK_FORMAT_B8G8R8_SRGB;
     VkFormatProperties format_properties;
@@ -4020,9 +3623,7 @@ TEST(profiles, TestFormatB8G8R8Srgb) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8A8Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8A8Unorm) {
 
     VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
     VkFormatProperties format_properties;
@@ -4041,9 +3642,7 @@ TEST(profiles, TestFormatR8G8B8A8Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8A8Snorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8A8Snorm) {
 
     VkFormat format = VK_FORMAT_R8G8B8A8_SNORM;
     VkFormatProperties format_properties;
@@ -4065,9 +3664,7 @@ TEST(profiles, TestFormatR8G8B8A8Snorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8A8Uscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8A8Uscaled) {
 
     VkFormat format = VK_FORMAT_R8G8B8A8_USCALED;
     VkFormatProperties format_properties;
@@ -4088,9 +3685,7 @@ TEST(profiles, TestFormatR8G8B8A8Uscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8A8Sscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8A8Sscaled) {
 
     VkFormat format = VK_FORMAT_R8G8B8A8_SSCALED;
     VkFormatProperties format_properties;
@@ -4114,9 +3709,7 @@ TEST(profiles, TestFormatR8G8B8A8Sscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8A8Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8A8Uint) {
 
     VkFormat format = VK_FORMAT_R8G8B8A8_UINT;
     VkFormatProperties format_properties;
@@ -4134,9 +3727,7 @@ TEST(profiles, TestFormatR8G8B8A8Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8A8Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8A8Sint) {
 
     VkFormat format = VK_FORMAT_R8G8B8A8_SINT;
     VkFormatProperties format_properties;
@@ -4154,9 +3745,7 @@ TEST(profiles, TestFormatR8G8B8A8Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR8G8B8A8Srgb) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR8G8B8A8Srgb) {
 
     VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
     VkFormatProperties format_properties;
@@ -4178,9 +3767,7 @@ TEST(profiles, TestFormatR8G8B8A8Srgb) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8A8Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8A8Unorm) {
 
     VkFormat format = VK_FORMAT_B8G8R8A8_UNORM;
     VkFormatProperties format_properties;
@@ -4197,9 +3784,7 @@ TEST(profiles, TestFormatB8G8R8A8Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8A8Snorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8A8Snorm) {
 
     VkFormat format = VK_FORMAT_B8G8R8A8_SNORM;
     VkFormatProperties format_properties;
@@ -4221,9 +3806,7 @@ TEST(profiles, TestFormatB8G8R8A8Snorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8A8Uscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8A8Uscaled) {
 
     VkFormat format = VK_FORMAT_B8G8R8A8_USCALED;
     VkFormatProperties format_properties;
@@ -4246,9 +3829,7 @@ TEST(profiles, TestFormatB8G8R8A8Uscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8A8Sscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8A8Sscaled) {
 
     VkFormat format = VK_FORMAT_B8G8R8A8_SSCALED;
     VkFormatProperties format_properties;
@@ -4268,9 +3849,7 @@ TEST(profiles, TestFormatB8G8R8A8Sscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8A8Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8A8Uint) {
 
     VkFormat format = VK_FORMAT_B8G8R8A8_UINT;
     VkFormatProperties format_properties;
@@ -4294,9 +3873,7 @@ TEST(profiles, TestFormatB8G8R8A8Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8A8Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8A8Sint) {
 
     VkFormat format = VK_FORMAT_B8G8R8A8_SINT;
     VkFormatProperties format_properties;
@@ -4312,9 +3889,7 @@ TEST(profiles, TestFormatB8G8R8A8Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8A8Srgb) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8A8Srgb) {
 
     VkFormat format = VK_FORMAT_B8G8R8A8_SRGB;
     VkFormatProperties format_properties;
@@ -4330,9 +3905,7 @@ TEST(profiles, TestFormatB8G8R8A8Srgb) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA8B8G8R8UnormPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA8B8G8R8UnormPack32) {
 
     VkFormat format = VK_FORMAT_A8B8G8R8_UNORM_PACK32;
     VkFormatProperties format_properties;
@@ -4354,9 +3927,7 @@ TEST(profiles, TestFormatA8B8G8R8UnormPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA8B8G8R8SnormPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA8B8G8R8SnormPack32) {
 
     VkFormat format = VK_FORMAT_A8B8G8R8_SNORM_PACK32;
     VkFormatProperties format_properties;
@@ -4377,9 +3948,7 @@ TEST(profiles, TestFormatA8B8G8R8SnormPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA8B8G8R8UscaledPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA8B8G8R8UscaledPack32) {
 
     VkFormat format = VK_FORMAT_A8B8G8R8_USCALED_PACK32;
     VkFormatProperties format_properties;
@@ -4402,9 +3971,7 @@ TEST(profiles, TestFormatA8B8G8R8UscaledPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA8B8G8R8SscaledPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA8B8G8R8SscaledPack32) {
 
     VkFormat format = VK_FORMAT_A8B8G8R8_SSCALED_PACK32;
     VkFormatProperties format_properties;
@@ -4426,9 +3993,7 @@ TEST(profiles, TestFormatA8B8G8R8SscaledPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA8B8G8R8UintPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA8B8G8R8UintPack32) {
 
     VkFormat format = VK_FORMAT_A8B8G8R8_UINT_PACK32;
     VkFormatProperties format_properties;
@@ -4448,9 +4013,7 @@ TEST(profiles, TestFormatA8B8G8R8UintPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA8B8G8R8SintPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA8B8G8R8SintPack32) {
 
     VkFormat format = VK_FORMAT_A8B8G8R8_SINT_PACK32;
     VkFormatProperties format_properties;
@@ -4471,9 +4034,7 @@ TEST(profiles, TestFormatA8B8G8R8SintPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA8B8G8R8SrgbPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA8B8G8R8SrgbPack32) {
 
     VkFormat format = VK_FORMAT_A8B8G8R8_SRGB_PACK32;
     VkFormatProperties format_properties;
@@ -4494,9 +4055,7 @@ TEST(profiles, TestFormatA8B8G8R8SrgbPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA2R10G10B10UnormPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA2R10G10B10UnormPack32) {
 
     VkFormat format = VK_FORMAT_A2R10G10B10_UNORM_PACK32;
     VkFormatProperties format_properties;
@@ -4519,9 +4078,7 @@ TEST(profiles, TestFormatA2R10G10B10UnormPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA2R10G10B10SnormPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA2R10G10B10SnormPack32) {
 
     VkFormat format = VK_FORMAT_A2R10G10B10_SNORM_PACK32;
     VkFormatProperties format_properties;
@@ -4543,9 +4100,7 @@ TEST(profiles, TestFormatA2R10G10B10SnormPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA2R10G10B10UscaledPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA2R10G10B10UscaledPack32) {
 
     VkFormat format = VK_FORMAT_A2R10G10B10_USCALED_PACK32;
     VkFormatProperties format_properties;
@@ -4564,9 +4119,7 @@ TEST(profiles, TestFormatA2R10G10B10UscaledPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA2R10G10B10SscaledPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA2R10G10B10SscaledPack32) {
 
     VkFormat format = VK_FORMAT_A2R10G10B10_SSCALED_PACK32;
     VkFormatProperties format_properties;
@@ -4584,9 +4137,7 @@ TEST(profiles, TestFormatA2R10G10B10SscaledPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA2R10G10B10UintPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA2R10G10B10UintPack32) {
 
     VkFormat format = VK_FORMAT_A2R10G10B10_UINT_PACK32;
     VkFormatProperties format_properties;
@@ -4608,9 +4159,7 @@ TEST(profiles, TestFormatA2R10G10B10UintPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA2R10G10B10SintPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA2R10G10B10SintPack32) {
 
     VkFormat format = VK_FORMAT_A2R10G10B10_SINT_PACK32;
     VkFormatProperties format_properties;
@@ -4630,9 +4179,7 @@ TEST(profiles, TestFormatA2R10G10B10SintPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA2B10G10R10UnormPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA2B10G10R10UnormPack32) {
 
     VkFormat format = VK_FORMAT_A2B10G10R10_UNORM_PACK32;
     VkFormatProperties format_properties;
@@ -4654,9 +4201,7 @@ TEST(profiles, TestFormatA2B10G10R10UnormPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA2B10G10R10SnormPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA2B10G10R10SnormPack32) {
 
     VkFormat format = VK_FORMAT_A2B10G10R10_SNORM_PACK32;
     VkFormatProperties format_properties;
@@ -4675,9 +4220,7 @@ TEST(profiles, TestFormatA2B10G10R10SnormPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA2B10G10R10UscaledPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA2B10G10R10UscaledPack32) {
 
     VkFormat format = VK_FORMAT_A2B10G10R10_USCALED_PACK32;
     VkFormatProperties format_properties;
@@ -4695,9 +4238,7 @@ TEST(profiles, TestFormatA2B10G10R10UscaledPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA2B10G10R10SscaledPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA2B10G10R10SscaledPack32) {
 
     VkFormat format = VK_FORMAT_A2B10G10R10_SSCALED_PACK32;
     VkFormatProperties format_properties;
@@ -4716,9 +4257,7 @@ TEST(profiles, TestFormatA2B10G10R10SscaledPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA2B10G10R10UintPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA2B10G10R10UintPack32) {
 
     VkFormat format = VK_FORMAT_A2B10G10R10_UINT_PACK32;
     VkFormatProperties format_properties;
@@ -4736,9 +4275,7 @@ TEST(profiles, TestFormatA2B10G10R10UintPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatA2B10G10R10SintPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatA2B10G10R10SintPack32) {
 
     VkFormat format = VK_FORMAT_A2B10G10R10_SINT_PACK32;
     VkFormatProperties format_properties;
@@ -4760,9 +4297,7 @@ TEST(profiles, TestFormatA2B10G10R10SintPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16Unorm) {
 
     VkFormat format = VK_FORMAT_R16_UNORM;
     VkFormatProperties format_properties;
@@ -4783,9 +4318,7 @@ TEST(profiles, TestFormatR16Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16Snorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16Snorm) {
 
     VkFormat format = VK_FORMAT_R16_SNORM;
     VkFormatProperties format_properties;
@@ -4804,9 +4337,7 @@ TEST(profiles, TestFormatR16Snorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16Uscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16Uscaled) {
 
     VkFormat format = VK_FORMAT_R16_USCALED;
     VkFormatProperties format_properties;
@@ -4831,9 +4362,7 @@ TEST(profiles, TestFormatR16Uscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16Sscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16Sscaled) {
 
     VkFormat format = VK_FORMAT_R16_SSCALED;
     VkFormatProperties format_properties;
@@ -4854,9 +4383,7 @@ TEST(profiles, TestFormatR16Sscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16Uint) {
 
     VkFormat format = VK_FORMAT_R16_UINT;
     VkFormatProperties format_properties;
@@ -4880,9 +4407,7 @@ TEST(profiles, TestFormatR16Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16Sint) {
 
     VkFormat format = VK_FORMAT_R16_SINT;
     VkFormatProperties format_properties;
@@ -4902,9 +4427,7 @@ TEST(profiles, TestFormatR16Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16Sfloat) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16Sfloat) {
 
     VkFormat format = VK_FORMAT_R16_SFLOAT;
     VkFormatProperties format_properties;
@@ -4925,9 +4448,7 @@ TEST(profiles, TestFormatR16Sfloat) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16Unorm) {
 
     VkFormat format = VK_FORMAT_R16G16_UNORM;
     VkFormatProperties format_properties;
@@ -4950,9 +4471,7 @@ TEST(profiles, TestFormatR16G16Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16Snorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16Snorm) {
 
     VkFormat format = VK_FORMAT_R16G16_SNORM;
     VkFormatProperties format_properties;
@@ -4974,9 +4493,7 @@ TEST(profiles, TestFormatR16G16Snorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16Uscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16Uscaled) {
 
     VkFormat format = VK_FORMAT_R16G16_USCALED;
     VkFormatProperties format_properties;
@@ -4999,9 +4516,7 @@ TEST(profiles, TestFormatR16G16Uscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16Sscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16Sscaled) {
 
     VkFormat format = VK_FORMAT_R16G16_SSCALED;
     VkFormatProperties format_properties;
@@ -5022,9 +4537,7 @@ TEST(profiles, TestFormatR16G16Sscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16Uint) {
 
     VkFormat format = VK_FORMAT_R16G16_UINT;
     VkFormatProperties format_properties;
@@ -5046,9 +4559,7 @@ TEST(profiles, TestFormatR16G16Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16Sint) {
 
     VkFormat format = VK_FORMAT_R16G16_SINT;
     VkFormatProperties format_properties;
@@ -5067,9 +4578,7 @@ TEST(profiles, TestFormatR16G16Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16Sfloat) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16Sfloat) {
 
     VkFormat format = VK_FORMAT_R16G16_SFLOAT;
     VkFormatProperties format_properties;
@@ -5088,9 +4597,7 @@ TEST(profiles, TestFormatR16G16Sfloat) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16Unorm) {
 
     VkFormat format = VK_FORMAT_R16G16B16_UNORM;
     VkFormatProperties format_properties;
@@ -5109,9 +4616,7 @@ TEST(profiles, TestFormatR16G16B16Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16Snorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16Snorm) {
 
     VkFormat format = VK_FORMAT_R16G16B16_SNORM;
     VkFormatProperties format_properties;
@@ -5132,9 +4637,7 @@ TEST(profiles, TestFormatR16G16B16Snorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16Uscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16Uscaled) {
 
     VkFormat format = VK_FORMAT_R16G16B16_USCALED;
     VkFormatProperties format_properties;
@@ -5154,9 +4657,7 @@ TEST(profiles, TestFormatR16G16B16Uscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16Sscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16Sscaled) {
 
     VkFormat format = VK_FORMAT_R16G16B16_SSCALED;
     VkFormatProperties format_properties;
@@ -5176,9 +4677,7 @@ TEST(profiles, TestFormatR16G16B16Sscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16Uint) {
 
     VkFormat format = VK_FORMAT_R16G16B16_UINT;
     VkFormatProperties format_properties;
@@ -5198,9 +4697,7 @@ TEST(profiles, TestFormatR16G16B16Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16Sint) {
 
     VkFormat format = VK_FORMAT_R16G16B16_SINT;
     VkFormatProperties format_properties;
@@ -5220,9 +4717,7 @@ TEST(profiles, TestFormatR16G16B16Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16Sfloat) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16Sfloat) {
 
     VkFormat format = VK_FORMAT_R16G16B16_SFLOAT;
     VkFormatProperties format_properties;
@@ -5247,9 +4742,7 @@ TEST(profiles, TestFormatR16G16B16Sfloat) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16A16Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16A16Unorm) {
 
     VkFormat format = VK_FORMAT_R16G16B16A16_UNORM;
     VkFormatProperties format_properties;
@@ -5267,9 +4760,7 @@ TEST(profiles, TestFormatR16G16B16A16Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16A16Snorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16A16Snorm) {
 
     VkFormat format = VK_FORMAT_R16G16B16A16_SNORM;
     VkFormatProperties format_properties;
@@ -5293,9 +4784,7 @@ TEST(profiles, TestFormatR16G16B16A16Snorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16A16Uscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16A16Uscaled) {
 
     VkFormat format = VK_FORMAT_R16G16B16A16_USCALED;
     VkFormatProperties format_properties;
@@ -5317,9 +4806,7 @@ TEST(profiles, TestFormatR16G16B16A16Uscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16A16Sscaled) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16A16Sscaled) {
 
     VkFormat format = VK_FORMAT_R16G16B16A16_SSCALED;
     VkFormatProperties format_properties;
@@ -5339,9 +4826,7 @@ TEST(profiles, TestFormatR16G16B16A16Sscaled) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16A16Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16A16Uint) {
 
     VkFormat format = VK_FORMAT_R16G16B16A16_UINT;
     VkFormatProperties format_properties;
@@ -5364,9 +4849,7 @@ TEST(profiles, TestFormatR16G16B16A16Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16A16Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16A16Sint) {
 
     VkFormat format = VK_FORMAT_R16G16B16A16_SINT;
     VkFormatProperties format_properties;
@@ -5388,9 +4871,7 @@ TEST(profiles, TestFormatR16G16B16A16Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR16G16B16A16Sfloat) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR16G16B16A16Sfloat) {
 
     VkFormat format = VK_FORMAT_R16G16B16A16_SFLOAT;
     VkFormatProperties format_properties;
@@ -5412,9 +4893,7 @@ TEST(profiles, TestFormatR16G16B16A16Sfloat) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR32Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR32Uint) {
 
     VkFormat format = VK_FORMAT_R32_UINT;
     VkFormatProperties format_properties;
@@ -5438,9 +4917,7 @@ TEST(profiles, TestFormatR32Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR32Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR32Sint) {
 
     VkFormat format = VK_FORMAT_R32_SINT;
     VkFormatProperties format_properties;
@@ -5458,9 +4935,7 @@ TEST(profiles, TestFormatR32Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR32Sfloat) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR32Sfloat) {
 
     VkFormat format = VK_FORMAT_R32_SFLOAT;
     VkFormatProperties format_properties;
@@ -5479,9 +4954,7 @@ TEST(profiles, TestFormatR32Sfloat) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR32G32Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR32G32Uint) {
 
     VkFormat format = VK_FORMAT_R32G32_UINT;
     VkFormatProperties format_properties;
@@ -5501,9 +4974,7 @@ TEST(profiles, TestFormatR32G32Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR32G32Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR32G32Sint) {
 
     VkFormat format = VK_FORMAT_R32G32_SINT;
     VkFormatProperties format_properties;
@@ -5523,9 +4994,7 @@ TEST(profiles, TestFormatR32G32Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR32G32Sfloat) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR32G32Sfloat) {
 
     VkFormat format = VK_FORMAT_R32G32_SFLOAT;
     VkFormatProperties format_properties;
@@ -5545,9 +5014,7 @@ TEST(profiles, TestFormatR32G32Sfloat) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR32G32B32Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR32G32B32Uint) {
 
     VkFormat format = VK_FORMAT_R32G32B32_UINT;
     VkFormatProperties format_properties;
@@ -5569,9 +5036,7 @@ TEST(profiles, TestFormatR32G32B32Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR32G32B32Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR32G32B32Sint) {
 
     VkFormat format = VK_FORMAT_R32G32B32_SINT;
     VkFormatProperties format_properties;
@@ -5589,9 +5054,7 @@ TEST(profiles, TestFormatR32G32B32Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR32G32B32Sfloat) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR32G32B32Sfloat) {
 
     VkFormat format = VK_FORMAT_R32G32B32_SFLOAT;
     VkFormatProperties format_properties;
@@ -5612,9 +5075,7 @@ TEST(profiles, TestFormatR32G32B32Sfloat) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR32G32B32A32Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR32G32B32A32Uint) {
 
     VkFormat format = VK_FORMAT_R32G32B32A32_UINT;
     VkFormatProperties format_properties;
@@ -5635,9 +5096,7 @@ TEST(profiles, TestFormatR32G32B32A32Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR32G32B32A32Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR32G32B32A32Sint) {
 
     VkFormat format = VK_FORMAT_R32G32B32A32_SINT;
     VkFormatProperties format_properties;
@@ -5660,9 +5119,7 @@ TEST(profiles, TestFormatR32G32B32A32Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR32G32B32A32Sfloat) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR32G32B32A32Sfloat) {
 
     VkFormat format = VK_FORMAT_R32G32B32A32_SFLOAT;
     VkFormatProperties format_properties;
@@ -5682,9 +5139,7 @@ TEST(profiles, TestFormatR32G32B32A32Sfloat) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR64Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR64Uint) {
 
     VkFormat format = VK_FORMAT_R64_UINT;
     VkFormatProperties format_properties;
@@ -5705,9 +5160,7 @@ TEST(profiles, TestFormatR64Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR64Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR64Sint) {
 
     VkFormat format = VK_FORMAT_R64_SINT;
     VkFormatProperties format_properties;
@@ -5727,9 +5180,7 @@ TEST(profiles, TestFormatR64Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR64Sfloat) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR64Sfloat) {
 
     VkFormat format = VK_FORMAT_R64_SFLOAT;
     VkFormatProperties format_properties;
@@ -5752,9 +5203,7 @@ TEST(profiles, TestFormatR64Sfloat) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR64G64Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR64G64Uint) {
 
     VkFormat format = VK_FORMAT_R64G64_UINT;
     VkFormatProperties format_properties;
@@ -5771,9 +5220,7 @@ TEST(profiles, TestFormatR64G64Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR64G64Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR64G64Sint) {
 
     VkFormat format = VK_FORMAT_R64G64_SINT;
     VkFormatProperties format_properties;
@@ -5796,9 +5243,7 @@ TEST(profiles, TestFormatR64G64Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR64G64Sfloat) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR64G64Sfloat) {
 
     VkFormat format = VK_FORMAT_R64G64_SFLOAT;
     VkFormatProperties format_properties;
@@ -5822,9 +5267,7 @@ TEST(profiles, TestFormatR64G64Sfloat) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR64G64B64Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR64G64B64Uint) {
 
     VkFormat format = VK_FORMAT_R64G64B64_UINT;
     VkFormatProperties format_properties;
@@ -5845,9 +5288,7 @@ TEST(profiles, TestFormatR64G64B64Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR64G64B64Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR64G64B64Sint) {
 
     VkFormat format = VK_FORMAT_R64G64B64_SINT;
     VkFormatProperties format_properties;
@@ -5867,9 +5308,7 @@ TEST(profiles, TestFormatR64G64B64Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR64G64B64Sfloat) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR64G64B64Sfloat) {
 
     VkFormat format = VK_FORMAT_R64G64B64_SFLOAT;
     VkFormatProperties format_properties;
@@ -5888,9 +5327,7 @@ TEST(profiles, TestFormatR64G64B64Sfloat) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR64G64B64A64Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR64G64B64A64Uint) {
 
     VkFormat format = VK_FORMAT_R64G64B64A64_UINT;
     VkFormatProperties format_properties;
@@ -5912,9 +5349,7 @@ TEST(profiles, TestFormatR64G64B64A64Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR64G64B64A64Sint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR64G64B64A64Sint) {
 
     VkFormat format = VK_FORMAT_R64G64B64A64_SINT;
     VkFormatProperties format_properties;
@@ -5934,9 +5369,7 @@ TEST(profiles, TestFormatR64G64B64A64Sint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR64G64B64A64Sfloat) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR64G64B64A64Sfloat) {
 
     VkFormat format = VK_FORMAT_R64G64B64A64_SFLOAT;
     VkFormatProperties format_properties;
@@ -5954,9 +5387,7 @@ TEST(profiles, TestFormatR64G64B64A64Sfloat) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB10G11R11UfloatPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB10G11R11UfloatPack32) {
 
     VkFormat format = VK_FORMAT_B10G11R11_UFLOAT_PACK32;
     VkFormatProperties format_properties;
@@ -5980,9 +5411,7 @@ TEST(profiles, TestFormatB10G11R11UfloatPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatE5b9g9r9UfloatPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatE5b9g9r9UfloatPack32) {
 
     VkFormat format = VK_FORMAT_E5B9G9R9_UFLOAT_PACK32;
     VkFormatProperties format_properties;
@@ -6004,9 +5433,7 @@ TEST(profiles, TestFormatE5b9g9r9UfloatPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatD16Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatD16Unorm) {
 
     VkFormat format = VK_FORMAT_D16_UNORM;
     VkFormatProperties format_properties;
@@ -6026,9 +5453,7 @@ TEST(profiles, TestFormatD16Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatX8D24UnormPack32) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatX8D24UnormPack32) {
 
     VkFormat format = VK_FORMAT_X8_D24_UNORM_PACK32;
     VkFormatProperties format_properties;
@@ -6045,9 +5470,7 @@ TEST(profiles, TestFormatX8D24UnormPack32) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatD32Sfloat) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatD32Sfloat) {
 
     VkFormat format = VK_FORMAT_D32_SFLOAT;
     VkFormatProperties format_properties;
@@ -6069,9 +5492,7 @@ TEST(profiles, TestFormatD32Sfloat) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatS8Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatS8Uint) {
 
     VkFormat format = VK_FORMAT_S8_UINT;
     VkFormatProperties format_properties;
@@ -6089,9 +5510,7 @@ TEST(profiles, TestFormatS8Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatD16UnormS8Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatD16UnormS8Uint) {
 
     VkFormat format = VK_FORMAT_D16_UNORM_S8_UINT;
     VkFormatProperties format_properties;
@@ -6114,9 +5533,7 @@ TEST(profiles, TestFormatD16UnormS8Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatD24UnormS8Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatD24UnormS8Uint) {
 
     VkFormat format = VK_FORMAT_D24_UNORM_S8_UINT;
     VkFormatProperties format_properties;
@@ -6134,9 +5551,7 @@ TEST(profiles, TestFormatD24UnormS8Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatD32SfloatS8Uint) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatD32SfloatS8Uint) {
 
     VkFormat format = VK_FORMAT_D32_SFLOAT_S8_UINT;
     VkFormatProperties format_properties;
@@ -6155,9 +5570,7 @@ TEST(profiles, TestFormatD32SfloatS8Uint) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC1RGBUnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC1RGBUnormBLock) {
 
     VkFormat format = VK_FORMAT_BC1_RGB_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6175,9 +5588,7 @@ TEST(profiles, TestFormatBC1RGBUnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC1RGBSrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC1RGBSrgbBLock) {
 
     VkFormat format = VK_FORMAT_BC1_RGB_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -6197,9 +5608,7 @@ TEST(profiles, TestFormatBC1RGBSrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC1RGBAUnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC1RGBAUnormBLock) {
 
     VkFormat format = VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6222,9 +5631,7 @@ TEST(profiles, TestFormatBC1RGBAUnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC1RGBASrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC1RGBASrgbBLock) {
 
     VkFormat format = VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -6244,9 +5651,7 @@ TEST(profiles, TestFormatBC1RGBASrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC2UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC2UnormBLock) {
 
     VkFormat format = VK_FORMAT_BC2_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6268,9 +5673,7 @@ TEST(profiles, TestFormatBC2UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC2SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC2SrgbBLock) {
 
     VkFormat format = VK_FORMAT_BC2_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -6291,9 +5694,7 @@ TEST(profiles, TestFormatBC2SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC3UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC3UnormBLock) {
 
     VkFormat format = VK_FORMAT_BC3_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6317,9 +5718,7 @@ TEST(profiles, TestFormatBC3UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC3SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC3SrgbBLock) {
 
     VkFormat format = VK_FORMAT_BC3_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -6340,9 +5739,7 @@ TEST(profiles, TestFormatBC3SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC4UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC4UnormBLock) {
 
     VkFormat format = VK_FORMAT_BC4_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6362,9 +5759,7 @@ TEST(profiles, TestFormatBC4UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC4SnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC4SnormBLock) {
 
     VkFormat format = VK_FORMAT_BC4_SNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6383,9 +5778,7 @@ TEST(profiles, TestFormatBC4SnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC5UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC5UnormBLock) {
 
     VkFormat format = VK_FORMAT_BC5_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6402,9 +5795,7 @@ TEST(profiles, TestFormatBC5UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC5SnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC5SnormBLock) {
 
     VkFormat format = VK_FORMAT_BC5_SNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6422,9 +5813,7 @@ TEST(profiles, TestFormatBC5SnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC6hUfloatBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC6hUfloatBLock) {
 
     VkFormat format = VK_FORMAT_BC6H_UFLOAT_BLOCK;
     VkFormatProperties format_properties;
@@ -6443,9 +5832,7 @@ TEST(profiles, TestFormatBC6hUfloatBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC6hSfloatBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC6hSfloatBLock) {
 
     VkFormat format = VK_FORMAT_BC6H_SFLOAT_BLOCK;
     VkFormatProperties format_properties;
@@ -6466,9 +5853,7 @@ TEST(profiles, TestFormatBC6hSfloatBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC7UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC7UnormBLock) {
 
     VkFormat format = VK_FORMAT_BC7_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6488,9 +5873,7 @@ TEST(profiles, TestFormatBC7UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatBC7SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatBC7SrgbBLock) {
 
     VkFormat format = VK_FORMAT_BC7_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -6508,9 +5891,7 @@ TEST(profiles, TestFormatBC7SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatEtc2R8G8B8UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatEtc2R8G8B8UnormBLock) {
 
     VkFormat format = VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6528,9 +5909,7 @@ TEST(profiles, TestFormatEtc2R8G8B8UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatEtc2R8G8B8SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatEtc2R8G8B8SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -6553,9 +5932,7 @@ TEST(profiles, TestFormatEtc2R8G8B8SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatEtc2R8G8B8A1UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatEtc2R8G8B8A1UnormBLock) {
 
     VkFormat format = VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6576,9 +5953,7 @@ TEST(profiles, TestFormatEtc2R8G8B8A1UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatEtc2R8G8B8A1SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatEtc2R8G8B8A1SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -6599,9 +5974,7 @@ TEST(profiles, TestFormatEtc2R8G8B8A1SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatEtc2R8G8B8A8UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatEtc2R8G8B8A8UnormBLock) {
 
     VkFormat format = VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6622,9 +5995,7 @@ TEST(profiles, TestFormatEtc2R8G8B8A8UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatEtc2R8G8B8A8SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatEtc2R8G8B8A8SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -6643,9 +6014,7 @@ TEST(profiles, TestFormatEtc2R8G8B8A8SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatEacR11UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatEacR11UnormBLock) {
 
     VkFormat format = VK_FORMAT_EAC_R11_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6666,9 +6035,7 @@ TEST(profiles, TestFormatEacR11UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatEacR11SnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatEacR11SnormBLock) {
 
     VkFormat format = VK_FORMAT_EAC_R11_SNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6689,9 +6056,7 @@ TEST(profiles, TestFormatEacR11SnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatEacR11G11UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatEacR11G11UnormBLock) {
 
     VkFormat format = VK_FORMAT_EAC_R11G11_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6711,9 +6076,7 @@ TEST(profiles, TestFormatEacR11G11UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatEacR11G11SnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatEacR11G11SnormBLock) {
 
     VkFormat format = VK_FORMAT_EAC_R11G11_SNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6735,9 +6098,7 @@ TEST(profiles, TestFormatEacR11G11SnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc4x4UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc4x4UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_4x4_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6759,9 +6120,7 @@ TEST(profiles, TestFormatAstc4x4UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc4x4SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc4x4SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_4x4_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -6783,9 +6142,7 @@ TEST(profiles, TestFormatAstc4x4SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc5x4UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc5x4UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_5x4_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6804,9 +6161,7 @@ TEST(profiles, TestFormatAstc5x4UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc5x4SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc5x4SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_5x4_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -6827,9 +6182,7 @@ TEST(profiles, TestFormatAstc5x4SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc5x5UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc5x5UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_5x5_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6849,9 +6202,7 @@ TEST(profiles, TestFormatAstc5x5UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc5x5SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc5x5SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_5x5_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -6872,9 +6223,7 @@ TEST(profiles, TestFormatAstc5x5SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc6x5UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc6x5UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_6x5_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6894,9 +6243,7 @@ TEST(profiles, TestFormatAstc6x5UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc6x5SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc6x5SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_6x5_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -6916,9 +6263,7 @@ TEST(profiles, TestFormatAstc6x5SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc6x6UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc6x6UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_6x6_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6938,9 +6283,7 @@ TEST(profiles, TestFormatAstc6x6UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc6x6SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc6x6SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_6x6_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -6964,9 +6307,7 @@ TEST(profiles, TestFormatAstc6x6SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc8x5UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc8x5UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_8x5_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -6990,9 +6331,7 @@ TEST(profiles, TestFormatAstc8x5UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc8x5SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc8x5SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_8x5_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -7011,9 +6350,7 @@ TEST(profiles, TestFormatAstc8x5SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc8x6UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc8x6UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_8x6_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -7036,9 +6373,7 @@ TEST(profiles, TestFormatAstc8x6UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc8x6SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc8x6SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_8x6_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -7062,9 +6397,7 @@ TEST(profiles, TestFormatAstc8x6SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc8x8UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc8x8UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_8x8_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -7088,9 +6421,7 @@ TEST(profiles, TestFormatAstc8x8UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc8x8SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc8x8SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_8x8_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -7114,9 +6445,7 @@ TEST(profiles, TestFormatAstc8x8SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc10x5UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc10x5UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_10x5_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -7137,9 +6466,7 @@ TEST(profiles, TestFormatAstc10x5UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc10x5SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc10x5SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_10x5_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -7161,9 +6488,7 @@ TEST(profiles, TestFormatAstc10x5SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc10x6UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc10x6UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_10x6_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -7182,9 +6507,7 @@ TEST(profiles, TestFormatAstc10x6UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc10x6SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc10x6SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_10x6_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -7205,9 +6528,7 @@ TEST(profiles, TestFormatAstc10x6SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc10x8UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc10x8UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_10x8_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -7226,9 +6547,7 @@ TEST(profiles, TestFormatAstc10x8UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc10x8SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc10x8SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_10x8_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -7246,9 +6565,7 @@ TEST(profiles, TestFormatAstc10x8SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc10x10UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc10x10UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_10x10_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -7269,9 +6586,7 @@ TEST(profiles, TestFormatAstc10x10UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc10x10SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc10x10SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_10x10_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -7290,9 +6605,7 @@ TEST(profiles, TestFormatAstc10x10SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc12x10UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc12x10UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_12x10_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -7312,9 +6625,7 @@ TEST(profiles, TestFormatAstc12x10UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc12x10SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc12x10SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_12x10_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -7333,9 +6644,7 @@ TEST(profiles, TestFormatAstc12x10SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc12x12UnormBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc12x12UnormBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_12x12_UNORM_BLOCK;
     VkFormatProperties format_properties;
@@ -7354,9 +6663,7 @@ TEST(profiles, TestFormatAstc12x12UnormBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc12x12SrgbBLock) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc12x12SrgbBLock) {
 
     VkFormat format = VK_FORMAT_ASTC_12x12_SRGB_BLOCK;
     VkFormatProperties format_properties;
@@ -7374,9 +6681,7 @@ TEST(profiles, TestFormatAstc12x12SrgbBLock) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG8B8G8R8422Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG8B8G8R8422Unorm) {
 
     VkFormat format = VK_FORMAT_G8B8G8R8_422_UNORM;
     VkFormatProperties format_properties;
@@ -7395,9 +6700,7 @@ TEST(profiles, TestFormatG8B8G8R8422Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB8G8R8G8422Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB8G8R8G8422Unorm) {
 
     VkFormat format = VK_FORMAT_B8G8R8G8_422_UNORM;
     VkFormatProperties format_properties;
@@ -7416,9 +6719,7 @@ TEST(profiles, TestFormatB8G8R8G8422Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG8B8R83Plane420Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG8B8R83Plane420Unorm) {
 
     VkFormat format = VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM;
     VkFormatProperties format_properties;
@@ -7440,9 +6741,7 @@ TEST(profiles, TestFormatG8B8R83Plane420Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG8B8R82Plane420Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG8B8R82Plane420Unorm) {
 
     VkFormat format = VK_FORMAT_G8_B8R8_2PLANE_420_UNORM;
     VkFormatProperties format_properties;
@@ -7463,9 +6762,7 @@ TEST(profiles, TestFormatG8B8R82Plane420Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG8B8R83Plane422Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG8B8R83Plane422Unorm) {
 
     VkFormat format = VK_FORMAT_G8_B8_R8_3PLANE_422_UNORM;
     VkFormatProperties format_properties;
@@ -7483,9 +6780,7 @@ TEST(profiles, TestFormatG8B8R83Plane422Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG8B8R82Plane422Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG8B8R82Plane422Unorm) {
 
     VkFormat format = VK_FORMAT_G8_B8R8_2PLANE_422_UNORM;
     VkFormatProperties format_properties;
@@ -7505,9 +6800,7 @@ TEST(profiles, TestFormatG8B8R82Plane422Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG8B8R83Plane444Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG8B8R83Plane444Unorm) {
 
     VkFormat format = VK_FORMAT_G8_B8_R8_3PLANE_444_UNORM;
     VkFormatProperties format_properties;
@@ -7527,9 +6820,7 @@ TEST(profiles, TestFormatG8B8R83Plane444Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR10X6UnormPack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR10X6UnormPack16) {
 
     VkFormat format = VK_FORMAT_R10X6_UNORM_PACK16;
     VkFormatProperties format_properties;
@@ -7555,9 +6846,7 @@ TEST(profiles, TestFormatR10X6UnormPack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR10X6g10x6Unorm2Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR10X6g10x6Unorm2Pack16) {
 
     VkFormat format = VK_FORMAT_R10X6G10X6_UNORM_2PACK16;
     VkFormatProperties format_properties;
@@ -7575,9 +6864,7 @@ TEST(profiles, TestFormatR10X6g10x6Unorm2Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR10X6g10x6b10x6a10x6Unorm4Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR10X6g10x6b10x6a10x6Unorm4Pack16) {
 
     VkFormat format = VK_FORMAT_R10X6G10X6B10X6A10X6_UNORM_4PACK16;
     VkFormatProperties format_properties;
@@ -7597,9 +6884,7 @@ TEST(profiles, TestFormatR10X6g10x6b10x6a10x6Unorm4Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG10X6b10x6g10x6r10x6422Unorm4Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG10X6b10x6g10x6r10x6422Unorm4Pack16) {
 
     VkFormat format = VK_FORMAT_G10X6B10X6G10X6R10X6_422_UNORM_4PACK16;
     VkFormatProperties format_properties;
@@ -7621,9 +6906,7 @@ TEST(profiles, TestFormatG10X6b10x6g10x6r10x6422Unorm4Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB10X6g10x6r10x6g10x6422Unorm4Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB10X6g10x6r10x6g10x6422Unorm4Pack16) {
 
     VkFormat format = VK_FORMAT_B10X6G10X6R10X6G10X6_422_UNORM_4PACK16;
     VkFormatProperties format_properties;
@@ -7649,9 +6932,7 @@ TEST(profiles, TestFormatB10X6g10x6r10x6g10x6422Unorm4Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG10X6B10X6R10X63Plane420Unorm3Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG10X6B10X6R10X63Plane420Unorm3Pack16) {
 
     VkFormat format = VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_420_UNORM_3PACK16;
     VkFormatProperties format_properties;
@@ -7671,9 +6952,7 @@ TEST(profiles, TestFormatG10X6B10X6R10X63Plane420Unorm3Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG10X6B10X6r10x62Plane420Unorm3Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG10X6B10X6r10x62Plane420Unorm3Pack16) {
 
     VkFormat format = VK_FORMAT_G10X6_B10X6R10X6_2PLANE_420_UNORM_3PACK16;
     VkFormatProperties format_properties;
@@ -7691,9 +6970,7 @@ TEST(profiles, TestFormatG10X6B10X6r10x62Plane420Unorm3Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG10X6B10X6R10X63Plane422Unorm3Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG10X6B10X6R10X63Plane422Unorm3Pack16) {
 
     VkFormat format = VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_422_UNORM_3PACK16;
     VkFormatProperties format_properties;
@@ -7716,9 +6993,7 @@ TEST(profiles, TestFormatG10X6B10X6R10X63Plane422Unorm3Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG10X6B10X6r10x62Plane422Unorm3Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG10X6B10X6r10x62Plane422Unorm3Pack16) {
 
     VkFormat format = VK_FORMAT_G10X6_B10X6R10X6_2PLANE_422_UNORM_3PACK16;
     VkFormatProperties format_properties;
@@ -7741,9 +7016,7 @@ TEST(profiles, TestFormatG10X6B10X6r10x62Plane422Unorm3Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG10X6B10X6R10X63Plane444Unorm3Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG10X6B10X6R10X63Plane444Unorm3Pack16) {
 
     VkFormat format = VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_444_UNORM_3PACK16;
     VkFormatProperties format_properties;
@@ -7762,9 +7035,7 @@ TEST(profiles, TestFormatG10X6B10X6R10X63Plane444Unorm3Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR12X4UnormPack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR12X4UnormPack16) {
 
     VkFormat format = VK_FORMAT_R12X4_UNORM_PACK16;
     VkFormatProperties format_properties;
@@ -7783,9 +7054,7 @@ TEST(profiles, TestFormatR12X4UnormPack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR12X4g12x4Unorm2Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR12X4g12x4Unorm2Pack16) {
 
     VkFormat format = VK_FORMAT_R12X4G12X4_UNORM_2PACK16;
     VkFormatProperties format_properties;
@@ -7801,9 +7070,7 @@ TEST(profiles, TestFormatR12X4g12x4Unorm2Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatR12X4g12x4b12x4a12x4Unorm4Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatR12X4g12x4b12x4a12x4Unorm4Pack16) {
 
     VkFormat format = VK_FORMAT_R12X4G12X4B12X4A12X4_UNORM_4PACK16;
     VkFormatProperties format_properties;
@@ -7828,9 +7095,7 @@ TEST(profiles, TestFormatR12X4g12x4b12x4a12x4Unorm4Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG12X4b12x4g12x4r12x4422Unorm4Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG12X4b12x4g12x4r12x4422Unorm4Pack16) {
 
     VkFormat format = VK_FORMAT_G12X4B12X4G12X4R12X4_422_UNORM_4PACK16;
     VkFormatProperties format_properties;
@@ -7849,9 +7114,7 @@ TEST(profiles, TestFormatG12X4b12x4g12x4r12x4422Unorm4Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB12X4g12x4r12x4g12x4422Unorm4Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB12X4g12x4r12x4g12x4422Unorm4Pack16) {
 
     VkFormat format = VK_FORMAT_B12X4G12X4R12X4G12X4_422_UNORM_4PACK16;
     VkFormatProperties format_properties;
@@ -7871,9 +7134,7 @@ TEST(profiles, TestFormatB12X4g12x4r12x4g12x4422Unorm4Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG12X4B12X4R12X43Plane420Unorm3Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG12X4B12X4R12X43Plane420Unorm3Pack16) {
 
     VkFormat format = VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_420_UNORM_3PACK16;
     VkFormatProperties format_properties;
@@ -7893,9 +7154,7 @@ TEST(profiles, TestFormatG12X4B12X4R12X43Plane420Unorm3Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG12X4B12X4r12x42Plane420Unorm3Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG12X4B12X4r12x42Plane420Unorm3Pack16) {
 
     VkFormat format = VK_FORMAT_G12X4_B12X4R12X4_2PLANE_420_UNORM_3PACK16;
     VkFormatProperties format_properties;
@@ -7917,9 +7176,7 @@ TEST(profiles, TestFormatG12X4B12X4r12x42Plane420Unorm3Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG12X4B12X4R12X43Plane422Unorm3Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG12X4B12X4R12X43Plane422Unorm3Pack16) {
 
     VkFormat format = VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_422_UNORM_3PACK16;
     VkFormatProperties format_properties;
@@ -7936,9 +7193,7 @@ TEST(profiles, TestFormatG12X4B12X4R12X43Plane422Unorm3Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG12X4B12X4r12x42Plane422Unorm3Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG12X4B12X4r12x42Plane422Unorm3Pack16) {
 
     VkFormat format = VK_FORMAT_G12X4_B12X4R12X4_2PLANE_422_UNORM_3PACK16;
     VkFormatProperties format_properties;
@@ -7959,9 +7214,7 @@ TEST(profiles, TestFormatG12X4B12X4r12x42Plane422Unorm3Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG12X4B12X4R12X43Plane444Unorm3Pack16) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG12X4B12X4R12X43Plane444Unorm3Pack16) {
 
     VkFormat format = VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_444_UNORM_3PACK16;
     VkFormatProperties format_properties;
@@ -7981,9 +7234,7 @@ TEST(profiles, TestFormatG12X4B12X4R12X43Plane444Unorm3Pack16) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG16B16G16R16422Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG16B16G16R16422Unorm) {
 
     VkFormat format = VK_FORMAT_G16B16G16R16_422_UNORM;
     VkFormatProperties format_properties;
@@ -8000,9 +7251,7 @@ TEST(profiles, TestFormatG16B16G16R16422Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatB16G16R16G16422Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatB16G16R16G16422Unorm) {
 
     VkFormat format = VK_FORMAT_B16G16R16G16_422_UNORM;
     VkFormatProperties format_properties;
@@ -8026,9 +7275,7 @@ TEST(profiles, TestFormatB16G16R16G16422Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG16B16R163Plane420Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG16B16R163Plane420Unorm) {
 
     VkFormat format = VK_FORMAT_G16_B16_R16_3PLANE_420_UNORM;
     VkFormatProperties format_properties;
@@ -8050,9 +7297,7 @@ TEST(profiles, TestFormatG16B16R163Plane420Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG16B16R162Plane420Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG16B16R162Plane420Unorm) {
 
     VkFormat format = VK_FORMAT_G16_B16R16_2PLANE_420_UNORM;
     VkFormatProperties format_properties;
@@ -8072,9 +7317,7 @@ TEST(profiles, TestFormatG16B16R162Plane420Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG16B16R163Plane422Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG16B16R163Plane422Unorm) {
 
     VkFormat format = VK_FORMAT_G16_B16_R16_3PLANE_422_UNORM;
     VkFormatProperties format_properties;
@@ -8099,9 +7342,7 @@ TEST(profiles, TestFormatG16B16R163Plane422Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG16B16R162Plane422Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG16B16R162Plane422Unorm) {
 
     VkFormat format = VK_FORMAT_G16_B16R16_2PLANE_422_UNORM;
     VkFormatProperties format_properties;
@@ -8121,9 +7362,7 @@ TEST(profiles, TestFormatG16B16R162Plane422Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG16B16R163Plane444Unorm) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatG16B16R163Plane444Unorm) {
 
     VkFormat format = VK_FORMAT_G16_B16_R16_3PLANE_444_UNORM;
     VkFormatProperties format_properties;
@@ -8144,9 +7383,7 @@ TEST(profiles, TestFormatG16B16R163Plane444Unorm) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatPvrtc12BPpUnormBLockImg) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatPvrtc12BPpUnormBLockImg) {
 
     VkFormat format = VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG;
     VkFormatProperties format_properties;
@@ -8167,9 +7404,7 @@ TEST(profiles, TestFormatPvrtc12BPpUnormBLockImg) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatPvrtc14BPpUnormBLockImg) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatPvrtc14BPpUnormBLockImg) {
 
     VkFormat format = VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG;
     VkFormatProperties format_properties;
@@ -8187,9 +7422,7 @@ TEST(profiles, TestFormatPvrtc14BPpUnormBLockImg) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatPvrtc22BPpUnormBLockImg) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatPvrtc22BPpUnormBLockImg) {
 
     VkFormat format = VK_FORMAT_PVRTC2_2BPP_UNORM_BLOCK_IMG;
     VkFormatProperties format_properties;
@@ -8212,9 +7445,7 @@ TEST(profiles, TestFormatPvrtc22BPpUnormBLockImg) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatPvrtc24BPpUnormBLockImg) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatPvrtc24BPpUnormBLockImg) {
 
     VkFormat format = VK_FORMAT_PVRTC2_4BPP_UNORM_BLOCK_IMG;
     VkFormatProperties format_properties;
@@ -8234,9 +7465,7 @@ TEST(profiles, TestFormatPvrtc24BPpUnormBLockImg) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatPvrtc12BPpSrgbBLockImg) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatPvrtc12BPpSrgbBLockImg) {
 
     VkFormat format = VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG;
     VkFormatProperties format_properties;
@@ -8255,9 +7484,7 @@ TEST(profiles, TestFormatPvrtc12BPpSrgbBLockImg) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatPvrtc14BPpSrgbBLockImg) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatPvrtc14BPpSrgbBLockImg) {
 
     VkFormat format = VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG;
     VkFormatProperties format_properties;
@@ -8279,9 +7506,7 @@ TEST(profiles, TestFormatPvrtc14BPpSrgbBLockImg) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatPvrtc22BPpSrgbBLockImg) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatPvrtc22BPpSrgbBLockImg) {
 
     VkFormat format = VK_FORMAT_PVRTC2_2BPP_SRGB_BLOCK_IMG;
     VkFormatProperties format_properties;
@@ -8304,9 +7529,7 @@ TEST(profiles, TestFormatPvrtc22BPpSrgbBLockImg) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatPvrtc24BPpSrgbBLockImg) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatPvrtc24BPpSrgbBLockImg) {
 
     VkFormat format = VK_FORMAT_PVRTC2_4BPP_SRGB_BLOCK_IMG;
     VkFormatProperties format_properties;
@@ -8331,9 +7554,7 @@ TEST(profiles, TestFormatPvrtc24BPpSrgbBLockImg) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc4x4SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc4x4SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8351,9 +7572,7 @@ TEST(profiles, TestFormatAstc4x4SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc5x4SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc5x4SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_5x4_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8374,9 +7593,7 @@ TEST(profiles, TestFormatAstc5x4SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc5x5SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc5x5SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_5x5_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8399,9 +7616,7 @@ TEST(profiles, TestFormatAstc5x5SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc6x5SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc6x5SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_6x5_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8422,9 +7637,7 @@ TEST(profiles, TestFormatAstc6x5SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc6x6SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc6x6SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8447,9 +7660,7 @@ TEST(profiles, TestFormatAstc6x6SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc8x5SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc8x5SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_8x5_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8467,9 +7678,7 @@ TEST(profiles, TestFormatAstc8x5SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc8x6SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc8x6SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_8x6_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8486,9 +7695,7 @@ TEST(profiles, TestFormatAstc8x6SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc8x8SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc8x8SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_8x8_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8510,9 +7717,7 @@ TEST(profiles, TestFormatAstc8x8SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc10x5SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc10x5SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_10x5_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8530,9 +7735,7 @@ TEST(profiles, TestFormatAstc10x5SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc10x6SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc10x6SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_10x6_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8551,9 +7754,7 @@ TEST(profiles, TestFormatAstc10x6SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc10x8SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc10x8SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_10x8_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8577,9 +7778,7 @@ TEST(profiles, TestFormatAstc10x8SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc10x10SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc10x10SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_10x10_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8600,9 +7799,7 @@ TEST(profiles, TestFormatAstc10x10SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc12x10SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc12x10SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_12x10_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8623,9 +7820,7 @@ TEST(profiles, TestFormatAstc12x10SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatAstc12x12SfloatBLockExt) {
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
+TEST_F(TestsCapabilities, TestFormatAstc12x12SfloatBLockExt) {
 
     VkFormat format = VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK_EXT;
     VkFormatProperties format_properties;
@@ -8645,10 +7840,8 @@ TEST(profiles, TestFormatAstc12x12SfloatBLockExt) {
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
 
-TEST(profiles, TestFormatG8B8R82Plane444UnormExt) {
+TEST_F(TestsCapabilities, TestFormatG8B8R82Plane444UnormExt) {
 #ifdef VK_EXT_ycbcr_2plane_444_formats
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkFormat format = VK_FORMAT_G8_B8R8_2PLANE_444_UNORM_EXT;
     VkFormatProperties format_properties;
@@ -8669,10 +7862,8 @@ TEST(profiles, TestFormatG8B8R82Plane444UnormExt) {
 #endif
 }
 
-TEST(profiles, TestFormatG10X6B10X6r10x62Plane444Unorm3Pack16Ext) {
+TEST_F(TestsCapabilities, TestFormatG10X6B10X6r10x62Plane444Unorm3Pack16Ext) {
 #ifdef VK_EXT_ycbcr_2plane_444_formats
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkFormat format = VK_FORMAT_G10X6_B10X6R10X6_2PLANE_444_UNORM_3PACK16_EXT;
     VkFormatProperties format_properties;
@@ -8695,10 +7886,8 @@ TEST(profiles, TestFormatG10X6B10X6r10x62Plane444Unorm3Pack16Ext) {
 #endif
 }
 
-TEST(profiles, TestFormatG12X4B12X4r12x42Plane444Unorm3Pack16Ext) {
+TEST_F(TestsCapabilities, TestFormatG12X4B12X4r12x42Plane444Unorm3Pack16Ext) {
 #ifdef VK_EXT_ycbcr_2plane_444_formats
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkFormat format = VK_FORMAT_G12X4_B12X4R12X4_2PLANE_444_UNORM_3PACK16_EXT;
     VkFormatProperties format_properties;
@@ -8718,10 +7907,8 @@ TEST(profiles, TestFormatG12X4B12X4r12x42Plane444Unorm3Pack16Ext) {
 #endif
 }
 
-TEST(profiles, TestFormatG16B16R162Plane444UnormExt) {
+TEST_F(TestsCapabilities, TestFormatG16B16R162Plane444UnormExt) {
 #ifdef VK_EXT_ycbcr_2plane_444_formats
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkFormat format = VK_FORMAT_G16_B16R16_2PLANE_444_UNORM_EXT;
     VkFormatProperties format_properties;
@@ -8742,10 +7929,8 @@ TEST(profiles, TestFormatG16B16R162Plane444UnormExt) {
 #endif
 }
 
-TEST(profiles, TestFormatA4R4G4B4UnormPack16Ext) {
+TEST_F(TestsCapabilities, TestFormatA4R4G4B4UnormPack16Ext) {
 #ifdef VK_EXT_4444_formats
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkFormat format = VK_FORMAT_A4R4G4B4_UNORM_PACK16_EXT;
     VkFormatProperties format_properties;
@@ -8771,10 +7956,8 @@ TEST(profiles, TestFormatA4R4G4B4UnormPack16Ext) {
 #endif
 }
 
-TEST(profiles, TestFormatA4B4G4R4UnormPack16Ext) {
+TEST_F(TestsCapabilities, TestFormatA4B4G4R4UnormPack16Ext) {
 #ifdef VK_EXT_4444_formats
-    VkPhysicalDevice gpu = GetPhysicalDevice();
-    if (gpu == VK_NULL_HANDLE) return;
 
     VkFormat format = VK_FORMAT_A4B4G4R4_UNORM_PACK16_EXT;
     VkFormatProperties format_properties;
