@@ -13,16 +13,24 @@ static const char* CONFIG_PATH = "bin/Release";
 static const char* CONFIG_PATH = "lib";
 #endif
 
-TEST(layer, TestDesktopPortability2022Limits) {
+static profiles_test::VulkanInstanceBuilder inst_builder;
+
+class TestsDesktopPortability : public VkTestFramework {
+  public:
+   TestsDesktopPortability(){};
+   ~TestsDesktopPortability(){};
+
+    static void SetUpTestSuite() {
+        const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+        profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+    }
+
+    static void TearDownTestSuite(){};
+};
+
+TEST_F(TestsDesktopPortability, TestDesktopPortability2022Limits) {
     VkResult err = VK_SUCCESS;
-
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
-
-    profiles_test::VulkanInstanceBuilder inst_builder;
-
-    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-
     VkProfileLayerSettingsEXT settings;
     settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_desktop_portability_2021.json";
     settings.emulate_portability = true;
