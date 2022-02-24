@@ -203,6 +203,18 @@ cd android-build
 cmake --build . --parallel
 ```
 
+#### Android Unit Tests
+The Android test packages are created in the following directory:
+    Vulkan-Profiles/android-build/apk/out
+
+```
+adb install -r apk/out/TestPackageName.apk
+adb shell am start -a android.intent.MAIN -c android-intent.category.LAUNCH -n com.example.TestPackageName/android.app.NativeActivity --es args --gtest_catch_exceptions=0
+# Test output is written to logcat
+adb logcat > tempfile
+grep VulkanProfilesLayerTests: tempfile
+```
+
 ### Repository Dependencies
 This repository attempts to resolve some of its dependencies by using
 components found from the following places, in this order:
