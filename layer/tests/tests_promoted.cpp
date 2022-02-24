@@ -57,6 +57,7 @@ struct TestInit {
         settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
                                          SimulateCapabilityFlag::SIMULATE_FEATURES_BIT |
                                          SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
+        settings.debug_reports = 0;
 
         err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -101,15 +102,11 @@ int main(int argc, char** argv) {
 
     int result = RUN_ALL_TESTS();
 
-    if (test.instance != VK_NULL_HANDLE) {
-        vkDestroyInstance(test.instance, nullptr);
-        test.instance = VK_NULL_HANDLE;
-    }
-
     return result;
 }
 
 TEST(layer_promoted, TestVulkan11Properties) {
+    TEST_DESCRIPTION("Test profile using VkPhysicalDeviceVulkan11Properties");
 #ifdef VK_VERSION_1_2
     VkPhysicalDevice gpu = GetPhysicalDevice();
     if (gpu == VK_NULL_HANDLE) return;
@@ -139,6 +136,7 @@ TEST(layer_promoted, TestVulkan11Properties) {
 }
 
 TEST(layer_promoted, TestVulkan11Features) {
+    TEST_DESCRIPTION("Test profile using VkPhysicalDeviceVulkan11Features");
 #ifdef VK_VERSION_1_2
     VkPhysicalDevice gpu = GetPhysicalDevice();
     if (gpu == VK_NULL_HANDLE) return;
@@ -171,6 +169,7 @@ TEST(layer_promoted, TestVulkan11Features) {
 }
 
 TEST(layer_promoted, TestVulkan12Properties) {
+    TEST_DESCRIPTION("Test profile using VkPhysicalDeviceVulkan12Properties");
 #ifdef VK_VERSION_1_2
     VkPhysicalDevice gpu = GetPhysicalDevice();
     if (gpu == VK_NULL_HANDLE) return;
@@ -239,6 +238,7 @@ TEST(layer_promoted, TestVulkan12Properties) {
 }
 
 TEST(layer_promoted, TestVulkan12Features) {
+    TEST_DESCRIPTION("Test profile using VkPhysicalDeviceVulkan12Features");
 #ifdef VK_VERSION_1_2
     VkPhysicalDevice gpu = GetPhysicalDevice();
     if (gpu == VK_NULL_HANDLE) return;
@@ -306,6 +306,7 @@ TEST(layer_promoted, TestVulkan12Features) {
 }
 
 TEST(layer_promoted, TestVulkan13Properties) {
+    TEST_DESCRIPTION("Test profile using VkPhysicalDeviceVulkan13Properties");
 #ifdef VK_VERSION_1_3
     VkPhysicalDevice gpu = GetPhysicalDevice();
     if (gpu == VK_NULL_HANDLE) return;
@@ -372,6 +373,7 @@ TEST(layer_promoted, TestVulkan13Properties) {
 }
 
 TEST(layer_promoted, TestVulkan13Features) {
+    TEST_DESCRIPTION("Test profile using VkPhysicalDeviceVulkan13Features");
 #ifdef VK_VERSION_1_2
     VkPhysicalDevice gpu = GetPhysicalDevice();
     if (gpu == VK_NULL_HANDLE) return;

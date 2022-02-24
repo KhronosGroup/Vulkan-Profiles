@@ -14,6 +14,7 @@ static const char* CONFIG_PATH = "lib";
 #endif
 
 TEST(layer, TestDesktopPortability2022Limits) {
+    TEST_DESCRIPTION("Test desktop portability 2021 profile");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;

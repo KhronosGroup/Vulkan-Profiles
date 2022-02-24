@@ -34,6 +34,7 @@ static const char* CONFIG_PATH = "lib";
 #endif
 
 TEST(layer, selecting_profile) {
+    TEST_DESCRIPTION("Test selecting profile from a profiles file with multiple profiles");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -50,6 +51,7 @@ TEST(layer, selecting_profile) {
         settings.profile_name = "VP_LUNARG_test_selecting_profile";
         settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
                                          SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
+        settings.debug_reports = 0;
 
         err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -69,6 +71,7 @@ TEST(layer, selecting_profile) {
 
         EXPECT_EQ(gpu_props.limits.maxImageDimension1D, 4096u);
 
+        vkDestroyInstance(test_inst, nullptr);
         inst_builder.reset();
     }
 
@@ -79,8 +82,8 @@ TEST(layer, selecting_profile) {
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_test_selecting_profile_subset";
-        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
-                                         SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
+        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT | SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
+        settings.debug_reports = 0;
 
         err = inst_builder.makeInstance(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -100,11 +103,13 @@ TEST(layer, selecting_profile) {
 
         EXPECT_EQ(gpu_props.limits.maxImageDimension1D, 2048u);
 
+        vkDestroyInstance(test_inst, nullptr);
         inst_builder.reset();
     }
 }
 
 TEST(layer, reading_flags) {
+    TEST_DESCRIPTION("Test profile specifying flags bits");
 #if defined(VK_NV_fragment_shading_rate_enums) && defined(VK_KHR_fragment_shading_rate) && defined(VK_KHR_shader_float_controls)
     VkResult err = VK_SUCCESS;
 
@@ -120,11 +125,12 @@ TEST(layer, reading_flags) {
     settings.emulate_portability = true;
     settings.profile_name = "VP_LUNARG_test_api";
     settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
+    settings.debug_reports = 0;
 
     err = inst_builder.makeInstance(&settings);
     ASSERT_EQ(err, VK_SUCCESS);
 
-    VkInstance instance = inst_builder.getInstance();
+    VkInstance test_inst = inst_builder.getInstance();
 
     VkPhysicalDevice physical_device;
     err = inst_builder.getPhysicalDevice(&physical_device);
@@ -156,10 +162,13 @@ TEST(layer, reading_flags) {
     EXPECT_EQ(fragment_shading_rate_properties.maxFragmentShadingRateRasterizationSamples, VK_SAMPLE_COUNT_2_BIT);
 
     EXPECT_EQ(fragment_shading_rate_enums_properties.maxFragmentShadingRateInvocationCount, VK_SAMPLE_COUNT_2_BIT);
+
+    vkDestroyInstance(test_inst, nullptr);
 #endif
 }
 
 TEST(layer, reading_duplicated_members) {
+    TEST_DESCRIPTION("Test profile using duplicated members");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -175,19 +184,22 @@ TEST(layer, reading_duplicated_members) {
     settings.profile_name = "VP_LUNARG_test_duplicated";
     settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
     settings.debug_fail_on_error = true;
+    settings.debug_reports = 0;
 
     err = inst_builder.makeInstance(&settings);
     ASSERT_EQ(err, VK_SUCCESS);
-
-    VkInstance instance = inst_builder.getInstance();
+    VkInstance test_inst = inst_builder.getInstance();
 
     VkPhysicalDevice physical_device;
     err = inst_builder.getPhysicalDevice(&physical_device);
     ASSERT_EQ(err, VK_ERROR_INITIALIZATION_FAILED);
+
+    vkDestroyInstance(test_inst, nullptr);
 }
 
 
 TEST(layer, TestParsingAllFormatProperties) {
+    TEST_DESCRIPTION("Test all different ways of setting image formats");
     VkResult err = VK_SUCCESS;
 
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
@@ -202,6 +214,7 @@ TEST(layer, TestParsingAllFormatProperties) {
     settings.emulate_portability = true;
     settings.profile_name = "VP_LUNARG_test_formats";
     settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
+    settings.debug_reports = 0;
 
     err = inst_builder.makeInstance(&settings);
     ASSERT_EQ(err, VK_SUCCESS);
