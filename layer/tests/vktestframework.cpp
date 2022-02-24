@@ -22,7 +22,9 @@
  */
 
 #include "vktestframework.h"
-
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
 
 #if defined(PATH_MAX) && !defined(MAX_PATH)
 #define MAX_PATH PATH_MAX
@@ -47,4 +49,7 @@
 VkTestFramework::VkTestFramework() {}
 VkTestFramework::~VkTestFramework() {}
 
-
+#ifdef __ANDROID__
+// Define static elements
+ANativeWindow *VkTestFramework::window = nullptr;
+#endif
