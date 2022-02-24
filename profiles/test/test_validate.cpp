@@ -81,7 +81,7 @@ struct JsonValidator {
         assert(!json_document.empty());
 
         if (!schema) {
-            const Json::Value schema_document = ParseJsonFile("profile_schema.json");
+            const Json::Value schema_document = ParseJsonFile("profiles-latest.json");
 
             schema.reset(new Schema);
 
