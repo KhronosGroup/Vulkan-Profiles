@@ -1360,12 +1360,12 @@ class VulkanRegistry():
         xml = etree.parse(registryFile)
         self.parsePlatformInfo(xml)
         self.parseVersionInfo(xml)
+        self.parseConstants(xml)
         self.parseExtensionInfo(xml)
         self.parseStructInfo(xml)
         self.parsePrerequisites(xml)
         self.parseEnums(xml)
         self.parseBitmasks(xml)
-        self.parseConstants(xml)
         self.parseAliases(xml)
         self.parseExternalTypes(xml)
         self.parseFeatures(xml)
@@ -1453,6 +1453,8 @@ class VulkanRegistry():
                         elif tail == '[' and enum != None and enum.tail == ']':
                             # [<enum>] case
                             structDef.members[name].arraySize = enum.text
+                            if structDef.members[name].arraySize in self.constants:
+                                structDef.members[name].arraySize = int(self.constants[structDef.members[name].arraySize])
                         else:
                             Log.f("Unsupported array format for struct member '{0}::{1}'".format(structDef.name, name))
 
@@ -1532,7 +1534,7 @@ class VulkanRegistry():
                 bitsName = bitmask.get('bitvalues')
                 if bitsName is None:
                     # Currently some definitions use "requires", not "bitvalues"
-                    bitsName = bitmask.get('requires') 
+                    bitsName = bitmask.get('requires')
 
                 if bitsName != None:
                     if bitsName in self.enums:
