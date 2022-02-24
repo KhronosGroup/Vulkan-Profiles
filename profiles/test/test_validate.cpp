@@ -64,9 +64,10 @@ static Json::Value ParseJsonFile(const char *filename) {
     file.open(filename);
     assert(file.is_open());
 
-    Json::Reader reader;
     Json::Value root = Json::nullValue;
-    bool success = reader.parse(file, root, false);
+    std::string errs;
+    Json::CharReaderBuilder builder;
+    bool success = Json::parseFromStream(builder, file, &root, &errs);
     assert(success);
 
     file.close();
