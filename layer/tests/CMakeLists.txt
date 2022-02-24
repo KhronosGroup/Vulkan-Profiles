@@ -36,7 +36,7 @@ function(LayerTest NAME)
                    ${TEST_FILENAME}
                    profiles_test_helper.h
                    profiles_test_helper.cpp
-                   layer_validation_tests.cpp
+                   layer_tests_main.cpp
                    vktestframework.cpp
                    ${jsoncpp_generated_source})
     add_dependencies(${TEST_NAME} VkLayer_khronos_profiles)
@@ -77,8 +77,8 @@ function(LayerTestAndroid NAME)
                 ${LAYER_TEST_FILES}
                 profiles_test_helper.h
                 profiles_test_helper.cpp
-                layer_validation_tests.cpp
-                vktestframeworkandroid.cpp
+                layer_tests_main.cpp
+                vktestframework.cpp
                 ${jsoncpp_generated_source})
 
     add_test(NAME ${ANDROID_APK_NAME} COMMAND profiles_${NAME})

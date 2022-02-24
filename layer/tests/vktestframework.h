@@ -29,18 +29,18 @@
 #endif
 
 #include "gtest/gtest.h"
+#ifdef __ANDROID__
+#include <android/native_window.h>
+#endif
 
 // Can be used by tests to record additional details / description of test
 #define TEST_DESCRIPTION(desc) RecordProperty("description", desc)
 
 class VkTestFramework : public ::testing::Test {
   public:
-
 #ifdef __ANDROID__
     static ANativeWindow *window;
 #endif
-
-  protected:
     VkTestFramework();
     ~VkTestFramework() = 0;
 

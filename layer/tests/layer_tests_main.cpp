@@ -13,7 +13,7 @@
  * Author: Mark Lobodzinski <mark@lunarg.com>
  */
 
-#include "layer_validation_tests.h"
+#include "layer_tests_main.h"
 #include "vktestframework.h"
 
 
