@@ -133,7 +133,6 @@ function(LayerTestAndroid NAME)
     set(_aapt ${ANDROID_SDK_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/aapt)
     set(_zipalign ${ANDROID_SDK_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/zipalign)
     add_custom_command(TARGET ${ANDROID_APK_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/apk
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/apk/assets
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${TEST_FILES_JSON} ${CMAKE_BINARY_DIR}/apk/assets
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/apk/out
