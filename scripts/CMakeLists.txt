@@ -6,7 +6,7 @@ add_custom_target(VpGenerated
 		-profiles ${CMAKE_SOURCE_DIR}/profiles
 		-outIncDir ${CMAKE_SOURCE_DIR}/library/include/vulkan
 		-outSrcDir ${CMAKE_SOURCE_DIR}/library/source
-		-outSchema ${CMAKE_SOURCE_DIR}/schema/profile_schema.json
+		-outSchema ${CMAKE_SOURCE_DIR}/schema/profiles-latest.json
 		-outDoc ${CMAKE_SOURCE_DIR}/PROFILES.md
 		-validate
 		-generateDebugLibrary
