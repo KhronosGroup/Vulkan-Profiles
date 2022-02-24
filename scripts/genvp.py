@@ -1595,6 +1595,10 @@ class VulkanRegistry():
                                 if sTypeAlias != None:
                                     break
 
+                        #Workaround due to a vk.xml issue that was resolved with 1.1.119
+                        if alias == 'VkPhysicalDeviceVariablePointersFeatures':
+                            sTypeAlias = 'VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES'
+                        
                         if sTypeAlias != None:
                             aliasStructDef.sType = sTypeAlias
                         else:
