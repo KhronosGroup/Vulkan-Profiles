@@ -137,10 +137,9 @@ function(LayerTestAndroid NAME)
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/apk/assets
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${TEST_FILES_JSON} ${CMAKE_BINARY_DIR}/apk/assets
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/apk/out
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/platforms/android/AndroidManifest.xml ${CMAKE_BINARY_DIR}/apk/AndroidManifest.xml
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${ANDROID_APK_NAME}> ${CMAKE_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:${ANDROID_APK_NAME}>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:VkLayer_khronos_profiles> ${CMAKE_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:VkLayer_khronos_profiles>
-        COMMAND ${_aapt} package -f -M ${CMAKE_BINARY_DIR}/apk/AndroidManifest.xml -I ${_android_jar} -A ${CMAKE_BINARY_DIR}/apk/assets -F ${CMAKE_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk ${CMAKE_BINARY_DIR}/apk/out
+        COMMAND ${_aapt} package -f -M ${CMAKE_CURRENT_SOURCE_DIR}/platforms/android/AndroidManifest.xml -I ${_android_jar} -A ${CMAKE_BINARY_DIR}/apk/assets -F ${CMAKE_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk ${CMAKE_BINARY_DIR}/apk/out
         COMMAND jarsigner -verbose -keystore $ENV{HOME}/.android/debug.keystore -storepass android -keypass android ${CMAKE_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk androiddebugkey
         COMMAND ${_zipalign} -f 4 ${CMAKE_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk ${CMAKE_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}.apk
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/..)
