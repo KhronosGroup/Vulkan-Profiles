@@ -1973,7 +1973,13 @@ PhysicalDeviceData::Map PhysicalDeviceData::map_;
 
 class JsonLoader {
    public:
-    JsonLoader() : pdd_(nullptr), profile_filename_(), root_(Json::nullValue), profile_api_version_(0), excluded_extensions_() {}
+    JsonLoader()
+        : pdd_(nullptr),
+          profile_filename_(),
+          root_(Json::nullValue),
+          profile_api_version_(0),
+          excluded_extensions_(),
+          excluded_formats_() {}
     JsonLoader(const JsonLoader &) = delete;
     JsonLoader &operator=(const JsonLoader &rhs) {
         if (this == &rhs) {
@@ -1984,6 +1990,7 @@ class JsonLoader {
         root_ = rhs.root_;
         profile_api_version_ = rhs.profile_api_version_;
         excluded_extensions_ = rhs.excluded_extensions_;
+        excluded_formats_ = rhs.excluded_formats_;
 
         return *this;
     }
@@ -2028,6 +2035,7 @@ class JsonLoader {
 
     std::uint32_t profile_api_version_;
     std::vector<std::string> excluded_extensions_;
+    std::vector<std::string> excluded_formats_;
 
     struct Extension {
         std::string name;
@@ -4183,6 +4191,12 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &proper
 
 bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest,
                            ArrayOfVkFormatProperties3 *dest3) {
+    for (const auto &excluded_format : excluded_formats_) {
+        if (format_name == excluded_format) {
+            ::format("Profile requires format %s, but it is excluded. The format will be unsupported.\n", format_name.c_str());
+            return true;
+        }
+    }
     VkFormat format = StringToFormat(format_name);
     VkFormatProperties profile_properties = {};
     VkFormatProperties3 profile_properties_3 = {};
@@ -5045,15 +5059,21 @@ void JsonLoader::ReadProfileApiVersion() {
             break; // Systematically load the first and default profile when the profile is not found
         }
     }
-}
 
-VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
-    pdd_ = pdd;
     for (std::size_t j = 0, m = layer_settings->exclude_device_extensions.size(); j < m; ++j) {
         const auto &extension = layer_settings->exclude_device_extensions[j];
         if (extension.empty()) continue;
         excluded_extensions_.push_back(extension);
     }
+    for (std::size_t j = 0, m = layer_settings->exclude_formats.size(); j < m; ++j) {
+        const auto &format = layer_settings->exclude_formats[j];
+        if (format.empty()) continue;
+        excluded_formats_.push_back(format);
+    }
+}
+
+VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
+    pdd_ = pdd;
 
     const std::string &profile_name = layer_settings->profile_name;
     const Json::Value &profiles = root_["profiles"];
