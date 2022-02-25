@@ -1532,7 +1532,7 @@ class VulkanRegistry():
                 bitsName = bitmask.get('bitvalues')
                 if bitsName is None:
                     # Currently some definitions use "requires", not "bitvalues"
-                    bitsName = bitmask.get('requires') 
+                    bitsName = bitmask.get('requires')
 
                 if bitsName != None:
                     if bitsName in self.enums:
@@ -2223,7 +2223,7 @@ class VulkanProfile():
                         # If list is empty then ignore
                         continue
                     if structDef.members[member].isArray:
-                        if not isinstance(structDef.members[member].arraySize, int):
+                        if not isinstance(self.registry.evalArraySize(structDef.members[member].arraySize), int):
                             Log.f("Unsupported array member '{0}' in structure '{1}'".format(member, structDef.name) +
                                   "(currently only 1D non-dynamic arrays are supported in this context)")
                         # If it's an array we have to generate per-element assignment code
@@ -2293,7 +2293,7 @@ class VulkanProfile():
                         # If list is empty then ignore
                         continue
                     if structDef.members[member].isArray:
-                        if not isinstance(structDef.members[member].arraySize, int):
+                        if not isinstance(self.registry.evalArraySize(structDef.members[member].arraySize), int):
                             Log.f("Unsupported array member '{0}' in structure '{1}'".format(member, structDef.name) +
                                   "(currently only 1D non-dynamic arrays are supported in this context)")
                         # If it's an array we have to generate per-element comparison code
