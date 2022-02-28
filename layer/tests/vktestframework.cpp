@@ -31,10 +31,10 @@
 #endif
 
 #ifdef _WIN32
-#define ERR_EXIT(err_msg, err_class)                 \
-    do {                                             \
-        MessageBox(NULL, err_msg, err_class, MB_OK); \
-        exit(1);                                     \
+#define ERR_EXIT(err_msg, err_class)                    \
+    do {                                                \
+        MessageBox(nullptr, err_msg, err_class, MB_OK); \
+        exit(1);                                        \
     } while (0)
 #else  // _WIN32
 
