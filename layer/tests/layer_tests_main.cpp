@@ -34,8 +34,8 @@ void CopyAssets(android_app *app) {
   if (assetManager != nullptr) {
     AAssetDir *assetDir = AAssetManager_openDir(assetManager, "");
     if (assetDir != nullptr) {
-      const char *filename = (const char *)NULL;
-      while ((filename = AAssetDir_getNextFileName(assetDir)) != NULL) {
+      const char *filename = (const char *)nullptr;
+      while ((filename = AAssetDir_getNextFileName(assetDir)) != nullptr) {
         AAsset *asset = AAssetManager_open(assetManager, filename, AASSET_MODE_BUFFER);
         if (asset != nullptr) {
           const void* file_buffer = AAsset_getBuffer(asset);
@@ -108,13 +108,13 @@ void addFullTestCommentIfPresent(const ::testing::TestInfo &test_info, std::stri
     const char *const type_param = test_info.type_param();
     const char *const value_param = test_info.value_param();
 
-    if (type_param != NULL || value_param != NULL) {
+    if (type_param != nullptr || value_param != nullptr) {
         error_message.append(", where ");
-        if (type_param != NULL) {
+        if (type_param != nullptr) {
             error_message.append("TypeParam = ").append(type_param);
-            if (value_param != NULL) error_message.append(" and ");
+            if (value_param != nullptr) error_message.append(" and ");
         }
-        if (value_param != NULL) {
+        if (value_param != nullptr) {
             error_message.append("GetParam() = ").append(value_param);
         }
     }
@@ -204,7 +204,7 @@ void android_main(struct android_app *app) {
     while (1) {
         int events;
         struct android_poll_source *source;
-        while (ALooper_pollAll(active ? 0 : -1, NULL, &events, (void **)&source) >= 0) {
+        while (ALooper_pollAll(active ? 0 : -1, nullptr, &events, (void **)&source) >= 0) {
             if (source) {
                 source->process(app, source);
             }
