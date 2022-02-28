@@ -1289,6 +1289,8 @@ class VulkanVersionNumber():
         # Construct version number pre-processor definition's name
         self.define = 'VK_VERSION_{0}_{1}'.format(self.major, self.minor)
 
+    def get_api_version_string(self):
+        return 'VK_API_VERSION_' + str(self.major) + '_' + str(self.minor)
 
     def __eq__(self, other):
         if isinstance(other, VulkanVersionNumber):
@@ -1364,6 +1366,7 @@ class VulkanRegistry():
         self.parseStructInfo(xml)
         self.parsePrerequisites(xml)
         self.parseEnums(xml)
+        self.parseFormats(xml)
         self.parseBitmasks(xml)
         self.parseConstants(xml)
         self.parseAliases(xml)
@@ -1518,6 +1521,12 @@ class VulkanRegistry():
             # Finally store it in the registry
             self.enums[enumDef.name] = enumDef
 
+
+    def parseFormats(self, xml):
+        self.formatCompression = dict()
+        for enum in xml.findall("./formats/format"):
+            if enum.get('compressed'):
+                self.formatCompression[enum.get('name')] = enum.get('compressed')
 
     def parseBitmasks(self, xml):
         self.bitmasks = dict()
