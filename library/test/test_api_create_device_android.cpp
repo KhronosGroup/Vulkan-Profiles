@@ -219,8 +219,8 @@ void android_main(struct android_app *app) {
             __android_log_print(ANDROID_LOG_DEBUG, appTag, "filter = %s", argv[1]);
 
             // Route output to files until we can override the gtest output
-            freopen("/sdcard/Android/data/com.example.VulkanProfilesLayerTests/files/out.txt", "w", stdout);
-            freopen("/sdcard/Android/data/com.example.VulkanProfilesLayerTests/files/err.txt", "w", stderr);
+            freopen("/sdcard/Android/data/com.example.VpLibrary_test_api_create_device_android/files/out.txt", "w", stdout);
+            freopen("/sdcard/Android/data/com.example.VpLibrary_test_api_create_device_android/files/err.txt", "w", stderr);
 
             ::testing::InitGoogleTest(&argc, argv);
 
