@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.204.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
     "capabilities": {
         "baseline": {
             "properties": {
