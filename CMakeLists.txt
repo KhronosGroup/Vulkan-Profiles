@@ -122,6 +122,7 @@ set(BUILD_TESTS OFF)
 set(_build_type ${CMAKE_BUILD_TYPE})
 set(VVL_CPP_STANDARD 11)
 set(_build_type ${CMAKE_BUILD_TYPE})
+set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
 
 # FetchContent() doesn't seem to actually do a Vulkan-Headers build at all.
 # Consequently, we're really only interested in the source.

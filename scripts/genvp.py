@@ -2712,7 +2712,7 @@ class VulkanProfilesSchemaGenerator():
 
         return OrderedDict({
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "$id": "https://schema.khronos.org/vulkan/profiles-{0}.json#".format(versionStr),
+            "$id": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "title": "Vulkan Profiles Schema for Vulkan {0}".format(versionStr),
             "additionalProperties": True,
             "required": [
