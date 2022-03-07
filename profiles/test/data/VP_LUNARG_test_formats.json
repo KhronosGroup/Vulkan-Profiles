@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.204.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
     "capabilities": {
         "baseline": {
             "formats": {
@@ -12,11 +12,11 @@
                 },
                 "VK_FORMAT_R4G4B4A4_UNORM_PACK16": {
                     "VkFormatProperties2": {
-						"formatProperties": {
-							"linearTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT" ],
-							"optimalTilingFeatures": [ "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT" ],
-							"bufferFeatures": [ "VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR" ]
-						}
+                        "formatProperties": {
+                            "linearTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT" ],
+                            "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT" ],
+                            "bufferFeatures": [ "VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR" ]
+                        }
                     }
                 },
                 "VK_FORMAT_B4G4R4A4_UNORM_PACK16": {
@@ -28,8 +28,8 @@
                 },
                 "VK_FORMAT_R5G6B5_UNORM_PACK16": {
                 }
-			}
-		}
+            }
+        }
     },
     "profiles": {
         "VP_LUNARG_test_formats": {
