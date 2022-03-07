@@ -3850,6 +3850,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-registry', action='store', help='Use specified registry file instead of vk.xml')
+    parser.add_argument('-outLayer', action='store', help='Output the layer source file')
 
     args = parser.parse_args()
 
@@ -3858,7 +3859,11 @@ if __name__ == '__main__':
         parser.print_help()
         exit()
 
+    outputPath = "../layer/profiles.cpp"
+    if args.outLayer is not None:
+        outputPath = args.outLayer
+
     registry = genvp.VulkanRegistry(args.registry)
 
     generator = VulkanProfilesLayerGenerator()
-    generator.generate("../layer/profiles.cpp", registry)
+    generator.generate(outputPath, registry)
