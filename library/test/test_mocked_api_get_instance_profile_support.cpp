@@ -173,7 +173,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan11_unsupported_version) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported API version: 1.3.203"
+        "Unsupported API version: 1.3.204"
     });
 #endif
 

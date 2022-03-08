@@ -861,7 +861,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_version) {
         "Checking device support for profile VP_KHR_roadmap_2022 "
             "(deviceName=, driverName=, driverInfo=). You may find the details "
             "of the capabilities of this device on https://vulkan.gpuinfo.org/",
-        "Unsupported API version: 1.3.203"
+        "Unsupported API version: 1.3.204"
     });
 #endif
 
