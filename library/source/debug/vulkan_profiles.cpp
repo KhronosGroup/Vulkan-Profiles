@@ -2735,10 +2735,10 @@ static const VkStructureType featureStructTypes[] = {
 };
 
 static const VkStructureType propertyStructTypes[] = {
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR,
 };
 
 static const VpFeatureDesc featureDesc = {
@@ -2905,6 +2905,38 @@ static const VpFeatureDesc featureDesc = {
 static const VpPropertyDesc propertyDesc = {
     [](VkBaseOutStructure* p) {
             switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
+                    VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
+                    s->properties.limits.bufferImageGranularity = 4096;
+                    s->properties.limits.lineWidthGranularity = 0.5;
+                    s->properties.limits.maxColorAttachments = 7;
+                    s->properties.limits.maxComputeWorkGroupInvocations = 256;
+                    s->properties.limits.maxComputeWorkGroupSize[0] = 1024;
+                    s->properties.limits.maxComputeWorkGroupSize[1] = 1024;
+                    s->properties.limits.maxComputeWorkGroupSize[2] = 64;
+                    s->properties.limits.maxDescriptorSetSampledImages = 1800;
+                    s->properties.limits.maxDescriptorSetSamplers = 576;
+                    s->properties.limits.maxDescriptorSetStorageBuffers = 96;
+                    s->properties.limits.maxDescriptorSetStorageImages = 144;
+                    s->properties.limits.maxDescriptorSetUniformBuffers = 90;
+                    s->properties.limits.maxFragmentCombinedOutputResources = 16;
+                    s->properties.limits.maxImageArrayLayers = 2048;
+                    s->properties.limits.maxImageDimension1D = 8192;
+                    s->properties.limits.maxImageDimension2D = 8192;
+                    s->properties.limits.maxImageDimensionCube = 8192;
+                    s->properties.limits.maxPerStageDescriptorSampledImages = 200;
+                    s->properties.limits.maxPerStageDescriptorSamplers = 64;
+                    s->properties.limits.maxPerStageDescriptorStorageBuffers = 30;
+                    s->properties.limits.maxPerStageDescriptorStorageImages = 16;
+                    s->properties.limits.maxPerStageDescriptorUniformBuffers = 15;
+                    s->properties.limits.maxPerStageResources = 200;
+                    s->properties.limits.maxSamplerLodBias = 14;
+                    s->properties.limits.maxUniformBufferRange = 65536;
+                    s->properties.limits.mipmapPrecisionBits = 6;
+                    s->properties.limits.pointSizeGranularity = 0.125;
+                    s->properties.limits.standardSampleLocations = VK_TRUE;
+                    s->properties.limits.subTexelPrecisionBits = 8;
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES: {
                     VkPhysicalDeviceVulkan11Properties* s = static_cast<VkPhysicalDeviceVulkan11Properties*>(static_cast<void*>(p));
                     s->maxMultiviewInstanceIndex = 134217727;
@@ -2944,44 +2976,44 @@ static const VpPropertyDesc propertyDesc = {
                     s->maxPerStageDescriptorInlineUniformBlocks = 4;
                     s->maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks = 4;
                 } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
-                    VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
-                    s->properties.limits.bufferImageGranularity = 4096;
-                    s->properties.limits.lineWidthGranularity = 0.5;
-                    s->properties.limits.maxColorAttachments = 7;
-                    s->properties.limits.maxComputeWorkGroupInvocations = 256;
-                    s->properties.limits.maxComputeWorkGroupSize[0] = 1024;
-                    s->properties.limits.maxComputeWorkGroupSize[1] = 1024;
-                    s->properties.limits.maxComputeWorkGroupSize[2] = 64;
-                    s->properties.limits.maxDescriptorSetSampledImages = 1800;
-                    s->properties.limits.maxDescriptorSetSamplers = 576;
-                    s->properties.limits.maxDescriptorSetStorageBuffers = 96;
-                    s->properties.limits.maxDescriptorSetStorageImages = 144;
-                    s->properties.limits.maxDescriptorSetUniformBuffers = 90;
-                    s->properties.limits.maxFragmentCombinedOutputResources = 16;
-                    s->properties.limits.maxImageArrayLayers = 2048;
-                    s->properties.limits.maxImageDimension1D = 8192;
-                    s->properties.limits.maxImageDimension2D = 8192;
-                    s->properties.limits.maxImageDimensionCube = 8192;
-                    s->properties.limits.maxPerStageDescriptorSampledImages = 200;
-                    s->properties.limits.maxPerStageDescriptorSamplers = 64;
-                    s->properties.limits.maxPerStageDescriptorStorageBuffers = 30;
-                    s->properties.limits.maxPerStageDescriptorStorageImages = 16;
-                    s->properties.limits.maxPerStageDescriptorUniformBuffers = 15;
-                    s->properties.limits.maxPerStageResources = 200;
-                    s->properties.limits.maxSamplerLodBias = 14;
-                    s->properties.limits.maxUniformBufferRange = 65536;
-                    s->properties.limits.mipmapPrecisionBits = 6;
-                    s->properties.limits.pointSizeGranularity = 0.125;
-                    s->properties.limits.standardSampleLocations = VK_TRUE;
-                    s->properties.limits.subTexelPrecisionBits = 8;
-                } break;
                 default: break;
             }
     },
     [](VkBaseOutStructure* p) -> bool {
         bool ret = true;
             switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
+                    VkPhysicalDeviceProperties2KHR* prettify_VkPhysicalDeviceProperties2KHR = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.bufferImageGranularity <= 4096); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.bufferImageGranularity <= 4096), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.bufferImageGranularity <= 4096");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.lineWidthGranularity <= 0.5); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.lineWidthGranularity <= 0.5), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.lineWidthGranularity <= 0.5");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxColorAttachments >= 7); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxColorAttachments >= 7), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxColorAttachments >= 7");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupInvocations >= 256); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupInvocations >= 256), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxComputeWorkGroupInvocations >= 256");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupSize[0] >= 1024); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupSize[0] >= 1024), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxComputeWorkGroupSize[0] >= 1024");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupSize[1] >= 1024); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupSize[1] >= 1024), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxComputeWorkGroupSize[1] >= 1024");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupSize[2] >= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupSize[2] >= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxComputeWorkGroupSize[2] >= 64");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetSampledImages >= 1800); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetSampledImages >= 1800), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetSampledImages >= 1800");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetSamplers >= 576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetSamplers >= 576), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetSamplers >= 576");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageBuffers >= 96); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageBuffers >= 96), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetStorageBuffers >= 96");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageImages >= 144); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageImages >= 144), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetStorageImages >= 144");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetUniformBuffers >= 90); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetUniformBuffers >= 90), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetUniformBuffers >= 90");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFragmentCombinedOutputResources >= 16); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFragmentCombinedOutputResources >= 16), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxFragmentCombinedOutputResources >= 16");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageArrayLayers >= 2048); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageArrayLayers >= 2048), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageArrayLayers >= 2048");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension1D >= 8192); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension1D >= 8192), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimension1D >= 8192");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension2D >= 8192); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension2D >= 8192), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimension2D >= 8192");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimensionCube >= 8192); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimensionCube >= 8192), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimensionCube >= 8192");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorSampledImages >= 200); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorSampledImages >= 200), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorSampledImages >= 200");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorSamplers >= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorSamplers >= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorSamplers >= 64");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorStorageBuffers >= 30); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorStorageBuffers >= 30), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorStorageBuffers >= 30");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorStorageImages >= 16); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorStorageImages >= 16), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorStorageImages >= 16");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorUniformBuffers >= 15); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorUniformBuffers >= 15), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorUniformBuffers >= 15");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageResources >= 200); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageResources >= 200), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageResources >= 200");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxSamplerLodBias >= 14); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxSamplerLodBias >= 14), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxSamplerLodBias >= 14");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxUniformBufferRange >= 65536); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxUniformBufferRange >= 65536), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxUniformBufferRange >= 65536");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.mipmapPrecisionBits >= 6); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.mipmapPrecisionBits >= 6), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.mipmapPrecisionBits >= 6");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.pointSizeGranularity <= 0.125); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.pointSizeGranularity <= 0.125), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.pointSizeGranularity <= 0.125");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.standardSampleLocations == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.standardSampleLocations == VK_TRUE), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.standardSampleLocations == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.subTexelPrecisionBits >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.subTexelPrecisionBits >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.subTexelPrecisionBits >= 8");
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES: {
                     VkPhysicalDeviceVulkan11Properties* prettify_VkPhysicalDeviceVulkan11Properties = static_cast<VkPhysicalDeviceVulkan11Properties*>(static_cast<void*>(p));
                     ret = ret && (prettify_VkPhysicalDeviceVulkan11Properties->maxMultiviewInstanceIndex >= 134217727); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Properties->maxMultiviewInstanceIndex >= 134217727), "Unsupported properties condition: VkPhysicalDeviceVulkan11Properties::maxMultiviewInstanceIndex >= 134217727");
@@ -3020,38 +3052,6 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (prettify_VkPhysicalDeviceVulkan13Properties->maxInlineUniformTotalSize >= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan13Properties->maxInlineUniformTotalSize >= 4), "Unsupported properties condition: VkPhysicalDeviceVulkan13Properties::maxInlineUniformTotalSize >= 4");
                     ret = ret && (prettify_VkPhysicalDeviceVulkan13Properties->maxPerStageDescriptorInlineUniformBlocks >= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan13Properties->maxPerStageDescriptorInlineUniformBlocks >= 4), "Unsupported properties condition: VkPhysicalDeviceVulkan13Properties::maxPerStageDescriptorInlineUniformBlocks >= 4");
                     ret = ret && (prettify_VkPhysicalDeviceVulkan13Properties->maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks >= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan13Properties->maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks >= 4), "Unsupported properties condition: VkPhysicalDeviceVulkan13Properties::maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks >= 4");
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
-                    VkPhysicalDeviceProperties2KHR* prettify_VkPhysicalDeviceProperties2KHR = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.bufferImageGranularity <= 4096); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.bufferImageGranularity <= 4096), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.bufferImageGranularity <= 4096");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.lineWidthGranularity <= 0.5); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.lineWidthGranularity <= 0.5), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.lineWidthGranularity <= 0.5");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxColorAttachments >= 7); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxColorAttachments >= 7), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxColorAttachments >= 7");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupInvocations >= 256); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupInvocations >= 256), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxComputeWorkGroupInvocations >= 256");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupSize[0] >= 1024); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupSize[0] >= 1024), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxComputeWorkGroupSize[0] >= 1024");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupSize[1] >= 1024); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupSize[1] >= 1024), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxComputeWorkGroupSize[1] >= 1024");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupSize[2] >= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupSize[2] >= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxComputeWorkGroupSize[2] >= 64");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetSampledImages >= 1800); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetSampledImages >= 1800), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetSampledImages >= 1800");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetSamplers >= 576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetSamplers >= 576), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetSamplers >= 576");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageBuffers >= 96); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageBuffers >= 96), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetStorageBuffers >= 96");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageImages >= 144); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageImages >= 144), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetStorageImages >= 144");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetUniformBuffers >= 90); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetUniformBuffers >= 90), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetUniformBuffers >= 90");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFragmentCombinedOutputResources >= 16); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFragmentCombinedOutputResources >= 16), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxFragmentCombinedOutputResources >= 16");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageArrayLayers >= 2048); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageArrayLayers >= 2048), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageArrayLayers >= 2048");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension1D >= 8192); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension1D >= 8192), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimension1D >= 8192");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension2D >= 8192); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension2D >= 8192), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimension2D >= 8192");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimensionCube >= 8192); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimensionCube >= 8192), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimensionCube >= 8192");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorSampledImages >= 200); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorSampledImages >= 200), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorSampledImages >= 200");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorSamplers >= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorSamplers >= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorSamplers >= 64");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorStorageBuffers >= 30); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorStorageBuffers >= 30), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorStorageBuffers >= 30");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorStorageImages >= 16); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorStorageImages >= 16), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorStorageImages >= 16");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorUniformBuffers >= 15); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorUniformBuffers >= 15), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorUniformBuffers >= 15");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageResources >= 200); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageResources >= 200), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageResources >= 200");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxSamplerLodBias >= 14); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxSamplerLodBias >= 14), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxSamplerLodBias >= 14");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxUniformBufferRange >= 65536); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxUniformBufferRange >= 65536), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxUniformBufferRange >= 65536");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.mipmapPrecisionBits >= 6); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.mipmapPrecisionBits >= 6), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.mipmapPrecisionBits >= 6");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.pointSizeGranularity <= 0.125); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.pointSizeGranularity <= 0.125), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.pointSizeGranularity <= 0.125");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.standardSampleLocations == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.standardSampleLocations == VK_TRUE), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.standardSampleLocations == VK_TRUE");
-                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.subTexelPrecisionBits >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.subTexelPrecisionBits >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.subTexelPrecisionBits >= 8");
                 } break;
                 default: break;
             }
