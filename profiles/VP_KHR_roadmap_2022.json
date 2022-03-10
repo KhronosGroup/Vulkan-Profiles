@@ -191,15 +191,27 @@
         "vulkan13requirements_1_2": {
             "extensions": {
                 "VK_EXT_image_robustness": 1,
+                "VK_KHR_shader_non_semantic_info": 1,
                 "VK_KHR_shader_terminate_invocation": 1,
+                "VK_KHR_format_feature_flags2": 1,
                 "VK_KHR_zero_initialize_workgroup_memory": 1,
                 "VK_KHR_synchronization2": 1,
                 "VK_KHR_shader_integer_dot_product": 1,
                 "VK_KHR_maintenance4": 1,
+                "VK_EXT_4444_formats": 1,
+                "VK_EXT_extended_dynamic_state": 1,
+                "VK_EXT_extended_dynamic_state2": 1,
                 "VK_EXT_pipeline_creation_cache_control": 1,
                 "VK_EXT_subgroup_size_control": 1,
                 "VK_EXT_shader_demote_to_helper_invocation": 1,
-                "VK_EXT_inline_uniform_block": 1
+                "VK_EXT_inline_uniform_block": 1,
+                "VK_EXT_pipeline_creation_feedback": 1,
+                "VK_EXT_texel_buffer_alignment": 1,
+                "VK_EXT_ycbcr_2plane_444_formats": 1,
+                "VK_EXT_texture_compression_astc_hdr": 1,
+                "VK_EXT_tooling_info": 1,
+                "VK_EXT_private_data": 1,
+                "VK_KHR_dynamic_rendering": 1
             },
             "features": {
                 "VkPhysicalDeviceVulkan12Features": {
