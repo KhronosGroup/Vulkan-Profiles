@@ -95,8 +95,8 @@ If the profile is supported by the Vulkan implementation at the instance level, 
     ...
 
     VpInstanceCreateInfo vpCreateInfo{};
-    createInfo.pCreateInfo = &vkCreateInfo;
-    createInfo.pProfile = &profile;
+    vpCreateInfo.pCreateInfo = &vkCreateInfo;
+    vpCreateInfo.pProfile = &profile;
 
     VkInstance instance = VK_NULL_HANDLE;
     result = vpCreateInstance(&vpCreateInfo, nullptr, &instance);
@@ -134,8 +134,8 @@ Finally, once a physical device supporting the profile is selected, a Vulkan dev
     ...
 
     VpDeviceCreateInfo vpCreateInfo{};
-    createInfo.pCreateInfo = &vkCreateInfo;
-    createInfo.pProfile = &profile;
+    vpCreateInfo.pCreateInfo = &vkCreateInfo;
+    vpCreateInfo.pProfile = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
     result = vpCreateDevice(physicalDevice, &vpCreateInfo, nullptr, &device);
@@ -169,10 +169,10 @@ If the application needs to provide its own set of instance or device extensions
     vkCreateInfo.ppEnabledExtensionNames = ...
 
     VpInstanceCreateInfo vpCreateInfo{};
-    createInfo.pCreateInfo = &vkCreateInfo;
-    createInfo.pProfile = &profile;
+    vpCreateInfo.pCreateInfo = &vkCreateInfo;
+    vpCreateInfo.pProfile = &profile;
     // Use extension override flag
-    createInfo.flags = VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT;
+    vpCreateInfo.flags = VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT;
     ...
 ```
 
@@ -184,10 +184,10 @@ If the application needs to provide its own set of instance or device extensions
     vkCreateInfo.ppEnabledExtensionNames = ...
 
     VpDeviceCreateInfo vpCreateInfo{};
-    createInfo.pCreateInfo = &vkCreateInfo;
-    createInfo.pProfile = &profile;
+    vpCreateInfo.pCreateInfo = &vkCreateInfo;
+    vpCreateInfo.pProfile = &profile;
     // Use extension override flag
-    createInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
+    vpCreateInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
     ...
 ```
 
@@ -203,10 +203,10 @@ If the application would like to specify additional extensions besides the ones 
     vkCreateInfo.ppEnabledExtensionNames = ...
 
     VpInstanceCreateInfo vpCreateInfo{};
-    createInfo.pCreateInfo = &vkCreateInfo;
-    createInfo.pProfile = &profile;
+    vpCreateInfo.pCreateInfo = &vkCreateInfo;
+    vpCreateInfo.pProfile = &profile;
     // Use extension merge flag
-    createInfo.flags = VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT;
+    vpCreateInfo.flags = VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT;
     ...
 ```
 
@@ -218,10 +218,10 @@ If the application would like to specify additional extensions besides the ones 
     vkCreateInfo.ppEnabledExtensionNames = ...
 
     VpDeviceCreateInfo vpCreateInfo{};
-    createInfo.pCreateInfo = &vkCreateInfo;
-    createInfo.pProfile = &profile;
+    vpCreateInfo.pCreateInfo = &vkCreateInfo;
+    vpCreateInfo.pProfile = &profile;
     // Use extension merge flag
-    createInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
+    vpCreateInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
     ...
 ```
 
@@ -244,10 +244,10 @@ If the application needs to override any subset of the feature structures otherw
     ...
 
     VpDeviceCreateInfo vpCreateInfo{};
-    createInfo.pCreateInfo = &vkCreateInfo;
-    createInfo.pProfile = &profile;
+    vpCreateInfo.pCreateInfo = &vkCreateInfo;
+    vpCreateInfo.pProfile = &profile;
     // Use feature override flag
-    createInfo.flags = VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT;
+    vpCreateInfo.flags = VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT;
     ...
 ```
 
@@ -257,11 +257,11 @@ Sometimes the application needs to override all feature structures with its own,
 
 ```C++
     VpDeviceCreateInfo vpCreateInfo{};
-    createInfo.pCreateInfo = &vkCreateInfo;
-    createInfo.pProfile = &profile;
+    vpCreateInfo.pCreateInfo = &vkCreateInfo;
+    vpCreateInfo.pProfile = &profile;
     // We want to enable only the features we specify, so we override
     // all profile-defined features
-    createInfo.flags = VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT;
+    vpCreateInfo.flags = VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT;
     ...
 ```
 
@@ -296,11 +296,11 @@ In order to achieve this, any feature structure that the application intends to 
     ...
 
     VpDeviceCreateInfo vpCreateInfo{};
-    createInfo.pCreateInfo = &vkCreateInfo;
-    createInfo.pProfile = &profile;
+    vpCreateInfo.pCreateInfo = &vkCreateInfo;
+    vpCreateInfo.pProfile = &profile;
     // Finally, we specify the feature override flag so that the feature
     // structures provided will be used instead of the profile defaults
-    createInfo.flags = VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT;
+    vpCreateInfo.flags = VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT;
     ...
 ```
 
