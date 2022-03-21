@@ -1,4 +1,5 @@
-set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/genvp.py) 
+set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/genvp.py)
+file(GLOB PROFILES_FILES ${CMAKE_SOURCE_DIR}/profiles)
 source_group("Python Files" FILES ${LAYER_PYTHON_FILES})
 
 add_custom_target(VpGenerated
@@ -11,6 +12,8 @@ add_custom_target(VpGenerated
 		-outDoc ${CMAKE_SOURCE_DIR}/PROFILES.md
 		-validate
 		-generateDebugLibrary
-	SOURCES ${LAYER_PYTHON_FILES})
+	VERBATIM
+	SOURCES ${LAYER_PYTHON_FILES} ${PROFILES_FILES}
+	DEPENDS ${LAYER_PYTHON_FILES} ${PROFILES_FILES})
 
 set_target_properties(VpGenerated PROPERTIES FOLDER "Profiles scripts")
