@@ -73,17 +73,18 @@ else()
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wpointer-arith -Werror")
 endif()
 
-source_group("Python Files" FILES ${CMAKE_SOURCE_DIR}/scripts/gen_layer.py)
+set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_layer.py) 
+source_group("Python Files" FILES ${LAYER_PYTHON_FILES})
 
 add_vk_layer(${TARGET_NAME} profiles.cpp vk_layer_table.cpp ${jsoncpp_generated_source} ${jsoncpp_generated_header})
 
 add_custom_target(VpGenerated_layer ALL
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/gen_layer.py 
+    COMMAND ${PYTHON_EXECUTABLE} ${LAYER_PYTHON_FILES} 
         -registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
         -outLayer ${CMAKE_SOURCE_DIR}/layer/profiles.cpp
     VERBATIM
     DEPENDS VkLayer_${TARGET_NAME}
-    )
+    SOURCES ${LAYER_PYTHON_FILES})
 set_target_properties(VpGenerated_layer PROPERTIES FOLDER "Profiles layer")
 
 # json file creation

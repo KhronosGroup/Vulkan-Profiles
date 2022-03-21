@@ -1,7 +1,8 @@
-source_group("Python Files" FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/genvp.py)
+set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/genvp.py) 
+source_group("Python Files" FILES ${LAYER_PYTHON_FILES})
 
 add_custom_target(VpGenerated
-	COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/genvp.py
+	COMMAND ${PYTHON_EXECUTABLE} ${LAYER_PYTHON_FILES}
 		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
 		-profiles ${CMAKE_SOURCE_DIR}/profiles
 		-outIncDir ${CMAKE_SOURCE_DIR}/library/include/vulkan
@@ -10,6 +11,6 @@ add_custom_target(VpGenerated
 		-outDoc ${CMAKE_SOURCE_DIR}/PROFILES.md
 		-validate
 		-generateDebugLibrary
-	SOURCES ${CMAKE_SOURCE_DIR}/scripts/genvp.py)
+	SOURCES ${LAYER_PYTHON_FILES})
 
 set_target_properties(VpGenerated PROPERTIES FOLDER "Profiles scripts")
