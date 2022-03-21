@@ -402,8 +402,6 @@ TEST_F(LayerTests, TestNotSettingProfileFile) {
         inst_builder.reset();
     }
     {
-        profiles_test::VulkanInstanceBuilder inst_builder;
-
         inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
         inst_builder.setApiVersion(VK_API_VERSION_1_0);
 
