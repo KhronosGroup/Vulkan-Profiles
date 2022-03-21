@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.14.0)
 
+set (CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/scripts")
+include(known_good)
+
 enable_testing()
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
@@ -73,21 +76,21 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_OBJECT_LIBS OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
 	vulkan-headers
-	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers
-	GIT_TAG ${VULKAN_TAG}
+	GIT_REPOSITORY ${GIT_VULKAN_HEADER_REPOSITORY}
+	GIT_TAG ${GIT_VULKAN_HEADER_COMMIT}
 )
 FetchContent_Declare(
 	vulkan-validationlayers
-	GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-ValidationLayers
-	GIT_TAG ${VULKAN_TAG}
+	GIT_REPOSITORY ${GIT_VULKAN_VALIDATION_REPOSITORY}
+	GIT_TAG ${GIT_VULKAN_VALIDATION_COMMIT}
 )
 # Desktop builds link against the loader vulkan library.  Android
 # builds just link against the system vulkan library.
 if (NOT ANDROID)
     FetchContent_Declare(
         vulkan-loader
-        GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Loader.git
-        GIT_TAG sdk-1.3.204
+        GIT_REPOSITORY ${GIT_VULKAN_LOADER_REPOSITORY}
+        GIT_TAG ${GIT_VULKAN_LOADER_COMMIT}
     )
 endif()
 
