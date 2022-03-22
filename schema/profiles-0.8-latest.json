@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.3.204",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.208",
     "additionalProperties": true,
     "required": [
         "capabilities",
@@ -567,6 +567,15 @@
                     "type": "boolean"
                 },
                 "shaderUniformTexelBufferArrayNonUniformIndexing": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "descriptorSetHostMapping": {
                     "type": "boolean"
                 }
             }
@@ -5032,6 +5041,9 @@
                             "VK_KHR_pipeline_library": {
                                 "type": "integer"
                             },
+                            "VK_KHR_portability_enumeration": {
+                                "type": "integer"
+                            },
                             "VK_KHR_portability_subset": {
                                 "type": "integer"
                             },
@@ -5305,6 +5317,9 @@
                             "VK_QNX_screen_surface": {
                                 "type": "integer"
                             },
+                            "VK_VALVE_descriptor_set_host_mapping": {
+                                "type": "integer"
+                            },
                             "VK_VALVE_mutable_descriptor_type": {
                                 "type": "integer"
                             }
@@ -5401,6 +5416,9 @@
                             },
                             "VkPhysicalDeviceDescriptorIndexingFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceDescriptorIndexingFeatures"
+                            },
+                            "VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE": {
+                                "$ref": "#/definitions/VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE"
                             },
                             "VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV": {
                                 "$ref": "#/definitions/VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV"

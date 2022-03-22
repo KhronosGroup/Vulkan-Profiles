@@ -2366,6 +2366,9 @@ class PhysicalDeviceData {
     VkPhysicalDeviceMaintenance4PropertiesKHR physical_device_maintenance_4_properties_;
     VkPhysicalDeviceMaintenance4FeaturesKHR physical_device_maintenance_4_features_;
 
+    // VK_VALVE_descriptor_set_host_mapping structs
+    VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE physical_device_descriptor_set_host_mapping_features_;
+
     // VK_QCOM_fragment_density_map_offset structs
     VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM physical_device_fragment_density_map_offset_properties_;
     VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM physical_device_fragment_density_map_offset_features_;
@@ -2776,6 +2779,9 @@ class PhysicalDeviceData {
         physical_device_maintenance_4_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_PROPERTIES_KHR};
         physical_device_maintenance_4_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_FEATURES_KHR};
 
+        // VK_VALVE_descriptor_set_host_mapping structs
+        physical_device_descriptor_set_host_mapping_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_SET_HOST_MAPPING_FEATURES_VALVE};
+
         // VK_QCOM_fragment_density_map_offset structs
         physical_device_fragment_density_map_offset_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_PROPERTIES_QCOM};
         physical_device_fragment_density_map_offset_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_FEATURES_QCOM};
@@ -3043,6 +3049,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4PropertiesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4FeaturesKHR *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceLinearColorAttachmentFeaturesNV *dest);
@@ -4117,6 +4124,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_NV_LINEAR_COLOR_ATTACHMENT_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_linear_color_attachment_features_);
+    } else if (name == "VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE") {
+        auto support = CheckExtensionSupport(VK_VALVE_DESCRIPTOR_SET_HOST_MAPPING_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_descriptor_set_host_mapping_features_);
     }
 
     return true;
@@ -7282,6 +7293,15 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
     return valid;
 }
 
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, descriptorSetHostMapping, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM)\n");
     bool valid = true;
@@ -9161,6 +9181,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDeviceMaintenance4FeaturesKHR *data = (VkPhysicalDeviceMaintenance4FeaturesKHR *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_maintenance_4_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_SET_HOST_MAPPING_FEATURES_VALVE:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_VALVE_DESCRIPTOR_SET_HOST_MAPPING_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE *data = (VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_descriptor_set_host_mapping_features_;
                     data->pNext = pNext;
                 }
                 break;
@@ -11109,6 +11137,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_maintenance_4_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_maintenance_4_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_VALVE_DESCRIPTOR_SET_HOST_MAPPING_EXTENSION_NAME)) {
+                    pdd.physical_device_descriptor_set_host_mapping_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_descriptor_set_host_mapping_features_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME)) {
