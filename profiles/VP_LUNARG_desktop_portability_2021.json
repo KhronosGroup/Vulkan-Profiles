@@ -1,13 +1,11 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-154.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.9.0-154.json#",
     "capabilities": {
         "vulkan11requirements": {
-            "features": {
+            "VK_VERSION_1_1": {
                 "VkPhysicalDeviceMultiviewFeatures": {
                     "multiview": true
-                }
-            },
-            "properties": {
+                },
                 "VkPhysicalDeviceMultiviewProperties": {
                     "maxMultiviewViewCount": 6,
                     "maxMultiviewInstanceIndex": 134217727
@@ -15,28 +13,7 @@
             }
         },
         "baseline": {
-            "extensions": {
-                "VK_KHR_8bit_storage": 1,
-                "VK_KHR_create_renderpass2": 1,
-                "VK_KHR_depth_stencil_resolve": 1,
-                "VK_KHR_driver_properties": 1,
-                "VK_KHR_image_format_list": 1,
-                "VK_KHR_imageless_framebuffer": 1,
-                "VK_KHR_sampler_mirror_clamp_to_edge": 1,
-                "VK_KHR_shader_float16_int8": 1,
-                "VK_KHR_timeline_semaphore": 1,
-                "VK_KHR_uniform_buffer_standard_layout": 1,
-                "VK_EXT_descriptor_indexing": 1,
-                "VK_EXT_host_query_reset": 1,
-                "VK_EXT_scalar_block_layout": 1,
-                "VK_EXT_robustness2": 1,
-                "VK_EXT_subgroup_size_control": 1,
-                "VK_EXT_texel_buffer_alignment": 1,
-                "VK_EXT_vertex_attribute_divisor": 1,
-                "VK_KHR_swapchain": 70,
-                "VK_KHR_swapchain_mutable_format": 1
-            },
-            "features": {
+            "VK_VERSION_1_0": {
                 "VkPhysicalDeviceFeatures": {
                     "depthBiasClamp": true,
                     "depthClamp": true,
@@ -68,50 +45,6 @@
                     "textureCompressionBC": true,
                     "vertexPipelineStoresAndAtomics": true
                 },
-                "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
-                    "imagelessFramebuffer": true
-                },
-                "VkPhysicalDevice16BitStorageFeatures": {
-                    "storageBuffer16BitAccess": true,
-                    "uniformAndStorageBuffer16BitAccess": true
-                },
-                "VkPhysicalDevice8BitStorageFeaturesKHR": {
-                    "storageBuffer8BitAccess": true,
-                    "uniformAndStorageBuffer8BitAccess": true
-                },
-                "VkPhysicalDeviceDescriptorIndexingFeaturesEXT": {
-                    "shaderUniformTexelBufferArrayDynamicIndexing": true,
-                    "shaderStorageTexelBufferArrayDynamicIndexing": true,
-                    "shaderSampledImageArrayNonUniformIndexing": true,
-                    "shaderUniformTexelBufferArrayNonUniformIndexing": true,
-                    "descriptorBindingSampledImageUpdateAfterBind": true,
-                    "descriptorBindingStorageImageUpdateAfterBind": true,
-                    "descriptorBindingStorageBufferUpdateAfterBind": true,
-                    "descriptorBindingUniformTexelBufferUpdateAfterBind": true,
-                    "descriptorBindingStorageTexelBufferUpdateAfterBind": true,
-                    "descriptorBindingUpdateUnusedWhilePending": true,
-                    "descriptorBindingPartiallyBound": true,
-                    "descriptorBindingVariableDescriptorCount": true,
-                    "runtimeDescriptorArray": true
-                },
-                "VkPhysicalDeviceHostQueryResetFeaturesEXT": {
-                    "hostQueryReset": true
-                },
-                "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR": {
-                    "uniformBufferStandardLayout": true
-                },
-                "VkPhysicalDeviceShaderDrawParametersFeatures": {
-                    "shaderDrawParameters": true
-                },
-                "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR": {
-                    "shaderInt8": true
-                },
-                "VkPhysicalDeviceVariablePointersFeatures": {
-                    "variablePointersStorageBuffer": true,
-                    "variablePointers": true
-                }
-            },
-            "properties": {
                 "VkPhysicalDeviceProperties": {
                     "limits": {
                         "maxImageDimension1D": 16384,
@@ -206,36 +139,6 @@
                         "lineWidthGranularity": 0.5
                     }
                 },
-                "VkPhysicalDeviceDescriptorIndexingPropertiesEXT": {
-                    "maxUpdateAfterBindDescriptorsInAllPools": 1048576,
-                    "maxPerStageDescriptorUpdateAfterBindSamplers": 16,
-                    "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 15,
-                    "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 31,
-                    "maxPerStageDescriptorUpdateAfterBindSampledImages": 128,
-                    "maxPerStageDescriptorUpdateAfterBindStorageImages": 8,
-                    "maxPerStageDescriptorUpdateAfterBindInputAttachments": 128,
-                    "maxPerStageUpdateAfterBindResources": 159,
-                    "maxDescriptorSetUpdateAfterBindSamplers": 80,
-                    "maxDescriptorSetUpdateAfterBindUniformBuffers": 90,
-                    "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 8,
-                    "maxDescriptorSetUpdateAfterBindStorageBuffers": 155,
-                    "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 8,
-                    "maxDescriptorSetUpdateAfterBindSampledImages": 640,
-                    "maxDescriptorSetUpdateAfterBindStorageImages": 40,
-                    "maxDescriptorSetUpdateAfterBindInputAttachments": 8
-                },
-                "VkPhysicalDeviceDepthStencilResolvePropertiesKHR": {
-                    "independentResolve": true,
-                    "independentResolveNone": true,
-                    "supportedDepthResolveModes": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ],
-                    "supportedStencilResolveModes": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ]
-                },
-                "VkPhysicalDeviceMaintenance3Properties": {
-                    "maxPerSetDescriptors": 700,
-                    "maxMemoryAllocationSize": 1073741824
-                }
-            },
-            "formats": {
                 "VK_FORMAT_R8_UNORM": {
                     "VkFormatProperties": {
                         "linearTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
@@ -683,42 +586,187 @@
                         "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
                         "bufferFeatures": []
                     }
-                }
-            },
-            "queueFamiliesProperties": [
-                {
-                    "VkQueueFamilyProperties": {
-                        "queueFlags": [ "VK_QUEUE_GRAPHICS_BIT", "VK_QUEUE_COMPUTE_BIT", "VK_QUEUE_TRANSFER_BIT" ],
-                        "queueCount": 1,
-                        "timestampValidBits": 36,
-                        "minImageTransferGranularity": {
-                            "width": 1,
-                            "height": 1,
-                            "depth": 1
+                },
+                "VkQueueFamilyProperties2": [
+                    {
+                        "queueFamilyProperties": {
+                            "queueFlags": [ "VK_QUEUE_GRAPHICS_BIT", "VK_QUEUE_COMPUTE_BIT", "VK_QUEUE_TRANSFER_BIT" ],
+                            "queueCount": 1,
+                            "timestampValidBits": 36,
+                            "minImageTransferGranularity": {
+                                "width": 1,
+                                "height": 1,
+                                "depth": 1
+                            }
                         }
                     }
+                ]
+            },
+            "VK_VERSION_1_1": {
+                "VkPhysicalDevice16BitStorageFeatures": {
+                    "storageBuffer16BitAccess": true,
+                    "uniformAndStorageBuffer16BitAccess": true
+                },
+                "VkPhysicalDeviceShaderDrawParametersFeatures": {
+                    "shaderDrawParameters": true
+                },
+                "VkPhysicalDeviceVariablePointersFeatures": {
+                    "variablePointersStorageBuffer": true,
+                    "variablePointers": true
+                },
+                "VkPhysicalDeviceMaintenance3Properties": {
+                    "maxPerSetDescriptors": 700,
+                    "maxMemoryAllocationSize": 1073741824
                 }
-            ]
+            },
+            "VK_KHR_8bit_storage": {
+                "version": 1,
+                "VkPhysicalDevice8BitStorageFeaturesKHR": {
+                    "storageBuffer8BitAccess": true,
+                    "uniformAndStorageBuffer8BitAccess": true
+                }
+            },
+            "VK_KHR_create_renderpass2": {
+                "version": 1
+            },
+            "VK_KHR_depth_stencil_resolve": {
+                "version": 1,
+                "VkPhysicalDeviceDepthStencilResolvePropertiesKHR": {
+                    "independentResolve": true,
+                    "independentResolveNone": true,
+                    "supportedDepthResolveModes": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ],
+                    "supportedStencilResolveModes": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ]
+                }
+            },
+            "VK_KHR_imageless_framebuffer": {
+                "version": 1,
+                "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
+                    "imagelessFramebuffer": true
+                }
+            },
+            "VK_KHR_driver_properties": {
+                "version": 1
+            },
+            "VK_KHR_image_format_list": {
+                "version": 1
+            },
+            "VK_KHR_sampler_mirror_clamp_to_edge": {
+                "version": 1
+            },
+            "VK_KHR_shader_float16_int8": {
+                "version": 1,
+                "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR": {
+                    "shaderInt8": true
+                }
+            },
+            "VK_KHR_timeline_semaphore": {
+                "version": 1
+            },
+            "VK_KHR_uniform_buffer_standard_layout": {
+                "version": 1,
+                "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR": {
+                    "uniformBufferStandardLayout": true
+                }
+            },
+            "VK_KHR_swapchain": {
+                "version": 70
+            },
+            "VK_KHR_swapchain_mutable_format": {
+                "version": 1
+            },
+            "VK_EXT_descriptor_indexing": {
+                "version": 1,
+                "VkPhysicalDeviceDescriptorIndexingFeaturesEXT": {
+                    "shaderUniformTexelBufferArrayDynamicIndexing": true,
+                    "shaderStorageTexelBufferArrayDynamicIndexing": true,
+                    "shaderSampledImageArrayNonUniformIndexing": true,
+                    "shaderUniformTexelBufferArrayNonUniformIndexing": true,
+                    "descriptorBindingSampledImageUpdateAfterBind": true,
+                    "descriptorBindingStorageImageUpdateAfterBind": true,
+                    "descriptorBindingStorageBufferUpdateAfterBind": true,
+                    "descriptorBindingUniformTexelBufferUpdateAfterBind": true,
+                    "descriptorBindingStorageTexelBufferUpdateAfterBind": true,
+                    "descriptorBindingUpdateUnusedWhilePending": true,
+                    "descriptorBindingPartiallyBound": true,
+                    "descriptorBindingVariableDescriptorCount": true,
+                    "runtimeDescriptorArray": true
+                },
+                "VkPhysicalDeviceDescriptorIndexingPropertiesEXT": {
+                    "maxUpdateAfterBindDescriptorsInAllPools": 1048576,
+                    "maxPerStageDescriptorUpdateAfterBindSamplers": 16,
+                    "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 15,
+                    "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 31,
+                    "maxPerStageDescriptorUpdateAfterBindSampledImages": 128,
+                    "maxPerStageDescriptorUpdateAfterBindStorageImages": 8,
+                    "maxPerStageDescriptorUpdateAfterBindInputAttachments": 128,
+                    "maxPerStageUpdateAfterBindResources": 159,
+                    "maxDescriptorSetUpdateAfterBindSamplers": 80,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffers": 90,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 8,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffers": 155,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 8,
+                    "maxDescriptorSetUpdateAfterBindSampledImages": 640,
+                    "maxDescriptorSetUpdateAfterBindStorageImages": 40,
+                    "maxDescriptorSetUpdateAfterBindInputAttachments": 8
+                }
+            },
+            "VK_EXT_host_query_reset": {
+                "version": 1,
+                "VkPhysicalDeviceHostQueryResetFeaturesEXT": {
+                    "hostQueryReset": true
+                }
+            },
+            "VK_EXT_scalar_block_layout": {
+                "version": 1
+            },
+            "VK_EXT_robustness2": {
+                "version": 1
+            },
+            "VK_EXT_subgroup_size_control": {
+                "version": 1
+            },
+            "VK_EXT_texel_buffer_alignment": {
+                "version": 1
+            },
+            "VK_EXT_vertex_attribute_divisor": {
+                "version": 1
+            },
+            "VK_KHR_surface": {
+                "version": 25,
+                "VkPresentModeKHR": [
+                    "VK_PRESENT_MODE_FIFO_KHR",
+                    "VK_PRESENT_MODE_MAILBOX_KHR"
+                ],
+                "VkSurfaceFormatKHR": [
+                    {
+                        "format": "VK_FORMAT_R8G8B8A8_SRGB",
+                        "colorSpace": "VK_COLORSPACE_SRGB_NONLINEAR_KHR"
+                    },
+                    {
+                        "format": "VK_FORMAT_R8G8B8A8_SRGB",
+                        "colorSpace": "VK_COLORSPACE_SRGB_NONLINEAR_KHR"
+                    }
+                ]
+            }
         },
         "macos-specific": {
             "extensions": {
-                "VK_KHR_portability_subset": 1
-            },
-            "features": {
-                "VkPhysicalDevicePortabilitySubsetFeaturesKHR": {
-                    "vertexAttributeAccessBeyondStride": true,
-                    "separateStencilMaskRef": true,
-                    "mutableComparisonSamplers": true,
-                    "multisampleArrayImage": true,
-                    "imageViewFormatSwizzle": true,
-                    "imageViewFormatReinterpretation": true,
-                    "events": true,
-                    "constantAlphaColorBlendFactors": true
-                }
-            },
-            "properties": {
-                "VkPhysicalDevicePortabilitySubsetPropertiesKHR": {
-                    "minVertexInputBindingStrideAlignment": 4
+                "VK_KHR_portability_subset": {
+                    "version": 1,
+                    "stage": "BETA",
+                    "VkPhysicalDevicePortabilitySubsetFeaturesKHR": {
+                        "vertexAttributeAccessBeyondStride": true,
+                        "separateStencilMaskRef": true,
+                        "mutableComparisonSamplers": true,
+                        "multisampleArrayImage": true,
+                        "imageViewFormatSwizzle": true,
+                        "imageViewFormatReinterpretation": true,
+                        "events": true,
+                        "constantAlphaColorBlendFactors": true
+                    },
+                    "VkPhysicalDevicePortabilitySubsetPropertiesKHR": {
+                        "minVertexInputBindingStrideAlignment": 4
+                    }
                 }
             }
         }
