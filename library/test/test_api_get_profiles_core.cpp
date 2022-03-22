@@ -18,14 +18,12 @@
  * - Christophe Riccio <christophe@lunarg.com>
  */
 
-//#define VK_ENABLE_BETA_EXTENSIONS <= checking the library build and report the right number of profiles when it's not defined
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+#undef VK_ENABLE_BETA_EXTENSIONS // checking the library build and report the right number of profiles when it's not defined
+#endif
 
 #include "test.hpp"
-#ifndef VULKAN_PROFILES_HEADER_ONLY
 #include <vulkan/vulkan_profiles.hpp>
-#else
-#include <vulkan/vulkan_profiles.h>
-#endif
 
 TEST(api_get_profiles_core, full) {
     uint32_t propertyCount = 0;
