@@ -69,25 +69,26 @@ if (WIN32)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS /bigobj")
     set (CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -D_CRT_SECURE_NO_WARNINGS /bigobj")
 else()
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpointer-arith -Werror")
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wpointer-arith -Werror")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpointer-arith")
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wpointer-arith")
 endif()
-
-set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_layer.py) 
-source_group("Python Files" FILES ${LAYER_PYTHON_FILES})
-
-add_custom_target(VpLayer_generate ALL
-    COMMAND ${PYTHON_EXECUTABLE} ${LAYER_PYTHON_FILES} 
-        -registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
-        -outLayer ${CMAKE_SOURCE_DIR}/layer/profiles.cpp
-    VERBATIM
-    SOURCES ${LAYER_PYTHON_FILES}
-    DEPENDS ${vulkan-headers_SOURCE_DIR}/registry/vk.xml)
-set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
 
 add_vk_layer(${TARGET_NAME} profiles.cpp vk_layer_table.cpp ${jsoncpp_generated_source} ${jsoncpp_generated_header})
 
-add_dependencies(VkLayer_${TARGET_NAME} VpLayer_generate)
+if(REGENERATE_LAYER)
+    set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_layer.py)
+    source_group("Python Files" FILES ${LAYER_PYTHON_FILES})
+
+    add_custom_target(VpLayer_generate ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${LAYER_PYTHON_FILES}
+            -registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
+            -outLayer ${CMAKE_SOURCE_DIR}/layer/profiles.cpp
+        VERBATIM
+        SOURCES ${LAYER_PYTHON_FILES}
+        DEPENDS ${vulkan-headers_SOURCE_DIR}/registry/vk.xml)
+    set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
+    add_dependencies(VkLayer_${TARGET_NAME} VpLayer_generate)
+endif()
 
 # json file creation
 

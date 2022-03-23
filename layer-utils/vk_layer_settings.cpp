@@ -173,7 +173,7 @@ static std::string GetEnvironment(const char *variable) {
 static std::string string_tolower(const std::string &s) {
     std::string result = s;
     for (auto &c : result) {
-        c = std::tolower(c);
+        c = (char) std::tolower(c);
     }
     return result;
 }
@@ -181,7 +181,7 @@ static std::string string_tolower(const std::string &s) {
 static std::string string_toupper(const std::string &s) {
     std::string result = s;
     for (auto &c : result) {
-        c = std::toupper(c);
+        c = (char) std::toupper(c);
     }
     return result;
 }

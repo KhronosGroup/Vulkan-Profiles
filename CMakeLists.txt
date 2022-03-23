@@ -20,9 +20,10 @@ include(GNUInstallDirs)
 # headers will be used.
 option(REGENERATE_PROFILES "Regenerate profiles source and headers" ON)
 option(REGENERATE_JSONCPP "Regenerate jsoncpp source and headers" ON)
+option(REGENERATE_LAYER "Regenerate profiles layer source" ON)
 if(REGENERATE_PROFILES)
     find_package(PythonInterp 3.7.2 REQUIRED)
-elseif(REGENERATE_JSONCPP)
+elseif(REGENERATE_JSONCPP OR REGENERATE_LAYER)
     find_package(PythonInterp 3 REQUIRED)
 endif()
 
@@ -187,6 +188,37 @@ if (NOT ANDROID)
     else()
         message(STATUS "Fetching and building Vulkan-Loader")
         FetchContent_MakeAvailable(vulkan-loader)
+    endif()
+endif()
+
+# For our own code, turn on warnings-are-errors if set.
+option(FATAL_WARNINGS "Fail builds if there are warnings" ON)
+if(FATAL_WARNINGS)
+    if(MSVC)
+        add_compile_options(/W4 /WX)
+        add_link_options(/WX)
+        # Ignore some warnings that we know we'll generate.  In the future the
+        # code that generates these warnings should be fixed properly.
+        # vk_layer_logging.h provokes:
+        #    warning C4100: 'default_flag_is_spec': unreferenced formal parameter
+        # vk_loader_platform.h provokes:
+        #    warning C4505: unreferenced local function has been removed
+        # jsoncpp.cpp provokes:
+        #    warning C4702: unreachable code
+        # profiles.cpp provokes:
+        #    warning C4244: '=': conversion from 'Json::Value::UInt' to 'uint8_t', possible loss of data
+        #    warning C4458: declaration of 'validator' hides class member
+        #    warning C4189: 'pdd': local variable is initialized but not referenced
+        #    warning C4800: 'VkBool32': forcing value to bool 'true' or 'false' (performance warning)
+        #    warning C4706: assignment within conditional expression
+        # test_validate.cpp provokes:
+        #    warning C4459: declaration of 'validator' hides global declaration
+        # gtest.h provokes:
+        #    warning C4389: '==': signed/unsigned mismatch
+        #    warning C4018: '>=': signed/unsigned mismatch
+        add_compile_options(/wd4100 /wd4505 /wd4702 /wd4244 /wd4458 /wd4189 /wd4800 /wd4706 /wd4459 /wd4389 /wd4018)
+    else()
+        add_compile_options(-Werror)
     endif()
 endif()
 
