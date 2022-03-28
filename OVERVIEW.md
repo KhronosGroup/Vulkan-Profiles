@@ -27,7 +27,7 @@ Conceptually, *Vulkan Profiles* can be understood as the explicit expression and
 ## Vulkan Profiles Toolset Components
 
 The *Vulkan Profiles Toolset* includes the following components:
-- ***The Vulkan Profiles JSON Schema***
+- [***The Vulkan Profiles JSON Schema***](https://github.com/KhronosGroup/Khronos-Schemas/tree/main/vulkan)
   - A data format to exchange Vulkan capabilities: extensions, features, properties, formats and queue properties.
   - Each revision of Vulkan API is represented by a schema that supersedes older versions of Vulkan API.
   - The schema covers Vulkan 1.3 and all extensions.
