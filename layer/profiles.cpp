@@ -2283,6 +2283,10 @@ class PhysicalDeviceData {
     // VK_KHR_synchronization2 structs
     VkPhysicalDeviceSynchronization2FeaturesKHR physical_device_synchronization_2_features_;
 
+    // VK_EXT_graphics_pipeline_library structs
+    VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT physical_device_graphics_pipeline_library_properties_;
+    VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT physical_device_graphics_pipeline_library_features_;
+
     // VK_KHR_shader_subgroup_uniform_control_flow structs
     VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR physical_device_shader_subgroup_uniform_control_flow_features_;
 
@@ -2345,6 +2349,9 @@ class PhysicalDeviceData {
 
     // VK_EXT_color_write_enable structs
     VkPhysicalDeviceColorWriteEnableFeaturesEXT physical_device_color_write_enable_features_;
+
+    // VK_EXT_primitives_generated_query structs
+    VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT physical_device_primitives_generated_query_features_;
 
     // VK_EXT_global_priority_query structs
     VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT physical_device_global_priority_query_features_;
@@ -2696,6 +2703,10 @@ class PhysicalDeviceData {
         // VK_KHR_synchronization2 structs
         physical_device_synchronization_2_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR};
 
+        // VK_EXT_graphics_pipeline_library structs
+        physical_device_graphics_pipeline_library_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GRAPHICS_PIPELINE_LIBRARY_PROPERTIES_EXT};
+        physical_device_graphics_pipeline_library_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GRAPHICS_PIPELINE_LIBRARY_FEATURES_EXT};
+
         // VK_KHR_shader_subgroup_uniform_control_flow structs
         physical_device_shader_subgroup_uniform_control_flow_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_FEATURES_KHR};
 
@@ -2758,6 +2769,9 @@ class PhysicalDeviceData {
 
         // VK_EXT_color_write_enable structs
         physical_device_color_write_enable_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COLOR_WRITE_ENABLE_FEATURES_EXT};
+
+        // VK_EXT_primitives_generated_query structs
+        physical_device_primitives_generated_query_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIMITIVES_GENERATED_QUERY_FEATURES_EXT};
 
         // VK_EXT_global_priority_query structs
         physical_device_global_priority_query_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES_EXT};
@@ -3018,6 +3032,8 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceSynchronization2FeaturesKHR *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest);
@@ -3041,6 +3057,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceImageViewMinLodFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPropertiesEXT *dest);
@@ -4078,6 +4095,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
     } else if (name == "VkPhysicalDeviceSynchronization2Features") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, name)) return false;
         return GetValue(feature, &pdd_->physical_device_synchronization_2_features_);
+    } else if (name == "VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_PRIMITIVES_GENERATED_QUERY_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_primitives_generated_query_features_);
     } else if (name == "VkPhysicalDeviceInheritedViewportScissorFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
@@ -4124,6 +4145,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_NV_LINEAR_COLOR_ATTACHMENT_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_linear_color_attachment_features_);
+    } else if (name == "VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_GRAPHICS_PIPELINE_LIBRARY_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_graphics_pipeline_library_features_);
     } else if (name == "VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE") {
         auto support = CheckExtensionSupport(VK_VALVE_DESCRIPTOR_SET_HOST_MAPPING_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
@@ -4375,6 +4400,10 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &name) 
         return GetValue(property, &pdd_->physical_device_shader_integer_dot_product_properties_);
     } else if (name == "VkPhysicalDeviceDrmPropertiesEXT") {
         return GetValuePhysicalDeviceDrmPropertiesEXT(property);
+    } else if (name == "VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_GRAPHICS_PIPELINE_LIBRARY_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(property, &pdd_->physical_device_graphics_pipeline_library_properties_);
     }
 
     return true;
@@ -6998,6 +7027,25 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchroniza
     return valid;
 }
 
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, graphicsPipelineLibraryFastLinking, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, graphicsPipelineLibraryIndependentInterpolationDecoration, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, graphicsPipelineLibrary, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR)\n");
     bool valid = true;
@@ -7216,6 +7264,17 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteE
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, colorWriteEnable, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, primitivesGeneratedQuery, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, primitivesGeneratedQueryWithRasterizerDiscard, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, primitivesGeneratedQueryWithNonZeroStreams, WarnIfNotEqualBool);
     }
     return valid;
 }
@@ -8944,6 +9003,22 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     data->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GRAPHICS_PIPELINE_LIBRARY_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_GRAPHICS_PIPELINE_LIBRARY_EXTENSION_NAME)) {
+                    VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT *data = (VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_graphics_pipeline_library_properties_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GRAPHICS_PIPELINE_LIBRARY_FEATURES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_GRAPHICS_PIPELINE_LIBRARY_EXTENSION_NAME)) {
+                    VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT *data = (VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_graphics_pipeline_library_features_;
+                    data->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_FEATURES_KHR:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
                     VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *data = (VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *)place;
@@ -9117,6 +9192,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDeviceColorWriteEnableFeaturesEXT *data = (VkPhysicalDeviceColorWriteEnableFeaturesEXT *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_color_write_enable_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRIMITIVES_GENERATED_QUERY_FEATURES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_PRIMITIVES_GENERATED_QUERY_EXTENSION_NAME)) {
+                    VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT *data = (VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_primitives_generated_query_features_;
                     data->pNext = pNext;
                 }
                 break;
@@ -10963,6 +11046,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_synchronization_2_features_);
                 }
 
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_GRAPHICS_PIPELINE_LIBRARY_EXTENSION_NAME)) {
+                    pdd.physical_device_graphics_pipeline_library_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_graphics_pipeline_library_properties_);
+
+                    pdd.physical_device_graphics_pipeline_library_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_graphics_pipeline_library_features_);
+                }
+
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
                     pdd.physical_device_shader_subgroup_uniform_control_flow_features_.pNext = feature_chain.pNext;
 
@@ -11093,6 +11186,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_color_write_enable_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_color_write_enable_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_PRIMITIVES_GENERATED_QUERY_EXTENSION_NAME)) {
+                    pdd.physical_device_primitives_generated_query_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_primitives_generated_query_features_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_GLOBAL_PRIORITY_QUERY_EXTENSION_NAME)) {
