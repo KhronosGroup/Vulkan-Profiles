@@ -3420,7 +3420,7 @@ class VulkanProfilesLayerGenerator():
             version = registry.structs[property].definedByVersion
             gen += self.generate_physical_device_chain_case(None, version, property, None)
         for feature in self.non_extension_features:
-            version = registry.structs[property].definedByVersion
+            version = registry.structs[feature].definedByVersion
             gen += self.generate_physical_device_chain_case(None, version, None, feature)
 
         gen += ENUMERATE_PHYSICAL_DEVICES_MIDDLE
