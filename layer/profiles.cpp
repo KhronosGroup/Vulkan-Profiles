@@ -11290,25 +11290,25 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     property_chain.pNext = &(pdd.physical_device_vulkan_13_properties_);
                 }
 
-                if (api_version_above_1_3) {
+                if (api_version_above_1_1) {
                     pdd.physical_device_protected_memory_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_protected_memory_features_);
                 }
 
-                if (api_version_above_1_3) {
+                if (api_version_above_1_1) {
                     pdd.physical_device_shader_draw_parameter_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_draw_parameter_features_);
                 }
 
-                if (api_version_above_1_3) {
+                if (api_version_above_1_2) {
                     pdd.physical_device_vulkan_11_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_vulkan_11_features_);
                 }
 
-                if (api_version_above_1_3) {
+                if (api_version_above_1_2) {
                     pdd.physical_device_vulkan_12_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_vulkan_12_features_);
