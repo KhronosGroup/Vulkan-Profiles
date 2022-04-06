@@ -2363,6 +2363,9 @@ class PhysicalDeviceData {
     VkPhysicalDeviceMultiDrawPropertiesEXT physical_device_multi_draw_properties_;
     VkPhysicalDeviceMultiDrawFeaturesEXT physical_device_multi_draw_features_;
 
+    // VK_EXT_image_2d_view_of_3d structs
+    VkPhysicalDeviceImage2DViewOf3DFeaturesEXT physical_device_image_2_dview_of_3_dfeatures_;
+
     // VK_EXT_border_color_swizzle structs
     VkPhysicalDeviceBorderColorSwizzleFeaturesEXT physical_device_border_color_swizzle_features_;
 
@@ -2783,6 +2786,9 @@ class PhysicalDeviceData {
         physical_device_multi_draw_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_PROPERTIES_EXT};
         physical_device_multi_draw_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_FEATURES_EXT};
 
+        // VK_EXT_image_2d_view_of_3d structs
+        physical_device_image_2_dview_of_3_dfeatures_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_2D_VIEW_OF_3D_FEATURES_EXT};
+
         // VK_EXT_border_color_swizzle structs
         physical_device_border_color_swizzle_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BORDER_COLOR_SWIZZLE_FEATURES_EXT};
 
@@ -3062,6 +3068,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceImageViewMinLodFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPropertiesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFeaturesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceImage2DViewOf3DFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4PropertiesKHR *dest);
@@ -4068,6 +4075,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_NV_FRAGMENT_SHADING_RATE_ENUMS_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_fragment_shading_rate_enums_features_);
+    } else if (name == "VkPhysicalDeviceImage2DViewOf3DFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_IMAGE_2D_VIEW_OF_3D_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_image_2_dview_of_3_dfeatures_);
     } else if (name == "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE") {
         auto support = CheckExtensionSupport(VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
@@ -7315,6 +7326,16 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFe
     return valid;
 }
 
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImage2DViewOf3DFeaturesEXT *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceImage2DViewOf3DFeaturesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, image2DViewOf3D, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, sampler2DViewOf3D, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceBorderColorSwizzleFeaturesEXT)\n");
     bool valid = true;
@@ -9232,6 +9253,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDeviceMultiDrawFeaturesEXT *data = (VkPhysicalDeviceMultiDrawFeaturesEXT *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_multi_draw_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_2D_VIEW_OF_3D_FEATURES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_IMAGE_2D_VIEW_OF_3D_EXTENSION_NAME)) {
+                    VkPhysicalDeviceImage2DViewOf3DFeaturesEXT *data = (VkPhysicalDeviceImage2DViewOf3DFeaturesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_image_2_dview_of_3_dfeatures_;
                     data->pNext = pNext;
                 }
                 break;
@@ -11214,6 +11243,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_multi_draw_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_multi_draw_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_IMAGE_2D_VIEW_OF_3D_EXTENSION_NAME)) {
+                    pdd.physical_device_image_2_dview_of_3_dfeatures_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_image_2_dview_of_3_dfeatures_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_BORDER_COLOR_SWIZZLE_EXTENSION_NAME)) {
