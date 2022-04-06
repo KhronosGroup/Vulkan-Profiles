@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.3.210",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.211",
     "additionalProperties": true,
     "required": [
         "capabilities",
@@ -768,6 +768,18 @@
             "additionalProperties": false,
             "properties": {
                 "hostQueryReset": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceImage2DViewOf3DFeaturesEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "image2DViewOf3D": {
+                    "type": "boolean"
+                },
+                "sampler2DViewOf3D": {
                     "type": "boolean"
                 }
             }
@@ -4726,6 +4738,9 @@
                             "VK_EXT_host_query_reset": {
                                 "type": "integer"
                             },
+                            "VK_EXT_image_2d_view_of_3d": {
+                                "type": "integer"
+                            },
                             "VK_EXT_image_drm_format_modifier": {
                                 "type": "integer"
                             },
@@ -5524,6 +5539,9 @@
                             },
                             "VkPhysicalDeviceHostQueryResetFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceHostQueryResetFeatures"
+                            },
+                            "VkPhysicalDeviceImage2DViewOf3DFeaturesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceImage2DViewOf3DFeaturesEXT"
                             },
                             "VkPhysicalDeviceImageRobustnessFeatures": {
                                 "$ref": "#/definitions/VkPhysicalDeviceImageRobustnessFeatures"
