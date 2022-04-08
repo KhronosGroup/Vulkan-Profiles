@@ -8114,8 +8114,6 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
     VkApplicationInfo appInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
     std::vector<const char*> extensions;
     VkInstanceCreateInfo* pInstanceCreateInfo = nullptr;
-    VkExtensionProperties* pProfileExtensions = nullptr;
-    uint32_t profileExtensionCount = 0;
 
     if (pCreateInfo != nullptr && pCreateInfo->pCreateInfo != nullptr) {
         createInfo = *pCreateInfo->pCreateInfo;
@@ -8727,8 +8725,6 @@ VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uin
 }
 
 VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext) {
-    VkResult result = VK_SUCCESS;
-
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
     if (pDesc == nullptr) return;
 
