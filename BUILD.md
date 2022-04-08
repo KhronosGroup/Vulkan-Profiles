@@ -146,8 +146,8 @@ On OSX:
 
 ### 64-bit Windows Build 
 ```
-    git clone git@github.com:LunarG/VulkanProfiles.git
-    cd VulkanProfiles
+    git clone git@github.com:KhronosGroup/Vulkan-Profiles.git
+    cd Vulkan-Profiles
     mkdir build
     cd build
     cmake -A x64 ..
@@ -156,8 +156,8 @@ On OSX:
 
 ### 32-bit Windows Build 
 ```
-    git clone git@github.com:LunarG/VulkanProfiles.git
-    cd VulkanProfiles
+    git clone git@github.com:KhronosGroup/Vulkan-Profiles.git
+    cd Vulkan-Profiles
     mkdir build
     cd build
     cmake -A Win32 ..
@@ -173,8 +173,8 @@ ctest -C Release  --output-on-failure --parallel 16
 
 ### Linux and macOS Build
 ```
-    git clone git@github.com:LunarG/VulkanProfiles.git
-    cd VulkanTools
+    git clone git@github.com:KhronosGroup/Vulkan-Profiles.git
+    cd Vulkan-Profiles
     mkdir build
     cd build
     cmake ..
