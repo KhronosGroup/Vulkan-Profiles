@@ -3587,6 +3587,9 @@ class VulkanProfilesLayerGenerator():
         return False
 
     def find_promoted_struct(self, value):
+        if value.name.startswith('VkPhysicalDeviceVulkan'):
+            if value.name[len('VkPhysicalDeviceVulkan'):][:2].isdigit():
+                return None
         if value.definedByVersion:
             promoted = 'VkPhysicalDeviceVulkan' + value.definedByVersion.define[11:].replace('_', '')
             if (('VkPhysicalDeviceProperties2' in value.extends)):
