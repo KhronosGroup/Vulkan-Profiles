@@ -3582,9 +3582,6 @@ bool JsonLoader::WarnDuplicatedFeature(const Json::Value &parent) {
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures", "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT", "VkPhysicalDeviceVulkan13Features"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceSubgroupSizeControlFeatures", "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT", "VkPhysicalDeviceVulkan13Features"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDevicePipelineCreationCacheControlFeatures", "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT", "VkPhysicalDeviceVulkan13Features"});
-    valid &= WarnDuplicated(parent, {"VkPhysicalDeviceVulkan11Features", "VkPhysicalDeviceVulkan12Features"});
-    valid &= WarnDuplicated(parent, {"VkPhysicalDeviceVulkan12Features", "VkPhysicalDeviceVulkan12Features"});
-    valid &= WarnDuplicated(parent, {"VkPhysicalDeviceVulkan13Features", "VkPhysicalDeviceVulkan13Features"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures", "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR", "VkPhysicalDeviceVulkan13Features"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceImageRobustnessFeatures", "VkPhysicalDeviceImageRobustnessFeaturesEXT", "VkPhysicalDeviceVulkan13Features"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceShaderTerminateInvocationFeatures", "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR", "VkPhysicalDeviceVulkan13Features"});
@@ -3612,9 +3609,6 @@ bool JsonLoader::WarnDuplicatedProperty(const Json::Value &parent) {
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceDepthStencilResolveProperties", "VkPhysicalDeviceDepthStencilResolvePropertiesKHR", "VkPhysicalDeviceVulkan12Properties"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceTexelBufferAlignmentProperties", "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT", "VkPhysicalDeviceVulkan13Properties"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceSubgroupSizeControlProperties", "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT", "VkPhysicalDeviceVulkan13Properties"});
-    valid &= WarnDuplicated(parent, {"VkPhysicalDeviceVulkan11Properties", "VkPhysicalDeviceVulkan12Properties"});
-    valid &= WarnDuplicated(parent, {"VkPhysicalDeviceVulkan12Properties", "VkPhysicalDeviceVulkan12Properties"});
-    valid &= WarnDuplicated(parent, {"VkPhysicalDeviceVulkan13Properties", "VkPhysicalDeviceVulkan13Properties"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceShaderIntegerDotProductProperties", "VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR", "VkPhysicalDeviceVulkan13Properties"});
     return valid;
 }
