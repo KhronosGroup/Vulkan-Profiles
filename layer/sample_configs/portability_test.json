@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/devsim_VK_KHR_portability_subset-provisional-1.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-211.json#",
     "capabilities": [
 		{
 			"features": {

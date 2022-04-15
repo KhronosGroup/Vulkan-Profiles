@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/devsim_1_0_0.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-211.json#",
     "capabilities": [
         {
             "name": "baseline",
