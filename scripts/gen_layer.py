@@ -3857,16 +3857,15 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if args.registry is None:
-        print("ERROR: Generating the profiles layer requires specifying -registry argument")
-        parser.print_help()
-        exit()
+    registryPath  = 'C:/Projects/Vulkan-Profiles/build/_deps/vulkan-headers-src/registry/vk.xml'
+    if args.registry is not None:
+        registryPath = args.registry
 
     outputPath = "../layer/profiles.cpp"
     if args.outLayer is not None:
         outputPath = args.outLayer
 
-    registry = genvp.VulkanRegistry(args.registry)
+    registry = genvp.VulkanRegistry(registryPath)
 
     generator = VulkanProfilesLayerGenerator()
     generator.generate(outputPath, registry)

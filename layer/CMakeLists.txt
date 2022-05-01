@@ -75,7 +75,7 @@ endif()
 
 add_vk_layer(${TARGET_NAME} profiles.cpp vk_layer_table.cpp ${jsoncpp_generated_source} ${jsoncpp_generated_header})
 
-if(REGENERATE_LAYER)
+if (REGENERATE_LAYER)
     set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_layer.py)
     source_group("Python Files" FILES ${LAYER_PYTHON_FILES})
 
@@ -88,7 +88,19 @@ if(REGENERATE_LAYER)
         DEPENDS ${vulkan-headers_SOURCE_DIR}/registry/vk.xml)
     set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
     add_dependencies(VkLayer_${TARGET_NAME} VpLayer_generate)
+	
+	source_group("Python Files" FILES ${CMAKE_SOURCE_DIR}/scripts/gen_all_ext_profile.py)
+	add_custom_target(VpLayer_generate_tests ALL
+		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/gen_all_ext_profile.py
+			-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
+			-outProfile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
+			-outTests ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
+		VERBATIM
+		DEPENDS VkLayer_${TARGET_NAME}
+		)
+	set_target_properties(VpLayer_generate_tests PROPERTIES FOLDER "Profiles layer")
 endif()
+
 
 # json file creation
 

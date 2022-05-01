@@ -25,6 +25,7 @@ set(LAYER_TEST_FILES
     tests_capabilities
     tests_mechanism
     tests_desktop_portability
+	tests_generated
     # Add new test files above this line
 )
 
