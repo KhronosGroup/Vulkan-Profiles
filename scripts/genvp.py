@@ -1349,6 +1349,11 @@ class VulkanExtension(VulkanDefinitionScope):
         self.promotedTo = xml.get('promotedto')
         self.obsoletedBy = xml.get('obsoletedby')
         self.deprecatedBy = xml.get('deprecatedby')
+        self.spec_version = 1
+        for e in xml.findall("./require/enum"):
+            if (e.get('name').endswith("SPEC_VERSION")):
+                self.spec_version = e.get('value')
+                break
         self.parseAliases(xml)
 
 
@@ -1523,6 +1528,14 @@ class VulkanRegistry():
         for enum in xml.findall("./formats/format"):
             if enum.get('compressed'):
                 self.formatCompression[enum.get('name')] = enum.get('compressed')
+
+        self.aliasFormats = list()
+        for format in xml.findall("./extensions/extension[@supported='vulkan']/require/enum[@extends='VkFormat'][@alias]"):
+            self.aliasFormats.append(format.attrib["name"])
+
+        self.betaFormatFeatures = list()
+        for format_feature in xml.findall("./extensions/extension[@supported='vulkan']/require/enum[@protect='VK_ENABLE_BETA_EXTENSIONS']"):
+            self.betaFormatFeatures.append(format_feature.attrib["name"])
 
     def parseBitmasks(self, xml):
         self.bitmasks = dict()
