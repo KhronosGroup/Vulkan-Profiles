@@ -11,7 +11,12 @@
 
 # Release Notes
 
-## [Vulkan Profiles Toolset 1.3.204](https://github.com/LunarG/VulkanProfiles/tree/master) - February 2022
+## [Vulkan Profiles Toolset 1.3.211](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.211.0) - April 2022
+
+### Improvements:
+- Add *Profiles layer* is generated with Python code
+
+## [Vulkan Profiles Toolset 1.3.204](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.204.1) - February 2022
 
 ### Features:
 - Add *Vulkan Profiles schema*
