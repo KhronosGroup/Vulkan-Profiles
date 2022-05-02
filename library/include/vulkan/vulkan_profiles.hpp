@@ -2998,6 +2998,7 @@ static const VpFeatureDesc featureDesc = {
                     VkPhysicalDeviceVulkan13Features* s = static_cast<VkPhysicalDeviceVulkan13Features*>(static_cast<void*>(p));
                     s->computeFullSubgroups = VK_TRUE;
                     s->descriptorBindingInlineUniformBlockUpdateAfterBind = VK_TRUE;
+                    s->dynamicRendering = VK_TRUE;
                     s->inlineUniformBlock = VK_TRUE;
                     s->maintenance4 = VK_TRUE;
                     s->pipelineCreationCacheControl = VK_TRUE;
@@ -3077,6 +3078,7 @@ static const VpFeatureDesc featureDesc = {
                     VkPhysicalDeviceVulkan13Features* s = static_cast<VkPhysicalDeviceVulkan13Features*>(static_cast<void*>(p));
                     ret = ret && (s->computeFullSubgroups == VK_TRUE);
                     ret = ret && (s->descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE);
+                    ret = ret && (s->dynamicRendering == VK_TRUE);
                     ret = ret && (s->inlineUniformBlock == VK_TRUE);
                     ret = ret && (s->maintenance4 == VK_TRUE);
                     ret = ret && (s->pipelineCreationCacheControl == VK_TRUE);
