@@ -206,6 +206,7 @@
 | **Vulkan 1.3** |
 | [computeFullSubgroups](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDeviceSubgroupSizeControlFeatures.html) | <span title="defined in VkPhysicalDeviceVulkan13Features (Vulkan 1.3)">:heavy_check_mark:</span> | :x: | :x: | :x: |
 | [descriptorBindingInlineUniformBlockUpdateAfterBind](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDeviceInlineUniformBlockFeatures.html) | <span title="defined in VkPhysicalDeviceVulkan13Features (Vulkan 1.3)">:heavy_check_mark:</span> | :x: | :x: | :x: |
+| [dynamicRendering](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDeviceDynamicRenderingFeatures.html) | <span title="defined in VkPhysicalDeviceVulkan13Features (Vulkan 1.3)">:heavy_check_mark:</span> | :x: | :x: | :x: |
 | [inlineUniformBlock](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDeviceInlineUniformBlockFeatures.html) | <span title="defined in VkPhysicalDeviceVulkan13Features (Vulkan 1.3)">:heavy_check_mark:</span> | :x: | :x: | :x: |
 | [maintenance4](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDeviceMaintenance4Features.html) | <span title="defined in VkPhysicalDeviceVulkan13Features (Vulkan 1.3)">:heavy_check_mark:</span> | :x: | :x: | :x: |
 | [pipelineCreationCacheControl](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDevicePipelineCreationCacheControlFeatures.html) | <span title="defined in VkPhysicalDeviceVulkan13Features (Vulkan 1.3)">:heavy_check_mark:</span> | :x: | :x: | :x: |
@@ -224,6 +225,8 @@
 | [uniformAndStorageBuffer8BitAccess](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDevice8BitStorageFeatures.html) | :x: | :x: | <span title="defined in VkPhysicalDevice8BitStorageFeaturesKHR (VK_KHR_8bit_storage)">:heavy_check_mark:</span> | <span title="defined in VkPhysicalDevice8BitStorageFeaturesKHR (VK_KHR_8bit_storage)">:heavy_check_mark:</span> |
 | **VK_KHR_buffer_device_address** |
 | [bufferDeviceAddress](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDeviceBufferDeviceAddressFeatures.html) | <span title="equivalent defined in VkPhysicalDeviceVulkan12Features (Vulkan 1.2)">:warning:</span> | :x: | :x: | :x: |
+| **VK_KHR_dynamic_rendering** |
+| [dynamicRendering](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDeviceDynamicRenderingFeatures.html) | <span title="equivalent defined in VkPhysicalDeviceVulkan13Features (Vulkan 1.3)">:warning:</span> | :x: | :x: | :x: |
 | **VK_KHR_imageless_framebuffer** |
 | [imagelessFramebuffer](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDeviceImagelessFramebufferFeatures.html) | <span title="equivalent defined in VkPhysicalDeviceVulkan12Features (Vulkan 1.2)">:warning:</span> | :x: | <span title="defined in VkPhysicalDeviceImagelessFramebufferFeaturesKHR (VK_KHR_imageless_framebuffer)">:heavy_check_mark:</span> | <span title="defined in VkPhysicalDeviceImagelessFramebufferFeaturesKHR (VK_KHR_imageless_framebuffer)">:heavy_check_mark:</span> |
 | **VK_KHR_maintenance4** |

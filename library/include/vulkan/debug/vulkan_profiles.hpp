@@ -3032,6 +3032,7 @@ static const VpFeatureDesc featureDesc = {
                     VkPhysicalDeviceVulkan13Features* s = static_cast<VkPhysicalDeviceVulkan13Features*>(static_cast<void*>(p));
                     s->computeFullSubgroups = VK_TRUE;
                     s->descriptorBindingInlineUniformBlockUpdateAfterBind = VK_TRUE;
+                    s->dynamicRendering = VK_TRUE;
                     s->inlineUniformBlock = VK_TRUE;
                     s->maintenance4 = VK_TRUE;
                     s->pipelineCreationCacheControl = VK_TRUE;
@@ -3111,6 +3112,7 @@ static const VpFeatureDesc featureDesc = {
                     VkPhysicalDeviceVulkan13Features* prettify_VkPhysicalDeviceVulkan13Features = static_cast<VkPhysicalDeviceVulkan13Features*>(static_cast<void*>(p));
                     ret = ret && (prettify_VkPhysicalDeviceVulkan13Features->computeFullSubgroups == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan13Features->computeFullSubgroups == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan13Features::computeFullSubgroups == VK_TRUE");
                     ret = ret && (prettify_VkPhysicalDeviceVulkan13Features->descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan13Features->descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan13Features::descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan13Features->dynamicRendering == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan13Features->dynamicRendering == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan13Features::dynamicRendering == VK_TRUE");
                     ret = ret && (prettify_VkPhysicalDeviceVulkan13Features->inlineUniformBlock == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan13Features->inlineUniformBlock == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan13Features::inlineUniformBlock == VK_TRUE");
                     ret = ret && (prettify_VkPhysicalDeviceVulkan13Features->maintenance4 == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan13Features->maintenance4 == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan13Features::maintenance4 == VK_TRUE");
                     ret = ret && (prettify_VkPhysicalDeviceVulkan13Features->pipelineCreationCacheControl == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan13Features->pipelineCreationCacheControl == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan13Features::pipelineCreationCacheControl == VK_TRUE");
