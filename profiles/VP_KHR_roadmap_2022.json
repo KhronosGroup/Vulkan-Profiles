@@ -307,6 +307,12 @@
             },
             "history": [
                 {
+                    "revision": 5,
+                    "date": "2022-05-02",
+                    "author": "Christophe Riccio",
+                    "comment": "Add missing dynamicRendering that is a Vulkan 1.3 requirement"
+                },
+                {
                     "revision": 4,
                     "date": "2022-03-08",
                     "author": "Christophe Riccio",
