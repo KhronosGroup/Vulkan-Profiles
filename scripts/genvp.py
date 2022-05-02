@@ -1831,7 +1831,8 @@ class VulkanRegistry():
         self.structs['VkPhysicalDeviceLimits'].members['subPixelInterpolationOffsetBits'].limittype = 'max'
         self.structs['VkPhysicalDeviceLimits'].members['timestampPeriod'].limittype = 'min' # min is the best guess but probably should be maxalign
         self.structs['VkPhysicalDeviceLimits'].members['nonCoherentAtomSize'].limittype = 'min' # should be maxalign
-        self.structs['VkPhysicalDeviceLimits'].members['maxColorAttachments'].limittype = 'max' # vk.xml declares this with 'bitmask' limittype for some reason
+        if self.headerVersionNumber.patch < 207: # vk.xml declares maxColorAttachments with 'bitmask' limittype before header 207
+            self.structs['VkPhysicalDeviceLimits'].members['maxColorAttachments'].limittype = 'max'
         self.structs['VkPhysicalDeviceLimits'].members['pointSizeGranularity'].limittype = 'min' # should be maxmul
         self.structs['VkPhysicalDeviceLimits'].members['lineWidthGranularity'].limittype = 'min' # should be maxmul
         if 'VkPhysicalDeviceVulkan11Properties' in self.structs:
