@@ -11,7 +11,7 @@
 
 # Release Notes
 
-## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.211.0) - X 2022
+## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/LunarG/VulkanProfiles/tree/master) - X 2022
 
 ### Bugfixes:
 - Fix Roadmap 2022 JSON file definision
