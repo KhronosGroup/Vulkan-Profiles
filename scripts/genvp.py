@@ -1817,28 +1817,39 @@ class VulkanRegistry():
 
 
     def applyWorkarounds(self):
+        if self.headerVersionNumber.patch < 207: # vk.xml declares maxColorAttachments with 'bitmask' limittype before header 207
+            self.structs['VkPhysicalDeviceLimits'].members['maxColorAttachments'].limittype = 'max'
+
         # TODO: We currently have to apply workarounds due to "noauto" limittypes and other bugs related to limittypes in the vk.xml
         # These can only be solved permanently if we make modifications to the registry xml itself
-        self.structs['VkPhysicalDeviceLimits'].members['bufferImageGranularity'].limittype = 'min' # should be maxalign
         self.structs['VkPhysicalDeviceLimits'].members['subPixelPrecisionBits'].limittype = 'max'
         self.structs['VkPhysicalDeviceLimits'].members['subTexelPrecisionBits'].limittype = 'max'
         self.structs['VkPhysicalDeviceLimits'].members['mipmapPrecisionBits'].limittype = 'max'
         self.structs['VkPhysicalDeviceLimits'].members['viewportSubPixelBits'].limittype = 'max'
-        self.structs['VkPhysicalDeviceLimits'].members['minMemoryMapAlignment'].limittype = 'min' # should be maxalign
-        self.structs['VkPhysicalDeviceLimits'].members['minTexelBufferOffsetAlignment'].limittype = 'min' # should be maxalign
-        self.structs['VkPhysicalDeviceLimits'].members['minUniformBufferOffsetAlignment'].limittype = 'min' # should be maxalign
-        self.structs['VkPhysicalDeviceLimits'].members['minStorageBufferOffsetAlignment'].limittype = 'min' # should be maxalign
         self.structs['VkPhysicalDeviceLimits'].members['subPixelInterpolationOffsetBits'].limittype = 'max'
-        self.structs['VkPhysicalDeviceLimits'].members['timestampPeriod'].limittype = 'min' # min is the best guess but probably should be maxalign
-        self.structs['VkPhysicalDeviceLimits'].members['nonCoherentAtomSize'].limittype = 'min' # should be maxalign
-        if self.headerVersionNumber.patch < 207: # vk.xml declares maxColorAttachments with 'bitmask' limittype before header 207
-            self.structs['VkPhysicalDeviceLimits'].members['maxColorAttachments'].limittype = 'max'
-        self.structs['VkPhysicalDeviceLimits'].members['pointSizeGranularity'].limittype = 'min' # should be maxmul
-        self.structs['VkPhysicalDeviceLimits'].members['lineWidthGranularity'].limittype = 'min' # should be maxmul
+        self.structs['VkQueueFamilyProperties'].members['timestampValidBits'].limittype = 'max'
+
+        self.structs['VkPhysicalDeviceLimits'].members['minMemoryMapAlignment'].limittype = 'min' # should be minpot
+        self.structs['VkPhysicalDeviceLimits'].members['minTexelBufferOffsetAlignment'].limittype = 'min' # should be minpot
+        self.structs['VkPhysicalDeviceLimits'].members['minUniformBufferOffsetAlignment'].limittype = 'min' # should be minpot
+        self.structs['VkPhysicalDeviceLimits'].members['minStorageBufferOffsetAlignment'].limittype = 'min' # should be minpot
+        self.structs['VkPhysicalDeviceLimits'].members['optimalBufferCopyOffsetAlignment'].limittype = 'min' # should be minpot
+        self.structs['VkPhysicalDeviceLimits'].members['optimalBufferCopyRowPitchAlignment'].limittype = 'min' # should be minpot
+        self.structs['VkPhysicalDeviceLimits'].members['nonCoherentAtomSize'].limittype = 'min' # should be minpot
+
+        if 'VkPhysicalDevicePortabilitySubsetPropertiesKHR' in self.structs:
+            self.structs['VkPhysicalDevicePortabilitySubsetPropertiesKHR'].members['minVertexInputBindingStrideAlignment'].limittype = 'min' # should be minpot
+
+        self.structs['VkPhysicalDeviceLimits'].members['timestampPeriod'].limittype = 'min' # should be minmul (for a float type!)
+        self.structs['VkPhysicalDeviceLimits'].members['bufferImageGranularity'].limittype = 'min' # should be minmul
+        self.structs['VkPhysicalDeviceLimits'].members['pointSizeGranularity'].limittype = 'min' # should be minmul
+        self.structs['VkPhysicalDeviceLimits'].members['lineWidthGranularity'].limittype = 'min' # should be minmul
+        self.structs['VkQueueFamilyProperties'].members['minImageTransferGranularity'].limittype = 'min' # should be minmul
+
+        # Some capabilities are missing limittypes
+        self.structs['VkQueueFamilyProperties'].members['queueCount'].limittype = 'max'
         if 'VkPhysicalDeviceVulkan11Properties' in self.structs:
             self.structs['VkPhysicalDeviceVulkan11Properties'].members['subgroupSize'].limittype = 'max'
-        if 'VkPhysicalDevicePortabilitySubsetPropertiesKHR' in self.structs:
-            self.structs['VkPhysicalDevicePortabilitySubsetPropertiesKHR'].members['minVertexInputBindingStrideAlignment'].limittype = 'min' # should be maxalign
 
         # TODO: There are also some bugs in the vk.xml, like parameters having "bitmask" limittype but actually VkBool32 type
         # This is non-sense, so we patch them
@@ -1858,9 +1869,6 @@ class VulkanRegistry():
             self.structs['VkFormatProperties3'].members['optimalTilingFeatures'].limittype = 'bitmask'
             self.structs['VkFormatProperties3'].members['bufferFeatures'].limittype = 'bitmask'
         self.structs['VkQueueFamilyProperties'].members['queueFlags'].limittype = 'bitmask'
-        self.structs['VkQueueFamilyProperties'].members['queueCount'].limittype = 'max'
-        self.structs['VkQueueFamilyProperties'].members['timestampValidBits'].limittype = 'max'
-        self.structs['VkQueueFamilyProperties'].members['minImageTransferGranularity'].limittype = 'min' # should be maxmul
 
         # TODO: The registry xml contains some return structures that contain count + pointers to arrays
         # While the script itself is prepared to drop those, as they are ill-formed, as return structures
