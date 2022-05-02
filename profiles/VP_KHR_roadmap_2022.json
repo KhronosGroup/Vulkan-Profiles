@@ -173,7 +173,8 @@
                     "subgroupSizeControl": true,
                     "computeFullSubgroups": true,
                     "shaderDemoteToHelperInvocation": true,
-                    "inlineUniformBlock": true
+                    "inlineUniformBlock": true,
+                    "dynamicRendering": true
                 }
             },
             "properties": {
