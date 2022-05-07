@@ -29,6 +29,7 @@
 #include <crtdbg.h>
 #include <errhandlingapi.h>
 #endif
+#include <algorithm>
 
 struct DisableDebugPopup {
     DisableDebugPopup() {
@@ -65,9 +66,24 @@ class TestScaffold {
         appInfo.engineVersion = VK_MAKE_VERSION(1, 2, 0);
         appInfo.apiVersion = VK_API_VERSION_1_2;
 
+        const char* surface_extension = VK_KHR_SURFACE_EXTENSION_NAME;
+
         VkInstanceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         createInfo.pApplicationInfo = &appInfo;
+
+        uint32_t propertyCount = 0;
+        vkEnumerateInstanceExtensionProperties(nullptr, &propertyCount, nullptr);
+        std::vector<VkExtensionProperties> properties(propertyCount);
+        vkEnumerateInstanceExtensionProperties(nullptr, &propertyCount, properties.data());
+        if (std::any_of(properties.begin(), properties.end(), [&surface_extension](const VkExtensionProperties& p) {
+                return strcmp(p.extensionName, surface_extension) == 0;
+            })) {
+            // Enable VK_KHR_surface if supported, as tests might use it
+            createInfo.enabledExtensionCount = 1;
+            createInfo.ppEnabledExtensionNames = &surface_extension;
+        }
+
         VkResult res = vkCreateInstance(&createInfo, nullptr, &instance);
         EXPECT_TRUE(res == VK_SUCCESS);
 
