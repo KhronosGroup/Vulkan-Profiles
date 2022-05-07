@@ -2294,9 +2294,18 @@ class VulkanProfile():
                 elif limittype == 'max':
                     # Compare max limit by checking if device value is greater than or equal to profile value
                     comparePredFmt = '{0} >= {1}'
+                elif limittype == 'bits':
+                    # Behaves like max, but smaller values are allowed
+                    comparePredFmt = '{0} >= {1}'
                 elif limittype == 'min':
                     # Compare min limit by checking if device value is less than or equal to profile value
                     comparePredFmt = '{0} <= {1}'
+                elif limittype == 'minpot':
+                    # Compare min limit by checking if device value is less than or equal to profile value and if the value is a power of two
+                    comparePredFmt = [ '{0} <= {1}', '({0} & ({0} - 1)) == 0' ]
+                elif limittype == 'minmul':
+                    # Compare min limit by checking if device value is less than or equal to profile value and a multiple of profile value
+                    comparePredFmt = [ '{0} <= {1}', '{0} % {1} == 0' ]
                 elif limittype == 'range':
                     # Compare range limit by checking if device range is larger than or equal to profile range
                     comparePredFmt = [ '{0} <= {1}', '{0} >= {1}' ]
@@ -2340,7 +2349,11 @@ class VulkanProfile():
 
                 else:
                     # Everything else
-                    gen += fmt.format(comparePredFmt.format('{0}{1}'.format(var, member), value))
+                    if type(comparePredFmt) == list:
+                        for i in range(len(comparePredFmt)):
+                            gen += fmt.format(comparePredFmt[i].format('{0}{1}'.format(var, member), value))
+                    elif comparePredFmt is not None:
+                        gen += fmt.format(comparePredFmt.format('{0}{1}'.format(var, member), value))
             else:
                 Log.f("No member '{0}' in structure '{1}'".format(member, structDef.name))
         return gen
@@ -3553,6 +3566,12 @@ class VulkanProfilesDocGenerator():
             return member + ' (max)'
         elif limittype in [ 'min', 'bitmask' ]:
             return member + ' (min)'
+        elif limittype == 'minpot':
+            return member + ' (minpot)'
+        elif limittype == 'minmul':
+            return member + ' (minmul)'
+        elif limittype == 'bits':
+            return member + ' (bits)'
         elif limittype == 'range':
             return member + ' (min,max)'
         else:
