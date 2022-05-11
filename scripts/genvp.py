@@ -1857,8 +1857,99 @@ class VulkanRegistry():
 
         # Some capabilities are missing limittypes
         self.structs['VkQueueFamilyProperties'].members['queueCount'].limittype = 'max'
+
         if 'VkPhysicalDeviceVulkan11Properties' in self.structs:
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['subgroupSize'].limittype = 'max'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceUUID'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['driverUUID'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceLUID'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceNodeMask'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceLUIDValid'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['subgroupSize'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['pointClippingBehavior'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['protectedNoFault'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceVulkan12Properties' in self.structs:
+            self.structs['VkPhysicalDeviceVulkan12Properties'].members['driverID'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceVulkan12Properties'].members['driverName'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceVulkan12Properties'].members['driverInfo'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceVulkan12Properties'].members['conformanceVersion'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceVulkan12Properties'].members['denormBehaviorIndependence'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceVulkan12Properties'].members['roundingModeIndependence'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceProperties' in self.structs:
+            self.structs['VkPhysicalDeviceProperties'].members['apiVersion'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceProperties'].members['driverVersion'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceProperties'].members['vendorID'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceProperties'].members['deviceID'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceProperties'].members['deviceType'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceProperties'].members['deviceName'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceProperties'].members['pipelineCacheUUID'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceDriverProperties' in self.structs:
+            self.structs['VkPhysicalDeviceDriverProperties'].members['driverID'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceDriverProperties'].members['driverName'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceDriverProperties'].members['driverInfo'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceDriverProperties'].members['conformanceVersion'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceIDProperties' in self.structs:
+            self.structs['VkPhysicalDeviceIDProperties'].members['deviceUUID'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceIDProperties'].members['driverUUID'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceIDProperties'].members['deviceLUID'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceIDProperties'].members['deviceNodeMask'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceIDProperties'].members['deviceLUIDValid'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceSubgroupProperties' in self.structs:
+            self.structs['VkPhysicalDeviceSubgroupProperties'].members['subgroupSize'].limittype = 'behavior'
+
+        if 'VkPhysicalDevicePointClippingProperties' in self.structs:
+            self.structs['VkPhysicalDevicePointClippingProperties'].members['pointClippingBehavior'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceProtectedMemoryProperties' in self.structs:
+            self.structs['VkPhysicalDeviceProtectedMemoryProperties'].members['protectedNoFault'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceFloatControlsProperties' in self.structs:
+            self.structs['VkPhysicalDeviceFloatControlsProperties'].members['denormBehaviorIndependence'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceFloatControlsProperties'].members['roundingModeIndependence'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceTexelBufferAlignmentProperties' in self.structs:
+            self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['storageTexelBufferOffsetSingleTexelAlignment'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['uniformTexelBufferOffsetSingleTexelAlignment'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceRayTracingPipelinePropertiesKHR' in self.structs:
+            self.structs['VkPhysicalDeviceRayTracingPipelinePropertiesKHR'].members['shaderGroupHandleSize'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceRayTracingPipelinePropertiesKHR'].members['shaderGroupBaseAlignment'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceRayTracingPipelinePropertiesKHR'].members['shaderGroupHandleCaptureReplaySize'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceConservativeRasterizationPropertiesEXT' in self.structs:
+            self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['primitiveOverestimationSize'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['degenerateTrianglesRasterized'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['degenerateLinesRasterized'].limittype = 'behavior'
+
+        if 'VkPhysicalDevicePCIBusInfoPropertiesEXT' in self.structs:
+            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciDomain'].limittype = 'behavior'
+            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciBus'].limittype = 'behavior'
+            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciDevice'].limittype = 'behavior'
+            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciFunction'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceFragmentDensityMap2PropertiesEXT' in self.structs:
+            self.structs['VkPhysicalDeviceFragmentDensityMap2PropertiesEXT'].members['subsampledLoads'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceFragmentDensityMap2PropertiesEXT'].members['subsampledCoarseReconstructionEarlyAccess'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceRayTracingPropertiesNV' in self.structs:
+            self.structs['VkPhysicalDeviceRayTracingPropertiesNV'].members['shaderGroupHandleSize'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceRayTracingPropertiesNV'].members['shaderGroupBaseAlignment'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceShaderCorePropertiesAMD' in self.structs:
+            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['shaderEngineCount'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['shaderArraysPerEngineCount'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['computeUnitsPerShaderArray'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['simdPerComputeUnit'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['wavefrontsPerSimd'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['sgprsPerSimd'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['vgprsPerSimd'].limittype = 'behavior'
+
+        if 'VkPhysicalDeviceShadingRateImagePropertiesNV' in self.structs:
+            self.structs['VkPhysicalDeviceShadingRateImagePropertiesNV'].members['shadingRateTexelSize'].limittype = 'behavior'
 
         # TODO: There are also some bugs in the vk.xml, like parameters having "bitmask" limittype but actually VkBool32 type
         # This is non-sense, so we patch them

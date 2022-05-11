@@ -5536,7 +5536,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupPro
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupProperties)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, subgroupSize, WarnIfGreater);
+        WarnNotModifiable("VkPhysicalDeviceSubgroupProperties", member, "subgroupSize");
         GET_VALUE_FLAG_WARN(member, supportedStages);
         GET_VALUE_FLAG_WARN(member, supportedOperations);
         GET_VALUE_WARN(member, quadOperationsInAllStages, WarnIfNotEqualBool);
@@ -5548,7 +5548,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMe
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceProtectedMemoryProperties)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, protectedNoFault, WarnIfNotEqualBool);
+        WarnNotModifiable("VkPhysicalDeviceProtectedMemoryProperties", member, "protectedNoFault");
     }
     return valid;
 }
@@ -5562,14 +5562,14 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan11Pro
         WarnNotModifiable("VkPhysicalDeviceVulkan11Properties", member, "deviceLUID");
         WarnNotModifiable("VkPhysicalDeviceVulkan11Properties", member, "deviceNodeMask");
         WarnNotModifiable("VkPhysicalDeviceVulkan11Properties", member, "deviceLUIDValid");
-        GET_VALUE_WARN(member, subgroupSize, WarnIfGreater);
+        WarnNotModifiable("VkPhysicalDeviceVulkan11Properties", member, "subgroupSize");
         GET_VALUE_FLAG_WARN(member, subgroupSupportedStages);
         GET_VALUE_FLAG_WARN(member, subgroupSupportedOperations);
         GET_VALUE_WARN(member, subgroupQuadOperationsInAllStages, WarnIfNotEqualBool);
         WarnNotModifiable("VkPhysicalDeviceVulkan11Properties", member, "pointClippingBehavior");
         GET_VALUE_WARN(member, maxMultiviewViewCount, WarnIfGreater);
         GET_VALUE_WARN(member, maxMultiviewInstanceIndex, WarnIfGreater);
-        GET_VALUE_WARN(member, protectedNoFault, WarnIfNotEqualBool);
+        WarnNotModifiable("VkPhysicalDeviceVulkan11Properties", member, "protectedNoFault");
         GET_VALUE_WARN(member, maxPerSetDescriptors, WarnIfGreater);
         GET_VALUE_WARN(member, maxMemoryAllocationSize, WarnIfGreater);
     }
@@ -5584,8 +5584,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Pro
         WarnNotModifiable("VkPhysicalDeviceVulkan12Properties", member, "driverName");
         WarnNotModifiable("VkPhysicalDeviceVulkan12Properties", member, "driverInfo");
         WarnNotModifiable("VkPhysicalDeviceVulkan12Properties", member, "conformanceVersion");
-        GET_VALUE_ENUM_WARN(member, denormBehaviorIndependence);
-        GET_VALUE_ENUM_WARN(member, roundingModeIndependence);
+        WarnNotModifiable("VkPhysicalDeviceVulkan12Properties", member, "denormBehaviorIndependence");
+        WarnNotModifiable("VkPhysicalDeviceVulkan12Properties", member, "roundingModeIndependence");
         GET_VALUE_WARN(member, shaderSignedZeroInfNanPreserveFloat16, WarnIfNotEqualBool);
         GET_VALUE_WARN(member, shaderSignedZeroInfNanPreserveFloat32, WarnIfNotEqualBool);
         GET_VALUE_WARN(member, shaderSignedZeroInfNanPreserveFloat64, WarnIfNotEqualBool);
@@ -5944,13 +5944,13 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativ
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceConservativeRasterizationPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, primitiveOverestimationSize, WarnIfGreaterFloat);
+        WarnNotModifiable("VkPhysicalDeviceConservativeRasterizationPropertiesEXT", member, "primitiveOverestimationSize");
         GET_VALUE_WARN(member, maxExtraPrimitiveOverestimationSize, WarnIfGreaterFloat);
         GET_VALUE_WARN(member, extraPrimitiveOverestimationSizeGranularity, WarnIfGreaterFloat);
         GET_VALUE_WARN(member, primitiveUnderestimation, WarnIfNotEqualBool);
         GET_VALUE_WARN(member, conservativePointAndLineRasterization, WarnIfNotEqualBool);
-        GET_VALUE_WARN(member, degenerateTrianglesRasterized, WarnIfNotEqualBool);
-        GET_VALUE_WARN(member, degenerateLinesRasterized, WarnIfNotEqualBool);
+        WarnNotModifiable("VkPhysicalDeviceConservativeRasterizationPropertiesEXT", member, "degenerateTrianglesRasterized");
+        WarnNotModifiable("VkPhysicalDeviceConservativeRasterizationPropertiesEXT", member, "degenerateLinesRasterized");
         GET_VALUE_WARN(member, fullyCoveredFragmentShaderInputVariable, WarnIfNotEqualBool);
         GET_VALUE_WARN(member, conservativeRasterizationPostDepthCoverage, WarnIfNotEqualBool);
     }
@@ -6106,11 +6106,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPipelinePropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderGroupHandleSize, WarnIfGreater);
+        WarnNotModifiable("VkPhysicalDeviceRayTracingPipelinePropertiesKHR", member, "shaderGroupHandleSize");
         GET_VALUE_WARN(member, maxRayRecursionDepth, WarnIfGreater);
         GET_VALUE_WARN(member, maxShaderGroupStride, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderGroupBaseAlignment, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderGroupHandleCaptureReplaySize, WarnIfGreater);
+        WarnNotModifiable("VkPhysicalDeviceRayTracingPipelinePropertiesKHR", member, "shaderGroupBaseAlignment");
+        WarnNotModifiable("VkPhysicalDeviceRayTracingPipelinePropertiesKHR", member, "shaderGroupHandleCaptureReplaySize");
         GET_VALUE_WARN(member, maxRayDispatchInvocationCount, WarnIfGreater);
         GET_VALUE_WARN(member, shaderGroupHandleAlignment, WarnIfGreater);
         GET_VALUE_WARN(member, maxRayHitAttributeSize, WarnIfGreater);
@@ -6263,7 +6263,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShadingRateImagePropertiesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shadingRateTexelSize, WarnIfGreater);
+        WarnNotModifiable("VkPhysicalDeviceShadingRateImagePropertiesNV", member, "shadingRateTexelSize");
         GET_VALUE_WARN(member, shadingRatePaletteSize, WarnIfGreater);
         GET_VALUE_WARN(member, shadingRateMaxCoarseSamples, WarnIfGreater);
     }
@@ -6284,10 +6284,10 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPropertiesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderGroupHandleSize, WarnIfGreater);
+        WarnNotModifiable("VkPhysicalDeviceRayTracingPropertiesNV", member, "shaderGroupHandleSize");
         GET_VALUE_WARN(member, maxRecursionDepth, WarnIfGreater);
         GET_VALUE_WARN(member, maxShaderGroupStride, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderGroupBaseAlignment, WarnIfGreater);
+        WarnNotModifiable("VkPhysicalDeviceRayTracingPropertiesNV", member, "shaderGroupBaseAlignment");
         GET_VALUE_WARN(member, maxGeometryCount, WarnIfGreater);
         GET_VALUE_WARN(member, maxInstanceCount, WarnIfGreater);
         GET_VALUE_WARN(member, maxTriangleCount, WarnIfGreater);
@@ -6368,17 +6368,17 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderCorePropertiesAMD)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, shaderEngineCount, WarnIfGreater);
-        GET_VALUE_WARN(member, shaderArraysPerEngineCount, WarnIfGreater);
-        GET_VALUE_WARN(member, computeUnitsPerShaderArray, WarnIfGreater);
-        GET_VALUE_WARN(member, simdPerComputeUnit, WarnIfGreater);
-        GET_VALUE_WARN(member, wavefrontsPerSimd, WarnIfGreater);
+        WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "shaderEngineCount");
+        WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "shaderArraysPerEngineCount");
+        WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "computeUnitsPerShaderArray");
+        WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "simdPerComputeUnit");
+        WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "wavefrontsPerSimd");
         GET_VALUE_WARN(member, wavefrontSize, WarnIfGreater);
-        GET_VALUE_WARN(member, sgprsPerSimd, WarnIfGreater);
+        WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "sgprsPerSimd");
         GET_VALUE_WARN(member, minSgprAllocation, WarnIfLesser);
         GET_VALUE_WARN(member, maxSgprAllocation, WarnIfGreater);
         GET_VALUE_WARN(member, sgprAllocationGranularity, WarnIfGreater);
-        GET_VALUE_WARN(member, vgprsPerSimd, WarnIfGreater);
+        WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "vgprsPerSimd");
         GET_VALUE_WARN(member, minVgprAllocation, WarnIfLesser);
         GET_VALUE_WARN(member, maxVgprAllocation, WarnIfGreater);
         GET_VALUE_WARN(member, vgprAllocationGranularity, WarnIfGreater);
@@ -6409,8 +6409,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatContro
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFloatControlsPropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_ENUM_WARN(member, denormBehaviorIndependence);
-        GET_VALUE_ENUM_WARN(member, roundingModeIndependence);
+        WarnNotModifiable("VkPhysicalDeviceFloatControlsPropertiesKHR", member, "denormBehaviorIndependence");
+        WarnNotModifiable("VkPhysicalDeviceFloatControlsPropertiesKHR", member, "roundingModeIndependence");
         GET_VALUE_WARN(member, shaderSignedZeroInfNanPreserveFloat16, WarnIfNotEqualBool);
         GET_VALUE_WARN(member, shaderSignedZeroInfNanPreserveFloat32, WarnIfNotEqualBool);
         GET_VALUE_WARN(member, shaderSignedZeroInfNanPreserveFloat64, WarnIfNotEqualBool);
@@ -7005,9 +7005,9 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, storageTexelBufferOffsetAlignmentBytes, WarnIfGreater);
-        GET_VALUE_WARN(member, storageTexelBufferOffsetSingleTexelAlignment, WarnIfNotEqualBool);
+        WarnNotModifiable("VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT", member, "storageTexelBufferOffsetSingleTexelAlignment");
         GET_VALUE_WARN(member, uniformTexelBufferOffsetAlignmentBytes, WarnIfGreater);
-        GET_VALUE_WARN(member, uniformTexelBufferOffsetSingleTexelAlignment, WarnIfNotEqualBool);
+        WarnNotModifiable("VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT", member, "uniformTexelBufferOffsetSingleTexelAlignment");
     }
     return valid;
 }
@@ -7213,8 +7213,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMap2PropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, subsampledLoads, WarnIfNotEqualBool);
-        GET_VALUE_WARN(member, subsampledCoarseReconstructionEarlyAccess, WarnIfNotEqualBool);
+        WarnNotModifiable("VkPhysicalDeviceFragmentDensityMap2PropertiesEXT", member, "subsampledLoads");
+        WarnNotModifiable("VkPhysicalDeviceFragmentDensityMap2PropertiesEXT", member, "subsampledCoarseReconstructionEarlyAccess");
         GET_VALUE_WARN(member, maxSubsampledArrayLayers, WarnIfGreater);
         GET_VALUE_WARN(member, maxDescriptorSetSubsampledSamplers, WarnIfGreater);
     }
