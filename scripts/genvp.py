@@ -1862,11 +1862,11 @@ class VulkanRegistry():
 
         # TODO: There are also some bugs in the vk.xml, like parameters having "bitmask" limittype but actually VkBool32 type
         # This is non-sense, so we patch them
-        for structName in self.structs:
-            for memberName in self.structs[structName].members:
-                memberDef = self.structs[structName].members[memberName]
-                if memberDef.limittype == 'bitmask' and memberDef.type == 'VkBool32':
-                    self.structs[structName].members[memberName].limittype = 'noauto'
+        #for structName in self.structs:
+        #    for memberName in self.structs[structName].members:
+        #        memberDef = self.structs[structName].members[memberName]
+        #        if memberDef.limittype == 'bitmask' and memberDef.type == 'VkBool32':
+        #            self.structs[structName].members[memberName].limittype = 'noauto'
 
         # TODO: The registry xml is also missing limittype definitions for format and queue family properties
         # For now we just add the important ones, this needs a larger overhaul in the vk.xml
@@ -2288,7 +2288,10 @@ class VulkanProfile():
                     # Use parent's limit type
                     limittype = parentLimittype
 
-                if limittype == 'bitmask':
+                if limittype == 'bitmask' and structDef.members[member].type == 'VkBool32':
+                    # Compare everything else with equality
+                    comparePredFmt = '{0} == {1}'
+                elif limittype == 'bitmask':
                     # Compare bitmask by checking if device value contains every bit of profile value
                     comparePredFmt = 'vpCheckFlags({0}, {1})'
                 elif limittype == 'max':
@@ -3563,7 +3566,7 @@ class VulkanProfilesDocGenerator():
         memberDef = structDef.members[member]
         limittype = memberDef.limittype
 
-        if limittype in [ None, 'noauto' ]:
+        if limittype in [ None, 'noauto', 'bitmask' ]:
             return member
         elif limittype == 'behavior':
             return member + ' (behavior)'
@@ -3571,7 +3574,7 @@ class VulkanProfilesDocGenerator():
             return member + ' (max)'
         elif limittype == 'maxpot':
             return member + ' (maxpot)'
-        elif limittype in [ 'min', 'bitmask' ]:
+        elif limittype in [ 'min' ]:
             return member + ' (min)'
         elif limittype == 'minpot':
             return member + ' (minpot)'
