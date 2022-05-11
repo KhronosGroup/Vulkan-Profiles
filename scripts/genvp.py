@@ -2312,7 +2312,7 @@ class VulkanProfile():
                 elif limittype == 'range':
                     # Compare range limit by checking if device range is larger than or equal to profile range
                     comparePredFmt = [ '{0} <= {1}', '{0} >= {1}' ]
-                elif limittype is None or limittype == 'noauto' or limittype == 'struct':
+                elif limittype is None or limittype == 'noauto' or limittype == 'behavior' or limittype == 'struct':
                     # Compare everything else with equality
                     comparePredFmt = '{0} == {1}'
                 else:
@@ -3565,6 +3565,8 @@ class VulkanProfilesDocGenerator():
 
         if limittype in [ None, 'noauto' ]:
             return member
+        elif limittype == 'behavior':
+            return member + ' (behavior)'
         elif limittype == 'max':
             return member + ' (max)'
         elif limittype == 'maxpot':
