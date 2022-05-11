@@ -3537,11 +3537,13 @@ class VulkanProfilesLayerGenerator():
         gen += '    bool valid = true;\n'
         gen += '    for (const auto &member : parent.getMemberNames()) {\n'
         for member_name in registry.structs[structure].members:
-            if 'VkPhysicalDeviceVulkan' in structure and self.is_non_modifiable_member(member_name):
-                gen += '        WarnNotModifiable(\"' + structure + '\", member, \"' + member_name + '\");\n'
-                continue
+            #if 'VkPhysicalDeviceVulkan' in structure and self.is_non_modifiable_member(member_name):
+            #    gen += '        WarnNotModifiable(\"' + structure + '\", member, \"' + member_name + '\");\n'
+            #    continue
             member = registry.structs[structure].members[member_name]
-            if member.type in registry.enums:
+            if member.limittype == 'behavior':
+                gen += '        WarnNotModifiable(\"' + structure + '\", member, \"' + member_name + '\");\n'
+            elif member.type in registry.enums:
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ');\n'
             elif member.isArray:
                 gen += '        GET_ARRAY(' + member_name + ');\n'
