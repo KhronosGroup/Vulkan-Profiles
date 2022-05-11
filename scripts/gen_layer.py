@@ -3531,10 +3531,10 @@ class VulkanProfilesLayerGenerator():
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ');\n'
             elif member.isArray:
                 gen += '        GET_ARRAY(' + member_name + ');\n'
-            elif member.limittype == 'bitmask':
-                gen += '        GET_VALUE_FLAG_WARN(member, ' + member_name + ');\n'
             elif member.type == 'VkBool32':
                 gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfNotEqualBool);\n'
+            elif member.limittype == 'bitmask':
+                gen += '        GET_VALUE_FLAG_WARN(member, ' + member_name + ');\n'
             elif member.type == 'size_t':
                 if member.limittype == 'min':
                     gen += '        GET_VALUE_SIZE_T_WARN(member, ' + member_name + ', WarnIfLesserSizet);\n'
