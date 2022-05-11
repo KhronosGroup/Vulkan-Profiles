@@ -2294,6 +2294,9 @@ class VulkanProfile():
                 elif limittype == 'max':
                     # Compare max limit by checking if device value is greater than or equal to profile value
                     comparePredFmt = '{0} >= {1}'
+                elif limittype == 'maxpot':
+                    # Compare max limit by checking if device value is greater than or equal to profile value
+                    comparePredFmt = [ '{0} >= {1}', '({0} & ({0} - 1)) == 0' ]
                 elif limittype == 'bits':
                     # Behaves like max, but smaller values are allowed
                     comparePredFmt = '{0} >= {1}'
@@ -3564,6 +3567,8 @@ class VulkanProfilesDocGenerator():
             return member
         elif limittype == 'max':
             return member + ' (max)'
+        elif limittype == 'maxpot':
+            return member + ' (maxpot)'
         elif limittype in [ 'min', 'bitmask' ]:
             return member + ' (min)'
         elif limittype == 'minpot':
