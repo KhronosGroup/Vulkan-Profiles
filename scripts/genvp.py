@@ -1991,8 +1991,11 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['computeUnitsPerShaderArray'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['simdPerComputeUnit'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['wavefrontsPerSimd'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['wavefrontSize'].limittype = 'max'
             self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['sgprsPerSimd'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['sgprAllocationGranularity'].limittype = 'min' # should be 'minmul'
             self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['vgprsPerSimd'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['vgprAllocationGranularity'].limittype = 'min' # should be 'minmul'
 
         if 'VkPhysicalDeviceShadingRateImagePropertiesNV' in self.structs:
             self.structs['VkPhysicalDeviceShadingRateImagePropertiesNV'].members['shadingRateTexelSize'].limittype = 'behavior'

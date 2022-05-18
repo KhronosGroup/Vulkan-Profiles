@@ -6402,15 +6402,15 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
         WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "computeUnitsPerShaderArray");
         WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "simdPerComputeUnit");
         WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "wavefrontsPerSimd");
-        WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "wavefrontSize");
+        GET_VALUE_WARN(member, wavefrontSize, WarnIfGreater);
         WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "sgprsPerSimd");
         GET_VALUE_WARN(member, minSgprAllocation, WarnIfLesser);
         GET_VALUE_WARN(member, maxSgprAllocation, WarnIfGreater);
-        WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "sgprAllocationGranularity");
+        GET_VALUE_WARN(member, sgprAllocationGranularity, WarnIfLesser);
         WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "vgprsPerSimd");
         GET_VALUE_WARN(member, minVgprAllocation, WarnIfLesser);
         GET_VALUE_WARN(member, maxVgprAllocation, WarnIfGreater);
-        WarnNotModifiable("VkPhysicalDeviceShaderCorePropertiesAMD", member, "vgprAllocationGranularity");
+        GET_VALUE_WARN(member, vgprAllocationGranularity, WarnIfLesser);
     }
     return valid;
 }
