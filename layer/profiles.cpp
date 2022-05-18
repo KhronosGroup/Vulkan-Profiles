@@ -6050,7 +6050,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocat
         GET_VALUE_FLAG_WARN(member, sampleLocationSampleCounts);
         GET_VALUE_WARN(member, maxSampleLocationGridSize, WarnIfGreater);
         GET_ARRAY(sampleLocationCoordinateRange);
-        WarnNotModifiable("VkPhysicalDeviceSampleLocationsPropertiesEXT", member, "sampleLocationSubPixelBits");
+        GET_VALUE_WARN(member, sampleLocationSubPixelBits, WarnIfGreater);
         GET_VALUE_WARN(member, variableSampleLocations, WarnIfNotEqualBool);
     }
     return valid;
