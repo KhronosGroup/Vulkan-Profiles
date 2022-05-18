@@ -1915,6 +1915,11 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['storageTexelBufferOffsetSingleTexelAlignment'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['uniformTexelBufferOffsetSingleTexelAlignment'].limittype = 'behavior'
 
+        if 'VkPhysicalDeviceFragmentShadingRatePropertiesKHR' in self.structs:
+            self.structs['VkPhysicalDeviceFragmentShadingRatePropertiesKHR'].members['maxFragmentShadingRateAttachmentTexelSizeAspectRatio'].limittype = 'max' # should be maxpot
+            self.structs['VkPhysicalDeviceFragmentShadingRatePropertiesKHR'].members['maxFragmentSizeAspectRatio'].limittype = 'max' # should be maxpot
+            self.structs['VkPhysicalDeviceFragmentShadingRatePropertiesKHR'].members['maxFragmentShadingRateCoverageSamples'].limittype = 'max'
+
         if 'VkPhysicalDeviceRayTracingPipelinePropertiesKHR' in self.structs:
             self.structs['VkPhysicalDeviceRayTracingPipelinePropertiesKHR'].members['shaderGroupHandleSize'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceRayTracingPipelinePropertiesKHR'].members['shaderGroupBaseAlignment'].limittype = 'behavior'

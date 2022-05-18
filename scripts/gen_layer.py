@@ -851,7 +851,7 @@ GET_VALUE_FUNCTIONS = '''
 
     template <typename T>  // for Vulkan enum types
     bool GetValueEnum(const Json::Value &parent, const std::string &member, const char *name, T *dest,
-                      std::function<bool(const char *, T, T)> warn_func = nullptr) {
+                      std::function<bool(const char *, std::uint32_t, std::uint32_t)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -861,8 +861,14 @@ GET_VALUE_FUNCTIONS = '''
         if (value.isString()) {
             new_value = static_cast<T>(VkStringToUint(value.asString()));
         }
-        if (WarnIfNotEqualEnum(name, new_value, *dest)) {
-            valid = false;
+        if (warn_func) {
+            if (warn_func(name, new_value, *dest)) {
+                valid = false;
+            }
+        } else {
+            if (WarnIfNotEqualEnum(name, new_value, *dest)) {
+                valid = false;
+            }
         }
         *dest = static_cast<T>(new_value);
         return valid;
@@ -1872,8 +1878,8 @@ GET_DEFINES = '''
     if (!GetValueFlag(parent, member, #name, &dest->name)) { \\
         valid = false;                                       \\
     }
-#define GET_VALUE_ENUM_WARN(member, name)                    \\
-    if (!GetValueEnum(parent, member, #name, &dest->name)) { \\
+#define GET_VALUE_ENUM_WARN(member, name, warn_func)                    \\
+    if (!GetValueEnum(parent, member, #name, &dest->name, warn_func)) { \\
         valid = false;                                       \\
     }
 '''
@@ -2923,7 +2929,7 @@ GET_VALUE_PHYSICAL_DEVICE_PROPERTIES = '''bool JsonLoader::GetValue(const Json::
         GET_VALUE(prop, driverVersion);
         GET_VALUE(prop, vendorID);
         GET_VALUE(prop, deviceID);
-        GET_VALUE_ENUM_WARN(prop, deviceType);
+        GET_VALUE_ENUM_WARN(prop, deviceType, WarnIfNotEqualEnum);
         GET_ARRAY(deviceName);         // size < VK_MAX_PHYSICAL_DEVICE_NAME_SIZE
         GET_ARRAY(pipelineCacheUUID);  // size == VK_UUID_SIZE*/
     }
@@ -3526,28 +3532,32 @@ class VulkanProfilesLayerGenerator():
             member = registry.structs[structure].members[member_name]
             if member.limittype == 'behavior':
                 gen += '        WarnNotModifiable(\"' + structure + '\", member, \"' + member_name + '\");\n'
-            elif member.type in registry.enums:
-                gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ');\n'
+            elif member.type in registry.enums and member.limittype == 'bitmask':
+                gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', WarnIfNotEqualEnum);\n'
             elif member.isArray:
                 gen += '        GET_ARRAY(' + member_name + ');\n'
             elif member.type == 'VkBool32':
                 gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfNotEqualBool);\n'
             elif member.limittype == 'bitmask':
                 gen += '        GET_VALUE_FLAG_WARN(member, ' + member_name + ');\n'
-            elif member.type == 'size_t':
-                if member.limittype == 'min':
-                    gen += '        GET_VALUE_SIZE_T_WARN(member, ' + member_name + ', WarnIfLesserSizet);\n'
-                else:
-                    gen += '        GET_VALUE_SIZE_T_WARN(member, ' + member_name + ', WarnIfGreaterSizet);\n'
-            elif member.type == 'float':
-                if member.limittype == 'min':
-                    gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfLesserFloat);\n'
-                else:
-                    gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfGreaterFloat);\n'
-            elif member.limittype == 'min':
+            elif member.type == 'size_t' and member.limittype == 'min':
+                gen += '        GET_VALUE_SIZE_T_WARN(member, ' + member_name + ', WarnIfLesserSizet);\n'
+            elif member.type == 'size_t' and member.limittype == 'max':
+                gen += '        GET_VALUE_SIZE_T_WARN(member, ' + member_name + ', WarnIfGreaterSizet);\n'
+            elif member.type == 'float' and member.limittype == 'min':
+                gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfLesserFloat);\n'
+            elif member.type == 'float' and member.limittype == 'max':
+                gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfGreaterFloat);\n'
+            elif (member.type == 'VkExtent2D' or member.type == 'VkDeviceSize' or member.type == 'uint32_t' or member.type == 'uint64_t') and member.limittype == 'min': # integer types
                 gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfLesser);\n'
-            else:
+            elif (member.type == 'VkExtent2D' or member.type == 'VkDeviceSize' or member.type == 'uint32_t' or member.type == 'uint64_t') and member.limittype == 'max': # integer types
                 gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfGreater);\n'
+            elif member.limittype == 'min': # enum values
+                gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', WarnIfLesser);\n'
+            elif member.limittype == 'max': # enum values
+                gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', WarnIfGreater);\n'
+            else:
+                gen += '        WarnNotModifiable(\"' + structure + '\", member, \"' + member_name + '\");\n'
         gen += '    }\n'
         gen += '    return valid;\n'
         gen += '}\n\n'
