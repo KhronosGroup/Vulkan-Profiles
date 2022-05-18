@@ -7033,9 +7033,9 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        WarnNotModifiable("VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT", member, "storageTexelBufferOffsetAlignmentBytes");
+        GET_VALUE_WARN(member, storageTexelBufferOffsetAlignmentBytes, WarnIfLesser);
         WarnNotModifiable("VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT", member, "storageTexelBufferOffsetSingleTexelAlignment");
-        WarnNotModifiable("VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT", member, "uniformTexelBufferOffsetAlignmentBytes");
+        GET_VALUE_WARN(member, uniformTexelBufferOffsetAlignmentBytes, WarnIfLesser);
         WarnNotModifiable("VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT", member, "uniformTexelBufferOffsetSingleTexelAlignment");
     }
     return valid;
