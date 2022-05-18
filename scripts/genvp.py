@@ -2000,14 +2000,6 @@ class VulkanRegistry():
         if 'VkPhysicalDeviceShadingRateImagePropertiesNV' in self.structs:
             self.structs['VkPhysicalDeviceShadingRateImagePropertiesNV'].members['shadingRateTexelSize'].limittype = 'behavior'
 
-        # TODO: There are also some bugs in the vk.xml, like parameters having "bitmask" limittype but actually VkBool32 type
-        # This is non-sense, so we patch them
-        #for structName in self.structs:
-        #    for memberName in self.structs[structName].members:
-        #        memberDef = self.structs[structName].members[memberName]
-        #        if memberDef.limittype == 'bitmask' and memberDef.type == 'VkBool32':
-        #            self.structs[structName].members[memberName].limittype = 'noauto'
-
         # TODO: The registry xml is also missing limittype definitions for format and queue family properties
         # For now we just add the important ones, this needs a larger overhaul in the vk.xml
         self.structs['VkFormatProperties'].members['linearTilingFeatures'].limittype = 'bitmask'
