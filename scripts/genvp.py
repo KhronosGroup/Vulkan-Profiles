@@ -2022,7 +2022,11 @@ class VulkanRegistry():
             self.structs['VkFormatProperties3'].members['linearTilingFeatures'].limittype = 'bitmask'
             self.structs['VkFormatProperties3'].members['optimalTilingFeatures'].limittype = 'bitmask'
             self.structs['VkFormatProperties3'].members['bufferFeatures'].limittype = 'bitmask'
+
         self.structs['VkQueueFamilyProperties'].members['queueFlags'].limittype = 'bitmask'
+        self.structs['VkQueueFamilyProperties'].members['queueCount'].limittype = 'max'
+        self.structs['VkQueueFamilyProperties'].members['timestampValidBits'].limittype = 'max' # should be 'bits'
+        self.structs['VkQueueFamilyProperties'].members['minImageTransferGranularity'].limittype = 'min' # should be 'minmul'
 
         # TODO: The registry xml contains some return structures that contain count + pointers to arrays
         # While the script itself is prepared to drop those, as they are ill-formed, as return structures
