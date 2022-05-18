@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.3.213",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.214",
     "additionalProperties": true,
     "required": [
         "capabilities",
@@ -1389,6 +1389,15 @@
             "additionalProperties": false,
             "properties": {
                 "shaderDrawParameters": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "shaderEarlyAndLateFragmentTests": {
                     "type": "boolean"
                 }
             }
@@ -4643,6 +4652,9 @@
                             "VK_AMD_shader_core_properties2": {
                                 "type": "integer"
                             },
+                            "VK_AMD_shader_early_and_late_fragment_tests": {
+                                "type": "integer"
+                            },
                             "VK_AMD_shader_explicit_vertex_parameter": {
                                 "type": "integer"
                             },
@@ -5786,6 +5798,9 @@
                             },
                             "VkPhysicalDeviceShaderDrawParameterFeatures": {
                                 "$ref": "#/definitions/VkPhysicalDeviceShaderDrawParametersFeatures"
+                            },
+                            "VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT"
                             },
                             "VkPhysicalDeviceShaderFloat16Int8Features": {
                                 "$ref": "#/definitions/VkPhysicalDeviceShaderFloat16Int8Features"
