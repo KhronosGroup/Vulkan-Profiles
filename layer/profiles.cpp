@@ -7040,8 +7040,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRobustness2PropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        WarnNotModifiable("VkPhysicalDeviceRobustness2PropertiesEXT", member, "robustStorageBufferAccessSizeAlignment");
-        WarnNotModifiable("VkPhysicalDeviceRobustness2PropertiesEXT", member, "robustUniformBufferAccessSizeAlignment");
+        GET_VALUE_WARN(member, robustStorageBufferAccessSizeAlignment, WarnIfLesser);
+        GET_VALUE_WARN(member, robustUniformBufferAccessSizeAlignment, WarnIfLesser);
     }
     return valid;
 }
@@ -7711,9 +7711,9 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_VALUE_WARN(member, minTexelBufferOffsetAlignment, WarnIfLesser);
         GET_VALUE_WARN(member, minUniformBufferOffsetAlignment, WarnIfLesser);
         GET_VALUE_WARN(member, minStorageBufferOffsetAlignment, WarnIfLesser);
-        GET_VALUE_ENUM_WARN(member, minTexelOffset, WarnIfLesser);
+        GET_VALUE_WARN(member, minTexelOffset, WarnIfLesser);
         GET_VALUE_WARN(member, maxTexelOffset, WarnIfGreater);
-        GET_VALUE_ENUM_WARN(member, minTexelGatherOffset, WarnIfLesser);
+        GET_VALUE_WARN(member, minTexelGatherOffset, WarnIfLesser);
         GET_VALUE_WARN(member, maxTexelGatherOffset, WarnIfGreater);
         GET_VALUE_WARN(member, minInterpolationOffset, WarnIfLesserFloat);
         GET_VALUE_WARN(member, maxInterpolationOffset, WarnIfGreaterFloat);

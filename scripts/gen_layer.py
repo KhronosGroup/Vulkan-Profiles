@@ -3562,9 +3562,9 @@ class VulkanProfilesLayerGenerator():
                 gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfLesserFloat);\n'
             elif member.type == 'float' and member.limittype == 'max':
                 gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfGreaterFloat);\n'
-            elif (member.type == 'VkExtent2D' or member.type == 'VkDeviceSize' or member.type == 'uint32_t' or member.type == 'uint64_t') and member.limittype == 'min': # integer types
+            elif (member.type == 'VkExtent2D' or member.type == 'VkDeviceSize' or member.type == 'int32_t' or member.type == 'uint32_t' or member.type == 'uint64_t') and member.limittype == 'min': # integer types
                 gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfLesser);\n'
-            elif (member.type == 'VkExtent2D' or member.type == 'VkDeviceSize' or member.type == 'uint32_t' or member.type == 'uint64_t') and member.limittype == 'max': # integer types
+            elif (member.type == 'VkExtent2D' or member.type == 'VkDeviceSize' or member.type == 'int32_t' or member.type == 'uint32_t' or member.type == 'uint64_t') and member.limittype == 'max': # integer types
                 gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfGreater);\n'
             elif member.limittype == 'min': # enum values
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', WarnIfLesser);\n'
