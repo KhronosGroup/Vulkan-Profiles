@@ -1953,6 +1953,9 @@ class VulkanRegistry():
             if 'VkPhysicalDeviceTransformFeedbackPropertiesEXT' in self.structs:
                 self.structs['VkPhysicalDeviceTransformFeedbackPropertiesEXT'].members['maxTransformFeedbackBufferDataStride'].limittype = 'max'
 
+        if 'VkPhysicalDeviceExternalMemoryHostPropertiesEXT' in self.structs:
+            self.structs['VkPhysicalDeviceExternalMemoryHostPropertiesEXT'].members['minImportedHostPointerAlignment'].limittype = 'min' # should be minpot
+
         if 'VkPhysicalDevicePCIBusInfoPropertiesEXT' in self.structs:
             self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciDomain'].limittype = 'behavior'
             self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciBus'].limittype = 'behavior'
