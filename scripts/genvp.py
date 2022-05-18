@@ -1932,6 +1932,10 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceRayTracingPipelinePropertiesKHR'].members['shaderGroupBaseAlignment'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceRayTracingPipelinePropertiesKHR'].members['shaderGroupHandleCaptureReplaySize'].limittype = 'behavior'
 
+        if self.headerVersionNumber.patch < 215: # vk.xml declares maxFragmentShadingRateRasterizationSamples with 'noauto' limittype before header 215
+            if 'VkPhysicalDeviceFragmentShadingRatePropertiesKHR' in self.structs:
+                self.structs['VkPhysicalDeviceFragmentShadingRatePropertiesKHR'].members['maxFragmentShadingRateRasterizationSamples'].limittype = 'max'
+
         if 'VkPhysicalDeviceConservativeRasterizationPropertiesEXT' in self.structs:
             self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['primitiveOverestimationSize'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['degenerateTrianglesRasterized'].limittype = 'behavior'
