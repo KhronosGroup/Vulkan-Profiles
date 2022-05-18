@@ -1968,6 +1968,10 @@ class VulkanRegistry():
         if 'VkPhysicalDeviceSampleLocationsPropertiesEXT' in self.structs:
             self.structs['VkPhysicalDeviceSampleLocationsPropertiesEXT'].members['sampleLocationSubPixelBits'].limittype = 'max' # should be 'bits'
 
+        if 'VkPhysicalDeviceRobustness2PropertiesEXT' in self.structs:
+            self.structs['VkPhysicalDeviceRobustness2PropertiesEXT'].members['robustStorageBufferAccessSizeAlignment'].limittype = 'min' # should be 'minpot'
+            self.structs['VkPhysicalDeviceRobustness2PropertiesEXT'].members['robustUniformBufferAccessSizeAlignment'].limittype = 'min' # should be 'minpot'
+
         if 'VkPhysicalDeviceShaderCorePropertiesAMD' in self.structs:
             self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['shaderEngineCount'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['shaderArraysPerEngineCount'].limittype = 'behavior'
