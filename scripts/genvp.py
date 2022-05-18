@@ -1961,6 +1961,9 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['degenerateTrianglesRasterized'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['degenerateLinesRasterized'].limittype = 'behavior'
 
+        if 'VkPhysicalDeviceLineRasterizationPropertiesEXT' in self.structs:
+            self.structs['VkPhysicalDeviceLineRasterizationPropertiesEXT'].members['lineSubPixelPrecisionBits'].limittype = 'max' # should be 'bits'
+
         if self.headerVersionNumber.patch < 213:
             if 'VkPhysicalDeviceTransformFeedbackPropertiesEXT' in self.structs:
                 self.structs['VkPhysicalDeviceTransformFeedbackPropertiesEXT'].members['maxTransformFeedbackBufferDataStride'].limittype = 'max'
@@ -2003,6 +2006,12 @@ class VulkanRegistry():
         if 'VkPhysicalDeviceMeshShaderPropertiesNV' in self.structs:
             self.structs['VkPhysicalDeviceMeshShaderPropertiesNV'].members['meshOutputPerVertexGranularity'].limittype = 'min' # should be 'minmul'
             self.structs['VkPhysicalDeviceMeshShaderPropertiesNV'].members['meshOutputPerPrimitiveGranularity'].limittype = 'min' # should be 'minmul'
+
+        if self.headerVersionNumber.patch < 213:
+            if 'VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV' in self.structs:
+                self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV'].members['minSequencesCountBufferOffsetAlignment'].limittype = 'min'
+                self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV'].members['minSequencesIndexBufferOffsetAlignment'].limittype = 'min'
+                self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV'].members['minIndirectCommandsBufferOffsetAlignment'].limittype = 'min'
 
         # TODO: The registry xml is also missing limittype definitions for format and queue family properties
         # For now we just add the important ones, this needs a larger overhaul in the vk.xml

@@ -6820,7 +6820,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceLineRasterizationPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        WarnNotModifiable("VkPhysicalDeviceLineRasterizationPropertiesEXT", member, "lineSubPixelPrecisionBits");
+        GET_VALUE_WARN(member, lineSubPixelPrecisionBits, WarnIfGreater);
     }
     return valid;
 }
