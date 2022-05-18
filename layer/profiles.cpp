@@ -2288,6 +2288,9 @@ class PhysicalDeviceData {
     VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT physical_device_graphics_pipeline_library_properties_;
     VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT physical_device_graphics_pipeline_library_features_;
 
+    // VK_AMD_shader_early_and_late_fragment_tests structs
+    VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT physical_device_shader_early_and_late_fragment_tests_features_;
+
     // VK_KHR_shader_subgroup_uniform_control_flow structs
     VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR physical_device_shader_subgroup_uniform_control_flow_features_;
 
@@ -2726,6 +2729,9 @@ class PhysicalDeviceData {
         physical_device_graphics_pipeline_library_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GRAPHICS_PIPELINE_LIBRARY_PROPERTIES_EXT};
         physical_device_graphics_pipeline_library_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GRAPHICS_PIPELINE_LIBRARY_FEATURES_EXT};
 
+        // VK_AMD_shader_early_and_late_fragment_tests structs
+        physical_device_shader_early_and_late_fragment_tests_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_EARLY_AND_LATE_FRAGMENT_TESTS_FEATURES_EXT};
+
         // VK_KHR_shader_subgroup_uniform_control_flow structs
         physical_device_shader_subgroup_uniform_control_flow_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_FEATURES_KHR};
 
@@ -3071,6 +3077,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceSynchronization2FeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest);
@@ -4214,6 +4221,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_EXT_PIPELINE_PROPERTIES_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_pipeline_properties_features_);
+    } else if (name == "VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_AMD_SHADER_EARLY_AND_LATE_FRAGMENT_TESTS_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_shader_early_and_late_fragment_tests_features_);
     }
 
     return true;
@@ -7107,6 +7118,15 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPip
     return valid;
 }
 
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderEarlyAndLateFragmentTests, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR)\n");
     bool valid = true;
@@ -9133,6 +9153,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT *data = (VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_graphics_pipeline_library_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_EARLY_AND_LATE_FRAGMENT_TESTS_FEATURES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_AMD_SHADER_EARLY_AND_LATE_FRAGMENT_TESTS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT *data = (VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_shader_early_and_late_fragment_tests_features_;
                     data->pNext = pNext;
                 }
                 break;
@@ -11219,6 +11247,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_graphics_pipeline_library_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_graphics_pipeline_library_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_AMD_SHADER_EARLY_AND_LATE_FRAGMENT_TESTS_EXTENSION_NAME)) {
+                    pdd.physical_device_shader_early_and_late_fragment_tests_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_shader_early_and_late_fragment_tests_features_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {
