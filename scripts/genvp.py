@@ -2000,6 +2000,10 @@ class VulkanRegistry():
         if 'VkPhysicalDeviceShadingRateImagePropertiesNV' in self.structs:
             self.structs['VkPhysicalDeviceShadingRateImagePropertiesNV'].members['shadingRateTexelSize'].limittype = 'behavior'
 
+        if 'VkPhysicalDeviceMeshShaderPropertiesNV' in self.structs:
+            self.structs['VkPhysicalDeviceMeshShaderPropertiesNV'].members['meshOutputPerVertexGranularity'].limittype = 'min' # should be 'minmul'
+            self.structs['VkPhysicalDeviceMeshShaderPropertiesNV'].members['meshOutputPerPrimitiveGranularity'].limittype = 'min' # should be 'minmul'
+
         # TODO: The registry xml is also missing limittype definitions for format and queue family properties
         # For now we just add the important ones, this needs a larger overhaul in the vk.xml
         self.structs['VkFormatProperties'].members['linearTilingFeatures'].limittype = 'bitmask'

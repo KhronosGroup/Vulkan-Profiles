@@ -6496,8 +6496,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderP
         GET_VALUE_WARN(member, maxMeshOutputVertices, WarnIfGreater);
         GET_VALUE_WARN(member, maxMeshOutputPrimitives, WarnIfGreater);
         GET_VALUE_WARN(member, maxMeshMultiviewViewCount, WarnIfGreater);
-        WarnNotModifiable("VkPhysicalDeviceMeshShaderPropertiesNV", member, "meshOutputPerVertexGranularity");
-        WarnNotModifiable("VkPhysicalDeviceMeshShaderPropertiesNV", member, "meshOutputPerPrimitiveGranularity");
+        GET_VALUE_WARN(member, meshOutputPerVertexGranularity, WarnIfLesser);
+        GET_VALUE_WARN(member, meshOutputPerPrimitiveGranularity, WarnIfLesser);
     }
     return valid;
 }
