@@ -6118,7 +6118,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
         WarnNotModifiable("VkPhysicalDeviceRayTracingPipelinePropertiesKHR", member, "shaderGroupBaseAlignment");
         WarnNotModifiable("VkPhysicalDeviceRayTracingPipelinePropertiesKHR", member, "shaderGroupHandleCaptureReplaySize");
         GET_VALUE_WARN(member, maxRayDispatchInvocationCount, WarnIfGreater);
-        WarnNotModifiable("VkPhysicalDeviceRayTracingPipelinePropertiesKHR", member, "shaderGroupHandleAlignment");
+        GET_VALUE_WARN(member, shaderGroupHandleAlignment, WarnIfLesser);
         GET_VALUE_WARN(member, maxRayHitAttributeSize, WarnIfGreater);
     }
     return valid;
@@ -6345,7 +6345,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceExternalMemoryHostPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        WarnNotModifiable("VkPhysicalDeviceExternalMemoryHostPropertiesEXT", member, "minImportedHostPointerAlignment");
+        GET_VALUE_WARN(member, minImportedHostPointerAlignment, WarnIfLesser);
     }
     return valid;
 }
