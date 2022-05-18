@@ -5975,9 +5975,9 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativ
     for (const auto &member : parent.getMemberNames()) {
         WarnNotModifiable("VkPhysicalDeviceConservativeRasterizationPropertiesEXT", member, "primitiveOverestimationSize");
         GET_VALUE_WARN(member, maxExtraPrimitiveOverestimationSize, WarnIfGreaterFloat);
-        WarnNotModifiable("VkPhysicalDeviceConservativeRasterizationPropertiesEXT", member, "extraPrimitiveOverestimationSizeGranularity");
+        GET_VALUE_WARN(member, extraPrimitiveOverestimationSizeGranularity, WarnIfLesserFloat);
         GET_VALUE_WARN(member, primitiveUnderestimation, WarnIfNotEqualBool);
-        GET_VALUE_WARN(member, conservativePointAndLineRasterization, WarnIfNotEqualBool);
+        WarnNotModifiable("VkPhysicalDeviceConservativeRasterizationPropertiesEXT", member, "conservativePointAndLineRasterization");
         WarnNotModifiable("VkPhysicalDeviceConservativeRasterizationPropertiesEXT", member, "degenerateTrianglesRasterized");
         WarnNotModifiable("VkPhysicalDeviceConservativeRasterizationPropertiesEXT", member, "degenerateLinesRasterized");
         GET_VALUE_WARN(member, fullyCoveredFragmentShaderInputVariable, WarnIfNotEqualBool);
