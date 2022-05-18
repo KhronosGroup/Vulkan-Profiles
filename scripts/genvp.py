@@ -1980,10 +1980,6 @@ class VulkanRegistry():
         if 'VkPhysicalDeviceSampleLocationsPropertiesEXT' in self.structs:
             self.structs['VkPhysicalDeviceSampleLocationsPropertiesEXT'].members['sampleLocationSubPixelBits'].limittype = 'max' # should be 'bits'
 
-        if 'VkPhysicalDeviceRayTracingPropertiesNV' in self.structs:
-            self.structs['VkPhysicalDeviceRayTracingPropertiesNV'].members['shaderGroupHandleSize'].limittype = 'behavior'
-            self.structs['VkPhysicalDeviceRayTracingPropertiesNV'].members['shaderGroupBaseAlignment'].limittype = 'behavior'
-
         if 'VkPhysicalDeviceShaderCorePropertiesAMD' in self.structs:
             self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['shaderEngineCount'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['shaderArraysPerEngineCount'].limittype = 'behavior'
@@ -1995,6 +1991,13 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['sgprAllocationGranularity'].limittype = 'min' # should be 'minmul'
             self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['vgprsPerSimd'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['vgprAllocationGranularity'].limittype = 'min' # should be 'minmul'
+
+        if 'VkPhysicalDeviceSubpassShadingPropertiesHUAWEI' in self.structs:
+            self.structs['VkPhysicalDeviceSubpassShadingPropertiesHUAWEI'].members['maxSubpassShadingWorkgroupSizeAspectRatio'].limittype = 'max' # should be 'maxpot'
+
+        if 'VkPhysicalDeviceRayTracingPropertiesNV' in self.structs:
+            self.structs['VkPhysicalDeviceRayTracingPropertiesNV'].members['shaderGroupHandleSize'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceRayTracingPropertiesNV'].members['shaderGroupBaseAlignment'].limittype = 'behavior'
 
         if 'VkPhysicalDeviceShadingRateImagePropertiesNV' in self.structs:
             self.structs['VkPhysicalDeviceShadingRateImagePropertiesNV'].members['shadingRateTexelSize'].limittype = 'behavior'
@@ -2008,6 +2011,9 @@ class VulkanRegistry():
                 self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV'].members['minSequencesCountBufferOffsetAlignment'].limittype = 'min'
                 self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV'].members['minSequencesIndexBufferOffsetAlignment'].limittype = 'min'
                 self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV'].members['minIndirectCommandsBufferOffsetAlignment'].limittype = 'min'
+
+        if 'VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM' in self.structs:
+            self.structs['VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM'].members['fragmentDensityOffsetGranularity'].limittype = 'min' # should be 'minmul'
 
         # TODO: The registry xml is also missing limittype definitions for format and queue family properties
         # For now we just add the important ones, this needs a larger overhaul in the vk.xml

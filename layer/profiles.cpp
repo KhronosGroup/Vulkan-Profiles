@@ -7337,7 +7337,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSubpassShadingPropertiesHUAWEI)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        WarnNotModifiable("VkPhysicalDeviceSubpassShadingPropertiesHUAWEI", member, "maxSubpassShadingWorkgroupSizeAspectRatio");
+        GET_VALUE_WARN(member, maxSubpassShadingWorkgroupSizeAspectRatio, WarnIfGreater);
     }
     return valid;
 }
@@ -7515,7 +7515,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        GET_VALUE_WARN(member, fragmentDensityOffsetGranularity, WarnIfGreater);
+        GET_VALUE_WARN(member, fragmentDensityOffsetGranularity, WarnIfLesser);
     }
     return valid;
 }
