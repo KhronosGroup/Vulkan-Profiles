@@ -5686,10 +5686,10 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Pro
         GET_VALUE_WARN(member, integerDotProductAccumulatingSaturating64BitUnsignedAccelerated, WarnIfNotEqualBool);
         GET_VALUE_WARN(member, integerDotProductAccumulatingSaturating64BitSignedAccelerated, WarnIfNotEqualBool);
         GET_VALUE_WARN(member, integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated, WarnIfNotEqualBool);
-        WarnNotModifiable("VkPhysicalDeviceVulkan13Properties", member, "storageTexelBufferOffsetAlignmentBytes");
-        GET_VALUE_WARN(member, storageTexelBufferOffsetSingleTexelAlignment, WarnIfNotEqualBool);
-        WarnNotModifiable("VkPhysicalDeviceVulkan13Properties", member, "uniformTexelBufferOffsetAlignmentBytes");
-        GET_VALUE_WARN(member, uniformTexelBufferOffsetSingleTexelAlignment, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, storageTexelBufferOffsetAlignmentBytes, WarnIfLesser);
+        WarnNotModifiable("VkPhysicalDeviceVulkan13Properties", member, "storageTexelBufferOffsetSingleTexelAlignment");
+        GET_VALUE_WARN(member, uniformTexelBufferOffsetAlignmentBytes, WarnIfLesser);
+        WarnNotModifiable("VkPhysicalDeviceVulkan13Properties", member, "uniformTexelBufferOffsetSingleTexelAlignment");
         GET_VALUE_WARN(member, maxBufferSize, WarnIfGreater);
     }
     return valid;
