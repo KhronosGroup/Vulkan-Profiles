@@ -1952,6 +1952,10 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['degenerateTrianglesRasterized'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['degenerateLinesRasterized'].limittype = 'behavior'
 
+        if self.headerVersionNumber.patch < 213:
+            if 'VkPhysicalDeviceTransformFeedbackPropertiesEXT' in self.structs:
+                self.structs['VkPhysicalDeviceTransformFeedbackPropertiesEXT'].members['maxTransformFeedbackBufferDataStride'].limittype = 'max'
+
         if 'VkPhysicalDevicePCIBusInfoPropertiesEXT' in self.structs:
             self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciDomain'].limittype = 'behavior'
             self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciBus'].limittype = 'behavior'
