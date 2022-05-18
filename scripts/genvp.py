@@ -1962,6 +1962,9 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceFragmentDensityMap2PropertiesEXT'].members['subsampledLoads'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceFragmentDensityMap2PropertiesEXT'].members['subsampledCoarseReconstructionEarlyAccess'].limittype = 'behavior'
 
+        if 'VkPhysicalDeviceSampleLocationsPropertiesEXT' in self.structs:
+            self.structs['VkPhysicalDeviceSampleLocationsPropertiesEXT'].members['sampleLocationSubPixelBits'].limittype = 'max' # should be 'bits'
+
         if 'VkPhysicalDeviceRayTracingPropertiesNV' in self.structs:
             self.structs['VkPhysicalDeviceRayTracingPropertiesNV'].members['shaderGroupHandleSize'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceRayTracingPropertiesNV'].members['shaderGroupBaseAlignment'].limittype = 'behavior'
