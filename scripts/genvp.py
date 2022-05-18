@@ -2028,6 +2028,10 @@ class VulkanRegistry():
         self.structs['VkQueueFamilyProperties'].members['timestampValidBits'].limittype = 'max' # should be 'bits'
         self.structs['VkQueueFamilyProperties'].members['minImageTransferGranularity'].limittype = 'min' # should be 'minmul'
 
+        self.structs['VkSparseImageFormatProperties'].members['aspectMask'].limittype = 'bitmask'
+        self.structs['VkSparseImageFormatProperties'].members['imageGranularity'].limittype = 'min' # should be 'minmul'
+        self.structs['VkSparseImageFormatProperties'].members['flags'].limittype = 'bitmask'
+
         # TODO: The registry xml contains some return structures that contain count + pointers to arrays
         # While the script itself is prepared to drop those, as they are ill-formed, as return structures
         # should never contain such pointers, some of the structures (e.g. 'VkVideoProfilesKHR') actually
