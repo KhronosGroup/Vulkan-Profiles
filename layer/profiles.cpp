@@ -7742,8 +7742,8 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_ARRAY(lineWidthRange);
         GET_VALUE_WARN(member, pointSizeGranularity, WarnIfLesserFloat);
         GET_VALUE_WARN(member, lineWidthGranularity, WarnIfLesserFloat);
-        GET_VALUE_WARN(member, strictLines, WarnIfNotEqualBool);
-        GET_VALUE_WARN(member, standardSampleLocations, WarnIfNotEqualBool);
+        WarnNotModifiable("VkPhysicalDeviceLimits", member, "strictLines");
+        WarnNotModifiable("VkPhysicalDeviceLimits", member, "standardSampleLocations");
         GET_VALUE_WARN(member, optimalBufferCopyOffsetAlignment, WarnIfLesser);
         GET_VALUE_WARN(member, optimalBufferCopyRowPitchAlignment, WarnIfLesser);
         GET_VALUE_WARN(member, nonCoherentAtomSize, WarnIfLesser);
