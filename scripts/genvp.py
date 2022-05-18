@@ -1888,6 +1888,12 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceVulkan12Properties'].members['denormBehaviorIndependence'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceVulkan12Properties'].members['roundingModeIndependence'].limittype = 'behavior'
 
+        if 'VkPhysicalDeviceVulkan13Properties' in self.structs:
+            self.structs['VkPhysicalDeviceVulkan13Properties'].members['storageTexelBufferOffsetAlignmentBytes'].limittype = 'min' # should be minpot
+            self.structs['VkPhysicalDeviceVulkan13Properties'].members['storageTexelBufferOffsetSingleTexelAlignment'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceVulkan13Properties'].members['uniformTexelBufferOffsetAlignmentBytes'].limittype = 'min' # should be minpot
+            self.structs['VkPhysicalDeviceVulkan13Properties'].members['uniformTexelBufferOffsetSingleTexelAlignment'].limittype = 'behavior'
+
         if 'VkPhysicalDeviceProperties' in self.structs:
             self.structs['VkPhysicalDeviceProperties'].members['apiVersion'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceProperties'].members['driverVersion'].limittype = 'behavior'
