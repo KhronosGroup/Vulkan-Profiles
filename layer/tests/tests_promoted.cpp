@@ -24,16 +24,6 @@
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
 
-#ifdef _WIN32
-#ifdef _DEBUG
-static const char* CONFIG_PATH = "bin/Debug";
-#else
-static const char* CONFIG_PATH = "bin/Release";
-#endif
-#else
-static const char* CONFIG_PATH = "lib";
-#endif
-
 static VkPhysicalDevice gpu_profile;
 static VkPhysicalDevice gpu_native;
 static profiles_test::VulkanInstanceBuilder inst_builder;
@@ -57,11 +47,6 @@ class TestsPromoted : public VkTestFramework {
     static void SetUpTestSuite() {
         VkResult err = VK_SUCCESS;
 
-        const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-        profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
-
-        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-
         VkProfileLayerSettingsEXT settings;
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_promoted_api.json";
         settings.profile_name = "VP_LUNARG_test_api";
@@ -82,7 +67,7 @@ class TestsPromoted : public VkTestFramework {
     };
 
     static void TearDownTestSuite() { 
-        inst_builder.clean(); 
+        inst_builder.reset(); 
     };
 };
 
@@ -93,23 +78,28 @@ TEST_F(TestsPromoted, TestVulkan11Properties) {
         return;
     }
 
-    VkPhysicalDeviceVulkan11Properties vulkan_11_properties{};
-    vulkan_11_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
-
     VkPhysicalDeviceProperties2 gpu_props{};
     gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-    gpu_props.pNext = &vulkan_11_properties;
+
+    VkPhysicalDeviceVulkan11Properties properties_profile{};
+    properties_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
+    gpu_props.pNext = &properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props);
 
-    EXPECT_EQ(vulkan_11_properties.subgroupSize, 211);
-    EXPECT_EQ(vulkan_11_properties.subgroupSupportedStages & VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_VERTEX_BIT);
-    EXPECT_EQ(vulkan_11_properties.subgroupSupportedOperations & VK_SUBGROUP_FEATURE_BASIC_BIT, VK_SUBGROUP_FEATURE_BASIC_BIT);
-    EXPECT_EQ(vulkan_11_properties.subgroupQuadOperationsInAllStages, VK_TRUE);
-    EXPECT_EQ(vulkan_11_properties.maxMultiviewViewCount, 212);
-    EXPECT_EQ(vulkan_11_properties.maxMultiviewInstanceIndex, 213);
-    EXPECT_EQ(vulkan_11_properties.protectedNoFault, VK_TRUE);
-    EXPECT_EQ(vulkan_11_properties.maxPerSetDescriptors, 214);
-    EXPECT_EQ(vulkan_11_properties.maxMemoryAllocationSize, 215);
+    VkPhysicalDeviceVulkan11Properties properties_native{}; // For capabilities that can't be modified
+    properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
+    gpu_props.pNext = &properties_native;
+    vkGetPhysicalDeviceProperties2(gpu_native, &gpu_props);
+
+    EXPECT_EQ(properties_profile.subgroupSize, properties_native.subgroupSize);
+    EXPECT_EQ(properties_profile.subgroupSupportedStages & VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_VERTEX_BIT);
+    EXPECT_EQ(properties_profile.subgroupSupportedOperations & VK_SUBGROUP_FEATURE_BASIC_BIT, VK_SUBGROUP_FEATURE_BASIC_BIT);
+    EXPECT_EQ(properties_profile.subgroupQuadOperationsInAllStages, VK_TRUE);
+    EXPECT_EQ(properties_profile.maxMultiviewViewCount, 212);
+    EXPECT_EQ(properties_profile.maxMultiviewInstanceIndex, 213);
+    EXPECT_EQ(properties_profile.protectedNoFault, properties_native.protectedNoFault);
+    EXPECT_EQ(properties_profile.maxPerSetDescriptors, 214);
+    EXPECT_EQ(properties_profile.maxMemoryAllocationSize, 215);
 
 #endif
 }
@@ -121,26 +111,27 @@ TEST_F(TestsPromoted, TestVulkan11Features) {
         return;
     }
 
-    VkPhysicalDeviceVulkan11Features vulkan_11_features{};
-    vulkan_11_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+    VkPhysicalDeviceFeatures2 gpu_features;
+    gpu_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 
-    VkPhysicalDeviceFeatures2 features;
-    features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-    features.pNext = &vulkan_11_features;
-    vkGetPhysicalDeviceFeatures2(gpu_profile, &features);
+    VkPhysicalDeviceVulkan11Features profile_features{};
+    profile_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
 
-    EXPECT_EQ(vulkan_11_features.storageBuffer16BitAccess, VK_TRUE);
-    EXPECT_EQ(vulkan_11_features.uniformAndStorageBuffer16BitAccess, VK_TRUE);
-    EXPECT_EQ(vulkan_11_features.storagePushConstant16, VK_TRUE);
-    EXPECT_EQ(vulkan_11_features.storageInputOutput16, VK_TRUE);
-    EXPECT_EQ(vulkan_11_features.multiview, VK_TRUE);
-    EXPECT_EQ(vulkan_11_features.multiviewGeometryShader, VK_TRUE);
-    EXPECT_EQ(vulkan_11_features.multiviewTessellationShader, VK_TRUE);
-    EXPECT_EQ(vulkan_11_features.variablePointersStorageBuffer, VK_TRUE);
-    EXPECT_EQ(vulkan_11_features.variablePointers, VK_TRUE);
-    EXPECT_EQ(vulkan_11_features.protectedMemory, VK_TRUE);
-    EXPECT_EQ(vulkan_11_features.samplerYcbcrConversion, VK_TRUE);
-    EXPECT_EQ(vulkan_11_features.shaderDrawParameters, VK_TRUE);
+    gpu_features.pNext = &profile_features;
+    vkGetPhysicalDeviceFeatures2(gpu_profile, &gpu_features);
+
+    EXPECT_EQ(profile_features.storageBuffer16BitAccess, VK_TRUE);
+    EXPECT_EQ(profile_features.uniformAndStorageBuffer16BitAccess, VK_TRUE);
+    EXPECT_EQ(profile_features.storagePushConstant16, VK_TRUE);
+    EXPECT_EQ(profile_features.storageInputOutput16, VK_TRUE);
+    EXPECT_EQ(profile_features.multiview, VK_TRUE);
+    EXPECT_EQ(profile_features.multiviewGeometryShader, VK_TRUE);
+    EXPECT_EQ(profile_features.multiviewTessellationShader, VK_TRUE);
+    EXPECT_EQ(profile_features.variablePointersStorageBuffer, VK_TRUE);
+    EXPECT_EQ(profile_features.variablePointers, VK_TRUE);
+    EXPECT_EQ(profile_features.protectedMemory, VK_TRUE);
+    EXPECT_EQ(profile_features.samplerYcbcrConversion, VK_TRUE);
+    EXPECT_EQ(profile_features.shaderDrawParameters, VK_TRUE);
 #endif
 }
 

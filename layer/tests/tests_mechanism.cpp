@@ -41,12 +41,10 @@ class TestsMechanism : public VkTestFramework {
    TestsMechanism(){};
    ~TestsMechanism(){};
 
-    static void SetUpTestSuite() {
-        const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-        profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
-    }
+    static void SetUpTestSuite() {}
 
-    static void TearDownTestSuite(){};
+    static void TearDownTestSuite(){ 
+    };
 };
 
 TEST_F(TestsMechanism, selecting_profile) {
@@ -55,8 +53,6 @@ TEST_F(TestsMechanism, selecting_profile) {
     profiles_test::VulkanInstanceBuilder inst_builder;
 
     {
-        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-
         VkProfileLayerSettingsEXT settings;
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
         settings.emulate_portability = true;
@@ -64,16 +60,14 @@ TEST_F(TestsMechanism, selecting_profile) {
         settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
                                          SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
 
-        err = inst_builder.makeInstance(&settings);
+        err = inst_builder.init(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
-        VkInstance test_inst = inst_builder.getInstance();
-
         VkPhysicalDevice gpu;
-        err = inst_builder.getPhysicalDevice(&gpu);
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
         if (err != VK_SUCCESS) {
             printf("Profile not supported on device, skipping test.\n");
-            vkDestroyInstance(test_inst, nullptr);
+            inst_builder.reset();
             return;
         }
 
@@ -86,8 +80,6 @@ TEST_F(TestsMechanism, selecting_profile) {
     }
 
     {
-        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-
         VkProfileLayerSettingsEXT settings;
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
         settings.emulate_portability = true;
@@ -95,16 +87,14 @@ TEST_F(TestsMechanism, selecting_profile) {
         settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
                                          SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
 
-        err = inst_builder.makeInstance(&settings);
+        err = inst_builder.init(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
-        VkInstance test_inst = inst_builder.getInstance();
-
         VkPhysicalDevice gpu;
-        err = inst_builder.getPhysicalDevice(&gpu);
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
         if (err != VK_SUCCESS) {
             printf("Profile not supported on device, skipping test.\n");
-            vkDestroyInstance(test_inst, nullptr);
+            inst_builder.reset();
             return;
         }
 
@@ -123,25 +113,17 @@ TEST_F(TestsMechanism, reading_flags) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-
     VkProfileLayerSettingsEXT settings;
     settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_alternate.json";
     settings.emulate_portability = true;
     settings.profile_name = "VP_LUNARG_test_api";
     settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
 
-    err = inst_builder.makeInstance(&settings);
-    ASSERT_EQ(err, VK_SUCCESS);
-
-    VkInstance instance = inst_builder.getInstance();
-
-    VkPhysicalDevice physical_device;
-    err = inst_builder.getPhysicalDevice(&physical_device);
+    err = inst_builder.init(&settings);
     ASSERT_EQ(err, VK_SUCCESS);
 
     VkPhysicalDevice gpu = VK_NULL_HANDLE;
-    err = inst_builder.getPhysicalDevice(&gpu);
+    err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
     if (gpu == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV fragment_shading_rate_enums_properties{};
@@ -174,8 +156,6 @@ TEST_F(TestsMechanism, reading_duplicated_members) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-
     VkProfileLayerSettingsEXT settings;
     settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_duplicated.json";
     settings.emulate_portability = true;
@@ -183,13 +163,11 @@ TEST_F(TestsMechanism, reading_duplicated_members) {
     settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
     settings.debug_fail_on_error = true;
 
-    err = inst_builder.makeInstance(&settings);
+    err = inst_builder.init(&settings);
     ASSERT_EQ(err, VK_SUCCESS);
 
-    VkInstance instance = inst_builder.getInstance();
-
     VkPhysicalDevice physical_device;
-    err = inst_builder.getPhysicalDevice(&physical_device);
+    err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &physical_device);
     ASSERT_EQ(err, VK_ERROR_INITIALIZATION_FAILED);
 }
 
@@ -199,24 +177,19 @@ TEST_F(TestsMechanism, TestParsingAllFormatProperties) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-
     VkProfileLayerSettingsEXT settings;
     settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_formats.json";
     settings.emulate_portability = true;
     settings.profile_name = "VP_LUNARG_test_formats";
     settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
 
-    err = inst_builder.makeInstance(&settings);
+    err = inst_builder.init(&settings);
     ASSERT_EQ(err, VK_SUCCESS);
 
-    VkInstance test_inst = inst_builder.getInstance();
-
     VkPhysicalDevice gpu;
-    err = inst_builder.getPhysicalDevice(&gpu);
+    err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
     if (err != VK_SUCCESS) {
         printf("Profile not supported on device, skipping test.\n");
-        vkDestroyInstance(test_inst, nullptr);
         return;
     }
 
@@ -270,6 +243,4 @@ TEST_F(TestsMechanism, TestParsingAllFormatProperties) {
         EXPECT_EQ(format_properties3.bufferFeatures & buffer_features, buffer_features);
     }
 #endif
-
-    vkDestroyInstance(test_inst, nullptr);
 }
