@@ -21,6 +21,7 @@
 
 #include <string>
 #include <vector>
+#include <array>
 
 #include <vulkan/vulkan.h>
 #include "../profiles.h"
@@ -38,23 +39,32 @@ std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags);
 
 VkApplicationInfo GetDefaultApplicationInfo();
 
+enum Mode {
+    MODE_NATIVE = 0,
+    MODE_PROFILE,
+
+    MODE_FIRST = MODE_NATIVE,
+    MODE_LAST = MODE_PROFILE
+};
+
+enum { MODE_COUNT = MODE_LAST - MODE_FIRST + 1 };
+
 class VulkanInstanceBuilder {
    public:
-    void setApiVersion(uint32_t apiVersion) { _app_info.apiVersion = apiVersion; }
+    //void setApiVersion(uint32_t apiVersion) { _app_info.apiVersion = apiVersion; }
     void addLayer(const char* layer_name) { _layer_names.push_back(layer_name); }
     void addExtension(const char* extension_name) { _extension_names.push_back(extension_name); }
-    VkResult makeInstance();
-    VkResult makeInstance(void* pnext);
-    VkResult getPhysicalDevice(VkPhysicalDevice* phys_dev);
+    VkResult init();
+    VkResult init(void* pnext);
+    VkResult getPhysicalDevice(Mode mode, VkPhysicalDevice* phys_dev);
 
+    void clean();
     void reset();
 
-    VkInstance getInstance() { return _instance; }
+    VkInstance getInstance(Mode mode) { return _instances[mode]; }
 
    protected:
-    VkApplicationInfo _app_info{GetDefaultApplicationInfo()};
-    VkInstanceCreateInfo _inst_create_info = {VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
-    VkInstance _instance{VK_NULL_HANDLE};
+    std::array<VkInstance, MODE_COUNT> _instances = {VK_NULL_HANDLE, VK_NULL_HANDLE};
 
     std::vector<const char*> _layer_names;
     std::vector<const char*> _extension_names;

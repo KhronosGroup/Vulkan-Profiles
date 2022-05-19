@@ -116,16 +116,16 @@ VkApplicationInfo profiles_test::GetDefaultApplicationInfo() {
     return out;
 }
 
-VkResult profiles_test::VulkanInstanceBuilder::getPhysicalDevice(VkPhysicalDevice* phys_dev) {
+VkResult profiles_test::VulkanInstanceBuilder::getPhysicalDevice(Mode mode, VkPhysicalDevice* phys_dev) {
     *phys_dev = VK_NULL_HANDLE;
     VkResult res;
     uint32_t gpu_count = 0;
-    res = vkEnumeratePhysicalDevices(_instance, &gpu_count, nullptr);
+    res = vkEnumeratePhysicalDevices(_instances[mode], &gpu_count, nullptr);
     if (res != VK_SUCCESS) {
         return res;
     }
     std::vector<VkPhysicalDevice> gpus(gpu_count);
-    res = vkEnumeratePhysicalDevices(_instance, &gpu_count, gpus.data());
+    res = vkEnumeratePhysicalDevices(_instances[mode], &gpu_count, gpus.data());
     if (res != VK_SUCCESS) {
         return res;
     }
@@ -133,26 +133,42 @@ VkResult profiles_test::VulkanInstanceBuilder::getPhysicalDevice(VkPhysicalDevic
     return res;
 }
 
-VkResult profiles_test::VulkanInstanceBuilder::makeInstance() {
-    _inst_create_info.pApplicationInfo = &_app_info;
-    _inst_create_info.enabledLayerCount = static_cast<uint32_t>(_layer_names.size());
-    _inst_create_info.ppEnabledLayerNames = _layer_names.data();
-    _inst_create_info.enabledExtensionCount = static_cast<uint32_t>(_extension_names.size());
-    _inst_create_info.ppEnabledExtensionNames = _extension_names.data();
+VkResult profiles_test::VulkanInstanceBuilder::init(void* pNext) {
+    VkApplicationInfo app_info{GetDefaultApplicationInfo()};
+    VkInstanceCreateInfo inst_create_info = {};
+    inst_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    inst_create_info.pNext = pNext;
+    inst_create_info.pApplicationInfo = &app_info;
+    inst_create_info.enabledLayerCount = 0;
+    inst_create_info.ppEnabledLayerNames = nullptr;
+    inst_create_info.enabledExtensionCount = static_cast<uint32_t>(_extension_names.size());
+    inst_create_info.ppEnabledExtensionNames = _extension_names.data();
 
-    return vkCreateInstance(&_inst_create_info, nullptr, &_instance);
+    VkResult result = vkCreateInstance(&inst_create_info, nullptr, &_instances[MODE_NATIVE]);
+    if (result != VK_SUCCESS) return result;
+
+    inst_create_info.enabledLayerCount = static_cast<uint32_t>(_layer_names.size());
+    inst_create_info.ppEnabledLayerNames = _layer_names.data();
+    return vkCreateInstance(&inst_create_info, nullptr, &_instances[MODE_PROFILE]);
 }
 
-VkResult profiles_test::VulkanInstanceBuilder::makeInstance(void* pnext) {
-    _inst_create_info.pNext = pnext;
+VkResult profiles_test::VulkanInstanceBuilder::init() {
+    return this->init(nullptr);
+}
 
-    return makeInstance();
+void profiles_test::VulkanInstanceBuilder::clean() {
+    for (VkInstance& instance : _instances) {
+        if (instance != VK_NULL_HANDLE) {
+            vkDestroyInstance(instance, nullptr);
+            instance = VK_NULL_HANDLE;
+        }
+    }
 }
 
 void profiles_test::VulkanInstanceBuilder::reset() {
-    _app_info = GetDefaultApplicationInfo();
-    _inst_create_info = { VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
-    _instance = VK_NULL_HANDLE;
+    for (VkInstance& instance : _instances) {
+        instance = VK_NULL_HANDLE;    
+    }
 
     _layer_names.clear();
     _extension_names.clear();
