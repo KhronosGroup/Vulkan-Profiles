@@ -30,23 +30,23 @@ static const char* CONFIG_PATH = "bin/Debug";
 #else
 static const char* CONFIG_PATH = "bin/Release";
 #endif
-#else 
+#else
 static const char* CONFIG_PATH = "lib";
 #endif
 
-static VkInstance instance;
-static VkPhysicalDevice gpu;
+static VkPhysicalDevice gpu_profile;
+static VkPhysicalDevice gpu_native;
 static profiles_test::VulkanInstanceBuilder inst_builder;
 
 class TestsPromoted : public VkTestFramework {
-  public:
+   public:
     TestsPromoted(){};
     ~TestsPromoted(){};
 
     bool IsVersionSupported(uint32_t api_version) {
         VkPhysicalDeviceProperties2 gpu_props{};
         gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-        vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+        vkGetPhysicalDeviceProperties2(gpu_native, &gpu_props);
         if (gpu_props.properties.apiVersion < api_version) {
             printf("Profile not supported on device, skipping test.\n");
             return false;
@@ -69,20 +69,20 @@ class TestsPromoted : public VkTestFramework {
                                          SimulateCapabilityFlag::SIMULATE_FEATURES_BIT |
                                          SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
 
-        err = inst_builder.makeInstance(&settings);
+        err = inst_builder.init(&settings);
+        EXPECT_EQ(VK_SUCCESS, err);
 
-        instance = inst_builder.getInstance();
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu_profile);
+        EXPECT_EQ(VK_SUCCESS, err);
+        EXPECT_TRUE(gpu_profile);
 
-        err = inst_builder.getPhysicalDevice(&gpu);
-        EXPECT_TRUE(gpu);
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_NATIVE, &gpu_native);
+        EXPECT_EQ(VK_SUCCESS, err);
+        EXPECT_TRUE(gpu_native);
     };
 
-    static void TearDownTestSuite() {
-        if (instance != VK_NULL_HANDLE) {
-            vkDestroyInstance(instance, nullptr);
-            instance = VK_NULL_HANDLE;
-        }
-
+    static void TearDownTestSuite() { 
+        inst_builder.clean(); 
     };
 };
 
@@ -99,7 +99,7 @@ TEST_F(TestsPromoted, TestVulkan11Properties) {
     VkPhysicalDeviceProperties2 gpu_props{};
     gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     gpu_props.pNext = &vulkan_11_properties;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+    vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props);
 
     EXPECT_EQ(vulkan_11_properties.subgroupSize, 211);
     EXPECT_EQ(vulkan_11_properties.subgroupSupportedStages & VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_VERTEX_BIT);
@@ -127,7 +127,7 @@ TEST_F(TestsPromoted, TestVulkan11Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &vulkan_11_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    vkGetPhysicalDeviceFeatures2(gpu_profile, &features);
 
     EXPECT_EQ(vulkan_11_features.storageBuffer16BitAccess, VK_TRUE);
     EXPECT_EQ(vulkan_11_features.uniformAndStorageBuffer16BitAccess, VK_TRUE);
@@ -157,7 +157,7 @@ TEST_F(TestsPromoted, TestVulkan12Properties) {
     VkPhysicalDeviceProperties2 gpu_props{};
     gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     gpu_props.pNext = &vulkan_12_properties;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+    vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props);
 
     EXPECT_EQ(vulkan_12_properties.denormBehaviorIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL);
     EXPECT_EQ(vulkan_12_properties.roundingModeIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL);
@@ -223,7 +223,7 @@ TEST_F(TestsPromoted, TestVulkan12Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &vulkan_12_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    vkGetPhysicalDeviceFeatures2(gpu_profile, &features);
 
     EXPECT_EQ(vulkan_12_features.samplerMirrorClampToEdge, VK_TRUE);
     EXPECT_EQ(vulkan_12_features.drawIndirectCount, VK_TRUE);
@@ -288,7 +288,7 @@ TEST_F(TestsPromoted, TestVulkan13Properties) {
     VkPhysicalDeviceProperties2 gpu_props{};
     gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     gpu_props.pNext = &vulkan_13_properties;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+    vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props);
 
     EXPECT_EQ(vulkan_13_properties.minSubgroupSize, 338);
     EXPECT_EQ(vulkan_13_properties.maxSubgroupSize, 339);
@@ -352,7 +352,7 @@ TEST_F(TestsPromoted, TestVulkan13Features) {
     VkPhysicalDeviceFeatures2 features;
     features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features.pNext = &vulkan_13_features;
-    vkGetPhysicalDeviceFeatures2(gpu, &features);
+    vkGetPhysicalDeviceFeatures2(gpu_profile, &features);
 
     EXPECT_EQ(vulkan_13_features.robustImageAccess, VK_TRUE);
     EXPECT_EQ(vulkan_13_features.inlineUniformBlock, VK_TRUE);
@@ -370,7 +370,4 @@ TEST_F(TestsPromoted, TestVulkan13Features) {
     EXPECT_EQ(vulkan_13_features.shaderIntegerDotProduct, VK_TRUE);
     EXPECT_EQ(vulkan_13_features.maintenance4, VK_TRUE);
 #endif
-
 }
-
-
