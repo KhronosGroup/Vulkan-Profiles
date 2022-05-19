@@ -882,30 +882,36 @@ TEST_F(TestsCapabilities, TestFragmentShadingRateProperties) {
 
 TEST_F(TestsCapabilities, TestShaderCoreProperties) {
 #ifdef VK_AMD_shader_core_properties
+    VkPhysicalDeviceShaderCorePropertiesAMD properties_profile{};
+    properties_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_PROPERTIES_AMD;
 
-    VkPhysicalDeviceShaderCorePropertiesAMD shader_core_properties{};
-    shader_core_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_PROPERTIES_AMD;
+    VkPhysicalDeviceProperties2 gpu_props_profile{};
+    gpu_props_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_profile.pNext = &properties_profile;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props_profile);
 
-    VkPhysicalDeviceProperties2 gpu_props{};
-    gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-    gpu_props.pNext = &shader_core_properties;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+    VkPhysicalDeviceShaderCorePropertiesAMD properties_native{};
+    properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_PROPERTIES_AMD;
 
-    EXPECT_EQ(shader_core_properties.shaderEngineCount, 297u);
-    EXPECT_EQ(shader_core_properties.shaderArraysPerEngineCount, 298u);
-    EXPECT_EQ(shader_core_properties.computeUnitsPerShaderArray, 2300u);
-    EXPECT_EQ(shader_core_properties.simdPerComputeUnit, 301u);
-    EXPECT_EQ(shader_core_properties.wavefrontsPerSimd, 302u);
-    EXPECT_EQ(shader_core_properties.wavefrontSize, 303u);
-    EXPECT_EQ(shader_core_properties.sgprsPerSimd, 304u);
-    EXPECT_EQ(shader_core_properties.minSgprAllocation, 305u);
-    EXPECT_EQ(shader_core_properties.maxSgprAllocation, 306u);
-    EXPECT_EQ(shader_core_properties.sgprAllocationGranularity, 307u);
-    EXPECT_EQ(shader_core_properties.vgprsPerSimd, 308u);
-    EXPECT_EQ(shader_core_properties.minVgprAllocation, 309u);
-    EXPECT_EQ(shader_core_properties.maxVgprAllocation, 310u);
-    EXPECT_EQ(shader_core_properties.vgprAllocationGranularity, 311u);
+    VkPhysicalDeviceProperties2 gpu_props_native{};
+    gpu_props_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_native.pNext = &properties_native;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props_native);
 
+    EXPECT_EQ(properties_profile.shaderEngineCount, properties_native.shaderEngineCount);
+    EXPECT_EQ(properties_profile.shaderArraysPerEngineCount, properties_native.shaderArraysPerEngineCount);
+    EXPECT_EQ(properties_profile.computeUnitsPerShaderArray, properties_native.computeUnitsPerShaderArray);
+    EXPECT_EQ(properties_profile.simdPerComputeUnit, properties_native.simdPerComputeUnit);
+    EXPECT_EQ(properties_profile.wavefrontsPerSimd, properties_native.wavefrontsPerSimd);
+    EXPECT_EQ(properties_profile.wavefrontSize, 303u);
+    EXPECT_EQ(properties_profile.sgprsPerSimd, properties_native.sgprsPerSimd);
+    EXPECT_EQ(properties_profile.minSgprAllocation, 305u);
+    EXPECT_EQ(properties_profile.maxSgprAllocation, 306u);
+    EXPECT_EQ(properties_profile.sgprAllocationGranularity, 307u);
+    EXPECT_EQ(properties_profile.vgprsPerSimd, properties_native.vgprsPerSimd);
+    EXPECT_EQ(properties_profile.minVgprAllocation, 309u);
+    EXPECT_EQ(properties_profile.maxVgprAllocation, 310u);
+    EXPECT_EQ(properties_profile.vgprAllocationGranularity, 311u);
 #endif
 }
 
@@ -1034,23 +1040,30 @@ TEST_F(TestsCapabilities, TestMeshShaderProperties) {
 TEST_F(TestsCapabilities, TestRayTracingProperties) {
 #ifdef VK_NV_ray_tracing
 
-    VkPhysicalDeviceRayTracingPropertiesNV ray_tracing_properties{};
-    ray_tracing_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PROPERTIES_NV;
+    VkPhysicalDeviceRayTracingPropertiesNV properties_profile{};
+    properties_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PROPERTIES_NV;
 
-    VkPhysicalDeviceProperties2 gpu_props{};
-    gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-    gpu_props.pNext = &ray_tracing_properties;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+    VkPhysicalDeviceProperties2 gpu_props_profile{};
+    gpu_props_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_profile.pNext = &properties_profile;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props_profile);
 
-    EXPECT_EQ(ray_tracing_properties.shaderGroupHandleSize, 288u);
-    EXPECT_EQ(ray_tracing_properties.maxRecursionDepth, 289u);
-    EXPECT_EQ(ray_tracing_properties.maxShaderGroupStride, 290u);
-    EXPECT_EQ(ray_tracing_properties.shaderGroupBaseAlignment, 291u);
-    EXPECT_EQ(ray_tracing_properties.maxGeometryCount, 292u);
-    EXPECT_EQ(ray_tracing_properties.maxInstanceCount, 293u);
-    EXPECT_EQ(ray_tracing_properties.maxTriangleCount, 294u);
-    EXPECT_EQ(ray_tracing_properties.maxDescriptorSetAccelerationStructures, 295u);
+    VkPhysicalDeviceRayTracingPropertiesNV properties_native{};
+    properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PROPERTIES_NV;
 
+    VkPhysicalDeviceProperties2 gpu_props_native{};
+    gpu_props_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_native.pNext = &properties_native;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props_native);
+
+    EXPECT_EQ(properties_profile.shaderGroupHandleSize, properties_native.shaderGroupHandleSize);
+    EXPECT_EQ(properties_profile.maxRecursionDepth, 289u);
+    EXPECT_EQ(properties_profile.maxShaderGroupStride, 290u);
+    EXPECT_EQ(properties_profile.shaderGroupBaseAlignment, properties_native.shaderGroupBaseAlignment);
+    EXPECT_EQ(properties_profile.maxGeometryCount, 292u);
+    EXPECT_EQ(properties_profile.maxInstanceCount, 293u);
+    EXPECT_EQ(properties_profile.maxTriangleCount, 294u);
+    EXPECT_EQ(properties_profile.maxDescriptorSetAccelerationStructures, 295u);
 #endif
 }
 
@@ -1073,20 +1086,26 @@ TEST_F(TestsCapabilities, TestShaderSMBuiltinsProperties) {
 
 TEST_F(TestsCapabilities, TestShadingRateImageProperties) {
 #ifdef VK_NV_shading_rate_image
+    VkPhysicalDeviceShadingRateImagePropertiesNV properties_profile{};
+    properties_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_PROPERTIES_NV;
 
-    VkPhysicalDeviceShadingRateImagePropertiesNV shading_rate_image_properties{};
-    shading_rate_image_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_PROPERTIES_NV;
+    VkPhysicalDeviceProperties2 gpu_props_profile{};
+    gpu_props_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_profile.pNext = &properties_profile;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props_profile);
 
-    VkPhysicalDeviceProperties2 gpu_props{};
-    gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-    gpu_props.pNext = &shading_rate_image_properties;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+    VkPhysicalDeviceShadingRateImagePropertiesNV properties_native{};
+    properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_PROPERTIES_NV;
 
-    EXPECT_EQ(shading_rate_image_properties.shadingRateTexelSize.width, 284u);
-    EXPECT_EQ(shading_rate_image_properties.shadingRateTexelSize.height, 285u);
-    EXPECT_EQ(shading_rate_image_properties.shadingRatePaletteSize, 286u);
-    EXPECT_EQ(shading_rate_image_properties.shadingRateMaxCoarseSamples, 287u);
+    VkPhysicalDeviceProperties2 gpu_props_native{};
+    gpu_props_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_native.pNext = &properties_native;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props_native);
 
+    EXPECT_EQ(properties_profile.shadingRateTexelSize.width, properties_native.shadingRateTexelSize.width);
+    EXPECT_EQ(properties_profile.shadingRateTexelSize.height, properties_native.shadingRateTexelSize.height);
+    EXPECT_EQ(properties_profile.shadingRatePaletteSize, 286u);
+    EXPECT_EQ(properties_profile.shadingRateMaxCoarseSamples, 287u);
 #endif
 }
 
