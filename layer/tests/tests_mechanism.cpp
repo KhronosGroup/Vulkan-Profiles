@@ -24,18 +24,6 @@
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
 
-#ifdef _WIN32
-#ifdef _DEBUG
-static const char* CONFIG_PATH = "bin/Debug";
-#else
-static const char* CONFIG_PATH = "bin/Release";
-#endif
-#else 
-static const char* CONFIG_PATH = "lib";
-#endif
-
-
-
 class TestsMechanism : public VkTestFramework {
   public:
    TestsMechanism(){};
@@ -122,32 +110,54 @@ TEST_F(TestsMechanism, reading_flags) {
     err = inst_builder.init(&settings);
     ASSERT_EQ(err, VK_SUCCESS);
 
-    VkPhysicalDevice gpu = VK_NULL_HANDLE;
-    err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
-    if (gpu == VK_NULL_HANDLE) return;
+    VkPhysicalDevice gpu_profile = VK_NULL_HANDLE;
+    err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu_profile);
+    if (gpu_profile == VK_NULL_HANDLE) return;
 
-    VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV fragment_shading_rate_enums_properties{};
-    fragment_shading_rate_enums_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_ENUMS_PROPERTIES_NV;
-
-    VkPhysicalDeviceFragmentShadingRatePropertiesKHR fragment_shading_rate_properties{};
-    fragment_shading_rate_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR;
-    fragment_shading_rate_properties.pNext = &fragment_shading_rate_enums_properties;
-
-    VkPhysicalDeviceFloatControlsPropertiesKHR float_control_properties{};
-    float_control_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR;
-    float_control_properties.pNext = &fragment_shading_rate_properties;
+    VkPhysicalDevice gpu_native = VK_NULL_HANDLE;
+    err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu_native);
+    if (gpu_native == VK_NULL_HANDLE) return;
 
     VkPhysicalDeviceProperties2 gpu_props{};
     gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-    gpu_props.pNext = &float_control_properties;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_EQ(float_control_properties.denormBehaviorIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY);
-    EXPECT_EQ(float_control_properties.roundingModeIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY);
+    VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV fragment_shading_rate_enums_properties_profile{};
+    fragment_shading_rate_enums_properties_profile.sType =
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_ENUMS_PROPERTIES_NV;
 
-    EXPECT_EQ(fragment_shading_rate_properties.maxFragmentShadingRateRasterizationSamples, VK_SAMPLE_COUNT_2_BIT);
+    VkPhysicalDeviceFragmentShadingRatePropertiesKHR fragment_shading_rate_properties_profile{};
+    fragment_shading_rate_properties_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR;
+    fragment_shading_rate_properties_profile.pNext = &fragment_shading_rate_enums_properties_profile;
 
-    EXPECT_EQ(fragment_shading_rate_enums_properties.maxFragmentShadingRateInvocationCount, VK_SAMPLE_COUNT_2_BIT);
+    VkPhysicalDeviceFloatControlsPropertiesKHR float_control_properties_profile{};
+    float_control_properties_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR;
+    float_control_properties_profile.pNext = &fragment_shading_rate_properties_profile;
+
+    VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV fragment_shading_rate_enums_properties_native{};
+    fragment_shading_rate_enums_properties_native.sType =
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_ENUMS_PROPERTIES_NV;
+
+    VkPhysicalDeviceFragmentShadingRatePropertiesKHR fragment_shading_rate_properties_native{};
+    fragment_shading_rate_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR;
+    fragment_shading_rate_properties_native.pNext = &fragment_shading_rate_enums_properties_native;
+
+    VkPhysicalDeviceFloatControlsPropertiesKHR float_control_properties_native{};
+    float_control_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR;
+    float_control_properties_native.pNext = &fragment_shading_rate_properties_native;
+
+    gpu_props.pNext = &float_control_properties_profile;
+    vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props);
+
+    gpu_props.pNext = &float_control_properties_native;
+    vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props);
+
+    // These values can't be overridden
+    EXPECT_EQ(float_control_properties_profile.denormBehaviorIndependence, float_control_properties_native.denormBehaviorIndependence);
+    EXPECT_EQ(float_control_properties_profile.roundingModeIndependence, float_control_properties_native.roundingModeIndependence);
+
+    // These values are overridden
+    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentShadingRateRasterizationSamples, VK_SAMPLE_COUNT_2_BIT);
+    EXPECT_EQ(fragment_shading_rate_enums_properties_profile.maxFragmentShadingRateInvocationCount, VK_SAMPLE_COUNT_2_BIT);
 #endif
 }
 
