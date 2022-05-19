@@ -143,6 +143,8 @@ VkResult profiles_test::VulkanInstanceBuilder::getPhysicalDevice(Mode mode, VkPh
 }
 
 VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion, void* pNext) {
+    _layer_names.push_back("VK_LAYER_KHRONOS_profiles");
+
     const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
     profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
