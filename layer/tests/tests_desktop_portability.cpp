@@ -19,8 +19,6 @@ class TestsDesktopPortability : public VkTestFramework {
 
         VkResult err = inst_builder.init(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
-
-        VkInstance test_inst = inst_builder.getInstance(profiles_test::MODE_PROFILE);
     }
 
     static void TearDownTestSuite() { inst_builder.reset(); };

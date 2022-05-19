@@ -83,20 +83,8 @@ TESTS_HEADER = '''/*
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
 
-#ifdef _WIN32
-#ifdef _DEBUG
-static const char* CONFIG_PATH = "bin/Debug";
-#else
-static const char* CONFIG_PATH = "bin/Release";
-#endif
-#else
-static const char* CONFIG_PATH = "lib";
-#endif
-
-static VkInstance instance;
 static VkPhysicalDevice gpu;
 static profiles_test::VulkanInstanceBuilder inst_builder;
-
 
 class TestsCapabilitiesGenerated : public VkTestFramework {
   public:
@@ -106,28 +94,22 @@ class TestsCapabilitiesGenerated : public VkTestFramework {
     static void SetUpTestSuite() {
         VkResult err = VK_SUCCESS;
 
-        const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-        profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
-
-        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-
         VkProfileLayerSettingsEXT settings;
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_generated.json";
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_test_api";
         settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
         settings.debug_reports = DEBUG_REPORT_ERROR_BIT;
-        err = inst_builder.makeInstance(&settings);
 
-        instance = inst_builder.getInstance();
-        err = inst_builder.getPhysicalDevice(&gpu);
+        err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        ASSERT_EQ(err, VK_SUCCESS);
     };
 
     static void TearDownTestSuite() {
-        if (instance != VK_NULL_HANDLE) {
-            vkDestroyInstance(instance, nullptr);
-            instance = VK_NULL_HANDLE;
-        }
+        inst_builder.reset();
     };
 
 };
