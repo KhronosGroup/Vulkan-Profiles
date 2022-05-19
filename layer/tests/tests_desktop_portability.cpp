@@ -3,50 +3,35 @@
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
 
-#ifdef _WIN32
-#ifdef _DEBUG
-static const char* CONFIG_PATH = "bin/Debug";
-#else
-static const char* CONFIG_PATH = "bin/Release";
-#endif
-#else 
-static const char* CONFIG_PATH = "lib";
-#endif
-
 static profiles_test::VulkanInstanceBuilder inst_builder;
 
 class TestsDesktopPortability : public VkTestFramework {
-  public:
-   TestsDesktopPortability(){};
-   ~TestsDesktopPortability(){};
+   public:
+    TestsDesktopPortability(){};
+    ~TestsDesktopPortability(){};
 
     static void SetUpTestSuite() {
-        const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-        profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
-        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_desktop_portability_2021.json";
+        settings.emulate_portability = true;
+        settings.profile_name = "VP_LUNARG_desktop_portability_2021";
+        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
+
+        VkResult err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkInstance test_inst = inst_builder.getInstance(profiles_test::MODE_PROFILE);
     }
 
-    static void TearDownTestSuite(){};
+    static void TearDownTestSuite() { inst_builder.reset(); };
 };
 
 TEST_F(TestsDesktopPortability, TestDesktopPortability2022Limits) {
-    VkResult err = VK_SUCCESS;
-    VkProfileLayerSettingsEXT settings;
-    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_desktop_portability_2021.json";
-    settings.emulate_portability = true;
-    settings.profile_name = "VP_LUNARG_desktop_portability_2021";
-    settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
-
-    err = inst_builder.makeInstance(&settings);
-    ASSERT_EQ(err, VK_SUCCESS);
-
-    VkInstance test_inst = inst_builder.getInstance();
-
     VkPhysicalDevice gpu;
-    err = inst_builder.getPhysicalDevice(&gpu);
+    VkResult err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
     if (err != VK_SUCCESS) {
         printf("Profile not supported on device, skipping test.\n");
-        vkDestroyInstance(test_inst, nullptr);
+        inst_builder.reset();
         return;
     }
 
@@ -201,6 +186,4 @@ TEST_F(TestsDesktopPortability, TestDesktopPortability2022Limits) {
     EXPECT_EQ(gpu_feats.tessellationShader, VK_TRUE);
     EXPECT_EQ(gpu_feats.textureCompressionBC, VK_TRUE);
     EXPECT_EQ(gpu_feats.vertexPipelineStoresAndAtomics, VK_TRUE);
-
-    vkDestroyInstance(test_inst, nullptr);
 }

@@ -31,6 +31,16 @@
 
 #include "profiles_test_helper.h"
 
+#ifdef _WIN32
+#ifdef _DEBUG
+static const char* CONFIG_PATH = "bin/Debug";
+#else
+static const char* CONFIG_PATH = "bin/Release";
+#endif
+#else
+static const char* CONFIG_PATH = "lib";
+#endif
+
 // On Android, VK_MAKE_API_VERSION doesn't yet exist.
 #ifndef VK_MAKE_API_VERSION
 #define VK_MAKE_API_VERSION(variant, major, minor, patch) VK_MAKE_VERSION(major, minor, patch)
@@ -104,9 +114,8 @@ std::string profiles_test::GetSimulateCapabilitiesLog(SimulateCapabilityFlags fl
     return result;
 }
 
-
 VkApplicationInfo profiles_test::GetDefaultApplicationInfo() {
-    VkApplicationInfo out{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
+    VkApplicationInfo out{VK_STRUCTURE_TYPE_APPLICATION_INFO};
     out.apiVersion = VK_API_VERSION_1_3;
     out.applicationVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
     out.pApplicationName = "profiles_tests";
@@ -133,8 +142,13 @@ VkResult profiles_test::VulkanInstanceBuilder::getPhysicalDevice(Mode mode, VkPh
     return res;
 }
 
-VkResult profiles_test::VulkanInstanceBuilder::init(void* pNext) {
+VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion, void* pNext) {
+    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+
     VkApplicationInfo app_info{GetDefaultApplicationInfo()};
+    app_info.apiVersion = apiVersion;
+
     VkInstanceCreateInfo inst_create_info = {};
     inst_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     inst_create_info.pNext = pNext;
@@ -152,22 +166,20 @@ VkResult profiles_test::VulkanInstanceBuilder::init(void* pNext) {
     return vkCreateInstance(&inst_create_info, nullptr, &_instances[MODE_PROFILE]);
 }
 
-VkResult profiles_test::VulkanInstanceBuilder::init() {
-    return this->init(nullptr);
+VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion) { return this->init(apiVersion, nullptr); }
+
+VkResult profiles_test::VulkanInstanceBuilder::init(void* pNext) {
+    return this->init(GetDefaultApplicationInfo().apiVersion, pNext);
 }
 
-void profiles_test::VulkanInstanceBuilder::clean() {
+VkResult profiles_test::VulkanInstanceBuilder::init() { return this->init(GetDefaultApplicationInfo().apiVersion, nullptr); }
+
+void profiles_test::VulkanInstanceBuilder::reset() {
     for (VkInstance& instance : _instances) {
         if (instance != VK_NULL_HANDLE) {
             vkDestroyInstance(instance, nullptr);
             instance = VK_NULL_HANDLE;
         }
-    }
-}
-
-void profiles_test::VulkanInstanceBuilder::reset() {
-    for (VkInstance& instance : _instances) {
-        instance = VK_NULL_HANDLE;    
     }
 
     _layer_names.clear();

@@ -51,14 +51,16 @@ enum { MODE_COUNT = MODE_LAST - MODE_FIRST + 1 };
 
 class VulkanInstanceBuilder {
    public:
-    //void setApiVersion(uint32_t apiVersion) { _app_info.apiVersion = apiVersion; }
-    void addLayer(const char* layer_name) { _layer_names.push_back(layer_name); }
+    ~VulkanInstanceBuilder() { this->reset(); }
+
     void addExtension(const char* extension_name) { _extension_names.push_back(extension_name); }
+
     VkResult init();
     VkResult init(void* pnext);
+    VkResult init(uint32_t apiVersion);
+    VkResult init(uint32_t apiVersion, void* pnext);
     VkResult getPhysicalDevice(Mode mode, VkPhysicalDevice* phys_dev);
 
-    void clean();
     void reset();
 
     VkInstance getInstance(Mode mode) { return _instances[mode]; }
