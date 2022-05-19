@@ -208,20 +208,27 @@ TEST_F(TestsCapabilities, TestDepthStencilResolveProperties) {
 
 TEST_F(TestsCapabilities, TestSubgroupProperties) {
 #ifdef VK_VERSION_1_1
+    VkPhysicalDeviceSubgroupProperties subgroup_properties_profile{};
+    subgroup_properties_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES;
 
-    VkPhysicalDeviceSubgroupProperties subgroup_properties{};
-    subgroup_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES;
+    VkPhysicalDeviceProperties2 gpu_props_profile{};
+    gpu_props_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_profile.pNext = &subgroup_properties_profile;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props_profile);
 
-    VkPhysicalDeviceProperties2 gpu_props{};
-    gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-    gpu_props.pNext = &subgroup_properties;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+    VkPhysicalDeviceSubgroupProperties subgroup_properties_native{};
+    subgroup_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES;
 
-    EXPECT_EQ(subgroup_properties.subgroupSize, 205u);
-    EXPECT_EQ(subgroup_properties.supportedStages & (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT),
+    VkPhysicalDeviceProperties2 gpu_props_native{};
+    gpu_props_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_native.pNext = &subgroup_properties_native;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props_native);
+
+    EXPECT_EQ(subgroup_properties_profile.subgroupSize, subgroup_properties_native.subgroupSize);
+    EXPECT_EQ(subgroup_properties_profile.supportedStages & (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT),
               (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT));
-    EXPECT_EQ(subgroup_properties.supportedOperations & (VK_SUBGROUP_FEATURE_BASIC_BIT), (VK_SUBGROUP_FEATURE_BASIC_BIT));
-    EXPECT_EQ(subgroup_properties.quadOperationsInAllStages, VK_TRUE);
+    EXPECT_EQ(subgroup_properties_profile.supportedOperations & (VK_SUBGROUP_FEATURE_BASIC_BIT), (VK_SUBGROUP_FEATURE_BASIC_BIT));
+    EXPECT_EQ(subgroup_properties_profile.quadOperationsInAllStages, VK_TRUE);
 #endif
 }
 
@@ -359,15 +366,23 @@ TEST_F(TestsCapabilities, TestPointClippingProperties) {
 TEST_F(TestsCapabilities, TestProtectedMemoryProperties) {
 #ifdef VK_VERSION_1_1
 
-    VkPhysicalDeviceProtectedMemoryProperties protected_memory_properties{};
-    protected_memory_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES;
+    VkPhysicalDeviceProtectedMemoryProperties protected_memory_properties_profile{};
+    protected_memory_properties_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES;
 
-    VkPhysicalDeviceProperties2 gpu_props{};
-    gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-    gpu_props.pNext = &protected_memory_properties;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+    VkPhysicalDeviceProperties2 gpu_props_profile{};
+    gpu_props_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_profile.pNext = &protected_memory_properties_profile;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props_profile);
 
-    EXPECT_EQ(protected_memory_properties.protectedNoFault, VK_TRUE);
+    VkPhysicalDeviceProtectedMemoryProperties protected_memory_properties_native{};
+    protected_memory_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_PROPERTIES;
+
+    VkPhysicalDeviceProperties2 gpu_props_native{};
+    gpu_props_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_native.pNext = &protected_memory_properties_native;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props_native);
+
+    EXPECT_EQ(protected_memory_properties_profile.protectedNoFault, protected_memory_properties_native.protectedNoFault);
 #endif
 }
 
