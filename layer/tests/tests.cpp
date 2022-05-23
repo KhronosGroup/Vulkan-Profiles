@@ -24,31 +24,16 @@
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
 
-#ifdef _WIN32
-#ifdef _DEBUG
-static const char* CONFIG_PATH = "bin/Debug";
-#else
-static const char* CONFIG_PATH = "bin/Release";
-#endif
-#else 
-static const char* CONFIG_PATH = "lib";
-#endif
-
-
 class LayerTests : public VkTestFramework {
   public:
    LayerTests(){};
    ~LayerTests(){};
 
     static void SetUpTestSuite() {
-        const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-        profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
     }
 
     static void TearDownTestSuite(){};
 };
-
-
 
 TEST_F(LayerTests, TestSetCombinationMode) {
     VkResult err = VK_SUCCESS;
@@ -336,7 +321,7 @@ TEST_F(LayerTests, TestNotSettingProfileFile) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    std::vector<VkExtensionProperties> device_extensions;
+    std::vector<VkExtensionProperties> profile_extensions;
     {
         err = inst_builder.init();
         ASSERT_EQ(err, VK_SUCCESS);
@@ -349,17 +334,19 @@ TEST_F(LayerTests, TestNotSettingProfileFile) {
         } else {
             uint32_t count;
             vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
-            device_extensions.resize(count);
-            vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, device_extensions.data());
+            profile_extensions.resize(count);
+            vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, profile_extensions.data());
         }
 
         inst_builder.reset();
     }
     {
+        std::vector<VkExtensionProperties> device_extensions;
+
         VkProfileLayerSettingsEXT settings;
         settings.profile_file = {};
         settings.profile_name = {};
-        settings.emulate_portability = false;
+        settings.emulate_portability = true;
         settings.debug_fail_on_error = false;
         settings.simulate_capabilities = SIMULATE_ALL_CAPABILITIES;
 
@@ -371,7 +358,12 @@ TEST_F(LayerTests, TestNotSettingProfileFile) {
 
         uint32_t count = 0;
         vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
-        ASSERT_EQ(device_extensions.size(), count);
+        device_extensions.resize(count);
+        vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, device_extensions.data());
+
+        ASSERT_EQ(profile_extensions.size(), count);
+
+        inst_builder.reset();
     }
 }
 
