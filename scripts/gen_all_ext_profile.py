@@ -83,7 +83,8 @@ TESTS_HEADER = '''/*
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
 
-static VkPhysicalDevice gpu;
+static VkPhysicalDevice gpu_profile;
+static VkPhysicalDevice gpu_native;
 static profiles_test::VulkanInstanceBuilder inst_builder;
 
 class TestsCapabilitiesGenerated : public VkTestFramework {
@@ -104,7 +105,10 @@ class TestsCapabilitiesGenerated : public VkTestFramework {
         err = inst_builder.init(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
-        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu_profile);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_NATIVE, &gpu_native);
         ASSERT_EQ(err, VK_SUCCESS);
     };
 
@@ -251,13 +255,13 @@ class ProfileGenerator():
         self.test_values = dict()
         for name, value  in registry.structs.items():
             if ('VkPhysicalDeviceProperties2' in value.extends and value.definedByExtensions):
-                skip = False
-                for skipped in gen_layer.VulkanProfilesLayerGenerator.non_modifiable_structs:
-                    if (name.startswith(skipped)):
-                        skip = True
-                        break
-                if skip:
-                    continue
+                #skip = False
+                #for skipped in gen_layer.VulkanProfilesLayerGenerator.non_modifiable_structs:
+                #    if (name.startswith(skipped)):
+                #        skip = True
+                #        break
+                #if skip:
+                #    continue
                 if gen_layer.VulkanProfilesLayerGenerator.from_skipped_extension(gen_layer.VulkanProfilesLayerGenerator(), name, registry):
                     continue
                 self.test_values[name] = dict()
@@ -272,6 +276,7 @@ class ProfileGenerator():
                 for property in value.members:
                     member = value.members[property]
                     property_type = member.type
+                    property_limittype = member.limittype
                     property_name = member.name
                     property_size = 1
                     if (member.arraySize):
@@ -294,6 +299,8 @@ class ProfileGenerator():
                     gen += '                    \"'
                     gen += property_name
                     gen += '\": '
+                    #if member.limittype == "":
+                    #    self.test_values[name][property] = 
                     if property_type == "VkBool32":
                         gen += "true"
                         self.test_values[name][property] = 'VK_TRUE'
@@ -532,13 +539,21 @@ class ProfileGenerator():
             gen += '#ifdef ' + registry.extensions[ext].name + '\n'
 
         var_name = self.create_var_name(name)
-        gen += '    ' + name + ' ' + var_name + '{};\n'
-        gen += '    ' + var_name + '.sType = ' + value.sType + ';\n\n'
+        gen += '    ' + name + ' ' + var_name + '_native' + '{};\n'
+        gen += '    ' + var_name + '_native' + '.sType = ' + value.sType + ';\n\n'
 
-        gen += '    VkPhysicalDeviceProperties2 gpu_props{};\n'
-        gen += '    gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;\n'
-        gen += '    gpu_props.pNext = &' + var_name + ';\n'
-        gen += '    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);\n\n'
+        gen += '    VkPhysicalDeviceProperties2 gpu_props_native{};\n'
+        gen += '    gpu_props_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;\n'
+        gen += '    gpu_props_native.pNext = &' + var_name + '_native' + ';\n'
+        gen += '    vkGetPhysicalDeviceProperties2(gpu_native, &gpu_props_native);\n\n'
+
+        gen += '    ' + name + ' ' + var_name + '_profile' + '{};\n'
+        gen += '    ' + var_name + '_profile' + '.sType = ' + value.sType + ';\n\n'
+
+        gen += '    VkPhysicalDeviceProperties2 gpu_props_profile{};\n'
+        gen += '    gpu_props_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;\n'
+        gen += '    gpu_props_profile.pNext = &' + var_name + '_profile' + ';\n'
+        gen += '    vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);\n\n'
 
         for member in value.members:
             if member in self.test_values[name]:
@@ -547,20 +562,20 @@ class ProfileGenerator():
                     if type(property_value) is list:
                         if (len(property_value) > 1):
                             for i in range(len(property_value)):
-                                gen += '    EXPECT_EQ(' + var_name + '.' + member + '[' + str(i) + '], ' + str(property_value[i]) + ');\n'
+                                gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '[' + str(i) + '], ' + str(property_value[i]) + ');\n'
                         else:
-                            gen += '    EXPECT_EQ(' + var_name + '.' + member + ', ' + str(property_value[0]) + ');\n'
+                            gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + ', ' + str(property_value[0]) + ');\n'
                     elif type(property_value) is tuple:
                         member_type = registry.structs[name].members[member].type
                         if (member_type == 'VkExtent2D'):
-                            gen += '    EXPECT_EQ(' + var_name + '.' + member + '.width, ' + str(property_value[0]) + ');\n'
-                            gen += '    EXPECT_EQ(' + var_name + '.' + member + '.height, ' + str(property_value[1]) + ');\n'
+                            gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.width, ' + str(property_value[0]) + ');\n'
+                            gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.height, ' + str(property_value[1]) + ');\n'
                         elif (member_type == 'VkExtent3D'):
-                            gen += '    EXPECT_EQ(' + var_name + '.' + member + '.width, ' + str(property_value[0]) + ');\n'
-                            gen += '    EXPECT_EQ(' + var_name + '.' + member + '.height, ' + str(property_value[1]) + ');\n'
-                            gen += '    EXPECT_EQ(' + var_name + '.' + member + '.depth, ' + str(property_value[2]) + ');\n'
+                            gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.width, ' + str(property_value[0]) + ');\n'
+                            gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.height, ' + str(property_value[1]) + ');\n'
+                            gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.depth, ' + str(property_value[2]) + ');\n'
                     else:
-                        gen += '    EXPECT_EQ(' + var_name + '.' + member + ', ' + property_value + ');\n'
+                        gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + ', ' + property_value + ');\n'
 
         for ext in value.definedByExtensions:
             gen += '#endif\n'
@@ -582,7 +597,7 @@ class ProfileGenerator():
         gen += '    VkPhysicalDeviceFeatures2 features;\n'
         gen += '    features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;\n'
         gen += '    features.pNext = &' + var_name + ';\n'
-        gen += '    vkGetPhysicalDeviceFeatures2(gpu, &features);\n\n'
+        gen += '    vkGetPhysicalDeviceFeatures2(gpu_profile, &features);\n\n'
         
         for member in value.members:
             gen += '    EXPECT_EQ(' + var_name + '.' + member + ', VK_TRUE);\n'
@@ -596,7 +611,7 @@ class ProfileGenerator():
         gen = 'TEST_F(TestsCapabilitiesGenerated, Test' + name[2:] + ') {\n'
         gen += '    VkFormat format = ' + name + ';\n'
         gen += '    VkFormatProperties format_properties;\n'
-        gen += '    vkGetPhysicalDeviceFormatProperties(gpu, format, &format_properties);\n\n'
+        gen += '    vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);\n\n'
 
         gen += '    VkFormatFeatureFlags linear_tiling_features = '
         first = True
