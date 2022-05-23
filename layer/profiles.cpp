@@ -8013,7 +8013,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     if (layer_settings) {
         delete layer_settings;
     }
-    layer_settings = new VkProfileLayerSettingsEXT;
+    layer_settings = new VkProfileLayerSettingsEXT{};
 
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "CreateInstance\n");
     LogMessage(DEBUG_REPORT_DEBUG_BIT, ::format("JsonCpp version %s\n", JSONCPP_VERSION_STRING));
