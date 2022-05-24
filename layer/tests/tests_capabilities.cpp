@@ -24,16 +24,6 @@
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
 
-#ifdef _WIN32
-#ifdef _DEBUG
-static const char* CONFIG_PATH = "bin/Debug";
-#else
-static const char* CONFIG_PATH = "bin/Release";
-#endif
-#else
-static const char* CONFIG_PATH = "lib";
-#endif
-
 static VkPhysicalDevice gpu;
 static profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -65,11 +55,11 @@ class TestsCapabilities : public VkTestFramework {
 
 TEST_F(TestsCapabilities, TestPhysicalDeviceProperties) {
 
-    VkPhysicalDeviceProperties2 gpu_props{};
-    gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+    VkPhysicalDeviceProperties2 gpu_props_profile{};
+    gpu_props_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props_profile);
 
-    const auto& limits = gpu_props.properties.limits;
+    const auto& limits = gpu_props_profile.properties.limits;
     EXPECT_EQ(limits.maxImageDimension1D, 102u);
     EXPECT_EQ(limits.maxImageDimension2D, 103u);
     EXPECT_EQ(limits.maxImageDimension3D, 104u);
@@ -179,7 +169,6 @@ TEST_F(TestsCapabilities, TestPhysicalDeviceProperties) {
     EXPECT_EQ(limits.lineWidthRange[1], 198.0f);
     EXPECT_EQ(limits.pointSizeGranularity, 1200.0f);
     EXPECT_EQ(limits.lineWidthGranularity, 201.0f);
-    EXPECT_EQ(limits.strictLines, VK_TRUE);
     EXPECT_EQ(limits.standardSampleLocations, VK_TRUE);
     EXPECT_EQ(limits.optimalBufferCopyOffsetAlignment, 202u);
     EXPECT_EQ(limits.optimalBufferCopyRowPitchAlignment, 203u);
@@ -280,8 +269,6 @@ TEST_F(TestsCapabilities, TestFloatControlsProperties) {
     gpu_props.pNext = &float_control_properties;
     vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
 
-    EXPECT_EQ(float_control_properties.denormBehaviorIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL);
-    EXPECT_EQ(float_control_properties.roundingModeIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL);
     EXPECT_EQ(float_control_properties.shaderSignedZeroInfNanPreserveFloat16, VK_TRUE);
     EXPECT_EQ(float_control_properties.shaderSignedZeroInfNanPreserveFloat32, VK_TRUE);
     EXPECT_EQ(float_control_properties.shaderSignedZeroInfNanPreserveFloat64, VK_TRUE);
@@ -589,9 +576,6 @@ TEST_F(TestsCapabilities, TestConservativeRasterizationProperties) {
     EXPECT_EQ(properties_profile.maxExtraPrimitiveOverestimationSize, 269.0f);
     EXPECT_EQ(properties_profile.extraPrimitiveOverestimationSizeGranularity, 270.0f);
     EXPECT_EQ(properties_profile.primitiveUnderestimation, VK_TRUE);
-    EXPECT_EQ(properties_profile.conservativePointAndLineRasterization, VK_TRUE);
-    EXPECT_EQ(properties_profile.degenerateTrianglesRasterized, VK_TRUE);
-    EXPECT_EQ(properties_profile.degenerateLinesRasterized, VK_TRUE);
     EXPECT_EQ(properties_profile.fullyCoveredFragmentShaderInputVariable, VK_TRUE);
     EXPECT_EQ(properties_profile.conservativeRasterizationPostDepthCoverage, VK_TRUE);
 #endif
