@@ -345,8 +345,8 @@ TEST_F(TestsCapabilitiesGenerated, TestFloatControlsPropertiesKHR) {
     gpu_props_profile.pNext = &float_controls_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(float_controls_properties_profile.denormBehaviorIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE);
-    EXPECT_EQ(float_controls_properties_profile.roundingModeIndependence, VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY_KHR);
+    EXPECT_EQ(float_controls_properties_profile.denormBehaviorIndependence, float_controls_properties_native.denormBehaviorIndependence);
+    EXPECT_EQ(float_controls_properties_profile.roundingModeIndependence, float_controls_properties_native.roundingModeIndependence);
     EXPECT_EQ(float_controls_properties_profile.shaderSignedZeroInfNanPreserveFloat16, VK_TRUE);
     EXPECT_EQ(float_controls_properties_profile.shaderSignedZeroInfNanPreserveFloat32, VK_TRUE);
     EXPECT_EQ(float_controls_properties_profile.shaderSignedZeroInfNanPreserveFloat64, VK_TRUE);
@@ -405,13 +405,13 @@ TEST_F(TestsCapabilitiesGenerated, TestConservativeRasterizationPropertiesEXT) {
     gpu_props_profile.pNext = &conservative_rasterization_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(conservative_rasterization_properties_profile.primitiveOverestimationSize, 41.0);
+    EXPECT_EQ(conservative_rasterization_properties_profile.primitiveOverestimationSize, conservative_rasterization_properties_native.primitiveOverestimationSize);
     EXPECT_EQ(conservative_rasterization_properties_profile.maxExtraPrimitiveOverestimationSize, 42.0);
     EXPECT_EQ(conservative_rasterization_properties_profile.extraPrimitiveOverestimationSizeGranularity, 43.0);
     EXPECT_EQ(conservative_rasterization_properties_profile.primitiveUnderestimation, VK_TRUE);
-    EXPECT_EQ(conservative_rasterization_properties_profile.conservativePointAndLineRasterization, VK_TRUE);
-    EXPECT_EQ(conservative_rasterization_properties_profile.degenerateTrianglesRasterized, VK_TRUE);
-    EXPECT_EQ(conservative_rasterization_properties_profile.degenerateLinesRasterized, VK_TRUE);
+    EXPECT_EQ(conservative_rasterization_properties_profile.conservativePointAndLineRasterization, conservative_rasterization_properties_native.conservativePointAndLineRasterization);
+    EXPECT_EQ(conservative_rasterization_properties_profile.degenerateTrianglesRasterized, conservative_rasterization_properties_native.degenerateTrianglesRasterized);
+    EXPECT_EQ(conservative_rasterization_properties_profile.degenerateLinesRasterized, conservative_rasterization_properties_native.degenerateLinesRasterized);
     EXPECT_EQ(conservative_rasterization_properties_profile.fullyCoveredFragmentShaderInputVariable, VK_TRUE);
     EXPECT_EQ(conservative_rasterization_properties_profile.conservativeRasterizationPostDepthCoverage, VK_TRUE);
 #endif
@@ -435,17 +435,17 @@ TEST_F(TestsCapabilitiesGenerated, TestShaderCorePropertiesAMD) {
     gpu_props_profile.pNext = &shader_core_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(shader_core_properties_profile.shaderEngineCount, 44);
-    EXPECT_EQ(shader_core_properties_profile.shaderArraysPerEngineCount, 45);
-    EXPECT_EQ(shader_core_properties_profile.computeUnitsPerShaderArray, 46);
-    EXPECT_EQ(shader_core_properties_profile.simdPerComputeUnit, 47);
-    EXPECT_EQ(shader_core_properties_profile.wavefrontsPerSimd, 48);
+    EXPECT_EQ(shader_core_properties_profile.shaderEngineCount, shader_core_properties_native.shaderEngineCount);
+    EXPECT_EQ(shader_core_properties_profile.shaderArraysPerEngineCount, shader_core_properties_native.shaderArraysPerEngineCount);
+    EXPECT_EQ(shader_core_properties_profile.computeUnitsPerShaderArray, shader_core_properties_native.computeUnitsPerShaderArray);
+    EXPECT_EQ(shader_core_properties_profile.simdPerComputeUnit, shader_core_properties_native.simdPerComputeUnit);
+    EXPECT_EQ(shader_core_properties_profile.wavefrontsPerSimd, shader_core_properties_native.wavefrontsPerSimd);
     EXPECT_EQ(shader_core_properties_profile.wavefrontSize, 49);
-    EXPECT_EQ(shader_core_properties_profile.sgprsPerSimd, 50);
+    EXPECT_EQ(shader_core_properties_profile.sgprsPerSimd, shader_core_properties_native.sgprsPerSimd);
     EXPECT_EQ(shader_core_properties_profile.minSgprAllocation, 51);
     EXPECT_EQ(shader_core_properties_profile.maxSgprAllocation, 52);
     EXPECT_EQ(shader_core_properties_profile.sgprAllocationGranularity, 53);
-    EXPECT_EQ(shader_core_properties_profile.vgprsPerSimd, 54);
+    EXPECT_EQ(shader_core_properties_profile.vgprsPerSimd, shader_core_properties_native.vgprsPerSimd);
     EXPECT_EQ(shader_core_properties_profile.minVgprAllocation, 55);
     EXPECT_EQ(shader_core_properties_profile.maxVgprAllocation, 56);
     EXPECT_EQ(shader_core_properties_profile.vgprAllocationGranularity, 57);
@@ -636,8 +636,8 @@ TEST_F(TestsCapabilitiesGenerated, TestShadingRateImagePropertiesNV) {
     gpu_props_profile.pNext = &shading_rate_image_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(shading_rate_image_properties_profile.shadingRateTexelSize.width, 89);
-    EXPECT_EQ(shading_rate_image_properties_profile.shadingRateTexelSize.height, 90);
+    EXPECT_EQ(shading_rate_image_properties_profile.shadingRateTexelSize.width, shading_rate_image_properties_native.shadingRateTexelSize.width);
+    EXPECT_EQ(shading_rate_image_properties_profile.shadingRateTexelSize.height, shading_rate_image_properties_native.shadingRateTexelSize.height);
     EXPECT_EQ(shading_rate_image_properties_profile.shadingRatePaletteSize, 91);
     EXPECT_EQ(shading_rate_image_properties_profile.shadingRateMaxCoarseSamples, 92);
 #endif
@@ -728,11 +728,11 @@ TEST_F(TestsCapabilitiesGenerated, TestRayTracingPipelinePropertiesKHR) {
     gpu_props_profile.pNext = &ray_tracing_pipeline_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupHandleSize, 114);
+    EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupHandleSize, ray_tracing_pipeline_properties_native.shaderGroupHandleSize);
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxRayRecursionDepth, 115);
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxShaderGroupStride, 116);
-    EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupBaseAlignment, 117);
-    EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupHandleCaptureReplaySize, 118);
+    EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupBaseAlignment, ray_tracing_pipeline_properties_native.shaderGroupBaseAlignment);
+    EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupHandleCaptureReplaySize, ray_tracing_pipeline_properties_native.shaderGroupHandleCaptureReplaySize);
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxRayDispatchInvocationCount, 119);
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupHandleAlignment, 120);
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxRayHitAttributeSize, 121);
@@ -757,10 +757,10 @@ TEST_F(TestsCapabilitiesGenerated, TestRayTracingPropertiesNV) {
     gpu_props_profile.pNext = &ray_tracing_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(ray_tracing_properties_profile.shaderGroupHandleSize, 122);
+    EXPECT_EQ(ray_tracing_properties_profile.shaderGroupHandleSize, ray_tracing_properties_native.shaderGroupHandleSize);
     EXPECT_EQ(ray_tracing_properties_profile.maxRecursionDepth, 123);
     EXPECT_EQ(ray_tracing_properties_profile.maxShaderGroupStride, 124);
-    EXPECT_EQ(ray_tracing_properties_profile.shaderGroupBaseAlignment, 125);
+    EXPECT_EQ(ray_tracing_properties_profile.shaderGroupBaseAlignment, ray_tracing_properties_native.shaderGroupBaseAlignment);
     EXPECT_EQ(ray_tracing_properties_profile.maxGeometryCount, 126);
     EXPECT_EQ(ray_tracing_properties_profile.maxInstanceCount, 127);
     EXPECT_EQ(ray_tracing_properties_profile.maxTriangleCount, 128);
@@ -812,8 +812,8 @@ TEST_F(TestsCapabilitiesGenerated, TestFragmentDensityMap2PropertiesEXT) {
     gpu_props_profile.pNext = &fragment_density_map_2_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(fragment_density_map_2_properties_profile.subsampledLoads, VK_TRUE);
-    EXPECT_EQ(fragment_density_map_2_properties_profile.subsampledCoarseReconstructionEarlyAccess, VK_TRUE);
+    EXPECT_EQ(fragment_density_map_2_properties_profile.subsampledLoads, fragment_density_map_2_properties_native.subsampledLoads);
+    EXPECT_EQ(fragment_density_map_2_properties_profile.subsampledCoarseReconstructionEarlyAccess, fragment_density_map_2_properties_native.subsampledCoarseReconstructionEarlyAccess);
     EXPECT_EQ(fragment_density_map_2_properties_profile.maxSubsampledArrayLayers, 134);
     EXPECT_EQ(fragment_density_map_2_properties_profile.maxDescriptorSetSubsampledSamplers, 135);
 #endif
@@ -928,9 +928,9 @@ TEST_F(TestsCapabilitiesGenerated, TestTexelBufferAlignmentPropertiesEXT) {
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
     EXPECT_EQ(texel_buffer_alignment_properties_profile.storageTexelBufferOffsetAlignmentBytes, 141);
-    EXPECT_EQ(texel_buffer_alignment_properties_profile.storageTexelBufferOffsetSingleTexelAlignment, VK_TRUE);
+    EXPECT_EQ(texel_buffer_alignment_properties_profile.storageTexelBufferOffsetSingleTexelAlignment, texel_buffer_alignment_properties_native.storageTexelBufferOffsetSingleTexelAlignment);
     EXPECT_EQ(texel_buffer_alignment_properties_profile.uniformTexelBufferOffsetAlignmentBytes, 142);
-    EXPECT_EQ(texel_buffer_alignment_properties_profile.uniformTexelBufferOffsetSingleTexelAlignment, VK_TRUE);
+    EXPECT_EQ(texel_buffer_alignment_properties_profile.uniformTexelBufferOffsetSingleTexelAlignment, texel_buffer_alignment_properties_native.uniformTexelBufferOffsetSingleTexelAlignment);
 #endif
 }
 
