@@ -582,12 +582,16 @@ TEST_F(LayerTests, TestQueueFamilyPropertiesPartial) {
 
         VkPhysicalDevice gpu;
         err = inst_builder.getPhysicalDevice(profiles_test::MODE_NATIVE, &gpu);
+        ASSERT_EQ(err, VK_SUCCESS);
 
         uint32_t count = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, nullptr);
         ASSERT_GT(count, 0);
-        device_qf_props.resize(count);
-        vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, device_qf_props.data());
+        if (count > 0) {
+            device_qf_props.resize(count);
+            vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, device_qf_props.data());
+        }
+
         inst_builder.reset();
     }
 
@@ -619,7 +623,7 @@ TEST_F(LayerTests, TestQueueFamilyPropertiesPartial) {
             std::vector<VkQueueFamilyProperties> qf_props(count);
             vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, qf_props.data());
 
-            uint32_t device_queue_index = 0;
+            int32_t device_queue_index = -1;
             for (uint32_t i = 0; i < device_qf_props.size(); ++i) {
                 if ((device_qf_props[i].queueFlags & VK_QUEUE_COMPUTE_BIT) == VK_QUEUE_COMPUTE_BIT &&
                     device_qf_props[i].minImageTransferGranularity.width <= 4 &&
@@ -635,9 +639,11 @@ TEST_F(LayerTests, TestQueueFamilyPropertiesPartial) {
             ASSERT_EQ(qf_props[0].minImageTransferGranularity.width, 4u);
             ASSERT_EQ(qf_props[0].minImageTransferGranularity.height, 4u);
 
-            ASSERT_EQ(qf_props[0].minImageTransferGranularity.depth,
-                      device_qf_props[device_queue_index].minImageTransferGranularity.depth);
-            ASSERT_EQ(qf_props[0].timestampValidBits, device_qf_props[device_queue_index].timestampValidBits);
+            if (device_queue_index != -1) {
+                ASSERT_EQ(qf_props[0].minImageTransferGranularity.depth,
+                          device_qf_props[device_queue_index].minImageTransferGranularity.depth);
+                ASSERT_EQ(qf_props[0].timestampValidBits, device_qf_props[device_queue_index].timestampValidBits);
+            }
         }
     }
 }
