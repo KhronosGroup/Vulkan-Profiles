@@ -3587,13 +3587,6 @@ class VulkanProfilesLayerGenerator():
         gen += '}\n\n'
         return gen
 
-    def is_non_modifiable_member(self, member_name):
-        for struct in self.non_modifiable_structs:
-            for member in registry.structs[struct].members:
-                if member == member_name:
-                    return True
-        return False
-
     def generate_get_value_non_modifiable(self, structure):
         gen = 'bool JsonLoader::GetValue' + structure[2:] + '(const Json::Value &parent) {\n'
         gen += '    LogMessage(DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetValue(' + structure + ')\\n\");\n'
