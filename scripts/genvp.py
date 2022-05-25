@@ -1973,6 +1973,14 @@ class VulkanRegistry():
             self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciDevice'].limittype = 'behavior'
             self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciFunction'].limittype = 'behavior'
 
+        if 'VkPhysicalDeviceDrmPropertiesEXT' in self.structs:
+            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['hasPrimary'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['hasRender'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['primaryMajor'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['primaryMinor'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['renderMajor'].limittype = 'behavior'
+            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['renderMinor'].limittype = 'behavior'
+
         if 'VkPhysicalDeviceFragmentDensityMap2PropertiesEXT' in self.structs:
             self.structs['VkPhysicalDeviceFragmentDensityMap2PropertiesEXT'].members['subsampledLoads'].limittype = 'behavior'
             self.structs['VkPhysicalDeviceFragmentDensityMap2PropertiesEXT'].members['subsampledCoarseReconstructionEarlyAccess'].limittype = 'behavior'

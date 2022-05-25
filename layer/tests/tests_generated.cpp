@@ -1362,12 +1362,12 @@ TEST_F(TestsCapabilitiesGenerated, TestDrmPropertiesEXT) {
     gpu_props_profile.pNext = &drm_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(drm_properties_profile.hasPrimary, VK_TRUE);
-    EXPECT_EQ(drm_properties_profile.hasRender, VK_TRUE);
-    EXPECT_EQ(drm_properties_profile.primaryMajor, 166);
-    EXPECT_EQ(drm_properties_profile.primaryMinor, 167);
-    EXPECT_EQ(drm_properties_profile.renderMajor, 168);
-    EXPECT_EQ(drm_properties_profile.renderMinor, 169);
+    EXPECT_EQ(drm_properties_profile.hasPrimary, drm_properties_native.hasPrimary);
+    EXPECT_EQ(drm_properties_profile.hasRender, drm_properties_native.hasRender);
+    EXPECT_EQ(drm_properties_profile.primaryMajor, drm_properties_native.primaryMajor);
+    EXPECT_EQ(drm_properties_profile.primaryMinor, drm_properties_native.primaryMinor);
+    EXPECT_EQ(drm_properties_profile.renderMajor, drm_properties_native.renderMajor);
+    EXPECT_EQ(drm_properties_profile.renderMinor, drm_properties_native.renderMinor);
 #endif
 }
 
