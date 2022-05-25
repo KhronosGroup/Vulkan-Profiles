@@ -561,9 +561,6 @@ class ProfileGenerator():
                 property_value = self.test_values[name][member]
                 if (property_value):
                     if (registry.structs[name].members[member].limittype == 'behavior'):
-                        #if type(property_value) is str:
-                        #    for i in range(len(property_value)):
-                        #        gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '[' + str(i) + '], ' + var_name + '_native' + '.' + member + '[' + str(i) + ']);\n'
                         if type(property_value) is list:
                             if (len(property_value) > 1):
                                 for i in range(len(property_value)):
@@ -584,9 +581,6 @@ class ProfileGenerator():
                         else:
                             gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + ', ' + var_name + '_native' + '.' + member + ');\n'
                     else:
-                        #if type(property_value) is str:
-                        #    for i in range(len(property_value)):
-                        #        gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '[' + str(i) + '], ' + str(property_value[i]) + ');\n'
                         if type(property_value) is list:
                             if (len(property_value) > 1):
                                 for i in range(len(property_value)):
