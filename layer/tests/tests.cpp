@@ -323,38 +323,31 @@ TEST_F(LayerTests, TestNotSettingProfileFile) {
 
     std::vector<VkExtensionProperties> profile_extensions;
     {
-        err = inst_builder.init();
+        err = inst_builder.init(VK_API_VERSION_1_0);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
         err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        ASSERT_EQ(err, VK_SUCCESS);
 
-        if (err != VK_SUCCESS) {
-            printf("Profile not supported on device, skipping test.\n");
-        } else {
-            uint32_t count;
-            vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
-            profile_extensions.resize(count);
-            vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, profile_extensions.data());
-        }
+        uint32_t count = 0;
+        vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
+        profile_extensions.resize(count);
+        vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, profile_extensions.data());
 
         inst_builder.reset();
     }
     {
         std::vector<VkExtensionProperties> device_extensions;
 
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = {};
-        settings.profile_name = {};
-        settings.emulate_portability = true;
-        settings.debug_fail_on_error = false;
-        settings.simulate_capabilities = SIMULATE_ALL_CAPABILITIES;
+        VkProfileLayerSettingsEXT settings = {};
 
         err = inst_builder.init(VK_API_VERSION_1_0, &settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
         err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        ASSERT_EQ(err, VK_SUCCESS);
 
         uint32_t count = 0;
         vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
