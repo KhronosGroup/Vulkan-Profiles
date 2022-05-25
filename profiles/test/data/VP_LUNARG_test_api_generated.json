@@ -237,6 +237,7 @@
                 "VK_KHR_synchronization2": 1,
                 "VK_EXT_graphics_pipeline_library": 1,
                 "VK_AMD_shader_early_and_late_fragment_tests": 1,
+                "VK_KHR_fragment_shader_barycentric": 1,
                 "VK_KHR_shader_subgroup_uniform_control_flow": 1,
                 "VK_KHR_zero_initialize_workgroup_memory": 1,
                 "VK_NV_fragment_shading_rate_enums": 1,
@@ -727,6 +728,9 @@
                 "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR": {
                     "shaderIntegerDotProduct": true
                 },
+                "VkPhysicalDeviceFragmentShaderBarycentricFeaturesKHR": {
+                    "fragmentShaderBarycentric": true
+                },
                 "VkPhysicalDeviceRayTracingMotionBlurFeaturesNV": {
                     "rayTracingMotionBlur": true,
                     "rayTracingMotionBlurPipelineTraceRaysIndirect": true
@@ -766,7 +770,7 @@
                 "VkPhysicalDevicePipelinePropertiesFeaturesEXT": {
                     "pipelinePropertiesIdentifier": true
                 },
-                "VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT": {
+                "VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD": {
                     "shaderEarlyAndLateFragmentTests": true
                 }
             },
@@ -1113,6 +1117,9 @@
                     "integerDotProductAccumulatingSaturating64BitUnsignedAccelerated": true,
                     "integerDotProductAccumulatingSaturating64BitSignedAccelerated": true,
                     "integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated": true
+                },
+                "VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR": {
+                    "triStripVertexOrderIndependentOfProvokingVertex": true
                 },
                 "VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT": {
                     "graphicsPipelineLibraryFastLinking": true,

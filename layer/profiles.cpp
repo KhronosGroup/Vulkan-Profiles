@@ -2289,7 +2289,10 @@ class PhysicalDeviceData {
     VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT physical_device_graphics_pipeline_library_features_;
 
     // VK_AMD_shader_early_and_late_fragment_tests structs
-    VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT physical_device_shader_early_and_late_fragment_tests_features_;
+    VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD physical_device_shader_early_and_late_fragment_tests_features_;
+
+    // VK_KHR_fragment_shader_barycentric structs
+    VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR physical_device_fragment_shader_barycentric_properties_;
 
     // VK_KHR_shader_subgroup_uniform_control_flow structs
     VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR physical_device_shader_subgroup_uniform_control_flow_features_;
@@ -2730,7 +2733,10 @@ class PhysicalDeviceData {
         physical_device_graphics_pipeline_library_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GRAPHICS_PIPELINE_LIBRARY_FEATURES_EXT};
 
         // VK_AMD_shader_early_and_late_fragment_tests structs
-        physical_device_shader_early_and_late_fragment_tests_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_EARLY_AND_LATE_FRAGMENT_TESTS_FEATURES_EXT};
+        physical_device_shader_early_and_late_fragment_tests_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_EARLY_AND_LATE_FRAGMENT_TESTS_FEATURES_AMD};
+
+        // VK_KHR_fragment_shader_barycentric structs
+        physical_device_fragment_shader_barycentric_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_BARYCENTRIC_PROPERTIES_KHR};
 
         // VK_KHR_shader_subgroup_uniform_control_flow structs
         physical_device_shader_subgroup_uniform_control_flow_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_FEATURES_KHR};
@@ -3077,7 +3083,8 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceSynchronization2FeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT *dest);
-    bool GetValue(const Json::Value &parent, VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest);
@@ -3630,6 +3637,7 @@ bool JsonLoader::WarnDuplicatedFeature(const Json::Value &parent) {
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceShaderTerminateInvocationFeatures", "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR", "VkPhysicalDeviceVulkan13Features"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceSynchronization2Features", "VkPhysicalDeviceSynchronization2FeaturesKHR", "VkPhysicalDeviceVulkan13Features"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceShaderIntegerDotProductFeatures", "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR", "VkPhysicalDeviceVulkan13Features"});
+    valid &= WarnDuplicated(parent, {"VkPhysicalDeviceFragmentShaderBarycentricFeaturesKHR", "VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceDynamicRenderingFeatures", "VkPhysicalDeviceDynamicRenderingFeaturesKHR", "VkPhysicalDeviceVulkan13Features"});
     return valid;
 }
@@ -3844,10 +3852,6 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_NV_COMPUTE_SHADER_DERIVATIVES_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_compute_shader_derivatives_features_);
-    } else if (name == "VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV") {
-        auto support = CheckExtensionSupport(VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME, name);
-        if (support != ExtensionSupport::SUPPORTED) return valid(support);
-        return GetValue(feature, &pdd_->physical_device_fragment_shader_barycentric_features_);
     } else if (name == "VkPhysicalDeviceShaderImageFootprintFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_SHADER_IMAGE_FOOTPRINT_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
@@ -4027,11 +4031,11 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
     } else if (name == "VkPhysicalDevicePipelineCreationCacheControlFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, name)) return false;
         return GetValue(feature, &pdd_->physical_device_pipeline_creation_cache_control_features_);
-    } // Blocks nested too deeply, break
-    if (name == "VkPhysicalDeviceVulkan11Features") {
+    } else if (name == "VkPhysicalDeviceVulkan11Features") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, name)) return false;
         return GetValue(feature, &pdd_->physical_device_vulkan_11_features_);
-    } else if (name == "VkPhysicalDeviceVulkan12Features") {
+    } // Blocks nested too deeply, break
+    if (name == "VkPhysicalDeviceVulkan12Features") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, name)) return false;
         return GetValue(feature, &pdd_->physical_device_vulkan_12_features_);
     } else if (name == "VkPhysicalDeviceVulkan13Features") {
@@ -4170,6 +4174,14 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
     } else if (name == "VkPhysicalDeviceShaderIntegerDotProductFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, name)) return false;
         return GetValue(feature, &pdd_->physical_device_shader_integer_dot_product_features_);
+    } else if (name == "VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV") {
+        auto support = CheckExtensionSupport(VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_fragment_shader_barycentric_features_);
+    } else if (name == "VkPhysicalDeviceFragmentShaderBarycentricFeaturesKHR") {
+        auto support = CheckExtensionSupport(VK_KHR_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_fragment_shader_barycentric_features_);
     } else if (name == "VkPhysicalDeviceRayTracingMotionBlurFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_RAY_TRACING_MOTION_BLUR_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
@@ -4221,7 +4233,7 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_EXT_PIPELINE_PROPERTIES_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_pipeline_properties_features_);
-    } else if (name == "VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT") {
+    } else if (name == "VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD") {
         auto support = CheckExtensionSupport(VK_AMD_SHADER_EARLY_AND_LATE_FRAGMENT_TESTS_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_shader_early_and_late_fragment_tests_features_);
@@ -4472,6 +4484,10 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &name) 
         return GetValue(property, &pdd_->physical_device_shader_integer_dot_product_properties_);
     } else if (name == "VkPhysicalDeviceDrmPropertiesEXT") {
         return GetValuePhysicalDeviceDrmPropertiesEXT(property);
+    } else if (name == "VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR") {
+        auto support = CheckExtensionSupport(VK_KHR_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(property, &pdd_->physical_device_fragment_shader_barycentric_properties_);
     } else if (name == "VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_GRAPHICS_PIPELINE_LIBRARY_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
@@ -7118,11 +7134,20 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPip
     return valid;
 }
 
-bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT *dest) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT)\n");
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, shaderEarlyAndLateFragmentTests, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, triStripVertexOrderIndependentOfProvokingVertex, WarnIfNotEqualBool);
     }
     return valid;
 }
@@ -9156,11 +9181,19 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     data->pNext = pNext;
                 }
                 break;
-            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_EARLY_AND_LATE_FRAGMENT_TESTS_FEATURES_EXT:
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_EARLY_AND_LATE_FRAGMENT_TESTS_FEATURES_AMD:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_AMD_SHADER_EARLY_AND_LATE_FRAGMENT_TESTS_EXTENSION_NAME)) {
-                    VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT *data = (VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesEXT *)place;
+                    VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD *data = (VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_shader_early_and_late_fragment_tests_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_BARYCENTRIC_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
+                    VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR *data = (VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_fragment_shader_barycentric_properties_;
                     data->pNext = pNext;
                 }
                 break;
@@ -11253,6 +11286,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_shader_early_and_late_fragment_tests_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_early_and_late_fragment_tests_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
+                    pdd.physical_device_fragment_shader_barycentric_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_fragment_shader_barycentric_properties_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SHADER_SUBGROUP_UNIFORM_CONTROL_FLOW_EXTENSION_NAME)) {

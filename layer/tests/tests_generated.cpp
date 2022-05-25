@@ -877,6 +877,20 @@ TEST_F(TestsCapabilitiesGenerated, TestShaderIntegerDotProductPropertiesKHR) {
 #endif
 }
 
+TEST_F(TestsCapabilitiesGenerated, TestFragmentShaderBarycentricPropertiesKHR) {
+#ifdef VK_KHR_fragment_shader_barycentric
+    VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR fragment_shader_barycentric_properties{};
+    fragment_shader_barycentric_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_BARYCENTRIC_PROPERTIES_KHR;
+
+    VkPhysicalDeviceProperties2 gpu_props{};
+    gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props.pNext = &fragment_shader_barycentric_properties;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props);
+
+    EXPECT_EQ(fragment_shader_barycentric_properties.triStripVertexOrderIndependentOfProvokingVertex, VK_TRUE);
+#endif
+}
+
 TEST_F(TestsCapabilitiesGenerated, TestGraphicsPipelineLibraryPropertiesEXT) {
 #ifdef VK_EXT_graphics_pipeline_library
     VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT graphics_pipeline_library_properties{};
