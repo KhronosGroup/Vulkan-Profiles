@@ -407,6 +407,7 @@ class ProfileGenerator():
                         gen += property_name
                         gen += "\""
                         self.test_values[name][property] = '\"' + property_name + '\"'
+                        self.i += 1
                     else:
                         gen += property_type
                 gen += '\n'
@@ -512,8 +513,8 @@ class ProfileGenerator():
 
         for name, value  in registry.structs.items():
             if ('VkPhysicalDeviceProperties2' in value.extends):
-                if name in gen_layer.VulkanProfilesLayerGenerator.non_modifiable_structs:
-                    continue
+                #if name in gen_layer.VulkanProfilesLayerGenerator.non_modifiable_structs:
+                #    continue
                 if gen_layer.VulkanProfilesLayerGenerator.from_skipped_extension(gen_layer.VulkanProfilesLayerGenerator(), name, registry):
                     continue
                 gen += self.gen_properties_test(registry, name, value)
@@ -560,6 +561,9 @@ class ProfileGenerator():
                 property_value = self.test_values[name][member]
                 if (property_value):
                     if (registry.structs[name].members[member].limittype == 'behavior'):
+                        #if type(property_value) is str:
+                        #    for i in range(len(property_value)):
+                        #        gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '[' + str(i) + '], ' + var_name + '_native' + '.' + member + '[' + str(i) + ']);\n'
                         if type(property_value) is list:
                             if (len(property_value) > 1):
                                 for i in range(len(property_value)):
@@ -575,9 +579,14 @@ class ProfileGenerator():
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.width, ' + var_name + '_native' + '.' + member + '.width);\n'
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.height, ' + var_name + '_native' + '.' + member + '.height);\n'
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.depth, ' + var_name + '_native' + '.' + member + '.depth);\n'
+                        elif registry.structs[name].members[member].type == 'char':
+                            gen += '    EXPECT_EQ(0, strncmp(' + var_name + '_profile' + '.' + member + ', ' + var_name + '_native' + '.' + member + ', ' + str(len(property_value)) + '));\n'
                         else:
                             gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + ', ' + var_name + '_native' + '.' + member + ');\n'
                     else:
+                        #if type(property_value) is str:
+                        #    for i in range(len(property_value)):
+                        #        gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '[' + str(i) + '], ' + str(property_value[i]) + ');\n'
                         if type(property_value) is list:
                             if (len(property_value) > 1):
                                 for i in range(len(property_value)):
@@ -593,6 +602,8 @@ class ProfileGenerator():
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.width, ' + str(property_value[0]) + ');\n'
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.height, ' + str(property_value[1]) + ');\n'
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.depth, ' + str(property_value[2]) + ');\n'
+                        elif registry.structs[name].members[member].type == 'char':
+                            gen += '    EXPECT_EQ(0, strncmp(' + var_name + '_profile' + '.' + member + ', ' + property_value + ', ' + str(len(property_value)) + '));\n'
                         else:
                             gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + ', ' + property_value + ');\n'
 
