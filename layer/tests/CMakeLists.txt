@@ -23,7 +23,6 @@ set(LAYER_TEST_FILES
     tests
     tests_promoted
     tests_mechanism
-    tests_generated
     # Add new test files above this line
 )
 

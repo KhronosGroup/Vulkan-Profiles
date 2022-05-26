@@ -757,6 +757,22 @@ TEST_F(TestsCapabilitiesGenerated, TestTransformFeedbackPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestShadingRateImagePropertiesNV) {
 #ifdef VK_NV_shading_rate_image
+
+    uint32_t count;
+    vkEnumerateDeviceExtensionProperties(gpu_profile, nullptr, &count, nullptr);
+    std::vector<VkExtensionProperties> extensions(count);
+    vkEnumerateDeviceExtensionProperties(gpu_profile, nullptr, &count, extensions.data());
+    bool found = false;
+    for (const auto& ext : extensions) {
+        if (strcmp(ext.extensionName, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME) == 0) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        return;
+    }
+
     VkPhysicalDeviceShadingRateImagePropertiesNV shading_rate_image_properties_native{};
     shading_rate_image_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_PROPERTIES_NV;
 

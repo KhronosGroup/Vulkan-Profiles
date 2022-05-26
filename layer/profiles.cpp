@@ -10852,7 +10852,9 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_descriptor_indexing_features_);
                 }
 
+                printf("BEFORE VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME\n");
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME)) {
+                    printf("LOADING VK_NV_SHADING_RATE_IMAGE_EXTENSION_NAME\n");
                     pdd.physical_device_shading_rate_image_properties_.pNext = property_chain.pNext;
 
                     property_chain.pNext = &(pdd.physical_device_shading_rate_image_properties_);
