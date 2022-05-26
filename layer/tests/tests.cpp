@@ -358,14 +358,14 @@ TEST_F(LayerTests, TestNotSettingProfileFile) {
         device_extensions.resize(count);
         vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, device_extensions.data());
 
+        for (std::size_t i = 0, n = device_extensions.size(); i < n; ++i) {
+            printf("device_extensions[%zd]: %s\n", i, device_extensions[i].extensionName);
+        }
+
         ASSERT_EQ(profile_extensions.size(), count);
 
         for (std::size_t i = 0, n = std::min<std::size_t>(profile_extensions.size(), device_extensions.size()); i < n; ++i) {
             ASSERT_STREQ(device_extensions[i].extensionName, profile_extensions[i].extensionName);
-        }
-
-        for (std::size_t i = 0, n = device_extensions.size(); i < n; ++i) {
-            printf("device_extensions[%zd]: %s\n", i, device_extensions[i].extensionName);
         }
 
         inst_builder.reset();
