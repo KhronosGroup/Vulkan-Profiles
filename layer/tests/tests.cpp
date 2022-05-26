@@ -321,7 +321,7 @@ TEST_F(LayerTests, TestNotSettingProfileFile) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    std::vector<VkExtensionProperties> profile_extensions;
+    std::vector<VkExtensionProperties> extensions_default;
     {
         err = inst_builder.init(VK_API_VERSION_1_0);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -332,14 +332,14 @@ TEST_F(LayerTests, TestNotSettingProfileFile) {
 
         uint32_t count = 0;
         vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
-        profile_extensions.resize(count);
-        vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, profile_extensions.data());
+        extensions_default.resize(count);
+        vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, extensions_default.data());
 
         inst_builder.reset();
     }
-    {
-        std::vector<VkExtensionProperties> device_extensions;
 
+    std::vector<VkExtensionProperties> extensions_settings;
+    {
         VkProfileLayerSettingsEXT settings = {};
 
         err = inst_builder.init(VK_API_VERSION_1_0, &settings);
@@ -351,18 +351,13 @@ TEST_F(LayerTests, TestNotSettingProfileFile) {
 
         uint32_t count = 0;
         vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
-        device_extensions.resize(count);
-        vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, device_extensions.data());
-
-        ASSERT_EQ(profile_extensions.size(), count);
-
-        for (std::size_t i = 0, n = std::max<std::size_t>(profile_extensions.size(), device_extensions.size()); i < n; ++i) {
-            ASSERT_STREQ(device_extensions[std::min<std::size_t>(i, device_extensions.size() - 1)].extensionName,
-                         profile_extensions[std::min<std::size_t>(i, profile_extensions.size() - 1)].extensionName);
-        }
+        extensions_settings.resize(count);
+        vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, extensions_settings.data());
 
         inst_builder.reset();
     }
+
+    ASSERT_EQ(extensions_settings.size(), extensions_default.size());
 }
 
 TEST_F(LayerTests, TestExcludedExtensions) {
