@@ -356,7 +356,7 @@ TEST_F(LayerTests, TestNotSettingProfileFile) {
 
         ASSERT_EQ(profile_extensions.size(), count);
 
-        for (std::size_t i = 0, n = min(profile_extensions.size(), device_extensions.size()); i < n; ++i) {
+        for (std::size_t i = 0, n = std::min<std::size_t>(profile_extensions.size(), device_extensions.size()); i < n; ++i) {
             ASSERT_STREQ(profile_extensions[i].extensionName, device_extensions[i].extensionName);
         }
 
