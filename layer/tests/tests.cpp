@@ -336,7 +336,7 @@ TEST_F(LayerTests, TestNotSettingProfileFile) {
         vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, profile_extensions.data());
 
         for (std::size_t i = 0, n = profile_extensions.size(); i < n; ++i) {
-            printf("profile_extensions[%d]: %s\n", i, profile_extensions[i].extensionName);
+            printf("profile_extensions[%zd]: %s\n", i, profile_extensions[i].extensionName);
         }
 
         inst_builder.reset();
@@ -365,7 +365,7 @@ TEST_F(LayerTests, TestNotSettingProfileFile) {
         }
 
         for (std::size_t i = 0, n = device_extensions.size(); i < n; ++i) {
-            printf("device_extensions[%d]: %s\n", i, device_extensions[i].extensionName);
+            printf("device_extensions[%zd]: %s\n", i, device_extensions[i].extensionName);
         }
 
         inst_builder.reset();
