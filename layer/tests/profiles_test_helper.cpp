@@ -168,7 +168,10 @@ VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion, void* p
     return vkCreateInstance(&inst_create_info, nullptr, &_instances[MODE_PROFILE]);
 }
 
-VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion) { return this->init(apiVersion, nullptr); }
+VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion) { 
+    VkProfileLayerSettingsEXT settings = {};
+    return this->init(apiVersion, &settings);
+}
 
 VkResult profiles_test::VulkanInstanceBuilder::init(void* pNext) {
     return this->init(GetDefaultApplicationInfo().apiVersion, pNext);
