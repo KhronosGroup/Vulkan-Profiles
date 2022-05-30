@@ -8109,6 +8109,18 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
                                     pDesc->instanceExtensionCount,
                                     pDesc->pInstanceExtensions,
                                     extensions, merge, override);
+            {
+                bool foundPortEnum = false;
+                for (size_t i = 0; i < extensions.size(); ++i) {
+                    if (strcmp(extensions[i], VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME) == 0) {
+                        foundPortEnum = true;
+                        break;
+                    }
+                }
+                if (foundPortEnum) {
+                    createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+                }
+            }
 
             // Need to include VK_KHR_get_physical_device_properties2 if we are on Vulkan 1.0
             if (createInfo.pApplicationInfo->apiVersion < VK_API_VERSION_1_1) {
