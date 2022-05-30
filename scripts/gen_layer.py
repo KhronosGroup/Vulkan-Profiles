@@ -2141,6 +2141,16 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
                             VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME));
     }
 
+    // Handle VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME
+    bool has_port_enum = false;
+    for (uint32_t i = 0; i < pCreateInfo->enabledExtensionCount; i++) {
+        if (strncmp(pCreateInfo->ppEnabledExtensionNames[i], VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME,
+                    VK_MAX_EXTENSION_NAME_SIZE) == 0) {
+            has_port_enum = true;
+            break;
+        }
+    }
+
     // Add VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
     VkApplicationInfo new_app_info;
     if (app_info) {
@@ -2160,6 +2170,10 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     create_info.sType = pCreateInfo->sType;
     create_info.pNext = pCreateInfo->pNext;
     create_info.flags = pCreateInfo->flags;
+    if (has_port_enum) {
+        create_info.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+    }
+
     if (changed_version) {
         create_info.pApplicationInfo = &new_app_info;
     } else {
