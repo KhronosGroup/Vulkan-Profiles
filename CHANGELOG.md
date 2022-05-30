@@ -11,7 +11,10 @@
 
 # Release Notes
 
-## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/LunarG/VulkanProfiles/tree/master) - X 2022
+## [Vulkan Profiles Toolset 1.3.215](https://github.com/LunarG/VulkanProfiles/tree/master) - June 2022
+
+### Features:
+- Add `VK_KHR_portability_enumeration` support
 
 ### Bugfixes:
 - Fix Roadmap 2022 JSON file definision
