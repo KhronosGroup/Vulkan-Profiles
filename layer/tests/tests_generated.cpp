@@ -59,8 +59,26 @@ class TestsCapabilitiesGenerated : public VkTestFramework {
 
 };
 
+bool IsSupported(VkPhysicalDevice device, const char* extension_name){
+    uint32_t count = 0;
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &count, nullptr);
+    std::vector<VkExtensionProperties> extensions(count);
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &count, extensions.data());
+
+    for (const auto& ext : extensions) {
+        if (strcmp(ext.extensionName, extension_name) == 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 TEST_F(TestsCapabilitiesGenerated, TestDeviceGeneratedCommandsPropertiesNV) {
 #ifdef VK_NV_device_generated_commands
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_NV_device_generated_commands");
+
     VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV device_generated_commands_properties_native{};
     device_generated_commands_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_PROPERTIES_NV;
 
@@ -91,6 +109,9 @@ TEST_F(TestsCapabilitiesGenerated, TestDeviceGeneratedCommandsPropertiesNV) {
 
 TEST_F(TestsCapabilitiesGenerated, TestMultiDrawPropertiesEXT) {
 #ifdef VK_EXT_multi_draw
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_multi_draw");
+
     VkPhysicalDeviceMultiDrawPropertiesEXT multi_draw_properties_native{};
     multi_draw_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTI_DRAW_PROPERTIES_EXT;
 
@@ -113,6 +134,9 @@ TEST_F(TestsCapabilitiesGenerated, TestMultiDrawPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestPushDescriptorPropertiesKHR) {
 #ifdef VK_KHR_push_descriptor
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_push_descriptor");
+
     VkPhysicalDevicePushDescriptorPropertiesKHR push_descriptor_properties_native{};
     push_descriptor_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR;
 
@@ -135,6 +159,9 @@ TEST_F(TestsCapabilitiesGenerated, TestPushDescriptorPropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestDriverPropertiesKHR) {
 #ifdef VK_KHR_driver_properties
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_driver_properties");
+
     VkPhysicalDeviceDriverPropertiesKHR driver_properties_native{};
     driver_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR;
 
@@ -151,8 +178,17 @@ TEST_F(TestsCapabilitiesGenerated, TestDriverPropertiesKHR) {
     gpu_props_profile.pNext = &driver_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
+    if (supported) {
     EXPECT_EQ(0, strncmp(driver_properties_profile.driverName, driver_properties_native.driverName, 12));
+    }
+
+    if (supported) {
     EXPECT_EQ(0, strncmp(driver_properties_profile.driverInfo, driver_properties_native.driverInfo, 12));
+    }
+
+    if (supported) {
+    }
+
 #endif
 }
 
@@ -160,6 +196,13 @@ TEST_F(TestsCapabilitiesGenerated, TestIDPropertiesKHR) {
 #ifdef VK_KHR_external_memory_capabilities
 #ifdef VK_KHR_external_semaphore_capabilities
 #ifdef VK_KHR_external_fence_capabilities
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_external_memory_capabilities");
+
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_external_semaphore_capabilities");
+
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_external_fence_capabilities");
+
     VkPhysicalDeviceIDPropertiesKHR idproperties_native{};
     idproperties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES_KHR;
 
@@ -176,6 +219,7 @@ TEST_F(TestsCapabilitiesGenerated, TestIDPropertiesKHR) {
     gpu_props_profile.pNext = &idproperties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
+    if (supported) {
     EXPECT_EQ(idproperties_profile.deviceUUID[0], idproperties_native.deviceUUID[0]);
     EXPECT_EQ(idproperties_profile.deviceUUID[1], idproperties_native.deviceUUID[1]);
     EXPECT_EQ(idproperties_profile.deviceUUID[2], idproperties_native.deviceUUID[2]);
@@ -192,6 +236,9 @@ TEST_F(TestsCapabilitiesGenerated, TestIDPropertiesKHR) {
     EXPECT_EQ(idproperties_profile.deviceUUID[13], idproperties_native.deviceUUID[13]);
     EXPECT_EQ(idproperties_profile.deviceUUID[14], idproperties_native.deviceUUID[14]);
     EXPECT_EQ(idproperties_profile.deviceUUID[15], idproperties_native.deviceUUID[15]);
+    }
+
+    if (supported) {
     EXPECT_EQ(idproperties_profile.driverUUID[0], idproperties_native.driverUUID[0]);
     EXPECT_EQ(idproperties_profile.driverUUID[1], idproperties_native.driverUUID[1]);
     EXPECT_EQ(idproperties_profile.driverUUID[2], idproperties_native.driverUUID[2]);
@@ -208,6 +255,9 @@ TEST_F(TestsCapabilitiesGenerated, TestIDPropertiesKHR) {
     EXPECT_EQ(idproperties_profile.driverUUID[13], idproperties_native.driverUUID[13]);
     EXPECT_EQ(idproperties_profile.driverUUID[14], idproperties_native.driverUUID[14]);
     EXPECT_EQ(idproperties_profile.driverUUID[15], idproperties_native.driverUUID[15]);
+    }
+
+    if (supported) {
     EXPECT_EQ(idproperties_profile.deviceLUID[0], idproperties_native.deviceLUID[0]);
     EXPECT_EQ(idproperties_profile.deviceLUID[1], idproperties_native.deviceLUID[1]);
     EXPECT_EQ(idproperties_profile.deviceLUID[2], idproperties_native.deviceLUID[2]);
@@ -216,8 +266,16 @@ TEST_F(TestsCapabilitiesGenerated, TestIDPropertiesKHR) {
     EXPECT_EQ(idproperties_profile.deviceLUID[5], idproperties_native.deviceLUID[5]);
     EXPECT_EQ(idproperties_profile.deviceLUID[6], idproperties_native.deviceLUID[6]);
     EXPECT_EQ(idproperties_profile.deviceLUID[7], idproperties_native.deviceLUID[7]);
+    }
+
+    if (supported) {
     EXPECT_EQ(idproperties_profile.deviceNodeMask, idproperties_native.deviceNodeMask);
+    }
+
+    if (supported) {
     EXPECT_EQ(idproperties_profile.deviceLUIDValid, idproperties_native.deviceLUIDValid);
+    }
+
 #endif
 #endif
 #endif
@@ -225,6 +283,9 @@ TEST_F(TestsCapabilitiesGenerated, TestIDPropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestMultiviewPropertiesKHR) {
 #ifdef VK_KHR_multiview
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_multiview");
+
     VkPhysicalDeviceMultiviewPropertiesKHR multiview_properties_native{};
     multiview_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR;
 
@@ -248,6 +309,9 @@ TEST_F(TestsCapabilitiesGenerated, TestMultiviewPropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestDiscardRectanglePropertiesEXT) {
 #ifdef VK_EXT_discard_rectangles
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_discard_rectangles");
+
     VkPhysicalDeviceDiscardRectanglePropertiesEXT discard_rectangle_properties_native{};
     discard_rectangle_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DISCARD_RECTANGLE_PROPERTIES_EXT;
 
@@ -270,6 +334,9 @@ TEST_F(TestsCapabilitiesGenerated, TestDiscardRectanglePropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestPointClippingPropertiesKHR) {
 #ifdef VK_KHR_maintenance2
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_maintenance2");
+
     VkPhysicalDevicePointClippingPropertiesKHR point_clipping_properties_native{};
     point_clipping_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR;
 
@@ -286,12 +353,18 @@ TEST_F(TestsCapabilitiesGenerated, TestPointClippingPropertiesKHR) {
     gpu_props_profile.pNext = &point_clipping_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
+    if (supported) {
     EXPECT_EQ(point_clipping_properties_profile.pointClippingBehavior, point_clipping_properties_native.pointClippingBehavior);
+    }
+
 #endif
 }
 
 TEST_F(TestsCapabilitiesGenerated, TestSamplerFilterMinmaxPropertiesEXT) {
 #ifdef VK_EXT_sampler_filter_minmax
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_sampler_filter_minmax");
+
     VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT sampler_filter_minmax_properties_native{};
     sampler_filter_minmax_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_FILTER_MINMAX_PROPERTIES_EXT;
 
@@ -315,6 +388,9 @@ TEST_F(TestsCapabilitiesGenerated, TestSamplerFilterMinmaxPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestSampleLocationsPropertiesEXT) {
 #ifdef VK_EXT_sample_locations
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_sample_locations");
+
     VkPhysicalDeviceSampleLocationsPropertiesEXT sample_locations_properties_native{};
     sample_locations_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLE_LOCATIONS_PROPERTIES_EXT;
 
@@ -343,6 +419,9 @@ TEST_F(TestsCapabilitiesGenerated, TestSampleLocationsPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestBlendOperationAdvancedPropertiesEXT) {
 #ifdef VK_EXT_blend_operation_advanced
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_blend_operation_advanced");
+
     VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT blend_operation_advanced_properties_native{};
     blend_operation_advanced_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_PROPERTIES_EXT;
 
@@ -370,6 +449,9 @@ TEST_F(TestsCapabilitiesGenerated, TestBlendOperationAdvancedPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestInlineUniformBlockPropertiesEXT) {
 #ifdef VK_EXT_inline_uniform_block
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_inline_uniform_block");
+
     VkPhysicalDeviceInlineUniformBlockPropertiesEXT inline_uniform_block_properties_native{};
     inline_uniform_block_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT;
 
@@ -396,6 +478,9 @@ TEST_F(TestsCapabilitiesGenerated, TestInlineUniformBlockPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestMaintenance3PropertiesKHR) {
 #ifdef VK_KHR_maintenance3
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_maintenance3");
+
     VkPhysicalDeviceMaintenance3PropertiesKHR maintenance_3_properties_native{};
     maintenance_3_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR;
 
@@ -419,6 +504,9 @@ TEST_F(TestsCapabilitiesGenerated, TestMaintenance3PropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestMaintenance4PropertiesKHR) {
 #ifdef VK_KHR_maintenance4
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_maintenance4");
+
     VkPhysicalDeviceMaintenance4PropertiesKHR maintenance_4_properties_native{};
     maintenance_4_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_PROPERTIES_KHR;
 
@@ -441,6 +529,9 @@ TEST_F(TestsCapabilitiesGenerated, TestMaintenance4PropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestFloatControlsPropertiesKHR) {
 #ifdef VK_KHR_shader_float_controls
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_shader_float_controls");
+
     VkPhysicalDeviceFloatControlsPropertiesKHR float_controls_properties_native{};
     float_controls_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR;
 
@@ -457,8 +548,14 @@ TEST_F(TestsCapabilitiesGenerated, TestFloatControlsPropertiesKHR) {
     gpu_props_profile.pNext = &float_controls_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
+    if (supported) {
     EXPECT_EQ(float_controls_properties_profile.denormBehaviorIndependence, float_controls_properties_native.denormBehaviorIndependence);
+    }
+
+    if (supported) {
     EXPECT_EQ(float_controls_properties_profile.roundingModeIndependence, float_controls_properties_native.roundingModeIndependence);
+    }
+
     EXPECT_EQ(float_controls_properties_profile.shaderSignedZeroInfNanPreserveFloat16, VK_TRUE);
     EXPECT_EQ(float_controls_properties_profile.shaderSignedZeroInfNanPreserveFloat32, VK_TRUE);
     EXPECT_EQ(float_controls_properties_profile.shaderSignedZeroInfNanPreserveFloat64, VK_TRUE);
@@ -479,6 +576,9 @@ TEST_F(TestsCapabilitiesGenerated, TestFloatControlsPropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestExternalMemoryHostPropertiesEXT) {
 #ifdef VK_EXT_external_memory_host
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_external_memory_host");
+
     VkPhysicalDeviceExternalMemoryHostPropertiesEXT external_memory_host_properties_native{};
     external_memory_host_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT;
 
@@ -501,6 +601,9 @@ TEST_F(TestsCapabilitiesGenerated, TestExternalMemoryHostPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestConservativeRasterizationPropertiesEXT) {
 #ifdef VK_EXT_conservative_rasterization
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_conservative_rasterization");
+
     VkPhysicalDeviceConservativeRasterizationPropertiesEXT conservative_rasterization_properties_native{};
     conservative_rasterization_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONSERVATIVE_RASTERIZATION_PROPERTIES_EXT;
 
@@ -517,13 +620,25 @@ TEST_F(TestsCapabilitiesGenerated, TestConservativeRasterizationPropertiesEXT) {
     gpu_props_profile.pNext = &conservative_rasterization_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
+    if (supported) {
     EXPECT_EQ(conservative_rasterization_properties_profile.primitiveOverestimationSize, conservative_rasterization_properties_native.primitiveOverestimationSize);
+    }
+
     EXPECT_EQ(conservative_rasterization_properties_profile.maxExtraPrimitiveOverestimationSize, 44.0);
     EXPECT_EQ(conservative_rasterization_properties_profile.extraPrimitiveOverestimationSizeGranularity, 45.0);
     EXPECT_EQ(conservative_rasterization_properties_profile.primitiveUnderestimation, VK_TRUE);
+    if (supported) {
     EXPECT_EQ(conservative_rasterization_properties_profile.conservativePointAndLineRasterization, conservative_rasterization_properties_native.conservativePointAndLineRasterization);
+    }
+
+    if (supported) {
     EXPECT_EQ(conservative_rasterization_properties_profile.degenerateTrianglesRasterized, conservative_rasterization_properties_native.degenerateTrianglesRasterized);
+    }
+
+    if (supported) {
     EXPECT_EQ(conservative_rasterization_properties_profile.degenerateLinesRasterized, conservative_rasterization_properties_native.degenerateLinesRasterized);
+    }
+
     EXPECT_EQ(conservative_rasterization_properties_profile.fullyCoveredFragmentShaderInputVariable, VK_TRUE);
     EXPECT_EQ(conservative_rasterization_properties_profile.conservativeRasterizationPostDepthCoverage, VK_TRUE);
 #endif
@@ -531,6 +646,9 @@ TEST_F(TestsCapabilitiesGenerated, TestConservativeRasterizationPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestShaderCorePropertiesAMD) {
 #ifdef VK_AMD_shader_core_properties
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_AMD_shader_core_properties");
+
     VkPhysicalDeviceShaderCorePropertiesAMD shader_core_properties_native{};
     shader_core_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_PROPERTIES_AMD;
 
@@ -547,17 +665,38 @@ TEST_F(TestsCapabilitiesGenerated, TestShaderCorePropertiesAMD) {
     gpu_props_profile.pNext = &shader_core_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
+    if (supported) {
     EXPECT_EQ(shader_core_properties_profile.shaderEngineCount, shader_core_properties_native.shaderEngineCount);
+    }
+
+    if (supported) {
     EXPECT_EQ(shader_core_properties_profile.shaderArraysPerEngineCount, shader_core_properties_native.shaderArraysPerEngineCount);
+    }
+
+    if (supported) {
     EXPECT_EQ(shader_core_properties_profile.computeUnitsPerShaderArray, shader_core_properties_native.computeUnitsPerShaderArray);
+    }
+
+    if (supported) {
     EXPECT_EQ(shader_core_properties_profile.simdPerComputeUnit, shader_core_properties_native.simdPerComputeUnit);
+    }
+
+    if (supported) {
     EXPECT_EQ(shader_core_properties_profile.wavefrontsPerSimd, shader_core_properties_native.wavefrontsPerSimd);
+    }
+
     EXPECT_EQ(shader_core_properties_profile.wavefrontSize, 51);
+    if (supported) {
     EXPECT_EQ(shader_core_properties_profile.sgprsPerSimd, shader_core_properties_native.sgprsPerSimd);
+    }
+
     EXPECT_EQ(shader_core_properties_profile.minSgprAllocation, 53);
     EXPECT_EQ(shader_core_properties_profile.maxSgprAllocation, 54);
     EXPECT_EQ(shader_core_properties_profile.sgprAllocationGranularity, 55);
+    if (supported) {
     EXPECT_EQ(shader_core_properties_profile.vgprsPerSimd, shader_core_properties_native.vgprsPerSimd);
+    }
+
     EXPECT_EQ(shader_core_properties_profile.minVgprAllocation, 57);
     EXPECT_EQ(shader_core_properties_profile.maxVgprAllocation, 58);
     EXPECT_EQ(shader_core_properties_profile.vgprAllocationGranularity, 59);
@@ -566,6 +705,9 @@ TEST_F(TestsCapabilitiesGenerated, TestShaderCorePropertiesAMD) {
 
 TEST_F(TestsCapabilitiesGenerated, TestShaderCoreProperties2AMD) {
 #ifdef VK_AMD_shader_core_properties2
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_AMD_shader_core_properties2");
+
     VkPhysicalDeviceShaderCoreProperties2AMD shader_core_properties_2_native{};
     shader_core_properties_2_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_PROPERTIES_2_AMD;
 
@@ -588,6 +730,9 @@ TEST_F(TestsCapabilitiesGenerated, TestShaderCoreProperties2AMD) {
 
 TEST_F(TestsCapabilitiesGenerated, TestDescriptorIndexingPropertiesEXT) {
 #ifdef VK_EXT_descriptor_indexing
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_descriptor_indexing");
+
     VkPhysicalDeviceDescriptorIndexingPropertiesEXT descriptor_indexing_properties_native{};
     descriptor_indexing_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT;
 
@@ -632,6 +777,9 @@ TEST_F(TestsCapabilitiesGenerated, TestDescriptorIndexingPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestTimelineSemaphorePropertiesKHR) {
 #ifdef VK_KHR_timeline_semaphore
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_timeline_semaphore");
+
     VkPhysicalDeviceTimelineSemaphorePropertiesKHR timeline_semaphore_properties_native{};
     timeline_semaphore_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR;
 
@@ -654,6 +802,9 @@ TEST_F(TestsCapabilitiesGenerated, TestTimelineSemaphorePropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestVertexAttributeDivisorPropertiesEXT) {
 #ifdef VK_EXT_vertex_attribute_divisor
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_vertex_attribute_divisor");
+
     VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT vertex_attribute_divisor_properties_native{};
     vertex_attribute_divisor_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT;
 
@@ -676,6 +827,9 @@ TEST_F(TestsCapabilitiesGenerated, TestVertexAttributeDivisorPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestPCIBusInfoPropertiesEXT) {
 #ifdef VK_EXT_pci_bus_info
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_pci_bus_info");
+
     VkPhysicalDevicePCIBusInfoPropertiesEXT pcibus_info_properties_native{};
     pcibus_info_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PCI_BUS_INFO_PROPERTIES_EXT;
 
@@ -692,15 +846,30 @@ TEST_F(TestsCapabilitiesGenerated, TestPCIBusInfoPropertiesEXT) {
     gpu_props_profile.pNext = &pcibus_info_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
+    if (supported) {
     EXPECT_EQ(pcibus_info_properties_profile.pciDomain, pcibus_info_properties_native.pciDomain);
+    }
+
+    if (supported) {
     EXPECT_EQ(pcibus_info_properties_profile.pciBus, pcibus_info_properties_native.pciBus);
+    }
+
+    if (supported) {
     EXPECT_EQ(pcibus_info_properties_profile.pciDevice, pcibus_info_properties_native.pciDevice);
+    }
+
+    if (supported) {
     EXPECT_EQ(pcibus_info_properties_profile.pciFunction, pcibus_info_properties_native.pciFunction);
+    }
+
 #endif
 }
 
 TEST_F(TestsCapabilitiesGenerated, TestDepthStencilResolvePropertiesKHR) {
 #ifdef VK_KHR_depth_stencil_resolve
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_depth_stencil_resolve");
+
     VkPhysicalDeviceDepthStencilResolvePropertiesKHR depth_stencil_resolve_properties_native{};
     depth_stencil_resolve_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR;
 
@@ -726,6 +895,9 @@ TEST_F(TestsCapabilitiesGenerated, TestDepthStencilResolvePropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestTransformFeedbackPropertiesEXT) {
 #ifdef VK_EXT_transform_feedback
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_transform_feedback");
+
     VkPhysicalDeviceTransformFeedbackPropertiesEXT transform_feedback_properties_native{};
     transform_feedback_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT;
 
@@ -757,6 +929,9 @@ TEST_F(TestsCapabilitiesGenerated, TestTransformFeedbackPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestShadingRateImagePropertiesNV) {
 #ifdef VK_NV_shading_rate_image
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_NV_shading_rate_image");
+
     VkPhysicalDeviceShadingRateImagePropertiesNV shading_rate_image_properties_native{};
     shading_rate_image_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADING_RATE_IMAGE_PROPERTIES_NV;
 
@@ -773,8 +948,11 @@ TEST_F(TestsCapabilitiesGenerated, TestShadingRateImagePropertiesNV) {
     gpu_props_profile.pNext = &shading_rate_image_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
+    if (supported) {
     EXPECT_EQ(shading_rate_image_properties_profile.shadingRateTexelSize.width, shading_rate_image_properties_native.shadingRateTexelSize.width);
     EXPECT_EQ(shading_rate_image_properties_profile.shadingRateTexelSize.height, shading_rate_image_properties_native.shadingRateTexelSize.height);
+    }
+
     EXPECT_EQ(shading_rate_image_properties_profile.shadingRatePaletteSize, 93);
     EXPECT_EQ(shading_rate_image_properties_profile.shadingRateMaxCoarseSamples, 94);
 #endif
@@ -782,6 +960,9 @@ TEST_F(TestsCapabilitiesGenerated, TestShadingRateImagePropertiesNV) {
 
 TEST_F(TestsCapabilitiesGenerated, TestMeshShaderPropertiesNV) {
 #ifdef VK_NV_mesh_shader
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_NV_mesh_shader");
+
     VkPhysicalDeviceMeshShaderPropertiesNV mesh_shader_properties_native{};
     mesh_shader_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_NV;
 
@@ -820,6 +1001,9 @@ TEST_F(TestsCapabilitiesGenerated, TestMeshShaderPropertiesNV) {
 
 TEST_F(TestsCapabilitiesGenerated, TestAccelerationStructurePropertiesKHR) {
 #ifdef VK_KHR_acceleration_structure
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_acceleration_structure");
+
     VkPhysicalDeviceAccelerationStructurePropertiesKHR acceleration_structure_properties_native{};
     acceleration_structure_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR;
 
@@ -849,6 +1033,9 @@ TEST_F(TestsCapabilitiesGenerated, TestAccelerationStructurePropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestRayTracingPipelinePropertiesKHR) {
 #ifdef VK_KHR_ray_tracing_pipeline
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_ray_tracing_pipeline");
+
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR ray_tracing_pipeline_properties_native{};
     ray_tracing_pipeline_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
 
@@ -865,11 +1052,20 @@ TEST_F(TestsCapabilitiesGenerated, TestRayTracingPipelinePropertiesKHR) {
     gpu_props_profile.pNext = &ray_tracing_pipeline_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
+    if (supported) {
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupHandleSize, ray_tracing_pipeline_properties_native.shaderGroupHandleSize);
+    }
+
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxRayRecursionDepth, 117);
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxShaderGroupStride, 118);
+    if (supported) {
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupBaseAlignment, ray_tracing_pipeline_properties_native.shaderGroupBaseAlignment);
+    }
+
+    if (supported) {
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupHandleCaptureReplaySize, ray_tracing_pipeline_properties_native.shaderGroupHandleCaptureReplaySize);
+    }
+
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxRayDispatchInvocationCount, 121);
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupHandleAlignment, 122);
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxRayHitAttributeSize, 123);
@@ -878,6 +1074,9 @@ TEST_F(TestsCapabilitiesGenerated, TestRayTracingPipelinePropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestRayTracingPropertiesNV) {
 #ifdef VK_NV_ray_tracing
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_NV_ray_tracing");
+
     VkPhysicalDeviceRayTracingPropertiesNV ray_tracing_properties_native{};
     ray_tracing_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PROPERTIES_NV;
 
@@ -894,10 +1093,16 @@ TEST_F(TestsCapabilitiesGenerated, TestRayTracingPropertiesNV) {
     gpu_props_profile.pNext = &ray_tracing_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
+    if (supported) {
     EXPECT_EQ(ray_tracing_properties_profile.shaderGroupHandleSize, ray_tracing_properties_native.shaderGroupHandleSize);
+    }
+
     EXPECT_EQ(ray_tracing_properties_profile.maxRecursionDepth, 125);
     EXPECT_EQ(ray_tracing_properties_profile.maxShaderGroupStride, 126);
+    if (supported) {
     EXPECT_EQ(ray_tracing_properties_profile.shaderGroupBaseAlignment, ray_tracing_properties_native.shaderGroupBaseAlignment);
+    }
+
     EXPECT_EQ(ray_tracing_properties_profile.maxGeometryCount, 128);
     EXPECT_EQ(ray_tracing_properties_profile.maxInstanceCount, 129);
     EXPECT_EQ(ray_tracing_properties_profile.maxTriangleCount, 130);
@@ -907,6 +1112,9 @@ TEST_F(TestsCapabilitiesGenerated, TestRayTracingPropertiesNV) {
 
 TEST_F(TestsCapabilitiesGenerated, TestFragmentDensityMapPropertiesEXT) {
 #ifdef VK_EXT_fragment_density_map
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_fragment_density_map");
+
     VkPhysicalDeviceFragmentDensityMapPropertiesEXT fragment_density_map_properties_native{};
     fragment_density_map_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_PROPERTIES_EXT;
 
@@ -933,6 +1141,9 @@ TEST_F(TestsCapabilitiesGenerated, TestFragmentDensityMapPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestFragmentDensityMap2PropertiesEXT) {
 #ifdef VK_EXT_fragment_density_map2
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_fragment_density_map2");
+
     VkPhysicalDeviceFragmentDensityMap2PropertiesEXT fragment_density_map_2_properties_native{};
     fragment_density_map_2_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_2_PROPERTIES_EXT;
 
@@ -949,8 +1160,14 @@ TEST_F(TestsCapabilitiesGenerated, TestFragmentDensityMap2PropertiesEXT) {
     gpu_props_profile.pNext = &fragment_density_map_2_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
+    if (supported) {
     EXPECT_EQ(fragment_density_map_2_properties_profile.subsampledLoads, fragment_density_map_2_properties_native.subsampledLoads);
+    }
+
+    if (supported) {
     EXPECT_EQ(fragment_density_map_2_properties_profile.subsampledCoarseReconstructionEarlyAccess, fragment_density_map_2_properties_native.subsampledCoarseReconstructionEarlyAccess);
+    }
+
     EXPECT_EQ(fragment_density_map_2_properties_profile.maxSubsampledArrayLayers, 136);
     EXPECT_EQ(fragment_density_map_2_properties_profile.maxDescriptorSetSubsampledSamplers, 137);
 #endif
@@ -958,6 +1175,9 @@ TEST_F(TestsCapabilitiesGenerated, TestFragmentDensityMap2PropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestFragmentDensityMapOffsetPropertiesQCOM) {
 #ifdef VK_QCOM_fragment_density_map_offset
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_QCOM_fragment_density_map_offset");
+
     VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM fragment_density_map_offset_properties_native{};
     fragment_density_map_offset_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_PROPERTIES_QCOM;
 
@@ -981,6 +1201,9 @@ TEST_F(TestsCapabilitiesGenerated, TestFragmentDensityMapOffsetPropertiesQCOM) {
 
 TEST_F(TestsCapabilitiesGenerated, TestCooperativeMatrixPropertiesNV) {
 #ifdef VK_NV_cooperative_matrix
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_NV_cooperative_matrix");
+
     VkPhysicalDeviceCooperativeMatrixPropertiesNV cooperative_matrix_properties_native{};
     cooperative_matrix_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_PROPERTIES_NV;
 
@@ -1003,6 +1226,9 @@ TEST_F(TestsCapabilitiesGenerated, TestCooperativeMatrixPropertiesNV) {
 
 TEST_F(TestsCapabilitiesGenerated, TestPerformanceQueryPropertiesKHR) {
 #ifdef VK_KHR_performance_query
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_performance_query");
+
     VkPhysicalDevicePerformanceQueryPropertiesKHR performance_query_properties_native{};
     performance_query_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PERFORMANCE_QUERY_PROPERTIES_KHR;
 
@@ -1025,6 +1251,9 @@ TEST_F(TestsCapabilitiesGenerated, TestPerformanceQueryPropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestShaderSMBuiltinsPropertiesNV) {
 #ifdef VK_NV_shader_sm_builtins
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_NV_shader_sm_builtins");
+
     VkPhysicalDeviceShaderSMBuiltinsPropertiesNV shader_smbuiltins_properties_native{};
     shader_smbuiltins_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SM_BUILTINS_PROPERTIES_NV;
 
@@ -1048,6 +1277,9 @@ TEST_F(TestsCapabilitiesGenerated, TestShaderSMBuiltinsPropertiesNV) {
 
 TEST_F(TestsCapabilitiesGenerated, TestTexelBufferAlignmentPropertiesEXT) {
 #ifdef VK_EXT_texel_buffer_alignment
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_texel_buffer_alignment");
+
     VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT texel_buffer_alignment_properties_native{};
     texel_buffer_alignment_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT;
 
@@ -1065,14 +1297,23 @@ TEST_F(TestsCapabilitiesGenerated, TestTexelBufferAlignmentPropertiesEXT) {
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
     EXPECT_EQ(texel_buffer_alignment_properties_profile.storageTexelBufferOffsetAlignmentBytes, 143);
+    if (supported) {
     EXPECT_EQ(texel_buffer_alignment_properties_profile.storageTexelBufferOffsetSingleTexelAlignment, texel_buffer_alignment_properties_native.storageTexelBufferOffsetSingleTexelAlignment);
+    }
+
     EXPECT_EQ(texel_buffer_alignment_properties_profile.uniformTexelBufferOffsetAlignmentBytes, 144);
+    if (supported) {
     EXPECT_EQ(texel_buffer_alignment_properties_profile.uniformTexelBufferOffsetSingleTexelAlignment, texel_buffer_alignment_properties_native.uniformTexelBufferOffsetSingleTexelAlignment);
+    }
+
 #endif
 }
 
 TEST_F(TestsCapabilitiesGenerated, TestSubgroupSizeControlPropertiesEXT) {
 #ifdef VK_EXT_subgroup_size_control
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_subgroup_size_control");
+
     VkPhysicalDeviceSubgroupSizeControlPropertiesEXT subgroup_size_control_properties_native{};
     subgroup_size_control_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT;
 
@@ -1098,6 +1339,9 @@ TEST_F(TestsCapabilitiesGenerated, TestSubgroupSizeControlPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestSubpassShadingPropertiesHUAWEI) {
 #ifdef VK_HUAWEI_subpass_shading
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_HUAWEI_subpass_shading");
+
     VkPhysicalDeviceSubpassShadingPropertiesHUAWEI subpass_shading_properties_native{};
     subpass_shading_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBPASS_SHADING_PROPERTIES_HUAWEI;
 
@@ -1120,6 +1364,9 @@ TEST_F(TestsCapabilitiesGenerated, TestSubpassShadingPropertiesHUAWEI) {
 
 TEST_F(TestsCapabilitiesGenerated, TestLineRasterizationPropertiesEXT) {
 #ifdef VK_EXT_line_rasterization
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_line_rasterization");
+
     VkPhysicalDeviceLineRasterizationPropertiesEXT line_rasterization_properties_native{};
     line_rasterization_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT;
 
@@ -1142,6 +1389,9 @@ TEST_F(TestsCapabilitiesGenerated, TestLineRasterizationPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestCustomBorderColorPropertiesEXT) {
 #ifdef VK_EXT_custom_border_color
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_custom_border_color");
+
     VkPhysicalDeviceCustomBorderColorPropertiesEXT custom_border_color_properties_native{};
     custom_border_color_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_PROPERTIES_EXT;
 
@@ -1164,6 +1414,9 @@ TEST_F(TestsCapabilitiesGenerated, TestCustomBorderColorPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestRobustness2PropertiesEXT) {
 #ifdef VK_EXT_robustness2
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_robustness2");
+
     VkPhysicalDeviceRobustness2PropertiesEXT robustness_2_properties_native{};
     robustness_2_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT;
 
@@ -1187,6 +1440,9 @@ TEST_F(TestsCapabilitiesGenerated, TestRobustness2PropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestPortabilitySubsetPropertiesKHR) {
 #ifdef VK_KHR_portability_subset
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_portability_subset");
+
     VkPhysicalDevicePortabilitySubsetPropertiesKHR portability_subset_properties_native{};
     portability_subset_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR;
 
@@ -1209,6 +1465,9 @@ TEST_F(TestsCapabilitiesGenerated, TestPortabilitySubsetPropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestFragmentShadingRatePropertiesKHR) {
 #ifdef VK_KHR_fragment_shading_rate
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_fragment_shading_rate");
+
     VkPhysicalDeviceFragmentShadingRatePropertiesKHR fragment_shading_rate_properties_native{};
     fragment_shading_rate_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_PROPERTIES_KHR;
 
@@ -1250,6 +1509,9 @@ TEST_F(TestsCapabilitiesGenerated, TestFragmentShadingRatePropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestFragmentShadingRateEnumsPropertiesNV) {
 #ifdef VK_NV_fragment_shading_rate_enums
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_NV_fragment_shading_rate_enums");
+
     VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV fragment_shading_rate_enums_properties_native{};
     fragment_shading_rate_enums_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_ENUMS_PROPERTIES_NV;
 
@@ -1272,6 +1534,9 @@ TEST_F(TestsCapabilitiesGenerated, TestFragmentShadingRateEnumsPropertiesNV) {
 
 TEST_F(TestsCapabilitiesGenerated, TestProvokingVertexPropertiesEXT) {
 #ifdef VK_EXT_provoking_vertex
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_provoking_vertex");
+
     VkPhysicalDeviceProvokingVertexPropertiesEXT provoking_vertex_properties_native{};
     provoking_vertex_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROVOKING_VERTEX_PROPERTIES_EXT;
 
@@ -1295,6 +1560,9 @@ TEST_F(TestsCapabilitiesGenerated, TestProvokingVertexPropertiesEXT) {
 
 TEST_F(TestsCapabilitiesGenerated, TestShaderIntegerDotProductPropertiesKHR) {
 #ifdef VK_KHR_shader_integer_dot_product
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_shader_integer_dot_product");
+
     VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR shader_integer_dot_product_properties_native{};
     shader_integer_dot_product_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_INTEGER_DOT_PRODUCT_PROPERTIES_KHR;
 
@@ -1346,6 +1614,9 @@ TEST_F(TestsCapabilitiesGenerated, TestShaderIntegerDotProductPropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestDrmPropertiesEXT) {
 #ifdef VK_EXT_physical_device_drm
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_physical_device_drm");
+
     VkPhysicalDeviceDrmPropertiesEXT drm_properties_native{};
     drm_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRM_PROPERTIES_EXT;
 
@@ -1362,17 +1633,38 @@ TEST_F(TestsCapabilitiesGenerated, TestDrmPropertiesEXT) {
     gpu_props_profile.pNext = &drm_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
+    if (supported) {
     EXPECT_EQ(drm_properties_profile.hasPrimary, drm_properties_native.hasPrimary);
+    }
+
+    if (supported) {
     EXPECT_EQ(drm_properties_profile.hasRender, drm_properties_native.hasRender);
+    }
+
+    if (supported) {
     EXPECT_EQ(drm_properties_profile.primaryMajor, drm_properties_native.primaryMajor);
+    }
+
+    if (supported) {
     EXPECT_EQ(drm_properties_profile.primaryMinor, drm_properties_native.primaryMinor);
+    }
+
+    if (supported) {
     EXPECT_EQ(drm_properties_profile.renderMajor, drm_properties_native.renderMajor);
+    }
+
+    if (supported) {
     EXPECT_EQ(drm_properties_profile.renderMinor, drm_properties_native.renderMinor);
+    }
+
 #endif
 }
 
 TEST_F(TestsCapabilitiesGenerated, TestFragmentShaderBarycentricPropertiesKHR) {
 #ifdef VK_KHR_fragment_shader_barycentric
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_KHR_fragment_shader_barycentric");
+
     VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR fragment_shader_barycentric_properties_native{};
     fragment_shader_barycentric_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_BARYCENTRIC_PROPERTIES_KHR;
 
@@ -1395,6 +1687,9 @@ TEST_F(TestsCapabilitiesGenerated, TestFragmentShaderBarycentricPropertiesKHR) {
 
 TEST_F(TestsCapabilitiesGenerated, TestGraphicsPipelineLibraryPropertiesEXT) {
 #ifdef VK_EXT_graphics_pipeline_library
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_EXT_graphics_pipeline_library");
+
     VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT graphics_pipeline_library_properties_native{};
     graphics_pipeline_library_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GRAPHICS_PIPELINE_LIBRARY_PROPERTIES_EXT;
 
