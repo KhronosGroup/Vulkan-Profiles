@@ -118,6 +118,21 @@ class TestsCapabilitiesGenerated : public VkTestFramework {
 
 };
 
+bool IsSupported(VkPhysicalDevice device, const char* extension_name){
+    uint32_t count = 0;
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &count, nullptr);
+    std::vector<VkExtensionProperties> extensions(count);
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &count, extensions.data());
+
+    for (const auto& ext : extensions) {
+        if (strcmp(ext.extensionName, extension_name) == 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 '''
 
 class ProfileGenerator():
@@ -539,6 +554,10 @@ class ProfileGenerator():
         for ext in value.definedByExtensions:
             gen += '#ifdef ' + registry.extensions[ext].name + '\n'
 
+        gen += '    bool supported = false;\n'
+        for ext in value.definedByExtensions:
+            gen += '    supported = supported && IsSupported(gpu_profile, "' + registry.extensions[ext].name + '");\n\n'
+
         var_name = self.create_var_name(name)
         gen += '    ' + name + ' ' + var_name + '_native' + '{};\n'
         gen += '    ' + var_name + '_native' + '.sType = ' + value.sType + ';\n\n'
@@ -561,6 +580,7 @@ class ProfileGenerator():
                 property_value = self.test_values[name][member]
                 if (property_value):
                     if (registry.structs[name].members[member].limittype == 'behavior'):
+                        gen += '    if (supported) {\n'
                         if type(property_value) is list:
                             if (len(property_value) > 1):
                                 for i in range(len(property_value)):
@@ -580,6 +600,7 @@ class ProfileGenerator():
                             gen += '    EXPECT_EQ(0, strncmp(' + var_name + '_profile' + '.' + member + ', ' + var_name + '_native' + '.' + member + ', ' + str(len(property_value)) + '));\n'
                         else:
                             gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + ', ' + var_name + '_native' + '.' + member + ');\n'
+                        gen += '    }\n\n'
                     else:
                         if type(property_value) is list:
                             if (len(property_value) > 1):
