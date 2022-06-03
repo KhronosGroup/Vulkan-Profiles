@@ -286,7 +286,7 @@
                 "VK_NV_linear_color_attachment": 1,
                 "VK_GOOGLE_surfaceless_query": 1,
                 "VK_EXT_image_compression_control_swapchain": 1,
-                "VK_EXT_subpass_merge_feedback": 1
+                "VK_EXT_subpass_merge_feedback": 2
             },
             "features": {
                 "VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV": {
