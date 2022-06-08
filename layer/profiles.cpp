@@ -4938,12 +4938,13 @@ void JsonLoader::AddPromotedExtensions(uint32_t api_version) {
     };
     if (api_version >= VK_API_VERSION_1_1) {
         for (const auto& ext : promoted_1_1) {
+            VkExtensionProperties extension;
+            strcpy(extension.extensionName, ext);
+            extension.specVersion = 1;
             if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, ext)) {
-                VkExtensionProperties extension;
-                strcpy(extension.extensionName, ext);
-                extension.specVersion = 1;
                 pdd_->simulation_extensions_.push_back(extension);
             }
+            pdd_->arrayof_extension_properties_.push_back(extension);
         }
     }
     static const std::vector<const char *> promoted_1_2 = {
@@ -4974,12 +4975,13 @@ void JsonLoader::AddPromotedExtensions(uint32_t api_version) {
     };
     if (api_version >= VK_API_VERSION_1_2) {
         for (const auto& ext : promoted_1_2) {
+            VkExtensionProperties extension;
+            strcpy(extension.extensionName, ext);
+            extension.specVersion = 1;
             if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, ext)) {
-                VkExtensionProperties extension;
-                strcpy(extension.extensionName, ext);
-                extension.specVersion = 1;
                 pdd_->simulation_extensions_.push_back(extension);
             }
+            pdd_->arrayof_extension_properties_.push_back(extension);
         }
     }
     static const std::vector<const char *> promoted_1_3 = {
@@ -5009,12 +5011,13 @@ void JsonLoader::AddPromotedExtensions(uint32_t api_version) {
     };
     if (api_version >= VK_API_VERSION_1_3) {
         for (const auto& ext : promoted_1_3) {
+            VkExtensionProperties extension;
+            strcpy(extension.extensionName, ext);
+            extension.specVersion = 1;
             if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, ext)) {
-                VkExtensionProperties extension;
-                strcpy(extension.extensionName, ext);
-                extension.specVersion = 1;
                 pdd_->simulation_extensions_.push_back(extension);
             }
+            pdd_->arrayof_extension_properties_.push_back(extension);
         }
     }
 }
@@ -5115,7 +5118,8 @@ struct JsonValidator {
 VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities) {
     bool failed = false;
 
-    std::uint32_t properties_api_version = 0;
+    uint32_t properties_api_version = 0;
+    uint32_t highest_version = 0;
 
     const auto &caps = root["capabilities"];
     for (const auto &capability : capabilities) {
@@ -5124,10 +5128,20 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         const auto &properties = c["properties"];
         if (properties.isMember("VkPhysicalDeviceProperties") && properties["VkPhysicalDeviceProperties"].isMember("apiVersion")) {
             properties_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
-            AddPromotedExtensions(properties_api_version);
+            if (properties_api_version > highest_version) {
+                highest_version = properties_api_version;
+            }
         } else if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
-            AddPromotedExtensions(this->profile_api_version_);
+            highest_version = profile_api_version_;
         }
+    }
+    if (highest_version != 0) {
+        AddPromotedExtensions(highest_version);
+    }
+
+    for (const auto &capability : capabilities) {
+        const auto &c = caps[capability];
+        const auto &properties = c["properties"];
 
         if (VK_API_VERSION_PATCH(this->profile_api_version_) > VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)) {
             LogMessage(DEBUG_REPORT_ERROR_BIT,

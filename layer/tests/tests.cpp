@@ -371,7 +371,7 @@ TEST_F(LayerTests, TestMissingPhysDevProps2) {
 
     uint32_t count = 0;
     vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
-    ASSERT_EQ(count, 19);
+    ASSERT_EQ(count, 42);
 }
 
 TEST_F(LayerTests, TestNotSettingProfileFile) {
