@@ -1513,11 +1513,9 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         const auto &c = caps[capability];
 
         const auto &properties = c["properties"];
-        if (properties.isMember("VkPhysicalDeviceProperties")) {
-            if (properties["VkPhysicalDeviceProperties"].isMember("apiVersion")) {
-                properties_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
-                AddPromotedExtensions(properties_api_version);
-            }
+        if (properties.isMember("VkPhysicalDeviceProperties") && properties["VkPhysicalDeviceProperties"].isMember("apiVersion")) {
+            properties_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
+            AddPromotedExtensions(properties_api_version);
         } else if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
             AddPromotedExtensions(this->profile_api_version_);
         }
