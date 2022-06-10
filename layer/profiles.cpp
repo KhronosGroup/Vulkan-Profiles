@@ -5119,7 +5119,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
     bool failed = false;
 
     uint32_t properties_api_version = 0;
-    uint32_t highest_version = 0;
+    uint32_t simulated_version = 0;
 
     const auto &caps = root["capabilities"];
     for (const auto &capability : capabilities) {
@@ -5128,15 +5128,13 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         const auto &properties = c["properties"];
         if (properties.isMember("VkPhysicalDeviceProperties") && properties["VkPhysicalDeviceProperties"].isMember("apiVersion")) {
             properties_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
-            if (properties_api_version > highest_version) {
-                highest_version = properties_api_version;
-            }
+            simulated_version = properties_api_version;
         } else if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
-            highest_version = profile_api_version_;
+            simulated_version = profile_api_version_;
         }
     }
-    if (highest_version != 0) {
-        AddPromotedExtensions(highest_version);
+    if (simulated_version != 0) {
+        AddPromotedExtensions(simulated_version);
     }
 
     for (const auto &capability : capabilities) {
