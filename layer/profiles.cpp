@@ -2395,6 +2395,9 @@ class PhysicalDeviceData {
     // VK_VALVE_descriptor_set_host_mapping structs
     VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE physical_device_descriptor_set_host_mapping_features_;
 
+    // VK_EXT_non_seamless_cube_map structs
+    VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT physical_device_non_seamless_cube_map_features_;
+
     // VK_QCOM_fragment_density_map_offset structs
     VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM physical_device_fragment_density_map_offset_properties_;
     VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM physical_device_fragment_density_map_offset_features_;
@@ -2839,6 +2842,9 @@ class PhysicalDeviceData {
         // VK_VALVE_descriptor_set_host_mapping structs
         physical_device_descriptor_set_host_mapping_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_SET_HOST_MAPPING_FEATURES_VALVE};
 
+        // VK_EXT_non_seamless_cube_map structs
+        physical_device_non_seamless_cube_map_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_NON_SEAMLESS_CUBE_MAP_FEATURES_EXT};
+
         // VK_QCOM_fragment_density_map_offset structs
         physical_device_fragment_density_map_offset_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_PROPERTIES_QCOM};
         physical_device_fragment_density_map_offset_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_FEATURES_QCOM};
@@ -3122,6 +3128,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4PropertiesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4FeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceLinearColorAttachmentFeaturesNV *dest);
@@ -4237,6 +4244,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_AMD_SHADER_EARLY_AND_LATE_FRAGMENT_TESTS_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_shader_early_and_late_fragment_tests_features_);
+    } else if (name == "VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_NON_SEAMLESS_CUBE_MAP_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_non_seamless_cube_map_features_);
     }
 
     return true;
@@ -7515,6 +7526,15 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorS
     return valid;
 }
 
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, nonSeamlessCubeMap, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM)\n");
     bool valid = true;
@@ -9506,6 +9526,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE *data = (VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_descriptor_set_host_mapping_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_NON_SEAMLESS_CUBE_MAP_FEATURES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_NON_SEAMLESS_CUBE_MAP_EXTENSION_NAME)) {
+                    VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT *data = (VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_non_seamless_cube_map_features_;
                     data->pNext = pNext;
                 }
                 break;
@@ -11528,6 +11556,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_descriptor_set_host_mapping_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_descriptor_set_host_mapping_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_NON_SEAMLESS_CUBE_MAP_EXTENSION_NAME)) {
+                    pdd.physical_device_non_seamless_cube_map_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_non_seamless_cube_map_features_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_QCOM_FRAGMENT_DENSITY_MAP_OFFSET_EXTENSION_NAME)) {
