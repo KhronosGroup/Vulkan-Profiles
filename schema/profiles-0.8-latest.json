@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.3.216",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.217",
     "additionalProperties": true,
     "required": [
         "capabilities",
@@ -960,6 +960,15 @@
             "additionalProperties": false,
             "properties": {
                 "mutableDescriptorType": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "nonSeamlessCubeMap": {
                     "type": "boolean"
                 }
             }
@@ -4844,10 +4853,16 @@
                             "VK_EXT_memory_priority": {
                                 "type": "integer"
                             },
+                            "VK_EXT_metal_objects": {
+                                "type": "integer"
+                            },
                             "VK_EXT_metal_surface": {
                                 "type": "integer"
                             },
                             "VK_EXT_multi_draw": {
+                                "type": "integer"
+                            },
+                            "VK_EXT_non_seamless_cube_map": {
                                 "type": "integer"
                             },
                             "VK_EXT_pageable_device_local_memory": {
@@ -5699,6 +5714,9 @@
                             },
                             "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE": {
                                 "$ref": "#/definitions/VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE"
+                            },
+                            "VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT"
                             },
                             "VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT"
