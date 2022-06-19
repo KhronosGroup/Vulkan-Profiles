@@ -4742,7 +4742,9 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
                 dest->checkpoint_properties_.checkpointExecutionStageMask |= StringToVkPipelineStageFlags(feature.asString());
             }
         } else if (name == "VkQueueFamilyQueryResultStatusProperties2KHR") {
-            dest->query_result_status_properties_2_.supported = props["supported"].asBool();
+            for (const auto &feature : props["queryResultStatusSupport"]) {
+                dest->query_result_status_properties_2_.queryResultStatusSupport = props["queryResultStatusSupport"].asBool();
+            }
         }
     }
 
@@ -4770,7 +4772,7 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
             dest->checkpoint_properties_2_.checkpointExecutionStageMask) {
             continue;
         }
-        if (device_qfp.query_result_status_properties_2_.supported != dest->query_result_status_properties_2_.supported) {
+        if (device_qfp.query_result_status_properties_2_.queryResultStatusSupport != dest->query_result_status_properties_2_.queryResultStatusSupport) {
             continue;
         }
         supported = true;
@@ -4810,8 +4812,8 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
             message += format(", VkQueueFamilyCheckpointProperties2NV [checkpointExecutionStageMask: %s]",
                               string_VkPipelineStageFlags2KHR(dest->checkpoint_properties_2_.checkpointExecutionStageMask).c_str());
         }
-        if (dest->query_result_status_properties_2_.supported) {
-            message += format(", VkQueueFamilyQueryResultStatusProperties2KHR [supported: VK_TRUE]");
+        if (dest->query_result_status_properties_2_.queryResultStatusSupport) {
+            message += format(", VkQueueFamilyQueryResultStatusProperties2KHR [queryResultStatusSupport: VK_TRUE]");
         }
         message += ".\n";
         LogMessage(DEBUG_REPORT_WARNING_BIT, message);
@@ -4842,7 +4844,7 @@ bool QueueFamilyAndExtensionsMatch(const QueueFamilyProperties &device, const Qu
         profile.checkpoint_properties_2_.checkpointExecutionStageMask) {
         return false;
     }
-    if (device.query_result_status_properties_2_.supported != profile.query_result_status_properties_2_.supported) {
+    if (device.query_result_status_properties_2_.queryResultStatusSupport != profile.query_result_status_properties_2_.queryResultStatusSupport) {
         return false;
     }
     return true;
