@@ -49,12 +49,6 @@
                         "linearTilingFeatures": [ "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT_KHR" ],
                         "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT_KHR", "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT_KHR" ],
                         "bufferFeatures": [ "VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT_KHR", "VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT_KHR" ]
-                    },
-                    "VkVideoProfileKHR": {
-                        "videoCodecOperation": "VK_VIDEO_CODEC_OPERATION_INVALID_BIT_KHR",
-                        "chromaSubsampling": [ "VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR" ],
-                        "lumaBitDepth": [ "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR" ],
-                        "chromaBitDepth": [ "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR", "VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR" ]
                     }
                 }
             }

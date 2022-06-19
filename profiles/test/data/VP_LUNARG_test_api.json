@@ -3020,7 +3020,7 @@
                         ]
                     },
                     "VkQueueFamilyQueryResultStatusProperties2KHR": {
-                        "supported": true
+                        "queryResultStatusSupport": true
                     }
                 }
             ]
