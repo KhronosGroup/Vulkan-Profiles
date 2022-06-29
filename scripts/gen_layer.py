@@ -449,6 +449,7 @@ class PhysicalDeviceData {
     VkPhysicalDeviceProperties physical_device_properties_;
     VkPhysicalDeviceFeatures physical_device_features_;
     VkPhysicalDeviceMemoryProperties physical_device_memory_properties_;
+    VkPhysicalDeviceToolProperties physical_device_tool_properties_;
     VkSurfaceCapabilitiesKHR surface_capabilities_;
     ArrayOfVkFormatProperties arrayof_format_properties_;
     ArrayOfVkFormatProperties3 arrayof_format_properties_3_;
@@ -2634,16 +2635,26 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolProperties(VkPhysicalDevice 
 }
 '''
 
+TRANSFER_DEFINES_ARRAY = '''
+#define TRANSFER_VALUE_ARRAY(name)    \\
+    if (promoted_written) {     \\
+        std::memmove(src->name, dest->name, sizeof(src->name)); \\
+    } else {                    \\
+        std::memmove(dest->name, src->name, sizeof(dest->name)); \\
+    }
+'''
+
 TRANSFER_DEFINES = '''
 #define TRANSFER_VALUE(name)    \\
     if (promoted_written) {     \\
-        src->name = dest->name; \\
+        std::memmove(&src->name, &dest->name, sizeof(src->name)); \\
     } else {                    \\
-        dest->name = src->name; \\
+        std::memmove(&dest->name, &src->name, sizeof(dest->name)); \\
     }
 '''
 
 TRANSFER_UNDEFINE = '''
+#undef TRANSFER_VALUE_ARRAY
 #undef TRANSFER_VALUE
 '''
 
@@ -2953,10 +2964,9 @@ GET_VALUE_PHYSICAL_DEVICE_PROPERTIES = '''bool JsonLoader::GetValue(const Json::
 '''
 
 class VulkanProfilesLayerGenerator():
-    skipped_extensions = ['VK_KHR_external_memory_capabilities']
     skipped_exts = ['NVX']
     emulated_extensions = ['VK_KHR_portability_subset']
-    non_modifiable_structs = ['VkPhysicalDevicePointClippingProperties', 'VkPhysicalDevicePointClippingPropertiesKHR', 'VkPhysicalDeviceDriverProperties', 'VkPhysicalDeviceDriverPropertiesKHR', 'VkPhysicalDeviceIDProperties', 'VkPhysicalDeviceIDPropertiesKHR', 'VkPhysicalDeviceMemoryBudgetPropertiesEXT', 'VkPhysicalDevicePCIBusInfoPropertiesEXT', 'VkPhysicalDeviceDrmPropertiesEXT', 'VkPhysicalDeviceToolProperties', 'VkPhysicalDeviceToolPropertiesEXT', 'VkPhysicalDeviceGroupProperties']
+    #non_modifiable_structs = ['VkPhysicalDevicePointClippingProperties', 'VkPhysicalDevicePointClippingPropertiesKHR', 'VkPhysicalDeviceDriverProperties', 'VkPhysicalDeviceDriverPropertiesKHR', 'VkPhysicalDeviceIDProperties', 'VkPhysicalDeviceIDPropertiesKHR', 'VkPhysicalDeviceMemoryBudgetPropertiesEXT', 'VkPhysicalDevicePCIBusInfoPropertiesEXT', 'VkPhysicalDeviceDrmPropertiesEXT', 'VkPhysicalDeviceToolProperties', 'VkPhysicalDeviceToolPropertiesEXT', 'VkPhysicalDeviceGroupProperties']
     additional_features = ['VkPhysicalDeviceFeatures']
     additional_properties = ['VkPhysicalDeviceProperties', 'VkPhysicalDeviceLimits', 'VkPhysicalDeviceSparseProperties', 'VkPhysicalDeviceToolProperties']
 
@@ -3002,6 +3012,7 @@ class VulkanProfilesLayerGenerator():
             f.write(PHYSICAL_DEVICE_FORMAT_FUNCTIONS)
             f.write(TOOL_PROPERTIES_FUNCTIONS)
             f.write(TRANSFER_DEFINES)
+            f.write(TRANSFER_DEFINES_ARRAY)
             f.write(self.generate_transfer_values())
             f.write(TRANSFER_UNDEFINE)
             f.write(self.generate_load_device_formats())
@@ -3162,35 +3173,30 @@ class VulkanProfilesLayerGenerator():
                     for alias in copy_aliases:
                         same_version = registry.structs[current].definedByVersion and registry.structs[alias].definedByVersion
                         same_extension = registry.structs[current].definedByExtensions and registry.structs[current].definedByExtensions == registry.structs[alias].definedByExtensions
-                        non_modifiable = current in self.non_modifiable_structs
-                        if same_version or same_extension or non_modifiable:
+                        if same_version or same_extension:
                             gen += ' || name == \"' + alias + '\"'
                             aliases.remove(alias)
-                        if non_modifiable and registry.structs[alias].isAlias == False:
-                            current = alias
                             
                     gen += ') {\n'
 
-                    if current in self.non_modifiable_structs:
-                        gen += '        return GetValue' + current[2:] + '(property);\n'
+                    version = registry.structs[current].definedByVersion
+                    if version:
+                        if version and (version.major != 1 or version.minor != 0):
+                            gen += '        if (!CheckVersionSupport(' + registry.structs[current].definedByVersion.get_api_version_string() + ', name)) return false;\n'
                     else:
-                        version = registry.structs[current].definedByVersion
-                        if version:
-                            if version and (version.major != 1 or version.minor != 0):
-                                gen += '        if (!CheckVersionSupport(' + registry.structs[current].definedByVersion.get_api_version_string() + ', name)) return false;\n'
-                        else:
-                            ext = registry.extensions[registry.structs[current].definedByExtensions[0]]
-                            if not ext.name in self.emulated_extensions:
-                                ext_name = ext.upperCaseName + '_EXTENSION_NAME'
-                                gen += '        auto support = CheckExtensionSupport(' + ext_name + ', name);\n'
-                                gen += '        if (support != ExtensionSupport::SUPPORTED) return valid(support);\n'
-                        # Workarounds
-                        if current == 'VkPhysicalDeviceLimits':
-                            gen += '        return GetValue(' + struct + ', &pdd_->physical_device_properties_.limits);\n'
-                        elif current == 'VkPhysicalDeviceSparseProperties':
-                            gen += '        return GetValue(' + struct + ', &pdd_->physical_device_properties_.sparseProperties);\n'
-                        else:
-                            gen += '        return GetValue(' + struct + ', &pdd_->' + self.create_var_name(current) + ');\n'
+                        ext = registry.extensions[registry.structs[current].definedByExtensions[0]]
+                        if not ext.name in self.emulated_extensions:
+                            ext_name = ext.upperCaseName + '_EXTENSION_NAME'
+                            gen += '        auto support = CheckExtensionSupport(' + ext_name + ', name);\n'
+                            gen += '        if (support != ExtensionSupport::SUPPORTED) return valid(support);\n'
+                    # Workarounds
+                    if current == 'VkPhysicalDeviceLimits':
+                        gen += '        return GetValue(' + struct + ', &pdd_->physical_device_properties_.limits);\n'
+                    elif current == 'VkPhysicalDeviceSparseProperties':
+                        gen += '        return GetValue(' + struct + ', &pdd_->physical_device_properties_.sparseProperties);\n'
+                    else:
+                        gen += '        return GetValue(' + struct + ', &pdd_->' + self.create_var_name(current) + ');\n'
+
                     gen += '    }'
         return gen
 
@@ -3283,12 +3289,8 @@ class VulkanProfilesLayerGenerator():
         for struct in self.additional_properties:
             if struct == 'VkPhysicalDeviceProperties':
                 gen += GET_VALUE_PHYSICAL_DEVICE_PROPERTIES
-            elif not struct in self.non_modifiable_structs:
+            else:
                 gen += self.generate_get_value_function(struct)
-
-        for struct in self.non_modifiable_structs:
-            if registry.structs[struct].isAlias == False:
-                gen += self.generate_get_value_non_modifiable(struct)
 
         return gen
     
@@ -3371,7 +3373,7 @@ class VulkanProfilesLayerGenerator():
                 gen += '\n\n// VK_VULKAN_' + major + '_' + minor + '\n'
 
                 for ext, property_name, feature_name in self.extension_structs:
-                    if property_name and not property_name in self.non_modifiable_structs:
+                    if property_name:
                         property = registry.structs[property_name]
                         version = None
                         if property.definedByVersion:
@@ -3385,7 +3387,7 @@ class VulkanProfilesLayerGenerator():
                         if version and version.major == int(major) and version.minor == int(minor):
                             gen += self.generate_transfer_function(major, minor, 'Properties', property_name)
 
-                    if feature_name and not feature_name in self.non_modifiable_structs:
+                    if feature_name:
                         feature = registry.structs[feature_name]
                         version = None
                         if feature.definedByVersion:
@@ -3505,8 +3507,13 @@ class VulkanProfilesLayerGenerator():
 
     def generate_transfer_function(self, major, minor, type, name):
         gen = '\nvoid TransferValue(VkPhysicalDeviceVulkan' + major + minor + type + ' *dest, ' + name + ' *src, bool promoted_written) {\n'
-        for member in registry.structs[name].members:
-            gen += '    TRANSFER_VALUE(' + member + ');\n'
+        for member_name in registry.structs[name].members:
+            member = registry.structs[name].members[member_name]
+            # The arrays need a enum member to specify the size of the array
+            if hasattr(member, 'enum'):
+                gen += '    TRANSFER_VALUE_ARRAY(' + member_name + ');\n'
+            else:
+                gen += '    TRANSFER_VALUE(' + member_name + ');\n'
         gen += '}\n'
         return gen
     
@@ -3628,16 +3635,10 @@ class VulkanProfilesLayerGenerator():
             if feature:
                 gen += '    bool GetValue(const Json::Value &parent, ' + feature + ' *dest);\n'
         for struct in self.additional_features:
-            if struct not in self.non_modifiable_structs:
-                gen += '    bool GetValue(const Json::Value &parent, ' + struct + ' *dest);\n'
+            gen += '    bool GetValue(const Json::Value &parent, ' + struct + ' *dest);\n'
         for struct in self.additional_properties:
-            if struct not in self.non_modifiable_structs:
-                gen += '    bool GetValue(const Json::Value &parent, ' + struct + ' *dest);\n'
+            gen += '    bool GetValue(const Json::Value &parent, ' + struct + ' *dest);\n'
 
-        gen += '\n    // Non-modifiable\n'
-        for struct in self.non_modifiable_structs:
-            if registry.structs[struct].isAlias == False:
-                gen += '    bool GetValue' + struct[2:] + '(const Json::Value &parent);\n'
         gen += WARN_FUNCTIONS
         gen += GET_VALUE_FUNCTIONS
         gen += GET_ARRAY_FUNCTIONS
@@ -3677,16 +3678,15 @@ class VulkanProfilesLayerGenerator():
 
         self.non_extension_properties = []
         for property_name, ext in properties:
-            if not ext and property_name not in self.non_modifiable_structs:
+            if not ext:
                 self.non_extension_properties.append(property_name)
 
         self.non_extension_features = []
         for feature_name, ext in features:
-            if not ext and feature_name not in self.non_modifiable_structs:
+            if not ext:
                 self.non_extension_features.append(feature_name)
 
         self.extension_structs = []
-        self.skipped_structs = []
         for extension in registry.extensions:
             if self.get_ext(extension) in self.skipped_exts:
                 continue
@@ -3695,20 +3695,13 @@ class VulkanProfilesLayerGenerator():
             for property in properties:
                 if property[1] and property[1][0] == extension:
                     property_name = property[0]
-                    if property_name in self.non_modifiable_structs:
-                        property_name = None
                     break
             for feature in features:
                 if feature[1] and feature[1][0] == extension:
                     feature_name = feature[0]
-                    if feature_name in self.non_modifiable_structs:
-                        feature_name = None
                     break
             if feature_name or property_name:
-                if extension in self.skipped_extensions:
-                    self.skipped_structs.append((extension, property_name, feature_name))
-                else:
-                    self.extension_structs.append((extension, property_name, feature_name))
+                self.extension_structs.append((extension, property_name, feature_name))
 
     def get_ext(self, extension):
         i = 3
@@ -3873,11 +3866,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    registryPath  = 'C:/Projects/Vulkan-Profiles/build/_deps/vulkan-headers-src/registry/vk.xml'
+    registryPath  = './build/_deps/vulkan-headers-src/registry/vk.xml'
     if args.registry is not None:
         registryPath = args.registry
 
-    outputPath = "../layer/profiles.cpp"
+    outputPath = "./layer/profiles.cpp"
     if args.outLayer is not None:
         outputPath = args.outLayer
 
