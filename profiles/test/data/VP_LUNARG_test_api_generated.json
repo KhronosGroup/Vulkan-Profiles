@@ -816,6 +816,9 @@
                 "VkPhysicalDeviceDiscardRectanglePropertiesEXT": {
                     "maxDiscardRectangles": 24
                 },
+                "VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX": {
+                    "perViewPositionAllComponents": true
+                },
                 "VkPhysicalDevicePointClippingPropertiesKHR": {
                     "pointClippingBehavior": "VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY"
                 },

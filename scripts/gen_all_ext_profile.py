@@ -270,15 +270,6 @@ class ProfileGenerator():
         self.test_values = dict()
         for name, value  in registry.structs.items():
             if ('VkPhysicalDeviceProperties2' in value.extends and value.definedByExtensions):
-                #skip = False
-                #for skipped in gen_layer.VulkanProfilesLayerGenerator.non_modifiable_structs:
-                #    if (name.startswith(skipped)):
-                #        skip = True
-                #        break
-                #if skip:
-                #    continue
-                if gen_layer.VulkanProfilesLayerGenerator.from_skipped_extension(gen_layer.VulkanProfilesLayerGenerator(), name, registry):
-                    continue
                 self.test_values[name] = dict()
                 if first:
                     first = False
@@ -528,10 +519,6 @@ class ProfileGenerator():
 
         for name, value  in registry.structs.items():
             if ('VkPhysicalDeviceProperties2' in value.extends):
-                #if name in gen_layer.VulkanProfilesLayerGenerator.non_modifiable_structs:
-                #    continue
-                if gen_layer.VulkanProfilesLayerGenerator.from_skipped_extension(gen_layer.VulkanProfilesLayerGenerator(), name, registry):
-                    continue
                 gen += self.gen_properties_test(registry, name, value)
             if ('VkPhysicalDeviceFeatures2' in value.extends):
                 if name in self.skipped_features:
@@ -579,7 +566,7 @@ class ProfileGenerator():
             if member in self.test_values[name]:
                 property_value = self.test_values[name][member]
                 if (property_value):
-                    if (registry.structs[name].members[member].limittype == 'behavior'):
+                    if (registry.structs[name].members[member].limittype == 'exact'):
                         gen += '    if (supported) {\n'
                         if type(property_value) is list:
                             if (len(property_value) > 1):

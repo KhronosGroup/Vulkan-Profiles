@@ -2031,6 +2031,9 @@ class PhysicalDeviceData {
     // VK_KHR_16bit_storage structs
     VkPhysicalDevice16BitStorageFeaturesKHR physical_device_16_bit_storage_features_;
 
+    // VK_NVX_multiview_per_view_attributes structs
+    VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX physical_device_multiview_per_view_attributes_properties_;
+
     // VK_EXT_discard_rectangles structs
     VkPhysicalDeviceDiscardRectanglePropertiesEXT physical_device_discard_rectangle_properties_;
 
@@ -2489,6 +2492,9 @@ class PhysicalDeviceData {
 
         // VK_KHR_16bit_storage structs
         physical_device_16_bit_storage_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR};
+
+        // VK_NVX_multiview_per_view_attributes structs
+        physical_device_multiview_per_view_attributes_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PER_VIEW_ATTRIBUTES_PROPERTIES_NVX};
 
         // VK_EXT_discard_rectangles structs
         physical_device_discard_rectangle_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DISCARD_RECTANGLE_PROPERTIES_EXT};
@@ -3012,6 +3018,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFloat16Int8FeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorageFeaturesKHR *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest);
@@ -4321,6 +4328,10 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &name) 
         auto support = CheckExtensionSupport(VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(property, &pdd_->physical_device_discard_rectangle_properties_);
+    } else if (name == "VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX") {
+        auto support = CheckExtensionSupport(VK_NVX_MULTIVIEW_PER_VIEW_ATTRIBUTES_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(property, &pdd_->physical_device_multiview_per_view_attributes_properties_);
     } else if (name == "VkPhysicalDeviceSubgroupProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_1, name)) return false;
         return GetValue(property, &pdd_->physical_device_subgroup_properties_);
@@ -5997,6 +6008,15 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorag
         GET_VALUE_WARN(member, uniformAndStorageBuffer16BitAccess, WarnIfNotEqualBool);
         GET_VALUE_WARN(member, storagePushConstant16, WarnIfNotEqualBool);
         GET_VALUE_WARN(member, storageInputOutput16, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, perViewPositionAllComponents, WarnIfNotEqualBool);
     }
     return valid;
 }
@@ -8439,6 +8459,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     data->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PER_VIEW_ATTRIBUTES_PROPERTIES_NVX:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NVX_MULTIVIEW_PER_VIEW_ATTRIBUTES_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX *data = (VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_multiview_per_view_attributes_properties_;
+                    data->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DISCARD_RECTANGLE_PROPERTIES_EXT:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
                     VkPhysicalDeviceDiscardRectanglePropertiesEXT *data = (VkPhysicalDeviceDiscardRectanglePropertiesEXT *)place;
@@ -10851,6 +10879,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_16_bit_storage_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_16_bit_storage_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_NVX_MULTIVIEW_PER_VIEW_ATTRIBUTES_EXTENSION_NAME)) {
+                    pdd.physical_device_multiview_per_view_attributes_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_multiview_per_view_attributes_properties_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_DISCARD_RECTANGLES_EXTENSION_NAME)) {
