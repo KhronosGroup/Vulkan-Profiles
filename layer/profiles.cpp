@@ -1967,6 +1967,7 @@ class PhysicalDeviceData {
     VkPhysicalDeviceProperties physical_device_properties_;
     VkPhysicalDeviceFeatures physical_device_features_;
     VkPhysicalDeviceMemoryProperties physical_device_memory_properties_;
+    VkPhysicalDeviceToolProperties physical_device_tool_properties_;
     VkSurfaceCapabilitiesKHR surface_capabilities_;
     ArrayOfVkFormatProperties arrayof_format_properties_;
     ArrayOfVkFormatProperties3 arrayof_format_properties_3_;
@@ -2015,6 +2016,9 @@ class PhysicalDeviceData {
     // VK_EXT_astc_decode_mode structs
     VkPhysicalDeviceASTCDecodeFeaturesEXT physical_device_astcdecode_features_;
 
+    // VK_KHR_external_memory_capabilities structs
+    VkPhysicalDeviceIDPropertiesKHR physical_device_idproperties_;
+
     // VK_KHR_push_descriptor structs
     VkPhysicalDevicePushDescriptorPropertiesKHR physical_device_push_descriptor_properties_;
 
@@ -2042,6 +2046,9 @@ class PhysicalDeviceData {
     // VK_KHR_performance_query structs
     VkPhysicalDevicePerformanceQueryPropertiesKHR physical_device_performance_query_properties_;
     VkPhysicalDevicePerformanceQueryFeaturesKHR physical_device_performance_query_features_;
+
+    // VK_KHR_maintenance2 structs
+    VkPhysicalDevicePointClippingPropertiesKHR physical_device_point_clipping_properties_;
 
     // VK_KHR_variable_pointers structs
     VkPhysicalDeviceVariablePointerFeaturesKHR physical_device_variable_pointer_features_;
@@ -2121,6 +2128,9 @@ class PhysicalDeviceData {
     VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT physical_device_vertex_attribute_divisor_properties_;
     VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT physical_device_vertex_attribute_divisor_features_;
 
+    // VK_KHR_driver_properties structs
+    VkPhysicalDeviceDriverPropertiesKHR physical_device_driver_properties_;
+
     // VK_KHR_shader_float_controls structs
     VkPhysicalDeviceFloatControlsPropertiesKHR physical_device_float_controls_properties_;
 
@@ -2152,6 +2162,9 @@ class PhysicalDeviceData {
 
     // VK_KHR_vulkan_memory_model structs
     VkPhysicalDeviceVulkanMemoryModelFeaturesKHR physical_device_vulkan_memory_model_features_;
+
+    // VK_EXT_pci_bus_info structs
+    VkPhysicalDevicePCIBusInfoPropertiesEXT physical_device_pcibus_info_properties_;
 
     // VK_KHR_shader_terminate_invocation structs
     VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR physical_device_shader_terminate_invocation_features_;
@@ -2338,6 +2351,9 @@ class PhysicalDeviceData {
     // VK_EXT_vertex_input_dynamic_state structs
     VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT physical_device_vertex_input_dynamic_state_features_;
 
+    // VK_EXT_physical_device_drm structs
+    VkPhysicalDeviceDrmPropertiesEXT physical_device_drm_properties_;
+
     // VK_EXT_depth_clip_control structs
     VkPhysicalDeviceDepthClipControlFeaturesEXT physical_device_depth_clip_control_features_;
 
@@ -2462,6 +2478,9 @@ class PhysicalDeviceData {
         // VK_EXT_astc_decode_mode structs
         physical_device_astcdecode_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ASTC_DECODE_FEATURES_EXT};
 
+        // VK_KHR_external_memory_capabilities structs
+        physical_device_idproperties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES_KHR};
+
         // VK_KHR_push_descriptor structs
         physical_device_push_descriptor_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR};
 
@@ -2489,6 +2508,9 @@ class PhysicalDeviceData {
         // VK_KHR_performance_query structs
         physical_device_performance_query_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PERFORMANCE_QUERY_PROPERTIES_KHR};
         physical_device_performance_query_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PERFORMANCE_QUERY_FEATURES_KHR};
+
+        // VK_KHR_maintenance2 structs
+        physical_device_point_clipping_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR};
 
         // VK_KHR_variable_pointers structs
         physical_device_variable_pointer_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES};
@@ -2568,6 +2590,9 @@ class PhysicalDeviceData {
         physical_device_vertex_attribute_divisor_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT};
         physical_device_vertex_attribute_divisor_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT};
 
+        // VK_KHR_driver_properties structs
+        physical_device_driver_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR};
+
         // VK_KHR_shader_float_controls structs
         physical_device_float_controls_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR};
 
@@ -2599,6 +2624,9 @@ class PhysicalDeviceData {
 
         // VK_KHR_vulkan_memory_model structs
         physical_device_vulkan_memory_model_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR};
+
+        // VK_EXT_pci_bus_info structs
+        physical_device_pcibus_info_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PCI_BUS_INFO_PROPERTIES_EXT};
 
         // VK_KHR_shader_terminate_invocation structs
         physical_device_shader_terminate_invocation_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_TERMINATE_INVOCATION_FEATURES_KHR};
@@ -2784,6 +2812,9 @@ class PhysicalDeviceData {
 
         // VK_EXT_vertex_input_dynamic_state structs
         physical_device_vertex_input_dynamic_state_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_INPUT_DYNAMIC_STATE_FEATURES_EXT};
+
+        // VK_EXT_physical_device_drm structs
+        physical_device_drm_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRM_PROPERTIES_EXT};
 
         // VK_EXT_depth_clip_control structs
         physical_device_depth_clip_control_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_CONTROL_FEATURES_EXT};
@@ -2982,6 +3013,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeFeaturesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceIDPropertiesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevicePushDescriptorPropertiesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFloat16Int8FeaturesKHR *dest);
@@ -2992,6 +3024,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFramebufferFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryPropertiesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryFeaturesKHR *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDevicePointClippingPropertiesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePointerFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockPropertiesEXT *dest);
@@ -3024,6 +3057,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCorePropertiesAMD *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceDriverPropertiesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFloatControlsPropertiesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStencilResolvePropertiesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest);
@@ -3036,6 +3070,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDevicePCIBusInfoPropertiesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapPropertiesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapFeaturesEXT *dest);
@@ -3107,6 +3142,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceDrmPropertiesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipControlFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest);
@@ -3138,16 +3174,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceSparseProperties *dest);
-
-    // Non-modifiable
-    bool GetValuePhysicalDevicePointClippingProperties(const Json::Value &parent);
-    bool GetValuePhysicalDeviceDriverProperties(const Json::Value &parent);
-    bool GetValuePhysicalDeviceIDProperties(const Json::Value &parent);
-    bool GetValuePhysicalDeviceMemoryBudgetPropertiesEXT(const Json::Value &parent);
-    bool GetValuePhysicalDevicePCIBusInfoPropertiesEXT(const Json::Value &parent);
-    bool GetValuePhysicalDeviceDrmPropertiesEXT(const Json::Value &parent);
-    bool GetValuePhysicalDeviceToolProperties(const Json::Value &parent);
-    bool GetValuePhysicalDeviceGroupProperties(const Json::Value &parent);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceToolProperties *dest);
 
     static void WarnNotModifiable(const char *parent_name, const std::string &member, const char *name) {
         if (member != name) {
@@ -4280,10 +4307,20 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &name) 
         auto support = CheckExtensionSupport(VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(property, &pdd_->physical_device_push_descriptor_properties_);
-    } else if (name == "VkPhysicalDeviceDriverPropertiesKHR" || name == "VkPhysicalDeviceDriverProperties") {
-        return GetValuePhysicalDeviceDriverProperties(property);
-    } else if (name == "VkPhysicalDeviceIDPropertiesKHR" || name == "VkPhysicalDeviceIDProperties") {
-        return GetValuePhysicalDeviceIDProperties(property);
+    } else if (name == "VkPhysicalDeviceDriverPropertiesKHR") {
+        auto support = CheckExtensionSupport(VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(property, &pdd_->physical_device_driver_properties_);
+    } else if (name == "VkPhysicalDeviceDriverProperties") {
+        if (!CheckVersionSupport(VK_API_VERSION_1_2, name)) return false;
+        return GetValue(property, &pdd_->physical_device_driver_properties_);
+    } else if (name == "VkPhysicalDeviceIDPropertiesKHR") {
+        auto support = CheckExtensionSupport(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(property, &pdd_->physical_device_idproperties_);
+    } else if (name == "VkPhysicalDeviceIDProperties") {
+        if (!CheckVersionSupport(VK_API_VERSION_1_1, name)) return false;
+        return GetValue(property, &pdd_->physical_device_idproperties_);
     } else if (name == "VkPhysicalDeviceMultiviewPropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_MULTIVIEW_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
@@ -4298,8 +4335,13 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &name) 
     } else if (name == "VkPhysicalDeviceSubgroupProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_1, name)) return false;
         return GetValue(property, &pdd_->physical_device_subgroup_properties_);
-    } else if (name == "VkPhysicalDevicePointClippingPropertiesKHR" || name == "VkPhysicalDevicePointClippingProperties") {
-        return GetValuePhysicalDevicePointClippingProperties(property);
+    } else if (name == "VkPhysicalDevicePointClippingPropertiesKHR") {
+        auto support = CheckExtensionSupport(VK_KHR_MAINTENANCE_2_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(property, &pdd_->physical_device_point_clipping_properties_);
+    } else if (name == "VkPhysicalDevicePointClippingProperties") {
+        if (!CheckVersionSupport(VK_API_VERSION_1_1, name)) return false;
+        return GetValue(property, &pdd_->physical_device_point_clipping_properties_);
     } else if (name == "VkPhysicalDeviceProtectedMemoryProperties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_1, name)) return false;
         return GetValue(property, &pdd_->physical_device_protected_memory_properties_);
@@ -4381,7 +4423,9 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &name) 
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(property, &pdd_->physical_device_vertex_attribute_divisor_properties_);
     } else if (name == "VkPhysicalDevicePCIBusInfoPropertiesEXT") {
-        return GetValuePhysicalDevicePCIBusInfoPropertiesEXT(property);
+        auto support = CheckExtensionSupport(VK_EXT_PCI_BUS_INFO_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(property, &pdd_->physical_device_pcibus_info_properties_);
     } else if (name == "VkPhysicalDeviceDepthStencilResolvePropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
@@ -4468,8 +4512,13 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &name) 
     } else if (name == "VkPhysicalDeviceVulkan13Properties") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, name)) return false;
         return GetValue(property, &pdd_->physical_device_vulkan_13_properties_);
-    } else if (name == "VkPhysicalDeviceToolPropertiesEXT" || name == "VkPhysicalDeviceToolProperties") {
-        return GetValuePhysicalDeviceToolProperties(property);
+    } else if (name == "VkPhysicalDeviceToolPropertiesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_TOOLING_INFO_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(property, &pdd_->physical_device_tool_properties_);
+    } else if (name == "VkPhysicalDeviceToolProperties") {
+        if (!CheckVersionSupport(VK_API_VERSION_1_3, name)) return false;
+        return GetValue(property, &pdd_->physical_device_tool_properties_);
     } else if (name == "VkPhysicalDeviceCustomBorderColorPropertiesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
@@ -4500,7 +4549,9 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &name) 
         if (!CheckVersionSupport(VK_API_VERSION_1_3, name)) return false;
         return GetValue(property, &pdd_->physical_device_shader_integer_dot_product_properties_);
     } else if (name == "VkPhysicalDeviceDrmPropertiesEXT") {
-        return GetValuePhysicalDeviceDrmPropertiesEXT(property);
+        auto support = CheckExtensionSupport(VK_EXT_PHYSICAL_DEVICE_DRM_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(property, &pdd_->physical_device_drm_properties_);
     } else if (name == "VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
@@ -5919,6 +5970,19 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeF
     return valid;
 }
 
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIDPropertiesKHR *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceIDPropertiesKHR)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", member, "deviceUUID");
+        WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", member, "driverUUID");
+        WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", member, "deviceLUID");
+        WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", member, "deviceNodeMask");
+        WarnNotModifiable("VkPhysicalDeviceIDPropertiesKHR", member, "deviceLUIDValid");
+    }
+    return valid;
+}
+
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescriptorPropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePushDescriptorPropertiesKHR)\n");
     bool valid = true;
@@ -6019,6 +6083,15 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, performanceCounterQueryPools, WarnIfNotEqualBool);
         GET_VALUE_WARN(member, performanceCounterMultipleQueryPools, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePointClippingPropertiesKHR *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePointClippingPropertiesKHR)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        WarnNotModifiable("VkPhysicalDevicePointClippingPropertiesKHR", member, "pointClippingBehavior");
     }
     return valid;
 }
@@ -6434,6 +6507,18 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
     return valid;
 }
 
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDriverPropertiesKHR *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDriverPropertiesKHR)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        WarnNotModifiable("VkPhysicalDeviceDriverPropertiesKHR", member, "driverID");
+        WarnNotModifiable("VkPhysicalDeviceDriverPropertiesKHR", member, "driverName");
+        WarnNotModifiable("VkPhysicalDeviceDriverPropertiesKHR", member, "driverInfo");
+        WarnNotModifiable("VkPhysicalDeviceDriverPropertiesKHR", member, "conformanceVersion");
+    }
+    return valid;
+}
+
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatControlsPropertiesKHR *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFloatControlsPropertiesKHR)\n");
     bool valid = true;
@@ -6573,6 +6658,18 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemor
         GET_VALUE_WARN(member, vulkanMemoryModel, WarnIfNotEqualBool);
         GET_VALUE_WARN(member, vulkanMemoryModelDeviceScope, WarnIfNotEqualBool);
         GET_VALUE_WARN(member, vulkanMemoryModelAvailabilityVisibilityChains, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePCIBusInfoPropertiesEXT *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePCIBusInfoPropertiesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", member, "pciDomain");
+        WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", member, "pciBus");
+        WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", member, "pciDevice");
+        WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", member, "pciFunction");
     }
     return valid;
 }
@@ -7337,6 +7434,20 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInput
     return valid;
 }
 
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDrmPropertiesEXT *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDrmPropertiesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        WarnNotModifiable("VkPhysicalDeviceDrmPropertiesEXT", member, "hasPrimary");
+        WarnNotModifiable("VkPhysicalDeviceDrmPropertiesEXT", member, "hasRender");
+        WarnNotModifiable("VkPhysicalDeviceDrmPropertiesEXT", member, "primaryMajor");
+        WarnNotModifiable("VkPhysicalDeviceDrmPropertiesEXT", member, "primaryMinor");
+        WarnNotModifiable("VkPhysicalDeviceDrmPropertiesEXT", member, "renderMajor");
+        WarnNotModifiable("VkPhysicalDeviceDrmPropertiesEXT", member, "renderMinor");
+    }
+    return valid;
+}
+
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipControlFeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDepthClipControlFeaturesEXT)\n");
     bool valid = true;
@@ -7796,90 +7907,17 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSparsePrope
     return valid;
 }
 
-bool JsonLoader::GetValuePhysicalDevicePointClippingProperties(const Json::Value &parent) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePointClippingProperties)\n");
-    for (const auto &member : parent.getMemberNames()) {
-        WarnNotModifiable("VkPhysicalDevicePointClippingProperties", member, "pointClippingBehavior");
-    }
-    return true;
-}
-
-bool JsonLoader::GetValuePhysicalDeviceDriverProperties(const Json::Value &parent) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDriverProperties)\n");
-    for (const auto &member : parent.getMemberNames()) {
-        WarnNotModifiable("VkPhysicalDeviceDriverProperties", member, "driverID");
-        WarnNotModifiable("VkPhysicalDeviceDriverProperties", member, "driverName");
-        WarnNotModifiable("VkPhysicalDeviceDriverProperties", member, "driverInfo");
-        WarnNotModifiable("VkPhysicalDeviceDriverProperties", member, "conformanceVersion");
-    }
-    return true;
-}
-
-bool JsonLoader::GetValuePhysicalDeviceIDProperties(const Json::Value &parent) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceIDProperties)\n");
-    for (const auto &member : parent.getMemberNames()) {
-        WarnNotModifiable("VkPhysicalDeviceIDProperties", member, "deviceUUID");
-        WarnNotModifiable("VkPhysicalDeviceIDProperties", member, "driverUUID");
-        WarnNotModifiable("VkPhysicalDeviceIDProperties", member, "deviceLUID");
-        WarnNotModifiable("VkPhysicalDeviceIDProperties", member, "deviceNodeMask");
-        WarnNotModifiable("VkPhysicalDeviceIDProperties", member, "deviceLUIDValid");
-    }
-    return true;
-}
-
-bool JsonLoader::GetValuePhysicalDeviceMemoryBudgetPropertiesEXT(const Json::Value &parent) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMemoryBudgetPropertiesEXT)\n");
-    for (const auto &member : parent.getMemberNames()) {
-        WarnNotModifiable("VkPhysicalDeviceMemoryBudgetPropertiesEXT", member, "heapBudget");
-        WarnNotModifiable("VkPhysicalDeviceMemoryBudgetPropertiesEXT", member, "heapUsage");
-    }
-    return true;
-}
-
-bool JsonLoader::GetValuePhysicalDevicePCIBusInfoPropertiesEXT(const Json::Value &parent) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePCIBusInfoPropertiesEXT)\n");
-    for (const auto &member : parent.getMemberNames()) {
-        WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", member, "pciDomain");
-        WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", member, "pciBus");
-        WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", member, "pciDevice");
-        WarnNotModifiable("VkPhysicalDevicePCIBusInfoPropertiesEXT", member, "pciFunction");
-    }
-    return true;
-}
-
-bool JsonLoader::GetValuePhysicalDeviceDrmPropertiesEXT(const Json::Value &parent) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDrmPropertiesEXT)\n");
-    for (const auto &member : parent.getMemberNames()) {
-        WarnNotModifiable("VkPhysicalDeviceDrmPropertiesEXT", member, "hasPrimary");
-        WarnNotModifiable("VkPhysicalDeviceDrmPropertiesEXT", member, "hasRender");
-        WarnNotModifiable("VkPhysicalDeviceDrmPropertiesEXT", member, "primaryMajor");
-        WarnNotModifiable("VkPhysicalDeviceDrmPropertiesEXT", member, "primaryMinor");
-        WarnNotModifiable("VkPhysicalDeviceDrmPropertiesEXT", member, "renderMajor");
-        WarnNotModifiable("VkPhysicalDeviceDrmPropertiesEXT", member, "renderMinor");
-    }
-    return true;
-}
-
-bool JsonLoader::GetValuePhysicalDeviceToolProperties(const Json::Value &parent) {
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceToolProperties *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceToolProperties)\n");
+    bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        WarnNotModifiable("VkPhysicalDeviceToolProperties", member, "name");
-        WarnNotModifiable("VkPhysicalDeviceToolProperties", member, "version");
+        GET_ARRAY(name);
+        GET_ARRAY(version);
         WarnNotModifiable("VkPhysicalDeviceToolProperties", member, "purposes");
-        WarnNotModifiable("VkPhysicalDeviceToolProperties", member, "description");
-        WarnNotModifiable("VkPhysicalDeviceToolProperties", member, "layer");
+        GET_ARRAY(description);
+        GET_ARRAY(layer);
     }
-    return true;
-}
-
-bool JsonLoader::GetValuePhysicalDeviceGroupProperties(const Json::Value &parent) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceGroupProperties)\n");
-    for (const auto &member : parent.getMemberNames()) {
-        WarnNotModifiable("VkPhysicalDeviceGroupProperties", member, "physicalDeviceCount");
-        WarnNotModifiable("VkPhysicalDeviceGroupProperties", member, "physicalDevices");
-        WarnNotModifiable("VkPhysicalDeviceGroupProperties", member, "subsetAllocation");
-    }
-    return true;
+    return valid;
 }
 
 
@@ -8393,6 +8431,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     data->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME) && PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME) && PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME)) {
+                    VkPhysicalDeviceIDPropertiesKHR *data = (VkPhysicalDeviceIDPropertiesKHR *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_idproperties_;
+                    data->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
                     VkPhysicalDevicePushDescriptorPropertiesKHR *data = (VkPhysicalDevicePushDescriptorPropertiesKHR *)place;
@@ -8470,6 +8516,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDevicePerformanceQueryFeaturesKHR *data = (VkPhysicalDevicePerformanceQueryFeaturesKHR *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_performance_query_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_MAINTENANCE_2_EXTENSION_NAME)) {
+                    VkPhysicalDevicePointClippingPropertiesKHR *data = (VkPhysicalDevicePointClippingPropertiesKHR *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_point_clipping_properties_;
                     data->pNext = pNext;
                 }
                 break;
@@ -8713,6 +8767,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     data->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDriverPropertiesKHR *data = (VkPhysicalDeviceDriverPropertiesKHR *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_driver_properties_;
+                    data->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
                     VkPhysicalDeviceFloatControlsPropertiesKHR *data = (VkPhysicalDeviceFloatControlsPropertiesKHR *)place;
@@ -8806,6 +8868,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *data = (VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_vulkan_memory_model_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PCI_BUS_INFO_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_PCI_BUS_INFO_EXTENSION_NAME)) {
+                    VkPhysicalDevicePCIBusInfoPropertiesEXT *data = (VkPhysicalDevicePCIBusInfoPropertiesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_pcibus_info_properties_;
                     data->pNext = pNext;
                 }
                 break;
@@ -9366,6 +9436,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *data = (VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_vertex_input_dynamic_state_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRM_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_PHYSICAL_DEVICE_DRM_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDrmPropertiesEXT *data = (VkPhysicalDeviceDrmPropertiesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_drm_properties_;
                     data->pNext = pNext;
                 }
                 break;
@@ -10025,9 +10103,16 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolProperties(VkPhysicalDevice 
 
 #define TRANSFER_VALUE(name)    \
     if (promoted_written) {     \
-        src->name = dest->name; \
+        std::memmove(&src->name, &dest->name, sizeof(src->name)); \
     } else {                    \
-        dest->name = src->name; \
+        std::memmove(&dest->name, &src->name, sizeof(dest->name)); \
+    }
+
+#define TRANSFER_VALUE_ARRAY(name)    \
+    if (promoted_written) {     \
+        std::memmove(src->name, dest->name, sizeof(src->name)); \
+    } else {                    \
+        std::memmove(dest->name, src->name, sizeof(dest->name)); \
     }
 
 
@@ -10044,11 +10129,23 @@ void TransferValue(VkPhysicalDeviceVulkan11Features *dest, VkPhysicalDeviceMulti
     TRANSFER_VALUE(multiviewTessellationShader);
 }
 
+void TransferValue(VkPhysicalDeviceVulkan11Properties *dest, VkPhysicalDeviceIDPropertiesKHR *src, bool promoted_written) {
+    TRANSFER_VALUE(deviceUUID);
+    TRANSFER_VALUE(driverUUID);
+    TRANSFER_VALUE(deviceLUID);
+    TRANSFER_VALUE(deviceNodeMask);
+    TRANSFER_VALUE(deviceLUIDValid);
+}
+
 void TransferValue(VkPhysicalDeviceVulkan11Features *dest, VkPhysicalDevice16BitStorageFeaturesKHR *src, bool promoted_written) {
     TRANSFER_VALUE(storageBuffer16BitAccess);
     TRANSFER_VALUE(uniformAndStorageBuffer16BitAccess);
     TRANSFER_VALUE(storagePushConstant16);
     TRANSFER_VALUE(storageInputOutput16);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan11Properties *dest, VkPhysicalDevicePointClippingPropertiesKHR *src, bool promoted_written) {
+    TRANSFER_VALUE(pointClippingBehavior);
 }
 
 void TransferValue(VkPhysicalDeviceVulkan11Features *dest, VkPhysicalDeviceVariablePointerFeaturesKHR *src, bool promoted_written) {
@@ -10144,6 +10241,13 @@ void TransferValue(VkPhysicalDeviceVulkan12Features *dest, VkPhysicalDevice8BitS
 void TransferValue(VkPhysicalDeviceVulkan12Features *dest, VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *src, bool promoted_written) {
     TRANSFER_VALUE(shaderBufferInt64Atomics);
     TRANSFER_VALUE(shaderSharedInt64Atomics);
+}
+
+void TransferValue(VkPhysicalDeviceVulkan12Properties *dest, VkPhysicalDeviceDriverPropertiesKHR *src, bool promoted_written) {
+    TRANSFER_VALUE(driverID);
+    TRANSFER_VALUE(driverName);
+    TRANSFER_VALUE(driverInfo);
+    TRANSFER_VALUE(conformanceVersion);
 }
 
 void TransferValue(VkPhysicalDeviceVulkan12Properties *dest, VkPhysicalDeviceFloatControlsPropertiesKHR *src, bool promoted_written) {
@@ -10325,6 +10429,7 @@ void TransferValue(VkPhysicalDeviceVulkan13Features *dest, VkPhysicalDeviceMaint
     TRANSFER_VALUE(maintenance4);
 }
 
+#undef TRANSFER_VALUE_ARRAY
 #undef TRANSFER_VALUE
 
 void LoadDeviceFormats(VkInstance instance, PhysicalDeviceData *pdd, VkPhysicalDevice pd, ArrayOfVkFormatProperties *dest,
@@ -10758,6 +10863,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_astcdecode_features_);
                 }
 
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME)) {
+                    pdd.physical_device_idproperties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_idproperties_);
+                }
+
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME)) {
                     pdd.physical_device_push_descriptor_properties_.pNext = property_chain.pNext;
 
@@ -10814,6 +10925,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_performance_query_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_performance_query_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_MAINTENANCE_2_EXTENSION_NAME)) {
+                    pdd.physical_device_point_clipping_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_point_clipping_properties_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME)) {
@@ -10980,6 +11097,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_vertex_attribute_divisor_features_);
                 }
 
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME)) {
+                    pdd.physical_device_driver_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_driver_properties_);
+                }
+
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME)) {
                     pdd.physical_device_float_controls_properties_.pNext = property_chain.pNext;
 
@@ -11046,6 +11169,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_vulkan_memory_model_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_vulkan_memory_model_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_PCI_BUS_INFO_EXTENSION_NAME)) {
+                    pdd.physical_device_pcibus_info_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_pcibus_info_properties_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME)) {
@@ -11446,6 +11575,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_vertex_input_dynamic_state_features_);
                 }
 
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_PHYSICAL_DEVICE_DRM_EXTENSION_NAME)) {
+                    pdd.physical_device_drm_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_drm_properties_);
+                }
+
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_DEPTH_CLIP_CONTROL_EXTENSION_NAME)) {
                     pdd.physical_device_depth_clip_control_features_.pNext = feature_chain.pNext;
 
@@ -11701,7 +11836,9 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             // VK_VULKAN_1_1
             TransferValue(&(pdd.physical_device_vulkan_11_properties_), &(pdd.physical_device_multiview_properties_), pdd.vulkan_1_1_properties_written_);
             TransferValue(&(pdd.physical_device_vulkan_11_features_), &(pdd.physical_device_multiview_features_), pdd.vulkan_1_1_features_written_);
+            TransferValue(&(pdd.physical_device_vulkan_11_properties_), &(pdd.physical_device_idproperties_), pdd.vulkan_1_1_properties_written_);
             TransferValue(&(pdd.physical_device_vulkan_11_features_), &(pdd.physical_device_16_bit_storage_features_), pdd.vulkan_1_1_features_written_);
+            TransferValue(&(pdd.physical_device_vulkan_11_properties_), &(pdd.physical_device_point_clipping_properties_), pdd.vulkan_1_1_properties_written_);
             TransferValue(&(pdd.physical_device_vulkan_11_features_), &(pdd.physical_device_variable_pointer_features_), pdd.vulkan_1_1_features_written_);
             TransferValue(&(pdd.physical_device_vulkan_11_features_), &(pdd.physical_device_sampler_ycbcr_conversion_features_), pdd.vulkan_1_1_features_written_);
             TransferValue(&(pdd.physical_device_vulkan_11_properties_), &(pdd.physical_device_maintenance_3_properties_), pdd.vulkan_1_1_properties_written_);
@@ -11715,6 +11852,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             TransferValue(&(pdd.physical_device_vulkan_12_features_), &(pdd.physical_device_shader_subgroup_extended_types_features_), pdd.vulkan_1_2_features_written_);
             TransferValue(&(pdd.physical_device_vulkan_12_features_), &(pdd.physical_device_8_bit_storage_features_), pdd.vulkan_1_2_features_written_);
             TransferValue(&(pdd.physical_device_vulkan_12_features_), &(pdd.physical_device_shader_atomic_int_64_features_), pdd.vulkan_1_2_features_written_);
+            TransferValue(&(pdd.physical_device_vulkan_12_properties_), &(pdd.physical_device_driver_properties_), pdd.vulkan_1_2_properties_written_);
             TransferValue(&(pdd.physical_device_vulkan_12_properties_), &(pdd.physical_device_float_controls_properties_), pdd.vulkan_1_2_properties_written_);
             TransferValue(&(pdd.physical_device_vulkan_12_properties_), &(pdd.physical_device_depth_stencil_resolve_properties_), pdd.vulkan_1_2_properties_written_);
             TransferValue(&(pdd.physical_device_vulkan_12_properties_), &(pdd.physical_device_timeline_semaphore_properties_), pdd.vulkan_1_2_properties_written_);
