@@ -332,6 +332,31 @@ TEST_F(TestsCapabilitiesGenerated, TestDiscardRectanglePropertiesEXT) {
 #endif
 }
 
+TEST_F(TestsCapabilitiesGenerated, TestMultiviewPerViewAttributesPropertiesNVX) {
+#ifdef VK_NVX_multiview_per_view_attributes
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_NVX_multiview_per_view_attributes");
+
+    VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX multiview_per_view_attributes_properties_native{};
+    multiview_per_view_attributes_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PER_VIEW_ATTRIBUTES_PROPERTIES_NVX;
+
+    VkPhysicalDeviceProperties2 gpu_props_native{};
+    gpu_props_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_native.pNext = &multiview_per_view_attributes_properties_native;
+    vkGetPhysicalDeviceProperties2(gpu_native, &gpu_props_native);
+
+    VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX multiview_per_view_attributes_properties_profile{};
+    multiview_per_view_attributes_properties_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PER_VIEW_ATTRIBUTES_PROPERTIES_NVX;
+
+    VkPhysicalDeviceProperties2 gpu_props_profile{};
+    gpu_props_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_profile.pNext = &multiview_per_view_attributes_properties_profile;
+    vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
+
+    EXPECT_EQ(multiview_per_view_attributes_properties_profile.perViewPositionAllComponents, VK_TRUE);
+#endif
+}
+
 TEST_F(TestsCapabilitiesGenerated, TestPointClippingPropertiesKHR) {
 #ifdef VK_KHR_maintenance2
     bool supported = false;

@@ -2973,9 +2973,7 @@ GET_VALUE_PHYSICAL_DEVICE_PROPERTIES = '''bool JsonLoader::GetValue(const Json::
 '''
 
 class VulkanProfilesLayerGenerator():
-    skipped_exts = ['NVX']
     emulated_extensions = ['VK_KHR_portability_subset']
-    #non_modifiable_structs = ['VkPhysicalDevicePointClippingProperties', 'VkPhysicalDevicePointClippingPropertiesKHR', 'VkPhysicalDeviceDriverProperties', 'VkPhysicalDeviceDriverPropertiesKHR', 'VkPhysicalDeviceIDProperties', 'VkPhysicalDeviceIDPropertiesKHR', 'VkPhysicalDeviceMemoryBudgetPropertiesEXT', 'VkPhysicalDevicePCIBusInfoPropertiesEXT', 'VkPhysicalDeviceDrmPropertiesEXT', 'VkPhysicalDeviceToolProperties', 'VkPhysicalDeviceToolPropertiesEXT', 'VkPhysicalDeviceGroupProperties']
     additional_features = ['VkPhysicalDeviceFeatures']
     additional_properties = ['VkPhysicalDeviceProperties', 'VkPhysicalDeviceLimits', 'VkPhysicalDeviceSparseProperties', 'VkPhysicalDeviceToolProperties']
 
@@ -3162,8 +3160,6 @@ class VulkanProfilesLayerGenerator():
         count = 0
         for name, value  in registry.structs.items():
             if (extends in value.extends and value.isAlias == False) or (name in additional):
-                if self.from_skipped_extension(name, registry):
-                    continue
                 aliases = value.aliases.copy()
                 count += 1
                 if count == 75:
@@ -3561,7 +3557,7 @@ class VulkanProfilesLayerGenerator():
         gen += '    for (const auto &member : parent.getMemberNames()) {\n'
         for member_name in registry.structs[structure].members:
             member = registry.structs[structure].members[member_name]
-            if member.limittype == 'behavior':
+            if member.limittype == 'exact':
                 gen += '        WarnNotModifiable(\"' + structure + '\", member, \"' + member_name + '\");\n'
             elif member.type in registry.enums and member.limittype == 'bitmask':
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', WarnIfNotEqualEnum);\n'
@@ -3611,13 +3607,6 @@ class VulkanProfilesLayerGenerator():
         elif type == 'int32_t':
             return 'asInt()'
         return 'asInt()'
-
-    def from_skipped_extension(self, name, registry):
-        if registry.structs[name].definedByExtensions:
-            for extension in registry.structs[name].definedByExtensions:
-                if self.get_ext(extension) in self.skipped_exts:
-                    return True
-        return False
 
     def find_promoted_struct(self, value):
         if value.name.startswith('VkPhysicalDeviceVulkan'):
@@ -3698,8 +3687,6 @@ class VulkanProfilesLayerGenerator():
 
         self.extension_structs = []
         for extension in registry.extensions:
-            if self.get_ext(extension) in self.skipped_exts:
-                continue
             feature_name = None
             property_name = None
             for property in properties:
