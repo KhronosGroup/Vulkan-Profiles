@@ -3557,24 +3557,27 @@ class VulkanProfilesLayerGenerator():
                 gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfNotEqualBool);\n'
             elif member.limittype == 'bitmask':
                 gen += '        GET_VALUE_FLAG_WARN(member, ' + member_name + ');\n'
-            elif member.type == 'size_t' and member.limittype == 'min':
+            elif member.type == 'size_t' and 'min' in member.limittype:
                 gen += '        GET_VALUE_SIZE_T_WARN(member, ' + member_name + ', WarnIfLesserSizet);\n'
-            elif member.type == 'size_t' and member.limittype == 'max':
+            elif member.type == 'size_t' and ('max' in member.limittype or 'bits' in member.limittype):
                 gen += '        GET_VALUE_SIZE_T_WARN(member, ' + member_name + ', WarnIfGreaterSizet);\n'
-            elif member.type == 'float' and member.limittype == 'min':
+            elif member.type == 'float' and 'min' in member.limittype:
                 gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfLesserFloat);\n'
-            elif member.type == 'float' and member.limittype == 'max':
+            elif member.type == 'float' and 'max' in member.limittype:
                 gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfGreaterFloat);\n'
-            elif (member.type == 'VkExtent2D' or member.type == 'VkDeviceSize' or member.type == 'int32_t' or member.type == 'uint32_t' or member.type == 'uint64_t') and member.limittype == 'min': # integer types
+            elif (member.type == 'VkExtent2D' or member.type == 'VkDeviceSize' or member.type == 'int32_t' or member.type == 'uint32_t' or member.type == 'uint64_t') and 'min' in member.limittype: # integer types
                 gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfLesser);\n'
-            elif (member.type == 'VkExtent2D' or member.type == 'VkDeviceSize' or member.type == 'int32_t' or member.type == 'uint32_t' or member.type == 'uint64_t') and member.limittype == 'max': # integer types
+            elif (member.type == 'VkExtent2D' or member.type == 'VkDeviceSize' or member.type == 'int32_t' or member.type == 'uint32_t' or member.type == 'uint64_t') and ('max' in member.limittype or 'bits' in member.limittype): # integer types
                 gen += '        GET_VALUE_WARN(member, ' + member_name + ', WarnIfGreater);\n'
             elif member.limittype == 'min': # enum values
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', WarnIfLesser);\n'
-            elif member.limittype == 'max': # enum values
+            elif member.limittype == 'max' or member.limittype == 'bits': # enum values
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', WarnIfGreater);\n'
-            else:
+            elif member.limittype == 'exact':
                 gen += '        WarnNotModifiable(\"' + structure + '\", member, \"' + member_name + '\");\n'
+            else:
+                print("ERROR: Unsupported limittype '{0}' in member '{1}' of structure '{2}'".format(member.limittype, member_name, structure))
+                
         gen += '    }\n'
         gen += '    return valid;\n'
         gen += '}\n\n'

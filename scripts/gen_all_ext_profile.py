@@ -360,6 +360,11 @@ class ProfileGenerator():
                         gen += enum[0]
                         self.test_values[name][property] = enum[1]
                         self.i += 1
+                    elif property_type == "VkToolPurposeFlags":
+                        enum = self.get_enum('VkToolPurposeFlagBits', True)
+                        gen += enum[0]
+                        self.test_values[name][property] = enum[1]
+                        self.i += 1
                     elif property_type == "VkShaderFloatControlsIndependence":
                         enum = self.get_enum(property_type, False)
                         gen += enum[0]
