@@ -16,15 +16,21 @@
  * DO NOT EDIT: This file is generated.
  */
 
-#include <stddef.h>
-#include <string.h>
-#include <stdint.h>
+#include <cstddef>
+#include <cstring>
+#include <cstdint>
+#include <cmath>
 #include <vector>
 #include <algorithm>
 #include <vulkan/vulkan_profiles.h>
 
 namespace detail {
 
+
+VPAPI_ATTR bool isMultiple(double source, double multiple) {
+    double mod = std::fmod(source, multiple);
+    return std::abs(mod) < 0.0001; 
+}
 
 using PFN_vpStructFiller = void(*)(VkBaseOutStructure* p);
 using PFN_vpStructComparator = bool(*)(VkBaseOutStructure* p);
@@ -295,6 +301,7 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferNoAttachmentsSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferStencilSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (s->properties.limits.lineWidthGranularity <= 1);
+                    ret = ret && (isMultiple(1, s->properties.limits.lineWidthGranularity));
                     ret = ret && (s->properties.limits.maxBoundDescriptorSets >= 4);
                     ret = ret && (s->properties.limits.maxColorAttachments >= 4);
                     ret = ret && (s->properties.limits.maxComputeSharedMemorySize >= 16384);
@@ -355,13 +362,18 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (s->properties.limits.maxViewports >= 1);
                     ret = ret && (s->properties.limits.minInterpolationOffset <= -0.5);
                     ret = ret && (s->properties.limits.minMemoryMapAlignment <= 4096);
+                    ret = ret && ((s->properties.limits.minMemoryMapAlignment & (s->properties.limits.minMemoryMapAlignment - 1)) == 0);
                     ret = ret && (s->properties.limits.minStorageBufferOffsetAlignment <= 256);
+                    ret = ret && ((s->properties.limits.minStorageBufferOffsetAlignment & (s->properties.limits.minStorageBufferOffsetAlignment - 1)) == 0);
                     ret = ret && (s->properties.limits.minTexelBufferOffsetAlignment <= 256);
+                    ret = ret && ((s->properties.limits.minTexelBufferOffsetAlignment & (s->properties.limits.minTexelBufferOffsetAlignment - 1)) == 0);
                     ret = ret && (s->properties.limits.minTexelGatherOffset <= -8);
                     ret = ret && (s->properties.limits.minTexelOffset <= -8);
                     ret = ret && (s->properties.limits.minUniformBufferOffsetAlignment <= 256);
+                    ret = ret && ((s->properties.limits.minUniformBufferOffsetAlignment & (s->properties.limits.minUniformBufferOffsetAlignment - 1)) == 0);
                     ret = ret && (s->properties.limits.mipmapPrecisionBits >= 4);
                     ret = ret && (s->properties.limits.pointSizeGranularity <= 1);
+                    ret = ret && (isMultiple(1, s->properties.limits.pointSizeGranularity));
                     ret = ret && (vpCheckFlags(s->properties.limits.sampledImageColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (vpCheckFlags(s->properties.limits.sampledImageDepthSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (vpCheckFlags(s->properties.limits.sampledImageIntegerSampleCounts, (VK_SAMPLE_COUNT_1_BIT)));
@@ -2953,7 +2965,9 @@ static const VpPropertyDesc propertyDesc = {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
                     VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
                     ret = ret && (s->properties.limits.bufferImageGranularity <= 4096);
+                    ret = ret && (s->properties.limits.bufferImageGranularity % 4096 == 0);
                     ret = ret && (s->properties.limits.lineWidthGranularity <= 0.5);
+                    ret = ret && (isMultiple(0.5, s->properties.limits.lineWidthGranularity));
                     ret = ret && (s->properties.limits.maxColorAttachments >= 7);
                     ret = ret && (s->properties.limits.maxComputeWorkGroupInvocations >= 256);
                     ret = ret && (s->properties.limits.maxComputeWorkGroupSize[0] >= 1024);
@@ -2979,6 +2993,7 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (s->properties.limits.maxUniformBufferRange >= 65536);
                     ret = ret && (s->properties.limits.mipmapPrecisionBits >= 6);
                     ret = ret && (s->properties.limits.pointSizeGranularity <= 0.125);
+                    ret = ret && (isMultiple(0.125, s->properties.limits.pointSizeGranularity));
                     ret = ret && (s->properties.limits.standardSampleLocations == VK_TRUE);
                     ret = ret && (s->properties.limits.subTexelPrecisionBits >= 8);
                 } break;
@@ -3008,8 +3023,8 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (s->maxPerStageDescriptorUpdateAfterBindUniformBuffers >= 12);
                     ret = ret && (s->maxPerStageUpdateAfterBindResources >= 500000);
                     ret = ret && (s->maxTimelineSemaphoreValueDifference >= 2147483647);
-                    ret = ret && (s->shaderSignedZeroInfNanPreserveFloat16 == VK_TRUE);
-                    ret = ret && (s->shaderSignedZeroInfNanPreserveFloat32 == VK_TRUE);
+                    ret = ret && (vpCheckFlags(s->shaderSignedZeroInfNanPreserveFloat16, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderSignedZeroInfNanPreserveFloat32, VK_TRUE));
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES: {
                     VkPhysicalDeviceVulkan13Properties* s = static_cast<VkPhysicalDeviceVulkan13Properties*>(static_cast<void*>(p));
@@ -3452,11 +3467,13 @@ static const VpPropertyDesc propertyDesc = {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
                     VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
                     ret = ret && (s->properties.limits.bufferImageGranularity <= 1024);
+                    ret = ret && (s->properties.limits.bufferImageGranularity % 1024 == 0);
                     ret = ret && (s->properties.limits.discreteQueuePriorities >= 2);
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferDepthSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferStencilSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (s->properties.limits.lineWidthGranularity <= 0.5);
+                    ret = ret && (isMultiple(0.5, s->properties.limits.lineWidthGranularity));
                     ret = ret && (s->properties.limits.lineWidthRange[0] <= 1.0);
                     ret = ret && (s->properties.limits.lineWidthRange[1] >= 1.0);
                     ret = ret && (s->properties.limits.maxBoundDescriptorSets >= 8);
@@ -3530,13 +3547,18 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (s->properties.limits.maxViewports >= 16);
                     ret = ret && (s->properties.limits.minInterpolationOffset <= -0.5);
                     ret = ret && (s->properties.limits.minMemoryMapAlignment <= 4096);
+                    ret = ret && ((s->properties.limits.minMemoryMapAlignment & (s->properties.limits.minMemoryMapAlignment - 1)) == 0);
                     ret = ret && (s->properties.limits.minStorageBufferOffsetAlignment <= 64);
+                    ret = ret && ((s->properties.limits.minStorageBufferOffsetAlignment & (s->properties.limits.minStorageBufferOffsetAlignment - 1)) == 0);
                     ret = ret && (s->properties.limits.minTexelBufferOffsetAlignment <= 256);
+                    ret = ret && ((s->properties.limits.minTexelBufferOffsetAlignment & (s->properties.limits.minTexelBufferOffsetAlignment - 1)) == 0);
                     ret = ret && (s->properties.limits.minTexelGatherOffset <= -8);
                     ret = ret && (s->properties.limits.minTexelOffset <= -8);
                     ret = ret && (s->properties.limits.minUniformBufferOffsetAlignment <= 256);
+                    ret = ret && ((s->properties.limits.minUniformBufferOffsetAlignment & (s->properties.limits.minUniformBufferOffsetAlignment - 1)) == 0);
                     ret = ret && (s->properties.limits.mipmapPrecisionBits >= 4);
                     ret = ret && (s->properties.limits.pointSizeGranularity <= 1.0);
+                    ret = ret && (isMultiple(1.0, s->properties.limits.pointSizeGranularity));
                     ret = ret && (s->properties.limits.pointSizeRange[0] <= 1.0);
                     ret = ret && (s->properties.limits.pointSizeRange[1] >= 64.0);
                     ret = ret && (vpCheckFlags(s->properties.limits.sampledImageColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
@@ -3571,8 +3593,8 @@ static const VpPropertyDesc propertyDesc = {
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR: {
                     VkPhysicalDeviceDepthStencilResolvePropertiesKHR* s = static_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(static_cast<void*>(p));
-                    ret = ret && (s->independentResolve == VK_TRUE);
-                    ret = ret && (s->independentResolveNone == VK_TRUE);
+                    ret = ret && (vpCheckFlags(s->independentResolve, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->independentResolveNone, VK_TRUE));
                     ret = ret && (vpCheckFlags(s->supportedDepthResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT)));
                     ret = ret && (vpCheckFlags(s->supportedStencilResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT)));
                 } break;
@@ -3609,8 +3631,11 @@ static const VpQueueFamilyDesc queueFamilyDesc[] = {
                 case VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR: {
                     VkQueueFamilyProperties2KHR* s = static_cast<VkQueueFamilyProperties2KHR*>(static_cast<void*>(p));
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.depth <= 1);
+                    ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.depth % 1 == 0);
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.height <= 1);
+                    ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.height % 1 == 0);
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.width <= 1);
+                    ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.width % 1 == 0);
                     ret = ret && (s->queueFamilyProperties.queueCount >= 1);
                     ret = ret && (vpCheckFlags(s->queueFamilyProperties.queueFlags, (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT)));
                     ret = ret && (s->queueFamilyProperties.timestampValidBits >= 36);
@@ -5738,11 +5763,13 @@ static const VpPropertyDesc propertyDesc = {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
                     VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
                     ret = ret && (s->properties.limits.bufferImageGranularity <= 1024);
+                    ret = ret && (s->properties.limits.bufferImageGranularity % 1024 == 0);
                     ret = ret && (s->properties.limits.discreteQueuePriorities >= 2);
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferDepthSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferStencilSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (s->properties.limits.lineWidthGranularity <= 0.5);
+                    ret = ret && (isMultiple(0.5, s->properties.limits.lineWidthGranularity));
                     ret = ret && (s->properties.limits.lineWidthRange[0] <= 1.0);
                     ret = ret && (s->properties.limits.lineWidthRange[1] >= 1.0);
                     ret = ret && (s->properties.limits.maxBoundDescriptorSets >= 8);
@@ -5816,13 +5843,18 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (s->properties.limits.maxViewports >= 16);
                     ret = ret && (s->properties.limits.minInterpolationOffset <= -0.5);
                     ret = ret && (s->properties.limits.minMemoryMapAlignment <= 4096);
+                    ret = ret && ((s->properties.limits.minMemoryMapAlignment & (s->properties.limits.minMemoryMapAlignment - 1)) == 0);
                     ret = ret && (s->properties.limits.minStorageBufferOffsetAlignment <= 64);
+                    ret = ret && ((s->properties.limits.minStorageBufferOffsetAlignment & (s->properties.limits.minStorageBufferOffsetAlignment - 1)) == 0);
                     ret = ret && (s->properties.limits.minTexelBufferOffsetAlignment <= 256);
+                    ret = ret && ((s->properties.limits.minTexelBufferOffsetAlignment & (s->properties.limits.minTexelBufferOffsetAlignment - 1)) == 0);
                     ret = ret && (s->properties.limits.minTexelGatherOffset <= -8);
                     ret = ret && (s->properties.limits.minTexelOffset <= -8);
                     ret = ret && (s->properties.limits.minUniformBufferOffsetAlignment <= 256);
+                    ret = ret && ((s->properties.limits.minUniformBufferOffsetAlignment & (s->properties.limits.minUniformBufferOffsetAlignment - 1)) == 0);
                     ret = ret && (s->properties.limits.mipmapPrecisionBits >= 4);
                     ret = ret && (s->properties.limits.pointSizeGranularity <= 1.0);
+                    ret = ret && (isMultiple(1.0, s->properties.limits.pointSizeGranularity));
                     ret = ret && (s->properties.limits.pointSizeRange[0] <= 1.0);
                     ret = ret && (s->properties.limits.pointSizeRange[1] >= 64.0);
                     ret = ret && (vpCheckFlags(s->properties.limits.sampledImageColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
@@ -5857,8 +5889,8 @@ static const VpPropertyDesc propertyDesc = {
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR: {
                     VkPhysicalDeviceDepthStencilResolvePropertiesKHR* s = static_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(static_cast<void*>(p));
-                    ret = ret && (s->independentResolve == VK_TRUE);
-                    ret = ret && (s->independentResolveNone == VK_TRUE);
+                    ret = ret && (vpCheckFlags(s->independentResolve, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->independentResolveNone, VK_TRUE));
                     ret = ret && (vpCheckFlags(s->supportedDepthResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT)));
                     ret = ret && (vpCheckFlags(s->supportedStencilResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT)));
                 } break;
@@ -5870,6 +5902,7 @@ static const VpPropertyDesc propertyDesc = {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR: {
                     VkPhysicalDevicePortabilitySubsetPropertiesKHR* s = static_cast<VkPhysicalDevicePortabilitySubsetPropertiesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->minVertexInputBindingStrideAlignment <= 4);
+                    ret = ret && ((s->minVertexInputBindingStrideAlignment & (s->minVertexInputBindingStrideAlignment - 1)) == 0);
                 } break;
                 default: break;
             }
@@ -5899,8 +5932,11 @@ static const VpQueueFamilyDesc queueFamilyDesc[] = {
                 case VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR: {
                     VkQueueFamilyProperties2KHR* s = static_cast<VkQueueFamilyProperties2KHR*>(static_cast<void*>(p));
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.depth <= 1);
+                    ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.depth % 1 == 0);
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.height <= 1);
+                    ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.height % 1 == 0);
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.width <= 1);
+                    ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.width % 1 == 0);
                     ret = ret && (s->queueFamilyProperties.queueCount >= 1);
                     ret = ret && (vpCheckFlags(s->queueFamilyProperties.queueFlags, (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT)));
                     ret = ret && (s->queueFamilyProperties.timestampValidBits >= 36);

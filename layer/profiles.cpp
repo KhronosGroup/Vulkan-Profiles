@@ -7931,11 +7931,11 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceToolPropert
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceToolProperties)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        GET_ARRAY(name);
-        GET_ARRAY(version);
+        WarnNotModifiable("VkPhysicalDeviceToolProperties", member, "name");
+        WarnNotModifiable("VkPhysicalDeviceToolProperties", member, "version");
         WarnNotModifiable("VkPhysicalDeviceToolProperties", member, "purposes");
-        GET_ARRAY(description);
-        GET_ARRAY(layer);
+        WarnNotModifiable("VkPhysicalDeviceToolProperties", member, "description");
+        WarnNotModifiable("VkPhysicalDeviceToolProperties", member, "layer");
     }
     return valid;
 }

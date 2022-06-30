@@ -26,6 +26,13 @@
 #include <vulkan/vulkan_profiles.h>
 #endif
 
+TEST(test_library_util, isMultiple) { 
+    EXPECT_TRUE(detail::isMultiple(4.0, 2.0));
+    EXPECT_TRUE(detail::isMultiple(4.0, 0.5));
+    
+    EXPECT_FALSE(detail::isMultiple(4.0, 3.0));
+}
+
 #define ARRAY_SIZE(arr) static_cast<uint32_t>(sizeof(arr) / sizeof(arr[0]))
 
 struct FormatFeatureFlagBits {
