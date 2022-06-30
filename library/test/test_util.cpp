@@ -33,6 +33,17 @@ TEST(test_library_util, isMultiple) {
     EXPECT_FALSE(detail::isMultiple(4.0, 3.0));
 }
 
+TEST(test_library_util, isPowerOfTwo) {
+    EXPECT_TRUE(detail::isPowerOfTwo(4.0));
+    EXPECT_TRUE(detail::isPowerOfTwo(1.0));
+    EXPECT_TRUE(detail::isPowerOfTwo(0.0));
+
+    EXPECT_FALSE(detail::isPowerOfTwo(3.0));
+    EXPECT_FALSE(detail::isPowerOfTwo(1.5));
+    EXPECT_FALSE(detail::isPowerOfTwo(0.5));
+}
+
+
 #define ARRAY_SIZE(arr) static_cast<uint32_t>(sizeof(arr) / sizeof(arr[0]))
 
 struct FormatFeatureFlagBits {
