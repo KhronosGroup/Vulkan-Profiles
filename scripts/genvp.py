@@ -270,6 +270,14 @@ VPAPI_ATTR bool isMultiple(double source, double multiple) {
     return std::abs(mod) < 0.0001; 
 }
 
+VPAPI_ATTR bool isPowerOfTwo(double source) {
+    double mod = std::fmod(source, 1.0);
+    if (std::abs(mod) >= 0.0001) return false;
+
+    std::uint64_t value = static_cast<std::uint64_t>(std::abs(source));
+    return !(value & (value - static_cast<std::uint64_t>(1)));
+}
+
 using PFN_vpStructFiller = void(*)(VkBaseOutStructure* p);
 using PFN_vpStructComparator = bool(*)(VkBaseOutStructure* p);
 using PFN_vpStructChainerCb =  void(*)(VkBaseOutStructure* p, void* pUser);
@@ -2496,7 +2504,7 @@ class VulkanProfile():
                 elif limittype == 'min,pot' or limittype == 'pot,min':
                     # Compare min limit by checking if device value is less than or equal to profile value and if the value is a power of two
                     if (membertype == 'float' or membertype == 'double'):
-                        comparePredFmt = [ '{0} <= {1}' ]
+                        comparePredFmt = [ '{0} <= {1}', 'isPowerOfTwo({0})' ]
                     else:
                         comparePredFmt = [ '{0} <= {1}', '({0} & ({0} - 1)) == 0' ]
                 elif limittype == 'min,mul' or limittype == 'mul,min':
