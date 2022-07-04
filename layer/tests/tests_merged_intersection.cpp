@@ -32,8 +32,7 @@ static const char* CONFIG_PATH = "bin/Release";
 static const char* CONFIG_PATH = "lib";
 #endif
 
-static VkInstance instance;
-static VkPhysicalDevice gpu;
+static VkPhysicalDevice gpu = VK_NULL_HANDLE;
 static profiles_test::VulkanInstanceBuilder inst_builder;
 
 class TestsMergedIntersection : public VkTestFramework {
@@ -46,9 +45,10 @@ class TestsMergedIntersection : public VkTestFramework {
 
         VkProfileLayerSettingsEXT settings;
         settings.profile_file = JSON_TEST_FILES_PATH "intersect.json";
-        settings.emulate_portability = false;
+        settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_desktop_portability_2021";
         settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
+        settings.debug_reports = DEBUG_REPORT_ERROR_BIT;
 
         err = inst_builder.init(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -57,7 +57,7 @@ class TestsMergedIntersection : public VkTestFramework {
         ASSERT_EQ(err, VK_SUCCESS);
     }
 
-    static void TearDownTestSuite() { vkDestroyInstance(instance, nullptr); };
+    static void TearDownTestSuite() { inst_builder.reset(); };
 };
 
 TEST_F(TestsMergedIntersection, TestDesktopPortability2022Limits) {
@@ -217,7 +217,7 @@ TEST_F(TestsMergedIntersection, TestDesktopPortability2022Limits) {
 TEST_F(TestsMergedIntersection, TestSetCombinationMode) {
     uint32_t count;
     vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
-    EXPECT_EQ(count, 42);
+    EXPECT_EQ(count, 43);
 }
 
 TEST_F(TestsMergedIntersection, TestPhysicalDeviceFeatures) {
