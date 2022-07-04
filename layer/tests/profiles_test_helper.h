@@ -66,7 +66,7 @@ class VulkanInstanceBuilder {
     VkInstance getInstance(Mode mode) { return _instances[mode]; }
 
    protected:
-    std::array<VkInstance, MODE_COUNT> _instances = {VK_NULL_HANDLE, VK_NULL_HANDLE};
+    std::array<VkInstance, MODE_COUNT> _instances;
 
     std::vector<const char*> _layer_names;
     std::vector<const char*> _extension_names;
