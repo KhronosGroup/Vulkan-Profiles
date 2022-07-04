@@ -22,9 +22,10 @@
 #define VPAPI_ATTR inline
 
 #include <vulkan/vulkan.h>
-#include <stddef.h>
-#include <string.h>
-#include <stdint.h>
+#include <cstddef>
+#include <cstring>
+#include <cstdint>
+#include <cmath>
 #include <vector>
 #include <algorithm>
 
