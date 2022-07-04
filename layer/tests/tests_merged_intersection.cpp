@@ -44,21 +44,16 @@ class TestsMergedIntersection : public VkTestFramework {
     static void SetUpTestSuite() {
         VkResult err = VK_SUCCESS;
 
-        const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
-        profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
-        inst_builder.addLayer("VK_LAYER_KHRONOS_profiles");
-
         VkProfileLayerSettingsEXT settings;
         settings.profile_file = JSON_TEST_FILES_PATH "intersect.json";
         settings.emulate_portability = false;
         settings.profile_name = "VP_LUNARG_desktop_portability_2021";
         settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
 
-        err = inst_builder.makeInstance(&settings);
+        err = inst_builder.init(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
-        instance = inst_builder.getInstance();
-        err = inst_builder.getPhysicalDevice(&gpu);
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
         ASSERT_EQ(err, VK_SUCCESS);
     }
 
