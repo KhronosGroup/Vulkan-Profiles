@@ -72,7 +72,7 @@ class ProfileMerger():
                 capability = jsons[i]['capabilities'][capability_name]
 
                 # Removed feature and properties not in the current json from already merged dicts
-                if self.mode == 'intersect' and self.first is False:
+                if self.mode == 'intersection' and self.first is False:
                     if 'features' in capability:
                         for feature in dict(merged_features):
                             if feature not in capability['features']:
@@ -175,7 +175,7 @@ class ProfileMerger():
                             del merged_formats[format]
 
                 if 'queueFamiliesProperties' in capability:
-                    if self.mode == 'intersect':
+                    if self.mode == 'intersection':
                         # If this is the first json just append all queue family properties
                         if self.first:
                             for qfp in capability['queueFamiliesProperties']:
@@ -184,39 +184,56 @@ class ProfileMerger():
                         else:
                             for mqfp in list(merged_qfp):
                                 found = False
+                                #if self.compareList(mqfp['VkQueueFamilyProperties']['queueFlags'], qfp['VkQueueFamilyProperties']['queueFlags']):
+                                #    found = True
+                                #    if (qfp['VkQueueFamilyProperties']['queueCount'] < mqfp['VkQueueFamilyProperties']['queueCount']):
+                                #        mqfp['VkQueueFamilyProperties']['queueCount'] = qfp['VkQueueFamilyProperties']['queueCount']
+                                #    if (qfp['VkQueueFamilyProperties']['timestampValidBits'] < mqfp['VkQueueFamilyProperties']['timestampValidBits']):
+                                #        mqfp['VkQueueFamilyProperties']['timestampValidBits'] = qfp['VkQueueFamilyProperties']['timestampValidBits']
+                                #    if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] > mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']):
+                                #        mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] = qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']
+                                #    if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] > mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']):
+                                #        mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] = qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']
+                                #    if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] > mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']):
+                                #        mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] = qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']
                                 for qfp in capability['queueFamiliesProperties']:
-                                    if self.compareList(mqfp['VkQueueFamilyProperties']['queueFlags'], qfp['VkQueueFamilyProperties']['queueFlags']):
-                                        found = True
-                                        if (qfp['VkQueueFamilyProperties']['queueCount'] < mqfp['VkQueueFamilyProperties']['queueCount']):
-                                            mqfp['VkQueueFamilyProperties']['queueCount'] = qfp['VkQueueFamilyProperties']['queueCount']
-                                        if (qfp['VkQueueFamilyProperties']['timestampValidBits'] < mqfp['VkQueueFamilyProperties']['timestampValidBits']):
-                                            mqfp['VkQueueFamilyProperties']['timestampValidBits'] = qfp['VkQueueFamilyProperties']['timestampValidBits']
-                                        if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] > mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']):
-                                            mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] = qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']
-                                        if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] > mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']):
-                                            mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] = qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']
-                                        if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] > mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']):
-                                            mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] = qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']
+                                    if mqfp['VkQueueFamilyProperties']['queueFlags'] != qfp['VkQueueFamilyProperties']['queueFlags']:
+                                        continue
+                                    if (qfp['VkQueueFamilyProperties']['queueCount'] != mqfp['VkQueueFamilyProperties']['queueCount']):
+                                        continue
+                                    if (qfp['VkQueueFamilyProperties']['timestampValidBits'] != mqfp['VkQueueFamilyProperties']['timestampValidBits']):
+                                        continue
+                                    if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']):
+                                        continue
+                                    if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']):
+                                        continue
+                                    if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']):
+                                        continue
+                                    found = True
                                 if not found:
                                     merged_qfp.remove(mqfp)
-                    else:
+                                    
+                    elif self.mode == 'union':
                         for qfp in capability['queueFamiliesProperties']:
-                            found = False
-                            for mqfp in merged_qfp:
-                                if self.compareList(mqfp['VkQueueFamilyProperties']['queueFlags'], qfp['VkQueueFamilyProperties']['queueFlags']):
-                                    found = True
-                                    if (qfp['VkQueueFamilyProperties']['queueCount'] > mqfp['VkQueueFamilyProperties']['queueCount']):
-                                        mqfp['VkQueueFamilyProperties']['queueCount'] = qfp['VkQueueFamilyProperties']['queueCount']
-                                    if (qfp['VkQueueFamilyProperties']['timestampValidBits'] > mqfp['VkQueueFamilyProperties']['timestampValidBits']):
-                                        mqfp['VkQueueFamilyProperties']['timestampValidBits'] = qfp['VkQueueFamilyProperties']['timestampValidBits']
-                                    if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] < mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']):
-                                        mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] = qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']
-                                    if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] < mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']):
-                                        mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] = qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']
-                                    if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] < mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']):
-                                        mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] = qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']
-                            if not found:
+                            if not merged_qfp:
                                 merged_qfp.append(qfp)
+                            else:
+                                for mqfp in merged_qfp:
+                                    if not self.compareList(mqfp['VkQueueFamilyProperties']['queueFlags'], qfp['VkQueueFamilyProperties']['queueFlags']):
+                                        merged_qfp.append(qfp)
+                                    elif qfp['VkQueueFamilyProperties']['queueCount'] != mqfp['VkQueueFamilyProperties']['queueCount']:
+                                        merged_qfp.append(qfp)
+                                    elif qfp['VkQueueFamilyProperties']['timestampValidBits'] != mqfp['VkQueueFamilyProperties']['timestampValidBits']:
+                                        merged_qfp.append(qfp)
+                                    elif qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']:
+                                        merged_qfp.append(qfp)
+                                    elif qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']:
+                                        merged_qfp.append(qfp)
+                                    elif qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']:
+                                        merged_qfp.append(qfp)
+
+                    else:
+                        print("ERROR: Unknown combination mode: " + self.mode)
 
         capabilities = dict()
         capabilities['baseline'] = dict()
@@ -238,7 +255,7 @@ class ProfileMerger():
 
     def merge_format_features(self, merged_formats, format, capability, features):
         # Remove all format features not in current json if intersect is used
-        if self.mode == 'intersect' and self.first is False:
+        if self.mode == 'intersection' and self.first is False:
             for mformat in dict(merged_formats):
                 if mformat not in capability['formats']:
                     del merged_formats[mformat]
@@ -274,10 +291,12 @@ class ProfileMerger():
                     for member in merged[struct]:
                         merged[promoted][member] = merged[struct][member]
                 # Intersect
-                else:
+                elif self.mode == 'intersection':
                     for member in list(merged[promoted]):
                         if member not in merged[struct]:
                             del merged[promoted][member]
+                else:
+                    print("ERROR: Unknown combination mode: " + self.mode)
                 del merged[struct]
 
 
@@ -308,16 +327,18 @@ class ProfileMerger():
                 for member in struct:
                     merged[struct_name][member] = struct[member]
             # Intersect
-            else:
+            elif self.mode == 'intersection':
                 for member in list(merged[struct_name]):
                     if member not in struct:
                         del merged[struct_name][member]
+            else:
+                print("ERROR: Unknown combination mode: " + self.mode)
         else:
             if self.mode == 'union' or self.first is True:
                 merged[struct_name] = struct
 
     def add_members(self, merged, entry, property = None):
-        if self.mode == 'intersect' and self.first is False:
+        if self.mode == 'intersection' and self.first is False:
             for member in list(merged):
                 if member not in entry:
                     del merged[member]
@@ -344,10 +365,15 @@ class ProfileMerger():
 
     def merge_members(self, merged, member, entry, limit, type):
         if self.mode == 'union':
-            if (limit == 'max' or limit == 'maxpot' or limit == 'noauto' or limit == 'bits') and entry[member] > merged[member]:
-                merged[member] = entry[member]
-            elif (limit == 'min' or limit == 'minpot' or limit == 'minmul') and entry[member] < merged[member]:
-                merged[member] = entry[member]
+            if limit == 'exact':
+                if merged[member] != entry[member]:
+                    print("ERROR: values with exact limittype have different values")
+            elif 'max' in limit or limit == 'bits':
+                if entry[member] > merged[member]:
+                    merged[member] = entry[member]
+            elif 'min' in limit:
+                if entry[member] < merged[member]:
+                    merged[member] = entry[member]
             elif limit == 'bitmask':
                 for smember in entry[member]:
                     if smember not in merged[member]:
@@ -357,11 +383,20 @@ class ProfileMerger():
                     merged[member][0] = entry[member][0]
                 if entry[member][1] > merged[member][1]:
                     merged[member][1] = entry[member][1]
-        else:
-            if (limit == 'max' or limit == 'maxpot' or limit == 'noauto' or limit == 'bits') and entry[member] < merged[member]:
-                merged[member] = entry[member]
-            elif (limit == 'min' or limit == 'minpot' or limit == 'minmul') and entry[member] > merged[member]:
-                merged[member] = entry[member]
+            elif limit == 'noauto':
+                print("ERROR: Unable to combine values with noauto limittype")
+            else:
+                print("ERROR: Unknown limitype: " + limit + " for " + member)
+        elif self.mode == 'intersection':
+            if limit == 'exact':
+                if merged[member] != entry[member]:
+                    print("ERROR: values with exact limittype have different values")
+            elif 'max' in limit or limit == 'bits':
+                if entry[member] < merged[member]:
+                    merged[member] = entry[member]
+            elif 'min' in limit:
+                if entry[member] > merged[member]:
+                    merged[member] = entry[member]
             elif limit == 'bitmask':
                 if type == 'VkBool32':
                     if member not in entry:
@@ -377,6 +412,12 @@ class ProfileMerger():
                     merged[member][1] = entry[member][1]
                 #if member[1] < member[0]:
                 #    merged.pop(member, None)
+            elif limit == 'noauto':
+                print("ERROR: Unable to combine values with noauto limittype")
+            else:
+                print("ERROR: Unknown limitype: " + limit + " for " + member)
+        else:
+            print("ERROR: Unknown combination mode: " + self.mode)
 
     def find_higher_struct(self, struct1, struct2):
         if registry.structs[struct1].definedByVersion:

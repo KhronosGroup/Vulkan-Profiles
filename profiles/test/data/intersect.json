@@ -96,9 +96,6 @@
                 "VkPhysicalDeviceVariablePointersFeatures": {
                     "variablePointersStorageBuffer": true,
                     "variablePointers": true
-                },
-                "VkPhysicalDeviceImageRobustnessFeaturesEXT": {
-                    "robustImageAccess": true
                 }
             },
             "properties": {
@@ -1660,21 +1657,6 @@
                             "depth": 1
                         }
                     }
-                },
-                {
-                    "VkQueueFamilyProperties": {
-                        "queueFlags": [
-                            "VK_QUEUE_GRAPHICS_BIT",
-                            "VK_QUEUE_TRANSFER_BIT"
-                        ],
-                        "queueCount": 1,
-                        "timestampValidBits": 36,
-                        "minImageTransferGranularity": {
-                            "width": 1,
-                            "height": 1,
-                            "depth": 1
-                        }
-                    }
                 }
             ]
         }
@@ -1690,7 +1672,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-07-04",
+                    "date": "2022-07-05",
                     "author": "Merge tool",
                     "comment": "Generated profile doing an intersection between profiles: VP_LUNARG_desktop_portability_2021_intersect_data1 and VP_LUNARG_desktop_portability_2021_intersect_data2"
                 }
