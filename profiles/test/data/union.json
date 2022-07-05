@@ -1664,6 +1664,20 @@
                             "depth": 1
                         }
                     }
+                },
+                {
+                    "VkQueueFamilyProperties": {
+                        "queueFlags": [
+                            "VK_QUEUE_COMPUTE_BIT"
+                        ],
+                        "queueCount": 1,
+                        "timestampValidBits": 64,
+                        "minImageTransferGranularity": {
+                            "width": 4,
+                            "height": 4,
+                            "depth": 1
+                        }
+                    }
                 }
             ]
         }
@@ -1679,7 +1693,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-07-04",
+                    "date": "2022-07-05",
                     "author": "Merge tool",
                     "comment": "Generated profile doing an union between profiles: VP_LUNARG_desktop_portability_2021_union_data1 and VP_LUNARG_desktop_portability_2021_union_data2"
                 }

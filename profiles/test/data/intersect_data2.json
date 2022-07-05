@@ -683,9 +683,9 @@
                         "queueCount": 1,
                         "timestampValidBits": 36,
                         "minImageTransferGranularity": {
-                            "width": 2,
-                            "height": 2,
-                            "depth": 2
+                            "width": 1,
+                            "height": 1,
+                            "depth": 1
                         }
                     }
                 }
