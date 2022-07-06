@@ -571,7 +571,7 @@ class ProfileGenerator():
             if member in self.test_values[name]:
                 property_value = self.test_values[name][member]
                 if (property_value):
-                    if (registry.structs[name].members[member].limittype == 'exact'):
+                    if (registry.structs[name].members[member].limittype == 'exact' or registry.structs[name].members[member].limittype == 'identifier'):
                         gen += '    if (supported) {\n'
                         if type(property_value) is list:
                             if (len(property_value) > 1):

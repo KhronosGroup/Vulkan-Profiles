@@ -3557,7 +3557,7 @@ class VulkanProfilesLayerGenerator():
         gen += '    for (const auto &member : parent.getMemberNames()) {\n'
         for member_name in registry.structs[structure].members:
             member = registry.structs[structure].members[member_name]
-            if member.limittype == 'exact':
+            if member.limittype == 'exact' or member.limittype == 'identifier':
                 gen += '        WarnNotModifiable(\"' + structure + '\", member, \"' + member_name + '\");\n'
             elif member.type in registry.enums and member.limittype == 'bitmask':
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', WarnIfNotEqualEnum);\n'
@@ -3583,8 +3583,6 @@ class VulkanProfilesLayerGenerator():
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', WarnIfLesser);\n'
             elif member.limittype == 'max' or member.limittype == 'bits': # enum values
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', WarnIfGreater);\n'
-            elif member.limittype == 'exact':
-                gen += '        WarnNotModifiable(\"' + structure + '\", member, \"' + member_name + '\");\n'
             else:
                 print("ERROR: Unsupported limittype '{0}' in member '{1}' of structure '{2}'".format(member.limittype, member_name, structure))
                 
