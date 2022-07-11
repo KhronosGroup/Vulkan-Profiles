@@ -2527,7 +2527,7 @@ class VulkanProfile():
                     # Compare everything else with equality
                     comparePredFmt = '{0} == {1}'
                 elif limittype is None or limittype == 'noauto':
-                    continue
+                    comparePredFmt = '{0} == {1}'
                 else:
                     Log.f("Unsupported limittype '{0}' in member '{1}' of structure '{2}'".format(limittype, member, structDef.name))
 
