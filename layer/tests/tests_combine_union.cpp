@@ -31,16 +31,16 @@ class TestsCombineMechanism : public VkTestFramework {
     static void TearDownTestSuite(){};
 };
 
-TEST_F(TestsCombineMechanism, TestDesktopPortability2022Limits) {
+TEST_F(TestsCombineMechanism, Extension) {
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
     {
         VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "combine.json";
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_combine_union.json";
         settings.emulate_portability = true;
-        settings.profile_name = "VP_LUNARG_test_selecting_profile";
+        settings.profile_name = "VP_LUNARG_test_combine_union";
         settings.simulate_capabilities =
             SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT | SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
 
