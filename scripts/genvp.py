@@ -1879,20 +1879,20 @@ class VulkanRegistry():
         self.structs['VkPhysicalDeviceLimits'].members['standardSampleLocations'].limittype = 'exact'
 
         if 'VkPhysicalDeviceVulkan11Properties' in self.structs:
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceUUID'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['driverUUID'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceLUID'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceNodeMask'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceLUIDValid'].limittype = 'exact'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceUUID'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['driverUUID'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceLUID'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceNodeMask'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceLUIDValid'].limittype = 'noauto'
             self.structs['VkPhysicalDeviceVulkan11Properties'].members['subgroupSize'].limittype = 'exact'
             self.structs['VkPhysicalDeviceVulkan11Properties'].members['pointClippingBehavior'].limittype = 'exact'
             self.structs['VkPhysicalDeviceVulkan11Properties'].members['protectedNoFault'].limittype = 'exact'
 
         if 'VkPhysicalDeviceVulkan12Properties' in self.structs:
-            self.structs['VkPhysicalDeviceVulkan12Properties'].members['driverID'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceVulkan12Properties'].members['driverName'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceVulkan12Properties'].members['driverInfo'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceVulkan12Properties'].members['conformanceVersion'].limittype = 'exact'
+            self.structs['VkPhysicalDeviceVulkan12Properties'].members['driverID'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceVulkan12Properties'].members['driverName'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceVulkan12Properties'].members['driverInfo'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceVulkan12Properties'].members['conformanceVersion'].limittype = 'noauto'
             self.structs['VkPhysicalDeviceVulkan12Properties'].members['denormBehaviorIndependence'].limittype = 'exact'
             self.structs['VkPhysicalDeviceVulkan12Properties'].members['roundingModeIndependence'].limittype = 'exact'
 
@@ -1909,33 +1909,33 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['uniformTexelBufferOffsetSingleTexelAlignment'].limittype = 'exact'
 
         if 'VkPhysicalDeviceProperties' in self.structs:
-            self.structs['VkPhysicalDeviceProperties'].members['apiVersion'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceProperties'].members['driverVersion'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceProperties'].members['vendorID'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceProperties'].members['deviceID'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceProperties'].members['deviceType'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceProperties'].members['deviceName'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceProperties'].members['pipelineCacheUUID'].limittype = 'exact'
+            self.structs['VkPhysicalDeviceProperties'].members['apiVersion'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceProperties'].members['driverVersion'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceProperties'].members['vendorID'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceProperties'].members['deviceID'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceProperties'].members['deviceType'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceProperties'].members['deviceName'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceProperties'].members['pipelineCacheUUID'].limittype = 'noauto'
 
         if 'VkPhysicalDeviceToolProperties' in self.structs:
-            self.structs['VkPhysicalDeviceToolProperties'].members['name'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceToolProperties'].members['version'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceToolProperties'].members['purposes'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceToolProperties'].members['description'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceToolProperties'].members['layer'].limittype = 'exact'
+            self.structs['VkPhysicalDeviceToolProperties'].members['name'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceToolProperties'].members['version'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceToolProperties'].members['purposes'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceToolProperties'].members['description'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceToolProperties'].members['layer'].limittype = 'noauto'
 
         if 'VkPhysicalDeviceDriverProperties' in self.structs:
-            self.structs['VkPhysicalDeviceDriverProperties'].members['driverID'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceDriverProperties'].members['driverName'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceDriverProperties'].members['driverInfo'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceDriverProperties'].members['conformanceVersion'].limittype = 'exact'
+            self.structs['VkPhysicalDeviceDriverProperties'].members['driverID'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceDriverProperties'].members['driverName'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceDriverProperties'].members['driverInfo'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceDriverProperties'].members['conformanceVersion'].limittype = 'noauto'
 
         if 'VkPhysicalDeviceIDProperties' in self.structs:
-            self.structs['VkPhysicalDeviceIDProperties'].members['deviceUUID'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceIDProperties'].members['driverUUID'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceIDProperties'].members['deviceLUID'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceIDProperties'].members['deviceNodeMask'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceIDProperties'].members['deviceLUIDValid'].limittype = 'exact'
+            self.structs['VkPhysicalDeviceIDProperties'].members['deviceUUID'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceIDProperties'].members['driverUUID'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceIDProperties'].members['deviceLUID'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceIDProperties'].members['deviceNodeMask'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceIDProperties'].members['deviceLUIDValid'].limittype = 'noauto'
 
         if 'VkPhysicalDeviceSubgroupProperties' in self.structs:
             self.structs['VkPhysicalDeviceSubgroupProperties'].members['subgroupSize'].limittype = 'exact'
@@ -1990,18 +1990,18 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceExternalMemoryHostPropertiesEXT'].members['minImportedHostPointerAlignment'].limittype = 'min,pot' # should be 'min,pot'
 
         if 'VkPhysicalDevicePCIBusInfoPropertiesEXT' in self.structs:
-            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciDomain'].limittype = 'exact'
-            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciBus'].limittype = 'exact'
-            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciDevice'].limittype = 'exact'
-            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciFunction'].limittype = 'exact'
+            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciDomain'].limittype = 'noauto'
+            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciBus'].limittype = 'noauto'
+            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciDevice'].limittype = 'noauto'
+            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciFunction'].limittype = 'noauto'
 
         if 'VkPhysicalDeviceDrmPropertiesEXT' in self.structs:
-            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['hasPrimary'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['hasRender'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['primaryMajor'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['primaryMinor'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['renderMajor'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['renderMinor'].limittype = 'exact'
+            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['hasPrimary'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['hasRender'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['primaryMajor'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['primaryMinor'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['renderMajor'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['renderMinor'].limittype = 'noauto'
 
         if 'VkPhysicalDeviceFragmentDensityMap2PropertiesEXT' in self.structs:
             self.structs['VkPhysicalDeviceFragmentDensityMap2PropertiesEXT'].members['subsampledLoads'].limittype = 'exact'
@@ -2523,9 +2523,11 @@ class VulkanProfile():
                 elif limittype == 'range':
                     # Compare range limit by checking if device range is larger than or equal to profile range
                     comparePredFmt = [ '{0} <= {1}', '{0} >= {1}' ]
-                elif limittype is None or limittype == 'noauto' or limittype == 'exact' or limittype == 'struct':
+                elif limittype == 'exact' or limittype == 'struct':
                     # Compare everything else with equality
                     comparePredFmt = '{0} == {1}'
+                elif limittype is None or limittype == 'noauto':
+                    continue
                 else:
                     Log.f("Unsupported limittype '{0}' in member '{1}' of structure '{2}'".format(limittype, member, structDef.name))
 

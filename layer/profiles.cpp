@@ -7803,7 +7803,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderModul
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        GET_ARRAY(shaderModuleIdentifierAlgorithmUUID);
+        WarnNotModifiable("VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT", member, "shaderModuleIdentifierAlgorithmUUID");
     }
     return valid;
 }

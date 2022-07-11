@@ -178,17 +178,8 @@ TEST_F(TestsCapabilitiesGenerated, TestDriverPropertiesKHR) {
     gpu_props_profile.pNext = &driver_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    if (supported) {
-    EXPECT_EQ(0, strncmp(driver_properties_profile.driverName, driver_properties_native.driverName, 12));
-    }
-
-    if (supported) {
-    EXPECT_EQ(0, strncmp(driver_properties_profile.driverInfo, driver_properties_native.driverInfo, 12));
-    }
-
-    if (supported) {
-    }
-
+    EXPECT_EQ(0, strncmp(driver_properties_profile.driverName, "driverName", 12));
+    EXPECT_EQ(0, strncmp(driver_properties_profile.driverInfo, "driverInfo", 12));
 #endif
 }
 
@@ -219,63 +210,48 @@ TEST_F(TestsCapabilitiesGenerated, TestIDPropertiesKHR) {
     gpu_props_profile.pNext = &idproperties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    if (supported) {
-    EXPECT_EQ(idproperties_profile.deviceUUID[0], idproperties_native.deviceUUID[0]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[1], idproperties_native.deviceUUID[1]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[2], idproperties_native.deviceUUID[2]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[3], idproperties_native.deviceUUID[3]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[4], idproperties_native.deviceUUID[4]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[5], idproperties_native.deviceUUID[5]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[6], idproperties_native.deviceUUID[6]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[7], idproperties_native.deviceUUID[7]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[8], idproperties_native.deviceUUID[8]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[9], idproperties_native.deviceUUID[9]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[10], idproperties_native.deviceUUID[10]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[11], idproperties_native.deviceUUID[11]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[12], idproperties_native.deviceUUID[12]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[13], idproperties_native.deviceUUID[13]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[14], idproperties_native.deviceUUID[14]);
-    EXPECT_EQ(idproperties_profile.deviceUUID[15], idproperties_native.deviceUUID[15]);
-    }
-
-    if (supported) {
-    EXPECT_EQ(idproperties_profile.driverUUID[0], idproperties_native.driverUUID[0]);
-    EXPECT_EQ(idproperties_profile.driverUUID[1], idproperties_native.driverUUID[1]);
-    EXPECT_EQ(idproperties_profile.driverUUID[2], idproperties_native.driverUUID[2]);
-    EXPECT_EQ(idproperties_profile.driverUUID[3], idproperties_native.driverUUID[3]);
-    EXPECT_EQ(idproperties_profile.driverUUID[4], idproperties_native.driverUUID[4]);
-    EXPECT_EQ(idproperties_profile.driverUUID[5], idproperties_native.driverUUID[5]);
-    EXPECT_EQ(idproperties_profile.driverUUID[6], idproperties_native.driverUUID[6]);
-    EXPECT_EQ(idproperties_profile.driverUUID[7], idproperties_native.driverUUID[7]);
-    EXPECT_EQ(idproperties_profile.driverUUID[8], idproperties_native.driverUUID[8]);
-    EXPECT_EQ(idproperties_profile.driverUUID[9], idproperties_native.driverUUID[9]);
-    EXPECT_EQ(idproperties_profile.driverUUID[10], idproperties_native.driverUUID[10]);
-    EXPECT_EQ(idproperties_profile.driverUUID[11], idproperties_native.driverUUID[11]);
-    EXPECT_EQ(idproperties_profile.driverUUID[12], idproperties_native.driverUUID[12]);
-    EXPECT_EQ(idproperties_profile.driverUUID[13], idproperties_native.driverUUID[13]);
-    EXPECT_EQ(idproperties_profile.driverUUID[14], idproperties_native.driverUUID[14]);
-    EXPECT_EQ(idproperties_profile.driverUUID[15], idproperties_native.driverUUID[15]);
-    }
-
-    if (supported) {
-    EXPECT_EQ(idproperties_profile.deviceLUID[0], idproperties_native.deviceLUID[0]);
-    EXPECT_EQ(idproperties_profile.deviceLUID[1], idproperties_native.deviceLUID[1]);
-    EXPECT_EQ(idproperties_profile.deviceLUID[2], idproperties_native.deviceLUID[2]);
-    EXPECT_EQ(idproperties_profile.deviceLUID[3], idproperties_native.deviceLUID[3]);
-    EXPECT_EQ(idproperties_profile.deviceLUID[4], idproperties_native.deviceLUID[4]);
-    EXPECT_EQ(idproperties_profile.deviceLUID[5], idproperties_native.deviceLUID[5]);
-    EXPECT_EQ(idproperties_profile.deviceLUID[6], idproperties_native.deviceLUID[6]);
-    EXPECT_EQ(idproperties_profile.deviceLUID[7], idproperties_native.deviceLUID[7]);
-    }
-
-    if (supported) {
-    EXPECT_EQ(idproperties_profile.deviceNodeMask, idproperties_native.deviceNodeMask);
-    }
-
-    if (supported) {
-    EXPECT_EQ(idproperties_profile.deviceLUIDValid, idproperties_native.deviceLUIDValid);
-    }
-
+    EXPECT_EQ(idproperties_profile.deviceUUID[0], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[1], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[2], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[3], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[4], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[5], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[6], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[7], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[8], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[9], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[10], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[11], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[12], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[13], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[14], 18);
+    EXPECT_EQ(idproperties_profile.deviceUUID[15], 18);
+    EXPECT_EQ(idproperties_profile.driverUUID[0], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[1], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[2], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[3], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[4], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[5], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[6], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[7], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[8], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[9], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[10], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[11], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[12], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[13], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[14], 19);
+    EXPECT_EQ(idproperties_profile.driverUUID[15], 19);
+    EXPECT_EQ(idproperties_profile.deviceLUID[0], 20);
+    EXPECT_EQ(idproperties_profile.deviceLUID[1], 20);
+    EXPECT_EQ(idproperties_profile.deviceLUID[2], 20);
+    EXPECT_EQ(idproperties_profile.deviceLUID[3], 20);
+    EXPECT_EQ(idproperties_profile.deviceLUID[4], 20);
+    EXPECT_EQ(idproperties_profile.deviceLUID[5], 20);
+    EXPECT_EQ(idproperties_profile.deviceLUID[6], 20);
+    EXPECT_EQ(idproperties_profile.deviceLUID[7], 20);
+    EXPECT_EQ(idproperties_profile.deviceNodeMask, 21);
+    EXPECT_EQ(idproperties_profile.deviceLUIDValid, VK_TRUE);
 #endif
 #endif
 #endif
@@ -871,22 +847,10 @@ TEST_F(TestsCapabilitiesGenerated, TestPCIBusInfoPropertiesEXT) {
     gpu_props_profile.pNext = &pcibus_info_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    if (supported) {
-    EXPECT_EQ(pcibus_info_properties_profile.pciDomain, pcibus_info_properties_native.pciDomain);
-    }
-
-    if (supported) {
-    EXPECT_EQ(pcibus_info_properties_profile.pciBus, pcibus_info_properties_native.pciBus);
-    }
-
-    if (supported) {
-    EXPECT_EQ(pcibus_info_properties_profile.pciDevice, pcibus_info_properties_native.pciDevice);
-    }
-
-    if (supported) {
-    EXPECT_EQ(pcibus_info_properties_profile.pciFunction, pcibus_info_properties_native.pciFunction);
-    }
-
+    EXPECT_EQ(pcibus_info_properties_profile.pciDomain, 79);
+    EXPECT_EQ(pcibus_info_properties_profile.pciBus, 80);
+    EXPECT_EQ(pcibus_info_properties_profile.pciDevice, 81);
+    EXPECT_EQ(pcibus_info_properties_profile.pciFunction, 82);
 #endif
 }
 
@@ -1658,30 +1622,12 @@ TEST_F(TestsCapabilitiesGenerated, TestDrmPropertiesEXT) {
     gpu_props_profile.pNext = &drm_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    if (supported) {
-    EXPECT_EQ(drm_properties_profile.hasPrimary, drm_properties_native.hasPrimary);
-    }
-
-    if (supported) {
-    EXPECT_EQ(drm_properties_profile.hasRender, drm_properties_native.hasRender);
-    }
-
-    if (supported) {
-    EXPECT_EQ(drm_properties_profile.primaryMajor, drm_properties_native.primaryMajor);
-    }
-
-    if (supported) {
-    EXPECT_EQ(drm_properties_profile.primaryMinor, drm_properties_native.primaryMinor);
-    }
-
-    if (supported) {
-    EXPECT_EQ(drm_properties_profile.renderMajor, drm_properties_native.renderMajor);
-    }
-
-    if (supported) {
-    EXPECT_EQ(drm_properties_profile.renderMinor, drm_properties_native.renderMinor);
-    }
-
+    EXPECT_EQ(drm_properties_profile.hasPrimary, VK_TRUE);
+    EXPECT_EQ(drm_properties_profile.hasRender, VK_TRUE);
+    EXPECT_EQ(drm_properties_profile.primaryMajor, 166);
+    EXPECT_EQ(drm_properties_profile.primaryMinor, 167);
+    EXPECT_EQ(drm_properties_profile.renderMajor, 168);
+    EXPECT_EQ(drm_properties_profile.renderMinor, 169);
 #endif
 }
 
