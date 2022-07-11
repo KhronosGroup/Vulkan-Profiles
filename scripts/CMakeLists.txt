@@ -49,3 +49,33 @@ add_custom_target(VpMergeUnion ALL
 	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
 
 set_target_properties(VpMergeUnion PROPERTIES FOLDER "Profiles scripts")
+
+add_custom_target(VpTestIntersect ALL
+	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
+		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
+		-profile_dir ${CMAKE_SOURCE_DIR}/profiles/test/data
+		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_intersect.json
+		-profile VP_LUNARG_test_combine_intersect1
+		-profile2 VP_LUNARG_test_combine_intersect2
+		-output_profile VP_LUNARG_test_combine_intersect
+		-mode intersection
+	VERBATIM
+	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
+	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
+
+set_target_properties(VpTestIntersect PROPERTIES FOLDER "Profiles scripts")
+
+add_custom_target(VpTestUnion ALL
+	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
+		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
+		-profile_dir ${CMAKE_SOURCE_DIR}/profiles/test/data
+		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_union.json
+		-profile VP_LUNARG_test_combine_union1
+		-profile2 VP_LUNARG_test_combine_union2
+		-output_profile VP_LUNARG_test_combine_union
+		-mode union
+	VERBATIM
+	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
+	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
+
+set_target_properties(VpTestUnion PROPERTIES FOLDER "Profiles scripts")
