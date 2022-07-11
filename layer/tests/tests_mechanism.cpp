@@ -30,10 +30,8 @@ class TestsMechanism : public VkTestFramework {
    TestsMechanism(){};
    ~TestsMechanism(){};
 
-    static void SetUpTestSuite() {}
-
-    static void TearDownTestSuite(){ 
-    };
+    static void SetUpTestSuite(){}
+    static void TearDownTestSuite(){};
 };
 
 TEST_F(TestsMechanism, api_versions) {

@@ -384,7 +384,7 @@ class ProfileMerger():
                 if entry[member][1] > merged[member][1]:
                     merged[member][1] = entry[member][1]
             elif limit == 'noauto':
-                print("ERROR: Unable to combine values with noauto limittype")
+                merged.remove(member)
             else:
                 print("ERROR: Unknown limitype: " + limit + " for " + member)
         elif self.mode == 'intersection':
@@ -413,7 +413,7 @@ class ProfileMerger():
                 #if member[1] < member[0]:
                 #    merged.pop(member, None)
             elif limit == 'noauto':
-                print("ERROR: Unable to combine values with noauto limittype")
+                merged.remove(member)
             else:
                 print("ERROR: Unknown limitype: " + limit + " for " + member)
         else:

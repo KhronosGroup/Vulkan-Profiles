@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-154.json#",
+    "capabilities": {
+        "baseline": {
+            "extensions": {
+                "VK_KHR_maintenance1": 1,
+                "VK_KHR_maintenance3": 1,
+                "VK_KHR_maintenance2": 1
+            }
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_test_union": {
+            "version": 1,
+            "status": "BETA",
+            "api-version": "1.1.142",
+            "label": "Merged profile",
+            "description": "Generated profile doing an union between profiles: VP_LUNARG_test_union1 and VP_LUNARG_test_union2",
+            "contributors": {},
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2022-07-11",
+                    "author": "Merge tool",
+                    "comment": "Generated profile doing an union between profiles: VP_LUNARG_test_union1 and VP_LUNARG_test_union2"
+                }
+            ],
+            "capabilities": [
+                "baseline"
+            ]
+        }
+    }
+}
