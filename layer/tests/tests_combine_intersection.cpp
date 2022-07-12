@@ -22,44 +22,73 @@
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
 
-class TestsCombineMechanism : public VkTestFramework {
+static VkPhysicalDevice gpu = VK_NULL_HANDLE;
+static profiles_test::VulkanInstanceBuilder inst_builder;
+
+class TestsIntersection : public VkTestFramework {
    public:
-    TestsCombineMechanism(){};
-    ~TestsCombineMechanism(){};
+    TestsIntersection(){};
+    ~TestsIntersection(){};
 
-    static void SetUpTestSuite(){}
-    static void TearDownTestSuite(){};
-};
+    static void SetUpTestSuite() {
+        VkResult err = VK_SUCCESS;
 
-TEST_F(TestsCombineMechanism, Extension) {
-    VkResult err = VK_SUCCESS;
-
-    profiles_test::VulkanInstanceBuilder inst_builder;
-
-    {
         VkProfileLayerSettingsEXT settings;
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_combine_intersect.json";
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_test_combine_intersect";
-        settings.simulate_capabilities =
-            SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT | SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
+        settings.simulate_capabilities = SIMULATE_MAX_ENUM;
+        settings.debug_reports =
+            DEBUG_REPORT_ERROR_BIT | DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_NOTIFICATION_BIT | DEBUG_REPORT_DEBUG_BIT;
 
         err = inst_builder.init(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
-        VkPhysicalDevice gpu;
         err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
-        if (err != VK_SUCCESS) {
-            printf("Profile not supported on device, skipping test.\n");
-            inst_builder.reset();
-            return;
-        }
-
-        VkPhysicalDeviceProperties gpu_props{};
-        vkGetPhysicalDeviceProperties(gpu, &gpu_props);
-
-        EXPECT_EQ(gpu_props.limits.maxImageDimension1D, 4096u);
-
-        inst_builder.reset();
+        ASSERT_EQ(err, VK_SUCCESS);
     }
+
+    static void TearDownTestSuite() { inst_builder.reset(); };
+};
+
+TEST_F(TestsIntersection, Extension) {
+    uint32_t count;
+    vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
+    std::vector<VkExtensionProperties> device_extensions(count);
+    vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, device_extensions.data());
+
+    for (std::size_t i = 0, n = count; i < n; ++i) {
+        printf(device_extensions[i].extensionName);
+    }
+
+    ASSERT_STREQ("VK_KHR_portability_subset", device_extensions[0].extensionName);
+    ASSERT_STREQ("VK_KHR_maintenance3", device_extensions[1].extensionName);
+}
+
+TEST_F(TestsIntersection, Feature) {
+    VkPhysicalDeviceFeatures gpu_features{};
+    vkGetPhysicalDeviceFeatures(gpu, &gpu_features);
+
+    EXPECT_EQ(gpu_features.depthClamp, VK_TRUE);
+}
+
+TEST_F(TestsIntersection, Properties) {
+    VkPhysicalDeviceProperties gpu_props{};
+    vkGetPhysicalDeviceProperties(gpu, &gpu_props);
+
+    EXPECT_EQ(gpu_props.limits.maxImageDimension1D, 4096u);
+    EXPECT_EQ(gpu_props.limits.maxComputeWorkGroupCount[0], 4096u);
+    EXPECT_EQ(gpu_props.limits.maxComputeWorkGroupCount[1], 4096u);
+    EXPECT_EQ(gpu_props.limits.maxComputeWorkGroupCount[2], 2048u);
+    EXPECT_EQ(gpu_props.limits.mipmapPrecisionBits, 2u);
+    EXPECT_TRUE(std::abs(gpu_props.limits.maxSamplerAnisotropy - 1.0) < 0.0001);
+    EXPECT_EQ(gpu_props.limits.viewportBoundsRange[0], -16384);
+    EXPECT_EQ(gpu_props.limits.viewportBoundsRange[1], 16384);
+    EXPECT_EQ(gpu_props.limits.minMemoryMapAlignment, 4096);
+    EXPECT_EQ(gpu_props.limits.minTexelOffset, -4);
+    EXPECT_EQ(gpu_props.limits.maxTexelOffset, 3);
+    EXPECT_EQ(gpu_props.limits.framebufferColorSampleCounts, VK_SAMPLE_COUNT_4_BIT);
+    EXPECT_EQ(gpu_props.limits.pointSizeRange[0], 4.0);
+    EXPECT_EQ(gpu_props.limits.pointSizeRange[1], 32.0);
+    EXPECT_EQ(gpu_props.limits.pointSizeGranularity, 4.0);
 }

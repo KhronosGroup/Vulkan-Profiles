@@ -22,16 +22,6 @@
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
 
-#ifdef _WIN32
-#ifdef _DEBUG
-static const char* CONFIG_PATH = "bin/Debug";
-#else
-static const char* CONFIG_PATH = "bin/Release";
-#endif
-#else 
-static const char* CONFIG_PATH = "lib";
-#endif
-
 static VkPhysicalDevice gpu = VK_NULL_HANDLE;
 static profiles_test::VulkanInstanceBuilder inst_builder;
 

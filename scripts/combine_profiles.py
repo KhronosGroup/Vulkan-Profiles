@@ -348,74 +348,97 @@ class ProfileMerger():
                     merged[member] = entry[member]
             else:
                 # Merge properties
-                limit = self.registry.structs[property].members[member].limittype
-                if limit == 'struct':
+                xmlmember = self.registry.structs[property].members[member]
+                if xmlmember.limittype == 'struct':
                     s = self.registry.structs[self.registry.structs[property].members[member].type].members
                     for smember in s:
                         if smember in merged[member]:
                             if smember in entry[member]:
-                                slimit = s[smember].limittype
-                                type = s[smember].type
-                                self.merge_members(merged[member], smember, entry[member], slimit, type)
+                                self.merge_members(merged[member], smember, entry[member], s[smember])
                         elif self.mode == 'union' and smember in entry[member]:
                             merged[member][smember] = entry[member][smember]
                 else:
-                    type = self.registry.structs[property].members[member].type
-                    self.merge_members(merged, member, entry, limit, type)
+                    self.merge_members(merged, member, entry, xmlmember)
 
-    def merge_members(self, merged, member, entry, limit, type):
+    def merge_members(self, merged, member, entry, xmlmember):
         if self.mode == 'union':
-            if limit == 'exact':
+            if xmlmember.limittype == 'exact':
                 if merged[member] != entry[member]:
                     print("ERROR: values with exact limittype have different values")
-            elif 'max' in limit or limit == 'bits':
-                if entry[member] > merged[member]:
-                    merged[member] = entry[member]
-            elif 'min' in limit:
+            elif 'max' in xmlmember.limittype or xmlmember.limittype == 'bits':
+                if xmlmember.arraySize == 3:
+                    if entry[member][0] > merged[member][0]:
+                        merged[member][0] = entry[member][0]
+                    if entry[member][1] > merged[member][1]:
+                        merged[member][1] = entry[member][1]
+                    if entry[member][2] > merged[member][2]:
+                        merged[member][2] = entry[member][2]
+                elif xmlmember.arraySize == 2:
+                    if entry[member][0] > merged[member][0]:
+                        merged[member][0] = entry[member][0]
+                    if entry[member][1] > merged[member][1]:
+                        merged[member][1] = entry[member][1]
+                else:
+                    if entry[member] > merged[member]:
+                        merged[member] = entry[member]
+            elif 'min' in xmlmember.limittype:
                 if entry[member] < merged[member]:
                     merged[member] = entry[member]
-            elif limit == 'bitmask':
+            elif xmlmember.limittype == 'bitmask':
                 for smember in entry[member]:
                     if smember not in merged[member]:
                         merged[member].append(smember)
-            elif limit == 'range':
+            elif xmlmember.limittype == 'range':
                 if entry[member][0] < merged[member][0]:
                     merged[member][0] = entry[member][0]
                 if entry[member][1] > merged[member][1]:
                     merged[member][1] = entry[member][1]
-            elif limit == 'noauto':
+            elif xmlmember.limittype == 'noauto':
                 merged.remove(member)
             else:
-                print("ERROR: Unknown limitype: " + limit + " for " + member)
+                print("ERROR: Unknown limitype: " + xmlmember.limittype + " for " + member)
         elif self.mode == 'intersection':
-            if limit == 'exact':
+            if xmlmember.limittype == 'exact':
                 if merged[member] != entry[member]:
                     print("ERROR: values with exact limittype have different values")
-            elif 'max' in limit or limit == 'bits':
-                if entry[member] < merged[member]:
-                    merged[member] = entry[member]
-            elif 'min' in limit:
+            elif 'max' in xmlmember.limittype or xmlmember.limittype == 'bits':
+                if xmlmember.arraySize == 3:
+                    if entry[member][0] < merged[member][0]:
+                        merged[member][0] = entry[member][0]
+                    if entry[member][1] < merged[member][1]:
+                        merged[member][1] = entry[member][1]
+                    if entry[member][2] < merged[member][2]:
+                        merged[member][2] = entry[member][2]
+                elif xmlmember.arraySize == 2:
+                    if entry[member][0] < merged[member][0]:
+                        merged[member][0] = entry[member][0]
+                    if entry[member][1] < merged[member][1]:
+                        merged[member][1] = entry[member][1]
+                else:
+                    if entry[member] < merged[member]:
+                        merged[member] = entry[member]
+            elif 'min' in xmlmember.limittype:
                 if entry[member] > merged[member]:
                     merged[member] = entry[member]
-            elif limit == 'bitmask':
-                if type == 'VkBool32':
+            elif xmlmember.limittype == 'bitmask':
+                if xmlmember.type == 'VkBool32':
                     if member not in entry:
                         merged.remove(member)
                 else:
                     for value in merged[member]:
                         if value not in entry[member]:
                             merged[member].remove(value)
-            elif limit == 'range':
+            elif xmlmember.limittype == 'range':
                 if entry[member][0] > merged[member][0]:
                     merged[member][0] = entry[member][0]
                 if entry[member][1] < merged[member][1]:
                     merged[member][1] = entry[member][1]
                 #if member[1] < member[0]:
                 #    merged.pop(member, None)
-            elif limit == 'noauto':
+            elif xmlmember.limittype == 'noauto':
                 merged.remove(member)
             else:
-                print("ERROR: Unknown limitype: " + limit + " for " + member)
+                print("ERROR: Unknown limitype: " + xmlmember.limittype + " for " + member)
         else:
             print("ERROR: Unknown combination mode: " + self.mode)
 
