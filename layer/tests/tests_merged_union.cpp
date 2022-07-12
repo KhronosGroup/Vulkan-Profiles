@@ -22,16 +22,6 @@
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
 
-#ifdef _WIN32
-#ifdef _DEBUG
-static const char* CONFIG_PATH = "bin/Debug";
-#else
-static const char* CONFIG_PATH = "bin/Release";
-#endif
-#else
-static const char* CONFIG_PATH = "lib";
-#endif
-
 static VkPhysicalDevice gpu;
 static profiles_test::VulkanInstanceBuilder inst_builder;
 
@@ -48,7 +38,7 @@ class TestsMergedUnion : public VkTestFramework {
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_desktop_portability_2021";
         settings.simulate_capabilities = SIMULATE_MAX_ENUM;
-        settings.debug_reports = DEBUG_REPORT_ERROR_BIT;
+        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
 
         err = inst_builder.init(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
