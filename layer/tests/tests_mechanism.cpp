@@ -42,6 +42,40 @@ TEST_F(TestsMechanism, selecting_profile) {
 
     {
         VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_extensions.json";
+        settings.emulate_portability = false;
+        settings.profile_name = "VP_LUNARG_test_device_extensions";
+        settings.simulate_capabilities =
+            SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT;
+
+        err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkResult result = VK_SUCCESS;
+
+        uint32_t extCount = 0;
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        std::vector<VkExtensionProperties> ext(extCount);
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_STREQ("VK_KHR_maintenance3", ext[0].extensionName);
+
+        inst_builder.reset();
+    }
+
+    {
+        VkProfileLayerSettingsEXT settings;
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_test_selecting_profile";
