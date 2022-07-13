@@ -303,7 +303,7 @@ TEST_F(LayerTests, TestMissingPhysDevProps2) {
     settings.profile_name = "VP_LUNARG_desktop_portability_2021";
     settings.emulate_portability = false;
     settings.debug_fail_on_error = false;
-    settings.simulate_capabilities = SIMULATE_ALL_CAPABILITIES;
+    settings.simulate_capabilities = SIMULATE_MAX_ENUM;
 
     err = inst_builder.init(VK_API_VERSION_1_0, & settings);
     ASSERT_EQ(err, VK_SUCCESS);
@@ -396,7 +396,7 @@ TEST_F(LayerTests, TestExcludedExtensions) {
         settings.profile_name = "VP_LUNARG_test_api";
         settings.emulate_portability = true;
         settings.debug_fail_on_error = false;
-        settings.simulate_capabilities = SIMULATE_ALL_CAPABILITIES;
+        settings.simulate_capabilities = SIMULATE_MAX_ENUM;
         settings.exclude_device_extensions.push_back(VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME);
         settings.debug_reports = 0;
 

@@ -99,7 +99,7 @@ class TestsCapabilitiesGenerated : public VkTestFramework {
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_generated.json";
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_test_api";
-        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
+        settings.simulate_capabilities = SIMULATE_MAX_ENUM;
         settings.debug_reports = DEBUG_REPORT_ERROR_BIT;
 
         err = inst_builder.init(&settings);

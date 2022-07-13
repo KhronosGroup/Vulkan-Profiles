@@ -40,13 +40,47 @@ TEST_F(TestsMechanism, selecting_profile) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
+    { /*
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_instance_extensions.json";
+        settings.emulate_portability = false;
+        settings.profile_name = "VP_LUNARG_test_instance_extensions";
+        settings.simulate_capabilities = SIMULATE_EXTENSIONS_BIT;
+
+        err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkResult result = VK_SUCCESS;
+
+        uint32_t extCount = 0;
+        result = vkEnumerateInstanceExtensionProperties(nullptr, &extCount, nullptr);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        std::vector<VkExtensionProperties> ext(extCount);
+        result = vkEnumerateInstanceExtensionProperties(nullptr, &extCount, ext.data());
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_STREQ("VK_KHR_get_physical_device_properties2", ext[0].extensionName);
+
+        inst_builder.reset();
+        */
+    }
+
+    // Only override extensions
     {
         VkProfileLayerSettingsEXT settings;
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_extensions.json";
         settings.emulate_portability = false;
         settings.profile_name = "VP_LUNARG_test_device_extensions";
-        settings.simulate_capabilities =
-            SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT;
+        settings.simulate_capabilities = SIMULATE_EXTENSIONS_BIT;
 
         err = inst_builder.init(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -65,6 +99,8 @@ TEST_F(TestsMechanism, selecting_profile) {
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
         ASSERT_EQ(err, VK_SUCCESS);
 
+        EXPECT_EQ(1, extCount);
+
         std::vector<VkExtensionProperties> ext(extCount);
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
         ASSERT_EQ(err, VK_SUCCESS);
@@ -73,14 +109,49 @@ TEST_F(TestsMechanism, selecting_profile) {
 
         inst_builder.reset();
     }
+    /*
+    // Override everything but the layer only has extensions
+    {
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_extensions.json";
+        settings.emulate_portability = false;
+        settings.profile_name = "VP_LUNARG_test_device_extensions";
+        settings.simulate_capabilities = SIMULATE_MAX_ENUM;
+
+        err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkResult result = VK_SUCCESS;
+
+        uint32_t extCount = 0;
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_EQ(1, extCount);
+
+        std::vector<VkExtensionProperties> ext(extCount);
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_STREQ("VK_KHR_maintenance3", ext[0].extensionName);
+
+        inst_builder.reset();
+    }*/
 
     {
         VkProfileLayerSettingsEXT settings;
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_test_selecting_profile";
-        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
-                                         SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
+        settings.simulate_capabilities = SIMULATE_EXTENSIONS_BIT | SIMULATE_PROPERTIES_BIT;
 
         err = inst_builder.init(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -106,8 +177,7 @@ TEST_F(TestsMechanism, selecting_profile) {
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_test_selecting_profile_subset";
-        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
-                                         SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
+        settings.simulate_capabilities = SIMULATE_EXTENSIONS_BIT | SIMULATE_PROPERTIES_BIT;
 
         err = inst_builder.init(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -139,7 +209,7 @@ TEST_F(TestsMechanism, reading_flags) {
     settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_alternate.json";
     settings.emulate_portability = true;
     settings.profile_name = "VP_LUNARG_test_api";
-    settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
+    settings.simulate_capabilities = SIMULATE_MAX_ENUM;
 
     err = inst_builder.init(&settings);
     ASSERT_EQ(err, VK_SUCCESS);
@@ -204,7 +274,7 @@ TEST_F(TestsMechanism, reading_duplicated_members) {
     settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_duplicated.json";
     settings.emulate_portability = true;
     settings.profile_name = "VP_LUNARG_test_duplicated";
-    settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
+    settings.simulate_capabilities = SIMULATE_MAX_ENUM;
     settings.debug_fail_on_error = true;
 
     err = inst_builder.init(&settings);
@@ -225,7 +295,7 @@ TEST_F(TestsMechanism, TestParsingAllFormatProperties) {
     settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_formats.json";
     settings.emulate_portability = true;
     settings.profile_name = "VP_LUNARG_test_formats";
-    settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
+    settings.simulate_capabilities = SIMULATE_MAX_ENUM;
 
     err = inst_builder.init(&settings);
     ASSERT_EQ(err, VK_SUCCESS);
