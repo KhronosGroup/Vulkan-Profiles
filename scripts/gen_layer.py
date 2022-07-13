@@ -3252,6 +3252,11 @@ class VulkanProfilesLayerGenerator():
 
     def generate_add_promoted_extensions(self):
         gen = '\nvoid JsonLoader::AddPromotedExtensions(uint32_t api_version) {\n'
+        gen += '\tconst uint32_t minor = VK_API_VERSION_MINOR(api_version);\n'
+        gen += '\tconst uint32_t major = VK_API_VERSION_MAJOR(api_version);\n'
+        gen += '\tLogMessage(DEBUG_REPORT_NOTIFICATION_BIT,\n'
+        gen += '\t\tformat("Adding promoted extensions to core in Vulkan (%" PRIu32 ".%" PRIu32 ")",major, minor));\n\n'
+
         for i in range(registry.headerVersionNumber.major):
             major = str(i + 1)
             for j in range(registry.headerVersionNumber.minor):

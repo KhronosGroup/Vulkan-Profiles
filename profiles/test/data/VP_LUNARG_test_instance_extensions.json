@@ -10,7 +10,7 @@
     "profiles": {
         "VP_LUNARG_test_instance_extensions": {
             "version": 1,
-            "api-version": "1.2.198",
+            "api-version": "1.0.198",
             "label": "Instance extensions",
             "description": "Unit test file",
             "contributors": {
