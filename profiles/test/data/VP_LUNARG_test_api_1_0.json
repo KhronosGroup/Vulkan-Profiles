@@ -1,0 +1,34 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+    "capabilities": {
+        "baseline": {
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_test_api_1_0": {
+            "version": 1,
+            "api-version": "1.0.198",
+            "label": "Device extensions",
+            "description": "Unit test file",
+            "contributors": {
+                "Christophe Riccio": {
+                    "company": "LunarG",
+                    "email": "christophe@lunarg.com",
+                    "github": "christophe-lunarg",
+                    "contact": true
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2021-12-08",
+                    "author": "Christophe Riccio",
+                    "comment": "Initial revision"
+                }
+            ],
+            "capabilities": [
+                "baseline"
+            ]
+        }
+    }
+}

@@ -5266,10 +5266,8 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
                         failed = true;
                     }
                     pdd_->arrayof_extension_properties_.push_back(extension);
-                    if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
-                        if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, extension.extensionName)) {
-                            pdd_->simulation_extensions_.push_back(extension);
-                        }
+                    if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, extension.extensionName)) {
+                        pdd_->simulation_extensions_.push_back(extension);
                     }
                 }
             }
@@ -9879,17 +9877,19 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
     uint32_t pCount_copy = *pCount;
 
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    const uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->simulation_extensions_.size()) : 0;
+    const uint32_t src_count = pdd ? static_cast<uint32_t>(pdd->simulation_extensions_.size()) : 0;
     if (pLayerName) {
         if (strcmp(pLayerName, kOurLayerName) == 0)
             result = EnumerateProperties(kDeviceExtensionPropertiesCount, kDeviceExtensionProperties.data(), pCount, pProperties);
         else
             result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
-    } else if (src_count == 0 || (!(layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) &&
+    //} else if (src_count == 0 || (!(layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) &&
+    //                              layer_settings->exclude_device_extensions.empty())) {
+    } else if (pdd == nullptr || (!(layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) &&
                                   layer_settings->exclude_device_extensions.empty())) {
         result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
     } else {
-        result = EnumerateProperties(src_count, pdd->simulation_extensions_.data(), pCount, pProperties);
+        result = EnumerateProperties(static_cast<uint32_t>(pdd->simulation_extensions_.size()), pdd->simulation_extensions_.data(), pCount, pProperties);
     }
 
     if (result == VK_SUCCESS && !pLayerName && layer_settings->emulate_portability &&
