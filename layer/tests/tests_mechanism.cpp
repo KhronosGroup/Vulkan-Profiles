@@ -81,6 +81,7 @@ TEST_F(TestsMechanism, selecting_profile) {
         settings.emulate_portability = false;
         settings.profile_name = "VP_LUNARG_test_device_extensions";
         settings.simulate_capabilities = SIMULATE_EXTENSIONS_BIT;
+        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
 
         err = inst_builder.init(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -109,7 +110,7 @@ TEST_F(TestsMechanism, selecting_profile) {
 
         inst_builder.reset();
     }
-    /*
+
     // Override everything but the layer only has extensions
     {
         VkProfileLayerSettingsEXT settings;
@@ -117,6 +118,7 @@ TEST_F(TestsMechanism, selecting_profile) {
         settings.emulate_portability = false;
         settings.profile_name = "VP_LUNARG_test_device_extensions";
         settings.simulate_capabilities = SIMULATE_MAX_ENUM;
+        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
 
         err = inst_builder.init(&settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -144,7 +146,7 @@ TEST_F(TestsMechanism, selecting_profile) {
         EXPECT_STREQ("VK_KHR_maintenance3", ext[0].extensionName);
 
         inst_builder.reset();
-    }*/
+    }
 
     {
         VkProfileLayerSettingsEXT settings;

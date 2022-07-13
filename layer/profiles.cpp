@@ -4992,6 +4992,11 @@ bool JsonLoader::OrderQueueFamilyProperties(ArrayOfVkQueueFamilyProperties *qfp)
 }
 
 void JsonLoader::AddPromotedExtensions(uint32_t api_version) {
+	const uint32_t minor = VK_API_VERSION_MINOR(api_version);
+	const uint32_t major = VK_API_VERSION_MAJOR(api_version);
+	LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+		format("Adding promoted extensions to core in Vulkan (%" PRIu32 ".%" PRIu32 ")",major, minor));
+
     static const std::vector<const char *> promoted_1_1 = {
         VK_KHR_MULTIVIEW_EXTENSION_NAME,
         VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
