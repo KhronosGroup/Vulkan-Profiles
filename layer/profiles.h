@@ -27,7 +27,7 @@ enum SimulateCapabilityFlag {
     SIMULATE_EXTENSIONS_BIT = 1 << 3,
     SIMULATE_FORMATS_BIT = 1 << 4,
     SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT = 1 << 5,
-    SIMULATE_ALL_CAPABILITIES = 0xFFFFFFFF
+    SIMULATE_MAX_ENUM = 0x7FFFFFFF
 };
 typedef int SimulateCapabilityFlags;
 
@@ -35,7 +35,8 @@ enum DebugAction {
     DEBUG_ACTION_FILE_BIT = (1 << 0),
     DEBUG_ACTION_STDOUT_BIT = (1 << 1),
     DEBUG_ACTION_OUTPUT_BIT = (1 << 2),
-    DEBUG_ACTION_BREAKPOINT_BIT = (1 << 3)
+    DEBUG_ACTION_BREAKPOINT_BIT = (1 << 3),
+    DEBUG_ACTION_MAX_ENUM = 0x7FFFFFFF
 };
 typedef int DebugActionFlags;
 
@@ -83,7 +84,8 @@ enum DebugReport {
     DEBUG_REPORT_NOTIFICATION_BIT = (1 << 0),
     DEBUG_REPORT_WARNING_BIT = (1 << 1),
     DEBUG_REPORT_ERROR_BIT = (1 << 2),
-    DEBUG_REPORT_DEBUG_BIT = (1 << 3)
+    DEBUG_REPORT_DEBUG_BIT = (1 << 3),
+    DEBUG_REPORT_MAX_ENUM = 0x7FFFFFFF
 };
 typedef int DebugReportFlags;
 

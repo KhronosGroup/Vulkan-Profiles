@@ -47,7 +47,7 @@ class TestsMergedIntersection : public VkTestFramework {
         settings.profile_file = JSON_TEST_FILES_PATH "intersect.json";
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_desktop_portability_2021";
-        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_ALL_CAPABILITIES;
+        settings.simulate_capabilities = SIMULATE_MAX_ENUM;
         settings.debug_reports = DEBUG_REPORT_ERROR_BIT;
 
         err = inst_builder.init(&settings);
