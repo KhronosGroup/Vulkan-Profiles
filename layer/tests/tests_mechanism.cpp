@@ -227,7 +227,7 @@ TEST_F(TestsMechanism, api_versions) {
 
         inst_builder.reset();
     }
-    /*
+    
     // Vulkan 1.2
     {
         VkProfileLayerSettingsEXT settings;
@@ -254,7 +254,7 @@ TEST_F(TestsMechanism, api_versions) {
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
         ASSERT_EQ(err, VK_SUCCESS);
 
-        EXPECT_EQ(0, extCount);
+        EXPECT_EQ(47, extCount);
 
         std::vector<VkExtensionProperties> ext(extCount);
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
@@ -283,10 +283,34 @@ TEST_F(TestsMechanism, api_versions) {
         EXPECT_STREQ(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, ext[20].extensionName);
         EXPECT_STREQ(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME, ext[21].extensionName);
         EXPECT_STREQ(VK_KHR_MAINTENANCE_3_EXTENSION_NAME, ext[22].extensionName);
+        EXPECT_STREQ(VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, ext[23].extensionName);
+        EXPECT_STREQ(VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, ext[24].extensionName);
+        EXPECT_STREQ(VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, ext[25].extensionName);
+        EXPECT_STREQ(VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, ext[26].extensionName);
+        EXPECT_STREQ(VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME, ext[27].extensionName);
+        EXPECT_STREQ(VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, ext[28].extensionName);
+        EXPECT_STREQ(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, ext[29].extensionName);
+        EXPECT_STREQ(VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME, ext[30].extensionName);
+        EXPECT_STREQ(VK_KHR_DRAW_INDIRECT_COUNT_EXTENSION_NAME, ext[31].extensionName);
+        EXPECT_STREQ(VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME, ext[32].extensionName);
+        EXPECT_STREQ(VK_KHR_8BIT_STORAGE_EXTENSION_NAME, ext[33].extensionName);
+        EXPECT_STREQ(VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME, ext[34].extensionName);
+        EXPECT_STREQ(VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, ext[35].extensionName);
+        EXPECT_STREQ(VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME, ext[36].extensionName);
+        EXPECT_STREQ(VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, ext[37].extensionName);
+        EXPECT_STREQ(VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, ext[38].extensionName);
+        EXPECT_STREQ(VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME, ext[39].extensionName);
+        EXPECT_STREQ(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, ext[40].extensionName);
+        EXPECT_STREQ(VK_KHR_SPIRV_1_4_EXTENSION_NAME, ext[41].extensionName);
+        EXPECT_STREQ(VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME, ext[42].extensionName);
+        EXPECT_STREQ(VK_EXT_SEPARATE_STENCIL_USAGE_EXTENSION_NAME, ext[43].extensionName);
+        EXPECT_STREQ(VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME, ext[44].extensionName);
+        EXPECT_STREQ(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME, ext[45].extensionName);
+        EXPECT_STREQ(VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, ext[46].extensionName);
 
         inst_builder.reset();
     }
-
+    /*
     // Vulkan 1.3
     {
         VkProfileLayerSettingsEXT settings;
