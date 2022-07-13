@@ -422,8 +422,8 @@ TEST_F(TestsMechanism, selecting_profile) {
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
-
-    { /*
+    /*
+    {
         VkProfileLayerSettingsEXT settings;
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_instance_extensions.json";
         settings.emulate_portability = false;
@@ -454,9 +454,8 @@ TEST_F(TestsMechanism, selecting_profile) {
         EXPECT_STREQ("VK_KHR_get_physical_device_properties2", ext[0].extensionName);
 
         inst_builder.reset();
-        */
     }
-
+    */
     // Only override extensions
     {
         VkProfileLayerSettingsEXT settings;
