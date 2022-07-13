@@ -20,6 +20,7 @@
  */
 
 #include <vulkan/vulkan_core.h>
+#include <vulkan/vulkan_beta.h>
 
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
@@ -34,6 +35,317 @@ class TestsMechanism : public VkTestFramework {
     static void TearDownTestSuite(){ 
     };
 };
+
+TEST_F(TestsMechanism, api_versions) {
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    // Vulkan 1.0
+    {
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
+        settings.emulate_portability = false;
+        settings.profile_name = "VP_LUNARG_test_api_1_0";
+        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
+        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+
+        err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkResult result = VK_SUCCESS;
+
+        uint32_t extCount = 0;
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_EQ(0, extCount);
+
+        inst_builder.reset();
+    }
+
+    // Vulkan 1.0 + emulate_portability = true
+    {
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
+        settings.emulate_portability = true;
+        settings.profile_name = "VP_LUNARG_test_api_1_0";
+        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
+        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+
+        err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkResult result = VK_SUCCESS;
+
+        uint32_t extCount = 0;
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_EQ(1, extCount);
+
+        std::vector<VkExtensionProperties> ext(extCount);
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_STREQ(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, ext[0].extensionName);
+
+        inst_builder.reset();
+    }
+
+    // Vulkan 1.1
+    {
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_1.json";
+        settings.emulate_portability = false;
+        settings.profile_name = "VP_LUNARG_test_api_1_1";
+        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
+        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+
+        err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkResult result = VK_SUCCESS;
+
+        uint32_t extCount = 0;
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_EQ(23, extCount);
+
+        std::vector<VkExtensionProperties> ext(extCount);
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_STREQ(VK_KHR_MULTIVIEW_EXTENSION_NAME, ext[0].extensionName);
+        EXPECT_STREQ(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, ext[1].extensionName);
+        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_EXTENSION_NAME, ext[2].extensionName);
+        EXPECT_STREQ(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME, ext[3].extensionName);
+        EXPECT_STREQ(VK_KHR_MAINTENANCE_1_EXTENSION_NAME, ext[4].extensionName);
+        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME, ext[5].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME, ext[6].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME, ext[7].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME, ext[8].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME, ext[9].extensionName);
+        EXPECT_STREQ(VK_KHR_16BIT_STORAGE_EXTENSION_NAME, ext[10].extensionName);
+        EXPECT_STREQ(VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME, ext[11].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME, ext[12].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME, ext[13].extensionName);
+        EXPECT_STREQ(VK_KHR_MAINTENANCE_2_EXTENSION_NAME, ext[14].extensionName);
+        EXPECT_STREQ(VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, ext[15].extensionName);
+        EXPECT_STREQ(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, ext[16].extensionName);
+        EXPECT_STREQ(VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME, ext[17].extensionName);
+        EXPECT_STREQ(VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME, ext[18].extensionName);
+        EXPECT_STREQ(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, ext[19].extensionName);
+        EXPECT_STREQ(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, ext[20].extensionName);
+        EXPECT_STREQ(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME, ext[21].extensionName);
+        EXPECT_STREQ(VK_KHR_MAINTENANCE_3_EXTENSION_NAME, ext[22].extensionName);
+
+        inst_builder.reset();
+    }
+
+    // Vulkan 1.1 + emulate_portability = true
+    {
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_1.json";
+        settings.emulate_portability = true;
+        settings.profile_name = "VP_LUNARG_test_api_1_1";
+        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
+        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+
+        err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkResult result = VK_SUCCESS;
+
+        uint32_t extCount = 0;
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_EQ(24, extCount);
+
+        std::vector<VkExtensionProperties> ext(extCount);
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_STREQ(VK_KHR_MULTIVIEW_EXTENSION_NAME, ext[0].extensionName);
+        EXPECT_STREQ(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, ext[1].extensionName);
+        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_EXTENSION_NAME, ext[2].extensionName);
+        EXPECT_STREQ(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME, ext[3].extensionName);
+        EXPECT_STREQ(VK_KHR_MAINTENANCE_1_EXTENSION_NAME, ext[4].extensionName);
+        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME, ext[5].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME, ext[6].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME, ext[7].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME, ext[8].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME, ext[9].extensionName);
+        EXPECT_STREQ(VK_KHR_16BIT_STORAGE_EXTENSION_NAME, ext[10].extensionName);
+        EXPECT_STREQ(VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME, ext[11].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME, ext[12].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME, ext[13].extensionName);
+        EXPECT_STREQ(VK_KHR_MAINTENANCE_2_EXTENSION_NAME, ext[14].extensionName);
+        EXPECT_STREQ(VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, ext[15].extensionName);
+        EXPECT_STREQ(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, ext[16].extensionName);
+        EXPECT_STREQ(VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME, ext[17].extensionName);
+        EXPECT_STREQ(VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME, ext[18].extensionName);
+        EXPECT_STREQ(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, ext[19].extensionName);
+        EXPECT_STREQ(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, ext[20].extensionName);
+        EXPECT_STREQ(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME, ext[21].extensionName);
+        EXPECT_STREQ(VK_KHR_MAINTENANCE_3_EXTENSION_NAME, ext[22].extensionName);
+        EXPECT_STREQ(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, ext[23].extensionName);
+
+        inst_builder.reset();
+    }
+    /*
+    // Vulkan 1.2
+    {
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_2.json";
+        settings.emulate_portability = false;
+        settings.profile_name = "VP_LUNARG_test_api_1_2";
+        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
+        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+
+        err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkResult result = VK_SUCCESS;
+
+        uint32_t extCount = 0;
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_EQ(0, extCount);
+
+        std::vector<VkExtensionProperties> ext(extCount);
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_STREQ(VK_KHR_MULTIVIEW_EXTENSION_NAME, ext[0].extensionName);
+        EXPECT_STREQ(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, ext[1].extensionName);
+        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_EXTENSION_NAME, ext[2].extensionName);
+        EXPECT_STREQ(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME, ext[3].extensionName);
+        EXPECT_STREQ(VK_KHR_MAINTENANCE_1_EXTENSION_NAME, ext[4].extensionName);
+        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME, ext[5].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME, ext[6].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME, ext[7].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME, ext[8].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME, ext[9].extensionName);
+        EXPECT_STREQ(VK_KHR_16BIT_STORAGE_EXTENSION_NAME, ext[10].extensionName);
+        EXPECT_STREQ(VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME, ext[11].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME, ext[12].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME, ext[13].extensionName);
+        EXPECT_STREQ(VK_KHR_MAINTENANCE_2_EXTENSION_NAME, ext[14].extensionName);
+        EXPECT_STREQ(VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, ext[15].extensionName);
+        EXPECT_STREQ(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, ext[16].extensionName);
+        EXPECT_STREQ(VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME, ext[17].extensionName);
+        EXPECT_STREQ(VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME, ext[18].extensionName);
+        EXPECT_STREQ(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, ext[19].extensionName);
+        EXPECT_STREQ(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, ext[20].extensionName);
+        EXPECT_STREQ(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME, ext[21].extensionName);
+        EXPECT_STREQ(VK_KHR_MAINTENANCE_3_EXTENSION_NAME, ext[22].extensionName);
+
+        inst_builder.reset();
+    }
+
+    // Vulkan 1.3
+    {
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_3.json";
+        settings.emulate_portability = false;
+        settings.profile_name = "VP_LUNARG_test_api_1_3";
+        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
+        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+
+        err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkResult result = VK_SUCCESS;
+
+        uint32_t extCount = 0;
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_EQ(0, extCount);
+
+        std::vector<VkExtensionProperties> ext(extCount);
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_STREQ(VK_KHR_MULTIVIEW_EXTENSION_NAME, ext[0].extensionName);
+        EXPECT_STREQ(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, ext[1].extensionName);
+        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_EXTENSION_NAME, ext[2].extensionName);
+        EXPECT_STREQ(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME, ext[3].extensionName);
+        EXPECT_STREQ(VK_KHR_MAINTENANCE_1_EXTENSION_NAME, ext[4].extensionName);
+        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME, ext[5].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME, ext[6].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME, ext[7].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME, ext[8].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME, ext[9].extensionName);
+        EXPECT_STREQ(VK_KHR_16BIT_STORAGE_EXTENSION_NAME, ext[10].extensionName);
+        EXPECT_STREQ(VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME, ext[11].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME, ext[12].extensionName);
+        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME, ext[13].extensionName);
+        EXPECT_STREQ(VK_KHR_MAINTENANCE_2_EXTENSION_NAME, ext[14].extensionName);
+        EXPECT_STREQ(VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, ext[15].extensionName);
+        EXPECT_STREQ(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, ext[16].extensionName);
+        EXPECT_STREQ(VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME, ext[17].extensionName);
+        EXPECT_STREQ(VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME, ext[18].extensionName);
+        EXPECT_STREQ(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, ext[19].extensionName);
+        EXPECT_STREQ(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, ext[20].extensionName);
+        EXPECT_STREQ(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME, ext[21].extensionName);
+        EXPECT_STREQ(VK_KHR_MAINTENANCE_3_EXTENSION_NAME, ext[22].extensionName);
+
+        inst_builder.reset();
+    }*/
+}
 
 TEST_F(TestsMechanism, selecting_profile) {
     VkResult err = VK_SUCCESS;
