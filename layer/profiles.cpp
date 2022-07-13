@@ -11949,7 +11949,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
 }
 
 VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL GetInstanceProcAddr(VkInstance instance, const char *pName) {
-// Apply the DRY principle, see https://en.wikipedia.org/wiki/Don%27t_repeat_yourself
     if (strcmp("vkGetInstanceProcAddr", pName) == 0) {
         return reinterpret_cast<PFN_vkVoidFunction>(GetInstanceProcAddr);
     }

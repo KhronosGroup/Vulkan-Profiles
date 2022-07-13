@@ -2857,34 +2857,78 @@ ENUMERATE_PHYSICAL_DEVICES_END = '''
 
 GET_INSTANCE_PROC_ADDR = '''
 VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL GetInstanceProcAddr(VkInstance instance, const char *pName) {
-// Apply the DRY principle, see https://en.wikipedia.org/wiki/Don%27t_repeat_yourself
-#define GET_PROC_ADDR(func) \\
-    if (strcmp("vk" #func, pName) == 0) return reinterpret_cast<PFN_vkVoidFunction>(func);
-    GET_PROC_ADDR(GetInstanceProcAddr);
-    GET_PROC_ADDR(CreateInstance);
-    GET_PROC_ADDR(EnumerateInstanceLayerProperties);
-    GET_PROC_ADDR(EnumerateInstanceExtensionProperties);
-    GET_PROC_ADDR(EnumerateDeviceExtensionProperties);
-    GET_PROC_ADDR(EnumeratePhysicalDevices);
-    GET_PROC_ADDR(DestroyInstance);
-    GET_PROC_ADDR(GetPhysicalDeviceProperties);
-    GET_PROC_ADDR(GetPhysicalDeviceProperties2);
-    GET_PROC_ADDR(GetPhysicalDeviceProperties2KHR);
-    GET_PROC_ADDR(GetPhysicalDeviceFeatures);
-    GET_PROC_ADDR(GetPhysicalDeviceFeatures2);
-    GET_PROC_ADDR(GetPhysicalDeviceFeatures2KHR);
-    GET_PROC_ADDR(GetPhysicalDeviceFormatProperties);
-    GET_PROC_ADDR(GetPhysicalDeviceFormatProperties2);
-    GET_PROC_ADDR(GetPhysicalDeviceFormatProperties2KHR);
-    GET_PROC_ADDR(GetPhysicalDeviceImageFormatProperties);
-    GET_PROC_ADDR(GetPhysicalDeviceImageFormatProperties2);
-    GET_PROC_ADDR(GetPhysicalDeviceImageFormatProperties2KHR);
-    GET_PROC_ADDR(GetPhysicalDeviceToolProperties);
-    GET_PROC_ADDR(GetPhysicalDeviceToolPropertiesEXT);
-    GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties);
-    GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties2);
-    GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties2KHR);
-#undef GET_PROC_ADDR
+    if (strcmp("vkGetInstanceProcAddr", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetInstanceProcAddr);
+    }
+    if (strcmp("vkCreateInstance", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(CreateInstance);
+    }
+    if (strcmp("vkEnumerateInstanceLayerProperties", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(EnumerateInstanceLayerProperties);
+    }
+    if (strcmp("vkEnumerateInstanceExtensionProperties", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(EnumerateInstanceExtensionProperties);
+    }
+    if (strcmp("vkEnumerateDeviceExtensionProperties", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(EnumerateDeviceExtensionProperties);
+    }
+    if (strcmp("vkEnumeratePhysicalDevices", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(EnumeratePhysicalDevices);
+    }
+    if (strcmp("vkDestroyInstance", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(DestroyInstance);
+    }
+    if (strcmp("vkGetPhysicalDeviceProperties", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceProperties);
+    }
+    if (strcmp("vkGetPhysicalDeviceProperties2", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceProperties2);
+    }
+    if (strcmp("vkGetPhysicalDeviceProperties2KHR", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceProperties2KHR);
+    }
+    if (strcmp("vkGetPhysicalDeviceFeatures", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceFeatures);
+    }
+    if (strcmp("vkGetPhysicalDeviceFeatures2", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceFeatures2);
+    }
+    if (strcmp("vkGetPhysicalDeviceFeatures2KHR", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceFeatures2KHR);
+    }
+    if (strcmp("vkGetPhysicalDeviceFormatProperties", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceFormatProperties);
+    }
+    if (strcmp("vkGetPhysicalDeviceFormatProperties2", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceFormatProperties2);
+    }
+    if (strcmp("vkGetPhysicalDeviceFormatProperties2KHR", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceFormatProperties2KHR);
+    }
+    if (strcmp("vkGetPhysicalDeviceImageFormatProperties", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceImageFormatProperties);
+    }
+    if (strcmp("vkGetPhysicalDeviceImageFormatProperties2", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceImageFormatProperties2);
+    }
+    if (strcmp("vkGetPhysicalDeviceImageFormatProperties2KHR", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceImageFormatProperties2KHR);
+    }
+    if (strcmp("vkGetPhysicalDeviceToolProperties", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceToolProperties);
+    }
+    if (strcmp("vkGetPhysicalDeviceToolPropertiesEXT", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceToolPropertiesEXT);
+    }
+    if (strcmp("vkGetPhysicalDeviceQueueFamilyProperties", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceQueueFamilyProperties);
+    }
+    if (strcmp("vkGetPhysicalDeviceQueueFamilyProperties2", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceQueueFamilyProperties2);
+    }
+    if (strcmp("vkGetPhysicalDeviceQueueFamilyProperties2KHR", pName) == 0) {
+        return reinterpret_cast<PFN_vkVoidFunction>(GetPhysicalDeviceQueueFamilyProperties2KHR);
+    }
 
     if (!instance) {
         return nullptr;
