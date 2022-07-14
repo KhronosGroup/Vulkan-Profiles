@@ -1695,6 +1695,7 @@
                     "revision": 1,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                     "date": "2022-07-14",
 =======
 =======
@@ -1711,6 +1712,9 @@
                     "date": "2022-07-12",
 >>>>>>> f6fb8a4... combination: fix members that are arrays
 >>>>>>> bc891e5... combination: fix members that are arrays
+=======
+                    "date": "2022-07-14",
+>>>>>>> 784501f... combine script: fix generated files
                     "author": "Merge tool",
                     "comment": "Generated profile doing an union between profiles: VP_LUNARG_desktop_portability_2021_union_data1 and VP_LUNARG_desktop_portability_2021_union_data2"
                 }
