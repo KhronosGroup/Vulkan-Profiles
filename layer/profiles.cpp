@@ -309,10 +309,6 @@ static std::string GetFormatFeatureString(VkFormatFeatureFlags flags) {
         if (!result.empty()) result += ", ";
         result += "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT";
     }
-    if (flags & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG) {
-        if (!result.empty()) result += ", ";
-        result += "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG";
-    }
     if (flags & VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR) {
         if (!result.empty()) result += ", ";
         result += "VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR";
@@ -324,6 +320,10 @@ static std::string GetFormatFeatureString(VkFormatFeatureFlags flags) {
     if (flags & VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR) {
         if (!result.empty()) result += ", ";
         result += "VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR";
+    }
+    if (flags & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT) {
+        if (!result.empty()) result += ", ";
+        result += "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT";
     }
     if (flags & VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT) {
         if (!result.empty()) result += ", ";
@@ -1437,14 +1437,15 @@ static VkFormatFeatureFlags StringToVkFormatFeatureFlags(const std::string &inpu
         {"VK_FORMAT_FEATURE_DISJOINT_BIT", VK_FORMAT_FEATURE_DISJOINT_BIT},
         {"VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT", VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT},
         {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT", VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT},
-        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG", VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG},
         {"VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR", VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR},
         {"VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR", VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR},
         {"VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR", VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT", VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT},
         {"VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT", VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT},
         {"VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR", VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR},
         {"VK_FORMAT_FEATURE_VIDEO_ENCODE_INPUT_BIT_KHR", VK_FORMAT_FEATURE_VIDEO_ENCODE_INPUT_BIT_KHR},
         {"VK_FORMAT_FEATURE_VIDEO_ENCODE_DPB_BIT_KHR", VK_FORMAT_FEATURE_VIDEO_ENCODE_DPB_BIT_KHR},
+        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG", VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG},
         {"VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR", VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR},
         {"VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR", VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR},
         {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT", VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT},
@@ -1455,7 +1456,6 @@ static VkFormatFeatureFlags StringToVkFormatFeatureFlags(const std::string &inpu
         {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR", VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR},
         {"VK_FORMAT_FEATURE_DISJOINT_BIT_KHR", VK_FORMAT_FEATURE_DISJOINT_BIT_KHR},
         {"VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR", VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR},
-        {"VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT", VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT},
     };
     const auto it = map.find(input_value);
     if (it != map.end()) {
@@ -2016,6 +2016,10 @@ class PhysicalDeviceData {
     // VK_EXT_astc_decode_mode structs
     VkPhysicalDeviceASTCDecodeFeaturesEXT physical_device_astcdecode_features_;
 
+    // VK_EXT_pipeline_robustness structs
+    VkPhysicalDevicePipelineRobustnessPropertiesEXT physical_device_pipeline_robustness_properties_;
+    VkPhysicalDevicePipelineRobustnessFeaturesEXT physical_device_pipeline_robustness_features_;
+
     // VK_KHR_external_memory_capabilities structs
     VkPhysicalDeviceIDPropertiesKHR physical_device_idproperties_;
 
@@ -2376,6 +2380,9 @@ class PhysicalDeviceData {
     // VK_EXT_pipeline_properties structs
     VkPhysicalDevicePipelinePropertiesFeaturesEXT physical_device_pipeline_properties_features_;
 
+    // VK_EXT_multisampled_render_to_single_sampled structs
+    VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT physical_device_multisampled_render_to_single_sampled_features_;
+
     // VK_EXT_extended_dynamic_state2 structs
     VkPhysicalDeviceExtendedDynamicState2FeaturesEXT physical_device_extended_dynamic_state_2_features_;
 
@@ -2430,6 +2437,10 @@ class PhysicalDeviceData {
     // VK_EXT_subpass_merge_feedback structs
     VkPhysicalDeviceSubpassMergeFeedbackFeaturesEXT physical_device_subpass_merge_feedback_features_;
 
+    // VK_EXT_shader_module_identifier structs
+    VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT physical_device_shader_module_identifier_properties_;
+    VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT physical_device_shader_module_identifier_features_;
+
   private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -2480,6 +2491,10 @@ class PhysicalDeviceData {
 
         // VK_EXT_astc_decode_mode structs
         physical_device_astcdecode_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ASTC_DECODE_FEATURES_EXT};
+
+        // VK_EXT_pipeline_robustness structs
+        physical_device_pipeline_robustness_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_ROBUSTNESS_PROPERTIES_EXT};
+        physical_device_pipeline_robustness_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_ROBUSTNESS_FEATURES_EXT};
 
         // VK_KHR_external_memory_capabilities structs
         physical_device_idproperties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES_KHR};
@@ -2841,6 +2856,9 @@ class PhysicalDeviceData {
         // VK_EXT_pipeline_properties structs
         physical_device_pipeline_properties_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_PROPERTIES_FEATURES_EXT};
 
+        // VK_EXT_multisampled_render_to_single_sampled structs
+        physical_device_multisampled_render_to_single_sampled_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTISAMPLED_RENDER_TO_SINGLE_SAMPLED_FEATURES_EXT};
+
         // VK_EXT_extended_dynamic_state2 structs
         physical_device_extended_dynamic_state_2_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT};
 
@@ -2894,6 +2912,10 @@ class PhysicalDeviceData {
 
         // VK_EXT_subpass_merge_feedback structs
         physical_device_subpass_merge_feedback_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBPASS_MERGE_FEEDBACK_FEATURES_EXT};
+
+        // VK_EXT_shader_module_identifier structs
+        physical_device_shader_module_identifier_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_MODULE_IDENTIFIER_PROPERTIES_EXT};
+        physical_device_shader_module_identifier_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_MODULE_IDENTIFIER_FEATURES_EXT};
     }
 
     const VkInstance instance_;
@@ -3019,6 +3041,8 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeFeaturesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDevicePipelineRobustnessPropertiesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDevicePipelineRobustnessFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceIDPropertiesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevicePushDescriptorPropertiesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest);
@@ -3157,6 +3181,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevicePipelinePropertiesFeaturesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT *dest);
@@ -3177,6 +3202,8 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceLinearColorAttachmentFeaturesNV *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceImageCompressionControlSwapchainFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassMergeFeedbackFeaturesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *dest);
@@ -4202,6 +4229,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_EXT_PRIMITIVES_GENERATED_QUERY_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_primitives_generated_query_features_);
+    } else if (name == "VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_MULTISAMPLED_RENDER_TO_SINGLE_SAMPLED_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_multisampled_render_to_single_sampled_features_);
     } else if (name == "VkPhysicalDeviceInheritedViewportScissorFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_INHERITED_VIEWPORT_SCISSOR_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
@@ -4264,6 +4295,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_VALVE_DESCRIPTOR_SET_HOST_MAPPING_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_descriptor_set_host_mapping_features_);
+    } else if (name == "VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_SHADER_MODULE_IDENTIFIER_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_shader_module_identifier_features_);
     } else if (name == "VkPhysicalDeviceImageCompressionControlFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_IMAGE_COMPRESSION_CONTROL_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
@@ -4288,6 +4323,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_EXT_NON_SEAMLESS_CUBE_MAP_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_non_seamless_cube_map_features_);
+    } else if (name == "VkPhysicalDevicePipelineRobustnessFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_PIPELINE_ROBUSTNESS_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_pipeline_robustness_features_);
     }
 
     return true;
@@ -4571,6 +4610,14 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &name) 
         auto support = CheckExtensionSupport(VK_EXT_GRAPHICS_PIPELINE_LIBRARY_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(property, &pdd_->physical_device_graphics_pipeline_library_properties_);
+    } else if (name == "VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_SHADER_MODULE_IDENTIFIER_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(property, &pdd_->physical_device_shader_module_identifier_properties_);
+    } else if (name == "VkPhysicalDevicePipelineRobustnessPropertiesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_PIPELINE_ROBUSTNESS_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(property, &pdd_->physical_device_pipeline_robustness_properties_);
     }
 
     return true;
@@ -5980,6 +6027,27 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeF
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, decodeModeSharedExponent, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineRobustnessPropertiesEXT *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePipelineRobustnessPropertiesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        WarnNotModifiable("VkPhysicalDevicePipelineRobustnessPropertiesEXT", member, "defaultRobustnessStorageBuffers");
+        WarnNotModifiable("VkPhysicalDevicePipelineRobustnessPropertiesEXT", member, "defaultRobustnessUniformBuffers");
+        WarnNotModifiable("VkPhysicalDevicePipelineRobustnessPropertiesEXT", member, "defaultRobustnessVertexInputs");
+        WarnNotModifiable("VkPhysicalDevicePipelineRobustnessPropertiesEXT", member, "defaultRobustnessImages");
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineRobustnessFeaturesEXT *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePipelineRobustnessFeaturesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, pipelineRobustness, WarnIfNotEqualBool);
     }
     return valid;
 }
@@ -7535,6 +7603,15 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelinePro
     return valid;
 }
 
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, multisampledRenderToSingleSampled, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *dest) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceExtendedDynamicState2FeaturesEXT)\n");
     bool valid = true;
@@ -7718,6 +7795,24 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassMerg
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, subpassMergeFeedback, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_ARRAY(shaderModuleIdentifierAlgorithmUUID);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderModuleIdentifier, WarnIfNotEqualBool);
     }
     return valid;
 }
@@ -8451,6 +8546,22 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDeviceASTCDecodeFeaturesEXT *data = (VkPhysicalDeviceASTCDecodeFeaturesEXT *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_astcdecode_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_ROBUSTNESS_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_PIPELINE_ROBUSTNESS_EXTENSION_NAME)) {
+                    VkPhysicalDevicePipelineRobustnessPropertiesEXT *data = (VkPhysicalDevicePipelineRobustnessPropertiesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_pipeline_robustness_properties_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_ROBUSTNESS_FEATURES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_PIPELINE_ROBUSTNESS_EXTENSION_NAME)) {
+                    VkPhysicalDevicePipelineRobustnessFeaturesEXT *data = (VkPhysicalDevicePipelineRobustnessFeaturesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_pipeline_robustness_features_;
                     data->pNext = pNext;
                 }
                 break;
@@ -9534,6 +9645,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     data->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTISAMPLED_RENDER_TO_SINGLE_SAMPLED_FEATURES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_MULTISAMPLED_RENDER_TO_SINGLE_SAMPLED_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT *data = (VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_multisampled_render_to_single_sampled_features_;
+                    data->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
                     VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *data = (VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *)place;
@@ -9691,6 +9810,22 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDeviceSubpassMergeFeedbackFeaturesEXT *data = (VkPhysicalDeviceSubpassMergeFeedbackFeaturesEXT *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_subpass_merge_feedback_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_MODULE_IDENTIFIER_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_SHADER_MODULE_IDENTIFIER_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT *data = (VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_shader_module_identifier_properties_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_MODULE_IDENTIFIER_FEATURES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_SHADER_MODULE_IDENTIFIER_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT *data = (VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_shader_module_identifier_features_;
                     data->pNext = pNext;
                 }
                 break;
@@ -10896,6 +11031,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_astcdecode_features_);
                 }
 
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_PIPELINE_ROBUSTNESS_EXTENSION_NAME)) {
+                    pdd.physical_device_pipeline_robustness_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_pipeline_robustness_properties_);
+
+                    pdd.physical_device_pipeline_robustness_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_pipeline_robustness_features_);
+                }
+
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME)) {
                     pdd.physical_device_idproperties_.pNext = property_chain.pNext;
 
@@ -11660,6 +11805,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_pipeline_properties_features_);
                 }
 
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_MULTISAMPLED_RENDER_TO_SINGLE_SAMPLED_EXTENSION_NAME)) {
+                    pdd.physical_device_multisampled_render_to_single_sampled_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_multisampled_render_to_single_sampled_features_);
+                }
+
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)) {
                     pdd.physical_device_extended_dynamic_state_2_features_.pNext = feature_chain.pNext;
 
@@ -11772,6 +11923,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_subpass_merge_feedback_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_subpass_merge_feedback_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_SHADER_MODULE_IDENTIFIER_EXTENSION_NAME)) {
+                    pdd.physical_device_shader_module_identifier_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_shader_module_identifier_properties_);
+
+                    pdd.physical_device_shader_module_identifier_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_shader_module_identifier_features_);
                 }
 
                 if (api_version_above_1_1) {

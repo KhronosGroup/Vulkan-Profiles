@@ -413,6 +413,16 @@ class ProfileGenerator():
                         gen += enum[0]
                         self.test_values[name][property] = enum[1]
                         self.i += 1
+                    elif property_type == "VkPipelineRobustnessBufferBehaviorEXT":
+                        enum = self.get_enum('VkPipelineRobustnessBufferBehaviorEXT', False)
+                        gen += enum[0]
+                        self.test_values[name][property] = enum[1]
+                        self.i += 1
+                    elif property_type == "VkPipelineRobustnessImageBehaviorEXT":
+                        enum = self.get_enum('VkPipelineRobustnessImageBehaviorEXT', False)
+                        gen += enum[0]
+                        self.test_values[name][property] = enum[1]
+                        self.i += 1
                     elif property_type == "char":
                         gen += "\""
                         gen += property_name
