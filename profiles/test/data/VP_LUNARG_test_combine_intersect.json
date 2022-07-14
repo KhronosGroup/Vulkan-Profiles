@@ -8,9 +8,7 @@
             "features": {
                 "VkPhysicalDeviceFeatures": {
                     "depthBiasClamp": true,
-                    "depthClamp": false,
-                    "drawIndirectFirstInstance": true,
-                    "multiDrawIndirect": false
+                    "depthClamp": false
                 }
             },
             "properties": {
@@ -48,7 +46,7 @@
         "VP_LUNARG_test_combine_intersect": {
             "version": 1,
             "status": "BETA",
-            "api-version": "1.1.142",
+            "api-version": "1.0.142",
             "label": "Merged profile",
             "description": "Generated profile doing an intersection between profiles: VP_LUNARG_test_combine_intersect1 and VP_LUNARG_test_combine_intersect2",
             "contributors": {},

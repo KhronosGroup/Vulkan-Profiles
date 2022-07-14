@@ -331,6 +331,8 @@ class ProfileMerger():
                 for member in list(merged[struct_name]):
                     if member not in struct:
                         del merged[struct_name][member]
+                    elif struct[member] != merged[struct_name][member]:
+                        del merged[struct_name][member]
             else:
                 print("ERROR: Unknown combination mode: " + self.mode)
         else:
@@ -342,6 +344,8 @@ class ProfileMerger():
             for member in list(merged):
                 if member not in entry:
                     del merged[member]
+                #elif entry[member] != merged[member]:
+                #    del merged[member]
         for member in entry:
             if property is None or not member in merged:
                 if self.mode == 'union' or self.first is True:
