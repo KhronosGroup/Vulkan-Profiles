@@ -581,7 +581,12 @@ class ProfileGenerator():
             if member in self.test_values[name]:
                 property_value = self.test_values[name][member]
                 if (property_value):
-                    if (registry.structs[name].members[member].limittype == 'exact'):
+                    if (registry.structs[name].members[member].limittype == 'exact' or registry.structs[name].members[member].limittype == 'noauto'):
+                        member_type = registry.structs[name].members[member].type
+                        # VkConformanceVersion is noauto and unmodified
+                        if 'VkConformanceVersion' in member_type:
+                            continue
+                        
                         gen += '    if (supported) {\n'
                         if type(property_value) is list:
                             if (len(property_value) > 1):
@@ -590,7 +595,6 @@ class ProfileGenerator():
                             else:
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + ', ' + var_name + '_native' + '.' + member + ');\n'
                         elif type(property_value) is tuple:
-                            member_type = registry.structs[name].members[member].type
                             if (member_type == 'VkExtent2D'):
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.width, ' + var_name + '_native' + '.' + member + '.width);\n'
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.height, ' + var_name + '_native' + '.' + member + '.height);\n'
@@ -598,6 +602,8 @@ class ProfileGenerator():
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.width, ' + var_name + '_native' + '.' + member + '.width);\n'
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.height, ' + var_name + '_native' + '.' + member + '.height);\n'
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.depth, ' + var_name + '_native' + '.' + member + '.depth);\n'
+                            else:
+                                print('ERROR: unknown tuple type from ' + name + '.' + member)
                         elif registry.structs[name].members[member].type == 'char':
                             gen += '    EXPECT_EQ(0, strncmp(' + var_name + '_profile' + '.' + member + ', ' + var_name + '_native' + '.' + member + ', ' + str(len(property_value)) + '));\n'
                         else:
@@ -619,6 +625,8 @@ class ProfileGenerator():
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.width, ' + str(property_value[0]) + ');\n'
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.height, ' + str(property_value[1]) + ');\n'
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.depth, ' + str(property_value[2]) + ');\n'
+                            else:
+                                print('ERROR: unknown tuple type from ' + name + '.' + member)
                         elif registry.structs[name].members[member].type == 'char':
                             gen += '    EXPECT_EQ(0, strncmp(' + var_name + '_profile' + '.' + member + ', ' + property_value + ', ' + str(len(property_value)) + '));\n'
                         else:
