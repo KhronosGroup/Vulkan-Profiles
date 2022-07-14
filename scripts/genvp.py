@@ -2040,6 +2040,12 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceMeshShaderPropertiesNV'].members['meshOutputPerVertexGranularity'].limittype = 'min,mul' # should be 'min,mul'
             self.structs['VkPhysicalDeviceMeshShaderPropertiesNV'].members['meshOutputPerPrimitiveGranularity'].limittype = 'min,mul' # should be 'min,mul'
 
+        if 'VkPhysicalDevicePipelineRobustnessPropertiesEXT' in self.structs:
+            self.structs['VkPhysicalDevicePipelineRobustnessPropertiesEXT'].members['defaultRobustnessStorageBuffers'].limittype = 'exact'
+            self.structs['VkPhysicalDevicePipelineRobustnessPropertiesEXT'].members['defaultRobustnessUniformBuffers'].limittype = 'exact'
+            self.structs['VkPhysicalDevicePipelineRobustnessPropertiesEXT'].members['defaultRobustnessVertexInputs'].limittype = 'exact'
+            self.structs['VkPhysicalDevicePipelineRobustnessPropertiesEXT'].members['defaultRobustnessImages'].limittype = 'exact'
+
         if self.headerVersionNumber.patch < 213:
             if 'VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV' in self.structs:
                 self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV'].members['minSequencesCountBufferOffsetAlignment'].limittype = 'min'
