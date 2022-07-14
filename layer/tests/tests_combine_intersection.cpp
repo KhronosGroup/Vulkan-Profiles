@@ -61,15 +61,24 @@ TEST_F(TestsIntersection, Extension) {
         printf(device_extensions[i].extensionName);
     }
 
-    ASSERT_STREQ("VK_KHR_portability_subset", device_extensions[0].extensionName);
-    ASSERT_STREQ("VK_KHR_maintenance3", device_extensions[1].extensionName);
+    ASSERT_STREQ("VK_KHR_maintenance3", device_extensions[0].extensionName);
+    ASSERT_STREQ("VK_KHR_portability_subset", device_extensions[1].extensionName);
 }
 
 TEST_F(TestsIntersection, Feature) {
     VkPhysicalDeviceFeatures gpu_features{};
     vkGetPhysicalDeviceFeatures(gpu, &gpu_features);
 
-    EXPECT_EQ(gpu_features.depthClamp, VK_TRUE);
+    EXPECT_EQ(gpu_features.depthBiasClamp, VK_TRUE);
+    EXPECT_EQ(gpu_features.depthClamp, VK_FALSE);
+/*
+    EXPECT_EQ(gpu_features.drawIndirectFirstInstance, VK_FALSE);
+    EXPECT_EQ(gpu_features.multiDrawIndirect, VK_FALSE);
+    EXPECT_EQ(gpu_features.sampleRateShading, VK_FALSE);
+    EXPECT_EQ(gpu_features.shaderClipDistance, VK_FALSE);
+    EXPECT_EQ(gpu_features.samplerAnisotropy, VK_FALSE);
+    EXPECT_EQ(gpu_features.multiViewport, VK_FALSE);
+*/
 }
 
 TEST_F(TestsIntersection, Properties) {
