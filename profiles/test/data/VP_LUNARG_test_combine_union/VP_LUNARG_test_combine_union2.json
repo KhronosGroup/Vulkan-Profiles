@@ -15,6 +15,23 @@
                     "samplerAnisotropy": true,
                     "multiViewport": false
                 }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 16384,
+                        "maxComputeWorkGroupCount": [ 4096, 65535, 2048 ],
+                        "mipmapPrecisionBits": 2,
+                        "maxSamplerAnisotropy": 1.0,
+                        "viewportBoundsRange": [ -16384, 16384 ],
+                        "minMemoryMapAlignment": 4096,
+                        "minTexelOffset": -8,
+                        "maxTexelOffset": 7,
+                        "framebufferColorSampleCounts": [ "VK_SAMPLE_COUNT_2_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "pointSizeRange": [ 2.0, 64.0 ],
+                        "pointSizeGranularity": 2.0
+                    }
+                }
             }
         }
     },
