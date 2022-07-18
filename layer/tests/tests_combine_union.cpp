@@ -64,16 +64,22 @@ TEST_F(TestsUnion, Extension) {
     ASSERT_STREQ("VK_KHR_maintenance3", device_extensions[2].extensionName);
     ASSERT_STREQ("VK_KHR_portability_subset", device_extensions[3].extensionName);
 }
-/*
+
 TEST_F(TestsUnion, Feature) {
-    {
-        VkPhysicalDeviceProperties gpu_props{};
-        vkGetPhysicalDeviceProperties(gpu, &gpu_props);
+    VkPhysicalDeviceFeatures gpu_features{};
+    vkGetPhysicalDeviceFeatures(gpu, &gpu_features);
 
-        EXPECT_EQ(gpu_props.limits.maxImageDimension1D, 4096u);
-    }
+    EXPECT_EQ(gpu_features.depthBiasClamp, VK_TRUE);
+    EXPECT_EQ(gpu_features.depthClamp, VK_FALSE);
+    //FIXME!
+    //EXPECT_EQ(gpu_features.drawIndirectFirstInstance, VK_TRUE);
+    EXPECT_EQ(gpu_features.multiDrawIndirect, VK_TRUE);
+    EXPECT_EQ(gpu_features.sampleRateShading, VK_TRUE);
+    EXPECT_EQ(gpu_features.shaderClipDistance, VK_FALSE);
+    EXPECT_EQ(gpu_features.samplerAnisotropy, VK_TRUE);
+    EXPECT_EQ(gpu_features.multiViewport, VK_FALSE);
 }
-
+/*
 TEST_F(TestsUnion, Properties) {
     {
         VkPhysicalDeviceProperties gpu_props{};
