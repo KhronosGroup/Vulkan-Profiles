@@ -15,6 +15,7 @@
                 "VkPhysicalDeviceProperties": {
                     "limits": {
                         "maxImageDimension1D": 4096,
+                        "maxImageDimension2D": 8192,
                         "maxComputeWorkGroupCount": [
                             4096,
                             4096,
@@ -36,7 +37,8 @@
                             4.0,
                             32.0
                         ],
-                        "pointSizeGranularity": 4.0
+                        "pointSizeGranularity": 4.0,
+                        "maxImageDimension3D": 2048
                     }
                 }
             }
