@@ -78,13 +78,10 @@ TEST_F(TestsUnion, Feature) {
     EXPECT_EQ(gpu_features.samplerAnisotropy, VK_TRUE);
     EXPECT_EQ(gpu_features.multiViewport, VK_FALSE);
 }
-/*
-TEST_F(TestsUnion, Properties) {
-    {
-        VkPhysicalDeviceProperties gpu_props{};
-        vkGetPhysicalDeviceProperties(gpu, &gpu_props);
 
-        EXPECT_EQ(gpu_props.limits.maxImageDimension1D, 4096u);
-    }
+TEST_F(TestsUnion, Properties) {
+    VkPhysicalDeviceProperties gpu_props{};
+    vkGetPhysicalDeviceProperties(gpu, &gpu_props);
+
+    //EXPECT_EQ(gpu_props.limits.maxImageDimension1D, 4096u);
 }
-*/
