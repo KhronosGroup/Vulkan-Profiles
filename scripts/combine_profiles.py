@@ -346,10 +346,10 @@ class ProfileMerger():
                 merged[struct_name] = struct
 
     def add_members(self, merged, entry, property = None):
-        if self.mode == 'intersection' and self.first is False:
-            for member in list(merged):
-                if member not in entry:
-                    del merged[member]
+        #if self.mode == 'intersection' and self.first is False:
+        #    for member in list(merged):
+        #        if member not in entry:
+        #            del merged[member]
                 #elif entry[member] != merged[member]:
                 #    del merged[member]
         for member in entry:
@@ -365,7 +365,8 @@ class ProfileMerger():
                         if smember in merged[member]:
                             if smember in entry[member]:
                                 self.merge_members(merged[member], smember, entry[member], s[smember])
-                        elif self.mode == 'union' and smember in entry[member]:
+                        #elif self.mode == 'union' and smember in entry[member]:
+                        elif smember in entry[member]:
                             merged[member][smember] = entry[member][smember]
                 else:
                     self.merge_members(merged, member, entry, xmlmember)

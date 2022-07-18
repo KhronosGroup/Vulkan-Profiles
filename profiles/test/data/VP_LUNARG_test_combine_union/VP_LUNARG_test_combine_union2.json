@@ -20,6 +20,7 @@
                 "VkPhysicalDeviceProperties": {
                     "limits": {
                         "maxImageDimension1D": 16384,
+                        "maxImageDimension3D": 2048,
                         "maxComputeWorkGroupCount": [ 4096, 65535, 2048 ],
                         "mipmapPrecisionBits": 2,
                         "maxSamplerAnisotropy": 1.0,
