@@ -11,7 +11,7 @@
                 "VkPhysicalDeviceFeatures": {
                     "depthBiasClamp": true,
                     "depthClamp": false,
-                    "drawIndirectFirstInstance": false,
+                    "drawIndirectFirstInstance": true,
                     "multiDrawIndirect": true,
                     "sampleRateShading": true,
                     "shaderClipDistance": false,
