@@ -1754,22 +1754,25 @@ TEST_F(TestsCapabilitiesGenerated, TestShaderModuleIdentifierPropertiesEXT) {
     gpu_props_profile.pNext = &shader_module_identifier_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[0], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[1], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[2], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[3], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[4], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[5], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[6], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[7], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[8], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[9], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[10], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[11], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[12], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[13], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[14], 170);
-    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[15], 170);
+    if (supported) {
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[0], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[0]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[1], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[1]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[2], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[2]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[3], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[3]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[4], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[4]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[5], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[5]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[6], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[6]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[7], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[7]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[8], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[8]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[9], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[9]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[10], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[10]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[11], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[11]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[12], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[12]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[13], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[13]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[14], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[14]);
+    EXPECT_EQ(shader_module_identifier_properties_profile.shaderModuleIdentifierAlgorithmUUID[15], shader_module_identifier_properties_native.shaderModuleIdentifierAlgorithmUUID[15]);
+    }
+
 #endif
 }
 

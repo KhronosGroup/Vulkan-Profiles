@@ -37,7 +37,7 @@ class TestsUnion : public VkTestFramework {
         settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_combine_union.json";
         settings.emulate_portability = true;
         settings.profile_name = "VP_LUNARG_test_combine_union";
-        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_MAX_ENUM;
+        settings.simulate_capabilities = SIMULATE_MAX_ENUM;
         settings.debug_reports =
             DEBUG_REPORT_ERROR_BIT | DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_NOTIFICATION_BIT | DEBUG_REPORT_DEBUG_BIT;
 
@@ -60,8 +60,9 @@ TEST_F(TestsUnion, Extension) {
     vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, device_extensions.data());
 
     ASSERT_STREQ("VK_KHR_maintenance1", device_extensions[0].extensionName);
-    ASSERT_STREQ("VK_KHR_maintenance3", device_extensions[1].extensionName);
-    ASSERT_STREQ("VK_KHR_maintenance2", device_extensions[2].extensionName);
+    ASSERT_STREQ("VK_KHR_maintenance2", device_extensions[1].extensionName);
+    ASSERT_STREQ("VK_KHR_maintenance3", device_extensions[2].extensionName);
+    ASSERT_STREQ("VK_KHR_portability_subset", device_extensions[3].extensionName);
 }
 /*
 TEST_F(TestsUnion, Feature) {
