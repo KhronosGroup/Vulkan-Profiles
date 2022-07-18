@@ -67,14 +67,6 @@ TEST_F(TestsIntersection, Feature) {
 
     EXPECT_EQ(gpu_features.depthBiasClamp, VK_TRUE);
     EXPECT_EQ(gpu_features.depthClamp, VK_FALSE);
-/*
-    EXPECT_EQ(gpu_features.drawIndirectFirstInstance, VK_FALSE);
-    EXPECT_EQ(gpu_features.multiDrawIndirect, VK_FALSE);
-    EXPECT_EQ(gpu_features.sampleRateShading, VK_FALSE);
-    EXPECT_EQ(gpu_features.shaderClipDistance, VK_FALSE);
-    EXPECT_EQ(gpu_features.samplerAnisotropy, VK_FALSE);
-    EXPECT_EQ(gpu_features.multiViewport, VK_FALSE);
-*/
 }
 
 TEST_F(TestsIntersection, Properties) {
