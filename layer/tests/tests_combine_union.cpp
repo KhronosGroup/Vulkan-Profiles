@@ -71,8 +71,7 @@ TEST_F(TestsUnion, Feature) {
 
     EXPECT_EQ(gpu_features.depthBiasClamp, VK_TRUE);
     EXPECT_EQ(gpu_features.depthClamp, VK_FALSE);
-    //FIXME!
-    //EXPECT_EQ(gpu_features.drawIndirectFirstInstance, VK_TRUE);
+    EXPECT_EQ(gpu_features.drawIndirectFirstInstance, VK_TRUE);
     EXPECT_EQ(gpu_features.multiDrawIndirect, VK_TRUE);
     EXPECT_EQ(gpu_features.sampleRateShading, VK_TRUE);
     EXPECT_EQ(gpu_features.shaderClipDistance, VK_FALSE);

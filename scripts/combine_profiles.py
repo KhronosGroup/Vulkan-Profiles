@@ -323,11 +323,17 @@ class ProfileMerger():
     def add_struct(self, struct_name, struct, merged):
         if struct_name in merged:
             # Union
-            if self.mode == 'union' or self.first is True:
+            if self.mode == 'union':
                 for member in struct:
-                    merged[struct_name][member] = struct[member]
+                    if member in merged[struct_name]:
+                        merged[struct_name][member] = merged[struct_name][member] or struct[member]
+                    else:
+                        merged[struct_name][member] = struct[member]
             # Intersect
             elif self.mode == 'intersection':
+                if self.first is True:
+                    for member in struct:
+                        merged[struct_name][member] = struct[member]
                 for member in list(merged[struct_name]):
                     if member not in struct:
                         del merged[struct_name][member]
