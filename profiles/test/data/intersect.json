@@ -1675,6 +1675,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                     "date": "2022-07-14",
 =======
 =======
@@ -1694,6 +1695,9 @@
 =======
                     "date": "2022-07-14",
 >>>>>>> 784501f... combine script: fix generated files
+=======
+                    "date": "2022-07-18",
+>>>>>>> c90f7e3... Combine: fix union extension test
                     "author": "Merge tool",
                     "comment": "Generated profile doing an intersection between profiles: VP_LUNARG_desktop_portability_2021_intersect_data1 and VP_LUNARG_desktop_portability_2021_intersect_data2"
                 }
