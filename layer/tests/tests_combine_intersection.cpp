@@ -57,10 +57,6 @@ TEST_F(TestsIntersection, Extension) {
     std::vector<VkExtensionProperties> device_extensions(count);
     vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, device_extensions.data());
 
-    for (std::size_t i = 0, n = count; i < n; ++i) {
-        printf(device_extensions[i].extensionName);
-    }
-
     ASSERT_STREQ("VK_KHR_maintenance3", device_extensions[0].extensionName);
     ASSERT_STREQ("VK_KHR_portability_subset", device_extensions[1].extensionName);
 }
