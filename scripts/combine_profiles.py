@@ -614,7 +614,8 @@ if __name__ == '__main__':
         paths = [args.profile_dir + '/' + pos_json for pos_json in os.listdir(args.profile_dir) if pos_json.endswith('.json')]
         json_files = list()
         for i in range(len(paths)):
-            file = open(paths[i], 'r')
+            print('Opening: ' + paths[i])
+            file = open(paths[i], "r")
             json_files.append(json.load(file))
         # We need to iterate through profile names first, so the indices of jsons and profiles lists will match
         for profile_name in profile_names:

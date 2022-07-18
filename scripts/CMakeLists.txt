@@ -23,7 +23,7 @@ set(MERGE_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/combine_profiles.py)
 add_custom_target(VpMergeIntersect ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
 		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
-		-profile_dir ${CMAKE_SOURCE_DIR}/profiles/test/data
+		-profile_dir ${CMAKE_SOURCE_DIR}/profiles/test/data/intersect
 		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/intersect.json
 		-profile VP_LUNARG_desktop_portability_2021_intersect_data1
 		-profile2 VP_LUNARG_desktop_portability_2021_intersect_data2
@@ -38,7 +38,7 @@ set_target_properties(VpMergeIntersect PROPERTIES FOLDER "Profiles scripts")
 add_custom_target(VpMergeUnion ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
 		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
-		-profile_dir ${CMAKE_SOURCE_DIR}/profiles/test/data
+		-profile_dir ${CMAKE_SOURCE_DIR}/profiles/test/data/union
 		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/union.json
 		-profile VP_LUNARG_desktop_portability_2021_union_data1
 		-profile2 VP_LUNARG_desktop_portability_2021_union_data2
@@ -53,7 +53,7 @@ set_target_properties(VpMergeUnion PROPERTIES FOLDER "Profiles scripts")
 add_custom_target(VpTestIntersect ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
 		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
-		-profile_dir ${CMAKE_SOURCE_DIR}/profiles/test/data
+		-profile_dir ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_intersect
 		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_intersect.json
 		-profile VP_LUNARG_test_combine_intersect1
 		-profile2 VP_LUNARG_test_combine_intersect2
@@ -68,7 +68,7 @@ set_target_properties(VpTestIntersect PROPERTIES FOLDER "Profiles scripts")
 add_custom_target(VpTestUnion ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
 		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
-		-profile_dir ${CMAKE_SOURCE_DIR}/profiles/test/data
+		-profile_dir ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_union
 		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_union.json
 		-profile VP_LUNARG_test_combine_union1
 		-profile2 VP_LUNARG_test_combine_union2
