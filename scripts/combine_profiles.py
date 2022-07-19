@@ -347,22 +347,31 @@ class ProfileMerger():
 
     def add_members(self, merged, entry, property = None):
         # First, remove all noauto member, they can't be merged
-        for member in list(merged):
-            xmlmember = self.registry.structs[property].members[member]
-            if xmlmember.limittype == 'noauto':
-                del merged[member]
+        if property != None:
+            for member in list(merged):
+                if (member not in self.registry.structs[property].members):
+                    print('member: ' + member)
+                    continue
+
+                xmlmember = self.registry.structs[property].members[member]
+                if xmlmember.limittype == 'noauto':
+                    del merged[member]
 
         for member in entry:
-            xmlmember = self.registry.structs[property].members[member]
-            if property is None or not member in merged:
+            if property is None:
+                if self.mode == 'union' or self.first is True:
+                    merged[member] = entry[member]
+            elif not member in merged:
+                xmlmember = self.registry.structs[property].members[member]
                 if xmlmember.limittype == 'noauto':
                     continue
                 elif self.mode == 'union' or self.first is True:
                     merged[member] = entry[member]
             else:
                 # Merge properties
+                xmlmember = self.registry.structs[property].members[member]
                 if xmlmember.limittype == 'struct':
-                    s = self.registry.structs[self.registry.structs[property].members[member].type].members
+                    s = self.registry.structs[xmlmember.type].members
                     for smember in s:
                         if smember in merged[member]:
                             if smember in entry[member]:

@@ -24,6 +24,7 @@ set(LAYER_TEST_FILES
     tests_promoted
     tests_mechanism
 	tests_generated
+    tests_desktop_2022
     tests_combine_union
     tests_combine_intersection
 	tests_merged_union
