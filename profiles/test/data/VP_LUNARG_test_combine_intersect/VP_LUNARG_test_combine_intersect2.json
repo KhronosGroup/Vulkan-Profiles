@@ -31,7 +31,9 @@
                         "framebufferColorSampleCounts": [ "VK_SAMPLE_COUNT_2_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
                         "pointSizeRange": [ 2.0, 64.0 ],
                         "pointSizeGranularity": 2.0
-                    }
+                    },
+                    "deviceID": 7676,
+                    "deviceName": "LunarG Toolset"
                 }
             }
         }
