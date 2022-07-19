@@ -78,4 +78,29 @@ add_custom_target(VpTestUnion ALL
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
 	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
 
+add_custom_target(VpCreateGeneratedName ALL
+	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
+		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
+		-profile_dir ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_intersect
+		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_generated_name.json
+		-profile VP_LUNARG_test_combine_intersect1
+		-profile2 VP_LUNARG_test_combine_intersect2
+		-mode intersection
+	VERBATIM
+	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
+	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
+
+add_custom_target(VpCreateDesktop2022 ALL
+	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
+		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
+		-profile_dir ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022/windows
+		-output_path ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022/VP_LUNARG_desktop_portability_2022_windows.json
+		-profile VP_GPUINFO_NVIDIA_GeForce_GTX_650_Ti_472_98_0_0_windows_10
+		-profile2 VP_GPUINFO_AMD_Radeon__TM__R7_370_Series_2_0_179_windows_10
+		-output_profile VP_LUNARG_desktop_portability_2022
+		-mode intersection
+	VERBATIM
+	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
+	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
+
 set_target_properties(VpTestUnion PROPERTIES FOLDER "Profiles scripts")

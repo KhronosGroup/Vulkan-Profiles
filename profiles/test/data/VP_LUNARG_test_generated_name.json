@@ -1,0 +1,68 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-154.json#",
+    "capabilities": {
+        "baseline": {
+            "extensions": {
+                "VK_KHR_maintenance3": 1
+            },
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "depthBiasClamp": true,
+                    "depthClamp": false
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 4096,
+                        "maxImageDimension2D": 8192,
+                        "maxComputeWorkGroupCount": [
+                            4096,
+                            4096,
+                            2048
+                        ],
+                        "mipmapPrecisionBits": 2,
+                        "maxSamplerAnisotropy": 1.0,
+                        "viewportBoundsRange": [
+                            -16384,
+                            16384
+                        ],
+                        "minMemoryMapAlignment": 4096,
+                        "minTexelOffset": -4,
+                        "maxTexelOffset": 3,
+                        "framebufferColorSampleCounts": [
+                            "VK_SAMPLE_COUNT_4_BIT"
+                        ],
+                        "pointSizeRange": [
+                            4.0,
+                            32.0
+                        ],
+                        "pointSizeGranularity": 4.0,
+                        "maxImageDimension3D": 2048
+                    }
+                }
+            }
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_merged_2022_07_19_17_12": {
+            "version": 1,
+            "status": "BETA",
+            "api-version": "1.0.142",
+            "label": "Merged profile",
+            "description": "Generated profile doing an intersection between profiles: VP_LUNARG_test_combine_intersect1 and VP_LUNARG_test_combine_intersect2",
+            "contributors": {},
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2022-07-19",
+                    "author": "Merge tool",
+                    "comment": "Generated profile doing an intersection between profiles: VP_LUNARG_test_combine_intersect1 and VP_LUNARG_test_combine_intersect2"
+                }
+            ],
+            "capabilities": [
+                "baseline"
+            ]
+        }
+    }
+}
