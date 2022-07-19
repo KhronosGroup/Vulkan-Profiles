@@ -346,19 +346,21 @@ class ProfileMerger():
                 merged[struct_name] = struct
 
     def add_members(self, merged, entry, property = None):
-        #if self.mode == 'intersection' and self.first is False:
-        #    for member in list(merged):
-        #        if member not in entry:
-        #            del merged[member]
-                #elif entry[member] != merged[member]:
-                #    del merged[member]
+        # First, remove all noauto member, they can't be merged
+        for member in list(merged):
+            xmlmember = self.registry.structs[property].members[member]
+            if xmlmember.limittype == 'noauto':
+                del merged[member]
+
         for member in entry:
+            xmlmember = self.registry.structs[property].members[member]
             if property is None or not member in merged:
-                if self.mode == 'union' or self.first is True:
+                if xmlmember.limittype == 'noauto':
+                    continue
+                elif self.mode == 'union' or self.first is True:
                     merged[member] = entry[member]
             else:
                 # Merge properties
-                xmlmember = self.registry.structs[property].members[member]
                 if xmlmember.limittype == 'struct':
                     s = self.registry.structs[self.registry.structs[property].members[member].type].members
                     for smember in s:
