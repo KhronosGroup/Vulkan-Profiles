@@ -91,7 +91,7 @@ TEST_F(TestsPromoted, TestVulkan11Properties) {
     gpu_props.pNext = &properties_native;
     vkGetPhysicalDeviceProperties2(gpu_native, &gpu_props);
 
-    EXPECT_EQ(properties_profile.subgroupSize, properties_native.subgroupSize);
+    EXPECT_EQ(properties_profile.subgroupSize, 64);
     EXPECT_EQ(properties_profile.subgroupSupportedStages & VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_VERTEX_BIT);
     EXPECT_EQ(properties_profile.subgroupSupportedOperations & VK_SUBGROUP_FEATURE_BASIC_BIT, VK_SUBGROUP_FEATURE_BASIC_BIT);
     EXPECT_EQ(properties_profile.subgroupQuadOperationsInAllStages, VK_TRUE);
@@ -285,8 +285,8 @@ TEST_F(TestsPromoted, TestVulkan13Properties) {
     gpu_props.pNext = &vulkan_13_properties;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props);
 
-    EXPECT_EQ(vulkan_13_properties.minSubgroupSize, 338);
-    EXPECT_EQ(vulkan_13_properties.maxSubgroupSize, 339);
+    EXPECT_EQ(vulkan_13_properties.minSubgroupSize, 32);
+    EXPECT_EQ(vulkan_13_properties.maxSubgroupSize, 128);
     EXPECT_EQ(vulkan_13_properties.maxComputeWorkgroupSubgroups, 340);
     EXPECT_EQ(vulkan_13_properties.requiredSubgroupSizeStages & (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT),
               VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
