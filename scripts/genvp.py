@@ -1897,10 +1897,12 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceVulkan12Properties'].members['roundingModeIndependence'].limittype = 'exact'
 
         if 'VkPhysicalDeviceVulkan13Properties' in self.structs:
-            self.structs['VkPhysicalDeviceVulkan13Properties'].members['storageTexelBufferOffsetAlignmentBytes'].limittype = 'min,pot' # should be `min,pot`
+            self.structs['VkPhysicalDeviceVulkan13Properties'].members['storageTexelBufferOffsetAlignmentBytes'].limittype = 'min,pot'
             self.structs['VkPhysicalDeviceVulkan13Properties'].members['storageTexelBufferOffsetSingleTexelAlignment'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceVulkan13Properties'].members['uniformTexelBufferOffsetAlignmentBytes'].limittype = 'min,pot' # should be `min,pot`
+            self.structs['VkPhysicalDeviceVulkan13Properties'].members['uniformTexelBufferOffsetAlignmentBytes'].limittype = 'min,pot'
             self.structs['VkPhysicalDeviceVulkan13Properties'].members['uniformTexelBufferOffsetSingleTexelAlignment'].limittype = 'exact'
+            self.structs['VkPhysicalDeviceVulkan13Properties'].members['minSubgroupSize'].limittype = 'min,pot'
+            self.structs['VkPhysicalDeviceVulkan13Properties'].members['maxSubgroupSize'].limittype = 'max,pot'
 
         if 'VkPhysicalDeviceTexelBufferAlignmentProperties' in self.structs:
             self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['storageTexelBufferOffsetAlignmentBytes'].limittype = 'min,pot' # should be `min,pot`
@@ -1923,6 +1925,10 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceToolProperties'].members['purposes'].limittype = 'noauto'
             self.structs['VkPhysicalDeviceToolProperties'].members['description'].limittype = 'noauto'
             self.structs['VkPhysicalDeviceToolProperties'].members['layer'].limittype = 'noauto'
+
+        if 'VkPhysicalDeviceSubgroupSizeControlProperties' in self.structs:
+            self.structs['VkPhysicalDeviceSubgroupSizeControlProperties'].members['minSubgroupSize'].limittype = 'min,pot'
+            self.structs['VkPhysicalDeviceSubgroupSizeControlProperties'].members['maxSubgroupSize'].limittype = 'max,pot'
 
         if 'VkPhysicalDeviceDriverProperties' in self.structs:
             self.structs['VkPhysicalDeviceDriverProperties'].members['driverID'].limittype = 'noauto'
