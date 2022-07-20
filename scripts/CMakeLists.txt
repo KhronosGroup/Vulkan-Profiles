@@ -52,7 +52,6 @@ add_custom_target(VpTestIntersect ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
 		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
 		-input_dir ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_intersect
-		-input_profiles "VP_LUNARG_test_combine_intersect1,VP_LUNARG_test_combine_intersect2"
 		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_intersect.json
 		-output_profile VP_LUNARG_test_combine_intersect
 		-mode intersection
@@ -66,7 +65,6 @@ add_custom_target(VpTestUnion ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
 		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
 		-input_dir ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_union
-		-input_profiles "VP_LUNARG_test_combine_union1,VP_LUNARG_test_combine_union2"
 		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_union.json
 		-output_profile VP_LUNARG_test_combine_union
 		-mode union
@@ -74,25 +72,27 @@ add_custom_target(VpTestUnion ALL
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
 	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
 
+set_target_properties(VpTestUnion PROPERTIES FOLDER "Profiles scripts")
+
 add_custom_target(VpCreateGeneratedName ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
 		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
 		-input_dir ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_intersect
-		-input_profiles "VP_LUNARG_test_combine_intersect1,VP_LUNARG_test_combine_intersect2"
 		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_generated_name.json
 	VERBATIM
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
 	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
 
+set_target_properties(VpCreateGeneratedName PROPERTIES FOLDER "Profiles scripts")
+
 add_custom_target(VpCreateDesktop2022 ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
 		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
 		-input_dir ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022/windows
-		-input_profiles "VP_GPUINFO_NVIDIA_GeForce_GTX_650_Ti_472_98_0_0_windows_10,VP_GPUINFO_AMD_Radeon__TM__R7_370_Series_2_0_179_windows_10,VP_GPUINFO_Intel_R__HD_Graphics_515_0_402_1124_windows_10"
 		-output_path ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022/VP_LUNARG_desktop_portability_2022_windows.json
 		-output_profile VP_LUNARG_desktop_portability_2022
 	VERBATIM
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
 	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
 
-set_target_properties(VpTestUnion PROPERTIES FOLDER "Profiles scripts")
+set_target_properties(VpCreateDesktop2022 PROPERTIES FOLDER "Profiles scripts")

@@ -383,11 +383,19 @@ class ProfileMerger():
                     self.merge_members(merged, member, entry, xmlmember)
 
     def merge_members(self, merged, member, entry, xmlmember):
-        if self.mode == 'union':
-            if xmlmember.limittype == 'exact':
-                if merged[member] != entry[member]:
-                    print("ERROR: values with exact limittype have different values")
-            elif 'max' in xmlmember.limittype or xmlmember.limittype == 'bits':
+        if xmlmember.limittype == 'exact':
+            if merged[member] != entry[member]:
+                del merged[member]
+        elif xmlmember.limittype == 'noauto':
+            del merged[member]
+        elif self.mode == 'union':
+            #if xmlmember.limittype == 'exact':
+                #if merged[member] != entry[member]:
+                    # merged.remove(member)
+                    # del merged[member]
+                    # del entry[member]
+                    #print("ERROR: '" + member + " 'values with 'exact' limittype have different values.")
+            if 'max' in xmlmember.limittype or xmlmember.limittype == 'bits':
                 if xmlmember.arraySize == 3:
                     if entry[member][0] > merged[member][0]:
                         merged[member][0] = entry[member][0]
@@ -408,22 +416,25 @@ class ProfileMerger():
                     merged[member] = entry[member]
             elif xmlmember.limittype == 'bitmask':
                 for smember in entry[member]:
-                    if smember not in merged[member]:
+                    if smember in merged[member]:
+                        merged[member] = merged[member] or smember
+                    else:
                         merged[member].append(smember)
             elif xmlmember.limittype == 'range':
                 if entry[member][0] < merged[member][0]:
                     merged[member][0] = entry[member][0]
                 if entry[member][1] > merged[member][1]:
                     merged[member][1] = entry[member][1]
-            elif xmlmember.limittype == 'noauto':
-                merged.remove(member)
             else:
                 print("ERROR: Unknown limitype: " + xmlmember.limittype + " for " + member)
         elif self.mode == 'intersection':
-            if xmlmember.limittype == 'exact':
-                if merged[member] != entry[member]:
-                    print("ERROR: values with exact limittype have different values")
-            elif 'max' in xmlmember.limittype or xmlmember.limittype == 'bits':
+            #if xmlmember.limittype == 'exact':
+                #if merged[member] != entry[member]:
+                    #merged.remove(member)
+                    #del merged[member]
+                    #del entry[member]
+                    #print("ERROR: '" + member + " 'values with 'exact' limittype have different values.")
+            if 'max' in xmlmember.limittype or xmlmember.limittype == 'bits':
                 if xmlmember.arraySize == 3:
                     if entry[member][0] < merged[member][0]:
                         merged[member][0] = entry[member][0]
@@ -444,7 +455,9 @@ class ProfileMerger():
                     merged[member] = entry[member]
             elif xmlmember.limittype == 'bitmask':
                 if xmlmember.type == 'VkBool32':
-                    if member not in entry:
+                    if member in entry:
+                        merged[member] = merged[member] or entry[member]
+                    else:
                         merged.remove(member)
                 else:
                     for value in merged[member]:
@@ -457,8 +470,6 @@ class ProfileMerger():
                     merged[member][1] = entry[member][1]
                 #if member[1] < member[0]:
                 #    merged.pop(member, None)
-            elif xmlmember.limittype == 'noauto':
-                merged.remove(member)
             else:
                 print("ERROR: Unknown limitype: " + xmlmember.limittype + " for " + member)
         else:
@@ -597,8 +608,6 @@ if __name__ == '__main__':
     parser.set_defaults(mode='intersection')
 
     args = parser.parse_args()
-    if (args.mode is None):
-        args.mode = 'union'
 
     if args.registry is None:
         genvp.Log.e('Merging the profiles requires specifying -registry')
@@ -616,7 +625,10 @@ if __name__ == '__main__':
         genvp.Log.e('Invalid output_profile, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
         exit()
 
-    profile_names = args.input_profiles.split(',')
+    if args.input_profiles is not None:
+        profile_names = args.input_profiles.split(',')
+    else:
+        profile_names = list()
 
     # Open file and load json
     jsons = list()
@@ -649,6 +661,7 @@ if __name__ == '__main__':
                     for profile in json_file['profiles']:
                         jsons.append(json_file)
                         profiles.append(json_file['profiles'][profile])
+                        profile_names.append(profile)
     else:
         print('ERROR: Not input directory set, use -input_dir')
         exit()
