@@ -346,7 +346,6 @@
                             "VK_SAMPLE_COUNT_4_BIT",
                             "VK_SAMPLE_COUNT_8_BIT"
                         ],
-                        "strictLines": true,
                         "subPixelInterpolationOffsetBits": 4,
                         "subPixelPrecisionBits": 8,
                         "subTexelPrecisionBits": 8,
@@ -373,11 +372,11 @@
                         "lineWidthRange": [
                             1,
                             7.99219
-                        ]
+                        ],
+                        "strictLines": false
                     }
                 },
                 "VkPhysicalDeviceVulkan11Properties": {
-                    "subgroupSize": 32,
                     "subgroupSupportedStages": [
                         "VK_SHADER_STAGE_VERTEX_BIT",
                         "VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT",
@@ -399,7 +398,6 @@
                         "VK_SUBGROUP_FEATURE_QUAD_BIT"
                     ],
                     "subgroupQuadOperationsInAllStages": true,
-                    "pointClippingBehavior": "VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY",
                     "maxMultiviewViewCount": 6,
                     "maxMultiviewInstanceIndex": 134217727,
                     "protectedNoFault": false,
@@ -408,20 +406,19 @@
                 },
                 "VkPhysicalDeviceVulkan12Properties": {
                     "denormBehaviorIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL",
-                    "roundingModeIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL",
                     "shaderSignedZeroInfNanPreserveFloat16": true,
                     "shaderSignedZeroInfNanPreserveFloat32": true,
                     "shaderSignedZeroInfNanPreserveFloat64": true,
-                    "shaderDenormPreserveFloat16": false,
-                    "shaderDenormPreserveFloat32": false,
-                    "shaderDenormPreserveFloat64": false,
-                    "shaderDenormFlushToZeroFloat16": false,
-                    "shaderDenormFlushToZeroFloat32": false,
-                    "shaderDenormFlushToZeroFloat64": false,
+                    "shaderDenormPreserveFloat16": true,
+                    "shaderDenormPreserveFloat32": true,
+                    "shaderDenormPreserveFloat64": true,
+                    "shaderDenormFlushToZeroFloat16": true,
+                    "shaderDenormFlushToZeroFloat32": true,
+                    "shaderDenormFlushToZeroFloat64": true,
                     "shaderRoundingModeRTEFloat16": true,
                     "shaderRoundingModeRTEFloat32": true,
                     "shaderRoundingModeRTEFloat64": true,
-                    "shaderRoundingModeRTZFloat16": false,
+                    "shaderRoundingModeRTZFloat16": true,
                     "shaderRoundingModeRTZFloat32": true,
                     "shaderRoundingModeRTZFloat64": true,
                     "maxUpdateAfterBindDescriptorsInAllPools": 1048576,
@@ -455,8 +452,8 @@
                     ],
                     "independentResolveNone": true,
                     "independentResolve": true,
-                    "filterMinmaxSingleComponentFormats": false,
-                    "filterMinmaxImageComponentMapping": false,
+                    "filterMinmaxSingleComponentFormats": true,
+                    "filterMinmaxImageComponentMapping": true,
                     "maxTimelineSemaphoreValueDifference": "-1",
                     "framebufferIntegerColorSampleCounts": [
                         "VK_SAMPLE_COUNT_1_BIT",
@@ -468,7 +465,6 @@
                 "VkPhysicalDeviceDriverPropertiesKHR": {},
                 "VkPhysicalDeviceFloatControlsPropertiesKHR": {
                     "denormBehaviorIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR",
-                    "roundingModeIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR",
                     "shaderDenormFlushToZeroFloat16": true,
                     "shaderDenormFlushToZeroFloat32": true,
                     "shaderDenormFlushToZeroFloat64": true,
@@ -569,9 +565,7 @@
                 "VkPhysicalDeviceExternalMemoryHostPropertiesEXT": {
                     "minImportedHostPointerAlignment": "4096"
                 },
-                "VkPhysicalDevicePointClippingPropertiesKHR": {
-                    "pointClippingBehavior": "VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY"
-                },
+                "VkPhysicalDevicePointClippingPropertiesKHR": {},
                 "VkPhysicalDeviceRobustness2PropertiesEXT": {
                     "robustStorageBufferAccessSizeAlignment": "4",
                     "robustUniformBufferAccessSizeAlignment": "4"
