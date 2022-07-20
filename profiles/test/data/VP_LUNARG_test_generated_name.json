@@ -45,7 +45,7 @@
         }
     },
     "profiles": {
-        "VP_LUNARG_merged_2022_07_19_17_12": {
+        "VP_LUNARG_merged_2022_07_20_12_25": {
             "version": 1,
             "status": "BETA",
             "api-version": "1.0.142",
@@ -55,7 +55,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-07-19",
+                    "date": "2022-07-20",
                     "author": "Merge tool",
                     "comment": "Generated profile doing an intersection between profiles: VP_LUNARG_test_combine_intersect1 and VP_LUNARG_test_combine_intersect2"
                 }

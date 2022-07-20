@@ -581,20 +581,14 @@ class ProfileMerger():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-registry', action='store',
+    parser.add_argument('-registry', action='store', required=True,
                         help='Use specified registry file instead of vk.xml')
-    parser.add_argument('-profile_dir', action='store',
+    parser.add_argument('-input_dir', action='store', required=True,
                         help='Path to directory with profiles')
-    parser.add_argument('-profile_path', action='store',
-                        help='Path to base profile')
-    parser.add_argument('-profile_path2', action='store',
-                        help='Path to second profile')
-    parser.add_argument('-output_path', action='store',
+    parser.add_argument('-input_profiles', action='store',
+                        help='Comma separated list of profiles')
+    parser.add_argument('-output_path', action='store', required=True,
                         help='Path to output profile')
-    parser.add_argument('-profile', action='store',
-                        help='Base profile to build the new profile from')
-    parser.add_argument('-profile2', action='store',
-                        help='Profile to combine into the base profile')
     parser.add_argument('-output_profile', action='store',
                         help='Profile name of the output profile')
     parser.add_argument('-mode', action='store',
@@ -620,45 +614,42 @@ if __name__ == '__main__':
         genvp.Log.e('Invalid output_profile, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
         exit()
 
-    directory = args.profile_dir is not None
-    profile_names = [args.profile, args.profile2]
+    profile_names = args.input_profiles.split(',')
 
     # Open file and load json
     jsons = list()
     profiles = list()
-    if directory:
+    if args.input_dir is not None:
         profiles_not_found = profile_names.copy()
         # Find all jsons in the folder
-        paths = [args.profile_dir + '/' + pos_json for pos_json in os.listdir(args.profile_dir) if pos_json.endswith('.json')]
+        paths = [args.input_dir + '/' + pos_json for pos_json in os.listdir(args.input_dir) if pos_json.endswith('.json')]
         json_files = list()
         for i in range(len(paths)):
             print('Opening: ' + paths[i])
             file = open(paths[i], "r")
             json_files.append(json.load(file))
         # We need to iterate through profile names first, so the indices of jsons and profiles lists will match
-        for profile_name in profile_names:
-            for json_file in json_files:
-                if 'profiles' in json_file and profile_name in json_file['profiles']:
-                    jsons.append(json_file)
-                    # Select profiles and capabilities
-                    profiles.append(json_file['profiles'][profile_name])
-                    profiles_not_found.remove(profile_name)
-                    break
-
-        if profiles_not_found:
-            print('Profiles: ' + ' '.join(profiles_not_found) + ' not found in directory ' + args.profile_dir)
-            exit()
-    else:
-        paths = [args.profile_path, args.profile_path2]
-        for i in range(len(paths)):
-            file = open(paths[i], 'r')
-            jsons.append(json.load(file))
-            # Make sure selected profile exists in the file
-            if (profile_names[i] not in jsons[i]['profiles']):
-                genvp.Log.e('Profile ' + profile_names[i] + ' not found in ' + paths[i])
+        if (len(profile_names) > 0):
+            for profile_name in profile_names:
+                for json_file in json_files:
+                    if 'profiles' in json_file and profile_name in json_file['profiles']:
+                        jsons.append(json_file)
+                        # Select profiles and capabilities
+                        profiles.append(json_file['profiles'][profile_name])
+                        profiles_not_found.remove(profile_name)
+                        break
+            if profiles_not_found:
+                print('Profiles: ' + ' '.join(profiles_not_found) + ' not found in directory ' + args.input_dir)
                 exit()
-            # Select profiles and capabilities
-            profiles.append(jsons[i]['profiles'][profile_names[i]])
+        else:
+            for json_file in json_files:
+                if 'profiles' in json_file:
+                    for profile in json_file['profiles']:
+                        jsons.append(json_file)
+                        profiles.append(json_file['profiles'][profile])
+    else:
+        print('ERROR: Not input directory set, use -input_dir')
+        exit()
 
     registry = genvp.VulkanRegistry(args.registry)
     profile_merger = ProfileMerger(registry)

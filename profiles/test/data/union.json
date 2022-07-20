@@ -1693,7 +1693,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-07-19",
+                    "date": "2022-07-20",
                     "author": "Merge tool",
                     "comment": "Generated profile doing an union between profiles: VP_LUNARG_desktop_portability_2021_union_data1 and VP_LUNARG_desktop_portability_2021_union_data2"
                 }
