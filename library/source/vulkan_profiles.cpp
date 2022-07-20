@@ -2785,7 +2785,6 @@ static const VpFeatureDesc featureDesc = {
                     s->timelineSemaphore = VK_TRUE;
                     s->uniformBufferStandardLayout = VK_TRUE;
                     s->vulkanMemoryModel = VK_TRUE;
-                    s->vulkanMemoryModelAvailabilityVisibilityChains = VK_TRUE;
                     s->vulkanMemoryModelDeviceScope = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES: {
@@ -2865,7 +2864,6 @@ static const VpFeatureDesc featureDesc = {
                     ret = ret && (s->timelineSemaphore == VK_TRUE);
                     ret = ret && (s->uniformBufferStandardLayout == VK_TRUE);
                     ret = ret && (s->vulkanMemoryModel == VK_TRUE);
-                    ret = ret && (s->vulkanMemoryModelAvailabilityVisibilityChains == VK_TRUE);
                     ret = ret && (s->vulkanMemoryModelDeviceScope == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES: {

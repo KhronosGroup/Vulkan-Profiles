@@ -2819,7 +2819,6 @@ static const VpFeatureDesc featureDesc = {
                     s->timelineSemaphore = VK_TRUE;
                     s->uniformBufferStandardLayout = VK_TRUE;
                     s->vulkanMemoryModel = VK_TRUE;
-                    s->vulkanMemoryModelAvailabilityVisibilityChains = VK_TRUE;
                     s->vulkanMemoryModelDeviceScope = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES: {
@@ -2899,7 +2898,6 @@ static const VpFeatureDesc featureDesc = {
                     ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->timelineSemaphore == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->timelineSemaphore == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::timelineSemaphore == VK_TRUE");
                     ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->uniformBufferStandardLayout == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->uniformBufferStandardLayout == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::uniformBufferStandardLayout == VK_TRUE");
                     ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->vulkanMemoryModel == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->vulkanMemoryModel == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::vulkanMemoryModel == VK_TRUE");
-                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->vulkanMemoryModelAvailabilityVisibilityChains == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->vulkanMemoryModelAvailabilityVisibilityChains == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::vulkanMemoryModelAvailabilityVisibilityChains == VK_TRUE");
                     ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->vulkanMemoryModelDeviceScope == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->vulkanMemoryModelDeviceScope == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::vulkanMemoryModelDeviceScope == VK_TRUE");
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES: {

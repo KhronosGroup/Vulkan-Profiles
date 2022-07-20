@@ -159,7 +159,6 @@
                 "VkPhysicalDeviceVulkan12Features": {
                     "vulkanMemoryModel": true,
                     "vulkanMemoryModelDeviceScope": true,
-                    "vulkanMemoryModelAvailabilityVisibilityChains": true,
                     "bufferDeviceAddress": true
                 },
                 "VkPhysicalDeviceVulkan13Features": {
