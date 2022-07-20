@@ -85,14 +85,14 @@ add_custom_target(VpCreateGeneratedName ALL
 
 set_target_properties(VpCreateGeneratedName PROPERTIES FOLDER "Profiles scripts")
 
-add_custom_target(VpCreateDesktop2022 ALL
-	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
-		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
-		-input_dir ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022/windows
-		-output_path ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022/VP_LUNARG_desktop_portability_2022_windows.json
-		-output_profile VP_LUNARG_desktop_portability_2022
-	VERBATIM
-	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
-	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
+#add_custom_target(VpCreateDesktop2022 ALL
+#	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
+#		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
+#		-input_dir ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022/windows
+#		-output_path ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022/VP_LUNARG_desktop_portability_2022_windows.json
+#		-output_profile VP_LUNARG_desktop_portability_2022
+#	VERBATIM
+#	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
+#	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
 
-set_target_properties(VpCreateDesktop2022 PROPERTIES FOLDER "Profiles scripts")
+# set_target_properties(VpCreateDesktop2022 PROPERTIES FOLDER "Profiles scripts")
