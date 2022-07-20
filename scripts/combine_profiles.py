@@ -593,7 +593,9 @@ if __name__ == '__main__':
                         help='Profile name of the output profile')
     parser.add_argument('-mode', action='store',
                         help='Mode of profile combination')
-                        
+          
+    parser.set_defaults(mode='intersection')
+
     args = parser.parse_args()
     if (args.mode is None):
         args.mode = 'union'

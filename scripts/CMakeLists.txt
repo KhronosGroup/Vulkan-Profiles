@@ -80,7 +80,6 @@ add_custom_target(VpCreateGeneratedName ALL
 		-input_dir ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_intersect
 		-input_profiles "VP_LUNARG_test_combine_intersect1,VP_LUNARG_test_combine_intersect2"
 		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_generated_name.json
-		-mode intersection
 	VERBATIM
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
 	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
@@ -92,7 +91,6 @@ add_custom_target(VpCreateDesktop2022 ALL
 		-input_profiles "VP_GPUINFO_NVIDIA_GeForce_GTX_650_Ti_472_98_0_0_windows_10,VP_GPUINFO_AMD_Radeon__TM__R7_370_Series_2_0_179_windows_10,VP_GPUINFO_Intel_R__HD_Graphics_515_0_402_1124_windows_10"
 		-output_path ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022/VP_LUNARG_desktop_portability_2022_windows.json
 		-output_profile VP_LUNARG_desktop_portability_2022
-		-mode intersection
 	VERBATIM
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
 	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
