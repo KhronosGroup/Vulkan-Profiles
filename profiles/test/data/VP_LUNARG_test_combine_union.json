@@ -17,6 +17,18 @@
                     "shaderClipDistance": false,
                     "samplerAnisotropy": true,
                     "multiViewport": false
+                },
+                "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT": {
+                    "shaderDemoteToHelperInvocation": true
+                },
+                "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
+                    "imagelessFramebuffer": false
+                },
+                "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT": {
+                    "extendedDynamicState": true
+                },
+                "VkPhysicalDeviceDynamicRenderingFeaturesKHR": {
+                    "dynamicRendering": false
                 }
             },
             "properties": {

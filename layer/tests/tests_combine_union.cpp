@@ -118,3 +118,32 @@ TEST_F(TestsUnion, Noauto) {
     EXPECT_STREQ(gpu_props_profile.deviceName, gpu_props_native.deviceName);
     EXPECT_EQ(gpu_props_profile.deviceType, gpu_props_native.deviceType);
 }
+
+// Noauto limittype member should not be modified
+TEST_F(TestsUnion, Structure) {
+    VkPhysicalDeviceDynamicRenderingFeaturesKHR featuresDynamicRendering{};
+    featuresDynamicRendering.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
+
+    VkPhysicalDeviceImagelessFramebufferFeaturesKHR featuresImageless{};
+    featuresImageless.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT;
+    featuresImageless.pNext = &featuresDynamicRendering;
+
+    VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT featuresHelperInvocation{};
+    featuresHelperInvocation.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT;
+    featuresHelperInvocation.pNext = &featuresImageless;
+
+    VkPhysicalDeviceExtendedDynamicStateFeaturesEXT features_dynamic_state{};
+    features_dynamic_state.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT;
+    features_dynamic_state.pNext = &featuresHelperInvocation;
+
+    VkPhysicalDeviceFeatures2KHR features{};
+    features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR;
+    features.pNext = &features_dynamic_state;
+
+    vkGetPhysicalDeviceFeatures2(gpu_profile, &features);
+
+    EXPECT_EQ(featuresDynamicRendering.dynamicRendering, VK_FALSE);
+    EXPECT_EQ(featuresImageless.imagelessFramebuffer, VK_FALSE);
+    EXPECT_EQ(featuresHelperInvocation.shaderDemoteToHelperInvocation, VK_TRUE);
+    EXPECT_EQ(features_dynamic_state.extendedDynamicState, VK_TRUE);
+}

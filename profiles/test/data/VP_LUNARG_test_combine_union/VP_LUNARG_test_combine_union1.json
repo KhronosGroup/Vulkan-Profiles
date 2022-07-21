@@ -14,6 +14,12 @@
                     "multiDrawIndirect": false,
                     "sampleRateShading": true,
                     "shaderClipDistance": false
+                },
+                "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT": {
+                    "shaderDemoteToHelperInvocation": true
+                },
+                "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
+                    "imagelessFramebuffer": false
                 }
             },
             "properties": {
