@@ -63,10 +63,14 @@ TEST_F(TestsUnion, Extension) {
     std::vector<VkExtensionProperties> device_extensions(count);
     vkEnumerateDeviceExtensionProperties(gpu_profile, nullptr, &count, device_extensions.data());
 
-    ASSERT_STREQ("VK_KHR_maintenance1", device_extensions[0].extensionName);
-    ASSERT_STREQ("VK_KHR_maintenance2", device_extensions[1].extensionName);
-    ASSERT_STREQ("VK_KHR_maintenance3", device_extensions[2].extensionName);
-    ASSERT_STREQ("VK_KHR_portability_subset", device_extensions[3].extensionName);
+    ASSERT_STREQ("VK_AMD_device_coherent_memory", device_extensions[0].extensionName);
+    ASSERT_STREQ("VK_EXT_extended_dynamic_state", device_extensions[1].extensionName);
+    ASSERT_STREQ("VK_EXT_shader_demote_to_helper_invocation", device_extensions[2].extensionName);
+    ASSERT_STREQ("VK_KHR_maintenance1", device_extensions[3].extensionName);
+    ASSERT_STREQ("VK_KHR_maintenance2", device_extensions[4].extensionName);
+    ASSERT_STREQ("VK_KHR_maintenance3", device_extensions[5].extensionName);
+    ASSERT_STREQ("VK_KHR_variable_pointers", device_extensions[6].extensionName);
+    ASSERT_STREQ("VK_KHR_portability_subset", device_extensions[7].extensionName);
 }
 
 TEST_F(TestsUnion, Feature) {
@@ -121,16 +125,16 @@ TEST_F(TestsUnion, Noauto) {
 
 // Noauto limittype member should not be modified
 TEST_F(TestsUnion, Structure) {
-    VkPhysicalDeviceDynamicRenderingFeaturesKHR featuresDynamicRendering{};
-    featuresDynamicRendering.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
+    VkPhysicalDeviceCoherentMemoryFeaturesAMD featuresCoherentMemory{};
+    featuresCoherentMemory.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD;
 
-    VkPhysicalDeviceImagelessFramebufferFeaturesKHR featuresImageless{};
-    featuresImageless.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT;
-    featuresImageless.pNext = &featuresDynamicRendering;
+    VkPhysicalDeviceVariablePointersFeaturesKHR featuresVariablePointers{};
+    featuresVariablePointers.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES;
+    featuresVariablePointers.pNext = &featuresCoherentMemory;
 
     VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT featuresHelperInvocation{};
     featuresHelperInvocation.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT;
-    featuresHelperInvocation.pNext = &featuresImageless;
+    featuresHelperInvocation.pNext = &featuresVariablePointers;
 
     VkPhysicalDeviceExtendedDynamicStateFeaturesEXT features_dynamic_state{};
     features_dynamic_state.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT;
@@ -142,8 +146,8 @@ TEST_F(TestsUnion, Structure) {
 
     vkGetPhysicalDeviceFeatures2(gpu_profile, &features);
 
-    EXPECT_EQ(featuresDynamicRendering.dynamicRendering, VK_FALSE);
-    EXPECT_EQ(featuresImageless.imagelessFramebuffer, VK_FALSE);
+    EXPECT_EQ(featuresCoherentMemory.deviceCoherentMemory, VK_FALSE);
+    EXPECT_EQ(featuresVariablePointers.variablePointersStorageBuffer, VK_FALSE);
     EXPECT_EQ(featuresHelperInvocation.shaderDemoteToHelperInvocation, VK_TRUE);
     EXPECT_EQ(features_dynamic_state.extendedDynamicState, VK_TRUE);
 }
