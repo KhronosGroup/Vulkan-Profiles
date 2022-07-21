@@ -14,7 +14,7 @@
 ## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/LunarG/VulkanProfiles/tree/master) - August 2022
 
 ### Features:
-- Add script to combine (union and intersection) multiple profiles
+- Add script to merge (union and intersection) multiple profiles
 - Add support of the new `vk.xml` limittypes
 
 ### Improvements:
@@ -23,6 +23,7 @@
 
 ### Bugfixes:
 - Fix the impossibility to override extensions with no extension
+- Fix Roadmap 2022 profile file that incorrecly required `vulkanMemoryModelAvailabilityVisibilityChains`
 
 ## [Vulkan Profiles Toolset 1.3.216](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.216.0) - June 2022
 
