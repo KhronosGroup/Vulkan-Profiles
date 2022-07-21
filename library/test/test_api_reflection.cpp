@@ -393,7 +393,6 @@ TEST(api_get_profile_structures, get_features) {
     EXPECT_EQ(VK_TRUE, deviceVulkan12Features.bufferDeviceAddress);
     EXPECT_EQ(VK_TRUE, deviceVulkan12Features.vulkanMemoryModel);
     EXPECT_EQ(VK_TRUE, deviceVulkan12Features.vulkanMemoryModelDeviceScope);
-    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.vulkanMemoryModelAvailabilityVisibilityChains);
     EXPECT_EQ(VK_TRUE, deviceVulkan12Features.subgroupBroadcastDynamicId);
     EXPECT_EQ(VK_TRUE, deviceVulkan12Features.imagelessFramebuffer);
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.shaderOutputLayer);
