@@ -18,8 +18,8 @@
                 "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT": {
                     "extendedDynamicState": true
                 },
-                "VkPhysicalDeviceDynamicRenderingFeaturesKHR": {
-                    "dynamicRendering": false
+                "VkPhysicalDeviceVariablePointersFeaturesKHR": {
+                    "variablePointersStorageBuffer": false
                 }
             },
             "properties": {

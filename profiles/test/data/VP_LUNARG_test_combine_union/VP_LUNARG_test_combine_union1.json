@@ -4,7 +4,9 @@
         "baseline": {
             "extensions": {
                 "VK_KHR_maintenance1": 1,
-                "VK_KHR_maintenance3": 1
+                "VK_KHR_maintenance3": 1,
+                "VK_AMD_device_coherent_memory": 1,
+                "VK_EXT_shader_demote_to_helper_invocation": 1
             },
             "features": {
                 "VkPhysicalDeviceFeatures": {
@@ -18,8 +20,8 @@
                 "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT": {
                     "shaderDemoteToHelperInvocation": true
                 },
-                "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
-                    "imagelessFramebuffer": false
+                "VkPhysicalDeviceCoherentMemoryFeaturesAMD": {
+                    "deviceCoherentMemory": false
                 }
             },
             "properties": {
