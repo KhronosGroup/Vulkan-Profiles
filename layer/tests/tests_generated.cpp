@@ -1816,13 +1816,44 @@ TEST_F(TestsCapabilitiesGenerated, TestPipelineRobustnessPropertiesEXT) {
 #endif
 }
 
+TEST_F(TestsCapabilitiesGenerated, TestImageProcessingPropertiesQCOM) {
+#ifdef VK_QCOM_image_processing
+    bool supported = false;
+    supported = supported && IsSupported(gpu_profile, "VK_QCOM_image_processing");
+
+    VkPhysicalDeviceImageProcessingPropertiesQCOM image_processing_properties_native{};
+    image_processing_properties_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_PROCESSING_PROPERTIES_QCOM;
+
+    VkPhysicalDeviceProperties2 gpu_props_native{};
+    gpu_props_native.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_native.pNext = &image_processing_properties_native;
+    vkGetPhysicalDeviceProperties2(gpu_native, &gpu_props_native);
+
+    VkPhysicalDeviceImageProcessingPropertiesQCOM image_processing_properties_profile{};
+    image_processing_properties_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_PROCESSING_PROPERTIES_QCOM;
+
+    VkPhysicalDeviceProperties2 gpu_props_profile{};
+    gpu_props_profile.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props_profile.pNext = &image_processing_properties_profile;
+    vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
+
+    EXPECT_EQ(image_processing_properties_profile.maxWeightFilterPhases, 175);
+    EXPECT_EQ(image_processing_properties_profile.maxWeightFilterDimension.width, 176);
+    EXPECT_EQ(image_processing_properties_profile.maxWeightFilterDimension.height, 177);
+    EXPECT_EQ(image_processing_properties_profile.maxBlockMatchRegion.width, 178);
+    EXPECT_EQ(image_processing_properties_profile.maxBlockMatchRegion.height, 179);
+    EXPECT_EQ(image_processing_properties_profile.maxBoxFilterBlockSize.width, 180);
+    EXPECT_EQ(image_processing_properties_profile.maxBoxFilterBlockSize.height, 181);
+#endif
+}
+
 TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_UNDEFINED) {
     VkFormat format = VK_FORMAT_UNDEFINED;
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
     VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);

@@ -290,8 +290,10 @@
                 "VK_NV_linear_color_attachment": 1,
                 "VK_GOOGLE_surfaceless_query": 1,
                 "VK_EXT_image_compression_control_swapchain": 1,
+                "VK_QCOM_image_processing": 1,
                 "VK_EXT_subpass_merge_feedback": 2,
-                "VK_EXT_shader_module_identifier": 1
+                "VK_EXT_shader_module_identifier": 1,
+                "VK_QCOM_tile_properties": 1
             },
             "features": {
                 "VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV": {
@@ -789,6 +791,14 @@
                 },
                 "VkPhysicalDevicePipelineRobustnessFeaturesEXT": {
                     "pipelineRobustness": true
+                },
+                "VkPhysicalDeviceImageProcessingFeaturesQCOM": {
+                    "textureSampleWeighted": true,
+                    "textureBoxFilter": true,
+                    "textureBlockMatch": true
+                },
+                "VkPhysicalDeviceTilePropertiesFeaturesQCOM": {
+                    "tileProperties": true
                 }
             },
             "properties": {
@@ -1187,13 +1197,28 @@
                     "defaultRobustnessUniformBuffers": "VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_DEVICE_DEFAULT_EXT",
                     "defaultRobustnessVertexInputs": "VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_DISABLED_EXT",
                     "defaultRobustnessImages": "VK_PIPELINE_ROBUSTNESS_IMAGE_BEHAVIOR_ROBUST_IMAGE_ACCESS_EXT"
+                },
+                "VkPhysicalDeviceImageProcessingPropertiesQCOM": {
+                    "maxWeightFilterPhases": 175,
+                    "maxWeightFilterDimension": {
+                        "width": 176,
+                        "height": 177
+                    },
+                    "maxBlockMatchRegion": {
+                        "width": 178,
+                        "height": 179
+                    },
+                    "maxBoxFilterBlockSize": {
+                        "width": 180,
+                        "height": 181
+                    }
                 }
             },
             "formats": {
                 "VK_FORMAT_UNDEFINED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [ "VK_FORMAT_FEATURE_DISJOINT_BIT_KHR", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT" ],
-                        "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR", "VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT", "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT", "VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR" ],
+                        "linearTilingFeatures": [ ],
+                        "optimalTilingFeatures": [  ],
                         "bufferFeatures": [ "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT" ]
                     }
                 },
