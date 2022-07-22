@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.3.221",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.222",
     "additionalProperties": true,
     "required": [
         "capabilities",
@@ -802,6 +802,21 @@
                 }
             }
         },
+        "VkPhysicalDeviceImageProcessingFeaturesQCOM": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "textureBlockMatch": {
+                    "type": "boolean"
+                },
+                "textureBoxFilter": {
+                    "type": "boolean"
+                },
+                "textureSampleWeighted": {
+                    "type": "boolean"
+                }
+            }
+        },
         "VkPhysicalDeviceImageRobustnessFeatures": {
             "type": "object",
             "additionalProperties": false,
@@ -1590,6 +1605,15 @@
             "additionalProperties": false,
             "properties": {
                 "textureCompressionASTC_HDR": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceTilePropertiesFeaturesQCOM": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "tileProperties": {
                     "type": "boolean"
                 }
             }
@@ -3056,6 +3080,24 @@
                 }
             }
         },
+        "VkPhysicalDeviceImageProcessingPropertiesQCOM": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "maxBlockMatchRegion": {
+                    "$ref": "#/definitions/VkExtent2D"
+                },
+                "maxBoxFilterBlockSize": {
+                    "$ref": "#/definitions/VkExtent2D"
+                },
+                "maxWeightFilterDimension": {
+                    "$ref": "#/definitions/VkExtent2D"
+                },
+                "maxWeightFilterPhases": {
+                    "$ref": "#/definitions/uint32_t"
+                }
+            }
+        },
         "VkPhysicalDeviceInlineUniformBlockProperties": {
             "type": "object",
             "additionalProperties": false,
@@ -4220,6 +4262,8 @@
                 "VK_FORMAT_FEATURE_2_BLIT_DST_BIT_KHR",
                 "VK_FORMAT_FEATURE_2_BLIT_SRC_BIT",
                 "VK_FORMAT_FEATURE_2_BLIT_SRC_BIT_KHR",
+                "VK_FORMAT_FEATURE_2_BLOCK_MATCHING_BIT_QCOM",
+                "VK_FORMAT_FEATURE_2_BOX_FILTER_SAMPLED_BIT_QCOM",
                 "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT",
                 "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT_KHR",
                 "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT",
@@ -4276,7 +4320,9 @@
                 "VK_FORMAT_FEATURE_2_VIDEO_DECODE_DPB_BIT_KHR",
                 "VK_FORMAT_FEATURE_2_VIDEO_DECODE_OUTPUT_BIT_KHR",
                 "VK_FORMAT_FEATURE_2_VIDEO_ENCODE_DPB_BIT_KHR",
-                "VK_FORMAT_FEATURE_2_VIDEO_ENCODE_INPUT_BIT_KHR"
+                "VK_FORMAT_FEATURE_2_VIDEO_ENCODE_INPUT_BIT_KHR",
+                "VK_FORMAT_FEATURE_2_WEIGHT_IMAGE_BIT_QCOM",
+                "VK_FORMAT_FEATURE_2_WEIGHT_SAMPLED_IMAGE_BIT_QCOM"
             ]
         },
         "VkFormatFeatureFlags2": {
@@ -5457,6 +5503,9 @@
                             "VK_QCOM_fragment_density_map_offset": {
                                 "type": "integer"
                             },
+                            "VK_QCOM_image_processing": {
+                                "type": "integer"
+                            },
                             "VK_QCOM_render_pass_shader_resolve": {
                                 "type": "integer"
                             },
@@ -5467,6 +5516,9 @@
                                 "type": "integer"
                             },
                             "VK_QCOM_rotated_copy_commands": {
+                                "type": "integer"
+                            },
+                            "VK_QCOM_tile_properties": {
                                 "type": "integer"
                             },
                             "VK_QNX_screen_surface": {
@@ -5649,6 +5701,9 @@
                             },
                             "VkPhysicalDeviceImageCompressionControlSwapchainFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceImageCompressionControlSwapchainFeaturesEXT"
+                            },
+                            "VkPhysicalDeviceImageProcessingFeaturesQCOM": {
+                                "$ref": "#/definitions/VkPhysicalDeviceImageProcessingFeaturesQCOM"
                             },
                             "VkPhysicalDeviceImageRobustnessFeatures": {
                                 "$ref": "#/definitions/VkPhysicalDeviceImageRobustnessFeatures"
@@ -5911,6 +5966,9 @@
                             "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceTextureCompressionASTCHDRFeatures"
                             },
+                            "VkPhysicalDeviceTilePropertiesFeaturesQCOM": {
+                                "$ref": "#/definitions/VkPhysicalDeviceTilePropertiesFeaturesQCOM"
+                            },
                             "VkPhysicalDeviceTimelineSemaphoreFeatures": {
                                 "$ref": "#/definitions/VkPhysicalDeviceTimelineSemaphoreFeatures"
                             },
@@ -6067,6 +6125,9 @@
                             },
                             "VkPhysicalDeviceIDPropertiesKHR": {
                                 "$ref": "#/definitions/VkPhysicalDeviceIDProperties"
+                            },
+                            "VkPhysicalDeviceImageProcessingPropertiesQCOM": {
+                                "$ref": "#/definitions/VkPhysicalDeviceImageProcessingPropertiesQCOM"
                             },
                             "VkPhysicalDeviceInlineUniformBlockProperties": {
                                 "$ref": "#/definitions/VkPhysicalDeviceInlineUniformBlockProperties"
