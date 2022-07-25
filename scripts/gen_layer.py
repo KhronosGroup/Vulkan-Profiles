@@ -158,6 +158,7 @@ bool device_has_astc_hdr = false;
 bool device_has_astc = false;
 bool device_has_etc2 = false;
 bool device_has_bc = false;
+bool device_has_pvrtc = false;
 
 FILE *profiles_log_file = nullptr;
 
@@ -934,7 +935,7 @@ GET_ARRAY_FUNCTIONS = '''
         }
         const int count = static_cast<int>(value.size());
         for (int i = 0; i < count; ++i) {
-            dest[i] = value[i].asUInt();
+            dest[i] = static_cast<uint8_t>(value[i].asUInt());
         }
         return count;
     }
@@ -946,7 +947,7 @@ GET_ARRAY_FUNCTIONS = '''
         }
         const int count = static_cast<int>(value.size());
         for (int i = 0; i < count; ++i) {
-            dest[i] = value[i].asUInt();
+            dest[i] = static_cast<uint32_t>(value[i].asUInt());
         }
         return count;
     }
@@ -1056,6 +1057,10 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
     }
     if (IsBCFormat(format) && !device_has_bc) {
         // We already notified that BC is not supported, no spamming
+        return false;
+    }
+    if (IsPVRTCFormat(format) &&!device_has_pvrtc) {
+        // We already notified that PVRTC is not supported, no spamming
         return false;
     }
 
@@ -1233,7 +1238,7 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
             }
         } else if (name == "VkQueueFamilyQueryResultStatusProperties2KHR") {
             for (const auto &feature : props["queryResultStatusSupport"]) {
-                dest->query_result_status_properties_2_.queryResultStatusSupport = props["queryResultStatusSupport"].asBool();
+                dest->query_result_status_properties_2_.queryResultStatusSupport = props["queryResultStatusSupport"].asBool() ? VK_TRUE : VK_FALSE;
             }
         }
     }
@@ -1507,7 +1512,6 @@ struct JsonValidator {
 
     std::string message;
     std::unique_ptr<Schema> schema;
-    std::unique_ptr<Validator> validator;
 };
 '''
 
@@ -2754,6 +2758,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             bool api_version_above_1_3 = effective_api_version >= VK_API_VERSION_1_3;
 
             ::device_has_astc_hdr = ::PhysicalDeviceData::HasExtension(&pdd, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME);
+            ::device_has_pvrtc = ::PhysicalDeviceData::HasExtension(&pdd, VK_IMG_FORMAT_PVRTC_EXTENSION_NAME);
 
             // Initialize PDD members to the actual Vulkan implementation's defaults.
             {

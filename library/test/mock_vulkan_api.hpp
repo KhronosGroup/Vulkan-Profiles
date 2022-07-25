@@ -245,6 +245,8 @@ public:
         uint32_t*                                   pPropertyCount,
         VkExtensionProperties*                      pProperties)
     {
+        (void)pLayerName;
+
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
         if (sInstance != nullptr) {
             VkResult result = VK_SUCCESS;
@@ -344,6 +346,8 @@ public:
         VkPhysicalDevice                            physicalDevice,
         VkPhysicalDeviceProperties*                 pProperties)
     {
+        (void)physicalDevice;
+
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
         if (sInstance != nullptr) {
             pProperties->apiVersion = sInstance->m_deviceAPIVersion;
@@ -361,6 +365,8 @@ public:
         VkPhysicalDevice                            physicalDevice,
         VkPhysicalDeviceFeatures2*                  pFeatures)
     {
+        (void)physicalDevice;
+
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
         if (sInstance != nullptr) {
             VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pFeatures));
@@ -385,6 +391,8 @@ public:
         VkPhysicalDevice                            physicalDevice,
         VkPhysicalDeviceProperties2*                pProperties)
     {
+        (void)physicalDevice;
+
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
         if (sInstance != nullptr) {
             VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pProperties));
@@ -411,6 +419,8 @@ public:
         VkFormat                                    format,
         VkFormatProperties2*                        pFormatProperties)
     {
+        (void)physicalDevice;
+
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
         if (sInstance != nullptr) {
             auto fmtIt = sInstance->m_mockedFormats.find(format);
@@ -442,6 +452,8 @@ public:
         uint32_t*                                   pQueueFamilyPropertyCount,
         VkQueueFamilyProperties2*                   pQueueFamilyProperties)
     {
+        (void)physicalDevice;
+
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
         if (sInstance != nullptr) {
             if (pQueueFamilyProperties == nullptr) {
@@ -476,6 +488,8 @@ public:
         const VkAllocationCallbacks*                pAllocator,
         VkDevice*                                   pDevice)
     {
+        (void)physicalDevice;
+
         EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
         EXPECT_NE(pCreateInfo, nullptr);
         if (sInstance != nullptr && pCreateInfo != nullptr) {
