@@ -71,7 +71,10 @@ static Json::Value ParseJsonFile(const char *filename) {
 
     file.close();
 
-    return root;
+    if (success)
+        return root;
+    else
+        return Json::Value();
 }
 
 struct JsonValidator {
