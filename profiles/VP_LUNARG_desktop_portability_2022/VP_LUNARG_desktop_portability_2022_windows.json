@@ -372,11 +372,11 @@
                         "lineWidthRange": [
                             1,
                             7.99219
-                        ],
-                        "strictLines": false
+                        ]
                     }
                 },
                 "VkPhysicalDeviceVulkan11Properties": {
+                    "subgroupSize": 64,
                     "subgroupSupportedStages": [
                         "VK_SHADER_STAGE_VERTEX_BIT",
                         "VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT",
@@ -385,7 +385,9 @@
                         "VK_SHADER_STAGE_FRAGMENT_BIT",
                         "VK_SHADER_STAGE_COMPUTE_BIT",
                         "VK_SHADER_STAGE_ALL_GRAPHICS",
-                        "VK_SHADER_STAGE_ALL"
+                        "VK_SHADER_STAGE_ALL",
+                        "VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR",
+                        "VK_SHADER_STAGE_INTERSECTION_BIT_KHR"
                     ],
                     "subgroupSupportedOperations": [
                         "VK_SUBGROUP_FEATURE_BASIC_BIT",
@@ -445,10 +447,12 @@
                     "maxDescriptorSetUpdateAfterBindStorageImages": 1048576,
                     "maxDescriptorSetUpdateAfterBindInputAttachments": 1048576,
                     "supportedDepthResolveModes": [
-                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT"
+                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT",
+                        "VK_RESOLVE_MODE_MAX_BIT"
                     ],
                     "supportedStencilResolveModes": [
-                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT"
+                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT",
+                        "VK_RESOLVE_MODE_MAX_BIT"
                     ],
                     "independentResolveNone": true,
                     "independentResolve": true,
@@ -485,10 +489,12 @@
                     "independentResolve": true,
                     "independentResolveNone": true,
                     "supportedDepthResolveModes": [
-                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT"
+                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT",
+                        "VK_RESOLVE_MODE_MAX_BIT"
                     ],
                     "supportedStencilResolveModes": [
-                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT"
+                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT",
+                        "VK_RESOLVE_MODE_MAX_BIT"
                     ]
                 },
                 "VkPhysicalDeviceLineRasterizationPropertiesEXT": {
@@ -498,11 +504,7 @@
                     "maxComputeWorkgroupSubgroups": 56,
                     "maxSubgroupSize": 32,
                     "minSubgroupSize": 64,
-                    "requiredSubgroupSizeStages": [
-                        "VK_SHADER_STAGE_GEOMETRY_BIT",
-                        "VK_SHADER_STAGE_COMPUTE_BIT",
-                        "VK_SHADER_STAGE_ALL"
-                    ]
+                    "requiredSubgroupSizeStages": []
                 },
                 "VkPhysicalDeviceInlineUniformBlockPropertiesEXT": {
                     "maxDescriptorSetInlineUniformBlocks": 4,
@@ -2588,16 +2590,16 @@
         "VP_LUNARG_desktop_portability_2022": {
             "version": 1,
             "status": "BETA",
-            "api-version": "1.2.175",
+            "api-version": "1.2.170",
             "label": "Merged profile",
-            "description": "Generated profile doing an intersection between profiles: VP_GPUINFO_NVIDIA_GeForce_GTX_650_Ti_472_98_0_0_windows_10, VP_GPUINFO_AMD_Radeon__TM__R7_370_Series_2_0_179_windows_10 and VP_GPUINFO_Intel_R__HD_Graphics_515_0_402_1124_windows_10",
+            "description": "Generated profile doing an intersection between profiles: VP_GPUINFO_AMD_Radeon__TM__R7_370_Series_2_0_179_windows_10, VP_GPUINFO_Intel_R__HD_Graphics_515_0_402_1124_windows_10 and VP_GPUINFO_NVIDIA_GeForce_GTX_650_Ti_472_98_0_0_windows_10",
             "contributors": {},
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-07-20",
+                    "date": "2022-07-25",
                     "author": "Merge tool",
-                    "comment": "Generated profile doing an intersection between profiles: VP_GPUINFO_NVIDIA_GeForce_GTX_650_Ti_472_98_0_0_windows_10, VP_GPUINFO_AMD_Radeon__TM__R7_370_Series_2_0_179_windows_10 and VP_GPUINFO_Intel_R__HD_Graphics_515_0_402_1124_windows_10"
+                    "comment": "Generated profile doing an intersection between profiles: VP_GPUINFO_AMD_Radeon__TM__R7_370_Series_2_0_179_windows_10, VP_GPUINFO_Intel_R__HD_Graphics_515_0_402_1124_windows_10 and VP_GPUINFO_NVIDIA_GeForce_GTX_650_Ti_472_98_0_0_windows_10"
                 }
             ],
             "capabilities": [

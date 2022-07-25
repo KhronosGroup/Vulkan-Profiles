@@ -396,7 +396,12 @@ class ProfileMerger():
                     # del entry[member]
                     #print("ERROR: '" + member + " 'values with 'exact' limittype have different values.")
             if 'max' in xmlmember.limittype or xmlmember.limittype == 'bits':
-                if xmlmember.arraySize == 3:
+                if xmlmember.type == 'VkExtent2D':
+                    if entry[member]['width'] > merged[member]['width']:
+                        merged[member]['width'] = entry[member]['width']
+                    if entry[member]['height'] > merged[member]['height']:
+                        merged[member]['height'] = entry[member]['height']
+                elif xmlmember.arraySize == 3:
                     if entry[member][0] > merged[member][0]:
                         merged[member][0] = entry[member][0]
                     if entry[member][1] > merged[member][1]:
@@ -412,8 +417,26 @@ class ProfileMerger():
                     if entry[member] > merged[member]:
                         merged[member] = entry[member]
             elif 'min' in xmlmember.limittype:
-                if entry[member] < merged[member]:
-                    merged[member] = entry[member]
+                if xmlmember.type == 'VkExtent2D':
+                    if entry[member]['width'] < merged[member]['width']:
+                        merged[member]['width'] = entry[member]['width']
+                    if entry[member]['height'] < merged[member]['height']:
+                        merged[member]['height'] = entry[member]['height']
+                elif xmlmember.arraySize == 3:
+                    if entry[member][0] < merged[member][0]:
+                        merged[member][0] = entry[member][0]
+                    if entry[member][1] < merged[member][1]:
+                        merged[member][1] = entry[member][1]
+                    if entry[member][2] < merged[member][2]:
+                        merged[member][2] = entry[member][2]
+                elif xmlmember.arraySize == 2:
+                    if entry[member][0] < merged[member][0]:
+                        merged[member][0] = entry[member][0]
+                    if entry[member][1] < merged[member][1]:
+                        merged[member][1] = entry[member][1]
+                else:
+                    if entry[member] < merged[member]:
+                        merged[member] = entry[member]
             elif xmlmember.limittype == 'bitmask':
                 for smember in entry[member]:
                     if smember in merged[member]:
@@ -435,7 +458,12 @@ class ProfileMerger():
                     #del entry[member]
                     #print("ERROR: '" + member + " 'values with 'exact' limittype have different values.")
             if 'max' in xmlmember.limittype or xmlmember.limittype == 'bits':
-                if xmlmember.arraySize == 3:
+                if xmlmember.type == 'VkExtent2D':
+                    if entry[member]['width'] < merged[member]['width']:
+                        merged[member]['width'] = entry[member]['width']
+                    if entry[member]['height'] < merged[member]['height']:
+                        merged[member]['height'] = entry[member]['height']
+                elif xmlmember.arraySize == 3:
                     if entry[member][0] < merged[member][0]:
                         merged[member][0] = entry[member][0]
                     if entry[member][1] < merged[member][1]:
@@ -447,12 +475,34 @@ class ProfileMerger():
                         merged[member][0] = entry[member][0]
                     if entry[member][1] < merged[member][1]:
                         merged[member][1] = entry[member][1]
-                else:
+                elif xmlmember.type == 'uint64_t' or xmlmember.type == 'uint32_t' or xmlmember.type == 'int32_t'  or xmlmember.type == 'size_t' or xmlmember.type == 'VkDeviceSize' or xmlmember.type == 'float':
                     if entry[member] < merged[member]:
                         merged[member] = entry[member]
+                else:
+                    print("ERROR: '" + member + " 'values with 'max' limittype unknown case.")
             elif 'min' in xmlmember.limittype:
-                if entry[member] > merged[member]:
-                    merged[member] = entry[member]
+                if xmlmember.type == 'VkExtent2D':
+                    if entry[member]['width'] < merged[member]['width']:
+                        merged[member]['width'] = entry[member]['width']
+                    if entry[member]['height'] < merged[member]['height']:
+                        merged[member]['height'] = entry[member]['height']
+                elif xmlmember.arraySize == 3:
+                    if entry[member][0] < merged[member][0]:
+                        merged[member][0] = entry[member][0]
+                    if entry[member][1] < merged[member][1]:
+                        merged[member][1] = entry[member][1]
+                    if entry[member][2] < merged[member][2]:
+                        merged[member][2] = entry[member][2]
+                elif xmlmember.arraySize == 2:
+                    if entry[member][0] < merged[member][0]:
+                        merged[member][0] = entry[member][0]
+                    if entry[member][1] < merged[member][1]:
+                        merged[member][1] = entry[member][1]
+                elif xmlmember.type == 'uint64_t' or xmlmember.type == 'uint32_t' or xmlmember.type == 'int32_t' or xmlmember.type == 'size_t' or xmlmember.type == 'VkDeviceSize' or xmlmember.type == 'float':
+                    if entry[member] > merged[member]:
+                        merged[member] = entry[member]
+                else:
+                    print("ERROR: '" + member + " 'values with 'min' limittype unknown case.")
             elif xmlmember.limittype == 'bitmask':
                 if xmlmember.type == 'VkBool32':
                     if member in entry:
