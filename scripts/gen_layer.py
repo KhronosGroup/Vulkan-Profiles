@@ -1237,9 +1237,7 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
                 dest->checkpoint_properties_.checkpointExecutionStageMask |= StringToVkPipelineStageFlags(feature.asString());
             }
         } else if (name == "VkQueueFamilyQueryResultStatusProperties2KHR") {
-            for (const auto &feature : props["queryResultStatusSupport"]) {
-                dest->query_result_status_properties_2_.queryResultStatusSupport = props["queryResultStatusSupport"].asBool() ? VK_TRUE : VK_FALSE;
-            }
+            dest->query_result_status_properties_2_.queryResultStatusSupport = props["queryResultStatusSupport"].asBool() ? VK_TRUE : VK_FALSE;
         }
     }
 
@@ -1902,6 +1900,64 @@ GET_UNDEFINE = '''
 '''
 
 SETTINGS_FUNCTIONS = '''
+static DebugActionFlags GetDebugActionFlags(const vku::Strings &values) {
+    DebugActionFlags result = 0;
+
+    for (std::size_t i = 0, n = values.size(); i < n; ++i) {
+        if (values[i] == "DEBUG_ACTION_FILE_BIT") {
+            result |= DEBUG_ACTION_FILE_BIT;
+        } else if (values[i] == "DEBUG_ACTION_STDOUT_BIT") {
+            result |= DEBUG_ACTION_STDOUT_BIT;
+        } else if (values[i] == "DEBUG_ACTION_OUTPUT_BIT") {
+            result |= DEBUG_ACTION_OUTPUT_BIT;
+        } else if (values[i] == "DEBUG_ACTION_BREAKPOINT_BIT") {
+            result |= DEBUG_ACTION_BREAKPOINT_BIT;
+        }
+    }
+
+    return result;
+}
+
+static std::string GetDebugActionsLog(DebugActionFlags flags) {
+    std::string result = {};
+
+    if (flags & DEBUG_ACTION_FILE_BIT) {
+        result += "DEBUG_ACTION_FILE_BIT";
+    }
+    if (flags & DEBUG_ACTION_STDOUT_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "DEBUG_ACTION_STDOUT_BIT";
+    }
+    if (flags & DEBUG_ACTION_OUTPUT_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "DEBUG_ACTION_OUTPUT_BIT";
+    }
+    if (flags & DEBUG_ACTION_BREAKPOINT_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "DEBUG_ACTION_BREAKPOINT_BIT";
+    }
+
+    return result;
+}
+
+static DebugReportFlags GetDebugReportFlags(const vku::Strings &values) {
+    DebugReportFlags result = 0;
+
+    for (std::size_t i = 0, n = values.size(); i < n; ++i) {
+        if (values[i] == "DEBUG_REPORT_NOTIFICATION_BIT") {
+            result |= DEBUG_REPORT_NOTIFICATION_BIT;
+        } else if (values[i] == "DEBUG_REPORT_WARNING_BIT") {
+            result |= DEBUG_REPORT_WARNING_BIT;
+        } else if (values[i] == "DEBUG_REPORT_ERROR_BIT") {
+            result |= DEBUG_REPORT_ERROR_BIT;
+        } else if (values[i] == "DEBUG_REPORT_DEBUG_BIT") {
+            result |= DEBUG_REPORT_DEBUG_BIT;
+        }
+    }
+
+    return result;
+}
+
 std::string GetString(const vku::List &list) {
     std::string result;
     for (std::size_t i = 0, n = list.size(); i < n; ++i) {
@@ -3562,6 +3618,7 @@ class VulkanProfilesLayerGenerator():
 
     def generate_get_value_function(self, structure):
         gen = 'bool JsonLoader::GetValue(const Json::Value &parent, ' + structure + ' *dest) {\n'
+        gen += '    (void)dest;\n'
         gen += '    LogMessage(DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetValue(' + structure + ')\\n\");\n'
         gen += '    bool valid = true;\n'
         gen += '    for (const auto &member : parent.getMemberNames()) {\n'

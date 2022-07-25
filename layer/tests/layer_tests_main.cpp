@@ -20,6 +20,8 @@
 void print_android(const char *c) {
 #ifdef VK_USE_PLATFORM_ANDROID_KHR
     __android_log_print(ANDROID_LOG_INFO, "VulkanProfilesLayerTests", "%s", c);
+#else
+    (void)c;
 #endif  // VK_USE_PLATFORM_ANDROID_KHR
 }
 

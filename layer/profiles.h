@@ -40,46 +40,6 @@ enum DebugAction {
 };
 typedef int DebugActionFlags;
 
-static DebugActionFlags GetDebugActionFlags(const vku::Strings &values) {
-    DebugActionFlags result = 0;
-
-    for (std::size_t i = 0, n = values.size(); i < n; ++i) {
-        if (values[i] == "DEBUG_ACTION_FILE_BIT") {
-            result |= DEBUG_ACTION_FILE_BIT;
-        } else if (values[i] == "DEBUG_ACTION_STDOUT_BIT") {
-            result |= DEBUG_ACTION_STDOUT_BIT;
-        } else if (values[i] == "DEBUG_ACTION_OUTPUT_BIT") {
-            result |= DEBUG_ACTION_OUTPUT_BIT;
-        } else if (values[i] == "DEBUG_ACTION_BREAKPOINT_BIT") {
-            result |= DEBUG_ACTION_BREAKPOINT_BIT;
-        }
-    }
-
-    return result;
-}
-
-static std::string GetDebugActionsLog(DebugActionFlags flags) {
-    std::string result = {};
-
-    if (flags & DEBUG_ACTION_FILE_BIT) {
-        result += "DEBUG_ACTION_FILE_BIT";
-    }
-    if (flags & DEBUG_ACTION_STDOUT_BIT) {
-        if (!result.empty()) result += ", ";
-        result += "DEBUG_ACTION_STDOUT_BIT";
-    }
-    if (flags & DEBUG_ACTION_OUTPUT_BIT) {
-        if (!result.empty()) result += ", ";
-        result += "DEBUG_ACTION_OUTPUT_BIT";
-    }
-    if (flags & DEBUG_ACTION_BREAKPOINT_BIT) {
-        if (!result.empty()) result += ", ";
-        result += "DEBUG_ACTION_BREAKPOINT_BIT";
-    }
-
-    return result;
-}
-
 enum DebugReport {
     DEBUG_REPORT_NOTIFICATION_BIT = (1 << 0),
     DEBUG_REPORT_WARNING_BIT = (1 << 1),
@@ -88,25 +48,6 @@ enum DebugReport {
     DEBUG_REPORT_MAX_ENUM = 0x7FFFFFFF
 };
 typedef int DebugReportFlags;
-
-static DebugReportFlags GetDebugReportFlags(const vku::Strings &values) {
-    DebugReportFlags result = 0;
-
-    for (std::size_t i = 0, n = values.size(); i < n; ++i) {
-        if (values[i] == "DEBUG_REPORT_NOTIFICATION_BIT") {
-            result |= DEBUG_REPORT_NOTIFICATION_BIT;
-        } else if (values[i] == "DEBUG_REPORT_WARNING_BIT") {
-            result |= DEBUG_REPORT_WARNING_BIT;
-        } else if (values[i] == "DEBUG_REPORT_ERROR_BIT") {
-            result |= DEBUG_REPORT_ERROR_BIT;
-        } else if (values[i] == "DEBUG_REPORT_DEBUG_BIT") {
-            result |= DEBUG_REPORT_DEBUG_BIT;
-        }
-    }
-
-    return result;
-}
-
 
 static const VkStructureType VK_STRUCTURE_TYPE_PROFILES_LAYER_SETTINGS_EXT = static_cast<VkStructureType>(3000300005);
 

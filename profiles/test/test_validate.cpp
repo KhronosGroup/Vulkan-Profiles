@@ -41,7 +41,6 @@ using valijson::Validator;
 using valijson::adapters::JsonCppAdapter;
 
 static std::unique_ptr<Schema> schema;
-static std::unique_ptr<Validator> validator;
 
 static std::string format(const char *message, ...) {
     std::size_t const STRING_BUFFER(4096);

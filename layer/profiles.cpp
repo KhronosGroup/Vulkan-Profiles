@@ -123,6 +123,7 @@ bool device_has_astc_hdr = false;
 bool device_has_astc = false;
 bool device_has_etc2 = false;
 bool device_has_bc = false;
+bool device_has_pvrtc = false;
 
 FILE *profiles_log_file = nullptr;
 
@@ -3523,7 +3524,7 @@ class JsonLoader {
         }
         const int count = static_cast<int>(value.size());
         for (int i = 0; i < count; ++i) {
-            dest[i] = value[i].asUInt();
+            dest[i] = static_cast<uint8_t>(value[i].asUInt());
         }
         return count;
     }
@@ -3535,7 +3536,7 @@ class JsonLoader {
         }
         const int count = static_cast<int>(value.size());
         for (int i = 0; i < count; ++i) {
-            dest[i] = value[i].asUInt();
+            dest[i] = static_cast<uint32_t>(value[i].asUInt());
         }
         return count;
     }
@@ -4732,6 +4733,10 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
         // We already notified that BC is not supported, no spamming
         return false;
     }
+    if (IsPVRTCFormat(format) &&!device_has_pvrtc) {
+        // We already notified that PVRTC is not supported, no spamming
+        return false;
+    }
 
     bool valid = true;
 
@@ -4906,9 +4911,7 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
                 dest->checkpoint_properties_.checkpointExecutionStageMask |= StringToVkPipelineStageFlags(feature.asString());
             }
         } else if (name == "VkQueueFamilyQueryResultStatusProperties2KHR") {
-            for (const auto &feature : props["queryResultStatusSupport"]) {
-                dest->query_result_status_properties_2_.queryResultStatusSupport = props["queryResultStatusSupport"].asBool();
-            }
+            dest->query_result_status_properties_2_.queryResultStatusSupport = props["queryResultStatusSupport"].asBool() ? VK_TRUE : VK_FALSE;
         }
     }
 
@@ -5294,7 +5297,6 @@ struct JsonValidator {
 
     std::string message;
     std::unique_ptr<Schema> schema;
-    std::unique_ptr<Validator> validator;
 };
 
 VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities) {
@@ -5723,6 +5725,7 @@ bool JsonLoader::GetValue(const Json::Value &pparent, const std::string &member,
     return true;
 }
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupProperties *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupProperties)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5735,6 +5738,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupPro
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryProperties *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceProtectedMemoryProperties)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5744,6 +5748,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan11Properties *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVulkan11Properties)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5767,6 +5772,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan11Pro
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Properties *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVulkan12Properties)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5827,6 +5833,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Pro
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Properties *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVulkan13Properties)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5880,6 +5887,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Pro
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMemoryFeatures *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceProtectedMemoryFeatures)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5889,6 +5897,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProtectedMe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawParameterFeatures *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderDrawParameterFeatures)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5898,6 +5907,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDrawP
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan11Features *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVulkan11Features)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5918,6 +5928,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan11Fea
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Features *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVulkan12Features)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5973,6 +5984,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan12Fea
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Features *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVulkan13Features)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -5996,6 +6008,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan13Fea
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTransformFeedbackPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6014,6 +6027,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFeedbackFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTransformFeedbackFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6024,6 +6038,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTransformFe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRenderingFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDynamicRenderingFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6033,6 +6048,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDynamicRend
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampledImageFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCornerSampledImageFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6042,6 +6058,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCornerSampl
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMultiviewPropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6052,6 +6069,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPr
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMultiviewFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6063,6 +6081,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewFe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6072,6 +6091,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTextureComp
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceASTCDecodeFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6081,6 +6101,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceASTCDecodeF
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineRobustnessPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePipelineRobustnessPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6093,6 +6114,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineRob
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineRobustnessFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePipelineRobustnessFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6102,6 +6124,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineRob
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIDPropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceIDPropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6115,6 +6138,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIDPropertie
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescriptorPropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePushDescriptorPropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6124,6 +6148,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePushDescrip
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditionalRenderingFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceConditionalRenderingFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6134,6 +6159,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConditional
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloat16Int8FeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFloat16Int8FeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6144,6 +6170,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloat16Int8
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorageFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevice16BitStorageFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6156,6 +6183,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice16BitStorag
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6165,6 +6193,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiviewPe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRectanglePropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDiscardRectanglePropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6174,6 +6203,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiscardRect
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativeRasterizationPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceConservativeRasterizationPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6191,6 +6221,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceConservativ
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEnableFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDepthClipEnableFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6200,6 +6231,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipEn
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFramebufferFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceImagelessFramebufferFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6209,6 +6241,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImagelessFr
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryPropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePerformanceQueryPropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6218,6 +6251,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformanceQueryFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePerformanceQueryFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6228,6 +6262,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePerformance
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePointClippingPropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePointClippingPropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6237,6 +6272,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePointClippi
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePointerFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVariablePointerFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6247,6 +6283,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVariablePoi
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6257,6 +6294,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerFilt
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceInlineUniformBlockPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6270,6 +6308,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUniformBlockFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceInlineUniformBlockFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6280,6 +6319,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInlineUnifo
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocationsPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSampleLocationsPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6293,6 +6333,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSampleLocat
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6307,6 +6348,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6316,6 +6358,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBlendOperat
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructurePropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceAccelerationStructurePropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6332,6 +6375,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAccelerationStructureFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceAccelerationStructureFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6345,6 +6389,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAcceleratio
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelinePropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPipelinePropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6361,6 +6406,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPipelineFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPipelineFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6374,6 +6420,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRayQueryFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6383,6 +6430,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayQueryFea
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsPropertiesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderSMBuiltinsPropertiesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6393,6 +6441,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBui
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBuiltinsFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderSMBuiltinsFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6402,6 +6451,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSMBui
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6411,6 +6461,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSamplerYcbc
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDescriptorIndexingPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6442,6 +6493,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorIndexingFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDescriptorIndexingFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6470,6 +6522,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorI
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetPropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6479,6 +6532,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6502,6 +6556,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePortability
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImagePropertiesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShadingRateImagePropertiesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6513,6 +6568,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRateImageFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShadingRateImageFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6523,6 +6579,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShadingRate
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingPropertiesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingPropertiesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6539,6 +6596,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingP
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6548,6 +6606,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRepresentat
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance3PropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance3PropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6558,6 +6617,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6567,6 +6627,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgr
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorageFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevice8BitStorageFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6578,6 +6639,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice8BitStorage
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryHostPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceExternalMemoryHostPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6587,6 +6649,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicInt64FeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicInt64FeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6597,6 +6660,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClockFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderClockFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6607,6 +6671,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderClock
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCorePropertiesAMD *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderCorePropertiesAMD)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6629,6 +6694,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6638,6 +6704,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6648,6 +6715,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexAttri
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDriverPropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDriverPropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6660,6 +6728,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDriverPrope
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatControlsPropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFloatControlsPropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6685,6 +6754,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFloatContro
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStencilResolvePropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDepthStencilResolvePropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6697,6 +6767,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthStenci
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShaderDerivativesFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceComputeShaderDerivativesFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6707,6 +6778,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceComputeShad
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderPropertiesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderPropertiesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6728,6 +6800,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderP
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6738,6 +6811,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderF
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6747,6 +6821,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageFootprintFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderImageFootprintFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6756,6 +6831,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveScissorFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceExclusiveScissorFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6765,6 +6841,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExclusiveSc
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphorePropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTimelineSemaphorePropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6774,6 +6851,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSem
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSemaphoreFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTimelineSemaphoreFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6783,6 +6861,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTimelineSem
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6792,6 +6871,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemoryModelFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVulkanMemoryModelFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6803,6 +6883,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkanMemor
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePCIBusInfoPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePCIBusInfoPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6815,6 +6896,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePCIBusInfoP
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6824,6 +6906,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderTermi
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6835,6 +6918,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6846,6 +6930,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlockLayoutFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceScalarBlockLayoutFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6855,6 +6940,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceScalarBlock
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupSizeControlPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6867,6 +6953,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSizeControlFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupSizeControlFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6877,6 +6964,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupSiz
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRatePropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRatePropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6902,6 +6990,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6913,6 +7002,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreProperties2AMD *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderCoreProperties2AMD)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6923,6 +7013,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderCoreP
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMemoryFeaturesAMD *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCoherentMemoryFeaturesAMD)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6932,6 +7023,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoherentMem
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6942,6 +7034,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderImage
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPriorityFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMemoryPriorityFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6951,6 +7044,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMemoryPrior
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6960,6 +7054,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDedicatedAl
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6969,6 +7064,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSeparateDep
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferAddressFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceBufferAddressFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6980,6 +7076,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferAddre
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWaitFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePresentWaitFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6989,6 +7086,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentWait
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixPropertiesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCooperativeMatrixPropertiesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -6998,6 +7096,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperativeMatrixFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCooperativeMatrixFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7008,6 +7107,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCooperative
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageReductionModeFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCoverageReductionModeFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7017,6 +7117,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCoverageRed
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7028,6 +7129,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageArraysFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceYcbcrImageArraysFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7037,6 +7139,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcrImageA
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7046,6 +7149,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceUniformBuff
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceProvokingVertexPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7056,6 +7160,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVertexFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceProvokingVertexFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7066,6 +7171,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProvokingVe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDeviceAddressFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceBufferDeviceAddressFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7077,6 +7183,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBufferDevic
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceLineRasterizationPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7086,6 +7193,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasterizationFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceLineRasterizationFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7100,6 +7208,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLineRasteri
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloatFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicFloatFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7120,6 +7229,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryResetFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceHostQueryResetFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7129,6 +7239,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceHostQueryRe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUint8FeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceIndexTypeUint8FeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7138,6 +7249,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceIndexTypeUi
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicStateFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceExtendedDynamicStateFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7147,6 +7259,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7156,6 +7269,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineExe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7176,6 +7290,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderAtomi
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7185,6 +7300,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderDemot
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7202,6 +7318,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDeviceGeneratedCommandsFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7211,6 +7328,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceGener
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedViewportScissorFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceInheritedViewportScissorFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7220,6 +7338,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInheritedVi
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7258,6 +7377,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7267,6 +7387,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderInteg
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7279,6 +7400,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7288,6 +7410,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTexelBuffer
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemoryReportFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDeviceMemoryReportFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7297,6 +7420,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDeviceMemor
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2PropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRobustness2PropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7307,6 +7431,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2FeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRobustness2FeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7318,6 +7443,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRobustness2
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCustomBorderColorPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7327,6 +7453,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorde
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorderColorFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceCustomBorderColorFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7337,6 +7464,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceCustomBorde
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePresentIdFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7346,6 +7474,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePresentIdFe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateDataFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePrivateDataFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7355,6 +7484,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrivateData
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7364,6 +7494,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelineCre
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnosticsConfigFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDiagnosticsConfigFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7373,6 +7504,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDiagnostics
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchronization2FeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSynchronization2FeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7382,6 +7514,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSynchroniza
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7392,6 +7525,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPip
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7401,6 +7535,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGraphicsPip
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7410,6 +7545,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderEarly
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7419,6 +7555,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7428,6 +7565,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderSubgr
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7437,6 +7575,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceZeroInitial
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7446,6 +7585,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7457,6 +7597,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentSha
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingMotionBlurFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7467,6 +7608,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingM
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7476,6 +7618,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMap2PropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7488,6 +7631,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMap2FeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7497,6 +7641,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobustnessFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceImageRobustnessFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7506,6 +7651,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobust
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7518,6 +7664,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageCompressionControlFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceImageCompressionControlFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7527,6 +7674,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageCompre
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444FormatsFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevice4444FormatsFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7537,6 +7685,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444Formats
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7548,6 +7697,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRasterizati
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7557,6 +7707,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6For
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7566,6 +7717,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMutableDesc
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7575,6 +7727,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVertexInput
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDrmPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDrmPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7589,6 +7742,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDrmProperti
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipControlFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDepthClipControlFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7598,6 +7752,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClipCo
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7608,6 +7763,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitiveTo
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingPropertiesHUAWEI *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSubpassShadingPropertiesHUAWEI)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7617,6 +7773,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShadingFeaturesHUAWEI *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSubpassShadingFeaturesHUAWEI)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7626,6 +7783,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassShad
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationMaskFeaturesHUAWEI *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceInvocationMaskFeaturesHUAWEI)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7635,6 +7793,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceInvocationM
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMemoryRDMAFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceExternalMemoryRDMAFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7644,6 +7803,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExternalMem
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelinePropertiesFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePipelinePropertiesFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7653,6 +7813,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePipelinePro
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7662,6 +7823,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultisample
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDynamicState2FeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceExtendedDynamicState2FeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7673,6 +7835,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceExtendedDyn
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteEnableFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceColorWriteEnableFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7682,6 +7845,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceColorWriteE
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7693,6 +7857,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePrimitivesG
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingMaintenance1FeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceRayTracingMaintenance1FeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7703,6 +7868,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingM
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7712,6 +7878,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceGlobalPrior
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageViewMinLodFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceImageViewMinLodFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7721,6 +7888,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageViewMi
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMultiDrawPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7730,6 +7898,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawPr
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMultiDrawFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7739,6 +7908,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMultiDrawFe
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImage2DViewOf3DFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceImage2DViewOf3DFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7749,6 +7919,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImage2DView
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColorSwizzleFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceBorderColorSwizzleFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7759,6 +7930,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceBorderColor
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7768,6 +7940,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevicePageableDev
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4PropertiesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance4PropertiesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7777,6 +7950,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4FeaturesKHR *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMaintenance4FeaturesKHR)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7786,6 +7960,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7795,6 +7970,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorS
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7804,6 +7980,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceNonSeamless
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7813,6 +7990,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7822,6 +8000,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDen
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLinearColorAttachmentFeaturesNV *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceLinearColorAttachmentFeaturesNV)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7831,6 +8010,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLinearColor
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageCompressionControlSwapchainFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceImageCompressionControlSwapchainFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7840,6 +8020,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageCompre
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageProcessingPropertiesQCOM *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceImageProcessingPropertiesQCOM)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7852,6 +8033,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageProces
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageProcessingFeaturesQCOM *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceImageProcessingFeaturesQCOM)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7863,6 +8045,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageProces
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassMergeFeedbackFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSubpassMergeFeedbackFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7872,6 +8055,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubpassMerg
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7881,6 +8065,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderModul
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7890,6 +8075,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceShaderModul
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTilePropertiesFeaturesQCOM *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceTilePropertiesFeaturesQCOM)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7899,6 +8085,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTilePropert
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceFeatures)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -7980,6 +8167,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceProperties 
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceLimits)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -8094,6 +8282,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSparseProperties *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSparseProperties)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -8107,6 +8296,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSparsePrope
 }
 
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceToolProperties *dest) {
+    (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceToolProperties)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
@@ -8122,6 +8312,64 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceToolPropert
 
 #undef GET_VALUE
 #undef GET_ARRAY
+
+static DebugActionFlags GetDebugActionFlags(const vku::Strings &values) {
+    DebugActionFlags result = 0;
+
+    for (std::size_t i = 0, n = values.size(); i < n; ++i) {
+        if (values[i] == "DEBUG_ACTION_FILE_BIT") {
+            result |= DEBUG_ACTION_FILE_BIT;
+        } else if (values[i] == "DEBUG_ACTION_STDOUT_BIT") {
+            result |= DEBUG_ACTION_STDOUT_BIT;
+        } else if (values[i] == "DEBUG_ACTION_OUTPUT_BIT") {
+            result |= DEBUG_ACTION_OUTPUT_BIT;
+        } else if (values[i] == "DEBUG_ACTION_BREAKPOINT_BIT") {
+            result |= DEBUG_ACTION_BREAKPOINT_BIT;
+        }
+    }
+
+    return result;
+}
+
+static std::string GetDebugActionsLog(DebugActionFlags flags) {
+    std::string result = {};
+
+    if (flags & DEBUG_ACTION_FILE_BIT) {
+        result += "DEBUG_ACTION_FILE_BIT";
+    }
+    if (flags & DEBUG_ACTION_STDOUT_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "DEBUG_ACTION_STDOUT_BIT";
+    }
+    if (flags & DEBUG_ACTION_OUTPUT_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "DEBUG_ACTION_OUTPUT_BIT";
+    }
+    if (flags & DEBUG_ACTION_BREAKPOINT_BIT) {
+        if (!result.empty()) result += ", ";
+        result += "DEBUG_ACTION_BREAKPOINT_BIT";
+    }
+
+    return result;
+}
+
+static DebugReportFlags GetDebugReportFlags(const vku::Strings &values) {
+    DebugReportFlags result = 0;
+
+    for (std::size_t i = 0, n = values.size(); i < n; ++i) {
+        if (values[i] == "DEBUG_REPORT_NOTIFICATION_BIT") {
+            result |= DEBUG_REPORT_NOTIFICATION_BIT;
+        } else if (values[i] == "DEBUG_REPORT_WARNING_BIT") {
+            result |= DEBUG_REPORT_WARNING_BIT;
+        } else if (values[i] == "DEBUG_REPORT_ERROR_BIT") {
+            result |= DEBUG_REPORT_ERROR_BIT;
+        } else if (values[i] == "DEBUG_REPORT_DEBUG_BIT") {
+            result |= DEBUG_REPORT_DEBUG_BIT;
+        }
+    }
+
+    return result;
+}
 
 std::string GetString(const vku::List &list) {
     std::string result;
@@ -11059,6 +11307,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             bool api_version_above_1_3 = effective_api_version >= VK_API_VERSION_1_3;
 
             ::device_has_astc_hdr = ::PhysicalDeviceData::HasExtension(&pdd, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME);
+            ::device_has_pvrtc = ::PhysicalDeviceData::HasExtension(&pdd, VK_IMG_FORMAT_PVRTC_EXTENSION_NAME);
 
             // Initialize PDD members to the actual Vulkan implementation's defaults.
             {

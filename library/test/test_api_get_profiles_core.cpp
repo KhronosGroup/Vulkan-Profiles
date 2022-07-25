@@ -29,14 +29,14 @@ TEST(api_get_profiles_core, full) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfiles(&propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(2, propertyCount);
+    EXPECT_EQ(static_cast<uint32_t>(2), propertyCount);
 
     propertyCount = 3;
 
     std::vector<VpProfileProperties> properties(propertyCount);
     VkResult result1 = vpGetProfiles(&propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(2, propertyCount);
+    EXPECT_EQ(static_cast<uint32_t>(2), propertyCount);
 
     EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, properties[0].profileName);
     EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, properties[0].specVersion);
@@ -49,7 +49,7 @@ TEST(api_get_profiles_core, partial) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfiles(&propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(2, propertyCount);
+    EXPECT_EQ(static_cast<uint32_t>(2), propertyCount);
 
     propertyCount = 1;
 
@@ -57,7 +57,7 @@ TEST(api_get_profiles_core, partial) {
     properties[0].specVersion = 0;
     VkResult result1 = vpGetProfiles(&propertyCount, &properties[0]);
     EXPECT_EQ(VK_INCOMPLETE, result1);
-    EXPECT_EQ(1, propertyCount);
+    EXPECT_EQ(static_cast<uint32_t>(1), propertyCount);
 
     EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, properties[0].profileName);
     EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, properties[0].specVersion);
