@@ -46,16 +46,16 @@ add_custom_target(VpTestUnion ALL
 
 set_target_properties(VpTestUnion PROPERTIES FOLDER "Profiles scripts")
 
-# add_custom_target(VpCreateGeneratedName ALL
-#	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
-#		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
-#		-input_dir ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_intersect
-#		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_generated_name.json
-#	VERBATIM
-#	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
-#	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
+add_custom_target(VpCreateGeneratedName ALL
+	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
+		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
+		-input_dir ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_combine_intersect
+		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_generated_name.json
+	VERBATIM
+	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
+	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
 
-# set_target_properties(VpCreateGeneratedName PROPERTIES FOLDER "Profiles scripts")
+set_target_properties(VpCreateGeneratedName PROPERTIES FOLDER "Profiles scripts")
 
 #add_custom_target(VpCreateDesktop2022 ALL
 #	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
