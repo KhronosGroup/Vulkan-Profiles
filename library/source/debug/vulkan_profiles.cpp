@@ -7767,7 +7767,7 @@ VPAPI_ATTR bool vpCheckVersion(uint32_t actual, uint32_t expected) {
 }
 
 VPAPI_ATTR bool vpCheckExtension(const VkExtensionProperties *supportedProperties, size_t supportedSize,
-                                 const char *requestedExtension, uint32_t expectedVersion = 0) {
+                                 const char *requestedExtension) {
     bool found = false;
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
         if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) {
@@ -7903,8 +7903,7 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
 
     for (uint32_t i = 0; i < pDesc->instanceExtensionCount; ++i) {
         if (!detail::vpCheckExtension(ext.data(), ext.size(),
-            pDesc->pInstanceExtensions[i].extensionName,
-            pDesc->pInstanceExtensions[i].specVersion)) {
+            pDesc->pInstanceExtensions[i].extensionName)) {
             *pSupported = VK_FALSE;
         }
     }
@@ -8085,8 +8084,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
 
     for (uint32_t i = 0; i < pDesc->deviceExtensionCount; ++i) {
         if (!detail::vpCheckExtension(ext.data(), ext.size(),
-            pDesc->pDeviceExtensions[i].extensionName,
-            pDesc->pDeviceExtensions[i].specVersion)) {
+            pDesc->pDeviceExtensions[i].extensionName)) {
             *pSupported = VK_FALSE;
         }
     }
