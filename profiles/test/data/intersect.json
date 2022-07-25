@@ -1672,7 +1672,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-07-22",
+                    "date": "2022-07-25",
                     "author": "Merge tool",
                     "comment": "Generated profile doing an intersection between profiles: VP_LUNARG_desktop_portability_2021_intersect_data1 and VP_LUNARG_desktop_portability_2021_intersect_data2"
                 }

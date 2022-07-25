@@ -3197,7 +3197,7 @@ static const VpPropertyDesc propertyDesc = {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
                     VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
                     ret = ret && (s->properties.limits.bufferImageGranularity <= 4096);
-                    ret = ret && (s->properties.limits.bufferImageGranularity % 4096 == 0);
+                    ret = ret && ((4096 % s->properties.limits.bufferImageGranularity) == 0);
                     ret = ret && (s->properties.limits.lineWidthGranularity <= 0.5);
                     ret = ret && (isMultiple(0.5, s->properties.limits.lineWidthGranularity));
                     ret = ret && (s->properties.limits.maxColorAttachments >= 7);
@@ -3700,7 +3700,7 @@ static const VpPropertyDesc propertyDesc = {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
                     VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
                     ret = ret && (s->properties.limits.bufferImageGranularity <= 1024);
-                    ret = ret && (s->properties.limits.bufferImageGranularity % 1024 == 0);
+                    ret = ret && ((1024 % s->properties.limits.bufferImageGranularity) == 0);
                     ret = ret && (s->properties.limits.discreteQueuePriorities >= 2);
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferDepthSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
@@ -3864,11 +3864,11 @@ static const VpQueueFamilyDesc queueFamilyDesc[] = {
                 case VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR: {
                     VkQueueFamilyProperties2KHR* s = static_cast<VkQueueFamilyProperties2KHR*>(static_cast<void*>(p));
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.depth <= 1);
-                    ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.depth % 1 == 0);
+                    ret = ret && ((1 % s->queueFamilyProperties.minImageTransferGranularity.depth) == 0);
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.height <= 1);
-                    ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.height % 1 == 0);
+                    ret = ret && ((1 % s->queueFamilyProperties.minImageTransferGranularity.height) == 0);
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.width <= 1);
-                    ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.width % 1 == 0);
+                    ret = ret && ((1 % s->queueFamilyProperties.minImageTransferGranularity.width) == 0);
                     ret = ret && (s->queueFamilyProperties.queueCount >= 1);
                     ret = ret && (vpCheckFlags(s->queueFamilyProperties.queueFlags, (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT)));
                     ret = ret && (s->queueFamilyProperties.timestampValidBits >= 36);
@@ -5996,7 +5996,7 @@ static const VpPropertyDesc propertyDesc = {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
                     VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
                     ret = ret && (s->properties.limits.bufferImageGranularity <= 1024);
-                    ret = ret && (s->properties.limits.bufferImageGranularity % 1024 == 0);
+                    ret = ret && ((1024 % s->properties.limits.bufferImageGranularity) == 0);
                     ret = ret && (s->properties.limits.discreteQueuePriorities >= 2);
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferDepthSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
@@ -6165,11 +6165,11 @@ static const VpQueueFamilyDesc queueFamilyDesc[] = {
                 case VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR: {
                     VkQueueFamilyProperties2KHR* s = static_cast<VkQueueFamilyProperties2KHR*>(static_cast<void*>(p));
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.depth <= 1);
-                    ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.depth % 1 == 0);
+                    ret = ret && ((1 % s->queueFamilyProperties.minImageTransferGranularity.depth) == 0);
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.height <= 1);
-                    ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.height % 1 == 0);
+                    ret = ret && ((1 % s->queueFamilyProperties.minImageTransferGranularity.height) == 0);
                     ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.width <= 1);
-                    ret = ret && (s->queueFamilyProperties.minImageTransferGranularity.width % 1 == 0);
+                    ret = ret && ((1 % s->queueFamilyProperties.minImageTransferGranularity.width) == 0);
                     ret = ret && (s->queueFamilyProperties.queueCount >= 1);
                     ret = ret && (vpCheckFlags(s->queueFamilyProperties.queueFlags, (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT)));
                     ret = ret && (s->queueFamilyProperties.timestampValidBits >= 36);
