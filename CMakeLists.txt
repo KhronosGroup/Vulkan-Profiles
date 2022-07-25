@@ -205,18 +205,10 @@ if(FATAL_WARNINGS)
         #    warning C4505: unreferenced local function has been removed
         # jsoncpp.cpp provokes:
         #    warning C4702: unreachable code
-        # profiles.cpp provokes:
-        #    warning C4244: '=': conversion from 'Json::Value::UInt' to 'uint8_t', possible loss of data
-        #    warning C4458: declaration of 'validator' hides class member
-        #    warning C4189: 'pdd': local variable is initialized but not referenced
-        #    warning C4800: 'VkBool32': forcing value to bool 'true' or 'false' (performance warning)
-        #    warning C4706: assignment within conditional expression
-        # test_validate.cpp provokes:
-        #    warning C4459: declaration of 'validator' hides global declaration
         # gtest.h provokes:
         #    warning C4389: '==': signed/unsigned mismatch
         #    warning C4018: '>=': signed/unsigned mismatch
-        add_compile_options(/wd4100 /wd4505 /wd4702 /wd4244 /wd4458 /wd4189 /wd4800 /wd4706 /wd4459 /wd4389 /wd4018)
+        add_compile_options(/wd4100 /wd4505 /wd4702 /wd4389 /wd4018)
     else()
         add_compile_options(-Werror)
     endif()
