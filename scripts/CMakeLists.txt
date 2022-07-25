@@ -20,34 +20,6 @@ set_target_properties(VpGenerated PROPERTIES FOLDER "Profiles scripts")
 
 set(MERGE_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/combine_profiles.py)
 
-add_custom_target(VpMergeIntersect ALL
-	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
-		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
-		-input_dir ${CMAKE_SOURCE_DIR}/profiles/test/data/intersect
-		-input_profiles "VP_LUNARG_desktop_portability_2021_intersect_data1,VP_LUNARG_desktop_portability_2021_intersect_data2"
-		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/intersect.json
-		-output_profile VP_LUNARG_desktop_portability_2021
-		-mode intersection
-	VERBATIM
-	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
-	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
-
-set_target_properties(VpMergeIntersect PROPERTIES FOLDER "Profiles scripts")
-
-add_custom_target(VpMergeUnion ALL
-	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
-		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
-		-input_dir ${CMAKE_SOURCE_DIR}/profiles/test/data/union
-		-input_profiles "VP_LUNARG_desktop_portability_2021_union_data1,VP_LUNARG_desktop_portability_2021_union_data2"
-		-output_path ${CMAKE_SOURCE_DIR}/profiles/test/data/union.json
-		-output_profile VP_LUNARG_desktop_portability_2021
-		-mode union
-	VERBATIM
-	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
-	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
-
-set_target_properties(VpMergeUnion PROPERTIES FOLDER "Profiles scripts")
-
 add_custom_target(VpTestIntersect ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
 		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml

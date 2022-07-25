@@ -152,3 +152,33 @@ TEST_F(TestsUnion, Structure) {
     EXPECT_EQ(featuresHelperInvocation.shaderDemoteToHelperInvocation, VK_TRUE);
     EXPECT_EQ(features_dynamic_state.extendedDynamicState, VK_TRUE);
 }
+
+TEST_F(TestsUnion, Format_Properties) {
+    const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+    VkFormatProperties format_properties;
+    vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
+
+    const VkFormatFeatureFlags linear_tiling_features = static_cast<VkFormatFeatureFlags>(0);
+    const VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    const VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+
+    EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
+    EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
+    EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
+}
+/*
+TEST_F(TestsUnion, Format_Properties2KHR) {
+    const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+    VkFormatProperties2 format_properties;
+    vkGetPhysicalDeviceFormatProperties2(gpu_profile, format, &format_properties);
+
+    const VkFormatFeatureFlags linear_tiling_features = static_cast<VkFormatFeatureFlags>(0);
+    const VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    const VkFormatFeatureFlags buffer_features =
+        VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+
+    EXPECT_EQ(format_properties.formatProperties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
+    EXPECT_EQ(format_properties.formatProperties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
+    EXPECT_EQ(format_properties.formatProperties.bufferFeatures & buffer_features, buffer_features);
+}
+*/
