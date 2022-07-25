@@ -2525,7 +2525,7 @@ class VulkanProfile():
                     if (membertype == 'float' or membertype == 'double'):
                         comparePredFmt = [ '{0} <= {1}', 'isMultiple({1}, {0})' ]
                     else:
-                        comparePredFmt = [ '{0} <= {1}', '{0} % {1} == 0' ]
+                        comparePredFmt = [ '{0} <= {1}', '({1} % {0}) == 0' ]
                 elif limittype == 'range':
                     # Compare range limit by checking if device range is larger than or equal to profile range
                     comparePredFmt = [ '{0} <= {1}', '{0} >= {1}' ]
