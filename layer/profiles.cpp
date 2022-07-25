@@ -8404,9 +8404,9 @@ const VkProfileLayerSettingsEXT *FindSettingsInChain(const void *next) {
 }
 
 static void InitSettings(const void *pnext) {
-    const VkProfileLayerSettingsEXT *user_settings = nullptr;
+    const VkProfileLayerSettingsEXT *user_settings = FindSettingsInChain(pnext);
     // Programmatically-specified settings override ENV vars or layer settings file settings
-    if ((pnext) && (user_settings = FindSettingsInChain(pnext))) {
+    if (pnext && user_settings) {
         *layer_settings = *user_settings;
     } else {
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileFile)) {
