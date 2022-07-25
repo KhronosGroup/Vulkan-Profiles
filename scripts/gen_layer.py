@@ -2619,7 +2619,6 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties(VkPhysical
     const auto dt = instance_dispatch_table(physicalDevice);
 
     // Are there JSON overrides, or should we call down to return the original values?
-    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
     if (!(layer_settings->simulate_capabilities & SIMULATE_FORMATS_BIT)) {
         return dt->GetPhysicalDeviceImageFormatProperties(physicalDevice, format, type, tiling, usage, flags,
                                                           pImageFormatProperties);

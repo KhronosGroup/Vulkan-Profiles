@@ -67,6 +67,21 @@
                         "maxImageDimension3D": 2048
                     }
                 }
+            },
+            "formats": {
+                "VK_FORMAT_R8G8B8A8_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT"
+                        ],
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT"
+                        ]
+                    }
+                }
             }
         }
     },

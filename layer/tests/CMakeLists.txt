@@ -27,8 +27,6 @@ set(LAYER_TEST_FILES
     #tests_desktop_2022
     tests_combine_union
     tests_combine_intersection
-	tests_merged_union
-	tests_merged_intersection
     # Add new test files above this line
 )
 
