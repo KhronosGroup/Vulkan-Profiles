@@ -586,7 +586,7 @@ TEST_F(LayerTests, TestQueueFamilyPropertiesPartial) {
 
         uint32_t count = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, nullptr);
-        ASSERT_GT(count, 0);
+        ASSERT_GT(count, static_cast<uint32_t>(0));
         if (count > 0) {
             device_qf_props.resize(count);
             vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, device_qf_props.data());
@@ -618,7 +618,7 @@ TEST_F(LayerTests, TestQueueFamilyPropertiesPartial) {
 
         uint32_t count = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, nullptr);
-        ASSERT_GT(count, 0);
+        ASSERT_GT(count, static_cast<uint32_t>(0));
         if (count > 0) {
             std::vector<VkQueueFamilyProperties> qf_props(count);
             vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, qf_props.data());

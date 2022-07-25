@@ -102,8 +102,9 @@ TEST_F(TestsUnion, Properties) {
     EXPECT_EQ(gpu_props.limits.viewportBoundsRange[1], 32767);
     EXPECT_EQ(gpu_props.limits.minMemoryMapAlignment, 2048);
     EXPECT_EQ(gpu_props.limits.minTexelOffset, -8);
-    EXPECT_EQ(gpu_props.limits.maxTexelOffset, 7);
-    EXPECT_EQ(gpu_props.limits.framebufferColorSampleCounts, VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT);
+    EXPECT_EQ(gpu_props.limits.maxTexelOffset, 7u);
+    EXPECT_EQ(gpu_props.limits.framebufferColorSampleCounts,
+              static_cast<VkSampleCountFlags>(VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT));
     EXPECT_EQ(gpu_props.limits.pointSizeRange[0], 2.0);
     EXPECT_EQ(gpu_props.limits.pointSizeRange[1], 64.0);
     EXPECT_EQ(gpu_props.limits.pointSizeGranularity, 2.0);
