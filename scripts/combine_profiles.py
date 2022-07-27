@@ -30,7 +30,7 @@ class ProfileMerger():
     def __init__(self, registry):
         self.registry = registry
 
-    def merge(self, jsons, profiles, profile_names, merged_path, merged_profile, mode):
+    def merge(self, jsons, profiles, profile_names, merged_path, merged_profile, profile_label, profile_description, mode):
         self.mode = mode
 
         # Find the api version to use
@@ -41,9 +41,7 @@ class ProfileMerger():
         merged = dict()
         merged['$schema'] = 'https://schema.khronos.org/vulkan/profiles-0.8.0-' + self.api_version[2] + '.json#'
         merged['capabilities'] = self.merge_capabilities(jsons, profile_names, self.api_version)
-
-        profile_description = self.get_profile_description(profile_names, mode)
-        merged['profiles'] = self.get_profiles(merged_profile, self.api_version, profile_description)
+        merged['profiles'] = self.get_profiles(merged_profile, self.api_version, profile_label, profile_description)
 
         # Wite new merged profile
         with open(merged_path, 'w') as file:
@@ -574,13 +572,13 @@ class ProfileMerger():
         minor = version[underscore+1:]
         return [major, minor]
 
-    def get_profiles(self, profile_name, api_version, description):
+    def get_profiles(self, profile_name, api_version, label, description):
         profiles = dict()
         profiles[profile_name] = dict()
         profiles[profile_name]['version'] = 1
         profiles[profile_name]['status'] = 'BETA'
         profiles[profile_name]['api-version'] = '.'.join(api_version)
-        profiles[profile_name]['label'] = 'Merged profile'
+        profiles[profile_name]['label'] = label
         profiles[profile_name]['description'] = description
         profiles[profile_name]['contributors'] = dict()
         profiles[profile_name]['history'] = list()
@@ -589,7 +587,7 @@ class ProfileMerger():
         # Get current time
         now = datetime.now()
         revision['date'] = str(now.year) + '-' + str(now.month).zfill(2) + '-' + str(now.day).zfill(2)
-        revision['author'] = 'Merge tool'
+        revision['author'] = 'LunarG Profiles Merger'
         revision['comment'] = description
         profiles[profile_name]['history'].append(revision)
         profiles[profile_name]['capabilities'] = list()
@@ -618,6 +616,10 @@ class ProfileMerger():
                 print('ERROR: Unknown mode when computing api-version')
         return api_version
 
+    def get_api_version_list(self, ver):
+        version = ver.split('.')
+        return version
+
     def get_profile_description(self, profile_names, mode):
         desc = 'Generated profile doing an ' + mode + ' between profiles: '
         count = len(profile_names)
@@ -628,24 +630,6 @@ class ProfileMerger():
             elif i < count - 2:
                 desc += ', '
         return desc
-
-    def get_version_from_schema(self, schema):
-        needle = 'profiles-'
-        pos = schema.find(needle) + len(needle)
-        ver = schema[pos:]
-        version = list()
-        version.append(ver[:ver.find('.')])
-        ver = ver[ver.find('.') + 1:]
-        version.append(ver[:ver.find('.')])
-        ver = ver[ver.find('.') + 1:]
-        version.append(ver[:ver.find('-')])
-        ver = ver[ver.find('-') + 1:]
-        version.append(ver[:ver.find('.')])
-        return version
-
-    def get_api_version_list(self, ver):
-        version = ver.split('.')
-        return version
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -660,6 +644,10 @@ if __name__ == '__main__':
                         help='Path to output profile')
     parser.add_argument('-output_profile', action='store',
                         help='Profile name of the output profile')
+    parser.add_argument('-profile_label', action='store',
+                        help='Label of the merged profile')
+    parser.add_argument('-profile_desc', action='store',
+                        help='Description of the merged profile')
     parser.add_argument('-mode', action='store',
                         help='Mode of profile combination')
           
@@ -687,6 +675,11 @@ if __name__ == '__main__':
         profile_names = args.input_profiles.split(',')
     else:
         profile_names = list()
+
+    if args.profile_label is not None:
+        profile_label = args.profile_label
+    else:
+        profile_label = 'Merged profile'
 
     # Open file and load json
     jsons = list()
@@ -727,5 +720,10 @@ if __name__ == '__main__':
     registry = genvp.VulkanRegistry(args.registry)
     profile_merger = ProfileMerger(registry)
 
-    profile_merger.merge(jsons, profiles, profile_names, args.output_path, args.output_profile, args.mode)
+    if args.profile_desc is not None:
+        profile_description = args.profile_desc
+    else:
+        profile_description = profile_merger.get_profile_description(profile_names, args.mode)
+
+    profile_merger.merge(jsons, profiles, profile_names, args.output_path, args.output_profile, args.profile_label, args.profile_desc, args.mode)
     

@@ -1975,19 +1975,19 @@
         }
     },
     "profiles": {
-        "VP_LUNARG_desktop_portability_2022": {
+        "VP_LUNARG_desktop_baseline_2022": {
             "version": 1,
             "status": "BETA",
             "api-version": "1.1.162",
-            "label": "Merged profile",
-            "description": "Generated profile doing an intersection between profiles: VP_GPUINFO_AMD_Radeon_RX_Vega_64_0_2_1911_osx_10_15, VP_GPUINFO_AMD_Radeon__TM__R7_370_Series_2_0_179_windows_10, VP_GPUINFO_AMD_RADV_BONAIRE__ACO__21_1_4_arch_unknown, VP_GPUINFO_Apple_M1_0_2_1911_osx_11_2, VP_GPUINFO_Intel_R__HD_Graphics_515_0_402_1124_windows_10, VP_GPUINFO_Intel_R__HD_Graphics_520__SKL_GT2__21_1_1_arch_unknown, VP_GPUINFO_Intel_R__Iris_TM__Graphics_6000_0_2_1911_osx_10_15, VP_GPUINFO_NVIDIA_GeForce_GTX_650_Ti_472_98_0_0_windows_10, VP_GPUINFO_NVIDIA_GeForce_GTX_660_470_74_0_0_arch_unknown and VP_GPUINFO_NVIDIA_Quadro_K4200_0_0_157_53_osx_10_15",
+            "label": "LunarG Vulkan Desktop Baseline 2022 profile",
+            "description": "A baseline desktop profile that supports Vulkan Header 162",
             "contributors": {},
             "history": [
                 {
                     "revision": 1,
                     "date": "2022-07-27",
-                    "author": "Merge tool",
-                    "comment": "Generated profile doing an intersection between profiles: VP_GPUINFO_AMD_Radeon_RX_Vega_64_0_2_1911_osx_10_15, VP_GPUINFO_AMD_Radeon__TM__R7_370_Series_2_0_179_windows_10, VP_GPUINFO_AMD_RADV_BONAIRE__ACO__21_1_4_arch_unknown, VP_GPUINFO_Apple_M1_0_2_1911_osx_11_2, VP_GPUINFO_Intel_R__HD_Graphics_515_0_402_1124_windows_10, VP_GPUINFO_Intel_R__HD_Graphics_520__SKL_GT2__21_1_1_arch_unknown, VP_GPUINFO_Intel_R__Iris_TM__Graphics_6000_0_2_1911_osx_10_15, VP_GPUINFO_NVIDIA_GeForce_GTX_650_Ti_472_98_0_0_windows_10, VP_GPUINFO_NVIDIA_GeForce_GTX_660_470_74_0_0_arch_unknown and VP_GPUINFO_NVIDIA_Quadro_K4200_0_0_157_53_osx_10_15"
+                    "author": "LunarG Profiles Merger",
+                    "comment": "A baseline desktop profile that supports Vulkan Header 162"
                 }
             ],
             "capabilities": [
