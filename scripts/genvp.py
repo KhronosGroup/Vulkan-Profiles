@@ -3875,7 +3875,7 @@ class VulkanProfilesDocGenerator():
                 if wrapperStruct in profile.capabilities.properties:
                     propertyStructName = wrapperStruct
                     propertyStruct = profile.capabilities.properties[wrapperStruct]['properties']
-            if propertyStruct != None:
+            if propertyStruct != None and memberStruct != 'sparseProperties':
                 limitStruct = propertyStruct[memberStruct]
                 if member in limitStruct:
                     return self.formatProperty(limitStruct[member], propertyStructName, section)
