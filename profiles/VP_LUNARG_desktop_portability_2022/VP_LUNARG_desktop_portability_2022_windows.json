@@ -3,72 +3,78 @@
     "capabilities": {
         "baseline": {
             "extensions": {
-                "VK_KHR_swapchain": 70,
-                "VK_KHR_sampler_mirror_clamp_to_edge": 3,
-                "VK_KHR_maintenance1": 2,
-                "VK_KHR_shader_draw_parameters": 1,
+                "VK_EXT_calibrated_timestamps": 1,
+                "VK_EXT_depth_clip_enable": 1,
+                "VK_EXT_descriptor_indexing": 2,
+                "VK_EXT_extended_dynamic_state": 1,
+                "VK_EXT_external_memory_host": 1,
+                "VK_EXT_full_screen_exclusive": 4,
+                "VK_EXT_host_query_reset": 1,
+                "VK_EXT_inline_uniform_block": 1,
+                "VK_EXT_line_rasterization": 1,
+                "VK_EXT_memory_budget": 1,
+                "VK_EXT_pipeline_creation_cache_control": 3,
+                "VK_EXT_pipeline_creation_feedback": 1,
+                "VK_EXT_robustness2": 1,
+                "VK_EXT_scalar_block_layout": 1,
+                "VK_EXT_separate_stencil_usage": 1,
+                "VK_EXT_shader_demote_to_helper_invocation": 1,
                 "VK_EXT_shader_subgroup_ballot": 1,
                 "VK_EXT_shader_subgroup_vote": 1,
-                "VK_KHR_descriptor_update_template": 1,
+                "VK_EXT_subgroup_size_control": 2,
+                "VK_EXT_texel_buffer_alignment": 1,
+                "VK_EXT_transform_feedback": 1,
+                "VK_EXT_vertex_attribute_divisor": 3,
                 "VK_KHR_16bit_storage": 1,
+                "VK_KHR_8bit_storage": 1,
+                "VK_KHR_bind_memory2": 1,
+                "VK_KHR_buffer_device_address": 1,
+                "VK_KHR_create_renderpass2": 1,
                 "VK_KHR_dedicated_allocation": 3,
-                "VK_KHR_get_memory_requirements2": 1,
-                "VK_KHR_storage_buffer_storage_class": 1,
+                "VK_KHR_depth_stencil_resolve": 1,
+                "VK_KHR_descriptor_update_template": 1,
+                "VK_KHR_device_group": 4,
+                "VK_KHR_draw_indirect_count": 1,
+                "VK_KHR_driver_properties": 1,
+                "VK_KHR_external_fence": 1,
+                "VK_KHR_external_fence_win32": 1,
                 "VK_KHR_external_memory": 1,
                 "VK_KHR_external_memory_win32": 1,
                 "VK_KHR_external_semaphore": 1,
                 "VK_KHR_external_semaphore_win32": 1,
-                "VK_KHR_win32_keyed_mutex": 1,
-                "VK_KHR_external_fence": 1,
-                "VK_KHR_external_fence_win32": 1,
-                "VK_KHR_variable_pointers": 1,
-                "VK_KHR_relaxed_block_layout": 1,
-                "VK_KHR_bind_memory2": 1,
+                "VK_KHR_get_memory_requirements2": 1,
                 "VK_KHR_image_format_list": 1,
+                "VK_KHR_imageless_framebuffer": 1,
+                "VK_KHR_maintenance1": 2,
                 "VK_KHR_maintenance2": 1,
-                "VK_KHR_multiview": 1,
-                "VK_EXT_external_memory_host": 1,
                 "VK_KHR_maintenance3": 1,
-                "VK_KHR_device_group": 4,
-                "VK_EXT_vertex_attribute_divisor": 3,
-                "VK_EXT_descriptor_indexing": 2,
-                "VK_KHR_draw_indirect_count": 1,
-                "VK_KHR_8bit_storage": 1,
-                "VK_KHR_create_renderpass2": 1,
-                "VK_EXT_inline_uniform_block": 1,
-                "VK_KHR_depth_stencil_resolve": 1,
-                "VK_KHR_driver_properties": 1,
+                "VK_KHR_multiview": 1,
+                "VK_KHR_pipeline_executable_properties": 1,
+                "VK_KHR_relaxed_block_layout": 1,
+                "VK_KHR_sampler_mirror_clamp_to_edge": 3,
+                "VK_KHR_separate_depth_stencil_layouts": 1,
+                "VK_KHR_shader_clock": 1,
+                "VK_KHR_shader_draw_parameters": 1,
                 "VK_KHR_shader_float16_int8": 1,
                 "VK_KHR_shader_float_controls": 4,
-                "VK_KHR_swapchain_mutable_format": 1,
-                "VK_EXT_transform_feedback": 1,
-                "VK_EXT_calibrated_timestamps": 1,
-                "VK_EXT_scalar_block_layout": 1,
-                "VK_EXT_memory_budget": 1,
-                "VK_EXT_depth_clip_enable": 1,
-                "VK_EXT_host_query_reset": 1,
-                "VK_EXT_pipeline_creation_feedback": 1,
-                "VK_KHR_uniform_buffer_standard_layout": 1,
-                "VK_EXT_separate_stencil_usage": 1,
-                "VK_EXT_full_screen_exclusive": 4,
-                "VK_EXT_shader_demote_to_helper_invocation": 1,
-                "VK_EXT_texel_buffer_alignment": 1,
-                "VK_KHR_imageless_framebuffer": 1,
-                "VK_EXT_subgroup_size_control": 2,
-                "VK_EXT_line_rasterization": 1,
-                "VK_KHR_pipeline_executable_properties": 1,
-                "VK_KHR_shader_subgroup_extended_types": 1,
-                "VK_KHR_shader_clock": 1,
-                "VK_KHR_timeline_semaphore": 2,
-                "VK_KHR_spirv_1_4": 1,
-                "VK_KHR_separate_depth_stencil_layouts": 1,
-                "VK_KHR_buffer_device_address": 1,
                 "VK_KHR_shader_non_semantic_info": 1,
-                "VK_EXT_pipeline_creation_cache_control": 3,
-                "VK_EXT_robustness2": 1,
-                "VK_EXT_extended_dynamic_state": 1
+                "VK_KHR_shader_subgroup_extended_types": 1,
+                "VK_KHR_spirv_1_4": 1,
+                "VK_KHR_storage_buffer_storage_class": 1,
+                "VK_KHR_swapchain": 70,
+                "VK_KHR_swapchain_mutable_format": 1,
+                "VK_KHR_timeline_semaphore": 2,
+                "VK_KHR_uniform_buffer_standard_layout": 1,
+                "VK_KHR_variable_pointers": 1,
+                "VK_KHR_win32_keyed_mutex": 1
             },
             "features": {
+                "VkPhysicalDeviceDepthClipEnableFeaturesEXT": {
+                    "depthClipEnable": true
+                },
+                "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT": {
+                    "extendedDynamicState": true
+                },
                 "VkPhysicalDeviceFeatures": {
                     "depthBiasClamp": true,
                     "depthClamp": true,
@@ -110,6 +116,46 @@
                     "vertexPipelineStoresAndAtomics": true,
                     "wideLines": true
                 },
+                "VkPhysicalDeviceInlineUniformBlockFeaturesEXT": {
+                    "inlineUniformBlock": true,
+                    "descriptorBindingInlineUniformBlockUpdateAfterBind": true
+                },
+                "VkPhysicalDeviceLineRasterizationFeaturesEXT": {
+                    "bresenhamLines": true,
+                    "stippledBresenhamLines": true
+                },
+                "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT": {
+                    "pipelineCreationCacheControl": true
+                },
+                "VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR": {
+                    "pipelineExecutableInfo": true
+                },
+                "VkPhysicalDeviceRobustness2FeaturesEXT": {
+                    "robustBufferAccess2": true,
+                    "robustImageAccess2": true,
+                    "nullDescriptor": true
+                },
+                "VkPhysicalDeviceShaderClockFeaturesKHR": {
+                    "shaderSubgroupClock": true
+                },
+                "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT": {
+                    "shaderDemoteToHelperInvocation": true
+                },
+                "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT": {
+                    "subgroupSizeControl": true,
+                    "computeFullSubgroups": true
+                },
+                "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT": {
+                    "texelBufferAlignment": true
+                },
+                "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
+                    "transformFeedback": true,
+                    "geometryStreams": true
+                },
+                "VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT": {
+                    "vertexAttributeInstanceRateDivisor": true,
+                    "vertexAttributeInstanceRateZeroDivisor": true
+                },
                 "VkPhysicalDeviceVulkan11Features": {
                     "storageBuffer16BitAccess": true,
                     "uniformAndStorageBuffer16BitAccess": true,
@@ -150,55 +196,87 @@
                     "timelineSemaphore": true,
                     "bufferDeviceAddress": true,
                     "subgroupBroadcastDynamicId": true
-                },
-                "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
-                    "transformFeedback": true,
-                    "geometryStreams": true
-                },
-                "VkPhysicalDeviceDepthClipEnableFeaturesEXT": {
-                    "depthClipEnable": true
-                },
-                "VkPhysicalDeviceInlineUniformBlockFeaturesEXT": {
-                    "inlineUniformBlock": true,
-                    "descriptorBindingInlineUniformBlockUpdateAfterBind": true
-                },
-                "VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT": {
-                    "vertexAttributeInstanceRateDivisor": true,
-                    "vertexAttributeInstanceRateZeroDivisor": true
-                },
-                "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT": {
-                    "subgroupSizeControl": true,
-                    "computeFullSubgroups": true
-                },
-                "VkPhysicalDeviceLineRasterizationFeaturesEXT": {
-                    "bresenhamLines": true,
-                    "stippledBresenhamLines": true
-                },
-                "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT": {
-                    "extendedDynamicState": true
-                },
-                "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT": {
-                    "shaderDemoteToHelperInvocation": true
-                },
-                "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT": {
-                    "texelBufferAlignment": true
-                },
-                "VkPhysicalDeviceRobustness2FeaturesEXT": {
-                    "robustBufferAccess2": true,
-                    "robustImageAccess2": true,
-                    "nullDescriptor": true
-                },
-                "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT": {
-                    "pipelineCreationCacheControl": true
-                },
-                "VkPhysicalDeviceShaderClockFeaturesKHR": {
-                    "shaderSubgroupClock": true
-                },
-                "VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR": {
-                    "pipelineExecutableInfo": true
                 }
             },
             "properties": {
+                "VkPhysicalDeviceDepthStencilResolvePropertiesKHR": {
+                    "independentResolve": true,
+                    "independentResolveNone": true,
+                    "supportedDepthResolveModes": [
+                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT",
+                        "VK_RESOLVE_MODE_MAX_BIT"
+                    ],
+                    "supportedStencilResolveModes": [
+                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT",
+                        "VK_RESOLVE_MODE_MAX_BIT"
+                    ]
+                },
+                "VkPhysicalDeviceDescriptorIndexingPropertiesEXT": {
+                    "maxDescriptorSetUpdateAfterBindInputAttachments": 1048576,
+                    "maxDescriptorSetUpdateAfterBindSampledImages": 1048576,
+                    "maxDescriptorSetUpdateAfterBindSamplers": 1048576,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffers": 1048576,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 8,
+                    "maxDescriptorSetUpdateAfterBindStorageImages": 1048576,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffers": 90,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 8,
+                    "maxPerStageDescriptorUpdateAfterBindInputAttachments": 1048576,
+                    "maxPerStageDescriptorUpdateAfterBindSampledImages": 1048576,
+                    "maxPerStageDescriptorUpdateAfterBindSamplers": 1048576,
+                    "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 1048576,
+                    "maxPerStageDescriptorUpdateAfterBindStorageImages": 1048576,
+                    "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 15,
+                    "maxPerStageUpdateAfterBindResources": 1048576,
+                    "maxUpdateAfterBindDescriptorsInAllPools": 1048576,
+                    "quadDivergentImplicitLod": true,
+                    "robustBufferAccessUpdateAfterBind": true,
+                    "shaderInputAttachmentArrayNonUniformIndexingNative": true,
+                    "shaderSampledImageArrayNonUniformIndexingNative": true,
+                    "shaderStorageBufferArrayNonUniformIndexingNative": true,
+                    "shaderStorageImageArrayNonUniformIndexingNative": true,
+                    "shaderUniformBufferArrayNonUniformIndexingNative": true
+                },
+                "VkPhysicalDeviceDriverPropertiesKHR": {},
+                "VkPhysicalDeviceExternalMemoryHostPropertiesEXT": {
+                    "minImportedHostPointerAlignment": "4096"
+                },
+                "VkPhysicalDeviceFloatControlsPropertiesKHR": {
+                    "denormBehaviorIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR",
+                    "shaderDenormFlushToZeroFloat16": true,
+                    "shaderDenormFlushToZeroFloat32": true,
+                    "shaderDenormFlushToZeroFloat64": true,
+                    "shaderDenormPreserveFloat16": true,
+                    "shaderDenormPreserveFloat32": true,
+                    "shaderDenormPreserveFloat64": true,
+                    "shaderRoundingModeRTEFloat16": true,
+                    "shaderRoundingModeRTEFloat32": true,
+                    "shaderRoundingModeRTEFloat64": true,
+                    "shaderRoundingModeRTZFloat16": true,
+                    "shaderRoundingModeRTZFloat32": true,
+                    "shaderRoundingModeRTZFloat64": true,
+                    "shaderSignedZeroInfNanPreserveFloat16": true,
+                    "shaderSignedZeroInfNanPreserveFloat32": true,
+                    "shaderSignedZeroInfNanPreserveFloat64": true
+                },
+                "VkPhysicalDeviceInlineUniformBlockPropertiesEXT": {
+                    "maxDescriptorSetInlineUniformBlocks": 4,
+                    "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 4,
+                    "maxInlineUniformBlockSize": 256,
+                    "maxPerStageDescriptorInlineUniformBlocks": 4,
+                    "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4
+                },
+                "VkPhysicalDeviceLineRasterizationPropertiesEXT": {
+                    "lineSubPixelPrecisionBits": 4
+                },
+                "VkPhysicalDeviceMaintenance3PropertiesKHR": {
+                    "maxMemoryAllocationSize": "2147483648",
+                    "maxPerSetDescriptors": 6160
+                },
+                "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                    "maxMultiviewInstanceIndex": 134217727,
+                    "maxMultiviewViewCount": 6
+                },
+                "VkPhysicalDevicePointClippingPropertiesKHR": {},
                 "VkPhysicalDeviceProperties": {
                     "sparseProperties": {
                         "residencyAlignedMipSize": true,
@@ -375,6 +453,40 @@
                         ]
                     }
                 },
+                "VkPhysicalDeviceRobustness2PropertiesEXT": {
+                    "robustStorageBufferAccessSizeAlignment": "4",
+                    "robustUniformBufferAccessSizeAlignment": "4"
+                },
+                "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT": {
+                    "maxComputeWorkgroupSubgroups": 56,
+                    "maxSubgroupSize": 32,
+                    "minSubgroupSize": 64,
+                    "requiredSubgroupSizeStages": []
+                },
+                "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT": {
+                    "storageTexelBufferOffsetAlignmentBytes": "4",
+                    "storageTexelBufferOffsetSingleTexelAlignment": true,
+                    "uniformTexelBufferOffsetAlignmentBytes": "4",
+                    "uniformTexelBufferOffsetSingleTexelAlignment": true
+                },
+                "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
+                    "maxTimelineSemaphoreValueDifference": "18446744073709551615"
+                },
+                "VkPhysicalDeviceTransformFeedbackPropertiesEXT": {
+                    "maxTransformFeedbackBufferDataSize": 512,
+                    "maxTransformFeedbackBufferDataStride": 512,
+                    "maxTransformFeedbackBuffers": 4,
+                    "maxTransformFeedbackBufferSize": "18446744073709551615",
+                    "maxTransformFeedbackStreamDataSize": 512,
+                    "maxTransformFeedbackStreams": 4,
+                    "transformFeedbackDraw": true,
+                    "transformFeedbackQueries": true,
+                    "transformFeedbackRasterizationStreamSelect": true,
+                    "transformFeedbackStreamsLinesTriangles": true
+                },
+                "VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT": {
+                    "maxVertexAttribDivisor": 268435455
+                },
                 "VkPhysicalDeviceVulkan11Properties": {
                     "subgroupSize": 64,
                     "subgroupSupportedStages": [
@@ -465,118 +577,6 @@
                         "VK_SAMPLE_COUNT_4_BIT",
                         "VK_SAMPLE_COUNT_8_BIT"
                     ]
-                },
-                "VkPhysicalDeviceDriverPropertiesKHR": {},
-                "VkPhysicalDeviceFloatControlsPropertiesKHR": {
-                    "denormBehaviorIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR",
-                    "shaderDenormFlushToZeroFloat16": true,
-                    "shaderDenormFlushToZeroFloat32": true,
-                    "shaderDenormFlushToZeroFloat64": true,
-                    "shaderDenormPreserveFloat16": true,
-                    "shaderDenormPreserveFloat32": true,
-                    "shaderDenormPreserveFloat64": true,
-                    "shaderRoundingModeRTEFloat16": true,
-                    "shaderRoundingModeRTEFloat32": true,
-                    "shaderRoundingModeRTEFloat64": true,
-                    "shaderRoundingModeRTZFloat16": true,
-                    "shaderRoundingModeRTZFloat32": true,
-                    "shaderRoundingModeRTZFloat64": true,
-                    "shaderSignedZeroInfNanPreserveFloat16": true,
-                    "shaderSignedZeroInfNanPreserveFloat32": true,
-                    "shaderSignedZeroInfNanPreserveFloat64": true
-                },
-                "VkPhysicalDeviceDepthStencilResolvePropertiesKHR": {
-                    "independentResolve": true,
-                    "independentResolveNone": true,
-                    "supportedDepthResolveModes": [
-                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT",
-                        "VK_RESOLVE_MODE_MAX_BIT"
-                    ],
-                    "supportedStencilResolveModes": [
-                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT",
-                        "VK_RESOLVE_MODE_MAX_BIT"
-                    ]
-                },
-                "VkPhysicalDeviceLineRasterizationPropertiesEXT": {
-                    "lineSubPixelPrecisionBits": 4
-                },
-                "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT": {
-                    "maxComputeWorkgroupSubgroups": 56,
-                    "maxSubgroupSize": 32,
-                    "minSubgroupSize": 64,
-                    "requiredSubgroupSizeStages": []
-                },
-                "VkPhysicalDeviceInlineUniformBlockPropertiesEXT": {
-                    "maxDescriptorSetInlineUniformBlocks": 4,
-                    "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 4,
-                    "maxInlineUniformBlockSize": 256,
-                    "maxPerStageDescriptorInlineUniformBlocks": 4,
-                    "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4
-                },
-                "VkPhysicalDeviceDescriptorIndexingPropertiesEXT": {
-                    "maxDescriptorSetUpdateAfterBindInputAttachments": 1048576,
-                    "maxDescriptorSetUpdateAfterBindSampledImages": 1048576,
-                    "maxDescriptorSetUpdateAfterBindSamplers": 1048576,
-                    "maxDescriptorSetUpdateAfterBindStorageBuffers": 1048576,
-                    "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 8,
-                    "maxDescriptorSetUpdateAfterBindStorageImages": 1048576,
-                    "maxDescriptorSetUpdateAfterBindUniformBuffers": 90,
-                    "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 8,
-                    "maxPerStageDescriptorUpdateAfterBindInputAttachments": 1048576,
-                    "maxPerStageDescriptorUpdateAfterBindSampledImages": 1048576,
-                    "maxPerStageDescriptorUpdateAfterBindSamplers": 1048576,
-                    "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 1048576,
-                    "maxPerStageDescriptorUpdateAfterBindStorageImages": 1048576,
-                    "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 15,
-                    "maxPerStageUpdateAfterBindResources": 1048576,
-                    "maxUpdateAfterBindDescriptorsInAllPools": 1048576,
-                    "quadDivergentImplicitLod": true,
-                    "robustBufferAccessUpdateAfterBind": true,
-                    "shaderInputAttachmentArrayNonUniformIndexingNative": true,
-                    "shaderSampledImageArrayNonUniformIndexingNative": true,
-                    "shaderStorageBufferArrayNonUniformIndexingNative": true,
-                    "shaderStorageImageArrayNonUniformIndexingNative": true,
-                    "shaderUniformBufferArrayNonUniformIndexingNative": true
-                },
-                "VkPhysicalDeviceMaintenance3PropertiesKHR": {
-                    "maxMemoryAllocationSize": "2147483648",
-                    "maxPerSetDescriptors": 6160
-                },
-                "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                    "maxMultiviewInstanceIndex": 134217727,
-                    "maxMultiviewViewCount": 6
-                },
-                "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
-                    "maxTimelineSemaphoreValueDifference": "18446744073709551615"
-                },
-                "VkPhysicalDeviceTransformFeedbackPropertiesEXT": {
-                    "maxTransformFeedbackBufferDataSize": 512,
-                    "maxTransformFeedbackBufferDataStride": 512,
-                    "maxTransformFeedbackBuffers": 4,
-                    "maxTransformFeedbackBufferSize": "18446744073709551615",
-                    "maxTransformFeedbackStreamDataSize": 512,
-                    "maxTransformFeedbackStreams": 4,
-                    "transformFeedbackDraw": true,
-                    "transformFeedbackQueries": true,
-                    "transformFeedbackRasterizationStreamSelect": true,
-                    "transformFeedbackStreamsLinesTriangles": true
-                },
-                "VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT": {
-                    "maxVertexAttribDivisor": 268435455
-                },
-                "VkPhysicalDeviceExternalMemoryHostPropertiesEXT": {
-                    "minImportedHostPointerAlignment": "4096"
-                },
-                "VkPhysicalDevicePointClippingPropertiesKHR": {},
-                "VkPhysicalDeviceRobustness2PropertiesEXT": {
-                    "robustStorageBufferAccessSizeAlignment": "4",
-                    "robustUniformBufferAccessSizeAlignment": "4"
-                },
-                "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT": {
-                    "storageTexelBufferOffsetAlignmentBytes": "4",
-                    "storageTexelBufferOffsetSingleTexelAlignment": true,
-                    "uniformTexelBufferOffsetAlignmentBytes": "4",
-                    "uniformTexelBufferOffsetSingleTexelAlignment": true
                 }
             },
             "formats": {
@@ -2597,7 +2597,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-07-25",
+                    "date": "2022-07-27",
                     "author": "Merge tool",
                     "comment": "Generated profile doing an intersection between profiles: VP_GPUINFO_AMD_Radeon__TM__R7_370_Series_2_0_179_windows_10, VP_GPUINFO_Intel_R__HD_Graphics_515_0_402_1124_windows_10 and VP_GPUINFO_NVIDIA_GeForce_GTX_650_Ti_472_98_0_0_windows_10"
                 }

@@ -238,13 +238,17 @@ class ProfileMerger():
         capabilities = dict()
         capabilities['baseline'] = dict()
         if merged_extensions:
-            capabilities['baseline']['extensions'] = merged_extensions
+            sorted_extensions = collections.OrderedDict(sorted(merged_extensions.items()))
+            capabilities['baseline']['extensions'] = dict(sorted_extensions)
         if merged_features:
-            capabilities['baseline']['features'] = merged_features
+            sorted_features = collections.OrderedDict(sorted(merged_features.items()))
+            capabilities['baseline']['features'] = dict(sorted_features)
         if merged_properties:
-            capabilities['baseline']['properties'] = merged_properties
+            sorted_properties = collections.OrderedDict(sorted(merged_properties.items()))
+            capabilities['baseline']['properties'] = dict(sorted_properties)
         if merged_formats:
-            capabilities['baseline']['formats'] = merged_formats
+            sorted_formats = collections.OrderedDict(sorted(merged_formats.items()))
+            capabilities['baseline']['formats'] = dict(sorted_formats)
         if merged_qfp:
             capabilities['baseline']['queueFamiliesProperties'] = merged_qfp
 

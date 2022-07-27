@@ -3,15 +3,21 @@
     "capabilities": {
         "baseline": {
             "extensions": {
-                "VK_KHR_maintenance1": 1,
-                "VK_KHR_maintenance3": 1,
                 "VK_AMD_device_coherent_memory": 1,
-                "VK_EXT_shader_demote_to_helper_invocation": 1,
-                "VK_KHR_maintenance2": 1,
                 "VK_EXT_extended_dynamic_state": 1,
+                "VK_EXT_shader_demote_to_helper_invocation": 1,
+                "VK_KHR_maintenance1": 1,
+                "VK_KHR_maintenance2": 1,
+                "VK_KHR_maintenance3": 1,
                 "VK_KHR_variable_pointers": 1
             },
             "features": {
+                "VkPhysicalDeviceCoherentMemoryFeaturesAMD": {
+                    "deviceCoherentMemory": false
+                },
+                "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT": {
+                    "extendedDynamicState": true
+                },
                 "VkPhysicalDeviceFeatures": {
                     "depthBiasClamp": true,
                     "depthClamp": false,
@@ -24,12 +30,6 @@
                 },
                 "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT": {
                     "shaderDemoteToHelperInvocation": true
-                },
-                "VkPhysicalDeviceCoherentMemoryFeaturesAMD": {
-                    "deviceCoherentMemory": false
-                },
-                "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT": {
-                    "extendedDynamicState": true
                 },
                 "VkPhysicalDeviceVariablePointersFeaturesKHR": {
                     "variablePointersStorageBuffer": false
@@ -96,7 +96,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-07-25",
+                    "date": "2022-07-27",
                     "author": "Merge tool",
                     "comment": "Generated profile doing an union between profiles: VP_LUNARG_test_combine_union1 and VP_LUNARG_test_combine_union2"
                 }
