@@ -25,6 +25,8 @@ import os
 import collections
 
 class ProfileMerger():
+
+
     def __init__(self, registry):
         self.registry = registry
 
@@ -32,41 +34,20 @@ class ProfileMerger():
         self.mode = mode
 
         # Find the api version to use
-        api_version = self.get_api_version(profiles)
+        self.api_version = self.get_api_version(profiles)
+        print('Building a Vulkan ' + '.'.join(self.api_version) + ' profile')
 
         # Begin constructing merged profile
         merged = dict()
-        merged['$schema'] = self.get_schema(jsons)
-        merged['capabilities'] = self.merge_capabilities(jsons, profile_names, api_version[1])
+        merged['$schema'] = 'https://schema.khronos.org/vulkan/profiles-0.8.0-' + self.api_version[2] + '.json#'
+        merged['capabilities'] = self.merge_capabilities(jsons, profile_names, self.api_version)
 
         profile_description = self.get_profile_description(profile_names, mode)
-        merged['profiles'] = self.get_profiles(merged_profile, api_version[0], profile_description)
+        merged['profiles'] = self.get_profiles(merged_profile, self.api_version, profile_description)
 
         # Wite new merged profile
         with open(merged_path, 'w') as file:
             json.dump(merged, file, indent = 4)
-
-    def get_schema(self, jsons):
-        # Take higher version of the schema
-        version = self.get_version_from_schema(jsons[0]['$schema'])
-        for json in jsons:
-            current_version = self.get_version_from_schema(json['$schema'])
-            for i in range(len(version)):
-                if self.mode == 'union':
-                    if (current_version[i] > version[i]):
-                        version = current_version
-                        break
-                    elif (current_version[i] < version[i]):
-                        break
-                elif self.mode == 'intersection':
-                    if (current_version[i] < version[i]):
-                        version = current_version
-                        break
-                    elif (current_version[i] > version[i]):
-                        break
-                else:
-                    print('ERROR: Unknown mode when computing api-version')
-        return 'https://schema.khronos.org/vulkan/profiles-' + version[0] + '.' + version[1] + '.' + version[2] + '-' + version[3] + '.json#'
 
     def merge_capabilities(self, jsons, profile_names, api_version):
         merged_extensions = dict()
@@ -598,7 +579,7 @@ class ProfileMerger():
         profiles[profile_name] = dict()
         profiles[profile_name]['version'] = 1
         profiles[profile_name]['status'] = 'BETA'
-        profiles[profile_name]['api-version'] = api_version
+        profiles[profile_name]['api-version'] = '.'.join(api_version)
         profiles[profile_name]['label'] = 'Merged profile'
         profiles[profile_name]['description'] = description
         profiles[profile_name]['contributors'] = dict()
@@ -616,17 +597,14 @@ class ProfileMerger():
         return profiles
 
     def get_api_version(self, profiles):
-        api_version_str = profiles[0]['api-version']
-        api_version = self.get_api_version_list(api_version_str)
+        api_version = self.get_api_version_list(profiles[0]['api-version'])
         for profile in profiles:
-            current_api_version_str = profile['api-version']
-            current_api_version = self.get_api_version_list(current_api_version_str)
+            current_api_version = self.get_api_version_list(profile['api-version'])
             if self.mode == 'union':
                 for i in range(len(api_version)):
                     if (api_version[i] > current_api_version[i]):
                         break
                     elif (api_version[i] < current_api_version[i]):
-                        api_version_str = current_api_version_str
                         api_version = current_api_version
                         break
             elif self.mode == 'intersection':
@@ -634,12 +612,11 @@ class ProfileMerger():
                     if (api_version[i] < current_api_version[i]):
                         break
                     elif (api_version[i] > current_api_version[i]):
-                        api_version_str = current_api_version_str
                         api_version = current_api_version
                         break
             else:
                 print('ERROR: Unknown mode when computing api-version')
-        return [api_version_str, api_version]
+        return api_version
 
     def get_profile_description(self, profile_names, mode):
         desc = 'Generated profile doing an ' + mode + ' between profiles: '
@@ -667,16 +644,8 @@ class ProfileMerger():
         return version
 
     def get_api_version_list(self, ver):
-        version = list()
-        version.append(ver[:ver.find('.')])
-        ver = ver[ver.find('.') + 1:]
-        version.append(ver[:ver.find('.')])
-        ver = ver[ver.find('.') + 1:]
-        version.append(ver[:ver.find('-')])
-        ver = ver[ver.find('-') + 1:]
+        version = ver.split('.')
         return version
-
-            
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
