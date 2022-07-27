@@ -250,9 +250,17 @@ class ProfileMerger():
             sorted_extensions = collections.OrderedDict(sorted(merged_extensions.items()))
             capabilities['baseline']['extensions'] = dict(sorted_extensions)
         if merged_features:
+            for feature in dict(merged_features):
+                if not merged_features[feature]:
+                    del merged_features[feature]
+
             sorted_features = collections.OrderedDict(sorted(merged_features.items()))
             capabilities['baseline']['features'] = dict(sorted_features)
         if merged_properties:
+            for property in dict(merged_properties):
+                if not merged_properties[property]:
+                    del merged_properties[property]
+
             sorted_properties = collections.OrderedDict(sorted(merged_properties.items()))
             capabilities['baseline']['properties'] = dict(sorted_properties)
         if merged_formats:

@@ -80,7 +80,6 @@
                 "VkPhysicalDeviceRobustness2FeaturesEXT": {
                     "robustImageAccess2": true
                 },
-                "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT": {},
                 "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT": {
                     "texelBufferAlignment": true
                 },
@@ -125,7 +124,6 @@
                     "shaderStorageImageArrayNonUniformIndexingNative": true,
                     "shaderUniformBufferArrayNonUniformIndexingNative": true
                 },
-                "VkPhysicalDeviceDriverPropertiesKHR": {},
                 "VkPhysicalDeviceInlineUniformBlockPropertiesEXT": {
                     "maxDescriptorSetInlineUniformBlocks": 4,
                     "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 4,
@@ -141,7 +139,6 @@
                     "maxMultiviewInstanceIndex": 134217727,
                     "maxMultiviewViewCount": 6
                 },
-                "VkPhysicalDevicePointClippingPropertiesKHR": {},
                 "VkPhysicalDeviceProperties": {
                     "sparseProperties": {
                         "residencyAlignedMipSize": true,
