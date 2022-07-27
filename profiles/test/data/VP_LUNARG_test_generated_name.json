@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-154.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-142.json#",
     "capabilities": {
         "baseline": {
             "extensions": {
@@ -45,7 +45,7 @@
         }
     },
     "profiles": {
-        "VP_LUNARG_merged_2022_07_27_12_10": {
+        "VP_LUNARG_merged_2022_07_27_15_17": {
             "version": 1,
             "status": "BETA",
             "api-version": "1.0.142",
