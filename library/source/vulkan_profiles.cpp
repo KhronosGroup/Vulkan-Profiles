@@ -7641,6 +7641,3976 @@ static const VpStructChainerDesc chainerDesc = {
 } // namespace VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET
 #endif
 
+#ifdef VP_LUNARG_desktop_portability_2022
+namespace VP_LUNARG_DESKTOP_PORTABILITY_2022 {
+
+static const VkExtensionProperties deviceExtensions[] = {
+    VkExtensionProperties{ VK_EXT_CALIBRATED_TIMESTAMPS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, 2 },
+    VkExtensionProperties{ VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_FULL_SCREEN_EXCLUSIVE_EXTENSION_NAME, 4 },
+    VkExtensionProperties{ VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_MEMORY_BUDGET_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME, 3 },
+    VkExtensionProperties{ VK_EXT_PIPELINE_CREATION_FEEDBACK_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SEPARATE_STENCIL_USAGE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SHADER_SUBGROUP_BALLOT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SHADER_SUBGROUP_VOTE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 2 },
+    VkExtensionProperties{ VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 3 },
+    VkExtensionProperties{ VK_KHR_16BIT_STORAGE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_8BIT_STORAGE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_BIND_MEMORY_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, 3 },
+    VkExtensionProperties{ VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DEVICE_GROUP_EXTENSION_NAME, 4 },
+    VkExtensionProperties{ VK_KHR_DRAW_INDIRECT_COUNT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_FENCE_WIN32_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_MAINTENANCE_1_EXTENSION_NAME, 2 },
+    VkExtensionProperties{ VK_KHR_MAINTENANCE_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_MAINTENANCE_3_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_MULTIVIEW_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, 3 },
+    VkExtensionProperties{ VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_CLOCK_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME, 4 },
+    VkExtensionProperties{ VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SPIRV_1_4_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SWAPCHAIN_EXTENSION_NAME, 70 },
+    VkExtensionProperties{ VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, 2 },
+    VkExtensionProperties{ VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_WIN32_KEYED_MUTEX_EXTENSION_NAME, 1 },
+};
+
+static const VkStructureType featureStructTypes[] = {
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+};
+
+static const VkStructureType propertyStructTypes[] = {
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES,
+};
+
+static const VkStructureType formatStructTypes[] = {
+    VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR,
+    VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR,
+};
+
+static const VpFeatureDesc featureDesc = {
+    [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT: {
+                    VkPhysicalDeviceDepthClipEnableFeaturesEXT* s = static_cast<VkPhysicalDeviceDepthClipEnableFeaturesEXT*>(static_cast<void*>(p));
+                    s->depthClipEnable = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT: {
+                    VkPhysicalDeviceExtendedDynamicStateFeaturesEXT* s = static_cast<VkPhysicalDeviceExtendedDynamicStateFeaturesEXT*>(static_cast<void*>(p));
+                    s->extendedDynamicState = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR: {
+                    VkPhysicalDeviceFeatures2KHR* s = static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p));
+                    s->features.depthBiasClamp = VK_TRUE;
+                    s->features.depthClamp = VK_TRUE;
+                    s->features.drawIndirectFirstInstance = VK_TRUE;
+                    s->features.dualSrcBlend = VK_TRUE;
+                    s->features.fillModeNonSolid = VK_TRUE;
+                    s->features.fragmentStoresAndAtomics = VK_TRUE;
+                    s->features.fullDrawIndexUint32 = VK_TRUE;
+                    s->features.geometryShader = VK_TRUE;
+                    s->features.imageCubeArray = VK_TRUE;
+                    s->features.independentBlend = VK_TRUE;
+                    s->features.inheritedQueries = VK_TRUE;
+                    s->features.largePoints = VK_TRUE;
+                    s->features.logicOp = VK_TRUE;
+                    s->features.multiDrawIndirect = VK_TRUE;
+                    s->features.multiViewport = VK_TRUE;
+                    s->features.occlusionQueryPrecise = VK_TRUE;
+                    s->features.pipelineStatisticsQuery = VK_TRUE;
+                    s->features.robustBufferAccess = VK_TRUE;
+                    s->features.sampleRateShading = VK_TRUE;
+                    s->features.samplerAnisotropy = VK_TRUE;
+                    s->features.shaderClipDistance = VK_TRUE;
+                    s->features.shaderCullDistance = VK_TRUE;
+                    s->features.shaderFloat64 = VK_TRUE;
+                    s->features.shaderImageGatherExtended = VK_TRUE;
+                    s->features.shaderInt64 = VK_TRUE;
+                    s->features.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
+                    s->features.shaderStorageBufferArrayDynamicIndexing = VK_TRUE;
+                    s->features.shaderStorageImageArrayDynamicIndexing = VK_TRUE;
+                    s->features.shaderStorageImageExtendedFormats = VK_TRUE;
+                    s->features.shaderStorageImageMultisample = VK_TRUE;
+                    s->features.shaderStorageImageWriteWithoutFormat = VK_TRUE;
+                    s->features.shaderTessellationAndGeometryPointSize = VK_TRUE;
+                    s->features.shaderUniformBufferArrayDynamicIndexing = VK_TRUE;
+                    s->features.sparseBinding = VK_TRUE;
+                    s->features.tessellationShader = VK_TRUE;
+                    s->features.textureCompressionBC = VK_TRUE;
+                    s->features.variableMultisampleRate = VK_TRUE;
+                    s->features.vertexPipelineStoresAndAtomics = VK_TRUE;
+                    s->features.wideLines = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT: {
+                    VkPhysicalDeviceInlineUniformBlockFeaturesEXT* s = static_cast<VkPhysicalDeviceInlineUniformBlockFeaturesEXT*>(static_cast<void*>(p));
+                    s->descriptorBindingInlineUniformBlockUpdateAfterBind = VK_TRUE;
+                    s->inlineUniformBlock = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT: {
+                    VkPhysicalDeviceLineRasterizationFeaturesEXT* s = static_cast<VkPhysicalDeviceLineRasterizationFeaturesEXT*>(static_cast<void*>(p));
+                    s->bresenhamLines = VK_TRUE;
+                    s->stippledBresenhamLines = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT: {
+                    VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT* s = static_cast<VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT*>(static_cast<void*>(p));
+                    s->pipelineCreationCacheControl = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR: {
+                    VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR* s = static_cast<VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR*>(static_cast<void*>(p));
+                    s->pipelineExecutableInfo = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT: {
+                    VkPhysicalDeviceRobustness2FeaturesEXT* s = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(static_cast<void*>(p));
+                    s->nullDescriptor = VK_TRUE;
+                    s->robustBufferAccess2 = VK_TRUE;
+                    s->robustImageAccess2 = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR: {
+                    VkPhysicalDeviceShaderClockFeaturesKHR* s = static_cast<VkPhysicalDeviceShaderClockFeaturesKHR*>(static_cast<void*>(p));
+                    s->shaderSubgroupClock = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT: {
+                    VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT* s = static_cast<VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT*>(static_cast<void*>(p));
+                    s->shaderDemoteToHelperInvocation = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT: {
+                    VkPhysicalDeviceSubgroupSizeControlFeaturesEXT* s = static_cast<VkPhysicalDeviceSubgroupSizeControlFeaturesEXT*>(static_cast<void*>(p));
+                    s->computeFullSubgroups = VK_TRUE;
+                    s->subgroupSizeControl = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT: {
+                    VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT*>(static_cast<void*>(p));
+                    s->texelBufferAlignment = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT: {
+                    VkPhysicalDeviceTransformFeedbackFeaturesEXT* s = static_cast<VkPhysicalDeviceTransformFeedbackFeaturesEXT*>(static_cast<void*>(p));
+                    s->geometryStreams = VK_TRUE;
+                    s->transformFeedback = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT: {
+                    VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT* s = static_cast<VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT*>(static_cast<void*>(p));
+                    s->vertexAttributeInstanceRateDivisor = VK_TRUE;
+                    s->vertexAttributeInstanceRateZeroDivisor = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES: {
+                    VkPhysicalDeviceVulkan11Features* s = static_cast<VkPhysicalDeviceVulkan11Features*>(static_cast<void*>(p));
+                    s->multiview = VK_TRUE;
+                    s->multiviewTessellationShader = VK_TRUE;
+                    s->protectedMemory = VK_FALSE;
+                    s->shaderDrawParameters = VK_TRUE;
+                    s->storageBuffer16BitAccess = VK_TRUE;
+                    s->uniformAndStorageBuffer16BitAccess = VK_TRUE;
+                    s->variablePointers = VK_TRUE;
+                    s->variablePointersStorageBuffer = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES: {
+                    VkPhysicalDeviceVulkan12Features* s = static_cast<VkPhysicalDeviceVulkan12Features*>(static_cast<void*>(p));
+                    s->bufferDeviceAddress = VK_TRUE;
+                    s->descriptorBindingPartiallyBound = VK_TRUE;
+                    s->descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingStorageImageUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingStorageTexelBufferUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingUniformTexelBufferUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingUpdateUnusedWhilePending = VK_TRUE;
+                    s->descriptorBindingVariableDescriptorCount = VK_TRUE;
+                    s->descriptorIndexing = VK_TRUE;
+                    s->drawIndirectCount = VK_TRUE;
+                    s->hostQueryReset = VK_TRUE;
+                    s->imagelessFramebuffer = VK_TRUE;
+                    s->runtimeDescriptorArray = VK_TRUE;
+                    s->samplerMirrorClampToEdge = VK_TRUE;
+                    s->scalarBlockLayout = VK_TRUE;
+                    s->separateDepthStencilLayouts = VK_TRUE;
+                    s->shaderInt8 = VK_TRUE;
+                    s->shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+                    s->shaderStorageBufferArrayNonUniformIndexing = VK_TRUE;
+                    s->shaderStorageTexelBufferArrayDynamicIndexing = VK_TRUE;
+                    s->shaderSubgroupExtendedTypes = VK_TRUE;
+                    s->shaderUniformTexelBufferArrayDynamicIndexing = VK_TRUE;
+                    s->shaderUniformTexelBufferArrayNonUniformIndexing = VK_TRUE;
+                    s->storageBuffer8BitAccess = VK_TRUE;
+                    s->subgroupBroadcastDynamicId = VK_TRUE;
+                    s->timelineSemaphore = VK_TRUE;
+                    s->uniformAndStorageBuffer8BitAccess = VK_TRUE;
+                    s->uniformBufferStandardLayout = VK_TRUE;
+                } break;
+                default: break;
+            }
+    },
+    [](VkBaseOutStructure* p) -> bool {
+        bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT: {
+                    VkPhysicalDeviceDepthClipEnableFeaturesEXT* s = static_cast<VkPhysicalDeviceDepthClipEnableFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->depthClipEnable == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT: {
+                    VkPhysicalDeviceExtendedDynamicStateFeaturesEXT* s = static_cast<VkPhysicalDeviceExtendedDynamicStateFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->extendedDynamicState == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR: {
+                    VkPhysicalDeviceFeatures2KHR* s = static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p));
+                    ret = ret && (s->features.depthBiasClamp == VK_TRUE);
+                    ret = ret && (s->features.depthClamp == VK_TRUE);
+                    ret = ret && (s->features.drawIndirectFirstInstance == VK_TRUE);
+                    ret = ret && (s->features.dualSrcBlend == VK_TRUE);
+                    ret = ret && (s->features.fillModeNonSolid == VK_TRUE);
+                    ret = ret && (s->features.fragmentStoresAndAtomics == VK_TRUE);
+                    ret = ret && (s->features.fullDrawIndexUint32 == VK_TRUE);
+                    ret = ret && (s->features.geometryShader == VK_TRUE);
+                    ret = ret && (s->features.imageCubeArray == VK_TRUE);
+                    ret = ret && (s->features.independentBlend == VK_TRUE);
+                    ret = ret && (s->features.inheritedQueries == VK_TRUE);
+                    ret = ret && (s->features.largePoints == VK_TRUE);
+                    ret = ret && (s->features.logicOp == VK_TRUE);
+                    ret = ret && (s->features.multiDrawIndirect == VK_TRUE);
+                    ret = ret && (s->features.multiViewport == VK_TRUE);
+                    ret = ret && (s->features.occlusionQueryPrecise == VK_TRUE);
+                    ret = ret && (s->features.pipelineStatisticsQuery == VK_TRUE);
+                    ret = ret && (s->features.robustBufferAccess == VK_TRUE);
+                    ret = ret && (s->features.sampleRateShading == VK_TRUE);
+                    ret = ret && (s->features.samplerAnisotropy == VK_TRUE);
+                    ret = ret && (s->features.shaderClipDistance == VK_TRUE);
+                    ret = ret && (s->features.shaderCullDistance == VK_TRUE);
+                    ret = ret && (s->features.shaderFloat64 == VK_TRUE);
+                    ret = ret && (s->features.shaderImageGatherExtended == VK_TRUE);
+                    ret = ret && (s->features.shaderInt64 == VK_TRUE);
+                    ret = ret && (s->features.shaderSampledImageArrayDynamicIndexing == VK_TRUE);
+                    ret = ret && (s->features.shaderStorageBufferArrayDynamicIndexing == VK_TRUE);
+                    ret = ret && (s->features.shaderStorageImageArrayDynamicIndexing == VK_TRUE);
+                    ret = ret && (s->features.shaderStorageImageExtendedFormats == VK_TRUE);
+                    ret = ret && (s->features.shaderStorageImageMultisample == VK_TRUE);
+                    ret = ret && (s->features.shaderStorageImageWriteWithoutFormat == VK_TRUE);
+                    ret = ret && (s->features.shaderTessellationAndGeometryPointSize == VK_TRUE);
+                    ret = ret && (s->features.shaderUniformBufferArrayDynamicIndexing == VK_TRUE);
+                    ret = ret && (s->features.sparseBinding == VK_TRUE);
+                    ret = ret && (s->features.tessellationShader == VK_TRUE);
+                    ret = ret && (s->features.textureCompressionBC == VK_TRUE);
+                    ret = ret && (s->features.variableMultisampleRate == VK_TRUE);
+                    ret = ret && (s->features.vertexPipelineStoresAndAtomics == VK_TRUE);
+                    ret = ret && (s->features.wideLines == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT: {
+                    VkPhysicalDeviceInlineUniformBlockFeaturesEXT* s = static_cast<VkPhysicalDeviceInlineUniformBlockFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE);
+                    ret = ret && (s->inlineUniformBlock == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT: {
+                    VkPhysicalDeviceLineRasterizationFeaturesEXT* s = static_cast<VkPhysicalDeviceLineRasterizationFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->bresenhamLines == VK_TRUE);
+                    ret = ret && (s->stippledBresenhamLines == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT: {
+                    VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT* s = static_cast<VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->pipelineCreationCacheControl == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR: {
+                    VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR* s = static_cast<VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (s->pipelineExecutableInfo == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT: {
+                    VkPhysicalDeviceRobustness2FeaturesEXT* s = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->nullDescriptor == VK_TRUE);
+                    ret = ret && (s->robustBufferAccess2 == VK_TRUE);
+                    ret = ret && (s->robustImageAccess2 == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR: {
+                    VkPhysicalDeviceShaderClockFeaturesKHR* s = static_cast<VkPhysicalDeviceShaderClockFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (s->shaderSubgroupClock == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT: {
+                    VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT* s = static_cast<VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->shaderDemoteToHelperInvocation == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT: {
+                    VkPhysicalDeviceSubgroupSizeControlFeaturesEXT* s = static_cast<VkPhysicalDeviceSubgroupSizeControlFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->computeFullSubgroups == VK_TRUE);
+                    ret = ret && (s->subgroupSizeControl == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT: {
+                    VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->texelBufferAlignment == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT: {
+                    VkPhysicalDeviceTransformFeedbackFeaturesEXT* s = static_cast<VkPhysicalDeviceTransformFeedbackFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->geometryStreams == VK_TRUE);
+                    ret = ret && (s->transformFeedback == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT: {
+                    VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT* s = static_cast<VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->vertexAttributeInstanceRateDivisor == VK_TRUE);
+                    ret = ret && (s->vertexAttributeInstanceRateZeroDivisor == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES: {
+                    VkPhysicalDeviceVulkan11Features* s = static_cast<VkPhysicalDeviceVulkan11Features*>(static_cast<void*>(p));
+                    ret = ret && (s->multiview == VK_TRUE);
+                    ret = ret && (s->multiviewTessellationShader == VK_TRUE);
+                    ret = ret && (s->protectedMemory == VK_FALSE);
+                    ret = ret && (s->shaderDrawParameters == VK_TRUE);
+                    ret = ret && (s->storageBuffer16BitAccess == VK_TRUE);
+                    ret = ret && (s->uniformAndStorageBuffer16BitAccess == VK_TRUE);
+                    ret = ret && (s->variablePointers == VK_TRUE);
+                    ret = ret && (s->variablePointersStorageBuffer == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES: {
+                    VkPhysicalDeviceVulkan12Features* s = static_cast<VkPhysicalDeviceVulkan12Features*>(static_cast<void*>(p));
+                    ret = ret && (s->bufferDeviceAddress == VK_TRUE);
+                    ret = ret && (s->descriptorBindingPartiallyBound == VK_TRUE);
+                    ret = ret && (s->descriptorBindingSampledImageUpdateAfterBind == VK_TRUE);
+                    ret = ret && (s->descriptorBindingStorageBufferUpdateAfterBind == VK_TRUE);
+                    ret = ret && (s->descriptorBindingStorageImageUpdateAfterBind == VK_TRUE);
+                    ret = ret && (s->descriptorBindingStorageTexelBufferUpdateAfterBind == VK_TRUE);
+                    ret = ret && (s->descriptorBindingUniformTexelBufferUpdateAfterBind == VK_TRUE);
+                    ret = ret && (s->descriptorBindingUpdateUnusedWhilePending == VK_TRUE);
+                    ret = ret && (s->descriptorBindingVariableDescriptorCount == VK_TRUE);
+                    ret = ret && (s->descriptorIndexing == VK_TRUE);
+                    ret = ret && (s->drawIndirectCount == VK_TRUE);
+                    ret = ret && (s->hostQueryReset == VK_TRUE);
+                    ret = ret && (s->imagelessFramebuffer == VK_TRUE);
+                    ret = ret && (s->runtimeDescriptorArray == VK_TRUE);
+                    ret = ret && (s->samplerMirrorClampToEdge == VK_TRUE);
+                    ret = ret && (s->scalarBlockLayout == VK_TRUE);
+                    ret = ret && (s->separateDepthStencilLayouts == VK_TRUE);
+                    ret = ret && (s->shaderInt8 == VK_TRUE);
+                    ret = ret && (s->shaderSampledImageArrayNonUniformIndexing == VK_TRUE);
+                    ret = ret && (s->shaderStorageBufferArrayNonUniformIndexing == VK_TRUE);
+                    ret = ret && (s->shaderStorageTexelBufferArrayDynamicIndexing == VK_TRUE);
+                    ret = ret && (s->shaderSubgroupExtendedTypes == VK_TRUE);
+                    ret = ret && (s->shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE);
+                    ret = ret && (s->shaderUniformTexelBufferArrayNonUniformIndexing == VK_TRUE);
+                    ret = ret && (s->storageBuffer8BitAccess == VK_TRUE);
+                    ret = ret && (s->subgroupBroadcastDynamicId == VK_TRUE);
+                    ret = ret && (s->timelineSemaphore == VK_TRUE);
+                    ret = ret && (s->uniformAndStorageBuffer8BitAccess == VK_TRUE);
+                    ret = ret && (s->uniformBufferStandardLayout == VK_TRUE);
+                } break;
+                default: break;
+            }
+        return ret;
+    }
+};
+
+static const VpPropertyDesc propertyDesc = {
+    [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR: {
+                    VkPhysicalDeviceDepthStencilResolvePropertiesKHR* s = static_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(static_cast<void*>(p));
+                    s->independentResolve = VK_TRUE;
+                    s->independentResolveNone = VK_TRUE;
+                    s->supportedDepthResolveModes |= (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT);
+                    s->supportedStencilResolveModes |= (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT: {
+                    VkPhysicalDeviceDescriptorIndexingPropertiesEXT* s = static_cast<VkPhysicalDeviceDescriptorIndexingPropertiesEXT*>(static_cast<void*>(p));
+                    s->maxDescriptorSetUpdateAfterBindInputAttachments = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindSampledImages = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindSamplers = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindStorageBuffers = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic = 8;
+                    s->maxDescriptorSetUpdateAfterBindStorageImages = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindUniformBuffers = 90;
+                    s->maxDescriptorSetUpdateAfterBindUniformBuffersDynamic = 8;
+                    s->maxPerStageDescriptorUpdateAfterBindInputAttachments = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindSampledImages = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindSamplers = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindStorageBuffers = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindStorageImages = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindUniformBuffers = 15;
+                    s->maxPerStageUpdateAfterBindResources = 1048576;
+                    s->maxUpdateAfterBindDescriptorsInAllPools = 1048576;
+                    s->quadDivergentImplicitLod = VK_TRUE;
+                    s->robustBufferAccessUpdateAfterBind = VK_TRUE;
+                    s->shaderInputAttachmentArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderSampledImageArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderStorageBufferArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderStorageImageArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderUniformBufferArrayNonUniformIndexingNative = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR: {
+                    VkPhysicalDeviceDriverPropertiesKHR* s = static_cast<VkPhysicalDeviceDriverPropertiesKHR*>(static_cast<void*>(p));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT: {
+                    VkPhysicalDeviceExternalMemoryHostPropertiesEXT* s = static_cast<VkPhysicalDeviceExternalMemoryHostPropertiesEXT*>(static_cast<void*>(p));
+                    s->minImportedHostPointerAlignment = 4096;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR: {
+                    VkPhysicalDeviceFloatControlsPropertiesKHR* s = static_cast<VkPhysicalDeviceFloatControlsPropertiesKHR*>(static_cast<void*>(p));
+                    s->denormBehaviorIndependence = VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR;
+                    s->shaderDenormFlushToZeroFloat16 = VK_TRUE;
+                    s->shaderDenormFlushToZeroFloat32 = VK_TRUE;
+                    s->shaderDenormFlushToZeroFloat64 = VK_TRUE;
+                    s->shaderDenormPreserveFloat16 = VK_TRUE;
+                    s->shaderDenormPreserveFloat32 = VK_TRUE;
+                    s->shaderDenormPreserveFloat64 = VK_TRUE;
+                    s->shaderRoundingModeRTEFloat16 = VK_TRUE;
+                    s->shaderRoundingModeRTEFloat32 = VK_TRUE;
+                    s->shaderRoundingModeRTEFloat64 = VK_TRUE;
+                    s->shaderRoundingModeRTZFloat16 = VK_TRUE;
+                    s->shaderRoundingModeRTZFloat32 = VK_TRUE;
+                    s->shaderRoundingModeRTZFloat64 = VK_TRUE;
+                    s->shaderSignedZeroInfNanPreserveFloat16 = VK_TRUE;
+                    s->shaderSignedZeroInfNanPreserveFloat32 = VK_TRUE;
+                    s->shaderSignedZeroInfNanPreserveFloat64 = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT: {
+                    VkPhysicalDeviceInlineUniformBlockPropertiesEXT* s = static_cast<VkPhysicalDeviceInlineUniformBlockPropertiesEXT*>(static_cast<void*>(p));
+                    s->maxDescriptorSetInlineUniformBlocks = 4;
+                    s->maxDescriptorSetUpdateAfterBindInlineUniformBlocks = 4;
+                    s->maxInlineUniformBlockSize = 256;
+                    s->maxPerStageDescriptorInlineUniformBlocks = 4;
+                    s->maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks = 4;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT: {
+                    VkPhysicalDeviceLineRasterizationPropertiesEXT* s = static_cast<VkPhysicalDeviceLineRasterizationPropertiesEXT*>(static_cast<void*>(p));
+                    s->lineSubPixelPrecisionBits = 4;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR: {
+                    VkPhysicalDeviceMaintenance3PropertiesKHR* s = static_cast<VkPhysicalDeviceMaintenance3PropertiesKHR*>(static_cast<void*>(p));
+                    s->maxMemoryAllocationSize = 2147483648;
+                    s->maxPerSetDescriptors = 6160;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR: {
+                    VkPhysicalDeviceMultiviewPropertiesKHR* s = static_cast<VkPhysicalDeviceMultiviewPropertiesKHR*>(static_cast<void*>(p));
+                    s->maxMultiviewInstanceIndex = 134217727;
+                    s->maxMultiviewViewCount = 6;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR: {
+                    VkPhysicalDevicePointClippingPropertiesKHR* s = static_cast<VkPhysicalDevicePointClippingPropertiesKHR*>(static_cast<void*>(p));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
+                    VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
+                    s->properties.limits.bufferImageGranularity = 65536;
+                    s->properties.limits.discreteQueuePriorities = 2;
+                    s->properties.limits.framebufferColorSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.framebufferDepthSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.framebufferNoAttachmentsSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.framebufferStencilSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.lineWidthGranularity = 0.125;
+                    s->properties.limits.lineWidthRange[0] = 1;
+                    s->properties.limits.lineWidthRange[1] = 7.99219;
+                    s->properties.limits.maxBoundDescriptorSets = 8;
+                    s->properties.limits.maxClipDistances = 8;
+                    s->properties.limits.maxColorAttachments = 8;
+                    s->properties.limits.maxCombinedClipAndCullDistances = 8;
+                    s->properties.limits.maxComputeSharedMemorySize = 32768;
+                    s->properties.limits.maxComputeWorkGroupCount[0] = 65535;
+                    s->properties.limits.maxComputeWorkGroupCount[1] = 65535;
+                    s->properties.limits.maxComputeWorkGroupCount[2] = 65535;
+                    s->properties.limits.maxComputeWorkGroupInvocations = 1024;
+                    s->properties.limits.maxCullDistances = 8;
+                    s->properties.limits.maxDescriptorSetInputAttachments = 8;
+                    s->properties.limits.maxDescriptorSetSampledImages = 1800;
+                    s->properties.limits.maxDescriptorSetSamplers = 576;
+                    s->properties.limits.maxDescriptorSetStorageBuffers = 1800;
+                    s->properties.limits.maxDescriptorSetStorageBuffersDynamic = 8;
+                    s->properties.limits.maxDescriptorSetStorageImages = 144;
+                    s->properties.limits.maxDescriptorSetUniformBuffers = 90;
+                    s->properties.limits.maxDescriptorSetUniformBuffersDynamic = 8;
+                    s->properties.limits.maxDrawIndexedIndexValue = 4294967295;
+                    s->properties.limits.maxDrawIndirectCount = 4294967295;
+                    s->properties.limits.maxFragmentCombinedOutputResources = 16;
+                    s->properties.limits.maxFragmentDualSrcAttachments = 1;
+                    s->properties.limits.maxFragmentInputComponents = 128;
+                    s->properties.limits.maxFragmentOutputAttachments = 8;
+                    s->properties.limits.maxFramebufferHeight = 16384;
+                    s->properties.limits.maxFramebufferLayers = 2048;
+                    s->properties.limits.maxFramebufferWidth = 16384;
+                    s->properties.limits.maxGeometryInputComponents = 128;
+                    s->properties.limits.maxGeometryOutputComponents = 128;
+                    s->properties.limits.maxGeometryOutputVertices = 256;
+                    s->properties.limits.maxGeometryShaderInvocations = 32;
+                    s->properties.limits.maxGeometryTotalOutputComponents = 1024;
+                    s->properties.limits.maxImageArrayLayers = 2048;
+                    s->properties.limits.maxImageDimension1D = 16384;
+                    s->properties.limits.maxImageDimension2D = 16384;
+                    s->properties.limits.maxImageDimension3D = 2048;
+                    s->properties.limits.maxImageDimensionCube = 16384;
+                    s->properties.limits.maxInterpolationOffset = 0.4375;
+                    s->properties.limits.maxMemoryAllocationCount = 4096;
+                    s->properties.limits.maxPerStageDescriptorInputAttachments = 8;
+                    s->properties.limits.maxPerStageDescriptorSampledImages = 200;
+                    s->properties.limits.maxPerStageDescriptorSamplers = 64;
+                    s->properties.limits.maxPerStageDescriptorStorageBuffers = 200;
+                    s->properties.limits.maxPerStageDescriptorStorageImages = 16;
+                    s->properties.limits.maxPerStageDescriptorUniformBuffers = 15;
+                    s->properties.limits.maxPerStageResources = 200;
+                    s->properties.limits.maxPushConstantsSize = 128;
+                    s->properties.limits.maxSampleMaskWords = 1;
+                    s->properties.limits.maxSamplerAllocationCount = 4000;
+                    s->properties.limits.maxSamplerAnisotropy = 16;
+                    s->properties.limits.maxSamplerLodBias = 15;
+                    s->properties.limits.maxStorageBufferRange = 4294967295;
+                    s->properties.limits.maxTessellationControlPerPatchOutputComponents = 120;
+                    s->properties.limits.maxTessellationControlPerVertexInputComponents = 128;
+                    s->properties.limits.maxTessellationControlPerVertexOutputComponents = 128;
+                    s->properties.limits.maxTessellationControlTotalOutputComponents = 4096;
+                    s->properties.limits.maxTessellationEvaluationInputComponents = 128;
+                    s->properties.limits.maxTessellationEvaluationOutputComponents = 128;
+                    s->properties.limits.maxTessellationGenerationLevel = 64;
+                    s->properties.limits.maxTessellationPatchSize = 32;
+                    s->properties.limits.maxTexelBufferElements = 134217728;
+                    s->properties.limits.maxTexelGatherOffset = 31;
+                    s->properties.limits.maxTexelOffset = 7;
+                    s->properties.limits.maxUniformBufferRange = 65536;
+                    s->properties.limits.maxVertexInputAttributeOffset = 2047;
+                    s->properties.limits.maxVertexInputAttributes = 32;
+                    s->properties.limits.maxVertexInputBindingStride = 2048;
+                    s->properties.limits.maxVertexInputBindings = 32;
+                    s->properties.limits.maxVertexOutputComponents = 128;
+                    s->properties.limits.maxViewportDimensions[0] = 16384;
+                    s->properties.limits.maxViewportDimensions[1] = 16384;
+                    s->properties.limits.maxViewports = 16;
+                    s->properties.limits.minInterpolationOffset = -0.5;
+                    s->properties.limits.minMemoryMapAlignment = 64;
+                    s->properties.limits.minStorageBufferOffsetAlignment = 64;
+                    s->properties.limits.minTexelBufferOffsetAlignment = 64;
+                    s->properties.limits.minTexelGatherOffset = -32;
+                    s->properties.limits.minTexelOffset = -8;
+                    s->properties.limits.minUniformBufferOffsetAlignment = 64;
+                    s->properties.limits.mipmapPrecisionBits = 8;
+                    s->properties.limits.nonCoherentAtomSize = 64;
+                    s->properties.limits.optimalBufferCopyOffsetAlignment = 64;
+                    s->properties.limits.optimalBufferCopyRowPitchAlignment = 64;
+                    s->properties.limits.pointSizeGranularity = 0.125;
+                    s->properties.limits.pointSizeRange[0] = 1;
+                    s->properties.limits.pointSizeRange[1] = 255.875;
+                    s->properties.limits.sampledImageColorSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.sampledImageDepthSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.sampledImageIntegerSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.sampledImageStencilSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.sparseAddressSpaceSize = 1086630000000;
+                    s->properties.limits.standardSampleLocations = VK_TRUE;
+                    s->properties.limits.storageImageSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.subPixelInterpolationOffsetBits = 4;
+                    s->properties.limits.subPixelPrecisionBits = 8;
+                    s->properties.limits.subTexelPrecisionBits = 8;
+                    s->properties.limits.timestampComputeAndGraphics = VK_TRUE;
+                    s->properties.limits.timestampPeriod = 83.333;
+                    s->properties.limits.viewportBoundsRange[0] = -32768;
+                    s->properties.limits.viewportBoundsRange[1] = 32767;
+                    s->properties.limits.viewportSubPixelBits = 8;
+                    s->properties.sparseProperties.residencyAlignedMipSize = VK_TRUE;
+                    s->properties.sparseProperties.residencyNonResidentStrict = VK_FALSE;
+                    s->properties.sparseProperties.residencyStandard2DBlockShape = VK_TRUE;
+                    s->properties.sparseProperties.residencyStandard2DMultisampleBlockShape = VK_TRUE;
+                    s->properties.sparseProperties.residencyStandard3DBlockShape = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT: {
+                    VkPhysicalDeviceRobustness2PropertiesEXT* s = static_cast<VkPhysicalDeviceRobustness2PropertiesEXT*>(static_cast<void*>(p));
+                    s->robustStorageBufferAccessSizeAlignment = 4;
+                    s->robustUniformBufferAccessSizeAlignment = 4;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT: {
+                    VkPhysicalDeviceSubgroupSizeControlPropertiesEXT* s = static_cast<VkPhysicalDeviceSubgroupSizeControlPropertiesEXT*>(static_cast<void*>(p));
+                    s->maxComputeWorkgroupSubgroups = 56;
+                    s->maxSubgroupSize = 32;
+                    s->minSubgroupSize = 64;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT: {
+                    VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT*>(static_cast<void*>(p));
+                    s->storageTexelBufferOffsetAlignmentBytes = 4;
+                    s->storageTexelBufferOffsetSingleTexelAlignment = VK_TRUE;
+                    s->uniformTexelBufferOffsetAlignmentBytes = 4;
+                    s->uniformTexelBufferOffsetSingleTexelAlignment = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR: {
+                    VkPhysicalDeviceTimelineSemaphorePropertiesKHR* s = static_cast<VkPhysicalDeviceTimelineSemaphorePropertiesKHR*>(static_cast<void*>(p));
+                    s->maxTimelineSemaphoreValueDifference = 18446744073709551615;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT: {
+                    VkPhysicalDeviceTransformFeedbackPropertiesEXT* s = static_cast<VkPhysicalDeviceTransformFeedbackPropertiesEXT*>(static_cast<void*>(p));
+                    s->maxTransformFeedbackBufferDataSize = 512;
+                    s->maxTransformFeedbackBufferDataStride = 512;
+                    s->maxTransformFeedbackBufferSize = 18446744073709551615;
+                    s->maxTransformFeedbackBuffers = 4;
+                    s->maxTransformFeedbackStreamDataSize = 512;
+                    s->maxTransformFeedbackStreams = 4;
+                    s->transformFeedbackDraw = VK_TRUE;
+                    s->transformFeedbackQueries = VK_TRUE;
+                    s->transformFeedbackRasterizationStreamSelect = VK_TRUE;
+                    s->transformFeedbackStreamsLinesTriangles = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT: {
+                    VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT* s = static_cast<VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT*>(static_cast<void*>(p));
+                    s->maxVertexAttribDivisor = 268435455;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES: {
+                    VkPhysicalDeviceVulkan11Properties* s = static_cast<VkPhysicalDeviceVulkan11Properties*>(static_cast<void*>(p));
+                    s->maxMemoryAllocationSize = 2147483648;
+                    s->maxMultiviewInstanceIndex = 134217727;
+                    s->maxMultiviewViewCount = 6;
+                    s->maxPerSetDescriptors = 6160;
+                    s->protectedNoFault = VK_FALSE;
+                    s->subgroupQuadOperationsInAllStages = VK_TRUE;
+                    s->subgroupSize = 64;
+                    s->subgroupSupportedOperations |= (VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT | VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT | VK_SUBGROUP_FEATURE_CLUSTERED_BIT | VK_SUBGROUP_FEATURE_QUAD_BIT);
+                    s->subgroupSupportedStages |= (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT | VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT | VK_SHADER_STAGE_GEOMETRY_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_ALL_GRAPHICS | VK_SHADER_STAGE_ALL | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_INTERSECTION_BIT_KHR);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES: {
+                    VkPhysicalDeviceVulkan12Properties* s = static_cast<VkPhysicalDeviceVulkan12Properties*>(static_cast<void*>(p));
+                    s->denormBehaviorIndependence = VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL;
+                    s->filterMinmaxImageComponentMapping = VK_TRUE;
+                    s->filterMinmaxSingleComponentFormats = VK_TRUE;
+                    s->framebufferIntegerColorSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->independentResolve = VK_TRUE;
+                    s->independentResolveNone = VK_TRUE;
+                    s->maxDescriptorSetUpdateAfterBindInputAttachments = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindSampledImages = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindSamplers = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindStorageBuffers = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic = 8;
+                    s->maxDescriptorSetUpdateAfterBindStorageImages = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindUniformBuffers = 90;
+                    s->maxDescriptorSetUpdateAfterBindUniformBuffersDynamic = 8;
+                    s->maxPerStageDescriptorUpdateAfterBindInputAttachments = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindSampledImages = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindSamplers = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindStorageBuffers = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindStorageImages = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindUniformBuffers = 15;
+                    s->maxPerStageUpdateAfterBindResources = 1048576;
+                    s->maxTimelineSemaphoreValueDifference = -1;
+                    s->maxUpdateAfterBindDescriptorsInAllPools = 1048576;
+                    s->quadDivergentImplicitLod = VK_TRUE;
+                    s->robustBufferAccessUpdateAfterBind = VK_TRUE;
+                    s->shaderDenormFlushToZeroFloat16 = VK_TRUE;
+                    s->shaderDenormFlushToZeroFloat32 = VK_TRUE;
+                    s->shaderDenormFlushToZeroFloat64 = VK_TRUE;
+                    s->shaderDenormPreserveFloat16 = VK_TRUE;
+                    s->shaderDenormPreserveFloat32 = VK_TRUE;
+                    s->shaderDenormPreserveFloat64 = VK_TRUE;
+                    s->shaderInputAttachmentArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderRoundingModeRTEFloat16 = VK_TRUE;
+                    s->shaderRoundingModeRTEFloat32 = VK_TRUE;
+                    s->shaderRoundingModeRTEFloat64 = VK_TRUE;
+                    s->shaderRoundingModeRTZFloat16 = VK_TRUE;
+                    s->shaderRoundingModeRTZFloat32 = VK_TRUE;
+                    s->shaderRoundingModeRTZFloat64 = VK_TRUE;
+                    s->shaderSampledImageArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderSignedZeroInfNanPreserveFloat16 = VK_TRUE;
+                    s->shaderSignedZeroInfNanPreserveFloat32 = VK_TRUE;
+                    s->shaderSignedZeroInfNanPreserveFloat64 = VK_TRUE;
+                    s->shaderStorageBufferArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderStorageImageArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderUniformBufferArrayNonUniformIndexingNative = VK_TRUE;
+                    s->supportedDepthResolveModes |= (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT);
+                    s->supportedStencilResolveModes |= (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT);
+                } break;
+                default: break;
+            }
+    },
+    [](VkBaseOutStructure* p) -> bool {
+        bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR: {
+                    VkPhysicalDeviceDepthStencilResolvePropertiesKHR* s = static_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->independentResolve, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->independentResolveNone, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->supportedDepthResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT)));
+                    ret = ret && (vpCheckFlags(s->supportedStencilResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT)));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT: {
+                    VkPhysicalDeviceDescriptorIndexingPropertiesEXT* s = static_cast<VkPhysicalDeviceDescriptorIndexingPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindInputAttachments >= 1048576);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindSampledImages >= 1048576);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindSamplers >= 1048576);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindStorageBuffers >= 1048576);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= 8);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindStorageImages >= 1048576);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindUniformBuffers >= 90);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= 8);
+                    ret = ret && (s->maxPerStageDescriptorUpdateAfterBindInputAttachments >= 1048576);
+                    ret = ret && (s->maxPerStageDescriptorUpdateAfterBindSampledImages >= 1048576);
+                    ret = ret && (s->maxPerStageDescriptorUpdateAfterBindSamplers >= 1048576);
+                    ret = ret && (s->maxPerStageDescriptorUpdateAfterBindStorageBuffers >= 1048576);
+                    ret = ret && (s->maxPerStageDescriptorUpdateAfterBindStorageImages >= 1048576);
+                    ret = ret && (s->maxPerStageDescriptorUpdateAfterBindUniformBuffers >= 15);
+                    ret = ret && (s->maxPerStageUpdateAfterBindResources >= 1048576);
+                    ret = ret && (s->maxUpdateAfterBindDescriptorsInAllPools >= 1048576);
+                    ret = ret && (vpCheckFlags(s->quadDivergentImplicitLod, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->robustBufferAccessUpdateAfterBind, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderInputAttachmentArrayNonUniformIndexingNative, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderSampledImageArrayNonUniformIndexingNative, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderStorageBufferArrayNonUniformIndexingNative, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderStorageImageArrayNonUniformIndexingNative, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderUniformBufferArrayNonUniformIndexingNative, VK_TRUE));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR: {
+                    VkPhysicalDeviceDriverPropertiesKHR* s = static_cast<VkPhysicalDeviceDriverPropertiesKHR*>(static_cast<void*>(p));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT: {
+                    VkPhysicalDeviceExternalMemoryHostPropertiesEXT* s = static_cast<VkPhysicalDeviceExternalMemoryHostPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->minImportedHostPointerAlignment <= 4096);
+                    ret = ret && ((s->minImportedHostPointerAlignment & (s->minImportedHostPointerAlignment - 1)) == 0);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR: {
+                    VkPhysicalDeviceFloatControlsPropertiesKHR* s = static_cast<VkPhysicalDeviceFloatControlsPropertiesKHR*>(static_cast<void*>(p));
+                    ret = ret && (s->denormBehaviorIndependence == VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR);
+                    ret = ret && (vpCheckFlags(s->shaderDenormFlushToZeroFloat16, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderDenormFlushToZeroFloat32, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderDenormFlushToZeroFloat64, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderDenormPreserveFloat16, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderDenormPreserveFloat32, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderDenormPreserveFloat64, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderRoundingModeRTEFloat16, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderRoundingModeRTEFloat32, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderRoundingModeRTEFloat64, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderRoundingModeRTZFloat16, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderRoundingModeRTZFloat32, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderRoundingModeRTZFloat64, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderSignedZeroInfNanPreserveFloat16, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderSignedZeroInfNanPreserveFloat32, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderSignedZeroInfNanPreserveFloat64, VK_TRUE));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT: {
+                    VkPhysicalDeviceInlineUniformBlockPropertiesEXT* s = static_cast<VkPhysicalDeviceInlineUniformBlockPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->maxDescriptorSetInlineUniformBlocks >= 4);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindInlineUniformBlocks >= 4);
+                    ret = ret && (s->maxInlineUniformBlockSize >= 256);
+                    ret = ret && (s->maxPerStageDescriptorInlineUniformBlocks >= 4);
+                    ret = ret && (s->maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks >= 4);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT: {
+                    VkPhysicalDeviceLineRasterizationPropertiesEXT* s = static_cast<VkPhysicalDeviceLineRasterizationPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->lineSubPixelPrecisionBits >= 4);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR: {
+                    VkPhysicalDeviceMaintenance3PropertiesKHR* s = static_cast<VkPhysicalDeviceMaintenance3PropertiesKHR*>(static_cast<void*>(p));
+                    ret = ret && (s->maxMemoryAllocationSize >= 2147483648);
+                    ret = ret && (s->maxPerSetDescriptors >= 6160);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR: {
+                    VkPhysicalDeviceMultiviewPropertiesKHR* s = static_cast<VkPhysicalDeviceMultiviewPropertiesKHR*>(static_cast<void*>(p));
+                    ret = ret && (s->maxMultiviewInstanceIndex >= 134217727);
+                    ret = ret && (s->maxMultiviewViewCount >= 6);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR: {
+                    VkPhysicalDevicePointClippingPropertiesKHR* s = static_cast<VkPhysicalDevicePointClippingPropertiesKHR*>(static_cast<void*>(p));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
+                    VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (s->properties.limits.bufferImageGranularity <= 65536);
+                    ret = ret && ((65536 % s->properties.limits.bufferImageGranularity) == 0);
+                    ret = ret && (s->properties.limits.discreteQueuePriorities >= 2);
+                    ret = ret && (vpCheckFlags(s->properties.limits.framebufferColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)));
+                    ret = ret && (vpCheckFlags(s->properties.limits.framebufferDepthSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)));
+                    ret = ret && (vpCheckFlags(s->properties.limits.framebufferNoAttachmentsSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)));
+                    ret = ret && (vpCheckFlags(s->properties.limits.framebufferStencilSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)));
+                    ret = ret && (s->properties.limits.lineWidthGranularity <= 0.125);
+                    ret = ret && (isMultiple(0.125, s->properties.limits.lineWidthGranularity));
+                    ret = ret && (s->properties.limits.lineWidthRange[0] <= 1);
+                    ret = ret && (s->properties.limits.lineWidthRange[1] >= 7.99219);
+                    ret = ret && (s->properties.limits.maxBoundDescriptorSets >= 8);
+                    ret = ret && (s->properties.limits.maxClipDistances >= 8);
+                    ret = ret && (s->properties.limits.maxColorAttachments >= 8);
+                    ret = ret && (s->properties.limits.maxCombinedClipAndCullDistances >= 8);
+                    ret = ret && (s->properties.limits.maxComputeSharedMemorySize >= 32768);
+                    ret = ret && (s->properties.limits.maxComputeWorkGroupCount[0] >= 65535);
+                    ret = ret && (s->properties.limits.maxComputeWorkGroupCount[1] >= 65535);
+                    ret = ret && (s->properties.limits.maxComputeWorkGroupCount[2] >= 65535);
+                    ret = ret && (s->properties.limits.maxComputeWorkGroupInvocations >= 1024);
+                    ret = ret && (s->properties.limits.maxCullDistances >= 8);
+                    ret = ret && (s->properties.limits.maxDescriptorSetInputAttachments >= 8);
+                    ret = ret && (s->properties.limits.maxDescriptorSetSampledImages >= 1800);
+                    ret = ret && (s->properties.limits.maxDescriptorSetSamplers >= 576);
+                    ret = ret && (s->properties.limits.maxDescriptorSetStorageBuffers >= 1800);
+                    ret = ret && (s->properties.limits.maxDescriptorSetStorageBuffersDynamic >= 8);
+                    ret = ret && (s->properties.limits.maxDescriptorSetStorageImages >= 144);
+                    ret = ret && (s->properties.limits.maxDescriptorSetUniformBuffers >= 90);
+                    ret = ret && (s->properties.limits.maxDescriptorSetUniformBuffersDynamic >= 8);
+                    ret = ret && (s->properties.limits.maxDrawIndexedIndexValue >= 4294967295);
+                    ret = ret && (s->properties.limits.maxDrawIndirectCount >= 4294967295);
+                    ret = ret && (s->properties.limits.maxFragmentCombinedOutputResources >= 16);
+                    ret = ret && (s->properties.limits.maxFragmentDualSrcAttachments >= 1);
+                    ret = ret && (s->properties.limits.maxFragmentInputComponents >= 128);
+                    ret = ret && (s->properties.limits.maxFragmentOutputAttachments >= 8);
+                    ret = ret && (s->properties.limits.maxFramebufferHeight >= 16384);
+                    ret = ret && (s->properties.limits.maxFramebufferLayers >= 2048);
+                    ret = ret && (s->properties.limits.maxFramebufferWidth >= 16384);
+                    ret = ret && (s->properties.limits.maxGeometryInputComponents >= 128);
+                    ret = ret && (s->properties.limits.maxGeometryOutputComponents >= 128);
+                    ret = ret && (s->properties.limits.maxGeometryOutputVertices >= 256);
+                    ret = ret && (s->properties.limits.maxGeometryShaderInvocations >= 32);
+                    ret = ret && (s->properties.limits.maxGeometryTotalOutputComponents >= 1024);
+                    ret = ret && (s->properties.limits.maxImageArrayLayers >= 2048);
+                    ret = ret && (s->properties.limits.maxImageDimension1D >= 16384);
+                    ret = ret && (s->properties.limits.maxImageDimension2D >= 16384);
+                    ret = ret && (s->properties.limits.maxImageDimension3D >= 2048);
+                    ret = ret && (s->properties.limits.maxImageDimensionCube >= 16384);
+                    ret = ret && (s->properties.limits.maxInterpolationOffset >= 0.4375);
+                    ret = ret && (s->properties.limits.maxMemoryAllocationCount >= 4096);
+                    ret = ret && (s->properties.limits.maxPerStageDescriptorInputAttachments >= 8);
+                    ret = ret && (s->properties.limits.maxPerStageDescriptorSampledImages >= 200);
+                    ret = ret && (s->properties.limits.maxPerStageDescriptorSamplers >= 64);
+                    ret = ret && (s->properties.limits.maxPerStageDescriptorStorageBuffers >= 200);
+                    ret = ret && (s->properties.limits.maxPerStageDescriptorStorageImages >= 16);
+                    ret = ret && (s->properties.limits.maxPerStageDescriptorUniformBuffers >= 15);
+                    ret = ret && (s->properties.limits.maxPerStageResources >= 200);
+                    ret = ret && (s->properties.limits.maxPushConstantsSize >= 128);
+                    ret = ret && (s->properties.limits.maxSampleMaskWords >= 1);
+                    ret = ret && (s->properties.limits.maxSamplerAllocationCount >= 4000);
+                    ret = ret && (s->properties.limits.maxSamplerAnisotropy >= 16);
+                    ret = ret && (s->properties.limits.maxSamplerLodBias >= 15);
+                    ret = ret && (s->properties.limits.maxStorageBufferRange >= 4294967295);
+                    ret = ret && (s->properties.limits.maxTessellationControlPerPatchOutputComponents >= 120);
+                    ret = ret && (s->properties.limits.maxTessellationControlPerVertexInputComponents >= 128);
+                    ret = ret && (s->properties.limits.maxTessellationControlPerVertexOutputComponents >= 128);
+                    ret = ret && (s->properties.limits.maxTessellationControlTotalOutputComponents >= 4096);
+                    ret = ret && (s->properties.limits.maxTessellationEvaluationInputComponents >= 128);
+                    ret = ret && (s->properties.limits.maxTessellationEvaluationOutputComponents >= 128);
+                    ret = ret && (s->properties.limits.maxTessellationGenerationLevel >= 64);
+                    ret = ret && (s->properties.limits.maxTessellationPatchSize >= 32);
+                    ret = ret && (s->properties.limits.maxTexelBufferElements >= 134217728);
+                    ret = ret && (s->properties.limits.maxTexelGatherOffset >= 31);
+                    ret = ret && (s->properties.limits.maxTexelOffset >= 7);
+                    ret = ret && (s->properties.limits.maxUniformBufferRange >= 65536);
+                    ret = ret && (s->properties.limits.maxVertexInputAttributeOffset >= 2047);
+                    ret = ret && (s->properties.limits.maxVertexInputAttributes >= 32);
+                    ret = ret && (s->properties.limits.maxVertexInputBindingStride >= 2048);
+                    ret = ret && (s->properties.limits.maxVertexInputBindings >= 32);
+                    ret = ret && (s->properties.limits.maxVertexOutputComponents >= 128);
+                    ret = ret && (s->properties.limits.maxViewportDimensions[0] >= 16384);
+                    ret = ret && (s->properties.limits.maxViewportDimensions[1] >= 16384);
+                    ret = ret && (s->properties.limits.maxViewports >= 16);
+                    ret = ret && (s->properties.limits.minInterpolationOffset <= -0.5);
+                    ret = ret && (s->properties.limits.minMemoryMapAlignment <= 64);
+                    ret = ret && ((s->properties.limits.minMemoryMapAlignment & (s->properties.limits.minMemoryMapAlignment - 1)) == 0);
+                    ret = ret && (s->properties.limits.minStorageBufferOffsetAlignment <= 64);
+                    ret = ret && ((s->properties.limits.minStorageBufferOffsetAlignment & (s->properties.limits.minStorageBufferOffsetAlignment - 1)) == 0);
+                    ret = ret && (s->properties.limits.minTexelBufferOffsetAlignment <= 64);
+                    ret = ret && ((s->properties.limits.minTexelBufferOffsetAlignment & (s->properties.limits.minTexelBufferOffsetAlignment - 1)) == 0);
+                    ret = ret && (s->properties.limits.minTexelGatherOffset <= -32);
+                    ret = ret && (s->properties.limits.minTexelOffset <= -8);
+                    ret = ret && (s->properties.limits.minUniformBufferOffsetAlignment <= 64);
+                    ret = ret && ((s->properties.limits.minUniformBufferOffsetAlignment & (s->properties.limits.minUniformBufferOffsetAlignment - 1)) == 0);
+                    ret = ret && (s->properties.limits.mipmapPrecisionBits >= 8);
+                    ret = ret && (s->properties.limits.nonCoherentAtomSize <= 64);
+                    ret = ret && ((s->properties.limits.nonCoherentAtomSize & (s->properties.limits.nonCoherentAtomSize - 1)) == 0);
+                    ret = ret && (s->properties.limits.optimalBufferCopyOffsetAlignment <= 64);
+                    ret = ret && ((s->properties.limits.optimalBufferCopyOffsetAlignment & (s->properties.limits.optimalBufferCopyOffsetAlignment - 1)) == 0);
+                    ret = ret && (s->properties.limits.optimalBufferCopyRowPitchAlignment <= 64);
+                    ret = ret && ((s->properties.limits.optimalBufferCopyRowPitchAlignment & (s->properties.limits.optimalBufferCopyRowPitchAlignment - 1)) == 0);
+                    ret = ret && (s->properties.limits.pointSizeGranularity <= 0.125);
+                    ret = ret && (isMultiple(0.125, s->properties.limits.pointSizeGranularity));
+                    ret = ret && (s->properties.limits.pointSizeRange[0] <= 1);
+                    ret = ret && (s->properties.limits.pointSizeRange[1] >= 255.875);
+                    ret = ret && (vpCheckFlags(s->properties.limits.sampledImageColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)));
+                    ret = ret && (vpCheckFlags(s->properties.limits.sampledImageDepthSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)));
+                    ret = ret && (vpCheckFlags(s->properties.limits.sampledImageIntegerSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)));
+                    ret = ret && (vpCheckFlags(s->properties.limits.sampledImageStencilSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)));
+                    ret = ret && (s->properties.limits.sparseAddressSpaceSize >= 1086630000000);
+                    ret = ret && (s->properties.limits.standardSampleLocations == VK_TRUE);
+                    ret = ret && (vpCheckFlags(s->properties.limits.storageImageSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)));
+                    ret = ret && (s->properties.limits.subPixelInterpolationOffsetBits >= 4);
+                    ret = ret && (s->properties.limits.subPixelPrecisionBits >= 8);
+                    ret = ret && (s->properties.limits.subTexelPrecisionBits >= 8);
+                    ret = ret && (vpCheckFlags(s->properties.limits.timestampComputeAndGraphics, VK_TRUE));
+                    ret = ret && (s->properties.limits.timestampPeriod <= 83.333);
+                    ret = ret && (isMultiple(83.333, s->properties.limits.timestampPeriod));
+                    ret = ret && (s->properties.limits.viewportBoundsRange[0] <= -32768);
+                    ret = ret && (s->properties.limits.viewportBoundsRange[1] >= 32767);
+                    ret = ret && (s->properties.limits.viewportSubPixelBits >= 8);
+                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyAlignedMipSize, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyNonResidentStrict, VK_FALSE));
+                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyStandard2DBlockShape, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyStandard2DMultisampleBlockShape, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyStandard3DBlockShape, VK_TRUE));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT: {
+                    VkPhysicalDeviceRobustness2PropertiesEXT* s = static_cast<VkPhysicalDeviceRobustness2PropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->robustStorageBufferAccessSizeAlignment <= 4);
+                    ret = ret && ((s->robustStorageBufferAccessSizeAlignment & (s->robustStorageBufferAccessSizeAlignment - 1)) == 0);
+                    ret = ret && (s->robustUniformBufferAccessSizeAlignment <= 4);
+                    ret = ret && ((s->robustUniformBufferAccessSizeAlignment & (s->robustUniformBufferAccessSizeAlignment - 1)) == 0);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT: {
+                    VkPhysicalDeviceSubgroupSizeControlPropertiesEXT* s = static_cast<VkPhysicalDeviceSubgroupSizeControlPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->maxComputeWorkgroupSubgroups >= 56);
+                    ret = ret && (s->maxSubgroupSize >= 32);
+                    ret = ret && ((s->maxSubgroupSize & (s->maxSubgroupSize - 1)) == 0);
+                    ret = ret && (s->minSubgroupSize <= 64);
+                    ret = ret && ((s->minSubgroupSize & (s->minSubgroupSize - 1)) == 0);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT: {
+                    VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->storageTexelBufferOffsetAlignmentBytes <= 4);
+                    ret = ret && ((s->storageTexelBufferOffsetAlignmentBytes & (s->storageTexelBufferOffsetAlignmentBytes - 1)) == 0);
+                    ret = ret && (s->storageTexelBufferOffsetSingleTexelAlignment == VK_TRUE);
+                    ret = ret && (s->uniformTexelBufferOffsetAlignmentBytes <= 4);
+                    ret = ret && ((s->uniformTexelBufferOffsetAlignmentBytes & (s->uniformTexelBufferOffsetAlignmentBytes - 1)) == 0);
+                    ret = ret && (s->uniformTexelBufferOffsetSingleTexelAlignment == VK_TRUE);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR: {
+                    VkPhysicalDeviceTimelineSemaphorePropertiesKHR* s = static_cast<VkPhysicalDeviceTimelineSemaphorePropertiesKHR*>(static_cast<void*>(p));
+                    ret = ret && (s->maxTimelineSemaphoreValueDifference >= 18446744073709551615);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT: {
+                    VkPhysicalDeviceTransformFeedbackPropertiesEXT* s = static_cast<VkPhysicalDeviceTransformFeedbackPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->maxTransformFeedbackBufferDataSize >= 512);
+                    ret = ret && (s->maxTransformFeedbackBufferDataStride >= 512);
+                    ret = ret && (s->maxTransformFeedbackBufferSize >= 18446744073709551615);
+                    ret = ret && (s->maxTransformFeedbackBuffers >= 4);
+                    ret = ret && (s->maxTransformFeedbackStreamDataSize >= 512);
+                    ret = ret && (s->maxTransformFeedbackStreams >= 4);
+                    ret = ret && (vpCheckFlags(s->transformFeedbackDraw, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->transformFeedbackQueries, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->transformFeedbackRasterizationStreamSelect, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->transformFeedbackStreamsLinesTriangles, VK_TRUE));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT: {
+                    VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT* s = static_cast<VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (s->maxVertexAttribDivisor >= 268435455);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES: {
+                    VkPhysicalDeviceVulkan11Properties* s = static_cast<VkPhysicalDeviceVulkan11Properties*>(static_cast<void*>(p));
+                    ret = ret && (s->maxMemoryAllocationSize >= 2147483648);
+                    ret = ret && (s->maxMultiviewInstanceIndex >= 134217727);
+                    ret = ret && (s->maxMultiviewViewCount >= 6);
+                    ret = ret && (s->maxPerSetDescriptors >= 6160);
+                    ret = ret && (s->protectedNoFault == VK_FALSE);
+                    ret = ret && (vpCheckFlags(s->subgroupQuadOperationsInAllStages, VK_TRUE));
+                    ret = ret && (s->subgroupSize <= 64);
+                    ret = ret && ((s->subgroupSize & (s->subgroupSize - 1)) == 0);
+                    ret = ret && (vpCheckFlags(s->subgroupSupportedOperations, (VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT | VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT | VK_SUBGROUP_FEATURE_CLUSTERED_BIT | VK_SUBGROUP_FEATURE_QUAD_BIT)));
+                    ret = ret && (vpCheckFlags(s->subgroupSupportedStages, (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT | VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT | VK_SHADER_STAGE_GEOMETRY_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_ALL_GRAPHICS | VK_SHADER_STAGE_ALL | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_INTERSECTION_BIT_KHR)));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES: {
+                    VkPhysicalDeviceVulkan12Properties* s = static_cast<VkPhysicalDeviceVulkan12Properties*>(static_cast<void*>(p));
+                    ret = ret && (s->denormBehaviorIndependence == VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL);
+                    ret = ret && (vpCheckFlags(s->filterMinmaxImageComponentMapping, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->filterMinmaxSingleComponentFormats, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->framebufferIntegerColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)));
+                    ret = ret && (vpCheckFlags(s->independentResolve, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->independentResolveNone, VK_TRUE));
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindInputAttachments >= 1048576);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindSampledImages >= 1048576);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindSamplers >= 1048576);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindStorageBuffers >= 1048576);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= 8);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindStorageImages >= 1048576);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindUniformBuffers >= 90);
+                    ret = ret && (s->maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= 8);
+                    ret = ret && (s->maxPerStageDescriptorUpdateAfterBindInputAttachments >= 1048576);
+                    ret = ret && (s->maxPerStageDescriptorUpdateAfterBindSampledImages >= 1048576);
+                    ret = ret && (s->maxPerStageDescriptorUpdateAfterBindSamplers >= 1048576);
+                    ret = ret && (s->maxPerStageDescriptorUpdateAfterBindStorageBuffers >= 1048576);
+                    ret = ret && (s->maxPerStageDescriptorUpdateAfterBindStorageImages >= 1048576);
+                    ret = ret && (s->maxPerStageDescriptorUpdateAfterBindUniformBuffers >= 15);
+                    ret = ret && (s->maxPerStageUpdateAfterBindResources >= 1048576);
+                    ret = ret && (s->maxTimelineSemaphoreValueDifference >= -1);
+                    ret = ret && (s->maxUpdateAfterBindDescriptorsInAllPools >= 1048576);
+                    ret = ret && (vpCheckFlags(s->quadDivergentImplicitLod, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->robustBufferAccessUpdateAfterBind, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderDenormFlushToZeroFloat16, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderDenormFlushToZeroFloat32, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderDenormFlushToZeroFloat64, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderDenormPreserveFloat16, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderDenormPreserveFloat32, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderDenormPreserveFloat64, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderInputAttachmentArrayNonUniformIndexingNative, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderRoundingModeRTEFloat16, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderRoundingModeRTEFloat32, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderRoundingModeRTEFloat64, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderRoundingModeRTZFloat16, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderRoundingModeRTZFloat32, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderRoundingModeRTZFloat64, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderSampledImageArrayNonUniformIndexingNative, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderSignedZeroInfNanPreserveFloat16, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderSignedZeroInfNanPreserveFloat32, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderSignedZeroInfNanPreserveFloat64, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderStorageBufferArrayNonUniformIndexingNative, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderStorageImageArrayNonUniformIndexingNative, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->shaderUniformBufferArrayNonUniformIndexingNative, VK_TRUE));
+                    ret = ret && (vpCheckFlags(s->supportedDepthResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT)));
+                    ret = ret && (vpCheckFlags(s->supportedStencilResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT)));
+                } break;
+                default: break;
+            }
+        return ret;
+    }
+};
+
+static const VpFormatDesc formatDesc[] = {
+    {
+        VK_FORMAT_A1R5G5B5_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2B10G10R10_SINT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2B10G10R10_SNORM_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2B10G10R10_SSCALED_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2B10G10R10_UINT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2B10G10R10_UNORM_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2B10G10R10_USCALED_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2R10G10B10_SINT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2R10G10B10_SNORM_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2R10G10B10_SSCALED_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2R10G10B10_UINT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2R10G10B10_UNORM_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2R10G10B10_USCALED_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_SINT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_SNORM_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_SRGB_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_SSCALED_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_UINT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_UNORM_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_USCALED_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_B10G11R11_UFLOAT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_B4G4R4A4_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_B5G5R5A1_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_B5G6R5_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_B8G8R8A8_SRGB,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_B8G8R8A8_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC1_RGBA_SRGB_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC1_RGBA_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC1_RGB_SRGB_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC1_RGB_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC2_SRGB_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC2_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC3_SRGB_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC3_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC4_SNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC4_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC5_SNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC5_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC6H_SFLOAT_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC6H_UFLOAT_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC7_SRGB_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC7_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_D16_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_D32_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_D32_SFLOAT_S8_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_E5B9G9R9_UFLOAT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32B32A32_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32B32A32_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32B32A32_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32B32_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32B32_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32B32_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R4G4B4A4_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R5G5B5A1_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R5G6B5_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R64G64B64A64_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R64G64B64_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R64G64_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R64_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_SRGB,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                    ret = ret && (vpCheckFlags(s->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(s->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)));
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+};
+
+static const VpStructChainerDesc chainerDesc = {
+    [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
+        VkPhysicalDeviceDepthClipEnableFeaturesEXT physicalDeviceDepthClipEnableFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT, nullptr };
+        VkPhysicalDeviceExtendedDynamicStateFeaturesEXT physicalDeviceExtendedDynamicStateFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT, &physicalDeviceDepthClipEnableFeaturesEXT };
+        VkPhysicalDeviceInlineUniformBlockFeaturesEXT physicalDeviceInlineUniformBlockFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT, &physicalDeviceExtendedDynamicStateFeaturesEXT };
+        VkPhysicalDeviceLineRasterizationFeaturesEXT physicalDeviceLineRasterizationFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT, &physicalDeviceInlineUniformBlockFeaturesEXT };
+        VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT physicalDevicePipelineCreationCacheControlFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT, &physicalDeviceLineRasterizationFeaturesEXT };
+        VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR physicalDevicePipelineExecutablePropertiesFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR, &physicalDevicePipelineCreationCacheControlFeaturesEXT };
+        VkPhysicalDeviceRobustness2FeaturesEXT physicalDeviceRobustness2FeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT, &physicalDevicePipelineExecutablePropertiesFeaturesKHR };
+        VkPhysicalDeviceShaderClockFeaturesKHR physicalDeviceShaderClockFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR, &physicalDeviceRobustness2FeaturesEXT };
+        VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT physicalDeviceShaderDemoteToHelperInvocationFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT, &physicalDeviceShaderClockFeaturesKHR };
+        VkPhysicalDeviceSubgroupSizeControlFeaturesEXT physicalDeviceSubgroupSizeControlFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT, &physicalDeviceShaderDemoteToHelperInvocationFeaturesEXT };
+        VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT physicalDeviceTexelBufferAlignmentFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT, &physicalDeviceSubgroupSizeControlFeaturesEXT };
+        VkPhysicalDeviceTransformFeedbackFeaturesEXT physicalDeviceTransformFeedbackFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT, &physicalDeviceTexelBufferAlignmentFeaturesEXT };
+        VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT physicalDeviceVertexAttributeDivisorFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT, &physicalDeviceTransformFeedbackFeaturesEXT };
+        VkPhysicalDeviceVulkan11Features physicalDeviceVulkan11Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &physicalDeviceVertexAttributeDivisorFeaturesEXT };
+        VkPhysicalDeviceVulkan12Features physicalDeviceVulkan12Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &physicalDeviceVulkan11Features };
+        p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceVulkan12Features));
+        pfnCb(p, pUser);
+    },
+    [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
+        VkPhysicalDeviceDepthStencilResolvePropertiesKHR physicalDeviceDepthStencilResolvePropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR, nullptr };
+        VkPhysicalDeviceDescriptorIndexingPropertiesEXT physicalDeviceDescriptorIndexingPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT, &physicalDeviceDepthStencilResolvePropertiesKHR };
+        VkPhysicalDeviceDriverPropertiesKHR physicalDeviceDriverPropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR, &physicalDeviceDescriptorIndexingPropertiesEXT };
+        VkPhysicalDeviceExternalMemoryHostPropertiesEXT physicalDeviceExternalMemoryHostPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT, &physicalDeviceDriverPropertiesKHR };
+        VkPhysicalDeviceFloatControlsPropertiesKHR physicalDeviceFloatControlsPropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR, &physicalDeviceExternalMemoryHostPropertiesEXT };
+        VkPhysicalDeviceInlineUniformBlockPropertiesEXT physicalDeviceInlineUniformBlockPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT, &physicalDeviceFloatControlsPropertiesKHR };
+        VkPhysicalDeviceLineRasterizationPropertiesEXT physicalDeviceLineRasterizationPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT, &physicalDeviceInlineUniformBlockPropertiesEXT };
+        VkPhysicalDeviceMaintenance3PropertiesKHR physicalDeviceMaintenance3PropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR, &physicalDeviceLineRasterizationPropertiesEXT };
+        VkPhysicalDeviceMultiviewPropertiesKHR physicalDeviceMultiviewPropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR, &physicalDeviceMaintenance3PropertiesKHR };
+        VkPhysicalDevicePointClippingPropertiesKHR physicalDevicePointClippingPropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR, &physicalDeviceMultiviewPropertiesKHR };
+        VkPhysicalDeviceRobustness2PropertiesEXT physicalDeviceRobustness2PropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT, &physicalDevicePointClippingPropertiesKHR };
+        VkPhysicalDeviceSubgroupSizeControlPropertiesEXT physicalDeviceSubgroupSizeControlPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT, &physicalDeviceRobustness2PropertiesEXT };
+        VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT physicalDeviceTexelBufferAlignmentPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT, &physicalDeviceSubgroupSizeControlPropertiesEXT };
+        VkPhysicalDeviceTimelineSemaphorePropertiesKHR physicalDeviceTimelineSemaphorePropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR, &physicalDeviceTexelBufferAlignmentPropertiesEXT };
+        VkPhysicalDeviceTransformFeedbackPropertiesEXT physicalDeviceTransformFeedbackPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT, &physicalDeviceTimelineSemaphorePropertiesKHR };
+        VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT physicalDeviceVertexAttributeDivisorPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT, &physicalDeviceTransformFeedbackPropertiesEXT };
+        VkPhysicalDeviceVulkan11Properties physicalDeviceVulkan11Properties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, &physicalDeviceVertexAttributeDivisorPropertiesEXT };
+        VkPhysicalDeviceVulkan12Properties physicalDeviceVulkan12Properties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &physicalDeviceVulkan11Properties };
+        p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceVulkan12Properties));
+        pfnCb(p, pUser);
+    },
+    [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
+        pfnCb(p, pUser);
+    },
+    [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
+        VkFormatProperties3KHR formatProperties3KHR{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR, nullptr };
+        p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>(&formatProperties3KHR));
+        pfnCb(p, pUser);
+    },
+};
+
+} // namespace VP_LUNARG_DESKTOP_PORTABILITY_2022
+#endif
+
 static const VpProfileDesc vpProfiles[] = {
 #ifdef VP_ANDROID_baseline_2021
     VpProfileDesc{
@@ -7712,6 +11682,24 @@ static const VpProfileDesc vpProfiles[] = {
         &VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::formatStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::formatStructTypes) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::formatStructTypes[0])),
         &VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::formatDesc[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::formatDesc) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::formatDesc[0])),
         VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::chainerDesc,
+    },
+#endif
+#ifdef VP_LUNARG_desktop_portability_2022
+    VpProfileDesc{
+        VpProfileProperties{ VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION },
+        VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION,
+        nullptr, 0,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::deviceExtensions[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::deviceExtensions) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::deviceExtensions[0])),
+        nullptr, 0,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::featureStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::featureStructTypes) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::featureStructTypes[0])),
+        VP_LUNARG_DESKTOP_PORTABILITY_2022::featureDesc,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::propertyStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::propertyStructTypes) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::propertyStructTypes[0])),
+        VP_LUNARG_DESKTOP_PORTABILITY_2022::propertyDesc,
+        nullptr, 0,
+        nullptr, 0,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::formatStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::formatStructTypes) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::formatStructTypes[0])),
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::formatDesc[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::formatDesc) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::formatDesc[0])),
+        VP_LUNARG_DESKTOP_PORTABILITY_2022::chainerDesc,
     },
 #endif
 };

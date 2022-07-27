@@ -61,7 +61,7 @@ add_custom_target(VpCreateDesktop2022 ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
 		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
 		-input_dir ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022/windows
-		-output_path ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022/VP_LUNARG_desktop_portability_2022_windows.json
+		-output_path ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022.json
 		-output_profile VP_LUNARG_desktop_portability_2022
 	VERBATIM
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}

@@ -117,6 +117,77 @@
 #define VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 154)
 #endif
 
+#if defined(VK_VERSION_1_2) && \
+    defined(VK_EXT_calibrated_timestamps) && \
+    defined(VK_EXT_depth_clip_enable) && \
+    defined(VK_EXT_descriptor_indexing) && \
+    defined(VK_EXT_extended_dynamic_state) && \
+    defined(VK_EXT_external_memory_host) && \
+    defined(VK_EXT_full_screen_exclusive) && \
+    defined(VK_EXT_host_query_reset) && \
+    defined(VK_EXT_inline_uniform_block) && \
+    defined(VK_EXT_line_rasterization) && \
+    defined(VK_EXT_memory_budget) && \
+    defined(VK_EXT_pipeline_creation_cache_control) && \
+    defined(VK_EXT_pipeline_creation_feedback) && \
+    defined(VK_EXT_robustness2) && \
+    defined(VK_EXT_scalar_block_layout) && \
+    defined(VK_EXT_separate_stencil_usage) && \
+    defined(VK_EXT_shader_demote_to_helper_invocation) && \
+    defined(VK_EXT_shader_subgroup_ballot) && \
+    defined(VK_EXT_shader_subgroup_vote) && \
+    defined(VK_EXT_subgroup_size_control) && \
+    defined(VK_EXT_texel_buffer_alignment) && \
+    defined(VK_EXT_transform_feedback) && \
+    defined(VK_EXT_vertex_attribute_divisor) && \
+    defined(VK_KHR_16bit_storage) && \
+    defined(VK_KHR_8bit_storage) && \
+    defined(VK_KHR_bind_memory2) && \
+    defined(VK_KHR_buffer_device_address) && \
+    defined(VK_KHR_create_renderpass2) && \
+    defined(VK_KHR_dedicated_allocation) && \
+    defined(VK_KHR_depth_stencil_resolve) && \
+    defined(VK_KHR_descriptor_update_template) && \
+    defined(VK_KHR_device_group) && \
+    defined(VK_KHR_draw_indirect_count) && \
+    defined(VK_KHR_driver_properties) && \
+    defined(VK_KHR_external_fence) && \
+    defined(VK_KHR_external_fence_win32) && \
+    defined(VK_KHR_external_memory) && \
+    defined(VK_KHR_external_memory_win32) && \
+    defined(VK_KHR_external_semaphore) && \
+    defined(VK_KHR_external_semaphore_win32) && \
+    defined(VK_KHR_get_memory_requirements2) && \
+    defined(VK_KHR_image_format_list) && \
+    defined(VK_KHR_imageless_framebuffer) && \
+    defined(VK_KHR_maintenance1) && \
+    defined(VK_KHR_maintenance2) && \
+    defined(VK_KHR_maintenance3) && \
+    defined(VK_KHR_multiview) && \
+    defined(VK_KHR_pipeline_executable_properties) && \
+    defined(VK_KHR_relaxed_block_layout) && \
+    defined(VK_KHR_sampler_mirror_clamp_to_edge) && \
+    defined(VK_KHR_separate_depth_stencil_layouts) && \
+    defined(VK_KHR_shader_clock) && \
+    defined(VK_KHR_shader_draw_parameters) && \
+    defined(VK_KHR_shader_float16_int8) && \
+    defined(VK_KHR_shader_float_controls) && \
+    defined(VK_KHR_shader_non_semantic_info) && \
+    defined(VK_KHR_shader_subgroup_extended_types) && \
+    defined(VK_KHR_spirv_1_4) && \
+    defined(VK_KHR_storage_buffer_storage_class) && \
+    defined(VK_KHR_swapchain) && \
+    defined(VK_KHR_swapchain_mutable_format) && \
+    defined(VK_KHR_timeline_semaphore) && \
+    defined(VK_KHR_uniform_buffer_standard_layout) && \
+    defined(VK_KHR_variable_pointers) && \
+    defined(VK_KHR_win32_keyed_mutex)
+#define VP_LUNARG_desktop_portability_2022 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME "VP_LUNARG_desktop_portability_2022"
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 2, 170)
+#endif
+
 #define VP_MAX_PROFILE_NAME_SIZE 256U
 
 typedef struct VpProfileProperties {

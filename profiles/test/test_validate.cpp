@@ -198,7 +198,7 @@ TEST(test_validate, VP_LUNARG_test_formats) {
     const Json::Value document = ParseJsonFile("VP_LUNARG_test_formats.json");
     EXPECT_TRUE(validator.Check(document));
 }
-/*
+/* Somehow, the generated profile pass using an online tool but not using our JsonValidator
 TEST(test_validate, VP_LUNARG_desktop_portability_2022) {
     JsonValidator validator;
 

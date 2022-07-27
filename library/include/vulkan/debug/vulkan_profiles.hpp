@@ -119,6 +119,77 @@
 #define VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 154)
 #endif
 
+#if defined(VK_VERSION_1_2) && \
+    defined(VK_EXT_calibrated_timestamps) && \
+    defined(VK_EXT_depth_clip_enable) && \
+    defined(VK_EXT_descriptor_indexing) && \
+    defined(VK_EXT_extended_dynamic_state) && \
+    defined(VK_EXT_external_memory_host) && \
+    defined(VK_EXT_full_screen_exclusive) && \
+    defined(VK_EXT_host_query_reset) && \
+    defined(VK_EXT_inline_uniform_block) && \
+    defined(VK_EXT_line_rasterization) && \
+    defined(VK_EXT_memory_budget) && \
+    defined(VK_EXT_pipeline_creation_cache_control) && \
+    defined(VK_EXT_pipeline_creation_feedback) && \
+    defined(VK_EXT_robustness2) && \
+    defined(VK_EXT_scalar_block_layout) && \
+    defined(VK_EXT_separate_stencil_usage) && \
+    defined(VK_EXT_shader_demote_to_helper_invocation) && \
+    defined(VK_EXT_shader_subgroup_ballot) && \
+    defined(VK_EXT_shader_subgroup_vote) && \
+    defined(VK_EXT_subgroup_size_control) && \
+    defined(VK_EXT_texel_buffer_alignment) && \
+    defined(VK_EXT_transform_feedback) && \
+    defined(VK_EXT_vertex_attribute_divisor) && \
+    defined(VK_KHR_16bit_storage) && \
+    defined(VK_KHR_8bit_storage) && \
+    defined(VK_KHR_bind_memory2) && \
+    defined(VK_KHR_buffer_device_address) && \
+    defined(VK_KHR_create_renderpass2) && \
+    defined(VK_KHR_dedicated_allocation) && \
+    defined(VK_KHR_depth_stencil_resolve) && \
+    defined(VK_KHR_descriptor_update_template) && \
+    defined(VK_KHR_device_group) && \
+    defined(VK_KHR_draw_indirect_count) && \
+    defined(VK_KHR_driver_properties) && \
+    defined(VK_KHR_external_fence) && \
+    defined(VK_KHR_external_fence_win32) && \
+    defined(VK_KHR_external_memory) && \
+    defined(VK_KHR_external_memory_win32) && \
+    defined(VK_KHR_external_semaphore) && \
+    defined(VK_KHR_external_semaphore_win32) && \
+    defined(VK_KHR_get_memory_requirements2) && \
+    defined(VK_KHR_image_format_list) && \
+    defined(VK_KHR_imageless_framebuffer) && \
+    defined(VK_KHR_maintenance1) && \
+    defined(VK_KHR_maintenance2) && \
+    defined(VK_KHR_maintenance3) && \
+    defined(VK_KHR_multiview) && \
+    defined(VK_KHR_pipeline_executable_properties) && \
+    defined(VK_KHR_relaxed_block_layout) && \
+    defined(VK_KHR_sampler_mirror_clamp_to_edge) && \
+    defined(VK_KHR_separate_depth_stencil_layouts) && \
+    defined(VK_KHR_shader_clock) && \
+    defined(VK_KHR_shader_draw_parameters) && \
+    defined(VK_KHR_shader_float16_int8) && \
+    defined(VK_KHR_shader_float_controls) && \
+    defined(VK_KHR_shader_non_semantic_info) && \
+    defined(VK_KHR_shader_subgroup_extended_types) && \
+    defined(VK_KHR_spirv_1_4) && \
+    defined(VK_KHR_storage_buffer_storage_class) && \
+    defined(VK_KHR_swapchain) && \
+    defined(VK_KHR_swapchain_mutable_format) && \
+    defined(VK_KHR_timeline_semaphore) && \
+    defined(VK_KHR_uniform_buffer_standard_layout) && \
+    defined(VK_KHR_variable_pointers) && \
+    defined(VK_KHR_win32_keyed_mutex)
+#define VP_LUNARG_desktop_portability_2022 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME "VP_LUNARG_desktop_portability_2022"
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 2, 170)
+#endif
+
 #define VP_MAX_PROFILE_NAME_SIZE 256U
 
 typedef struct VpProfileProperties {
@@ -7901,6 +7972,3976 @@ static const VpStructChainerDesc chainerDesc = {
 } // namespace VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET
 #endif
 
+#ifdef VP_LUNARG_desktop_portability_2022
+namespace VP_LUNARG_DESKTOP_PORTABILITY_2022 {
+
+static const VkExtensionProperties deviceExtensions[] = {
+    VkExtensionProperties{ VK_EXT_CALIBRATED_TIMESTAMPS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, 2 },
+    VkExtensionProperties{ VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_EXTERNAL_MEMORY_HOST_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_FULL_SCREEN_EXCLUSIVE_EXTENSION_NAME, 4 },
+    VkExtensionProperties{ VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_MEMORY_BUDGET_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME, 3 },
+    VkExtensionProperties{ VK_EXT_PIPELINE_CREATION_FEEDBACK_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_ROBUSTNESS_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SEPARATE_STENCIL_USAGE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SHADER_SUBGROUP_BALLOT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SHADER_SUBGROUP_VOTE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 2 },
+    VkExtensionProperties{ VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME, 3 },
+    VkExtensionProperties{ VK_KHR_16BIT_STORAGE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_8BIT_STORAGE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_BIND_MEMORY_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, 3 },
+    VkExtensionProperties{ VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DEVICE_GROUP_EXTENSION_NAME, 4 },
+    VkExtensionProperties{ VK_KHR_DRAW_INDIRECT_COUNT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_FENCE_WIN32_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_MAINTENANCE_1_EXTENSION_NAME, 2 },
+    VkExtensionProperties{ VK_KHR_MAINTENANCE_2_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_MAINTENANCE_3_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_MULTIVIEW_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, 3 },
+    VkExtensionProperties{ VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_CLOCK_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME, 4 },
+    VkExtensionProperties{ VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SPIRV_1_4_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_SWAPCHAIN_EXTENSION_NAME, 70 },
+    VkExtensionProperties{ VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, 2 },
+    VkExtensionProperties{ VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_WIN32_KEYED_MUTEX_EXTENSION_NAME, 1 },
+};
+
+static const VkStructureType featureStructTypes[] = {
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+};
+
+static const VkStructureType propertyStructTypes[] = {
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES,
+};
+
+static const VkStructureType formatStructTypes[] = {
+    VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR,
+    VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR,
+};
+
+static const VpFeatureDesc featureDesc = {
+    [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT: {
+                    VkPhysicalDeviceDepthClipEnableFeaturesEXT* s = static_cast<VkPhysicalDeviceDepthClipEnableFeaturesEXT*>(static_cast<void*>(p));
+                    s->depthClipEnable = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT: {
+                    VkPhysicalDeviceExtendedDynamicStateFeaturesEXT* s = static_cast<VkPhysicalDeviceExtendedDynamicStateFeaturesEXT*>(static_cast<void*>(p));
+                    s->extendedDynamicState = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR: {
+                    VkPhysicalDeviceFeatures2KHR* s = static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p));
+                    s->features.depthBiasClamp = VK_TRUE;
+                    s->features.depthClamp = VK_TRUE;
+                    s->features.drawIndirectFirstInstance = VK_TRUE;
+                    s->features.dualSrcBlend = VK_TRUE;
+                    s->features.fillModeNonSolid = VK_TRUE;
+                    s->features.fragmentStoresAndAtomics = VK_TRUE;
+                    s->features.fullDrawIndexUint32 = VK_TRUE;
+                    s->features.geometryShader = VK_TRUE;
+                    s->features.imageCubeArray = VK_TRUE;
+                    s->features.independentBlend = VK_TRUE;
+                    s->features.inheritedQueries = VK_TRUE;
+                    s->features.largePoints = VK_TRUE;
+                    s->features.logicOp = VK_TRUE;
+                    s->features.multiDrawIndirect = VK_TRUE;
+                    s->features.multiViewport = VK_TRUE;
+                    s->features.occlusionQueryPrecise = VK_TRUE;
+                    s->features.pipelineStatisticsQuery = VK_TRUE;
+                    s->features.robustBufferAccess = VK_TRUE;
+                    s->features.sampleRateShading = VK_TRUE;
+                    s->features.samplerAnisotropy = VK_TRUE;
+                    s->features.shaderClipDistance = VK_TRUE;
+                    s->features.shaderCullDistance = VK_TRUE;
+                    s->features.shaderFloat64 = VK_TRUE;
+                    s->features.shaderImageGatherExtended = VK_TRUE;
+                    s->features.shaderInt64 = VK_TRUE;
+                    s->features.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
+                    s->features.shaderStorageBufferArrayDynamicIndexing = VK_TRUE;
+                    s->features.shaderStorageImageArrayDynamicIndexing = VK_TRUE;
+                    s->features.shaderStorageImageExtendedFormats = VK_TRUE;
+                    s->features.shaderStorageImageMultisample = VK_TRUE;
+                    s->features.shaderStorageImageWriteWithoutFormat = VK_TRUE;
+                    s->features.shaderTessellationAndGeometryPointSize = VK_TRUE;
+                    s->features.shaderUniformBufferArrayDynamicIndexing = VK_TRUE;
+                    s->features.sparseBinding = VK_TRUE;
+                    s->features.tessellationShader = VK_TRUE;
+                    s->features.textureCompressionBC = VK_TRUE;
+                    s->features.variableMultisampleRate = VK_TRUE;
+                    s->features.vertexPipelineStoresAndAtomics = VK_TRUE;
+                    s->features.wideLines = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT: {
+                    VkPhysicalDeviceInlineUniformBlockFeaturesEXT* s = static_cast<VkPhysicalDeviceInlineUniformBlockFeaturesEXT*>(static_cast<void*>(p));
+                    s->descriptorBindingInlineUniformBlockUpdateAfterBind = VK_TRUE;
+                    s->inlineUniformBlock = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT: {
+                    VkPhysicalDeviceLineRasterizationFeaturesEXT* s = static_cast<VkPhysicalDeviceLineRasterizationFeaturesEXT*>(static_cast<void*>(p));
+                    s->bresenhamLines = VK_TRUE;
+                    s->stippledBresenhamLines = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT: {
+                    VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT* s = static_cast<VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT*>(static_cast<void*>(p));
+                    s->pipelineCreationCacheControl = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR: {
+                    VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR* s = static_cast<VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR*>(static_cast<void*>(p));
+                    s->pipelineExecutableInfo = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT: {
+                    VkPhysicalDeviceRobustness2FeaturesEXT* s = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(static_cast<void*>(p));
+                    s->nullDescriptor = VK_TRUE;
+                    s->robustBufferAccess2 = VK_TRUE;
+                    s->robustImageAccess2 = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR: {
+                    VkPhysicalDeviceShaderClockFeaturesKHR* s = static_cast<VkPhysicalDeviceShaderClockFeaturesKHR*>(static_cast<void*>(p));
+                    s->shaderSubgroupClock = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT: {
+                    VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT* s = static_cast<VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT*>(static_cast<void*>(p));
+                    s->shaderDemoteToHelperInvocation = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT: {
+                    VkPhysicalDeviceSubgroupSizeControlFeaturesEXT* s = static_cast<VkPhysicalDeviceSubgroupSizeControlFeaturesEXT*>(static_cast<void*>(p));
+                    s->computeFullSubgroups = VK_TRUE;
+                    s->subgroupSizeControl = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT: {
+                    VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT*>(static_cast<void*>(p));
+                    s->texelBufferAlignment = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT: {
+                    VkPhysicalDeviceTransformFeedbackFeaturesEXT* s = static_cast<VkPhysicalDeviceTransformFeedbackFeaturesEXT*>(static_cast<void*>(p));
+                    s->geometryStreams = VK_TRUE;
+                    s->transformFeedback = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT: {
+                    VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT* s = static_cast<VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT*>(static_cast<void*>(p));
+                    s->vertexAttributeInstanceRateDivisor = VK_TRUE;
+                    s->vertexAttributeInstanceRateZeroDivisor = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES: {
+                    VkPhysicalDeviceVulkan11Features* s = static_cast<VkPhysicalDeviceVulkan11Features*>(static_cast<void*>(p));
+                    s->multiview = VK_TRUE;
+                    s->multiviewTessellationShader = VK_TRUE;
+                    s->protectedMemory = VK_FALSE;
+                    s->shaderDrawParameters = VK_TRUE;
+                    s->storageBuffer16BitAccess = VK_TRUE;
+                    s->uniformAndStorageBuffer16BitAccess = VK_TRUE;
+                    s->variablePointers = VK_TRUE;
+                    s->variablePointersStorageBuffer = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES: {
+                    VkPhysicalDeviceVulkan12Features* s = static_cast<VkPhysicalDeviceVulkan12Features*>(static_cast<void*>(p));
+                    s->bufferDeviceAddress = VK_TRUE;
+                    s->descriptorBindingPartiallyBound = VK_TRUE;
+                    s->descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingStorageImageUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingStorageTexelBufferUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingUniformTexelBufferUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingUpdateUnusedWhilePending = VK_TRUE;
+                    s->descriptorBindingVariableDescriptorCount = VK_TRUE;
+                    s->descriptorIndexing = VK_TRUE;
+                    s->drawIndirectCount = VK_TRUE;
+                    s->hostQueryReset = VK_TRUE;
+                    s->imagelessFramebuffer = VK_TRUE;
+                    s->runtimeDescriptorArray = VK_TRUE;
+                    s->samplerMirrorClampToEdge = VK_TRUE;
+                    s->scalarBlockLayout = VK_TRUE;
+                    s->separateDepthStencilLayouts = VK_TRUE;
+                    s->shaderInt8 = VK_TRUE;
+                    s->shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+                    s->shaderStorageBufferArrayNonUniformIndexing = VK_TRUE;
+                    s->shaderStorageTexelBufferArrayDynamicIndexing = VK_TRUE;
+                    s->shaderSubgroupExtendedTypes = VK_TRUE;
+                    s->shaderUniformTexelBufferArrayDynamicIndexing = VK_TRUE;
+                    s->shaderUniformTexelBufferArrayNonUniformIndexing = VK_TRUE;
+                    s->storageBuffer8BitAccess = VK_TRUE;
+                    s->subgroupBroadcastDynamicId = VK_TRUE;
+                    s->timelineSemaphore = VK_TRUE;
+                    s->uniformAndStorageBuffer8BitAccess = VK_TRUE;
+                    s->uniformBufferStandardLayout = VK_TRUE;
+                } break;
+                default: break;
+            }
+    },
+    [](VkBaseOutStructure* p) -> bool {
+        bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT: {
+                    VkPhysicalDeviceDepthClipEnableFeaturesEXT* prettify_VkPhysicalDeviceDepthClipEnableFeaturesEXT = static_cast<VkPhysicalDeviceDepthClipEnableFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceDepthClipEnableFeaturesEXT->depthClipEnable == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDepthClipEnableFeaturesEXT->depthClipEnable == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDepthClipEnableFeaturesEXT::depthClipEnable == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT: {
+                    VkPhysicalDeviceExtendedDynamicStateFeaturesEXT* prettify_VkPhysicalDeviceExtendedDynamicStateFeaturesEXT = static_cast<VkPhysicalDeviceExtendedDynamicStateFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceExtendedDynamicStateFeaturesEXT->extendedDynamicState == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceExtendedDynamicStateFeaturesEXT->extendedDynamicState == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceExtendedDynamicStateFeaturesEXT::extendedDynamicState == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR: {
+                    VkPhysicalDeviceFeatures2KHR* prettify_VkPhysicalDeviceFeatures2KHR = static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.depthBiasClamp == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.depthBiasClamp == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.depthBiasClamp == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.depthClamp == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.depthClamp == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.depthClamp == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.drawIndirectFirstInstance == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.drawIndirectFirstInstance == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.drawIndirectFirstInstance == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.dualSrcBlend == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.dualSrcBlend == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.dualSrcBlend == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.fillModeNonSolid == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.fillModeNonSolid == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.fillModeNonSolid == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.fragmentStoresAndAtomics == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.fragmentStoresAndAtomics == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.fragmentStoresAndAtomics == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.fullDrawIndexUint32 == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.fullDrawIndexUint32 == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.fullDrawIndexUint32 == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.geometryShader == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.geometryShader == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.geometryShader == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.imageCubeArray == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.imageCubeArray == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.imageCubeArray == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.independentBlend == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.independentBlend == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.independentBlend == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.inheritedQueries == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.inheritedQueries == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.inheritedQueries == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.largePoints == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.largePoints == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.largePoints == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.logicOp == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.logicOp == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.logicOp == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.multiDrawIndirect == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.multiDrawIndirect == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.multiDrawIndirect == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.multiViewport == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.multiViewport == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.multiViewport == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.occlusionQueryPrecise == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.occlusionQueryPrecise == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.occlusionQueryPrecise == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.pipelineStatisticsQuery == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.pipelineStatisticsQuery == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.pipelineStatisticsQuery == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.robustBufferAccess == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.robustBufferAccess == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.robustBufferAccess == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.sampleRateShading == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.sampleRateShading == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.sampleRateShading == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.samplerAnisotropy == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.samplerAnisotropy == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.samplerAnisotropy == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.shaderClipDistance == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.shaderClipDistance == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.shaderClipDistance == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.shaderCullDistance == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.shaderCullDistance == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.shaderCullDistance == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.shaderFloat64 == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.shaderFloat64 == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.shaderFloat64 == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.shaderImageGatherExtended == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.shaderImageGatherExtended == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.shaderImageGatherExtended == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.shaderInt64 == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.shaderInt64 == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.shaderInt64 == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.shaderSampledImageArrayDynamicIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.shaderSampledImageArrayDynamicIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.shaderSampledImageArrayDynamicIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.shaderStorageBufferArrayDynamicIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.shaderStorageBufferArrayDynamicIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.shaderStorageBufferArrayDynamicIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.shaderStorageImageArrayDynamicIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.shaderStorageImageArrayDynamicIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.shaderStorageImageArrayDynamicIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.shaderStorageImageExtendedFormats == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.shaderStorageImageExtendedFormats == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.shaderStorageImageExtendedFormats == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.shaderStorageImageMultisample == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.shaderStorageImageMultisample == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.shaderStorageImageMultisample == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.shaderStorageImageWriteWithoutFormat == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.shaderStorageImageWriteWithoutFormat == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.shaderStorageImageWriteWithoutFormat == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.shaderTessellationAndGeometryPointSize == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.shaderTessellationAndGeometryPointSize == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.shaderTessellationAndGeometryPointSize == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.shaderUniformBufferArrayDynamicIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.shaderUniformBufferArrayDynamicIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.shaderUniformBufferArrayDynamicIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.sparseBinding == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.sparseBinding == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.sparseBinding == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.tessellationShader == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.tessellationShader == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.tessellationShader == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.textureCompressionBC == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.textureCompressionBC == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.textureCompressionBC == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.variableMultisampleRate == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.variableMultisampleRate == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.variableMultisampleRate == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.vertexPipelineStoresAndAtomics == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.vertexPipelineStoresAndAtomics == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.vertexPipelineStoresAndAtomics == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.wideLines == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.wideLines == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.wideLines == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT: {
+                    VkPhysicalDeviceInlineUniformBlockFeaturesEXT* prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT = static_cast<VkPhysicalDeviceInlineUniformBlockFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT->descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT->descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceInlineUniformBlockFeaturesEXT::descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT->inlineUniformBlock == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT->inlineUniformBlock == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceInlineUniformBlockFeaturesEXT::inlineUniformBlock == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT: {
+                    VkPhysicalDeviceLineRasterizationFeaturesEXT* prettify_VkPhysicalDeviceLineRasterizationFeaturesEXT = static_cast<VkPhysicalDeviceLineRasterizationFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceLineRasterizationFeaturesEXT->bresenhamLines == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceLineRasterizationFeaturesEXT->bresenhamLines == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceLineRasterizationFeaturesEXT::bresenhamLines == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceLineRasterizationFeaturesEXT->stippledBresenhamLines == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceLineRasterizationFeaturesEXT->stippledBresenhamLines == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceLineRasterizationFeaturesEXT::stippledBresenhamLines == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT: {
+                    VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT* prettify_VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT = static_cast<VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT->pipelineCreationCacheControl == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT->pipelineCreationCacheControl == VK_TRUE), "Unsupported feature condition: VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT::pipelineCreationCacheControl == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR: {
+                    VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR* prettify_VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR = static_cast<VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR->pipelineExecutableInfo == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR->pipelineExecutableInfo == VK_TRUE), "Unsupported feature condition: VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR::pipelineExecutableInfo == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT: {
+                    VkPhysicalDeviceRobustness2FeaturesEXT* prettify_VkPhysicalDeviceRobustness2FeaturesEXT = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceRobustness2FeaturesEXT->nullDescriptor == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceRobustness2FeaturesEXT->nullDescriptor == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceRobustness2FeaturesEXT::nullDescriptor == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceRobustness2FeaturesEXT->robustBufferAccess2 == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceRobustness2FeaturesEXT->robustBufferAccess2 == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceRobustness2FeaturesEXT::robustBufferAccess2 == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceRobustness2FeaturesEXT->robustImageAccess2 == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceRobustness2FeaturesEXT->robustImageAccess2 == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceRobustness2FeaturesEXT::robustImageAccess2 == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR: {
+                    VkPhysicalDeviceShaderClockFeaturesKHR* prettify_VkPhysicalDeviceShaderClockFeaturesKHR = static_cast<VkPhysicalDeviceShaderClockFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceShaderClockFeaturesKHR->shaderSubgroupClock == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceShaderClockFeaturesKHR->shaderSubgroupClock == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceShaderClockFeaturesKHR::shaderSubgroupClock == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT: {
+                    VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT* prettify_VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT = static_cast<VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT->shaderDemoteToHelperInvocation == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT->shaderDemoteToHelperInvocation == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT::shaderDemoteToHelperInvocation == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT: {
+                    VkPhysicalDeviceSubgroupSizeControlFeaturesEXT* prettify_VkPhysicalDeviceSubgroupSizeControlFeaturesEXT = static_cast<VkPhysicalDeviceSubgroupSizeControlFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceSubgroupSizeControlFeaturesEXT->computeFullSubgroups == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceSubgroupSizeControlFeaturesEXT->computeFullSubgroups == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceSubgroupSizeControlFeaturesEXT::computeFullSubgroups == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceSubgroupSizeControlFeaturesEXT->subgroupSizeControl == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceSubgroupSizeControlFeaturesEXT->subgroupSizeControl == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceSubgroupSizeControlFeaturesEXT::subgroupSizeControl == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT: {
+                    VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT* prettify_VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT = static_cast<VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT->texelBufferAlignment == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT->texelBufferAlignment == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT::texelBufferAlignment == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT: {
+                    VkPhysicalDeviceTransformFeedbackFeaturesEXT* prettify_VkPhysicalDeviceTransformFeedbackFeaturesEXT = static_cast<VkPhysicalDeviceTransformFeedbackFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceTransformFeedbackFeaturesEXT->geometryStreams == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTransformFeedbackFeaturesEXT->geometryStreams == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceTransformFeedbackFeaturesEXT::geometryStreams == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceTransformFeedbackFeaturesEXT->transformFeedback == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTransformFeedbackFeaturesEXT->transformFeedback == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceTransformFeedbackFeaturesEXT::transformFeedback == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT: {
+                    VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT* prettify_VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT = static_cast<VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT->vertexAttributeInstanceRateDivisor == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT->vertexAttributeInstanceRateDivisor == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT::vertexAttributeInstanceRateDivisor == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT->vertexAttributeInstanceRateZeroDivisor == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT->vertexAttributeInstanceRateZeroDivisor == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT::vertexAttributeInstanceRateZeroDivisor == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES: {
+                    VkPhysicalDeviceVulkan11Features* prettify_VkPhysicalDeviceVulkan11Features = static_cast<VkPhysicalDeviceVulkan11Features*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Features->multiview == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Features->multiview == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan11Features::multiview == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Features->multiviewTessellationShader == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Features->multiviewTessellationShader == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan11Features::multiviewTessellationShader == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Features->protectedMemory == VK_FALSE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Features->protectedMemory == VK_FALSE), "Unsupported feature condition: VkPhysicalDeviceVulkan11Features::protectedMemory == VK_FALSE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Features->shaderDrawParameters == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Features->shaderDrawParameters == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan11Features::shaderDrawParameters == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Features->storageBuffer16BitAccess == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Features->storageBuffer16BitAccess == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan11Features::storageBuffer16BitAccess == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Features->uniformAndStorageBuffer16BitAccess == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Features->uniformAndStorageBuffer16BitAccess == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan11Features::uniformAndStorageBuffer16BitAccess == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Features->variablePointers == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Features->variablePointers == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan11Features::variablePointers == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Features->variablePointersStorageBuffer == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Features->variablePointersStorageBuffer == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan11Features::variablePointersStorageBuffer == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES: {
+                    VkPhysicalDeviceVulkan12Features* prettify_VkPhysicalDeviceVulkan12Features = static_cast<VkPhysicalDeviceVulkan12Features*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->bufferDeviceAddress == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->bufferDeviceAddress == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::bufferDeviceAddress == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingPartiallyBound == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingPartiallyBound == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::descriptorBindingPartiallyBound == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingSampledImageUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingSampledImageUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::descriptorBindingSampledImageUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingStorageBufferUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingStorageBufferUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::descriptorBindingStorageBufferUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingStorageImageUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingStorageImageUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::descriptorBindingStorageImageUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingStorageTexelBufferUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingStorageTexelBufferUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::descriptorBindingStorageTexelBufferUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingUniformTexelBufferUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingUniformTexelBufferUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::descriptorBindingUniformTexelBufferUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingUpdateUnusedWhilePending == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingUpdateUnusedWhilePending == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::descriptorBindingUpdateUnusedWhilePending == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingVariableDescriptorCount == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->descriptorBindingVariableDescriptorCount == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::descriptorBindingVariableDescriptorCount == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->descriptorIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->descriptorIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::descriptorIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->drawIndirectCount == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->drawIndirectCount == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::drawIndirectCount == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->hostQueryReset == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->hostQueryReset == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::hostQueryReset == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->imagelessFramebuffer == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->imagelessFramebuffer == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::imagelessFramebuffer == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->runtimeDescriptorArray == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->runtimeDescriptorArray == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::runtimeDescriptorArray == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->samplerMirrorClampToEdge == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->samplerMirrorClampToEdge == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::samplerMirrorClampToEdge == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->scalarBlockLayout == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->scalarBlockLayout == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::scalarBlockLayout == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->separateDepthStencilLayouts == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->separateDepthStencilLayouts == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::separateDepthStencilLayouts == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->shaderInt8 == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->shaderInt8 == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::shaderInt8 == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->shaderSampledImageArrayNonUniformIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->shaderSampledImageArrayNonUniformIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::shaderSampledImageArrayNonUniformIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->shaderStorageBufferArrayNonUniformIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->shaderStorageBufferArrayNonUniformIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::shaderStorageBufferArrayNonUniformIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->shaderStorageTexelBufferArrayDynamicIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->shaderStorageTexelBufferArrayDynamicIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::shaderStorageTexelBufferArrayDynamicIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->shaderSubgroupExtendedTypes == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->shaderSubgroupExtendedTypes == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::shaderSubgroupExtendedTypes == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->shaderUniformTexelBufferArrayNonUniformIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->shaderUniformTexelBufferArrayNonUniformIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::shaderUniformTexelBufferArrayNonUniformIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->storageBuffer8BitAccess == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->storageBuffer8BitAccess == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::storageBuffer8BitAccess == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->subgroupBroadcastDynamicId == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->subgroupBroadcastDynamicId == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::subgroupBroadcastDynamicId == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->timelineSemaphore == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->timelineSemaphore == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::timelineSemaphore == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->uniformAndStorageBuffer8BitAccess == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->uniformAndStorageBuffer8BitAccess == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::uniformAndStorageBuffer8BitAccess == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Features->uniformBufferStandardLayout == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Features->uniformBufferStandardLayout == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVulkan12Features::uniformBufferStandardLayout == VK_TRUE");
+                } break;
+                default: break;
+            }
+        return ret;
+    }
+};
+
+static const VpPropertyDesc propertyDesc = {
+    [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR: {
+                    VkPhysicalDeviceDepthStencilResolvePropertiesKHR* s = static_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(static_cast<void*>(p));
+                    s->independentResolve = VK_TRUE;
+                    s->independentResolveNone = VK_TRUE;
+                    s->supportedDepthResolveModes |= (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT);
+                    s->supportedStencilResolveModes |= (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT: {
+                    VkPhysicalDeviceDescriptorIndexingPropertiesEXT* s = static_cast<VkPhysicalDeviceDescriptorIndexingPropertiesEXT*>(static_cast<void*>(p));
+                    s->maxDescriptorSetUpdateAfterBindInputAttachments = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindSampledImages = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindSamplers = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindStorageBuffers = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic = 8;
+                    s->maxDescriptorSetUpdateAfterBindStorageImages = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindUniformBuffers = 90;
+                    s->maxDescriptorSetUpdateAfterBindUniformBuffersDynamic = 8;
+                    s->maxPerStageDescriptorUpdateAfterBindInputAttachments = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindSampledImages = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindSamplers = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindStorageBuffers = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindStorageImages = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindUniformBuffers = 15;
+                    s->maxPerStageUpdateAfterBindResources = 1048576;
+                    s->maxUpdateAfterBindDescriptorsInAllPools = 1048576;
+                    s->quadDivergentImplicitLod = VK_TRUE;
+                    s->robustBufferAccessUpdateAfterBind = VK_TRUE;
+                    s->shaderInputAttachmentArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderSampledImageArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderStorageBufferArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderStorageImageArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderUniformBufferArrayNonUniformIndexingNative = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR: {
+                    VkPhysicalDeviceDriverPropertiesKHR* s = static_cast<VkPhysicalDeviceDriverPropertiesKHR*>(static_cast<void*>(p));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT: {
+                    VkPhysicalDeviceExternalMemoryHostPropertiesEXT* s = static_cast<VkPhysicalDeviceExternalMemoryHostPropertiesEXT*>(static_cast<void*>(p));
+                    s->minImportedHostPointerAlignment = 4096;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR: {
+                    VkPhysicalDeviceFloatControlsPropertiesKHR* s = static_cast<VkPhysicalDeviceFloatControlsPropertiesKHR*>(static_cast<void*>(p));
+                    s->denormBehaviorIndependence = VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR;
+                    s->shaderDenormFlushToZeroFloat16 = VK_TRUE;
+                    s->shaderDenormFlushToZeroFloat32 = VK_TRUE;
+                    s->shaderDenormFlushToZeroFloat64 = VK_TRUE;
+                    s->shaderDenormPreserveFloat16 = VK_TRUE;
+                    s->shaderDenormPreserveFloat32 = VK_TRUE;
+                    s->shaderDenormPreserveFloat64 = VK_TRUE;
+                    s->shaderRoundingModeRTEFloat16 = VK_TRUE;
+                    s->shaderRoundingModeRTEFloat32 = VK_TRUE;
+                    s->shaderRoundingModeRTEFloat64 = VK_TRUE;
+                    s->shaderRoundingModeRTZFloat16 = VK_TRUE;
+                    s->shaderRoundingModeRTZFloat32 = VK_TRUE;
+                    s->shaderRoundingModeRTZFloat64 = VK_TRUE;
+                    s->shaderSignedZeroInfNanPreserveFloat16 = VK_TRUE;
+                    s->shaderSignedZeroInfNanPreserveFloat32 = VK_TRUE;
+                    s->shaderSignedZeroInfNanPreserveFloat64 = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT: {
+                    VkPhysicalDeviceInlineUniformBlockPropertiesEXT* s = static_cast<VkPhysicalDeviceInlineUniformBlockPropertiesEXT*>(static_cast<void*>(p));
+                    s->maxDescriptorSetInlineUniformBlocks = 4;
+                    s->maxDescriptorSetUpdateAfterBindInlineUniformBlocks = 4;
+                    s->maxInlineUniformBlockSize = 256;
+                    s->maxPerStageDescriptorInlineUniformBlocks = 4;
+                    s->maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks = 4;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT: {
+                    VkPhysicalDeviceLineRasterizationPropertiesEXT* s = static_cast<VkPhysicalDeviceLineRasterizationPropertiesEXT*>(static_cast<void*>(p));
+                    s->lineSubPixelPrecisionBits = 4;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR: {
+                    VkPhysicalDeviceMaintenance3PropertiesKHR* s = static_cast<VkPhysicalDeviceMaintenance3PropertiesKHR*>(static_cast<void*>(p));
+                    s->maxMemoryAllocationSize = 2147483648;
+                    s->maxPerSetDescriptors = 6160;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR: {
+                    VkPhysicalDeviceMultiviewPropertiesKHR* s = static_cast<VkPhysicalDeviceMultiviewPropertiesKHR*>(static_cast<void*>(p));
+                    s->maxMultiviewInstanceIndex = 134217727;
+                    s->maxMultiviewViewCount = 6;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR: {
+                    VkPhysicalDevicePointClippingPropertiesKHR* s = static_cast<VkPhysicalDevicePointClippingPropertiesKHR*>(static_cast<void*>(p));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
+                    VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
+                    s->properties.limits.bufferImageGranularity = 65536;
+                    s->properties.limits.discreteQueuePriorities = 2;
+                    s->properties.limits.framebufferColorSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.framebufferDepthSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.framebufferNoAttachmentsSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.framebufferStencilSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.lineWidthGranularity = 0.125;
+                    s->properties.limits.lineWidthRange[0] = 1;
+                    s->properties.limits.lineWidthRange[1] = 7.99219;
+                    s->properties.limits.maxBoundDescriptorSets = 8;
+                    s->properties.limits.maxClipDistances = 8;
+                    s->properties.limits.maxColorAttachments = 8;
+                    s->properties.limits.maxCombinedClipAndCullDistances = 8;
+                    s->properties.limits.maxComputeSharedMemorySize = 32768;
+                    s->properties.limits.maxComputeWorkGroupCount[0] = 65535;
+                    s->properties.limits.maxComputeWorkGroupCount[1] = 65535;
+                    s->properties.limits.maxComputeWorkGroupCount[2] = 65535;
+                    s->properties.limits.maxComputeWorkGroupInvocations = 1024;
+                    s->properties.limits.maxCullDistances = 8;
+                    s->properties.limits.maxDescriptorSetInputAttachments = 8;
+                    s->properties.limits.maxDescriptorSetSampledImages = 1800;
+                    s->properties.limits.maxDescriptorSetSamplers = 576;
+                    s->properties.limits.maxDescriptorSetStorageBuffers = 1800;
+                    s->properties.limits.maxDescriptorSetStorageBuffersDynamic = 8;
+                    s->properties.limits.maxDescriptorSetStorageImages = 144;
+                    s->properties.limits.maxDescriptorSetUniformBuffers = 90;
+                    s->properties.limits.maxDescriptorSetUniformBuffersDynamic = 8;
+                    s->properties.limits.maxDrawIndexedIndexValue = 4294967295;
+                    s->properties.limits.maxDrawIndirectCount = 4294967295;
+                    s->properties.limits.maxFragmentCombinedOutputResources = 16;
+                    s->properties.limits.maxFragmentDualSrcAttachments = 1;
+                    s->properties.limits.maxFragmentInputComponents = 128;
+                    s->properties.limits.maxFragmentOutputAttachments = 8;
+                    s->properties.limits.maxFramebufferHeight = 16384;
+                    s->properties.limits.maxFramebufferLayers = 2048;
+                    s->properties.limits.maxFramebufferWidth = 16384;
+                    s->properties.limits.maxGeometryInputComponents = 128;
+                    s->properties.limits.maxGeometryOutputComponents = 128;
+                    s->properties.limits.maxGeometryOutputVertices = 256;
+                    s->properties.limits.maxGeometryShaderInvocations = 32;
+                    s->properties.limits.maxGeometryTotalOutputComponents = 1024;
+                    s->properties.limits.maxImageArrayLayers = 2048;
+                    s->properties.limits.maxImageDimension1D = 16384;
+                    s->properties.limits.maxImageDimension2D = 16384;
+                    s->properties.limits.maxImageDimension3D = 2048;
+                    s->properties.limits.maxImageDimensionCube = 16384;
+                    s->properties.limits.maxInterpolationOffset = 0.4375;
+                    s->properties.limits.maxMemoryAllocationCount = 4096;
+                    s->properties.limits.maxPerStageDescriptorInputAttachments = 8;
+                    s->properties.limits.maxPerStageDescriptorSampledImages = 200;
+                    s->properties.limits.maxPerStageDescriptorSamplers = 64;
+                    s->properties.limits.maxPerStageDescriptorStorageBuffers = 200;
+                    s->properties.limits.maxPerStageDescriptorStorageImages = 16;
+                    s->properties.limits.maxPerStageDescriptorUniformBuffers = 15;
+                    s->properties.limits.maxPerStageResources = 200;
+                    s->properties.limits.maxPushConstantsSize = 128;
+                    s->properties.limits.maxSampleMaskWords = 1;
+                    s->properties.limits.maxSamplerAllocationCount = 4000;
+                    s->properties.limits.maxSamplerAnisotropy = 16;
+                    s->properties.limits.maxSamplerLodBias = 15;
+                    s->properties.limits.maxStorageBufferRange = 4294967295;
+                    s->properties.limits.maxTessellationControlPerPatchOutputComponents = 120;
+                    s->properties.limits.maxTessellationControlPerVertexInputComponents = 128;
+                    s->properties.limits.maxTessellationControlPerVertexOutputComponents = 128;
+                    s->properties.limits.maxTessellationControlTotalOutputComponents = 4096;
+                    s->properties.limits.maxTessellationEvaluationInputComponents = 128;
+                    s->properties.limits.maxTessellationEvaluationOutputComponents = 128;
+                    s->properties.limits.maxTessellationGenerationLevel = 64;
+                    s->properties.limits.maxTessellationPatchSize = 32;
+                    s->properties.limits.maxTexelBufferElements = 134217728;
+                    s->properties.limits.maxTexelGatherOffset = 31;
+                    s->properties.limits.maxTexelOffset = 7;
+                    s->properties.limits.maxUniformBufferRange = 65536;
+                    s->properties.limits.maxVertexInputAttributeOffset = 2047;
+                    s->properties.limits.maxVertexInputAttributes = 32;
+                    s->properties.limits.maxVertexInputBindingStride = 2048;
+                    s->properties.limits.maxVertexInputBindings = 32;
+                    s->properties.limits.maxVertexOutputComponents = 128;
+                    s->properties.limits.maxViewportDimensions[0] = 16384;
+                    s->properties.limits.maxViewportDimensions[1] = 16384;
+                    s->properties.limits.maxViewports = 16;
+                    s->properties.limits.minInterpolationOffset = -0.5;
+                    s->properties.limits.minMemoryMapAlignment = 64;
+                    s->properties.limits.minStorageBufferOffsetAlignment = 64;
+                    s->properties.limits.minTexelBufferOffsetAlignment = 64;
+                    s->properties.limits.minTexelGatherOffset = -32;
+                    s->properties.limits.minTexelOffset = -8;
+                    s->properties.limits.minUniformBufferOffsetAlignment = 64;
+                    s->properties.limits.mipmapPrecisionBits = 8;
+                    s->properties.limits.nonCoherentAtomSize = 64;
+                    s->properties.limits.optimalBufferCopyOffsetAlignment = 64;
+                    s->properties.limits.optimalBufferCopyRowPitchAlignment = 64;
+                    s->properties.limits.pointSizeGranularity = 0.125;
+                    s->properties.limits.pointSizeRange[0] = 1;
+                    s->properties.limits.pointSizeRange[1] = 255.875;
+                    s->properties.limits.sampledImageColorSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.sampledImageDepthSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.sampledImageIntegerSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.sampledImageStencilSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.sparseAddressSpaceSize = 1086630000000;
+                    s->properties.limits.standardSampleLocations = VK_TRUE;
+                    s->properties.limits.storageImageSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->properties.limits.subPixelInterpolationOffsetBits = 4;
+                    s->properties.limits.subPixelPrecisionBits = 8;
+                    s->properties.limits.subTexelPrecisionBits = 8;
+                    s->properties.limits.timestampComputeAndGraphics = VK_TRUE;
+                    s->properties.limits.timestampPeriod = 83.333;
+                    s->properties.limits.viewportBoundsRange[0] = -32768;
+                    s->properties.limits.viewportBoundsRange[1] = 32767;
+                    s->properties.limits.viewportSubPixelBits = 8;
+                    s->properties.sparseProperties.residencyAlignedMipSize = VK_TRUE;
+                    s->properties.sparseProperties.residencyNonResidentStrict = VK_FALSE;
+                    s->properties.sparseProperties.residencyStandard2DBlockShape = VK_TRUE;
+                    s->properties.sparseProperties.residencyStandard2DMultisampleBlockShape = VK_TRUE;
+                    s->properties.sparseProperties.residencyStandard3DBlockShape = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT: {
+                    VkPhysicalDeviceRobustness2PropertiesEXT* s = static_cast<VkPhysicalDeviceRobustness2PropertiesEXT*>(static_cast<void*>(p));
+                    s->robustStorageBufferAccessSizeAlignment = 4;
+                    s->robustUniformBufferAccessSizeAlignment = 4;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT: {
+                    VkPhysicalDeviceSubgroupSizeControlPropertiesEXT* s = static_cast<VkPhysicalDeviceSubgroupSizeControlPropertiesEXT*>(static_cast<void*>(p));
+                    s->maxComputeWorkgroupSubgroups = 56;
+                    s->maxSubgroupSize = 32;
+                    s->minSubgroupSize = 64;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT: {
+                    VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT*>(static_cast<void*>(p));
+                    s->storageTexelBufferOffsetAlignmentBytes = 4;
+                    s->storageTexelBufferOffsetSingleTexelAlignment = VK_TRUE;
+                    s->uniformTexelBufferOffsetAlignmentBytes = 4;
+                    s->uniformTexelBufferOffsetSingleTexelAlignment = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR: {
+                    VkPhysicalDeviceTimelineSemaphorePropertiesKHR* s = static_cast<VkPhysicalDeviceTimelineSemaphorePropertiesKHR*>(static_cast<void*>(p));
+                    s->maxTimelineSemaphoreValueDifference = 18446744073709551615;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT: {
+                    VkPhysicalDeviceTransformFeedbackPropertiesEXT* s = static_cast<VkPhysicalDeviceTransformFeedbackPropertiesEXT*>(static_cast<void*>(p));
+                    s->maxTransformFeedbackBufferDataSize = 512;
+                    s->maxTransformFeedbackBufferDataStride = 512;
+                    s->maxTransformFeedbackBufferSize = 18446744073709551615;
+                    s->maxTransformFeedbackBuffers = 4;
+                    s->maxTransformFeedbackStreamDataSize = 512;
+                    s->maxTransformFeedbackStreams = 4;
+                    s->transformFeedbackDraw = VK_TRUE;
+                    s->transformFeedbackQueries = VK_TRUE;
+                    s->transformFeedbackRasterizationStreamSelect = VK_TRUE;
+                    s->transformFeedbackStreamsLinesTriangles = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT: {
+                    VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT* s = static_cast<VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT*>(static_cast<void*>(p));
+                    s->maxVertexAttribDivisor = 268435455;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES: {
+                    VkPhysicalDeviceVulkan11Properties* s = static_cast<VkPhysicalDeviceVulkan11Properties*>(static_cast<void*>(p));
+                    s->maxMemoryAllocationSize = 2147483648;
+                    s->maxMultiviewInstanceIndex = 134217727;
+                    s->maxMultiviewViewCount = 6;
+                    s->maxPerSetDescriptors = 6160;
+                    s->protectedNoFault = VK_FALSE;
+                    s->subgroupQuadOperationsInAllStages = VK_TRUE;
+                    s->subgroupSize = 64;
+                    s->subgroupSupportedOperations |= (VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT | VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT | VK_SUBGROUP_FEATURE_CLUSTERED_BIT | VK_SUBGROUP_FEATURE_QUAD_BIT);
+                    s->subgroupSupportedStages |= (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT | VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT | VK_SHADER_STAGE_GEOMETRY_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_ALL_GRAPHICS | VK_SHADER_STAGE_ALL | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_INTERSECTION_BIT_KHR);
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES: {
+                    VkPhysicalDeviceVulkan12Properties* s = static_cast<VkPhysicalDeviceVulkan12Properties*>(static_cast<void*>(p));
+                    s->denormBehaviorIndependence = VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL;
+                    s->filterMinmaxImageComponentMapping = VK_TRUE;
+                    s->filterMinmaxSingleComponentFormats = VK_TRUE;
+                    s->framebufferIntegerColorSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT);
+                    s->independentResolve = VK_TRUE;
+                    s->independentResolveNone = VK_TRUE;
+                    s->maxDescriptorSetUpdateAfterBindInputAttachments = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindSampledImages = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindSamplers = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindStorageBuffers = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic = 8;
+                    s->maxDescriptorSetUpdateAfterBindStorageImages = 1048576;
+                    s->maxDescriptorSetUpdateAfterBindUniformBuffers = 90;
+                    s->maxDescriptorSetUpdateAfterBindUniformBuffersDynamic = 8;
+                    s->maxPerStageDescriptorUpdateAfterBindInputAttachments = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindSampledImages = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindSamplers = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindStorageBuffers = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindStorageImages = 1048576;
+                    s->maxPerStageDescriptorUpdateAfterBindUniformBuffers = 15;
+                    s->maxPerStageUpdateAfterBindResources = 1048576;
+                    s->maxTimelineSemaphoreValueDifference = -1;
+                    s->maxUpdateAfterBindDescriptorsInAllPools = 1048576;
+                    s->quadDivergentImplicitLod = VK_TRUE;
+                    s->robustBufferAccessUpdateAfterBind = VK_TRUE;
+                    s->shaderDenormFlushToZeroFloat16 = VK_TRUE;
+                    s->shaderDenormFlushToZeroFloat32 = VK_TRUE;
+                    s->shaderDenormFlushToZeroFloat64 = VK_TRUE;
+                    s->shaderDenormPreserveFloat16 = VK_TRUE;
+                    s->shaderDenormPreserveFloat32 = VK_TRUE;
+                    s->shaderDenormPreserveFloat64 = VK_TRUE;
+                    s->shaderInputAttachmentArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderRoundingModeRTEFloat16 = VK_TRUE;
+                    s->shaderRoundingModeRTEFloat32 = VK_TRUE;
+                    s->shaderRoundingModeRTEFloat64 = VK_TRUE;
+                    s->shaderRoundingModeRTZFloat16 = VK_TRUE;
+                    s->shaderRoundingModeRTZFloat32 = VK_TRUE;
+                    s->shaderRoundingModeRTZFloat64 = VK_TRUE;
+                    s->shaderSampledImageArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderSignedZeroInfNanPreserveFloat16 = VK_TRUE;
+                    s->shaderSignedZeroInfNanPreserveFloat32 = VK_TRUE;
+                    s->shaderSignedZeroInfNanPreserveFloat64 = VK_TRUE;
+                    s->shaderStorageBufferArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderStorageImageArrayNonUniformIndexingNative = VK_TRUE;
+                    s->shaderUniformBufferArrayNonUniformIndexingNative = VK_TRUE;
+                    s->supportedDepthResolveModes |= (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT);
+                    s->supportedStencilResolveModes |= (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT);
+                } break;
+                default: break;
+            }
+    },
+    [](VkBaseOutStructure* p) -> bool {
+        bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR: {
+                    VkPhysicalDeviceDepthStencilResolvePropertiesKHR* prettify_VkPhysicalDeviceDepthStencilResolvePropertiesKHR = static_cast<VkPhysicalDeviceDepthStencilResolvePropertiesKHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceDepthStencilResolvePropertiesKHR->independentResolve, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceDepthStencilResolvePropertiesKHR->independentResolve, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceDepthStencilResolvePropertiesKHR::independentResolve contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceDepthStencilResolvePropertiesKHR->independentResolveNone, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceDepthStencilResolvePropertiesKHR->independentResolveNone, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceDepthStencilResolvePropertiesKHR::independentResolveNone contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceDepthStencilResolvePropertiesKHR->supportedDepthResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceDepthStencilResolvePropertiesKHR->supportedDepthResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT))), "Unsupported properties condition: VkPhysicalDeviceDepthStencilResolvePropertiesKHR::supportedDepthResolveModes contains (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceDepthStencilResolvePropertiesKHR->supportedStencilResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceDepthStencilResolvePropertiesKHR->supportedStencilResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT))), "Unsupported properties condition: VkPhysicalDeviceDepthStencilResolvePropertiesKHR::supportedStencilResolveModes contains (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT)");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT: {
+                    VkPhysicalDeviceDescriptorIndexingPropertiesEXT* prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT = static_cast<VkPhysicalDeviceDescriptorIndexingPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindInputAttachments >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindInputAttachments >= 1048576), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxDescriptorSetUpdateAfterBindInputAttachments >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindSampledImages >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindSampledImages >= 1048576), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxDescriptorSetUpdateAfterBindSampledImages >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindSamplers >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindSamplers >= 1048576), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxDescriptorSetUpdateAfterBindSamplers >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindStorageBuffers >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindStorageBuffers >= 1048576), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxDescriptorSetUpdateAfterBindStorageBuffers >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= 8), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindStorageImages >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindStorageImages >= 1048576), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxDescriptorSetUpdateAfterBindStorageImages >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindUniformBuffers >= 90); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindUniformBuffers >= 90), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxDescriptorSetUpdateAfterBindUniformBuffers >= 90");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= 8), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageDescriptorUpdateAfterBindInputAttachments >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageDescriptorUpdateAfterBindInputAttachments >= 1048576), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxPerStageDescriptorUpdateAfterBindInputAttachments >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageDescriptorUpdateAfterBindSampledImages >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageDescriptorUpdateAfterBindSampledImages >= 1048576), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxPerStageDescriptorUpdateAfterBindSampledImages >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageDescriptorUpdateAfterBindSamplers >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageDescriptorUpdateAfterBindSamplers >= 1048576), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxPerStageDescriptorUpdateAfterBindSamplers >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageDescriptorUpdateAfterBindStorageBuffers >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageDescriptorUpdateAfterBindStorageBuffers >= 1048576), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxPerStageDescriptorUpdateAfterBindStorageBuffers >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageDescriptorUpdateAfterBindStorageImages >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageDescriptorUpdateAfterBindStorageImages >= 1048576), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxPerStageDescriptorUpdateAfterBindStorageImages >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageDescriptorUpdateAfterBindUniformBuffers >= 15); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageDescriptorUpdateAfterBindUniformBuffers >= 15), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxPerStageDescriptorUpdateAfterBindUniformBuffers >= 15");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageUpdateAfterBindResources >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxPerStageUpdateAfterBindResources >= 1048576), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxPerStageUpdateAfterBindResources >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxUpdateAfterBindDescriptorsInAllPools >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->maxUpdateAfterBindDescriptorsInAllPools >= 1048576), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxUpdateAfterBindDescriptorsInAllPools >= 1048576");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->quadDivergentImplicitLod, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->quadDivergentImplicitLod, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::quadDivergentImplicitLod contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->robustBufferAccessUpdateAfterBind, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->robustBufferAccessUpdateAfterBind, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::robustBufferAccessUpdateAfterBind contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->shaderInputAttachmentArrayNonUniformIndexingNative, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->shaderInputAttachmentArrayNonUniformIndexingNative, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::shaderInputAttachmentArrayNonUniformIndexingNative contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->shaderSampledImageArrayNonUniformIndexingNative, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->shaderSampledImageArrayNonUniformIndexingNative, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::shaderSampledImageArrayNonUniformIndexingNative contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->shaderStorageBufferArrayNonUniformIndexingNative, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->shaderStorageBufferArrayNonUniformIndexingNative, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::shaderStorageBufferArrayNonUniformIndexingNative contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->shaderStorageImageArrayNonUniformIndexingNative, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->shaderStorageImageArrayNonUniformIndexingNative, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::shaderStorageImageArrayNonUniformIndexingNative contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->shaderUniformBufferArrayNonUniformIndexingNative, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceDescriptorIndexingPropertiesEXT->shaderUniformBufferArrayNonUniformIndexingNative, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::shaderUniformBufferArrayNonUniformIndexingNative contains VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR: {
+                    VkPhysicalDeviceDriverPropertiesKHR* prettify_VkPhysicalDeviceDriverPropertiesKHR = static_cast<VkPhysicalDeviceDriverPropertiesKHR*>(static_cast<void*>(p));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT: {
+                    VkPhysicalDeviceExternalMemoryHostPropertiesEXT* prettify_VkPhysicalDeviceExternalMemoryHostPropertiesEXT = static_cast<VkPhysicalDeviceExternalMemoryHostPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceExternalMemoryHostPropertiesEXT->minImportedHostPointerAlignment <= 4096); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceExternalMemoryHostPropertiesEXT->minImportedHostPointerAlignment <= 4096), "Unsupported properties condition: VkPhysicalDeviceExternalMemoryHostPropertiesEXT::minImportedHostPointerAlignment <= 4096");
+                    ret = ret && ((prettify_VkPhysicalDeviceExternalMemoryHostPropertiesEXT->minImportedHostPointerAlignment & (prettify_VkPhysicalDeviceExternalMemoryHostPropertiesEXT->minImportedHostPointerAlignment - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceExternalMemoryHostPropertiesEXT->minImportedHostPointerAlignment & (prettify_VkPhysicalDeviceExternalMemoryHostPropertiesEXT->minImportedHostPointerAlignment - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceExternalMemoryHostPropertiesEXT->minImportedHostPointerAlignment & (prettify_VkPhysicalDeviceExternalMemoryHostPropertiesEXT->minImportedHostPointerAlignment - 1)) == 0");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR: {
+                    VkPhysicalDeviceFloatControlsPropertiesKHR* prettify_VkPhysicalDeviceFloatControlsPropertiesKHR = static_cast<VkPhysicalDeviceFloatControlsPropertiesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->denormBehaviorIndependence == VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->denormBehaviorIndependence == VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::denormBehaviorIndependence == VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderDenormFlushToZeroFloat16, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderDenormFlushToZeroFloat16, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderDenormFlushToZeroFloat16 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderDenormFlushToZeroFloat32, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderDenormFlushToZeroFloat32, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderDenormFlushToZeroFloat32 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderDenormFlushToZeroFloat64, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderDenormFlushToZeroFloat64, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderDenormFlushToZeroFloat64 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderDenormPreserveFloat16, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderDenormPreserveFloat16, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderDenormPreserveFloat16 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderDenormPreserveFloat32, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderDenormPreserveFloat32, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderDenormPreserveFloat32 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderDenormPreserveFloat64, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderDenormPreserveFloat64, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderDenormPreserveFloat64 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderRoundingModeRTEFloat16, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderRoundingModeRTEFloat16, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderRoundingModeRTEFloat16 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderRoundingModeRTEFloat32, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderRoundingModeRTEFloat32, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderRoundingModeRTEFloat32 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderRoundingModeRTEFloat64, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderRoundingModeRTEFloat64, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderRoundingModeRTEFloat64 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderRoundingModeRTZFloat16, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderRoundingModeRTZFloat16, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderRoundingModeRTZFloat16 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderRoundingModeRTZFloat32, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderRoundingModeRTZFloat32, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderRoundingModeRTZFloat32 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderRoundingModeRTZFloat64, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderRoundingModeRTZFloat64, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderRoundingModeRTZFloat64 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderSignedZeroInfNanPreserveFloat16, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderSignedZeroInfNanPreserveFloat16, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderSignedZeroInfNanPreserveFloat16 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderSignedZeroInfNanPreserveFloat32, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderSignedZeroInfNanPreserveFloat32, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderSignedZeroInfNanPreserveFloat32 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderSignedZeroInfNanPreserveFloat64, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceFloatControlsPropertiesKHR->shaderSignedZeroInfNanPreserveFloat64, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceFloatControlsPropertiesKHR::shaderSignedZeroInfNanPreserveFloat64 contains VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT: {
+                    VkPhysicalDeviceInlineUniformBlockPropertiesEXT* prettify_VkPhysicalDeviceInlineUniformBlockPropertiesEXT = static_cast<VkPhysicalDeviceInlineUniformBlockPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceInlineUniformBlockPropertiesEXT->maxDescriptorSetInlineUniformBlocks >= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceInlineUniformBlockPropertiesEXT->maxDescriptorSetInlineUniformBlocks >= 4), "Unsupported properties condition: VkPhysicalDeviceInlineUniformBlockPropertiesEXT::maxDescriptorSetInlineUniformBlocks >= 4");
+                    ret = ret && (prettify_VkPhysicalDeviceInlineUniformBlockPropertiesEXT->maxDescriptorSetUpdateAfterBindInlineUniformBlocks >= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceInlineUniformBlockPropertiesEXT->maxDescriptorSetUpdateAfterBindInlineUniformBlocks >= 4), "Unsupported properties condition: VkPhysicalDeviceInlineUniformBlockPropertiesEXT::maxDescriptorSetUpdateAfterBindInlineUniformBlocks >= 4");
+                    ret = ret && (prettify_VkPhysicalDeviceInlineUniformBlockPropertiesEXT->maxInlineUniformBlockSize >= 256); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceInlineUniformBlockPropertiesEXT->maxInlineUniformBlockSize >= 256), "Unsupported properties condition: VkPhysicalDeviceInlineUniformBlockPropertiesEXT::maxInlineUniformBlockSize >= 256");
+                    ret = ret && (prettify_VkPhysicalDeviceInlineUniformBlockPropertiesEXT->maxPerStageDescriptorInlineUniformBlocks >= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceInlineUniformBlockPropertiesEXT->maxPerStageDescriptorInlineUniformBlocks >= 4), "Unsupported properties condition: VkPhysicalDeviceInlineUniformBlockPropertiesEXT::maxPerStageDescriptorInlineUniformBlocks >= 4");
+                    ret = ret && (prettify_VkPhysicalDeviceInlineUniformBlockPropertiesEXT->maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks >= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceInlineUniformBlockPropertiesEXT->maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks >= 4), "Unsupported properties condition: VkPhysicalDeviceInlineUniformBlockPropertiesEXT::maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks >= 4");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT: {
+                    VkPhysicalDeviceLineRasterizationPropertiesEXT* prettify_VkPhysicalDeviceLineRasterizationPropertiesEXT = static_cast<VkPhysicalDeviceLineRasterizationPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceLineRasterizationPropertiesEXT->lineSubPixelPrecisionBits >= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceLineRasterizationPropertiesEXT->lineSubPixelPrecisionBits >= 4), "Unsupported properties condition: VkPhysicalDeviceLineRasterizationPropertiesEXT::lineSubPixelPrecisionBits >= 4");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR: {
+                    VkPhysicalDeviceMaintenance3PropertiesKHR* prettify_VkPhysicalDeviceMaintenance3PropertiesKHR = static_cast<VkPhysicalDeviceMaintenance3PropertiesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceMaintenance3PropertiesKHR->maxMemoryAllocationSize >= 2147483648); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceMaintenance3PropertiesKHR->maxMemoryAllocationSize >= 2147483648), "Unsupported properties condition: VkPhysicalDeviceMaintenance3PropertiesKHR::maxMemoryAllocationSize >= 2147483648");
+                    ret = ret && (prettify_VkPhysicalDeviceMaintenance3PropertiesKHR->maxPerSetDescriptors >= 6160); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceMaintenance3PropertiesKHR->maxPerSetDescriptors >= 6160), "Unsupported properties condition: VkPhysicalDeviceMaintenance3PropertiesKHR::maxPerSetDescriptors >= 6160");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR: {
+                    VkPhysicalDeviceMultiviewPropertiesKHR* prettify_VkPhysicalDeviceMultiviewPropertiesKHR = static_cast<VkPhysicalDeviceMultiviewPropertiesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceMultiviewPropertiesKHR->maxMultiviewInstanceIndex >= 134217727); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceMultiviewPropertiesKHR->maxMultiviewInstanceIndex >= 134217727), "Unsupported properties condition: VkPhysicalDeviceMultiviewPropertiesKHR::maxMultiviewInstanceIndex >= 134217727");
+                    ret = ret && (prettify_VkPhysicalDeviceMultiviewPropertiesKHR->maxMultiviewViewCount >= 6); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceMultiviewPropertiesKHR->maxMultiviewViewCount >= 6), "Unsupported properties condition: VkPhysicalDeviceMultiviewPropertiesKHR::maxMultiviewViewCount >= 6");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR: {
+                    VkPhysicalDevicePointClippingPropertiesKHR* prettify_VkPhysicalDevicePointClippingPropertiesKHR = static_cast<VkPhysicalDevicePointClippingPropertiesKHR*>(static_cast<void*>(p));
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
+                    VkPhysicalDeviceProperties2KHR* prettify_VkPhysicalDeviceProperties2KHR = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.bufferImageGranularity <= 65536); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.bufferImageGranularity <= 65536), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.bufferImageGranularity <= 65536");
+                    ret = ret && ((65536 % prettify_VkPhysicalDeviceProperties2KHR->properties.limits.bufferImageGranularity) == 0); VP_DEBUG_COND_MSG(!((65536 % prettify_VkPhysicalDeviceProperties2KHR->properties.limits.bufferImageGranularity) == 0), "Unsupported properties condition: (65536 % prettify_VkPhysicalDeviceProperties2KHR->properties.limits.bufferImageGranularity) == 0");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.discreteQueuePriorities >= 2); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.discreteQueuePriorities >= 2), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.discreteQueuePriorities >= 2");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.framebufferColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.framebufferColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.framebufferColorSampleCounts contains (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.framebufferDepthSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.framebufferDepthSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.framebufferDepthSampleCounts contains (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.framebufferNoAttachmentsSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.framebufferNoAttachmentsSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.framebufferNoAttachmentsSampleCounts contains (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.framebufferStencilSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.framebufferStencilSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.framebufferStencilSampleCounts contains (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.lineWidthGranularity <= 0.125); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.lineWidthGranularity <= 0.125), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.lineWidthGranularity <= 0.125");
+                    ret = ret && (isMultiple(0.125, prettify_VkPhysicalDeviceProperties2KHR->properties.limits.lineWidthGranularity)); VP_DEBUG_COND_MSG(!(isMultiple(0.125, prettify_VkPhysicalDeviceProperties2KHR->properties.limits.lineWidthGranularity)), "Unsupported properties condition: isMultiple(0.125, prettify_VkPhysicalDeviceProperties2KHR->properties.limits.lineWidthGranularity)");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.lineWidthRange[0] <= 1); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.lineWidthRange[0] <= 1), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.lineWidthRange[0] <= 1");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.lineWidthRange[1] >= 7.99219); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.lineWidthRange[1] >= 7.99219), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.lineWidthRange[1] >= 7.99219");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxBoundDescriptorSets >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxBoundDescriptorSets >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxBoundDescriptorSets >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxClipDistances >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxClipDistances >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxClipDistances >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxColorAttachments >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxColorAttachments >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxColorAttachments >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxCombinedClipAndCullDistances >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxCombinedClipAndCullDistances >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxCombinedClipAndCullDistances >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeSharedMemorySize >= 32768); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeSharedMemorySize >= 32768), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxComputeSharedMemorySize >= 32768");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupCount[0] >= 65535); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupCount[0] >= 65535), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxComputeWorkGroupCount[0] >= 65535");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupCount[1] >= 65535); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupCount[1] >= 65535), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxComputeWorkGroupCount[1] >= 65535");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupCount[2] >= 65535); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupCount[2] >= 65535), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxComputeWorkGroupCount[2] >= 65535");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupInvocations >= 1024); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxComputeWorkGroupInvocations >= 1024), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxComputeWorkGroupInvocations >= 1024");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxCullDistances >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxCullDistances >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxCullDistances >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetInputAttachments >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetInputAttachments >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetInputAttachments >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetSampledImages >= 1800); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetSampledImages >= 1800), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetSampledImages >= 1800");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetSamplers >= 576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetSamplers >= 576), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetSamplers >= 576");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageBuffers >= 1800); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageBuffers >= 1800), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetStorageBuffers >= 1800");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageBuffersDynamic >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageBuffersDynamic >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetStorageBuffersDynamic >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageImages >= 144); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetStorageImages >= 144), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetStorageImages >= 144");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetUniformBuffers >= 90); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetUniformBuffers >= 90), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetUniformBuffers >= 90");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetUniformBuffersDynamic >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDescriptorSetUniformBuffersDynamic >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDescriptorSetUniformBuffersDynamic >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDrawIndexedIndexValue >= 4294967295); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDrawIndexedIndexValue >= 4294967295), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDrawIndexedIndexValue >= 4294967295");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDrawIndirectCount >= 4294967295); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxDrawIndirectCount >= 4294967295), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxDrawIndirectCount >= 4294967295");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFragmentCombinedOutputResources >= 16); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFragmentCombinedOutputResources >= 16), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxFragmentCombinedOutputResources >= 16");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFragmentDualSrcAttachments >= 1); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFragmentDualSrcAttachments >= 1), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxFragmentDualSrcAttachments >= 1");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFragmentInputComponents >= 128); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFragmentInputComponents >= 128), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxFragmentInputComponents >= 128");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFragmentOutputAttachments >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFragmentOutputAttachments >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxFragmentOutputAttachments >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFramebufferHeight >= 16384); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFramebufferHeight >= 16384), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxFramebufferHeight >= 16384");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFramebufferLayers >= 2048); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFramebufferLayers >= 2048), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxFramebufferLayers >= 2048");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFramebufferWidth >= 16384); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxFramebufferWidth >= 16384), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxFramebufferWidth >= 16384");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxGeometryInputComponents >= 128); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxGeometryInputComponents >= 128), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxGeometryInputComponents >= 128");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxGeometryOutputComponents >= 128); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxGeometryOutputComponents >= 128), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxGeometryOutputComponents >= 128");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxGeometryOutputVertices >= 256); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxGeometryOutputVertices >= 256), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxGeometryOutputVertices >= 256");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxGeometryShaderInvocations >= 32); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxGeometryShaderInvocations >= 32), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxGeometryShaderInvocations >= 32");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxGeometryTotalOutputComponents >= 1024); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxGeometryTotalOutputComponents >= 1024), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxGeometryTotalOutputComponents >= 1024");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageArrayLayers >= 2048); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageArrayLayers >= 2048), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageArrayLayers >= 2048");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension1D >= 16384); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension1D >= 16384), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimension1D >= 16384");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension2D >= 16384); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension2D >= 16384), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimension2D >= 16384");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension3D >= 2048); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimension3D >= 2048), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimension3D >= 2048");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimensionCube >= 16384); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxImageDimensionCube >= 16384), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimensionCube >= 16384");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxInterpolationOffset >= 0.4375); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxInterpolationOffset >= 0.4375), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxInterpolationOffset >= 0.4375");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxMemoryAllocationCount >= 4096); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxMemoryAllocationCount >= 4096), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxMemoryAllocationCount >= 4096");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorInputAttachments >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorInputAttachments >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorInputAttachments >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorSampledImages >= 200); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorSampledImages >= 200), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorSampledImages >= 200");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorSamplers >= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorSamplers >= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorSamplers >= 64");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorStorageBuffers >= 200); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorStorageBuffers >= 200), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorStorageBuffers >= 200");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorStorageImages >= 16); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorStorageImages >= 16), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorStorageImages >= 16");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorUniformBuffers >= 15); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageDescriptorUniformBuffers >= 15), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageDescriptorUniformBuffers >= 15");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageResources >= 200); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPerStageResources >= 200), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPerStageResources >= 200");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPushConstantsSize >= 128); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxPushConstantsSize >= 128), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxPushConstantsSize >= 128");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxSampleMaskWords >= 1); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxSampleMaskWords >= 1), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxSampleMaskWords >= 1");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxSamplerAllocationCount >= 4000); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxSamplerAllocationCount >= 4000), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxSamplerAllocationCount >= 4000");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxSamplerAnisotropy >= 16); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxSamplerAnisotropy >= 16), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxSamplerAnisotropy >= 16");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxSamplerLodBias >= 15); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxSamplerLodBias >= 15), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxSamplerLodBias >= 15");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxStorageBufferRange >= 4294967295); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxStorageBufferRange >= 4294967295), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxStorageBufferRange >= 4294967295");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationControlPerPatchOutputComponents >= 120); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationControlPerPatchOutputComponents >= 120), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxTessellationControlPerPatchOutputComponents >= 120");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationControlPerVertexInputComponents >= 128); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationControlPerVertexInputComponents >= 128), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxTessellationControlPerVertexInputComponents >= 128");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationControlPerVertexOutputComponents >= 128); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationControlPerVertexOutputComponents >= 128), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxTessellationControlPerVertexOutputComponents >= 128");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationControlTotalOutputComponents >= 4096); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationControlTotalOutputComponents >= 4096), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxTessellationControlTotalOutputComponents >= 4096");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationEvaluationInputComponents >= 128); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationEvaluationInputComponents >= 128), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxTessellationEvaluationInputComponents >= 128");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationEvaluationOutputComponents >= 128); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationEvaluationOutputComponents >= 128), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxTessellationEvaluationOutputComponents >= 128");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationGenerationLevel >= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationGenerationLevel >= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxTessellationGenerationLevel >= 64");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationPatchSize >= 32); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTessellationPatchSize >= 32), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxTessellationPatchSize >= 32");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTexelBufferElements >= 134217728); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTexelBufferElements >= 134217728), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxTexelBufferElements >= 134217728");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTexelGatherOffset >= 31); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTexelGatherOffset >= 31), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxTexelGatherOffset >= 31");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTexelOffset >= 7); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxTexelOffset >= 7), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxTexelOffset >= 7");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxUniformBufferRange >= 65536); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxUniformBufferRange >= 65536), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxUniformBufferRange >= 65536");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxVertexInputAttributeOffset >= 2047); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxVertexInputAttributeOffset >= 2047), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxVertexInputAttributeOffset >= 2047");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxVertexInputAttributes >= 32); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxVertexInputAttributes >= 32), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxVertexInputAttributes >= 32");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxVertexInputBindingStride >= 2048); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxVertexInputBindingStride >= 2048), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxVertexInputBindingStride >= 2048");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxVertexInputBindings >= 32); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxVertexInputBindings >= 32), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxVertexInputBindings >= 32");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxVertexOutputComponents >= 128); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxVertexOutputComponents >= 128), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxVertexOutputComponents >= 128");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxViewportDimensions[0] >= 16384); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxViewportDimensions[0] >= 16384), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxViewportDimensions[0] >= 16384");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxViewportDimensions[1] >= 16384); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxViewportDimensions[1] >= 16384), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxViewportDimensions[1] >= 16384");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxViewports >= 16); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.maxViewports >= 16), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxViewports >= 16");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minInterpolationOffset <= -0.5); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minInterpolationOffset <= -0.5), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minInterpolationOffset <= -0.5");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minMemoryMapAlignment <= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minMemoryMapAlignment <= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minMemoryMapAlignment <= 64");
+                    ret = ret && ((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minMemoryMapAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minMemoryMapAlignment - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minMemoryMapAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minMemoryMapAlignment - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minMemoryMapAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minMemoryMapAlignment - 1)) == 0");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minStorageBufferOffsetAlignment <= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minStorageBufferOffsetAlignment <= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minStorageBufferOffsetAlignment <= 64");
+                    ret = ret && ((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minStorageBufferOffsetAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minStorageBufferOffsetAlignment - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minStorageBufferOffsetAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minStorageBufferOffsetAlignment - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minStorageBufferOffsetAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minStorageBufferOffsetAlignment - 1)) == 0");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment <= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment <= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minTexelBufferOffsetAlignment <= 64");
+                    ret = ret && ((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelBufferOffsetAlignment - 1)) == 0");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelGatherOffset <= -32); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelGatherOffset <= -32), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minTexelGatherOffset <= -32");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelOffset <= -8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minTexelOffset <= -8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minTexelOffset <= -8");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minUniformBufferOffsetAlignment <= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minUniformBufferOffsetAlignment <= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.minUniformBufferOffsetAlignment <= 64");
+                    ret = ret && ((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minUniformBufferOffsetAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minUniformBufferOffsetAlignment - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minUniformBufferOffsetAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minUniformBufferOffsetAlignment - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minUniformBufferOffsetAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.minUniformBufferOffsetAlignment - 1)) == 0");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.mipmapPrecisionBits >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.mipmapPrecisionBits >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.mipmapPrecisionBits >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.nonCoherentAtomSize <= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.nonCoherentAtomSize <= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.nonCoherentAtomSize <= 64");
+                    ret = ret && ((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.nonCoherentAtomSize & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.nonCoherentAtomSize - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.nonCoherentAtomSize & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.nonCoherentAtomSize - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.nonCoherentAtomSize & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.nonCoherentAtomSize - 1)) == 0");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyOffsetAlignment <= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyOffsetAlignment <= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.optimalBufferCopyOffsetAlignment <= 64");
+                    ret = ret && ((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyOffsetAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyOffsetAlignment - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyOffsetAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyOffsetAlignment - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyOffsetAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyOffsetAlignment - 1)) == 0");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyRowPitchAlignment <= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyRowPitchAlignment <= 64), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.optimalBufferCopyRowPitchAlignment <= 64");
+                    ret = ret && ((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyRowPitchAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyRowPitchAlignment - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyRowPitchAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyRowPitchAlignment - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyRowPitchAlignment & (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.optimalBufferCopyRowPitchAlignment - 1)) == 0");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.pointSizeGranularity <= 0.125); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.pointSizeGranularity <= 0.125), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.pointSizeGranularity <= 0.125");
+                    ret = ret && (isMultiple(0.125, prettify_VkPhysicalDeviceProperties2KHR->properties.limits.pointSizeGranularity)); VP_DEBUG_COND_MSG(!(isMultiple(0.125, prettify_VkPhysicalDeviceProperties2KHR->properties.limits.pointSizeGranularity)), "Unsupported properties condition: isMultiple(0.125, prettify_VkPhysicalDeviceProperties2KHR->properties.limits.pointSizeGranularity)");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.pointSizeRange[0] <= 1); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.pointSizeRange[0] <= 1), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.pointSizeRange[0] <= 1");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.pointSizeRange[1] >= 255.875); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.pointSizeRange[1] >= 255.875), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.pointSizeRange[1] >= 255.875");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.sampledImageColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.sampledImageColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.sampledImageColorSampleCounts contains (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.sampledImageDepthSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.sampledImageDepthSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.sampledImageDepthSampleCounts contains (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.sampledImageIntegerSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.sampledImageIntegerSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.sampledImageIntegerSampleCounts contains (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.sampledImageStencilSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.sampledImageStencilSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.sampledImageStencilSampleCounts contains (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.sparseAddressSpaceSize >= 1086630000000); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.sparseAddressSpaceSize >= 1086630000000), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.sparseAddressSpaceSize >= 1086630000000");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.standardSampleLocations == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.standardSampleLocations == VK_TRUE), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.standardSampleLocations == VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.storageImageSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.storageImageSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.storageImageSampleCounts contains (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.subPixelInterpolationOffsetBits >= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.subPixelInterpolationOffsetBits >= 4), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.subPixelInterpolationOffsetBits >= 4");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.subPixelPrecisionBits >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.subPixelPrecisionBits >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.subPixelPrecisionBits >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.subTexelPrecisionBits >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.subTexelPrecisionBits >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.subTexelPrecisionBits >= 8");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.timestampComputeAndGraphics, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.timestampComputeAndGraphics, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.timestampComputeAndGraphics contains VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.timestampPeriod <= 83.333); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.timestampPeriod <= 83.333), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.timestampPeriod <= 83.333");
+                    ret = ret && (isMultiple(83.333, prettify_VkPhysicalDeviceProperties2KHR->properties.limits.timestampPeriod)); VP_DEBUG_COND_MSG(!(isMultiple(83.333, prettify_VkPhysicalDeviceProperties2KHR->properties.limits.timestampPeriod)), "Unsupported properties condition: isMultiple(83.333, prettify_VkPhysicalDeviceProperties2KHR->properties.limits.timestampPeriod)");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportBoundsRange[0] <= -32768); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportBoundsRange[0] <= -32768), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.viewportBoundsRange[0] <= -32768");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportBoundsRange[1] >= 32767); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportBoundsRange[1] >= 32767), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.viewportBoundsRange[1] >= 32767");
+                    ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportSubPixelBits >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportSubPixelBits >= 8), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.viewportSubPixelBits >= 8");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyAlignedMipSize, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyAlignedMipSize, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyAlignedMipSize contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyNonResidentStrict, VK_FALSE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyNonResidentStrict, VK_FALSE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyNonResidentStrict contains VK_FALSE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard2DBlockShape, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard2DBlockShape, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyStandard2DBlockShape contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard2DMultisampleBlockShape, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard2DMultisampleBlockShape, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyStandard2DMultisampleBlockShape contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard3DBlockShape, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard3DBlockShape, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyStandard3DBlockShape contains VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT: {
+                    VkPhysicalDeviceRobustness2PropertiesEXT* prettify_VkPhysicalDeviceRobustness2PropertiesEXT = static_cast<VkPhysicalDeviceRobustness2PropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustStorageBufferAccessSizeAlignment <= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustStorageBufferAccessSizeAlignment <= 4), "Unsupported properties condition: VkPhysicalDeviceRobustness2PropertiesEXT::robustStorageBufferAccessSizeAlignment <= 4");
+                    ret = ret && ((prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustStorageBufferAccessSizeAlignment & (prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustStorageBufferAccessSizeAlignment - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustStorageBufferAccessSizeAlignment & (prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustStorageBufferAccessSizeAlignment - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustStorageBufferAccessSizeAlignment & (prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustStorageBufferAccessSizeAlignment - 1)) == 0");
+                    ret = ret && (prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustUniformBufferAccessSizeAlignment <= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustUniformBufferAccessSizeAlignment <= 4), "Unsupported properties condition: VkPhysicalDeviceRobustness2PropertiesEXT::robustUniformBufferAccessSizeAlignment <= 4");
+                    ret = ret && ((prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustUniformBufferAccessSizeAlignment & (prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustUniformBufferAccessSizeAlignment - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustUniformBufferAccessSizeAlignment & (prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustUniformBufferAccessSizeAlignment - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustUniformBufferAccessSizeAlignment & (prettify_VkPhysicalDeviceRobustness2PropertiesEXT->robustUniformBufferAccessSizeAlignment - 1)) == 0");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT: {
+                    VkPhysicalDeviceSubgroupSizeControlPropertiesEXT* prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT = static_cast<VkPhysicalDeviceSubgroupSizeControlPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->maxComputeWorkgroupSubgroups >= 56); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->maxComputeWorkgroupSubgroups >= 56), "Unsupported properties condition: VkPhysicalDeviceSubgroupSizeControlPropertiesEXT::maxComputeWorkgroupSubgroups >= 56");
+                    ret = ret && (prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->maxSubgroupSize >= 32); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->maxSubgroupSize >= 32), "Unsupported properties condition: VkPhysicalDeviceSubgroupSizeControlPropertiesEXT::maxSubgroupSize >= 32");
+                    ret = ret && ((prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->maxSubgroupSize & (prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->maxSubgroupSize - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->maxSubgroupSize & (prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->maxSubgroupSize - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->maxSubgroupSize & (prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->maxSubgroupSize - 1)) == 0");
+                    ret = ret && (prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->minSubgroupSize <= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->minSubgroupSize <= 64), "Unsupported properties condition: VkPhysicalDeviceSubgroupSizeControlPropertiesEXT::minSubgroupSize <= 64");
+                    ret = ret && ((prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->minSubgroupSize & (prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->minSubgroupSize - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->minSubgroupSize & (prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->minSubgroupSize - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->minSubgroupSize & (prettify_VkPhysicalDeviceSubgroupSizeControlPropertiesEXT->minSubgroupSize - 1)) == 0");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT: {
+                    VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT* prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT = static_cast<VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->storageTexelBufferOffsetAlignmentBytes <= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->storageTexelBufferOffsetAlignmentBytes <= 4), "Unsupported properties condition: VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT::storageTexelBufferOffsetAlignmentBytes <= 4");
+                    ret = ret && ((prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->storageTexelBufferOffsetAlignmentBytes & (prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->storageTexelBufferOffsetAlignmentBytes - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->storageTexelBufferOffsetAlignmentBytes & (prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->storageTexelBufferOffsetAlignmentBytes - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->storageTexelBufferOffsetAlignmentBytes & (prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->storageTexelBufferOffsetAlignmentBytes - 1)) == 0");
+                    ret = ret && (prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->storageTexelBufferOffsetSingleTexelAlignment == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->storageTexelBufferOffsetSingleTexelAlignment == VK_TRUE), "Unsupported properties condition: VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT::storageTexelBufferOffsetSingleTexelAlignment == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->uniformTexelBufferOffsetAlignmentBytes <= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->uniformTexelBufferOffsetAlignmentBytes <= 4), "Unsupported properties condition: VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT::uniformTexelBufferOffsetAlignmentBytes <= 4");
+                    ret = ret && ((prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->uniformTexelBufferOffsetAlignmentBytes & (prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->uniformTexelBufferOffsetAlignmentBytes - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->uniformTexelBufferOffsetAlignmentBytes & (prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->uniformTexelBufferOffsetAlignmentBytes - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->uniformTexelBufferOffsetAlignmentBytes & (prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->uniformTexelBufferOffsetAlignmentBytes - 1)) == 0");
+                    ret = ret && (prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->uniformTexelBufferOffsetSingleTexelAlignment == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT->uniformTexelBufferOffsetSingleTexelAlignment == VK_TRUE), "Unsupported properties condition: VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT::uniformTexelBufferOffsetSingleTexelAlignment == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR: {
+                    VkPhysicalDeviceTimelineSemaphorePropertiesKHR* prettify_VkPhysicalDeviceTimelineSemaphorePropertiesKHR = static_cast<VkPhysicalDeviceTimelineSemaphorePropertiesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceTimelineSemaphorePropertiesKHR->maxTimelineSemaphoreValueDifference >= 18446744073709551615); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTimelineSemaphorePropertiesKHR->maxTimelineSemaphoreValueDifference >= 18446744073709551615), "Unsupported properties condition: VkPhysicalDeviceTimelineSemaphorePropertiesKHR::maxTimelineSemaphoreValueDifference >= 18446744073709551615");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT: {
+                    VkPhysicalDeviceTransformFeedbackPropertiesEXT* prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT = static_cast<VkPhysicalDeviceTransformFeedbackPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->maxTransformFeedbackBufferDataSize >= 512); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->maxTransformFeedbackBufferDataSize >= 512), "Unsupported properties condition: VkPhysicalDeviceTransformFeedbackPropertiesEXT::maxTransformFeedbackBufferDataSize >= 512");
+                    ret = ret && (prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->maxTransformFeedbackBufferDataStride >= 512); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->maxTransformFeedbackBufferDataStride >= 512), "Unsupported properties condition: VkPhysicalDeviceTransformFeedbackPropertiesEXT::maxTransformFeedbackBufferDataStride >= 512");
+                    ret = ret && (prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->maxTransformFeedbackBufferSize >= 18446744073709551615); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->maxTransformFeedbackBufferSize >= 18446744073709551615), "Unsupported properties condition: VkPhysicalDeviceTransformFeedbackPropertiesEXT::maxTransformFeedbackBufferSize >= 18446744073709551615");
+                    ret = ret && (prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->maxTransformFeedbackBuffers >= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->maxTransformFeedbackBuffers >= 4), "Unsupported properties condition: VkPhysicalDeviceTransformFeedbackPropertiesEXT::maxTransformFeedbackBuffers >= 4");
+                    ret = ret && (prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->maxTransformFeedbackStreamDataSize >= 512); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->maxTransformFeedbackStreamDataSize >= 512), "Unsupported properties condition: VkPhysicalDeviceTransformFeedbackPropertiesEXT::maxTransformFeedbackStreamDataSize >= 512");
+                    ret = ret && (prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->maxTransformFeedbackStreams >= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->maxTransformFeedbackStreams >= 4), "Unsupported properties condition: VkPhysicalDeviceTransformFeedbackPropertiesEXT::maxTransformFeedbackStreams >= 4");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->transformFeedbackDraw, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->transformFeedbackDraw, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceTransformFeedbackPropertiesEXT::transformFeedbackDraw contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->transformFeedbackQueries, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->transformFeedbackQueries, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceTransformFeedbackPropertiesEXT::transformFeedbackQueries contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->transformFeedbackRasterizationStreamSelect, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->transformFeedbackRasterizationStreamSelect, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceTransformFeedbackPropertiesEXT::transformFeedbackRasterizationStreamSelect contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->transformFeedbackStreamsLinesTriangles, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceTransformFeedbackPropertiesEXT->transformFeedbackStreamsLinesTriangles, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceTransformFeedbackPropertiesEXT::transformFeedbackStreamsLinesTriangles contains VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT: {
+                    VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT* prettify_VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT = static_cast<VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT->maxVertexAttribDivisor >= 268435455); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT->maxVertexAttribDivisor >= 268435455), "Unsupported properties condition: VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT::maxVertexAttribDivisor >= 268435455");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES: {
+                    VkPhysicalDeviceVulkan11Properties* prettify_VkPhysicalDeviceVulkan11Properties = static_cast<VkPhysicalDeviceVulkan11Properties*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Properties->maxMemoryAllocationSize >= 2147483648); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Properties->maxMemoryAllocationSize >= 2147483648), "Unsupported properties condition: VkPhysicalDeviceVulkan11Properties::maxMemoryAllocationSize >= 2147483648");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Properties->maxMultiviewInstanceIndex >= 134217727); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Properties->maxMultiviewInstanceIndex >= 134217727), "Unsupported properties condition: VkPhysicalDeviceVulkan11Properties::maxMultiviewInstanceIndex >= 134217727");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Properties->maxMultiviewViewCount >= 6); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Properties->maxMultiviewViewCount >= 6), "Unsupported properties condition: VkPhysicalDeviceVulkan11Properties::maxMultiviewViewCount >= 6");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Properties->maxPerSetDescriptors >= 6160); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Properties->maxPerSetDescriptors >= 6160), "Unsupported properties condition: VkPhysicalDeviceVulkan11Properties::maxPerSetDescriptors >= 6160");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Properties->protectedNoFault == VK_FALSE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Properties->protectedNoFault == VK_FALSE), "Unsupported properties condition: VkPhysicalDeviceVulkan11Properties::protectedNoFault == VK_FALSE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan11Properties->subgroupQuadOperationsInAllStages, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan11Properties->subgroupQuadOperationsInAllStages, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan11Properties::subgroupQuadOperationsInAllStages contains VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan11Properties->subgroupSize <= 64); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan11Properties->subgroupSize <= 64), "Unsupported properties condition: VkPhysicalDeviceVulkan11Properties::subgroupSize <= 64");
+                    ret = ret && ((prettify_VkPhysicalDeviceVulkan11Properties->subgroupSize & (prettify_VkPhysicalDeviceVulkan11Properties->subgroupSize - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDeviceVulkan11Properties->subgroupSize & (prettify_VkPhysicalDeviceVulkan11Properties->subgroupSize - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDeviceVulkan11Properties->subgroupSize & (prettify_VkPhysicalDeviceVulkan11Properties->subgroupSize - 1)) == 0");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan11Properties->subgroupSupportedOperations, (VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT | VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT | VK_SUBGROUP_FEATURE_CLUSTERED_BIT | VK_SUBGROUP_FEATURE_QUAD_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan11Properties->subgroupSupportedOperations, (VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT | VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT | VK_SUBGROUP_FEATURE_CLUSTERED_BIT | VK_SUBGROUP_FEATURE_QUAD_BIT))), "Unsupported properties condition: VkPhysicalDeviceVulkan11Properties::subgroupSupportedOperations contains (VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT | VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT | VK_SUBGROUP_FEATURE_CLUSTERED_BIT | VK_SUBGROUP_FEATURE_QUAD_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan11Properties->subgroupSupportedStages, (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT | VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT | VK_SHADER_STAGE_GEOMETRY_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_ALL_GRAPHICS | VK_SHADER_STAGE_ALL | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_INTERSECTION_BIT_KHR))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan11Properties->subgroupSupportedStages, (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT | VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT | VK_SHADER_STAGE_GEOMETRY_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_ALL_GRAPHICS | VK_SHADER_STAGE_ALL | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_INTERSECTION_BIT_KHR))), "Unsupported properties condition: VkPhysicalDeviceVulkan11Properties::subgroupSupportedStages contains (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT | VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT | VK_SHADER_STAGE_GEOMETRY_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_ALL_GRAPHICS | VK_SHADER_STAGE_ALL | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_INTERSECTION_BIT_KHR)");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES: {
+                    VkPhysicalDeviceVulkan12Properties* prettify_VkPhysicalDeviceVulkan12Properties = static_cast<VkPhysicalDeviceVulkan12Properties*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->denormBehaviorIndependence == VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->denormBehaviorIndependence == VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::denormBehaviorIndependence == VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->filterMinmaxImageComponentMapping, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->filterMinmaxImageComponentMapping, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::filterMinmaxImageComponentMapping contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->filterMinmaxSingleComponentFormats, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->filterMinmaxSingleComponentFormats, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::filterMinmaxSingleComponentFormats contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->framebufferIntegerColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->framebufferIntegerColorSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT))), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::framebufferIntegerColorSampleCounts contains (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->independentResolve, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->independentResolve, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::independentResolve contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->independentResolveNone, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->independentResolveNone, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::independentResolveNone contains VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindInputAttachments >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindInputAttachments >= 1048576), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxDescriptorSetUpdateAfterBindInputAttachments >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindSampledImages >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindSampledImages >= 1048576), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxDescriptorSetUpdateAfterBindSampledImages >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindSamplers >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindSamplers >= 1048576), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxDescriptorSetUpdateAfterBindSamplers >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindStorageBuffers >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindStorageBuffers >= 1048576), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxDescriptorSetUpdateAfterBindStorageBuffers >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= 8), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxDescriptorSetUpdateAfterBindStorageBuffersDynamic >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindStorageImages >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindStorageImages >= 1048576), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxDescriptorSetUpdateAfterBindStorageImages >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindUniformBuffers >= 90); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindUniformBuffers >= 90), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxDescriptorSetUpdateAfterBindUniformBuffers >= 90");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= 8); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= 8), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxDescriptorSetUpdateAfterBindUniformBuffersDynamic >= 8");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageDescriptorUpdateAfterBindInputAttachments >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageDescriptorUpdateAfterBindInputAttachments >= 1048576), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxPerStageDescriptorUpdateAfterBindInputAttachments >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageDescriptorUpdateAfterBindSampledImages >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageDescriptorUpdateAfterBindSampledImages >= 1048576), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxPerStageDescriptorUpdateAfterBindSampledImages >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageDescriptorUpdateAfterBindSamplers >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageDescriptorUpdateAfterBindSamplers >= 1048576), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxPerStageDescriptorUpdateAfterBindSamplers >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageDescriptorUpdateAfterBindStorageBuffers >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageDescriptorUpdateAfterBindStorageBuffers >= 1048576), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxPerStageDescriptorUpdateAfterBindStorageBuffers >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageDescriptorUpdateAfterBindStorageImages >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageDescriptorUpdateAfterBindStorageImages >= 1048576), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxPerStageDescriptorUpdateAfterBindStorageImages >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageDescriptorUpdateAfterBindUniformBuffers >= 15); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageDescriptorUpdateAfterBindUniformBuffers >= 15), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxPerStageDescriptorUpdateAfterBindUniformBuffers >= 15");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageUpdateAfterBindResources >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxPerStageUpdateAfterBindResources >= 1048576), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxPerStageUpdateAfterBindResources >= 1048576");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxTimelineSemaphoreValueDifference >= -1); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxTimelineSemaphoreValueDifference >= -1), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxTimelineSemaphoreValueDifference >= -1");
+                    ret = ret && (prettify_VkPhysicalDeviceVulkan12Properties->maxUpdateAfterBindDescriptorsInAllPools >= 1048576); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVulkan12Properties->maxUpdateAfterBindDescriptorsInAllPools >= 1048576), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::maxUpdateAfterBindDescriptorsInAllPools >= 1048576");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->quadDivergentImplicitLod, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->quadDivergentImplicitLod, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::quadDivergentImplicitLod contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->robustBufferAccessUpdateAfterBind, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->robustBufferAccessUpdateAfterBind, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::robustBufferAccessUpdateAfterBind contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderDenormFlushToZeroFloat16, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderDenormFlushToZeroFloat16, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderDenormFlushToZeroFloat16 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderDenormFlushToZeroFloat32, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderDenormFlushToZeroFloat32, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderDenormFlushToZeroFloat32 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderDenormFlushToZeroFloat64, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderDenormFlushToZeroFloat64, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderDenormFlushToZeroFloat64 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderDenormPreserveFloat16, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderDenormPreserveFloat16, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderDenormPreserveFloat16 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderDenormPreserveFloat32, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderDenormPreserveFloat32, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderDenormPreserveFloat32 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderDenormPreserveFloat64, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderDenormPreserveFloat64, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderDenormPreserveFloat64 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderInputAttachmentArrayNonUniformIndexingNative, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderInputAttachmentArrayNonUniformIndexingNative, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderInputAttachmentArrayNonUniformIndexingNative contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderRoundingModeRTEFloat16, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderRoundingModeRTEFloat16, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderRoundingModeRTEFloat16 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderRoundingModeRTEFloat32, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderRoundingModeRTEFloat32, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderRoundingModeRTEFloat32 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderRoundingModeRTEFloat64, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderRoundingModeRTEFloat64, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderRoundingModeRTEFloat64 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderRoundingModeRTZFloat16, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderRoundingModeRTZFloat16, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderRoundingModeRTZFloat16 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderRoundingModeRTZFloat32, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderRoundingModeRTZFloat32, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderRoundingModeRTZFloat32 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderRoundingModeRTZFloat64, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderRoundingModeRTZFloat64, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderRoundingModeRTZFloat64 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderSampledImageArrayNonUniformIndexingNative, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderSampledImageArrayNonUniformIndexingNative, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderSampledImageArrayNonUniformIndexingNative contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderSignedZeroInfNanPreserveFloat16, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderSignedZeroInfNanPreserveFloat16, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderSignedZeroInfNanPreserveFloat16 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderSignedZeroInfNanPreserveFloat32, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderSignedZeroInfNanPreserveFloat32, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderSignedZeroInfNanPreserveFloat32 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderSignedZeroInfNanPreserveFloat64, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderSignedZeroInfNanPreserveFloat64, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderSignedZeroInfNanPreserveFloat64 contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderStorageBufferArrayNonUniformIndexingNative, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderStorageBufferArrayNonUniformIndexingNative, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderStorageBufferArrayNonUniformIndexingNative contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderStorageImageArrayNonUniformIndexingNative, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderStorageImageArrayNonUniformIndexingNative, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderStorageImageArrayNonUniformIndexingNative contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderUniformBufferArrayNonUniformIndexingNative, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->shaderUniformBufferArrayNonUniformIndexingNative, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::shaderUniformBufferArrayNonUniformIndexingNative contains VK_TRUE");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->supportedDepthResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->supportedDepthResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT))), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::supportedDepthResolveModes contains (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->supportedStencilResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceVulkan12Properties->supportedStencilResolveModes, (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT))), "Unsupported properties condition: VkPhysicalDeviceVulkan12Properties::supportedStencilResolveModes contains (VK_RESOLVE_MODE_SAMPLE_ZERO_BIT | VK_RESOLVE_MODE_MAX_BIT)");
+                } break;
+                default: break;
+            }
+        return ret;
+    }
+};
+
+static const VpFormatDesc formatDesc[] = {
+    {
+        VK_FORMAT_A1R5G5B5_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A1R5G5B5_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A1R5G5B5_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2B10G10R10_SINT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A2B10G10R10_SINT_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2B10G10R10_SNORM_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A2B10G10R10_SNORM_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2B10G10R10_SSCALED_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A2B10G10R10_SSCALED_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2B10G10R10_UINT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A2B10G10R10_UINT_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A2B10G10R10_UINT_PACK32: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A2B10G10R10_UINT_PACK32: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2B10G10R10_UNORM_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A2B10G10R10_UNORM_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A2B10G10R10_UNORM_PACK32: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A2B10G10R10_UNORM_PACK32: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2B10G10R10_USCALED_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A2B10G10R10_USCALED_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2R10G10B10_SINT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A2R10G10B10_SINT_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2R10G10B10_SNORM_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A2R10G10B10_SNORM_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2R10G10B10_SSCALED_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A2R10G10B10_SSCALED_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2R10G10B10_UINT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A2R10G10B10_UINT_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2R10G10B10_UNORM_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A2R10G10B10_UNORM_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A2R10G10B10_UNORM_PACK32: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A2R10G10B10_UNORM_PACK32: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A2R10G10B10_USCALED_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A2R10G10B10_USCALED_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_SINT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_SINT_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_SINT_PACK32: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_SINT_PACK32: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_SNORM_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_SNORM_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_SNORM_PACK32: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_SNORM_PACK32: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_SRGB_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_SRGB_PACK32: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_SRGB_PACK32: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_SSCALED_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_SSCALED_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_UINT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_UINT_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_UINT_PACK32: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_UINT_PACK32: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_UNORM_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_UNORM_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_UNORM_PACK32: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_UNORM_PACK32: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_A8B8G8R8_USCALED_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_A8B8G8R8_USCALED_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_B10G11R11_UFLOAT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_B10G11R11_UFLOAT_PACK32: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_B10G11R11_UFLOAT_PACK32: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_B10G11R11_UFLOAT_PACK32: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_B4G4R4A4_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_B4G4R4A4_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_B4G4R4A4_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_B5G5R5A1_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_B5G5R5A1_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_B5G5R5A1_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_B5G6R5_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_B5G6R5_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_B5G6R5_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_B8G8R8A8_SRGB,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_B8G8R8A8_SRGB: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_B8G8R8A8_SRGB: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_B8G8R8A8_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_B8G8R8A8_UNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_B8G8R8A8_UNORM: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_B8G8R8A8_UNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC1_RGBA_SRGB_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC1_RGBA_SRGB_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC1_RGBA_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC1_RGBA_UNORM_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC1_RGB_SRGB_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC1_RGB_SRGB_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC1_RGB_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC1_RGB_UNORM_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC2_SRGB_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC2_SRGB_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC2_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC2_UNORM_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC3_SRGB_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC3_SRGB_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC3_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC3_UNORM_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC4_SNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC4_SNORM_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC4_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC4_UNORM_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC5_SNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC5_SNORM_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC5_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC5_UNORM_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC6H_SFLOAT_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC6H_SFLOAT_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC6H_UFLOAT_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC6H_UFLOAT_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC7_SRGB_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC7_SRGB_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_BC7_UNORM_BLOCK,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_BC7_UNORM_BLOCK: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_D16_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_D16_UNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_D32_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_D32_SFLOAT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_D32_SFLOAT_S8_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_D32_SFLOAT_S8_UINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_E5B9G9R9_UFLOAT_PACK32,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_E5B9G9R9_UFLOAT_PACK32: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_E5B9G9R9_UFLOAT_PACK32: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_SFLOAT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_SFLOAT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_SFLOAT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_SINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_SINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_SINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_SNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_SNORM: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_SNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_SSCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_UINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_UINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_UINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_UNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_UNORM: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_UNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16A16_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16A16_USCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16_SNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16_SSCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16_UNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16B16_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16B16_USCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_SFLOAT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_SFLOAT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_SFLOAT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_SINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_SINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_SINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_SNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_SNORM: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_SNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_SSCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_UINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_UINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_UINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_UNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_UNORM: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_UNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16G16_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16G16_USCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16_SFLOAT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16_SFLOAT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16_SFLOAT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16_SINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16_SINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16_SINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16_SNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16_SNORM: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16_SNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16_SSCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16_UINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16_UINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16_UINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16_UNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16_UNORM: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R16_UNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R16_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R16_USCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32B32A32_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32A32_SFLOAT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32A32_SFLOAT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32A32_SFLOAT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32B32A32_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32A32_SINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32A32_SINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32A32_SINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32B32A32_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32A32_UINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32A32_UINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32A32_UINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32B32_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32_SFLOAT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32_SFLOAT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32B32_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32_SINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32_SINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32B32_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32_UINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32B32_UINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R32G32_SFLOAT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32_SFLOAT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32_SFLOAT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R32G32_SINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32_SINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32_SINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32G32_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R32G32_UINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32_UINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32G32_UINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R32_SFLOAT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32_SFLOAT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32_SFLOAT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R32_SINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32_SINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32_SINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R32_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R32_UINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32_UINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R32_UINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R4G4B4A4_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R4G4B4A4_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R4G4B4A4_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R5G5B5A1_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R5G5B5A1_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R5G5B5A1_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R5G6B5_UNORM_PACK16,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R5G6B5_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R5G6B5_UNORM_PACK16: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R64G64B64A64_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R64G64B64A64_SFLOAT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R64G64B64_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R64G64B64_SFLOAT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R64G64_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R64G64_SFLOAT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R64_SFLOAT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R64_SFLOAT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_SINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_SINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_SINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_SNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_SNORM: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_SNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_SRGB,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_SRGB: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_SRGB: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_SSCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_UINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_UINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_UINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_UNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_UNORM: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_UNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8A8_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8A8_USCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8_SINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8_SNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8_SSCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8_UINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8_UNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8B8_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8B8_USCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_SINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_SINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_SINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_SNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_SNORM: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_SNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_SSCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_UINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_UINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_UINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_UNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_UNORM: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_UNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8G8_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8G8_USCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8_SINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8_SINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8_SINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8_SINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8_SNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8_SNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8_SNORM: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8_SNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8_SSCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8_SSCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8_UINT,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8_UINT: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8_UINT: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8_UINT: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8_UNORM,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                    s->formatProperties.linearTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                    s->formatProperties.optimalTilingFeatures |= (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8_UNORM: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.linearTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8_UNORM: VkFormatProperties2KHR::formatProperties.linearTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.optimalTilingFeatures, (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT))), "Unsupported format condition for VK_FORMAT_R8_UNORM: VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains (VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+    {
+        VK_FORMAT_R8_USCALED,
+        [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* s = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    s->formatProperties.bufferFeatures |= (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+                } break;
+                default: break;
+            }
+        },
+        [](VkBaseOutStructure* p) -> bool {
+            bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR: {
+                    VkFormatProperties2KHR* prettify_VkFormatProperties2KHR = static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p));
+                    ret = ret && (vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkFormatProperties2KHR->formatProperties.bufferFeatures, (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT))), "Unsupported format condition for VK_FORMAT_R8_USCALED: VkFormatProperties2KHR::formatProperties.bufferFeatures contains (VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT)");
+                } break;
+                default: break;
+            }
+            return ret;
+        }
+    },
+};
+
+static const VpStructChainerDesc chainerDesc = {
+    [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
+        VkPhysicalDeviceDepthClipEnableFeaturesEXT physicalDeviceDepthClipEnableFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT, nullptr };
+        VkPhysicalDeviceExtendedDynamicStateFeaturesEXT physicalDeviceExtendedDynamicStateFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT, &physicalDeviceDepthClipEnableFeaturesEXT };
+        VkPhysicalDeviceInlineUniformBlockFeaturesEXT physicalDeviceInlineUniformBlockFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT, &physicalDeviceExtendedDynamicStateFeaturesEXT };
+        VkPhysicalDeviceLineRasterizationFeaturesEXT physicalDeviceLineRasterizationFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT, &physicalDeviceInlineUniformBlockFeaturesEXT };
+        VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT physicalDevicePipelineCreationCacheControlFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES_EXT, &physicalDeviceLineRasterizationFeaturesEXT };
+        VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR physicalDevicePipelineExecutablePropertiesFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR, &physicalDevicePipelineCreationCacheControlFeaturesEXT };
+        VkPhysicalDeviceRobustness2FeaturesEXT physicalDeviceRobustness2FeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT, &physicalDevicePipelineExecutablePropertiesFeaturesKHR };
+        VkPhysicalDeviceShaderClockFeaturesKHR physicalDeviceShaderClockFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR, &physicalDeviceRobustness2FeaturesEXT };
+        VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT physicalDeviceShaderDemoteToHelperInvocationFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DEMOTE_TO_HELPER_INVOCATION_FEATURES_EXT, &physicalDeviceShaderClockFeaturesKHR };
+        VkPhysicalDeviceSubgroupSizeControlFeaturesEXT physicalDeviceSubgroupSizeControlFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT, &physicalDeviceShaderDemoteToHelperInvocationFeaturesEXT };
+        VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT physicalDeviceTexelBufferAlignmentFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT, &physicalDeviceSubgroupSizeControlFeaturesEXT };
+        VkPhysicalDeviceTransformFeedbackFeaturesEXT physicalDeviceTransformFeedbackFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_FEATURES_EXT, &physicalDeviceTexelBufferAlignmentFeaturesEXT };
+        VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT physicalDeviceVertexAttributeDivisorFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT, &physicalDeviceTransformFeedbackFeaturesEXT };
+        VkPhysicalDeviceVulkan11Features physicalDeviceVulkan11Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &physicalDeviceVertexAttributeDivisorFeaturesEXT };
+        VkPhysicalDeviceVulkan12Features physicalDeviceVulkan12Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &physicalDeviceVulkan11Features };
+        p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceVulkan12Features));
+        pfnCb(p, pUser);
+    },
+    [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
+        VkPhysicalDeviceDepthStencilResolvePropertiesKHR physicalDeviceDepthStencilResolvePropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR, nullptr };
+        VkPhysicalDeviceDescriptorIndexingPropertiesEXT physicalDeviceDescriptorIndexingPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT, &physicalDeviceDepthStencilResolvePropertiesKHR };
+        VkPhysicalDeviceDriverPropertiesKHR physicalDeviceDriverPropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR, &physicalDeviceDescriptorIndexingPropertiesEXT };
+        VkPhysicalDeviceExternalMemoryHostPropertiesEXT physicalDeviceExternalMemoryHostPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT, &physicalDeviceDriverPropertiesKHR };
+        VkPhysicalDeviceFloatControlsPropertiesKHR physicalDeviceFloatControlsPropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES_KHR, &physicalDeviceExternalMemoryHostPropertiesEXT };
+        VkPhysicalDeviceInlineUniformBlockPropertiesEXT physicalDeviceInlineUniformBlockPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT, &physicalDeviceFloatControlsPropertiesKHR };
+        VkPhysicalDeviceLineRasterizationPropertiesEXT physicalDeviceLineRasterizationPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT, &physicalDeviceInlineUniformBlockPropertiesEXT };
+        VkPhysicalDeviceMaintenance3PropertiesKHR physicalDeviceMaintenance3PropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR, &physicalDeviceLineRasterizationPropertiesEXT };
+        VkPhysicalDeviceMultiviewPropertiesKHR physicalDeviceMultiviewPropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR, &physicalDeviceMaintenance3PropertiesKHR };
+        VkPhysicalDevicePointClippingPropertiesKHR physicalDevicePointClippingPropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR, &physicalDeviceMultiviewPropertiesKHR };
+        VkPhysicalDeviceRobustness2PropertiesEXT physicalDeviceRobustness2PropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT, &physicalDevicePointClippingPropertiesKHR };
+        VkPhysicalDeviceSubgroupSizeControlPropertiesEXT physicalDeviceSubgroupSizeControlPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT, &physicalDeviceRobustness2PropertiesEXT };
+        VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT physicalDeviceTexelBufferAlignmentPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT, &physicalDeviceSubgroupSizeControlPropertiesEXT };
+        VkPhysicalDeviceTimelineSemaphorePropertiesKHR physicalDeviceTimelineSemaphorePropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR, &physicalDeviceTexelBufferAlignmentPropertiesEXT };
+        VkPhysicalDeviceTransformFeedbackPropertiesEXT physicalDeviceTransformFeedbackPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT, &physicalDeviceTimelineSemaphorePropertiesKHR };
+        VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT physicalDeviceVertexAttributeDivisorPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT, &physicalDeviceTransformFeedbackPropertiesEXT };
+        VkPhysicalDeviceVulkan11Properties physicalDeviceVulkan11Properties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, &physicalDeviceVertexAttributeDivisorPropertiesEXT };
+        VkPhysicalDeviceVulkan12Properties physicalDeviceVulkan12Properties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &physicalDeviceVulkan11Properties };
+        p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceVulkan12Properties));
+        pfnCb(p, pUser);
+    },
+    [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
+        pfnCb(p, pUser);
+    },
+    [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
+        VkFormatProperties3KHR formatProperties3KHR{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR, nullptr };
+        p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>(&formatProperties3KHR));
+        pfnCb(p, pUser);
+    },
+};
+
+} // namespace VP_LUNARG_DESKTOP_PORTABILITY_2022
+#endif
+
 static const VpProfileDesc vpProfiles[] = {
 #ifdef VP_ANDROID_baseline_2021
     VpProfileDesc{
@@ -7972,6 +12013,24 @@ static const VpProfileDesc vpProfiles[] = {
         &VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::formatStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::formatStructTypes) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::formatStructTypes[0])),
         &VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::formatDesc[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::formatDesc) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::formatDesc[0])),
         VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET::chainerDesc,
+    },
+#endif
+#ifdef VP_LUNARG_desktop_portability_2022
+    VpProfileDesc{
+        VpProfileProperties{ VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION },
+        VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION,
+        nullptr, 0,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::deviceExtensions[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::deviceExtensions) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::deviceExtensions[0])),
+        nullptr, 0,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::featureStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::featureStructTypes) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::featureStructTypes[0])),
+        VP_LUNARG_DESKTOP_PORTABILITY_2022::featureDesc,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::propertyStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::propertyStructTypes) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::propertyStructTypes[0])),
+        VP_LUNARG_DESKTOP_PORTABILITY_2022::propertyDesc,
+        nullptr, 0,
+        nullptr, 0,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::formatStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::formatStructTypes) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::formatStructTypes[0])),
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::formatDesc[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::formatDesc) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::formatDesc[0])),
+        VP_LUNARG_DESKTOP_PORTABILITY_2022::chainerDesc,
     },
 #endif
 };
