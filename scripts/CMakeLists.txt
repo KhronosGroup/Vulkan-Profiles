@@ -57,12 +57,17 @@ add_custom_target(VpCreateGeneratedName ALL
 
 set_target_properties(VpCreateGeneratedName PROPERTIES FOLDER "Profiles scripts")
 
+set(PROFILE_LABEL "LunarG Vulkan Desktop Baseline 2022 profile")
+set(PROFILE_DESC "A baseline desktop profile that supports Vulkan Header 162")
+
 add_custom_target(VpCreateDesktop2022 ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
 		-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
-		-input_dir ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022
-		-output_path ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022.json
-		-output_profile VP_LUNARG_desktop_portability_2022
+		-input_dir ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_baseline_2022
+		-output_path ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_baseline_2022.json
+		-output_profile VP_LUNARG_desktop_baseline_2022
+		-profile_label ${PROFILE_LABEL}
+		-profile_desc ${PROFILE_DESC}
 	VERBATIM
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
 	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})

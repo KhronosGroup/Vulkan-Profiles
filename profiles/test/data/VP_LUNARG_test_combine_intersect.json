@@ -49,15 +49,15 @@
             "version": 1,
             "status": "BETA",
             "api-version": "1.0.142",
-            "label": "Merged profile",
-            "description": "Generated profile doing an intersection between profiles: VP_LUNARG_test_combine_intersect1 and VP_LUNARG_test_combine_intersect2",
+            "label": null,
+            "description": null,
             "contributors": {},
             "history": [
                 {
                     "revision": 1,
                     "date": "2022-07-27",
-                    "author": "Merge tool",
-                    "comment": "Generated profile doing an intersection between profiles: VP_LUNARG_test_combine_intersect1 and VP_LUNARG_test_combine_intersect2"
+                    "author": "LunarG Profiles Merger",
+                    "comment": null
                 }
             ],
             "capabilities": [
