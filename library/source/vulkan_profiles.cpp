@@ -7688,7 +7688,6 @@ static const VkStructureType featureStructTypes[] = {
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT,
 };
@@ -7696,11 +7695,9 @@ static const VkStructureType featureStructTypes[] = {
 static const VkStructureType propertyStructTypes[] = {
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT,
@@ -7758,9 +7755,6 @@ static const VpFeatureDesc featureDesc = {
                     VkPhysicalDeviceRobustness2FeaturesEXT* s = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(static_cast<void*>(p));
                     s->robustImageAccess2 = VK_TRUE;
                 } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT: {
-                    VkPhysicalDeviceSubgroupSizeControlFeaturesEXT* s = static_cast<VkPhysicalDeviceSubgroupSizeControlFeaturesEXT*>(static_cast<void*>(p));
-                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT: {
                     VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT*>(static_cast<void*>(p));
                     s->texelBufferAlignment = VK_TRUE;
@@ -7817,9 +7811,6 @@ static const VpFeatureDesc featureDesc = {
                     VkPhysicalDeviceRobustness2FeaturesEXT* s = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(static_cast<void*>(p));
                     ret = ret && (s->robustImageAccess2 == VK_TRUE);
                 } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT: {
-                    VkPhysicalDeviceSubgroupSizeControlFeaturesEXT* s = static_cast<VkPhysicalDeviceSubgroupSizeControlFeaturesEXT*>(static_cast<void*>(p));
-                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT: {
                     VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT*>(static_cast<void*>(p));
                     ret = ret && (s->texelBufferAlignment == VK_TRUE);
@@ -7871,9 +7862,6 @@ static const VpPropertyDesc propertyDesc = {
                     s->shaderStorageImageArrayNonUniformIndexingNative = VK_TRUE;
                     s->shaderUniformBufferArrayNonUniformIndexingNative = VK_TRUE;
                 } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR: {
-                    VkPhysicalDeviceDriverPropertiesKHR* s = static_cast<VkPhysicalDeviceDriverPropertiesKHR*>(static_cast<void*>(p));
-                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT: {
                     VkPhysicalDeviceInlineUniformBlockPropertiesEXT* s = static_cast<VkPhysicalDeviceInlineUniformBlockPropertiesEXT*>(static_cast<void*>(p));
                     s->maxDescriptorSetInlineUniformBlocks = 4;
@@ -7891,9 +7879,6 @@ static const VpPropertyDesc propertyDesc = {
                     VkPhysicalDeviceMultiviewPropertiesKHR* s = static_cast<VkPhysicalDeviceMultiviewPropertiesKHR*>(static_cast<void*>(p));
                     s->maxMultiviewInstanceIndex = 134217727;
                     s->maxMultiviewViewCount = 6;
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR: {
-                    VkPhysicalDevicePointClippingPropertiesKHR* s = static_cast<VkPhysicalDevicePointClippingPropertiesKHR*>(static_cast<void*>(p));
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
                     VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
@@ -8079,9 +8064,6 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (vpCheckFlags(s->shaderStorageImageArrayNonUniformIndexingNative, VK_TRUE));
                     ret = ret && (vpCheckFlags(s->shaderUniformBufferArrayNonUniformIndexingNative, VK_TRUE));
                 } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR: {
-                    VkPhysicalDeviceDriverPropertiesKHR* s = static_cast<VkPhysicalDeviceDriverPropertiesKHR*>(static_cast<void*>(p));
-                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT: {
                     VkPhysicalDeviceInlineUniformBlockPropertiesEXT* s = static_cast<VkPhysicalDeviceInlineUniformBlockPropertiesEXT*>(static_cast<void*>(p));
                     ret = ret && (s->maxDescriptorSetInlineUniformBlocks >= 4);
@@ -8099,9 +8081,6 @@ static const VpPropertyDesc propertyDesc = {
                     VkPhysicalDeviceMultiviewPropertiesKHR* s = static_cast<VkPhysicalDeviceMultiviewPropertiesKHR*>(static_cast<void*>(p));
                     ret = ret && (s->maxMultiviewInstanceIndex >= 134217727);
                     ret = ret && (s->maxMultiviewViewCount >= 6);
-                } break;
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR: {
-                    VkPhysicalDevicePointClippingPropertiesKHR* s = static_cast<VkPhysicalDevicePointClippingPropertiesKHR*>(static_cast<void*>(p));
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
                     VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
@@ -10444,8 +10423,7 @@ static const VpStructChainerDesc chainerDesc = {
     [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
         VkPhysicalDeviceInlineUniformBlockFeaturesEXT physicalDeviceInlineUniformBlockFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT, nullptr };
         VkPhysicalDeviceRobustness2FeaturesEXT physicalDeviceRobustness2FeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT, &physicalDeviceInlineUniformBlockFeaturesEXT };
-        VkPhysicalDeviceSubgroupSizeControlFeaturesEXT physicalDeviceSubgroupSizeControlFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT, &physicalDeviceRobustness2FeaturesEXT };
-        VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT physicalDeviceTexelBufferAlignmentFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT, &physicalDeviceSubgroupSizeControlFeaturesEXT };
+        VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT physicalDeviceTexelBufferAlignmentFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT, &physicalDeviceRobustness2FeaturesEXT };
         VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT physicalDeviceVertexAttributeDivisorFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT, &physicalDeviceTexelBufferAlignmentFeaturesEXT };
         p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceVertexAttributeDivisorFeaturesEXT));
         pfnCb(p, pUser);
@@ -10453,12 +10431,10 @@ static const VpStructChainerDesc chainerDesc = {
     [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
         VkPhysicalDeviceDepthStencilResolvePropertiesKHR physicalDeviceDepthStencilResolvePropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR, nullptr };
         VkPhysicalDeviceDescriptorIndexingPropertiesEXT physicalDeviceDescriptorIndexingPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT, &physicalDeviceDepthStencilResolvePropertiesKHR };
-        VkPhysicalDeviceDriverPropertiesKHR physicalDeviceDriverPropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES_KHR, &physicalDeviceDescriptorIndexingPropertiesEXT };
-        VkPhysicalDeviceInlineUniformBlockPropertiesEXT physicalDeviceInlineUniformBlockPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT, &physicalDeviceDriverPropertiesKHR };
+        VkPhysicalDeviceInlineUniformBlockPropertiesEXT physicalDeviceInlineUniformBlockPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES_EXT, &physicalDeviceDescriptorIndexingPropertiesEXT };
         VkPhysicalDeviceMaintenance3PropertiesKHR physicalDeviceMaintenance3PropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES_KHR, &physicalDeviceInlineUniformBlockPropertiesEXT };
         VkPhysicalDeviceMultiviewPropertiesKHR physicalDeviceMultiviewPropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR, &physicalDeviceMaintenance3PropertiesKHR };
-        VkPhysicalDevicePointClippingPropertiesKHR physicalDevicePointClippingPropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR, &physicalDeviceMultiviewPropertiesKHR };
-        VkPhysicalDeviceRobustness2PropertiesEXT physicalDeviceRobustness2PropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT, &physicalDevicePointClippingPropertiesKHR };
+        VkPhysicalDeviceRobustness2PropertiesEXT physicalDeviceRobustness2PropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT, &physicalDeviceMultiviewPropertiesKHR };
         VkPhysicalDeviceSubgroupSizeControlPropertiesEXT physicalDeviceSubgroupSizeControlPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT, &physicalDeviceRobustness2PropertiesEXT };
         VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT physicalDeviceTexelBufferAlignmentPropertiesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT, &physicalDeviceSubgroupSizeControlPropertiesEXT };
         VkPhysicalDeviceTimelineSemaphorePropertiesKHR physicalDeviceTimelineSemaphorePropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR, &physicalDeviceTexelBufferAlignmentPropertiesEXT };
