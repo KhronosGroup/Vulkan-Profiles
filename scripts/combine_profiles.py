@@ -52,11 +52,20 @@ class ProfileMerger():
         for json in jsons:
             current_version = self.get_version_from_schema(json['$schema'])
             for i in range(len(version)):
-                if (current_version[i] > version[i]):
-                    version = current_version
-                    break
-                elif (current_version[i] < version[i]):
-                    break
+                if self.mode == 'union':
+                    if (current_version[i] > version[i]):
+                        version = current_version
+                        break
+                    elif (current_version[i] < version[i]):
+                        break
+                elif self.mode == 'intersection':
+                    if (current_version[i] < version[i]):
+                        version = current_version
+                        break
+                    elif (current_version[i] > version[i]):
+                        break
+                else:
+                    print('ERROR: Unknown mode when computing api-version')
         return 'https://schema.khronos.org/vulkan/profiles-' + version[0] + '.' + version[1] + '.' + version[2] + '-' + version[3] + '.json#'
 
     def merge_capabilities(self, jsons, profile_names, api_version):
@@ -296,9 +305,10 @@ class ProfileMerger():
                         merged[promoted][member] = merged[struct][member]
                 # Intersect
                 elif self.mode == 'intersection':
-                    for member in list(merged[promoted]):
-                        if member not in merged[struct]:
-                            del merged[promoted][member]
+                    if promoted in merged:
+                        for member in list(merged[promoted]):
+                            if member not in merged[struct]:
+                                del merged[promoted][member]
                 else:
                     print("ERROR: Unknown combination mode: " + self.mode)
                 del merged[struct]
@@ -603,13 +613,24 @@ class ProfileMerger():
         for profile in profiles:
             current_api_version_str = profile['api-version']
             current_api_version = self.get_api_version_list(current_api_version_str)
-            for i in range(len(api_version)):
-                if (api_version[i] > current_api_version[i]):
-                    break
-                elif (api_version[i] < current_api_version[i]):
-                    api_version_str = current_api_version_str
-                    api_version = current_api_version
-                    break
+            if self.mode == 'union':
+                for i in range(len(api_version)):
+                    if (api_version[i] > current_api_version[i]):
+                        break
+                    elif (api_version[i] < current_api_version[i]):
+                        api_version_str = current_api_version_str
+                        api_version = current_api_version
+                        break
+            elif self.mode == 'intersection':
+                for i in range(len(api_version)):
+                    if (api_version[i] < current_api_version[i]):
+                        break
+                    elif (api_version[i] > current_api_version[i]):
+                        api_version_str = current_api_version_str
+                        api_version = current_api_version
+                        break
+            else:
+                print('ERROR: Unknown mode when computing api-version')
         return [api_version_str, api_version]
 
     def get_profile_description(self, profile_names, mode):
