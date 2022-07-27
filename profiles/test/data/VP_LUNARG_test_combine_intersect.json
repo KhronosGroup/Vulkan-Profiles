@@ -55,7 +55,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-07-25",
+                    "date": "2022-07-27",
                     "author": "Merge tool",
                     "comment": "Generated profile doing an intersection between profiles: VP_LUNARG_test_combine_intersect1 and VP_LUNARG_test_combine_intersect2"
                 }
