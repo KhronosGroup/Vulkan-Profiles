@@ -123,7 +123,6 @@
     defined(VK_EXT_descriptor_indexing) && \
     defined(VK_EXT_extended_dynamic_state) && \
     defined(VK_EXT_external_memory_host) && \
-    defined(VK_EXT_full_screen_exclusive) && \
     defined(VK_EXT_host_query_reset) && \
     defined(VK_EXT_inline_uniform_block) && \
     defined(VK_EXT_line_rasterization) && \
@@ -132,7 +131,6 @@
     defined(VK_EXT_pipeline_creation_feedback) && \
     defined(VK_EXT_robustness2) && \
     defined(VK_EXT_scalar_block_layout) && \
-    defined(VK_EXT_separate_stencil_usage) && \
     defined(VK_EXT_shader_demote_to_helper_invocation) && \
     defined(VK_EXT_shader_subgroup_ballot) && \
     defined(VK_EXT_shader_subgroup_vote) && \
@@ -152,11 +150,8 @@
     defined(VK_KHR_draw_indirect_count) && \
     defined(VK_KHR_driver_properties) && \
     defined(VK_KHR_external_fence) && \
-    defined(VK_KHR_external_fence_win32) && \
     defined(VK_KHR_external_memory) && \
-    defined(VK_KHR_external_memory_win32) && \
     defined(VK_KHR_external_semaphore) && \
-    defined(VK_KHR_external_semaphore_win32) && \
     defined(VK_KHR_get_memory_requirements2) && \
     defined(VK_KHR_image_format_list) && \
     defined(VK_KHR_imageless_framebuffer) && \
@@ -180,8 +175,7 @@
     defined(VK_KHR_swapchain_mutable_format) && \
     defined(VK_KHR_timeline_semaphore) && \
     defined(VK_KHR_uniform_buffer_standard_layout) && \
-    defined(VK_KHR_variable_pointers) && \
-    defined(VK_KHR_win32_keyed_mutex)
+    defined(VK_KHR_variable_pointers)
 #define VP_LUNARG_desktop_portability_2022 1
 #define VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME "VP_LUNARG_desktop_portability_2022"
 #define VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION 1

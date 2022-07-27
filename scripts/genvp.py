@@ -2465,7 +2465,8 @@ class VulkanProfile():
                             genAssign = '{0}{1} = '.format(var, member)
                         genAssign += '{0}'.format(self.gen_listValue(value, isEnum))
                         gen += fmt.format(genAssign)
-
+                elif type(value) == float:
+                    gen += fmt.format('{0}{1} = {2}f'.format(var, member, value))
                 elif type(value) == bool:
                     # Boolean
                     gen += fmt.format('{0}{1} = {2}'.format(var, member, 'VK_TRUE' if value else 'VK_FALSE'))
