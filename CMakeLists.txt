@@ -209,10 +209,9 @@ if(FATAL_WARNINGS)
         #    warning C4389: '==': signed/unsigned mismatch
         #    warning C4018: '>=': signed/unsigned mismatch
     # vulkan_profiles.hpp provokes: 
-    #    warning C4189: 's': local variable is initialized but not referenced
     #    warning C4245: '=': conversion from 'int' to 'uint64_t', signed/unsigned mismatch
     #    warning C4305: '=': truncation from 'double' to 'float'
-        add_compile_options(/wd4100 /wd4505 /wd4702 /wd4389 /wd4245 /wd4305 /wd4189 /wd4018)
+        add_compile_options(/wd4100 /wd4505 /wd4702 /wd4389 /wd4245 /wd4305 /wd4018)
     else()
         add_compile_options(-Werror)
     endif()
