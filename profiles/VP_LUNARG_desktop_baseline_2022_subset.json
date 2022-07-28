@@ -30,6 +30,7 @@
                 "VK_KHR_maintenance2": 1,
                 "VK_KHR_maintenance3": 1,
                 "VK_KHR_multiview": 1,
+                "VK_KHR_portability_subset": 1,
                 "VK_KHR_relaxed_block_layout": 1,
                 "VK_KHR_sampler_mirror_clamp_to_edge": 3,
                 "VK_KHR_shader_draw_parameters": 1,
@@ -76,6 +77,16 @@
                 "VkPhysicalDeviceInlineUniformBlockFeaturesEXT": {
                     "inlineUniformBlock": true,
                     "descriptorBindingInlineUniformBlockUpdateAfterBind": true
+                },
+                "VkPhysicalDevicePortabilitySubsetFeaturesKHR": {
+                    "vertexAttributeAccessBeyondStride": true,
+                    "separateStencilMaskRef": true,
+                    "mutableComparisonSamplers": true,
+                    "multisampleArrayImage": true,
+                    "imageViewFormatSwizzle": true,
+                    "imageViewFormatReinterpretation": true,
+                    "events": true,
+                    "constantAlphaColorBlendFactors": true
                 },
                 "VkPhysicalDeviceRobustness2FeaturesEXT": {
                     "robustImageAccess2": true
@@ -138,6 +149,9 @@
                 "VkPhysicalDeviceMultiviewPropertiesKHR": {
                     "maxMultiviewInstanceIndex": 134217727,
                     "maxMultiviewViewCount": 6
+                },
+                "VkPhysicalDevicePortabilitySubsetPropertiesKHR": {
+                    "minVertexInputBindingStrideAlignment": 4
                 },
                 "VkPhysicalDeviceProperties": {
                     "sparseProperties": {
@@ -1975,19 +1989,19 @@
         }
     },
     "profiles": {
-        "VP_LUNARG_desktop_baseline_2022": {
+        "VP_LUNARG_desktop_baseline_2022_subset": {
             "version": 1,
             "status": "BETA",
             "api-version": "1.1.162",
-            "label": "LunarG Vulkan Desktop Baseline 2022 profile",
-            "description": "A baseline desktop profile that supports Vulkan Header 162",
+            "label": "LunarG Vulkan Desktop Baseline 2022 Subset profile",
+            "description": "A baseline macOS specific profile variant of VP_LUNARG_desktop_baseline_2022",
             "contributors": {},
             "history": [
                 {
                     "revision": 1,
                     "date": "2022-07-28",
                     "author": "LunarG Profiles Merger",
-                    "comment": "A baseline desktop profile that supports Vulkan Header 162"
+                    "comment": "A baseline macOS specific profile variant of VP_LUNARG_desktop_baseline_2022"
                 }
             ],
             "capabilities": [
