@@ -111,6 +111,14 @@
 #endif
 
 #if defined(VK_VERSION_1_1) && \
+    defined(VK_KHR_portability_subset)
+#define VP_LUNARG_desktop_baseline_2022_subset 1
+#define VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_NAME "VP_LUNARG_desktop_baseline_2022_subset"
+#define VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_SPEC_VERSION 1
+#define VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 154)
+#endif
+
+#if defined(VK_VERSION_1_1) && \
     defined(VK_EXT_descriptor_indexing) && \
     defined(VK_EXT_host_query_reset) && \
     defined(VK_EXT_robustness2) && \
@@ -6193,6 +6201,104 @@ static const VpStructChainerDesc chainerDesc = {
 } // namespace VP_LUNARG_DESKTOP_BASELINE_2022
 #endif
 
+#ifdef VP_LUNARG_desktop_baseline_2022_subset
+namespace VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET {
+
+static const VkExtensionProperties deviceExtensions[] = {
+    VkExtensionProperties{ VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, 1 },
+};
+
+static const VkStructureType featureStructTypes[] = {
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR,
+};
+
+static const VkStructureType propertyStructTypes[] = {
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR,
+};
+
+static const VpFeatureDesc featureDesc = {
+    [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR: {
+                    VkPhysicalDevicePortabilitySubsetFeaturesKHR* s = static_cast<VkPhysicalDevicePortabilitySubsetFeaturesKHR*>(static_cast<void*>(p));
+                    s->constantAlphaColorBlendFactors = VK_TRUE;
+                    s->events = VK_TRUE;
+                    s->imageViewFormatReinterpretation = VK_TRUE;
+                    s->imageViewFormatSwizzle = VK_TRUE;
+                    s->multisampleArrayImage = VK_TRUE;
+                    s->mutableComparisonSamplers = VK_TRUE;
+                    s->separateStencilMaskRef = VK_TRUE;
+                    s->vertexAttributeAccessBeyondStride = VK_TRUE;
+                } break;
+                default: break;
+            }
+    },
+    [](VkBaseOutStructure* p) -> bool {
+        bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR: {
+                    VkPhysicalDevicePortabilitySubsetFeaturesKHR* prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR = static_cast<VkPhysicalDevicePortabilitySubsetFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->constantAlphaColorBlendFactors == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->constantAlphaColorBlendFactors == VK_TRUE), "Unsupported feature condition: VkPhysicalDevicePortabilitySubsetFeaturesKHR::constantAlphaColorBlendFactors == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->events == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->events == VK_TRUE), "Unsupported feature condition: VkPhysicalDevicePortabilitySubsetFeaturesKHR::events == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->imageViewFormatReinterpretation == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->imageViewFormatReinterpretation == VK_TRUE), "Unsupported feature condition: VkPhysicalDevicePortabilitySubsetFeaturesKHR::imageViewFormatReinterpretation == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->imageViewFormatSwizzle == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->imageViewFormatSwizzle == VK_TRUE), "Unsupported feature condition: VkPhysicalDevicePortabilitySubsetFeaturesKHR::imageViewFormatSwizzle == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->multisampleArrayImage == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->multisampleArrayImage == VK_TRUE), "Unsupported feature condition: VkPhysicalDevicePortabilitySubsetFeaturesKHR::multisampleArrayImage == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->mutableComparisonSamplers == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->mutableComparisonSamplers == VK_TRUE), "Unsupported feature condition: VkPhysicalDevicePortabilitySubsetFeaturesKHR::mutableComparisonSamplers == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->separateStencilMaskRef == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->separateStencilMaskRef == VK_TRUE), "Unsupported feature condition: VkPhysicalDevicePortabilitySubsetFeaturesKHR::separateStencilMaskRef == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->vertexAttributeAccessBeyondStride == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR->vertexAttributeAccessBeyondStride == VK_TRUE), "Unsupported feature condition: VkPhysicalDevicePortabilitySubsetFeaturesKHR::vertexAttributeAccessBeyondStride == VK_TRUE");
+                } break;
+                default: break;
+            }
+        return ret;
+    }
+};
+
+static const VpPropertyDesc propertyDesc = {
+    [](VkBaseOutStructure* p) {
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR: {
+                    VkPhysicalDevicePortabilitySubsetPropertiesKHR* s = static_cast<VkPhysicalDevicePortabilitySubsetPropertiesKHR*>(static_cast<void*>(p));
+                    s->minVertexInputBindingStrideAlignment = 4;
+                } break;
+                default: break;
+            }
+    },
+    [](VkBaseOutStructure* p) -> bool {
+        bool ret = true;
+            switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR: {
+                    VkPhysicalDevicePortabilitySubsetPropertiesKHR* prettify_VkPhysicalDevicePortabilitySubsetPropertiesKHR = static_cast<VkPhysicalDevicePortabilitySubsetPropertiesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDevicePortabilitySubsetPropertiesKHR->minVertexInputBindingStrideAlignment <= 4); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevicePortabilitySubsetPropertiesKHR->minVertexInputBindingStrideAlignment <= 4), "Unsupported properties condition: VkPhysicalDevicePortabilitySubsetPropertiesKHR::minVertexInputBindingStrideAlignment <= 4");
+                    ret = ret && ((prettify_VkPhysicalDevicePortabilitySubsetPropertiesKHR->minVertexInputBindingStrideAlignment & (prettify_VkPhysicalDevicePortabilitySubsetPropertiesKHR->minVertexInputBindingStrideAlignment - 1)) == 0); VP_DEBUG_COND_MSG(!((prettify_VkPhysicalDevicePortabilitySubsetPropertiesKHR->minVertexInputBindingStrideAlignment & (prettify_VkPhysicalDevicePortabilitySubsetPropertiesKHR->minVertexInputBindingStrideAlignment - 1)) == 0), "Unsupported properties condition: (prettify_VkPhysicalDevicePortabilitySubsetPropertiesKHR->minVertexInputBindingStrideAlignment & (prettify_VkPhysicalDevicePortabilitySubsetPropertiesKHR->minVertexInputBindingStrideAlignment - 1)) == 0");
+                } break;
+                default: break;
+            }
+        return ret;
+    }
+};
+
+static const VpStructChainerDesc chainerDesc = {
+    [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
+        VkPhysicalDevicePortabilitySubsetFeaturesKHR physicalDevicePortabilitySubsetFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR, nullptr };
+        p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDevicePortabilitySubsetFeaturesKHR));
+        pfnCb(p, pUser);
+    },
+    [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
+        VkPhysicalDevicePortabilitySubsetPropertiesKHR physicalDevicePortabilitySubsetPropertiesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR, nullptr };
+        p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDevicePortabilitySubsetPropertiesKHR));
+        pfnCb(p, pUser);
+    },
+    [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
+        pfnCb(p, pUser);
+    },
+    [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
+        pfnCb(p, pUser);
+    },
+};
+
+} // namespace VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET
+#endif
+
 #ifdef VP_LUNARG_desktop_portability_2021
 namespace VP_LUNARG_DESKTOP_PORTABILITY_2021 {
 
@@ -10812,6 +10918,24 @@ static const VpProfileDesc vpProfiles[] = {
         &VP_LUNARG_DESKTOP_BASELINE_2022::formatStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_BASELINE_2022::formatStructTypes) / sizeof(VP_LUNARG_DESKTOP_BASELINE_2022::formatStructTypes[0])),
         &VP_LUNARG_DESKTOP_BASELINE_2022::formatDesc[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_BASELINE_2022::formatDesc) / sizeof(VP_LUNARG_DESKTOP_BASELINE_2022::formatDesc[0])),
         VP_LUNARG_DESKTOP_BASELINE_2022::chainerDesc,
+    },
+#endif
+#ifdef VP_LUNARG_desktop_baseline_2022_subset
+    VpProfileDesc{
+        VpProfileProperties{ VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_SPEC_VERSION },
+        VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_MIN_API_VERSION,
+        nullptr, 0,
+        &VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::deviceExtensions[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::deviceExtensions) / sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::deviceExtensions[0])),
+        nullptr, 0,
+        &VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::featureStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::featureStructTypes) / sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::featureStructTypes[0])),
+        VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::featureDesc,
+        &VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::propertyStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::propertyStructTypes) / sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::propertyStructTypes[0])),
+        VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::propertyDesc,
+        nullptr, 0,
+        nullptr, 0,
+        nullptr, 0,
+        nullptr, 0,
+        VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::chainerDesc,
     },
 #endif
 #ifdef VP_LUNARG_desktop_portability_2021

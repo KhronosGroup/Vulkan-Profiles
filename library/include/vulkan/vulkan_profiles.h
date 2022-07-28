@@ -109,6 +109,14 @@
 #endif
 
 #if defined(VK_VERSION_1_1) && \
+    defined(VK_KHR_portability_subset)
+#define VP_LUNARG_desktop_baseline_2022_subset 1
+#define VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_NAME "VP_LUNARG_desktop_baseline_2022_subset"
+#define VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_SPEC_VERSION 1
+#define VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 154)
+#endif
+
+#if defined(VK_VERSION_1_1) && \
     defined(VK_EXT_descriptor_indexing) && \
     defined(VK_EXT_host_query_reset) && \
     defined(VK_EXT_robustness2) && \
