@@ -16,6 +16,8 @@
 ### Features:
 - Add script to merge (union and intersection) multiple profiles
 - Add support of the new `vk.xml` limittypes
+- Add the generated `VP_LUNARG_desktop_baseline_2022` profile
+- Add the generated `VP_LUNARG_desktop_baseline_2022_subset` profile
 
 ### Improvements:
 - Add handling of many Vulkan capabilities
