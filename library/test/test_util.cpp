@@ -211,8 +211,8 @@ TEST(test_library_util, CheckExtension) {
 
 TEST(test_library_util, GetDeviceExtensions) {
     static const char *EXTENSIONS[] = {
-        VK_KHR_MAINTENANCE_3_EXTENSION_NAME,                    // Not in VP_LUNARG_DESKTOP_BASELINE_2022_NAME
         VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME,  // Not in VP_LUNARG_DESKTOP_BASELINE_2022_NAME
+        VK_KHR_MAINTENANCE_3_EXTENSION_NAME,                    // In VP_LUNARG_DESKTOP_BASELINE_2022_NAME
         VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,              // In VP_LUNARG_DESKTOP_BASELINE_2022_NAME
         VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME                 // In VP_LUNARG_DESKTOP_BASELINE_2022_NAME
     };
@@ -257,7 +257,7 @@ TEST(test_library_util, GetDeviceExtensions) {
                                 extensions,
                                 (profileInfo.flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0,
                                 (profileInfo.flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0);
-        EXPECT_EQ(ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2022::deviceExtensions) + 2, extensions.size());
+        EXPECT_EQ(ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2022::deviceExtensions) + 1, extensions.size());
     }
 
     {
@@ -294,7 +294,7 @@ TEST(test_library_util, GetDeviceExtensions) {
 }
 
 TEST(test_library_util, check_extension_not_found) {
-    static const char *EXTENSIONS[] = {VK_KHR_MAINTENANCE_3_EXTENSION_NAME, VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME};
+    static const char *EXTENSIONS[] = {VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME};
 
     VkDeviceCreateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
