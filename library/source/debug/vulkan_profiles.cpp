@@ -9365,14 +9365,19 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
     if (result != VK_SUCCESS) {
         return result;
     }
-    std::vector<VkExtensionProperties> ext(extCount);
+    std::vector<VkExtensionProperties> ext;
+    if (extCount > 0) {
+        ext.resize(extCount);
+    }
     result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, ext.data());
     if (result != VK_SUCCESS) {
         return result;
     }
 
     // Workaround old loader bug where count could be smaller on the second call to vkEnumerateDeviceExtensionProperties
-    ext.resize(extCount);
+    if (extCount > 0) {
+        ext.resize(extCount);
+    }
 
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
