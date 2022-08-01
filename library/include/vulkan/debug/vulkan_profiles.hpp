@@ -3468,10 +3468,20 @@ static const VkExtensionProperties deviceExtensions[] = {
 };
 
 static const VkStructureType featureStructTypes[] = {
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES_EXT,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT,
 };
 
@@ -3497,6 +3507,32 @@ static const VkStructureType formatStructTypes[] = {
 static const VpFeatureDesc featureDesc = {
     [](VkBaseOutStructure* p) {
             switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR: {
+                    VkPhysicalDevice16BitStorageFeaturesKHR* s = static_cast<VkPhysicalDevice16BitStorageFeaturesKHR*>(static_cast<void*>(p));
+                    s->storageBuffer16BitAccess = VK_TRUE;
+                    s->uniformAndStorageBuffer16BitAccess = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR: {
+                    VkPhysicalDevice8BitStorageFeaturesKHR* s = static_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(static_cast<void*>(p));
+                    s->storageBuffer8BitAccess = VK_TRUE;
+                    s->uniformAndStorageBuffer8BitAccess = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT: {
+                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT* s = static_cast<VkPhysicalDeviceDescriptorIndexingFeaturesEXT*>(static_cast<void*>(p));
+                    s->descriptorBindingPartiallyBound = VK_TRUE;
+                    s->descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingStorageImageUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingStorageTexelBufferUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingUniformTexelBufferUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingUpdateUnusedWhilePending = VK_TRUE;
+                    s->descriptorBindingVariableDescriptorCount = VK_TRUE;
+                    s->runtimeDescriptorArray = VK_TRUE;
+                    s->shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+                    s->shaderStorageTexelBufferArrayDynamicIndexing = VK_TRUE;
+                    s->shaderUniformTexelBufferArrayDynamicIndexing = VK_TRUE;
+                    s->shaderUniformTexelBufferArrayNonUniformIndexing = VK_TRUE;
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR: {
                     VkPhysicalDeviceFeatures2KHR* s = static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p));
                     s->features.depthBiasClamp = VK_TRUE;
@@ -3529,18 +3565,47 @@ static const VpFeatureDesc featureDesc = {
                     s->features.textureCompressionBC = VK_TRUE;
                     s->features.vertexPipelineStoresAndAtomics = VK_TRUE;
                 } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR: {
+                    VkPhysicalDeviceFloat16Int8FeaturesKHR* s = static_cast<VkPhysicalDeviceFloat16Int8FeaturesKHR*>(static_cast<void*>(p));
+                    s->shaderInt8 = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT: {
+                    VkPhysicalDeviceHostQueryResetFeaturesEXT* s = static_cast<VkPhysicalDeviceHostQueryResetFeaturesEXT*>(static_cast<void*>(p));
+                    s->hostQueryReset = VK_TRUE;
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT: {
                     VkPhysicalDeviceInlineUniformBlockFeaturesEXT* s = static_cast<VkPhysicalDeviceInlineUniformBlockFeaturesEXT*>(static_cast<void*>(p));
                     s->descriptorBindingInlineUniformBlockUpdateAfterBind = VK_TRUE;
                     s->inlineUniformBlock = VK_TRUE;
                 } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR: {
+                    VkPhysicalDeviceMultiviewFeaturesKHR* s = static_cast<VkPhysicalDeviceMultiviewFeaturesKHR*>(static_cast<void*>(p));
+                    s->multiview = VK_TRUE;
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT: {
                     VkPhysicalDeviceRobustness2FeaturesEXT* s = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(static_cast<void*>(p));
                     s->robustImageAccess2 = VK_TRUE;
                 } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES_EXT: {
+                    VkPhysicalDeviceScalarBlockLayoutFeaturesEXT* s = static_cast<VkPhysicalDeviceScalarBlockLayoutFeaturesEXT*>(static_cast<void*>(p));
+                    s->scalarBlockLayout = VK_TRUE;
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT: {
                     VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT*>(static_cast<void*>(p));
                     s->texelBufferAlignment = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR: {
+                    VkPhysicalDeviceTimelineSemaphoreFeaturesKHR* s = static_cast<VkPhysicalDeviceTimelineSemaphoreFeaturesKHR*>(static_cast<void*>(p));
+                    s->timelineSemaphore = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR: {
+                    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR* s = static_cast<VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR*>(static_cast<void*>(p));
+                    s->uniformBufferStandardLayout = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES: {
+                    VkPhysicalDeviceVariablePointersFeaturesKHR* s = static_cast<VkPhysicalDeviceVariablePointersFeaturesKHR*>(static_cast<void*>(p));
+                    s->variablePointers = VK_TRUE;
+                    s->variablePointersStorageBuffer = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT: {
                     VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT* s = static_cast<VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT*>(static_cast<void*>(p));
@@ -3553,6 +3618,32 @@ static const VpFeatureDesc featureDesc = {
     [](VkBaseOutStructure* p) -> bool {
         bool ret = true;
             switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR: {
+                    VkPhysicalDevice16BitStorageFeaturesKHR* prettify_VkPhysicalDevice16BitStorageFeaturesKHR = static_cast<VkPhysicalDevice16BitStorageFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDevice16BitStorageFeaturesKHR->storageBuffer16BitAccess == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevice16BitStorageFeaturesKHR->storageBuffer16BitAccess == VK_TRUE), "Unsupported feature condition: VkPhysicalDevice16BitStorageFeaturesKHR::storageBuffer16BitAccess == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDevice16BitStorageFeaturesKHR->uniformAndStorageBuffer16BitAccess == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevice16BitStorageFeaturesKHR->uniformAndStorageBuffer16BitAccess == VK_TRUE), "Unsupported feature condition: VkPhysicalDevice16BitStorageFeaturesKHR::uniformAndStorageBuffer16BitAccess == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR: {
+                    VkPhysicalDevice8BitStorageFeaturesKHR* prettify_VkPhysicalDevice8BitStorageFeaturesKHR = static_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDevice8BitStorageFeaturesKHR->storageBuffer8BitAccess == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevice8BitStorageFeaturesKHR->storageBuffer8BitAccess == VK_TRUE), "Unsupported feature condition: VkPhysicalDevice8BitStorageFeaturesKHR::storageBuffer8BitAccess == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDevice8BitStorageFeaturesKHR->uniformAndStorageBuffer8BitAccess == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevice8BitStorageFeaturesKHR->uniformAndStorageBuffer8BitAccess == VK_TRUE), "Unsupported feature condition: VkPhysicalDevice8BitStorageFeaturesKHR::uniformAndStorageBuffer8BitAccess == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT: {
+                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT* prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT = static_cast<VkPhysicalDeviceDescriptorIndexingFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingPartiallyBound == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingPartiallyBound == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingPartiallyBound == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingSampledImageUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingSampledImageUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingSampledImageUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingStorageBufferUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingStorageBufferUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingStorageBufferUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingStorageImageUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingStorageImageUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingStorageImageUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingStorageTexelBufferUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingStorageTexelBufferUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingStorageTexelBufferUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingUniformTexelBufferUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingUniformTexelBufferUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingUniformTexelBufferUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingUpdateUnusedWhilePending == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingUpdateUnusedWhilePending == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingUpdateUnusedWhilePending == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingVariableDescriptorCount == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingVariableDescriptorCount == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingVariableDescriptorCount == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->runtimeDescriptorArray == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->runtimeDescriptorArray == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::runtimeDescriptorArray == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderSampledImageArrayNonUniformIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderSampledImageArrayNonUniformIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::shaderSampledImageArrayNonUniformIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderStorageTexelBufferArrayDynamicIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderStorageTexelBufferArrayDynamicIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::shaderStorageTexelBufferArrayDynamicIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderUniformTexelBufferArrayNonUniformIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderUniformTexelBufferArrayNonUniformIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::shaderUniformTexelBufferArrayNonUniformIndexing == VK_TRUE");
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR: {
                     VkPhysicalDeviceFeatures2KHR* prettify_VkPhysicalDeviceFeatures2KHR = static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p));
                     ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.depthBiasClamp == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.depthBiasClamp == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.depthBiasClamp == VK_TRUE");
@@ -3585,18 +3676,47 @@ static const VpFeatureDesc featureDesc = {
                     ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.textureCompressionBC == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.textureCompressionBC == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.textureCompressionBC == VK_TRUE");
                     ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.vertexPipelineStoresAndAtomics == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.vertexPipelineStoresAndAtomics == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.vertexPipelineStoresAndAtomics == VK_TRUE");
                 } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR: {
+                    VkPhysicalDeviceFloat16Int8FeaturesKHR* prettify_VkPhysicalDeviceFloat16Int8FeaturesKHR = static_cast<VkPhysicalDeviceFloat16Int8FeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceFloat16Int8FeaturesKHR->shaderInt8 == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFloat16Int8FeaturesKHR->shaderInt8 == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFloat16Int8FeaturesKHR::shaderInt8 == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT: {
+                    VkPhysicalDeviceHostQueryResetFeaturesEXT* prettify_VkPhysicalDeviceHostQueryResetFeaturesEXT = static_cast<VkPhysicalDeviceHostQueryResetFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceHostQueryResetFeaturesEXT->hostQueryReset == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceHostQueryResetFeaturesEXT->hostQueryReset == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceHostQueryResetFeaturesEXT::hostQueryReset == VK_TRUE");
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT: {
                     VkPhysicalDeviceInlineUniformBlockFeaturesEXT* prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT = static_cast<VkPhysicalDeviceInlineUniformBlockFeaturesEXT*>(static_cast<void*>(p));
                     ret = ret && (prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT->descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT->descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceInlineUniformBlockFeaturesEXT::descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE");
                     ret = ret && (prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT->inlineUniformBlock == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT->inlineUniformBlock == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceInlineUniformBlockFeaturesEXT::inlineUniformBlock == VK_TRUE");
                 } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR: {
+                    VkPhysicalDeviceMultiviewFeaturesKHR* prettify_VkPhysicalDeviceMultiviewFeaturesKHR = static_cast<VkPhysicalDeviceMultiviewFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceMultiviewFeaturesKHR->multiview == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceMultiviewFeaturesKHR->multiview == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceMultiviewFeaturesKHR::multiview == VK_TRUE");
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT: {
                     VkPhysicalDeviceRobustness2FeaturesEXT* prettify_VkPhysicalDeviceRobustness2FeaturesEXT = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(static_cast<void*>(p));
                     ret = ret && (prettify_VkPhysicalDeviceRobustness2FeaturesEXT->robustImageAccess2 == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceRobustness2FeaturesEXT->robustImageAccess2 == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceRobustness2FeaturesEXT::robustImageAccess2 == VK_TRUE");
                 } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES_EXT: {
+                    VkPhysicalDeviceScalarBlockLayoutFeaturesEXT* prettify_VkPhysicalDeviceScalarBlockLayoutFeaturesEXT = static_cast<VkPhysicalDeviceScalarBlockLayoutFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceScalarBlockLayoutFeaturesEXT->scalarBlockLayout == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceScalarBlockLayoutFeaturesEXT->scalarBlockLayout == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceScalarBlockLayoutFeaturesEXT::scalarBlockLayout == VK_TRUE");
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT: {
                     VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT* prettify_VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT = static_cast<VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT*>(static_cast<void*>(p));
                     ret = ret && (prettify_VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT->texelBufferAlignment == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT->texelBufferAlignment == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT::texelBufferAlignment == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR: {
+                    VkPhysicalDeviceTimelineSemaphoreFeaturesKHR* prettify_VkPhysicalDeviceTimelineSemaphoreFeaturesKHR = static_cast<VkPhysicalDeviceTimelineSemaphoreFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceTimelineSemaphoreFeaturesKHR->timelineSemaphore == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTimelineSemaphoreFeaturesKHR->timelineSemaphore == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceTimelineSemaphoreFeaturesKHR::timelineSemaphore == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR: {
+                    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR* prettify_VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR = static_cast<VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR->uniformBufferStandardLayout == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR->uniformBufferStandardLayout == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR::uniformBufferStandardLayout == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES: {
+                    VkPhysicalDeviceVariablePointersFeaturesKHR* prettify_VkPhysicalDeviceVariablePointersFeaturesKHR = static_cast<VkPhysicalDeviceVariablePointersFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceVariablePointersFeaturesKHR->variablePointers == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVariablePointersFeaturesKHR->variablePointers == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVariablePointersFeaturesKHR::variablePointers == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVariablePointersFeaturesKHR->variablePointersStorageBuffer == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVariablePointersFeaturesKHR->variablePointersStorageBuffer == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVariablePointersFeaturesKHR::variablePointersStorageBuffer == VK_TRUE");
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT: {
                     VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT* prettify_VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT = static_cast<VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT*>(static_cast<void*>(p));
@@ -6204,10 +6324,20 @@ static const VpFormatDesc formatDesc[] = {
 
 static const VpStructChainerDesc chainerDesc = {
     [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
-        VkPhysicalDeviceInlineUniformBlockFeaturesEXT physicalDeviceInlineUniformBlockFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT, nullptr };
-        VkPhysicalDeviceRobustness2FeaturesEXT physicalDeviceRobustness2FeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT, &physicalDeviceInlineUniformBlockFeaturesEXT };
-        VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT physicalDeviceTexelBufferAlignmentFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT, &physicalDeviceRobustness2FeaturesEXT };
-        VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT physicalDeviceVertexAttributeDivisorFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT, &physicalDeviceTexelBufferAlignmentFeaturesEXT };
+        VkPhysicalDevice16BitStorageFeaturesKHR physicalDevice16BitStorageFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR, nullptr };
+        VkPhysicalDevice8BitStorageFeaturesKHR physicalDevice8BitStorageFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR, &physicalDevice16BitStorageFeaturesKHR };
+        VkPhysicalDeviceDescriptorIndexingFeaturesEXT physicalDeviceDescriptorIndexingFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT, &physicalDevice8BitStorageFeaturesKHR };
+        VkPhysicalDeviceFloat16Int8FeaturesKHR physicalDeviceFloat16Int8FeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR, &physicalDeviceDescriptorIndexingFeaturesEXT };
+        VkPhysicalDeviceHostQueryResetFeaturesEXT physicalDeviceHostQueryResetFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &physicalDeviceFloat16Int8FeaturesKHR };
+        VkPhysicalDeviceInlineUniformBlockFeaturesEXT physicalDeviceInlineUniformBlockFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT, &physicalDeviceHostQueryResetFeaturesEXT };
+        VkPhysicalDeviceMultiviewFeaturesKHR physicalDeviceMultiviewFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR, &physicalDeviceInlineUniformBlockFeaturesEXT };
+        VkPhysicalDeviceRobustness2FeaturesEXT physicalDeviceRobustness2FeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT, &physicalDeviceMultiviewFeaturesKHR };
+        VkPhysicalDeviceScalarBlockLayoutFeaturesEXT physicalDeviceScalarBlockLayoutFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES_EXT, &physicalDeviceRobustness2FeaturesEXT };
+        VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT physicalDeviceTexelBufferAlignmentFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT, &physicalDeviceScalarBlockLayoutFeaturesEXT };
+        VkPhysicalDeviceTimelineSemaphoreFeaturesKHR physicalDeviceTimelineSemaphoreFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR, &physicalDeviceTexelBufferAlignmentFeaturesEXT };
+        VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR physicalDeviceUniformBufferStandardLayoutFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR, &physicalDeviceTimelineSemaphoreFeaturesKHR };
+        VkPhysicalDeviceVariablePointersFeaturesKHR physicalDeviceVariablePointersFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES, &physicalDeviceUniformBufferStandardLayoutFeaturesKHR };
+        VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT physicalDeviceVertexAttributeDivisorFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT, &physicalDeviceVariablePointersFeaturesKHR };
         p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceVertexAttributeDivisorFeaturesEXT));
         pfnCb(p, pUser);
     },
@@ -6283,11 +6413,21 @@ static const VkExtensionProperties deviceExtensions[] = {
 };
 
 static const VkStructureType featureStructTypes[] = {
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES_EXT,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR,
+    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES,
     VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT,
 };
 
@@ -6314,6 +6454,32 @@ static const VkStructureType formatStructTypes[] = {
 static const VpFeatureDesc featureDesc = {
     [](VkBaseOutStructure* p) {
             switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR: {
+                    VkPhysicalDevice16BitStorageFeaturesKHR* s = static_cast<VkPhysicalDevice16BitStorageFeaturesKHR*>(static_cast<void*>(p));
+                    s->storageBuffer16BitAccess = VK_TRUE;
+                    s->uniformAndStorageBuffer16BitAccess = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR: {
+                    VkPhysicalDevice8BitStorageFeaturesKHR* s = static_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(static_cast<void*>(p));
+                    s->storageBuffer8BitAccess = VK_TRUE;
+                    s->uniformAndStorageBuffer8BitAccess = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT: {
+                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT* s = static_cast<VkPhysicalDeviceDescriptorIndexingFeaturesEXT*>(static_cast<void*>(p));
+                    s->descriptorBindingPartiallyBound = VK_TRUE;
+                    s->descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingStorageImageUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingStorageTexelBufferUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingUniformTexelBufferUpdateAfterBind = VK_TRUE;
+                    s->descriptorBindingUpdateUnusedWhilePending = VK_TRUE;
+                    s->descriptorBindingVariableDescriptorCount = VK_TRUE;
+                    s->runtimeDescriptorArray = VK_TRUE;
+                    s->shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+                    s->shaderStorageTexelBufferArrayDynamicIndexing = VK_TRUE;
+                    s->shaderUniformTexelBufferArrayDynamicIndexing = VK_TRUE;
+                    s->shaderUniformTexelBufferArrayNonUniformIndexing = VK_TRUE;
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR: {
                     VkPhysicalDeviceFeatures2KHR* s = static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p));
                     s->features.depthBiasClamp = VK_TRUE;
@@ -6346,10 +6512,22 @@ static const VpFeatureDesc featureDesc = {
                     s->features.textureCompressionBC = VK_TRUE;
                     s->features.vertexPipelineStoresAndAtomics = VK_TRUE;
                 } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR: {
+                    VkPhysicalDeviceFloat16Int8FeaturesKHR* s = static_cast<VkPhysicalDeviceFloat16Int8FeaturesKHR*>(static_cast<void*>(p));
+                    s->shaderInt8 = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT: {
+                    VkPhysicalDeviceHostQueryResetFeaturesEXT* s = static_cast<VkPhysicalDeviceHostQueryResetFeaturesEXT*>(static_cast<void*>(p));
+                    s->hostQueryReset = VK_TRUE;
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT: {
                     VkPhysicalDeviceInlineUniformBlockFeaturesEXT* s = static_cast<VkPhysicalDeviceInlineUniformBlockFeaturesEXT*>(static_cast<void*>(p));
                     s->descriptorBindingInlineUniformBlockUpdateAfterBind = VK_TRUE;
                     s->inlineUniformBlock = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR: {
+                    VkPhysicalDeviceMultiviewFeaturesKHR* s = static_cast<VkPhysicalDeviceMultiviewFeaturesKHR*>(static_cast<void*>(p));
+                    s->multiview = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR: {
                     VkPhysicalDevicePortabilitySubsetFeaturesKHR* s = static_cast<VkPhysicalDevicePortabilitySubsetFeaturesKHR*>(static_cast<void*>(p));
@@ -6366,9 +6544,26 @@ static const VpFeatureDesc featureDesc = {
                     VkPhysicalDeviceRobustness2FeaturesEXT* s = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(static_cast<void*>(p));
                     s->robustImageAccess2 = VK_TRUE;
                 } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES_EXT: {
+                    VkPhysicalDeviceScalarBlockLayoutFeaturesEXT* s = static_cast<VkPhysicalDeviceScalarBlockLayoutFeaturesEXT*>(static_cast<void*>(p));
+                    s->scalarBlockLayout = VK_TRUE;
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT: {
                     VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT*>(static_cast<void*>(p));
                     s->texelBufferAlignment = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR: {
+                    VkPhysicalDeviceTimelineSemaphoreFeaturesKHR* s = static_cast<VkPhysicalDeviceTimelineSemaphoreFeaturesKHR*>(static_cast<void*>(p));
+                    s->timelineSemaphore = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR: {
+                    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR* s = static_cast<VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR*>(static_cast<void*>(p));
+                    s->uniformBufferStandardLayout = VK_TRUE;
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES: {
+                    VkPhysicalDeviceVariablePointersFeaturesKHR* s = static_cast<VkPhysicalDeviceVariablePointersFeaturesKHR*>(static_cast<void*>(p));
+                    s->variablePointers = VK_TRUE;
+                    s->variablePointersStorageBuffer = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT: {
                     VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT* s = static_cast<VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT*>(static_cast<void*>(p));
@@ -6381,6 +6576,32 @@ static const VpFeatureDesc featureDesc = {
     [](VkBaseOutStructure* p) -> bool {
         bool ret = true;
             switch (p->sType) {
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR: {
+                    VkPhysicalDevice16BitStorageFeaturesKHR* prettify_VkPhysicalDevice16BitStorageFeaturesKHR = static_cast<VkPhysicalDevice16BitStorageFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDevice16BitStorageFeaturesKHR->storageBuffer16BitAccess == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevice16BitStorageFeaturesKHR->storageBuffer16BitAccess == VK_TRUE), "Unsupported feature condition: VkPhysicalDevice16BitStorageFeaturesKHR::storageBuffer16BitAccess == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDevice16BitStorageFeaturesKHR->uniformAndStorageBuffer16BitAccess == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevice16BitStorageFeaturesKHR->uniformAndStorageBuffer16BitAccess == VK_TRUE), "Unsupported feature condition: VkPhysicalDevice16BitStorageFeaturesKHR::uniformAndStorageBuffer16BitAccess == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR: {
+                    VkPhysicalDevice8BitStorageFeaturesKHR* prettify_VkPhysicalDevice8BitStorageFeaturesKHR = static_cast<VkPhysicalDevice8BitStorageFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDevice8BitStorageFeaturesKHR->storageBuffer8BitAccess == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevice8BitStorageFeaturesKHR->storageBuffer8BitAccess == VK_TRUE), "Unsupported feature condition: VkPhysicalDevice8BitStorageFeaturesKHR::storageBuffer8BitAccess == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDevice8BitStorageFeaturesKHR->uniformAndStorageBuffer8BitAccess == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDevice8BitStorageFeaturesKHR->uniformAndStorageBuffer8BitAccess == VK_TRUE), "Unsupported feature condition: VkPhysicalDevice8BitStorageFeaturesKHR::uniformAndStorageBuffer8BitAccess == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT: {
+                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT* prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT = static_cast<VkPhysicalDeviceDescriptorIndexingFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingPartiallyBound == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingPartiallyBound == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingPartiallyBound == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingSampledImageUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingSampledImageUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingSampledImageUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingStorageBufferUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingStorageBufferUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingStorageBufferUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingStorageImageUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingStorageImageUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingStorageImageUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingStorageTexelBufferUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingStorageTexelBufferUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingStorageTexelBufferUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingUniformTexelBufferUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingUniformTexelBufferUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingUniformTexelBufferUpdateAfterBind == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingUpdateUnusedWhilePending == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingUpdateUnusedWhilePending == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingUpdateUnusedWhilePending == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingVariableDescriptorCount == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->descriptorBindingVariableDescriptorCount == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingVariableDescriptorCount == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->runtimeDescriptorArray == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->runtimeDescriptorArray == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::runtimeDescriptorArray == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderSampledImageArrayNonUniformIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderSampledImageArrayNonUniformIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::shaderSampledImageArrayNonUniformIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderStorageTexelBufferArrayDynamicIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderStorageTexelBufferArrayDynamicIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::shaderStorageTexelBufferArrayDynamicIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderUniformTexelBufferArrayNonUniformIndexing == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceDescriptorIndexingFeaturesEXT->shaderUniformTexelBufferArrayNonUniformIndexing == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::shaderUniformTexelBufferArrayNonUniformIndexing == VK_TRUE");
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR: {
                     VkPhysicalDeviceFeatures2KHR* prettify_VkPhysicalDeviceFeatures2KHR = static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p));
                     ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.depthBiasClamp == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.depthBiasClamp == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.depthBiasClamp == VK_TRUE");
@@ -6413,10 +6634,22 @@ static const VpFeatureDesc featureDesc = {
                     ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.textureCompressionBC == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.textureCompressionBC == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.textureCompressionBC == VK_TRUE");
                     ret = ret && (prettify_VkPhysicalDeviceFeatures2KHR->features.vertexPipelineStoresAndAtomics == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFeatures2KHR->features.vertexPipelineStoresAndAtomics == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.vertexPipelineStoresAndAtomics == VK_TRUE");
                 } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR: {
+                    VkPhysicalDeviceFloat16Int8FeaturesKHR* prettify_VkPhysicalDeviceFloat16Int8FeaturesKHR = static_cast<VkPhysicalDeviceFloat16Int8FeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceFloat16Int8FeaturesKHR->shaderInt8 == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceFloat16Int8FeaturesKHR->shaderInt8 == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceFloat16Int8FeaturesKHR::shaderInt8 == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT: {
+                    VkPhysicalDeviceHostQueryResetFeaturesEXT* prettify_VkPhysicalDeviceHostQueryResetFeaturesEXT = static_cast<VkPhysicalDeviceHostQueryResetFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceHostQueryResetFeaturesEXT->hostQueryReset == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceHostQueryResetFeaturesEXT->hostQueryReset == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceHostQueryResetFeaturesEXT::hostQueryReset == VK_TRUE");
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT: {
                     VkPhysicalDeviceInlineUniformBlockFeaturesEXT* prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT = static_cast<VkPhysicalDeviceInlineUniformBlockFeaturesEXT*>(static_cast<void*>(p));
                     ret = ret && (prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT->descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT->descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceInlineUniformBlockFeaturesEXT::descriptorBindingInlineUniformBlockUpdateAfterBind == VK_TRUE");
                     ret = ret && (prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT->inlineUniformBlock == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceInlineUniformBlockFeaturesEXT->inlineUniformBlock == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceInlineUniformBlockFeaturesEXT::inlineUniformBlock == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR: {
+                    VkPhysicalDeviceMultiviewFeaturesKHR* prettify_VkPhysicalDeviceMultiviewFeaturesKHR = static_cast<VkPhysicalDeviceMultiviewFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceMultiviewFeaturesKHR->multiview == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceMultiviewFeaturesKHR->multiview == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceMultiviewFeaturesKHR::multiview == VK_TRUE");
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR: {
                     VkPhysicalDevicePortabilitySubsetFeaturesKHR* prettify_VkPhysicalDevicePortabilitySubsetFeaturesKHR = static_cast<VkPhysicalDevicePortabilitySubsetFeaturesKHR*>(static_cast<void*>(p));
@@ -6433,9 +6666,26 @@ static const VpFeatureDesc featureDesc = {
                     VkPhysicalDeviceRobustness2FeaturesEXT* prettify_VkPhysicalDeviceRobustness2FeaturesEXT = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(static_cast<void*>(p));
                     ret = ret && (prettify_VkPhysicalDeviceRobustness2FeaturesEXT->robustImageAccess2 == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceRobustness2FeaturesEXT->robustImageAccess2 == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceRobustness2FeaturesEXT::robustImageAccess2 == VK_TRUE");
                 } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES_EXT: {
+                    VkPhysicalDeviceScalarBlockLayoutFeaturesEXT* prettify_VkPhysicalDeviceScalarBlockLayoutFeaturesEXT = static_cast<VkPhysicalDeviceScalarBlockLayoutFeaturesEXT*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceScalarBlockLayoutFeaturesEXT->scalarBlockLayout == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceScalarBlockLayoutFeaturesEXT->scalarBlockLayout == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceScalarBlockLayoutFeaturesEXT::scalarBlockLayout == VK_TRUE");
+                } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT: {
                     VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT* prettify_VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT = static_cast<VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT*>(static_cast<void*>(p));
                     ret = ret && (prettify_VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT->texelBufferAlignment == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT->texelBufferAlignment == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT::texelBufferAlignment == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR: {
+                    VkPhysicalDeviceTimelineSemaphoreFeaturesKHR* prettify_VkPhysicalDeviceTimelineSemaphoreFeaturesKHR = static_cast<VkPhysicalDeviceTimelineSemaphoreFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceTimelineSemaphoreFeaturesKHR->timelineSemaphore == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceTimelineSemaphoreFeaturesKHR->timelineSemaphore == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceTimelineSemaphoreFeaturesKHR::timelineSemaphore == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR: {
+                    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR* prettify_VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR = static_cast<VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR->uniformBufferStandardLayout == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR->uniformBufferStandardLayout == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR::uniformBufferStandardLayout == VK_TRUE");
+                } break;
+                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES: {
+                    VkPhysicalDeviceVariablePointersFeaturesKHR* prettify_VkPhysicalDeviceVariablePointersFeaturesKHR = static_cast<VkPhysicalDeviceVariablePointersFeaturesKHR*>(static_cast<void*>(p));
+                    ret = ret && (prettify_VkPhysicalDeviceVariablePointersFeaturesKHR->variablePointers == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVariablePointersFeaturesKHR->variablePointers == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVariablePointersFeaturesKHR::variablePointers == VK_TRUE");
+                    ret = ret && (prettify_VkPhysicalDeviceVariablePointersFeaturesKHR->variablePointersStorageBuffer == VK_TRUE); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceVariablePointersFeaturesKHR->variablePointersStorageBuffer == VK_TRUE), "Unsupported feature condition: VkPhysicalDeviceVariablePointersFeaturesKHR::variablePointersStorageBuffer == VK_TRUE");
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT: {
                     VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT* prettify_VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT = static_cast<VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT*>(static_cast<void*>(p));
@@ -9052,11 +9302,21 @@ static const VpFormatDesc formatDesc[] = {
 
 static const VpStructChainerDesc chainerDesc = {
     [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {
-        VkPhysicalDeviceInlineUniformBlockFeaturesEXT physicalDeviceInlineUniformBlockFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT, nullptr };
-        VkPhysicalDevicePortabilitySubsetFeaturesKHR physicalDevicePortabilitySubsetFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR, &physicalDeviceInlineUniformBlockFeaturesEXT };
+        VkPhysicalDevice16BitStorageFeaturesKHR physicalDevice16BitStorageFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR, nullptr };
+        VkPhysicalDevice8BitStorageFeaturesKHR physicalDevice8BitStorageFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR, &physicalDevice16BitStorageFeaturesKHR };
+        VkPhysicalDeviceDescriptorIndexingFeaturesEXT physicalDeviceDescriptorIndexingFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT, &physicalDevice8BitStorageFeaturesKHR };
+        VkPhysicalDeviceFloat16Int8FeaturesKHR physicalDeviceFloat16Int8FeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR, &physicalDeviceDescriptorIndexingFeaturesEXT };
+        VkPhysicalDeviceHostQueryResetFeaturesEXT physicalDeviceHostQueryResetFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &physicalDeviceFloat16Int8FeaturesKHR };
+        VkPhysicalDeviceInlineUniformBlockFeaturesEXT physicalDeviceInlineUniformBlockFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT, &physicalDeviceHostQueryResetFeaturesEXT };
+        VkPhysicalDeviceMultiviewFeaturesKHR physicalDeviceMultiviewFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR, &physicalDeviceInlineUniformBlockFeaturesEXT };
+        VkPhysicalDevicePortabilitySubsetFeaturesKHR physicalDevicePortabilitySubsetFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR, &physicalDeviceMultiviewFeaturesKHR };
         VkPhysicalDeviceRobustness2FeaturesEXT physicalDeviceRobustness2FeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT, &physicalDevicePortabilitySubsetFeaturesKHR };
-        VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT physicalDeviceTexelBufferAlignmentFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT, &physicalDeviceRobustness2FeaturesEXT };
-        VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT physicalDeviceVertexAttributeDivisorFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT, &physicalDeviceTexelBufferAlignmentFeaturesEXT };
+        VkPhysicalDeviceScalarBlockLayoutFeaturesEXT physicalDeviceScalarBlockLayoutFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES_EXT, &physicalDeviceRobustness2FeaturesEXT };
+        VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT physicalDeviceTexelBufferAlignmentFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_FEATURES_EXT, &physicalDeviceScalarBlockLayoutFeaturesEXT };
+        VkPhysicalDeviceTimelineSemaphoreFeaturesKHR physicalDeviceTimelineSemaphoreFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR, &physicalDeviceTexelBufferAlignmentFeaturesEXT };
+        VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR physicalDeviceUniformBufferStandardLayoutFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR, &physicalDeviceTimelineSemaphoreFeaturesKHR };
+        VkPhysicalDeviceVariablePointersFeaturesKHR physicalDeviceVariablePointersFeaturesKHR{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES, &physicalDeviceUniformBufferStandardLayoutFeaturesKHR };
+        VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT physicalDeviceVertexAttributeDivisorFeaturesEXT{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT, &physicalDeviceVariablePointersFeaturesKHR };
         p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>(&physicalDeviceVertexAttributeDivisorFeaturesEXT));
         pfnCb(p, pUser);
     },
