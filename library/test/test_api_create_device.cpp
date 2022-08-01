@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 }
 
 TEST(api_create_device_profile, overrite_with_profile_only) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkDeviceCreateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -71,7 +71,7 @@ TEST(api_create_device_profile, overrite_with_profile_only) {
 }
 
 TEST(api_create_device_profile, overrite_with_supported_extensions) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     static const char* extensions[] = {"VK_KHR_image_format_list", "VK_KHR_maintenance3", "VK_KHR_imageless_framebuffer"};
 
@@ -96,7 +96,7 @@ TEST(api_create_device_profile, overrite_with_supported_extensions) {
 }
 
 TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     static const char* extensions[] = {"VK_LUNARG_doesnot_exist", "VK_GTRUC_automagic_rendering",
                                        "VK_GTRUC_portability_everywhere"};
@@ -123,7 +123,7 @@ TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
 
 
 TEST(api_create_device_profile, overrite_with_enabled_features) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkPhysicalDeviceFeatures enabledFeatures = {};
     enabledFeatures.robustBufferAccess = VK_TRUE;
@@ -148,7 +148,7 @@ TEST(api_create_device_profile, overrite_with_enabled_features) {
 }
 
 TEST(api_create_device_profile, overrite_with_pnext_features) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceFeatures = {};
     deviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
@@ -176,7 +176,7 @@ TEST(api_create_device_profile, overrite_with_pnext_features) {
 }
 
 TEST(api_create_device_profile, with_extensions_flag) {
-    const VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
+    const VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     static const char* extensions[] = {VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME};
 
@@ -228,16 +228,8 @@ TEST(api_create_device_profile, with_extensions_flag) {
     }
 }
 
-TEST(api_get_profile_support, supported) {
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
-
-    VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
-    EXPECT_EQ(VK_TRUE, supported);
-}
-
 TEST(api_get_profile_support, unsupported_name) {
-    VpProfileProperties profile{"Bouuahhhh", VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
+    VpProfileProperties profile{"Bouuahhhh", VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
@@ -245,7 +237,7 @@ TEST(api_get_profile_support, unsupported_name) {
 }
 
 TEST(api_get_profile_support, unsupported_version) {
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION + 1};
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION + 1};
 
     VkBool32 supported = VK_FALSE;
     vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);

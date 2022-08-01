@@ -29,14 +29,14 @@ TEST(api_get_profiles_beta, full) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfiles(&propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(5, propertyCount);
+    EXPECT_EQ(3, propertyCount);
 
-    propertyCount = 6;
+    propertyCount = 4;
 
     std::vector<VpProfileProperties> properties(propertyCount);
     VkResult result1 = vpGetProfiles(&propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(5, propertyCount);
+    EXPECT_EQ(3, propertyCount);
 
     EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, properties[0].profileName);
     EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, properties[0].specVersion);
@@ -46,7 +46,7 @@ TEST(api_get_profiles_beta, partial) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfiles(&propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(5, propertyCount);
+    EXPECT_EQ(3, propertyCount);
 
     propertyCount = 1;
 
@@ -61,7 +61,7 @@ TEST(api_get_profiles_beta, partial) {
 }
 
 TEST(api_get_profile_device_extension_properties, full) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, &propertyCount, nullptr);
@@ -82,7 +82,7 @@ TEST(api_get_profile_device_extension_properties, full) {
 }
 
 TEST(api_get_profile_device_extension_properties, partial) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, &propertyCount, nullptr);
@@ -103,7 +103,7 @@ TEST(api_get_profile_device_extension_properties, partial) {
 }
 
 TEST(api_get_profile_instance_extension_properties, full) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileInstanceExtensionProperties(&profile, &propertyCount, nullptr);
@@ -118,49 +118,25 @@ TEST(api_get_profile_instance_extension_properties, full) {
     EXPECT_EQ(0, propertyCount);
 }
 
-TEST(api_get_profile_fallbacks, full) {
-    const VpProfileProperties profile_subset = {VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME, 1};
-    const VpProfileProperties profile_expect = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+TEST(api_get_profile_fallbacks, empty) {
+    const VpProfileProperties profile_subset = {VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_NAME, 1};
+    const VpProfileProperties profile_expect = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
 
     uint32_t count = 0;
     VkResult result0 = vpGetProfileFallbacks(&profile_subset, &count, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(1, count);
+    EXPECT_EQ(0, count);
 
-    count = 2;
+    count = 1;
 
     std::vector<VpProfileProperties> data(count);
     VkResult result1 = vpGetProfileFallbacks(&profile_subset, &count, &data[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(1, count);
-
-    EXPECT_EQ(profile_expect.specVersion, data[0].specVersion);
-    EXPECT_STREQ(profile_expect.profileName, data[0].profileName);
-}
-
-TEST(api_get_profile_fallbacks, partial) {
-    const VpProfileProperties profile_subset = {VP_LUNARG_DESKTOP_PORTABILITY_2021_SUBSET_NAME, 1};
-
-    uint32_t count = 0;
-    VkResult result0 = vpGetProfileFallbacks(&profile_subset, &count, nullptr);
-    EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(1, count);
-
-    std::vector<VpProfileProperties> data(count);
-
-    count = 0;
-
-    VkResult result1 = vpGetProfileFallbacks(&profile_subset, &count, &data[0]);
-    EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(0, count);
-
-    EXPECT_EQ(0, data[0].specVersion);
-    EXPECT_STREQ("", data[0].profileName);
 }
-
 
 TEST(api_get_profile_formats, full) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
 
     uint32_t formatCount = 0;
     VkResult result0 = vpGetProfileFormats(&profile, &formatCount, nullptr);
@@ -180,7 +156,7 @@ TEST(api_get_profile_formats, full) {
 }
 
 TEST(api_get_profile_formats, partial) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
 
     uint32_t formatCount = 0;
     VkResult result0 = vpGetProfileFormats(&profile, &formatCount, nullptr);
@@ -209,7 +185,7 @@ TEST(api_get_profile_formats, unspecified) {
 }
 
 TEST(api_get_profile_formats, properties_single) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
 
 #if defined(VK_VERSION_1_1) || defined(VK_KHR_get_physical_device_properties2)
     VkFormatProperties2KHR properties2 = {};
@@ -237,7 +213,7 @@ TEST(api_get_profile_formats, properties_single) {
 }
 
 TEST(api_get_profile_formats, properties_chained) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
 
 #if defined(VK_VERSION_1_3) || defined(VK_KHR_format_feature_flags2)
     VkFormatProperties2KHR properties2 = {};
@@ -267,19 +243,21 @@ TEST(api_get_profile_formats, properties_chained) {
 }
 
 TEST(api_get_profile_queue_families, full) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
 
     uint32_t count = 0;
     VkResult result0 = vpGetProfileQueueFamilyProperties(&profile, &count, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(1, count);
 
+    count = 1;
+
 #if defined(VK_VERSION_1_1) || defined(VK_KHR_get_physical_device_properties2)
     std::vector<VkQueueFamilyProperties2KHR> data(count, {VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR});
     VkResult result1 = vpGetProfileQueueFamilyProperties(&profile, &count, &data[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(1, count);
-
+    EXPECT_EQ(0, count);
+/*
     EXPECT_EQ(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT,
               data[0].queueFamilyProperties.queueFlags);
     EXPECT_EQ(1, data[0].queueFamilyProperties.queueCount);
@@ -287,6 +265,7 @@ TEST(api_get_profile_queue_families, full) {
     EXPECT_EQ(1, data[0].queueFamilyProperties.minImageTransferGranularity.width);
     EXPECT_EQ(1, data[0].queueFamilyProperties.minImageTransferGranularity.height);
     EXPECT_EQ(1, data[0].queueFamilyProperties.minImageTransferGranularity.depth);
+*/
 #endif  //
 }
 
@@ -297,10 +276,17 @@ TEST(api_get_profile_queue_families, unspecified) {
     VkResult result0 = vpGetProfileQueueFamilyProperties(&profile, &count, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(0, count);
-}
 
+    count = 1;
+
+    std::vector<VkQueueFamilyProperties2KHR> data(count, {VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR});
+    VkResult result1 = vpGetProfileQueueFamilyProperties(&profile, &count, &data[0]);
+    EXPECT_EQ(VK_SUCCESS, result1);
+    EXPECT_EQ(0, count);
+}
+/*
 TEST(api_get_profile_queue_families, list) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileQueueFamilyStructureTypes(&profile, &propertyCount, nullptr);
@@ -314,14 +300,14 @@ TEST(api_get_profile_queue_families, list) {
     EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(0, propertyCount);
 }
-
+*/
 
 TEST(api_get_profile_properties, get_properties2) {
     VkPhysicalDeviceProperties2 profileProperties2{};
     profileProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     profileProperties2.pNext = nullptr;
 
-    const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+    const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
 
     vpGetProfileProperties(&Profile, &profileProperties2);
 
@@ -346,7 +332,7 @@ TEST(api_get_profile_structures, get_properties_chain) {
     properties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     properties2.pNext = &properties1;
 
-    const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, 1};
+    const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
 
     vpGetProfileProperties(&Profile, &properties2);
 

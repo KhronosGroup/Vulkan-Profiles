@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
 #if defined(VK_VERSION_1_2) || defined(VK_KHR_maintenance3)
 // In this example, a typical usage of profiles with additional features and extensions
 TEST(test_profile, example_add_features_add_extensions) {
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
@@ -82,7 +82,7 @@ TEST(test_profile, example_add_features_add_extensions) {
 #if defined(VK_VERSION_1_1) || defined(VK_EXT_subgroup_size_control)
 // In this example, we are using vpGetProfileStructures to initialize each application structure individually
 TEST(test_profile, example_individual_override_features) {
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
@@ -121,7 +121,7 @@ TEST(test_profile, example_individual_override_features) {
 #if defined(VK_VERSION_1_1) || defined(VK_EXT_subgroup_size_control)
 // In this example, we are using vpGetProfileStructures to initial the entire application structure chain
 TEST(test_profile, example_collective_override_features) {
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
@@ -161,7 +161,7 @@ TEST(test_profile, example_collective_override_features) {
 
 // In this example, we are using VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT to disable robustBufferAccess
 TEST(test_profile, example_flag_disable_robust_access) {
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION};
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
