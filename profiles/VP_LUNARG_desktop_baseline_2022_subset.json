@@ -43,6 +43,29 @@
                 "VK_KHR_variable_pointers": 1
             },
             "features": {
+                "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                    "storageBuffer16BitAccess": true,
+                    "uniformAndStorageBuffer16BitAccess": true
+                },
+                "VkPhysicalDevice8BitStorageFeaturesKHR": {
+                    "storageBuffer8BitAccess": true,
+                    "uniformAndStorageBuffer8BitAccess": true
+                },
+                "VkPhysicalDeviceDescriptorIndexingFeaturesEXT": {
+                    "shaderUniformTexelBufferArrayDynamicIndexing": true,
+                    "shaderStorageTexelBufferArrayDynamicIndexing": true,
+                    "shaderSampledImageArrayNonUniformIndexing": true,
+                    "shaderUniformTexelBufferArrayNonUniformIndexing": true,
+                    "descriptorBindingSampledImageUpdateAfterBind": true,
+                    "descriptorBindingStorageImageUpdateAfterBind": true,
+                    "descriptorBindingStorageBufferUpdateAfterBind": true,
+                    "descriptorBindingUniformTexelBufferUpdateAfterBind": true,
+                    "descriptorBindingStorageTexelBufferUpdateAfterBind": true,
+                    "descriptorBindingUpdateUnusedWhilePending": true,
+                    "descriptorBindingPartiallyBound": true,
+                    "descriptorBindingVariableDescriptorCount": true,
+                    "runtimeDescriptorArray": true
+                },
                 "VkPhysicalDeviceFeatures": {
                     "depthBiasClamp": true,
                     "depthClamp": true,
@@ -74,9 +97,18 @@
                     "textureCompressionBC": true,
                     "vertexPipelineStoresAndAtomics": true
                 },
+                "VkPhysicalDeviceFloat16Int8FeaturesKHR": {
+                    "shaderInt8": true
+                },
+                "VkPhysicalDeviceHostQueryResetFeaturesEXT": {
+                    "hostQueryReset": true
+                },
                 "VkPhysicalDeviceInlineUniformBlockFeaturesEXT": {
                     "inlineUniformBlock": true,
                     "descriptorBindingInlineUniformBlockUpdateAfterBind": true
+                },
+                "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                    "multiview": true
                 },
                 "VkPhysicalDevicePortabilitySubsetFeaturesKHR": {
                     "vertexAttributeAccessBeyondStride": true,
@@ -91,8 +123,21 @@
                 "VkPhysicalDeviceRobustness2FeaturesEXT": {
                     "robustImageAccess2": true
                 },
+                "VkPhysicalDeviceScalarBlockLayoutFeaturesEXT": {
+                    "scalarBlockLayout": true
+                },
                 "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT": {
                     "texelBufferAlignment": true
+                },
+                "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR": {
+                    "timelineSemaphore": true
+                },
+                "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR": {
+                    "uniformBufferStandardLayout": true
+                },
+                "VkPhysicalDeviceVariablePointersFeaturesKHR": {
+                    "variablePointersStorageBuffer": true,
+                    "variablePointers": true
                 },
                 "VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT": {
                     "vertexAttributeInstanceRateDivisor": true,
@@ -1999,7 +2044,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-07-28",
+                    "date": "2022-08-01",
                     "author": "LunarG Profiles Merger",
                     "comment": "A baseline macOS specific profile variant of VP_LUNARG_desktop_baseline_2022"
                 }

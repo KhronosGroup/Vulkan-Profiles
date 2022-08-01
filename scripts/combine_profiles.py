@@ -291,14 +291,14 @@ class ProfileMerger():
                     for member in merged[struct]:
                         merged[promoted][member] = merged[struct][member]
                 # Intersect
-                elif self.mode == 'intersection':
-                    if promoted in merged:
-                        for member in list(merged[promoted]):
-                            if member not in merged[struct]:
-                                del merged[promoted][member]
-                else:
-                    print("ERROR: Unknown combination mode: " + self.mode)
-                del merged[struct]
+                #elif self.mode == 'intersection':
+                #    if promoted in merged:
+                #        for member in list(merged[promoted]):
+                #            if member not in merged[struct]:
+                #                del merged[promoted][member]
+                #else:
+                #    print("ERROR: Unknown combination mode: " + self.mode)
+                #del merged[struct]
 
 
     def get_promoted_struct_name(self, struct, feature):
