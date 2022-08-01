@@ -89,7 +89,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_unsupported_version) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported API version: 1.1.142"
+        "Unsupported API version: 1.1.162"
     });
 #endif
 
@@ -102,7 +102,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_unsupported_version) {
         VK_EXT(VK_KHR_EXTERNAL_FENCE_CAPABILITIES),
     });
 
-    VpProfileProperties profile{ VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION };
+    const VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkBool32 supported = VK_TRUE;
     VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);

@@ -211,10 +211,10 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_version) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Checking device support for profile VP_LUNARG_desktop_portability_2021 "
+        "Checking device support for profile VP_LUNARG_desktop_baseline_2022 "
             "(deviceName=, driverName=, driverInfo=). You may find the details "
             "of the capabilities of this device on https://vulkan.gpuinfo.org/",
-        "Unsupported API version: 1.1.142"
+        "Unsupported API version: 1.1.162"
     });
 #endif
 
@@ -245,7 +245,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_version) {
         VK_EXT(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT),
     });
 
-    VpProfileProperties profile{ VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION };
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkPhysicalDeviceVariablePointerFeatures vpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTER_FEATURES };
     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
@@ -761,7 +761,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_supported) {
         VK_EXT(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT),
     });
 
-    VpProfileProperties profile{ VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION };
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkPhysicalDeviceVariablePointerFeatures vpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTER_FEATURES };
     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
@@ -775,6 +775,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_supported) {
     VkPhysicalDeviceImagelessFramebufferFeaturesKHR imagelessFbFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES, &storage16Features };
     VkPhysicalDeviceMultiviewFeatures multiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES, &imagelessFbFeatures };
     VkPhysicalDeviceFeatures2 features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &multiviewFeatures };
+
     vpGetProfileFeatures(&profile, &features);
     features.features.logicOp = VK_TRUE;
     storage8Features.storagePushConstant8 = VK_TRUE;
@@ -975,7 +976,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_extension) {
         VK_EXT(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT),
     });
 
-    VpProfileProperties profile{ VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION };
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkPhysicalDeviceVariablePointerFeatures vpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTER_FEATURES };
     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
@@ -1070,7 +1071,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_feature) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Checking device support for profile VP_LUNARG_desktop_portability_2021 "
+        "Checking device support for profile VP_LUNARG_desktop_baseline_2022 "
             "(deviceName=, driverName=, driverInfo=). You may find the details "
             "of the capabilities of this device on https://vulkan.gpuinfo.org/",
         "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE"
@@ -1104,7 +1105,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_feature) {
         VK_EXT(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT),
     });
 
-    VpProfileProperties profile{ VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION };
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkPhysicalDeviceVariablePointerFeatures vpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTER_FEATURES };
     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
@@ -1233,7 +1234,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_property) {
         VK_EXT(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT),
     });
 
-    VpProfileProperties profile{ VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION };
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkPhysicalDeviceVariablePointerFeatures vpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTER_FEATURES };
     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
@@ -1368,7 +1369,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_format) {
         VK_EXT(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT),
     });
 
-    VpProfileProperties profile{ VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION };
+    const VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkPhysicalDeviceVariablePointerFeatures vpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTER_FEATURES };
     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
@@ -1499,7 +1500,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_queue_family) 
         VK_EXT(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT),
     });
 
-    VpProfileProperties profile{ VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION };
+    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkPhysicalDeviceVariablePointerFeatures vpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTER_FEATURES };
     VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
