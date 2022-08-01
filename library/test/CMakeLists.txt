@@ -123,7 +123,6 @@ function(add_unit_test_simple NAME)
 endfunction(add_unit_test_simple)
 
 add_unit_test_simple(test_util)
-add_unit_test_simple(test_profile_examples)
 
 function(add_unit_test_with_debug_messages_variant NAME)
 	set(TEST_FILE ./${NAME}.cpp)
