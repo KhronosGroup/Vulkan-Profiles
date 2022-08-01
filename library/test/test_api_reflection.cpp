@@ -130,46 +130,6 @@ TEST(api_get_profile_fallbacks, empty) {
     EXPECT_EQ(0, count);
 }
 
-TEST(api_get_profile_formats, full) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
-
-    uint32_t formatCount = 0;
-    VkResult result0 = vpGetProfileFormats(&profile, &formatCount, nullptr);
-    EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(64, formatCount);
-
-    formatCount = 67;
-
-    std::vector<VkFormat> formats(formatCount);
-    VkResult result1 = vpGetProfileFormats(&profile, &formatCount, &formats[0]);
-    EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(64, formatCount);
-
-    EXPECT_EQ(VK_FORMAT_A2B10G10R10_UINT_PACK32, formats[0]);
-    EXPECT_EQ(VK_FORMAT_A2B10G10R10_UNORM_PACK32, formats[1]);
-    EXPECT_EQ(VK_FORMAT_A8B8G8R8_SINT_PACK32, formats[2]);
-}
-
-TEST(api_get_profile_formats, partial) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
-
-    uint32_t formatCount = 0;
-    VkResult result0 = vpGetProfileFormats(&profile, &formatCount, nullptr);
-    EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(64, formatCount);
-
-    formatCount = 3;
-
-    std::vector<VkFormat> formats(formatCount);
-    VkResult result1 = vpGetProfileFormats(&profile, &formatCount, &formats[0]);
-    EXPECT_EQ(VK_INCOMPLETE, result1);
-    EXPECT_EQ(3, formatCount);
-
-    EXPECT_EQ(VK_FORMAT_A2B10G10R10_UINT_PACK32, formats[0]);
-    EXPECT_EQ(VK_FORMAT_A2B10G10R10_UNORM_PACK32, formats[1]);
-    EXPECT_EQ(VK_FORMAT_A8B8G8R8_SINT_PACK32, formats[2]);
-}
-
 TEST(api_get_profile_formats, unspecified) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
@@ -177,91 +137,6 @@ TEST(api_get_profile_formats, unspecified) {
     VkResult result0 = vpGetProfileFormats(&profile, &formatCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(0, formatCount);
-}
-
-TEST(api_get_profile_formats, properties_single) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
-
-#if defined(VK_VERSION_1_1) || defined(VK_KHR_get_physical_device_properties2)
-    VkFormatProperties2KHR properties2 = {};
-    properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR;
-    vpGetProfileFormatProperties(&profile, VK_FORMAT_D16_UNORM, &properties2);
-    EXPECT_EQ(0, properties2.formatProperties.bufferFeatures);
-    EXPECT_EQ(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT |
-                  VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
-                  VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
-              properties2.formatProperties.optimalTilingFeatures);
-    EXPECT_EQ(0, properties2.formatProperties.linearTilingFeatures);
-#endif
-
-#if defined(VK_VERSION_1_3) || defined(VK_KHR_format_feature_flags2)
-    VkFormatProperties3KHR properties3 = {};
-    properties3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR;
-    vpGetProfileFormatProperties(&profile, VK_FORMAT_D16_UNORM, &properties3);
-    EXPECT_EQ(0, properties3.bufferFeatures);
-    EXPECT_EQ(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT |
-                  VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
-                  VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
-              properties3.optimalTilingFeatures);
-    EXPECT_EQ(0, properties3.linearTilingFeatures);
-#endif
-}
-
-TEST(api_get_profile_formats, properties_chained) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
-
-#if defined(VK_VERSION_1_3) || defined(VK_KHR_format_feature_flags2)
-    VkFormatProperties2KHR properties2 = {};
-    properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR;
-    properties2.pNext = nullptr;
-
-    VkFormatProperties3KHR properties3 = {};
-    properties3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR;
-    properties3.pNext = &properties2;
-
-    vpGetProfileFormatProperties(&profile, VK_FORMAT_D16_UNORM, &properties3);
-
-    EXPECT_EQ(0, properties2.formatProperties.bufferFeatures);
-    EXPECT_EQ(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT |
-                  VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
-                  VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
-              properties2.formatProperties.optimalTilingFeatures);
-    EXPECT_EQ(0, properties2.formatProperties.linearTilingFeatures);
-
-    EXPECT_EQ(0, properties3.bufferFeatures);
-    EXPECT_EQ(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT |
-                  VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT |
-                  VK_FORMAT_FEATURE_TRANSFER_DST_BIT,
-              properties3.optimalTilingFeatures);
-    EXPECT_EQ(0, properties3.linearTilingFeatures);
-#endif
-}
-
-TEST(api_get_profile_queue_families, full) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
-
-    uint32_t count = 0;
-    VkResult result0 = vpGetProfileQueueFamilyProperties(&profile, &count, nullptr);
-    EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(1, count);
-
-    count = 1;
-
-#if defined(VK_VERSION_1_1) || defined(VK_KHR_get_physical_device_properties2)
-    std::vector<VkQueueFamilyProperties2KHR> data(count, {VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR});
-    VkResult result1 = vpGetProfileQueueFamilyProperties(&profile, &count, &data[0]);
-    EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(0, count);
-/*
-    EXPECT_EQ(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT,
-              data[0].queueFamilyProperties.queueFlags);
-    EXPECT_EQ(1, data[0].queueFamilyProperties.queueCount);
-    EXPECT_EQ(36, data[0].queueFamilyProperties.timestampValidBits);
-    EXPECT_EQ(1, data[0].queueFamilyProperties.minImageTransferGranularity.width);
-    EXPECT_EQ(1, data[0].queueFamilyProperties.minImageTransferGranularity.height);
-    EXPECT_EQ(1, data[0].queueFamilyProperties.minImageTransferGranularity.depth);
-*/
-#endif  //
 }
 
 TEST(api_get_profile_queue_families, unspecified) {
@@ -279,23 +154,6 @@ TEST(api_get_profile_queue_families, unspecified) {
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(0, count);
 }
-/*
-TEST(api_get_profile_queue_families, list) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
-
-    uint32_t propertyCount = 0;
-    VkResult result0 = vpGetProfileQueueFamilyStructureTypes(&profile, &propertyCount, nullptr);
-    EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(1, propertyCount);
-
-    std::vector<VkStructureType> properties(propertyCount);
-
-    propertyCount = 0;
-    VkResult result1 = vpGetProfileQueueFamilyStructureTypes(&profile, &propertyCount, &properties[0]);
-    EXPECT_EQ(VK_INCOMPLETE, result1);
-    EXPECT_EQ(0, propertyCount);
-}
-*/
 
 TEST(api_get_profile_properties, get_properties2) {
     VkPhysicalDeviceProperties2 profileProperties2{};
