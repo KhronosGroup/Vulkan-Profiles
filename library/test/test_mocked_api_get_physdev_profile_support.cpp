@@ -740,7 +740,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_extension) {
         "Checking device support for profile VP_KHR_roadmap_2022 "
             "(deviceName=, driverName=, driverInfo=). You may find the details "
             "of the capabilities of this device on https://vulkan.gpuinfo.org/",
-        "Unsupported extension: VK_KHR_driver_properties"
+        "Unsupported extension: VK_KHR_global_priority"
     });
 #endif
 
@@ -761,6 +761,50 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_extension) {
 
     mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features)});
 
+    VkPhysicalDeviceVulkan13Properties vulkan13Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES};
+    VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};
+    VkPhysicalDeviceVulkan11Properties vulkan11Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, &vulkan12Properties};
+    VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, &vulkan11Properties};
+    vpGetProfileProperties(&profile, &props);
+
+    mock.SetProperties({VK_STRUCT(props), VK_STRUCT(vulkan11Properties), VK_STRUCT(vulkan12Properties), VK_STRUCT(vulkan13Properties)});
+
+    VkBool32 supported = VK_TRUE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(supported, VK_FALSE);
+}
+
+TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_feature) {
+    MockVulkanAPI mock;
+
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb({
+        "Checking device support for profile VP_KHR_roadmap_2022 "
+            "(deviceName=, driverName=, driverInfo=). You may find the details "
+            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
+        "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.fullDrawIndexUint32 == VK_TRUE"
+    });
+#endif
+
+    mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
+    mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
+
+    mock.SetDeviceExtensions(mock.vkPhysicalDevice, {
+        VK_EXT(VK_KHR_GLOBAL_PRIORITY),
+    });
+
+    VpProfileProperties profile{VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
+
+    VkPhysicalDeviceVulkan13Features vulkan13Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES};
+    VkPhysicalDeviceVulkan12Features vulkan12Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &vulkan13Features};
+    VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkan11Features};
+    vpGetProfileFeatures(&profile, &features);
+
+    features.features.fullDrawIndexUint32 = VK_FALSE;
+
     mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features)});
 
     VkPhysicalDeviceVulkan13Properties vulkan13Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES};
@@ -769,296 +813,54 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_extension) {
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, &vulkan11Properties};
     vpGetProfileProperties(&profile, &props);
 
+    mock.SetProperties({VK_STRUCT(props), VK_STRUCT(vulkan11Properties), VK_STRUCT(vulkan12Properties), VK_STRUCT(vulkan13Properties)});
+
+    VkBool32 supported = VK_TRUE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(supported, VK_FALSE);
+}
+
+TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_property) {
+    MockVulkanAPI mock;
+
+#if WITH_DEBUG_MESSAGES
+    MockDebugMessageCallback cb(
+        {"Checking device support for profile VP_KHR_roadmap_2022 "
+         "(deviceName=, driverName=, driverInfo=). You may find the details "
+         "of the capabilities of this device on https://vulkan.gpuinfo.org/",
+         "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimensionCube >= 8192"});
+#endif
+
+    mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
+    mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
+
+    mock.SetDeviceExtensions(mock.vkPhysicalDevice, {
+        VK_EXT(VK_KHR_GLOBAL_PRIORITY),
+    });
+
+    VpProfileProperties profile{VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
+
+    VkPhysicalDeviceVulkan13Features vulkan13Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES};
+    VkPhysicalDeviceVulkan12Features vulkan12Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &vulkan13Features};
+    VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkan11Features};
+    vpGetProfileFeatures(&profile, &features);
+
+
+    mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features)});
+
+    VkPhysicalDeviceVulkan13Properties vulkan13Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES};
+    VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};
+    VkPhysicalDeviceVulkan11Properties vulkan11Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, &vulkan12Properties};
+    VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, &vulkan11Properties};
+    vpGetProfileProperties(&profile, &props);
+
+    props.properties.limits.maxImageDimensionCube = 2048;
+
     mock.SetProperties(
         {VK_STRUCT(props), VK_STRUCT(vulkan11Properties), VK_STRUCT(vulkan12Properties), VK_STRUCT(vulkan13Properties)});
-
-    uint32_t formatCount;
-    vpGetProfileFormats(&profile, &formatCount, nullptr);
-    std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, &formatCount, formats.data());
-    for (size_t i = 0; i < formatCount; ++i) {
-        VkFormatProperties2KHR formatProps{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-        vpGetProfileFormatProperties(&profile, formats[i], &formatProps);
-        mock.AddFormat(formats[i], { VK_STRUCT(formatProps) });
-    }
-
-    VkQueueFamilyProperties2KHR queueFamilyProps{ VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR };
-    queueFamilyProps.queueFamilyProperties.queueFlags = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT;
-    queueFamilyProps.queueFamilyProperties.queueCount = 1;
-    queueFamilyProps.queueFamilyProperties.timestampValidBits = 63;
-    queueFamilyProps.queueFamilyProperties.minImageTransferGranularity = { 1, 1, 1 };
-    mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
-
-    queueFamilyProps.queueFamilyProperties.queueFlags = VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT;
-    queueFamilyProps.queueFamilyProperties.queueCount = 4;
-    queueFamilyProps.queueFamilyProperties.timestampValidBits = 63;
-    queueFamilyProps.queueFamilyProperties.minImageTransferGranularity = { 1, 1, 1 };
-    mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
-
-    queueFamilyProps.queueFamilyProperties.queueFlags = VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT;
-    queueFamilyProps.queueFamilyProperties.queueCount = 2;
-    queueFamilyProps.queueFamilyProperties.timestampValidBits = 63;
-    queueFamilyProps.queueFamilyProperties.minImageTransferGranularity = { 8, 8, 8 };
-    mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
-
-    VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
-
-    EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(supported, VK_FALSE);
-}
-
-TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_feature) {
-    MockVulkanAPI mock;
-
-#if WITH_DEBUG_MESSAGES
-    MockDebugMessageCallback cb({
-        "Checking device support for profile VP_LUNARG_desktop_baseline_2022 "
-            "(deviceName=, driverName=, driverInfo=). You may find the details "
-            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
-        "Unsupported feature condition: VkPhysicalDeviceDescriptorIndexingFeaturesEXT::shaderUniformTexelBufferArrayDynamicIndexing == VK_TRUE"
-    });
-#endif
-
-    mock.SetInstanceAPIVersion(VK_API_VERSION_1_1);
-    mock.SetDeviceAPIVersion(VK_API_VERSION_1_1);
-
-    mock.SetDeviceExtensions(mock.vkPhysicalDevice, {
-        VK_EXT(VK_KHR_8BIT_STORAGE),
-        VK_EXT(VK_KHR_CREATE_RENDERPASS_2),
-        VK_EXT(VK_KHR_DEPTH_STENCIL_RESOLVE),
-        VK_EXT(VK_KHR_DRIVER_PROPERTIES),
-        VK_EXT(VK_KHR_IMAGE_FORMAT_LIST),
-        VK_EXT(VK_KHR_IMAGELESS_FRAMEBUFFER),
-        VK_EXT(VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE),
-        VK_EXT(VK_KHR_SHADER_FLOAT16_INT8),
-        VK_EXT(VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES),
-        VK_EXT(VK_KHR_TIMELINE_SEMAPHORE),
-        VK_EXT(VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT),
-        VK_EXT(VK_EXT_DESCRIPTOR_INDEXING),
-        VK_EXT(VK_EXT_HOST_QUERY_RESET),
-        VK_EXT(VK_EXT_INLINE_UNIFORM_BLOCK),
-        VK_EXT(VK_EXT_SCALAR_BLOCK_LAYOUT),
-        VK_EXT(VK_EXT_ROBUSTNESS_2),
-        VK_EXT(VK_EXT_SUBGROUP_SIZE_CONTROL),
-        VK_EXT(VK_EXT_TEXEL_BUFFER_ALIGNMENT),
-        VK_EXT(VK_EXT_VERTEX_ATTRIBUTE_DIVISOR),
-        VK_EXT(VK_KHR_SWAPCHAIN),
-        VK_EXT(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT),
-    });
-
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
-
-    VkPhysicalDeviceVariablePointerFeatures vpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTER_FEATURES };
-    VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
-    VkPhysicalDeviceShaderDrawParametersFeatures sdpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETER_FEATURES, &sf16i8Features };
-    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR ubslFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR, &sdpFeatures };
-    VkPhysicalDeviceHostQueryResetFeaturesEXT hqResetFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &ubslFeatures};
-    VkPhysicalDeviceDescriptorIndexingFeaturesEXT descIndFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT, &hqResetFeatures };
-    VkPhysicalDevice8BitStorageFeatures storage8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES, &descIndFeatures };
-    VkPhysicalDevice16BitStorageFeatures storage16Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES, &storage8Features };
-    VkPhysicalDeviceImagelessFramebufferFeaturesKHR imagelessFbFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES, &storage16Features };
-    VkPhysicalDeviceMultiviewFeatures multiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES, &imagelessFbFeatures };
-    VkPhysicalDeviceFeatures2 features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &multiviewFeatures };
-    vpGetProfileFeatures(&profile, &features);
-    features.features.logicOp = VK_TRUE;
-    storage8Features.storagePushConstant8 = VK_TRUE;
-    descIndFeatures.shaderUniformTexelBufferArrayDynamicIndexing = VK_FALSE; // Unsupported feature
-    mock.SetFeatures({
-        VK_STRUCT(features),
-        VK_STRUCT(multiviewFeatures),
-        VK_STRUCT(imagelessFbFeatures),
-        VK_STRUCT(storage16Features),
-        VK_STRUCT(storage8Features),
-        VK_STRUCT(descIndFeatures),
-        VK_STRUCT(hqResetFeatures),
-        VK_STRUCT(ubslFeatures),
-        VK_STRUCT(sdpFeatures),
-        VK_STRUCT(sf16i8Features),
-        VK_STRUCT(vpFeatures)
-    });
-
-    VkPhysicalDeviceMaintenance3Properties maint3Props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES };
-    VkPhysicalDeviceDepthStencilResolvePropertiesKHR dsResProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR, &maint3Props };
-    VkPhysicalDeviceDescriptorIndexingPropertiesEXT descIndProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT, &dsResProps };
-    VkPhysicalDeviceMultiviewProperties multiviewProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES, &descIndProps };
-    VkPhysicalDeviceProperties2 props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, &multiviewProps };
-    vpGetProfileProperties(&profile, &props);
-    props.properties.limits.maxImageDimension3D = 8192;
-    props.properties.limits.maxBoundDescriptorSets = 16;
-    props.properties.limits.subPixelPrecisionBits = 8;
-    props.properties.limits.framebufferColorSampleCounts |= VK_SAMPLE_COUNT_16_BIT;
-    props.properties.limits.pointSizeRange[0] = 1.f;
-    props.properties.limits.pointSizeRange[1] = 128.f;
-    props.properties.limits.pointSizeGranularity = 0.0625f;
-    multiviewProps.maxMultiviewViewCount = 8;
-    mock.SetProperties({
-        VK_STRUCT(props),
-        VK_STRUCT(multiviewProps),
-        VK_STRUCT(descIndProps),
-        VK_STRUCT(dsResProps),
-        VK_STRUCT(maint3Props)
-    });
-
-    uint32_t formatCount;
-    vpGetProfileFormats(&profile, &formatCount, nullptr);
-    std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, &formatCount, formats.data());
-    for (size_t i = 0; i < formatCount; ++i) {
-        VkFormatProperties2KHR formatProps{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-        vpGetProfileFormatProperties(&profile, formats[i], &formatProps);
-        formatProps.formatProperties.optimalTilingFeatures |= VK_FORMAT_FEATURE_BLIT_SRC_BIT;
-        formatProps.formatProperties.bufferFeatures |= VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-        mock.AddFormat(formats[i], { VK_STRUCT(formatProps) });
-    }
-
-    VkQueueFamilyProperties2KHR queueFamilyProps{ VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR };
-    queueFamilyProps.queueFamilyProperties.queueFlags = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT;
-    queueFamilyProps.queueFamilyProperties.queueCount = 1;
-    queueFamilyProps.queueFamilyProperties.timestampValidBits = 63;
-    queueFamilyProps.queueFamilyProperties.minImageTransferGranularity = { 1, 1, 1 };
-    mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
-
-    queueFamilyProps.queueFamilyProperties.queueFlags = VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT;
-    queueFamilyProps.queueFamilyProperties.queueCount = 4;
-    queueFamilyProps.queueFamilyProperties.timestampValidBits = 63;
-    queueFamilyProps.queueFamilyProperties.minImageTransferGranularity = { 1, 1, 1 };
-    mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
-
-    queueFamilyProps.queueFamilyProperties.queueFlags = VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT;
-    queueFamilyProps.queueFamilyProperties.queueCount = 2;
-    queueFamilyProps.queueFamilyProperties.timestampValidBits = 63;
-    queueFamilyProps.queueFamilyProperties.minImageTransferGranularity = { 8, 8, 8 };
-    mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
-
-    VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
-
-    EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(supported, VK_FALSE);
-}
-
-TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_property) {
-    MockVulkanAPI mock;
-
-#if WITH_DEBUG_MESSAGES
-    MockDebugMessageCallback cb({
-        "Checking device support for profile VP_LUNARG_desktop_portability_2021 "
-            "(deviceName=, driverName=, driverInfo=). You may find the details "
-            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
-        "Unsupported properties condition: VkPhysicalDeviceDescriptorIndexingPropertiesEXT::maxDescriptorSetUpdateAfterBindInputAttachments >= 8"
-    });
-#endif
-
-    mock.SetInstanceAPIVersion(VK_API_VERSION_1_1);
-    mock.SetDeviceAPIVersion(VK_API_VERSION_1_1);
-
-    mock.SetDeviceExtensions(mock.vkPhysicalDevice, {
-        VK_EXT(VK_KHR_8BIT_STORAGE),
-        VK_EXT(VK_KHR_CREATE_RENDERPASS_2),
-        VK_EXT(VK_KHR_DEPTH_STENCIL_RESOLVE),
-        VK_EXT(VK_KHR_DRIVER_PROPERTIES),
-        VK_EXT(VK_KHR_IMAGE_FORMAT_LIST),
-        VK_EXT(VK_KHR_IMAGELESS_FRAMEBUFFER),
-        VK_EXT(VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE),
-        VK_EXT(VK_KHR_SHADER_FLOAT16_INT8),
-        VK_EXT(VK_KHR_TIMELINE_SEMAPHORE),
-        VK_EXT(VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT),
-        VK_EXT(VK_EXT_DESCRIPTOR_INDEXING),
-        VK_EXT(VK_EXT_HOST_QUERY_RESET),
-        VK_EXT(VK_EXT_INLINE_UNIFORM_BLOCK),
-        VK_EXT(VK_EXT_SCALAR_BLOCK_LAYOUT),
-        VK_EXT(VK_EXT_ROBUSTNESS_2),
-        VK_EXT(VK_EXT_SUBGROUP_SIZE_CONTROL),
-        VK_EXT(VK_EXT_TEXEL_BUFFER_ALIGNMENT),
-        VK_EXT(VK_EXT_VERTEX_ATTRIBUTE_DIVISOR),
-        VK_EXT(VK_KHR_SWAPCHAIN),
-        VK_EXT(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT),
-    });
-
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
-
-    VkPhysicalDeviceVariablePointerFeatures vpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTER_FEATURES };
-    VkPhysicalDeviceShaderFloat16Int8FeaturesKHR sf16i8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, &vpFeatures };
-    VkPhysicalDeviceShaderDrawParametersFeatures sdpFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETER_FEATURES, &sf16i8Features };
-    VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR ubslFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_UNIFORM_BUFFER_STANDARD_LAYOUT_FEATURES_KHR, &sdpFeatures };
-    VkPhysicalDeviceHostQueryResetFeaturesEXT hqResetFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES_EXT, &ubslFeatures};
-    VkPhysicalDeviceDescriptorIndexingFeaturesEXT descIndFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT, &hqResetFeatures };
-    VkPhysicalDevice8BitStorageFeatures storage8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES, &descIndFeatures };
-    VkPhysicalDevice16BitStorageFeatures storage16Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES, &storage8Features };
-    VkPhysicalDeviceImagelessFramebufferFeaturesKHR imagelessFbFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGELESS_FRAMEBUFFER_FEATURES, &storage16Features };
-    VkPhysicalDeviceMultiviewFeatures multiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES, &imagelessFbFeatures };
-    VkPhysicalDeviceFeatures2 features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &multiviewFeatures };
-    vpGetProfileFeatures(&profile, &features);
-    features.features.logicOp = VK_TRUE;
-    storage8Features.storagePushConstant8 = VK_TRUE;
-    mock.SetFeatures({
-        VK_STRUCT(features),
-        VK_STRUCT(multiviewFeatures),
-        VK_STRUCT(imagelessFbFeatures),
-        VK_STRUCT(storage16Features),
-        VK_STRUCT(storage8Features),
-        VK_STRUCT(descIndFeatures),
-        VK_STRUCT(hqResetFeatures),
-        VK_STRUCT(ubslFeatures),
-        VK_STRUCT(sdpFeatures),
-        VK_STRUCT(sf16i8Features),
-        VK_STRUCT(vpFeatures)
-    });
-
-    VkPhysicalDeviceMaintenance3Properties maint3Props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES };
-    VkPhysicalDeviceDepthStencilResolvePropertiesKHR dsResProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR, &maint3Props };
-    VkPhysicalDeviceDescriptorIndexingPropertiesEXT descIndProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES_EXT, &dsResProps };
-    VkPhysicalDeviceMultiviewProperties multiviewProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES, &descIndProps };
-    VkPhysicalDeviceProperties2 props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, &multiviewProps };
-    vpGetProfileProperties(&profile, &props);
-    props.properties.limits.maxImageDimension3D = 8192;
-    props.properties.limits.maxBoundDescriptorSets = 16;
-    props.properties.limits.subPixelPrecisionBits = 8;
-    props.properties.limits.framebufferColorSampleCounts |= VK_SAMPLE_COUNT_16_BIT;
-    props.properties.limits.pointSizeRange[0] = 1.f;
-    props.properties.limits.pointSizeRange[1] = 128.f;
-    props.properties.limits.pointSizeGranularity = 0.0625f;
-    multiviewProps.maxMultiviewViewCount = 8;
-    descIndProps.maxDescriptorSetUpdateAfterBindInputAttachments = 4; // Unsupported property
-    mock.SetProperties({
-        VK_STRUCT(props),
-        VK_STRUCT(multiviewProps),
-        VK_STRUCT(descIndProps),
-        VK_STRUCT(dsResProps),
-        VK_STRUCT(maint3Props)
-    });
-
-    uint32_t formatCount;
-    vpGetProfileFormats(&profile, &formatCount, nullptr);
-    std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, &formatCount, formats.data());
-    for (size_t i = 0; i < formatCount; ++i) {
-        VkFormatProperties2KHR formatProps{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-        vpGetProfileFormatProperties(&profile, formats[i], &formatProps);
-        formatProps.formatProperties.optimalTilingFeatures |= VK_FORMAT_FEATURE_BLIT_SRC_BIT;
-        formatProps.formatProperties.bufferFeatures |= VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-        mock.AddFormat(formats[i], { VK_STRUCT(formatProps) });
-    }
-
-    VkQueueFamilyProperties2KHR queueFamilyProps{ VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR };
-    queueFamilyProps.queueFamilyProperties.queueFlags = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT;
-    queueFamilyProps.queueFamilyProperties.queueCount = 1;
-    queueFamilyProps.queueFamilyProperties.timestampValidBits = 63;
-    queueFamilyProps.queueFamilyProperties.minImageTransferGranularity = { 1, 1, 1 };
-    mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
-
-    queueFamilyProps.queueFamilyProperties.queueFlags = VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT;
-    queueFamilyProps.queueFamilyProperties.queueCount = 4;
-    queueFamilyProps.queueFamilyProperties.timestampValidBits = 63;
-    queueFamilyProps.queueFamilyProperties.minImageTransferGranularity = { 1, 1, 1 };
-    mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
-
-    queueFamilyProps.queueFamilyProperties.queueFlags = VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT;
-    queueFamilyProps.queueFamilyProperties.queueCount = 2;
-    queueFamilyProps.queueFamilyProperties.timestampValidBits = 63;
-    queueFamilyProps.queueFamilyProperties.minImageTransferGranularity = { 8, 8, 8 };
-    mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_TRUE;
     VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
