@@ -22,7 +22,7 @@
         "features": {
             "presets": [
                 {
-                    "label": "LunarG Desktop Portability",
+                    "label": "LunarG Desktop Baseline 2022",
                     "description": "Check the Vulkan 1.1 application will run on Windows,  Linux and macOS platforms without exceeding ecosystem effective devices capabilities",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "status": "STABLE",
@@ -33,11 +33,11 @@
                         },
                         {
                             "key": "profile_file",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2021.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2022_subset.json"
                         },
                         {
                             "key": "profile_name",
-                            "value": "VP_LUNARG_desktop_portability_2021_subset"
+                            "value": "VP_LUNARG_desktop_baseline_2022_subset"
                         },
                         {
                             "key": "simulate_capabilities",
@@ -104,7 +104,7 @@
                     "type": "LOAD_FILE",
                     "format": "PROFILE",
                     "filter": "*.json",
-                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2021.json",
+                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2022.json",
                     "expanded": true,
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "settings": [
