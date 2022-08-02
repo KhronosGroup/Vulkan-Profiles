@@ -212,8 +212,8 @@ TEST_F(LayerTests, TestExcludingDeviceExtensions) {
     profiles_test::VulkanInstanceBuilder inst_builder;
 
     VkProfileLayerSettingsEXT settings;
-    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_desktop_portability_2021.json";
-    settings.profile_name = "VP_LUNARG_desktop_portability_2021";
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_desktop_baseline_2022.json";
+    settings.profile_name = "VP_LUNARG_desktop_baseline_2022";
     settings.emulate_portability = true;
     settings.debug_fail_on_error = false;
     settings.exclude_device_extensions = {
@@ -269,8 +269,7 @@ TEST_F(LayerTests, TestExcludingFormats) {
     profiles_test::VulkanInstanceBuilder inst_builder;
 
     VkProfileLayerSettingsEXT settings;
-    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_desktop_portability_2021.json";
-    settings.profile_name = "VP_LUNARG_desktop_portability_2021";
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_desktop_baseline_2022.json";
     settings.emulate_portability = true;
     settings.debug_fail_on_error = false;
     settings.exclude_formats = {"VK_FORMAT_R8G8B8A8_UNORM"};
@@ -299,8 +298,8 @@ TEST_F(LayerTests, TestMissingPhysDevProps2) {
     profiles_test::VulkanInstanceBuilder inst_builder;
 
     VkProfileLayerSettingsEXT settings;
-    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_desktop_portability_2021.json";
-    settings.profile_name = "VP_LUNARG_desktop_portability_2021";
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_desktop_baseline_2022.json";
+    settings.profile_name = "VP_LUNARG_desktop_baseline_2022";
     settings.emulate_portability = false;
     settings.debug_fail_on_error = false;
     settings.simulate_capabilities = SIMULATE_MAX_ENUM;
@@ -313,7 +312,7 @@ TEST_F(LayerTests, TestMissingPhysDevProps2) {
 
     uint32_t count = 0;
     vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
-    ASSERT_EQ(count, 42);
+    ASSERT_EQ(count, 43);
 }
 
 TEST_F(LayerTests, TestNotSettingProfileFile) {
@@ -421,10 +420,8 @@ TEST_F(LayerTests, TestExcludedExtensions) {
         ASSERT_EQ(device_properties.maxTransformFeedbackBufferDataSize, profile_properties.maxTransformFeedbackBufferDataSize);
         ASSERT_EQ(device_properties.maxTransformFeedbackBufferDataStride, profile_properties.maxTransformFeedbackBufferDataStride);
         ASSERT_EQ(device_properties.transformFeedbackQueries, profile_properties.transformFeedbackQueries);
-        ASSERT_EQ(device_properties.transformFeedbackStreamsLinesTriangles,
-                  profile_properties.transformFeedbackStreamsLinesTriangles);
-        ASSERT_EQ(device_properties.transformFeedbackRasterizationStreamSelect,
-                  profile_properties.transformFeedbackRasterizationStreamSelect);
+        ASSERT_EQ(device_properties.transformFeedbackStreamsLinesTriangles, profile_properties.transformFeedbackStreamsLinesTriangles);
+        ASSERT_EQ(device_properties.transformFeedbackRasterizationStreamSelect, profile_properties.transformFeedbackRasterizationStreamSelect);
         ASSERT_EQ(device_properties.transformFeedbackDraw, profile_properties.transformFeedbackDraw);
     }
 #endif
@@ -455,8 +452,7 @@ TEST_F(LayerTests, TestQueueFamilyProperties) {
     vkGetPhysicalDeviceQueueFamilyProperties(gpu, &count, qf_props.data());
 
     ASSERT_EQ(qf_props.size(), 2);
-    ASSERT_EQ(qf_props[0].queueFlags,
-              VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT);
+    ASSERT_EQ(qf_props[0].queueFlags, VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT);
     ASSERT_EQ(qf_props[0].queueCount, 1);
     ASSERT_EQ(qf_props[0].timestampValidBits, 36);
     ASSERT_EQ(qf_props[0].minImageTransferGranularity.width, 1);
@@ -640,8 +636,7 @@ TEST_F(LayerTests, TestQueueFamilyPropertiesPartial) {
             ASSERT_EQ(qf_props[0].minImageTransferGranularity.height, 4u);
 
             if (device_queue_index != -1) {
-                ASSERT_EQ(qf_props[0].minImageTransferGranularity.depth,
-                          device_qf_props[device_queue_index].minImageTransferGranularity.depth);
+                ASSERT_EQ(qf_props[0].minImageTransferGranularity.depth, device_qf_props[device_queue_index].minImageTransferGranularity.depth);
                 ASSERT_EQ(qf_props[0].timestampValidBits, device_qf_props[device_queue_index].timestampValidBits);
             }
         }

@@ -27,6 +27,10 @@
 - Fix the impossibility to override extensions with no extension
 - Fix Roadmap 2022 profile file that incorrecly required `vulkanMemoryModelAvailabilityVisibilityChains`
 
+### Deprecation:
+- Remove `VP_LUNARG_desktop_portability_2021` profile
+- Remove `VP_LUNARG_desktop_portability_2021_subset` profile
+
 ## [Vulkan Profiles Toolset 1.3.216](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.216.0) - June 2022
 
 ### Features:
