@@ -21,7 +21,7 @@ import argparse
 
 COPYRIGHT_HEADER = '''
 // This file is ***GENERATED***.  Do Not Edit.
-// See scripts/gen_profiles_layer.py for modifications.
+// See scripts/gen_layer.py for modifications.
 
 /*
  * Copyright (C) 2015-2022 Valve Corporation
