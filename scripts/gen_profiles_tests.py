@@ -16,7 +16,7 @@
 #
 # Author: Ziga Markus <ziga@lunarg.com>
 
-import gen_profile_solution
+import gen_profiles_solution
 import gen_profiles_layer
 import xml.etree.ElementTree as etree
 import math
@@ -748,7 +748,7 @@ if __name__ == '__main__':
         parser.print_help()
         exit()
 
-    registry = gen_profile_solution.VulkanRegistry(args.registry)
+    registry = gen_profiles_solution.VulkanRegistry(args.registry)
     generator = ProfileGenerator()
     generator.generate_profile(args.outProfile, registry)
     generator.generate_tests(args.outTests, registry)
