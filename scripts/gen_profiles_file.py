@@ -632,23 +632,23 @@ class ProfileMerger():
         return desc
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='Generate Vulkan profile JSON files')
 
-    parser.add_argument('-registry', action='store', required=True,
+    parser.add_argument('--registry', '-r', action='store', required=True,
                         help='Use specified registry file instead of vk.xml')
-    parser.add_argument('-input_dir', action='store', required=True,
+    parser.add_argument('--input_dir', '-i', action='store', required=True,
                         help='Path to directory with profiles')
-    parser.add_argument('-input_profiles', action='store',
+    parser.add_argument('--input_profiles', action='store',
                         help='Comma separated list of profiles')
-    parser.add_argument('-output_path', action='store', required=True,
+    parser.add_argument('--output_path', '-o', action='store', required=True,
                         help='Path to output profile')
-    parser.add_argument('-output_profile', action='store',
+    parser.add_argument('--output_profile', action='store',
                         help='Profile name of the output profile')
-    parser.add_argument('-profile_label', action='store',
+    parser.add_argument('--profile_label', action='store',
                         help='Label of the merged profile')
-    parser.add_argument('-profile_desc', action='store',
+    parser.add_argument('--profile_desc', action='store',
                         help='Description of the merged profile')
-    parser.add_argument('-mode', action='store',
+    parser.add_argument('--mode', '-m', action='store',
                         help='Mode of profile combination')
           
     parser.set_defaults(mode='intersection')
