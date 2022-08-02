@@ -89,9 +89,9 @@ if (REGENERATE_LAYER)
     set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
     add_dependencies(VkLayer_${TARGET_NAME} VpLayer_generate)
 	
-	source_group("Python Files" FILES ${CMAKE_SOURCE_DIR}/scripts/gen_unit_tests.py)
+	source_group("Python Files" FILES ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_tests.py)
 	add_custom_target(VpLayer_generate_tests ALL
-		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/gen_unit_tests.py
+		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_tests.py
 			-registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
 			-outProfile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
 			-outTests ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
