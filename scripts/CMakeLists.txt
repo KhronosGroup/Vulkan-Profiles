@@ -1,6 +1,8 @@
+set(MERGE_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_profile.py)
 set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/genvp.py)
+
 file(GLOB PROFILES_FILES ${CMAKE_SOURCE_DIR}/profiles)
-source_group("Python Files" FILES ${LAYER_PYTHON_FILES})
+source_group("Python Files" FILES ${MERGE_PYTHON_FILES} ${LAYER_PYTHON_FILES})
 
 add_custom_target(VpGenerated
 	COMMAND ${PYTHON_EXECUTABLE} ${LAYER_PYTHON_FILES}
@@ -16,9 +18,7 @@ add_custom_target(VpGenerated
 	SOURCES ${LAYER_PYTHON_FILES} ${PROFILES_FILES}
 	DEPENDS ${LAYER_PYTHON_FILES} ${PROFILES_FILES})
 
-set_target_properties(VpGenerated PROPERTIES FOLDER "Profiles scripts")
-
-set(MERGE_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/combine_profiles.py)
+set_target_properties(VpGenerated PROPERTIES FOLDER "Profiles generator")
 
 add_custom_target(VpTestIntersect ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
@@ -31,7 +31,7 @@ add_custom_target(VpTestIntersect ALL
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
 	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
 
-set_target_properties(VpTestIntersect PROPERTIES FOLDER "Profiles scripts")
+set_target_properties(VpTestIntersect PROPERTIES FOLDER "Profiles generator")
 
 add_custom_target(VpTestUnion ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
@@ -44,7 +44,7 @@ add_custom_target(VpTestUnion ALL
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
 	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
 
-set_target_properties(VpTestUnion PROPERTIES FOLDER "Profiles scripts")
+set_target_properties(VpTestUnion PROPERTIES FOLDER "Profiles generator")
 
 add_custom_target(VpCreateGeneratedName ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
@@ -55,7 +55,7 @@ add_custom_target(VpCreateGeneratedName ALL
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
 	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
 
-set_target_properties(VpCreateGeneratedName PROPERTIES FOLDER "Profiles scripts")
+set_target_properties(VpCreateGeneratedName PROPERTIES FOLDER "Profiles generator")
 
 set(PROFILE_DESKTOP2022_LABEL "LunarG Vulkan Desktop Baseline 2022 profile")
 set(PROFILE_DESKTOP2022_DESC "A baseline desktop profile that supports Vulkan Header 162")
@@ -72,7 +72,7 @@ add_custom_target(VpCreateDesktop2022 ALL
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
 	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
 
- set_target_properties(VpCreateDesktop2022 PROPERTIES FOLDER "Profiles scripts")
+ set_target_properties(VpCreateDesktop2022 PROPERTIES FOLDER "Profiles generator")
  
 set(PROFILE_DESKTOP2022_SUBSET_LABEL "LunarG Vulkan Desktop Baseline 2022 Subset profile")
 set(PROFILE_DESKTOP2022_SUBSET_DESC "A baseline macOS specific profile variant of VP_LUNARG_desktop_baseline_2022")
@@ -96,6 +96,6 @@ add_custom_command(
 		${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_baseline_2022.json
 		${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_baseline_2022_subset)
 
- set_target_properties(VpCreateDesktop2022Subset PROPERTIES FOLDER "Profiles scripts")
+ set_target_properties(VpCreateDesktop2022Subset PROPERTIES FOLDER "Profiles generator")
 
  add_dependencies(VpCreateDesktop2022Subset VpCreateDesktop2022)
