@@ -1,4 +1,4 @@
-set(MERGE_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_profile.py)
+set(MERGE_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_profile_file.py)
 set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_profile_solution.py)
 
 file(GLOB PROFILES_FILES ${CMAKE_SOURCE_DIR}/profiles)
