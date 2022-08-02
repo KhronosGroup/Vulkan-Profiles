@@ -16,7 +16,7 @@
 #
 # Author: Ziga Markus <ziga@lunarg.com>
 
-import genvp
+import gen_profile_solution
 import argparse
 
 COPYRIGHT_HEADER = '''
@@ -3938,7 +3938,7 @@ if __name__ == '__main__':
     if args.outLayer is not None:
         outputPath = args.outLayer
 
-    registry = genvp.VulkanRegistry(registryPath)
+    registry = gen_profile_solution.VulkanRegistry(registryPath)
 
     generator = VulkanProfilesLayerGenerator()
     generator.generate(outputPath, registry)

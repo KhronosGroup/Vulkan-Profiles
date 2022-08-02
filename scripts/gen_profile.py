@@ -19,7 +19,7 @@
 from datetime import datetime
 import argparse
 import json
-import genvp
+import gen_profile_solution
 import re
 import os
 import collections
@@ -656,19 +656,19 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.registry is None:
-        genvp.Log.e('Merging the profiles requires specifying -registry')
+        gen_profile_solution.Log.e('Merging the profiles requires specifying -registry')
         parser.print_help()
         exit()
 
     if (args.mode.lower() != 'union' and args.mode.lower() != 'intersection'):
-        genvp.Log.e('Mode must be either union or intersection')
+        gen_profile_solution.Log.e('Mode must be either union or intersection')
         parser.print_help()
         exit()
 
     if args.output_profile is None:
         args.output_profile = 'VP_LUNARG_merged_' + datetime.now().strftime('%Y_%m_%d_%H_%M')
     elif not re.match('^VP_[A-Z0-9]+[A-Za-z0-9]+', args.output_profile):
-        genvp.Log.e('Invalid output_profile, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
+        gen_profile_solution.Log.e('Invalid output_profile, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
         exit()
 
     if args.input_profiles is not None:
@@ -717,7 +717,7 @@ if __name__ == '__main__':
         print('ERROR: Not input directory set, use -input_dir')
         exit()
 
-    registry = genvp.VulkanRegistry(args.registry)
+    registry = gen_profile_solution.VulkanRegistry(args.registry)
     profile_merger = ProfileMerger(registry)
 
     if args.profile_desc is not None:
