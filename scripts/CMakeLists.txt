@@ -1,5 +1,5 @@
 set(MERGE_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_profile.py)
-set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/genvp.py)
+set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_profile_solution.py)
 
 file(GLOB PROFILES_FILES ${CMAKE_SOURCE_DIR}/profiles)
 source_group("Python Files" FILES ${MERGE_PYTHON_FILES} ${LAYER_PYTHON_FILES})
