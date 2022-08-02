@@ -17,7 +17,7 @@
 # Author: Ziga Markus <ziga@lunarg.com>
 
 import gen_profile_solution
-import gen_layer
+import gen_profiles_layer
 import xml.etree.ElementTree as etree
 import math
 import argparse

@@ -76,7 +76,7 @@ endif()
 add_vk_layer(${TARGET_NAME} profiles.cpp vk_layer_table.cpp ${jsoncpp_generated_source} ${jsoncpp_generated_header})
 
 if (REGENERATE_LAYER)
-    set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_layer.py)
+    set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_layer.py)
     source_group("Python Files" FILES ${LAYER_PYTHON_FILES})
 
     add_custom_target(VpLayer_generate ALL
