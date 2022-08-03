@@ -152,15 +152,18 @@ class ProfileMerger():
                                 self.add_struct(property, capability['properties'][property], merged_properties)
                 if 'formats' in capability:
                     for format in capability['formats']:
-                        if format not in merged_formats:
+                        if (format not in merged_formats) and (self.mode == 'union' or self.first):
                             merged_formats[format] = dict()
                             merged_formats[format]['VkFormatProperties'] = dict()
-                        self.merge_format_features(merged_formats, format, capability, 'linearTilingFeatures')
-                        self.merge_format_features(merged_formats, format, capability, 'optimalTilingFeatures')
-                        self.merge_format_features(merged_formats, format, capability, 'bufferFeatures')
-                        # Remove empty entries (can occur when using intersect)
-                        if not dict(merged_formats[format]['VkFormatProperties']):
-                            del merged_formats[format]
+
+                        if (format in merged_formats):
+                            self.merge_format_features(merged_formats, format, capability, 'linearTilingFeatures')
+                            self.merge_format_features(merged_formats, format, capability, 'optimalTilingFeatures')
+                            self.merge_format_features(merged_formats, format, capability, 'bufferFeatures')
+
+                            # Remove empty entries (can occur when using intersect)
+                            if not dict(merged_formats[format]['VkFormatProperties']):
+                                del merged_formats[format]
 
                 if 'queueFamiliesProperties' in capability:
                     if self.mode == 'intersection':
