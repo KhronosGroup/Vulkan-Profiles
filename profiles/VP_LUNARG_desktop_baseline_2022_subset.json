@@ -2044,7 +2044,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-08-02",
+                    "date": "2022-08-03",
                     "author": "LunarG Profiles Merger",
                     "comment": "A baseline macOS specific profile variant of VP_LUNARG_desktop_baseline_2022"
                 }
