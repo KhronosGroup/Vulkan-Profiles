@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.3.223",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.224",
     "additionalProperties": true,
     "required": [
         "capabilities",
@@ -339,6 +339,24 @@
                     "type": "boolean"
                 },
                 "descriptorBindingAccelerationStructureUpdateAfterBind": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceAmigoProfilingFeaturesSEC": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "amigoProfiling": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "attachmentFeedbackLoopLayout": {
                     "type": "boolean"
                 }
             }
@@ -4741,6 +4759,9 @@
                             "VK_EXT_astc_decode_mode": {
                                 "type": "integer"
                             },
+                            "VK_EXT_attachment_feedback_loop_layout": {
+                                "type": "integer"
+                            },
                             "VK_EXT_blend_operation_advanced": {
                                 "type": "integer"
                             },
@@ -5524,6 +5545,9 @@
                             "VK_QNX_screen_surface": {
                                 "type": "integer"
                             },
+                            "VK_SEC_amigo_profiling": {
+                                "type": "integer"
+                            },
                             "VK_VALVE_descriptor_set_host_mapping": {
                                 "type": "integer"
                             },
@@ -5566,6 +5590,12 @@
                             },
                             "VkPhysicalDeviceAccelerationStructureFeaturesKHR": {
                                 "$ref": "#/definitions/VkPhysicalDeviceAccelerationStructureFeaturesKHR"
+                            },
+                            "VkPhysicalDeviceAmigoProfilingFeaturesSEC": {
+                                "$ref": "#/definitions/VkPhysicalDeviceAmigoProfilingFeaturesSEC"
+                            },
+                            "VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT"
                             },
                             "VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceBlendOperationAdvancedFeaturesEXT"
