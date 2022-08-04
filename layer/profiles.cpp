@@ -2364,6 +2364,9 @@ class PhysicalDeviceData {
     // VK_EXT_image_compression_control structs
     VkPhysicalDeviceImageCompressionControlFeaturesEXT physical_device_image_compression_control_features_;
 
+    // VK_EXT_attachment_feedback_loop_layout structs
+    VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT physical_device_attachment_feedback_loop_layout_features_;
+
     // VK_EXT_4444_formats structs
     VkPhysicalDevice4444FormatsFeaturesEXT physical_device_4444_formats_features_;
 
@@ -2468,6 +2471,9 @@ class PhysicalDeviceData {
 
     // VK_QCOM_tile_properties structs
     VkPhysicalDeviceTilePropertiesFeaturesQCOM physical_device_tile_properties_features_;
+
+    // VK_SEC_amigo_profiling structs
+    VkPhysicalDeviceAmigoProfilingFeaturesSEC physical_device_amigo_profiling_features_;
 
   private:
     PhysicalDeviceData() = delete;
@@ -2847,6 +2853,9 @@ class PhysicalDeviceData {
         // VK_EXT_image_compression_control structs
         physical_device_image_compression_control_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_COMPRESSION_CONTROL_FEATURES_EXT};
 
+        // VK_EXT_attachment_feedback_loop_layout structs
+        physical_device_attachment_feedback_loop_layout_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ATTACHMENT_FEEDBACK_LOOP_LAYOUT_FEATURES_EXT};
+
         // VK_EXT_4444_formats structs
         physical_device_4444_formats_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_4444_FORMATS_FEATURES_EXT};
 
@@ -2951,6 +2960,9 @@ class PhysicalDeviceData {
 
         // VK_QCOM_tile_properties structs
         physical_device_tile_properties_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TILE_PROPERTIES_FEATURES_QCOM};
+
+        // VK_SEC_amigo_profiling structs
+        physical_device_amigo_profiling_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_AMIGO_PROFILING_FEATURES_SEC};
     }
 
     const VkInstance instance_;
@@ -3203,6 +3215,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceImageRobustnessFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceImageCompressionControlFeaturesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDevice4444FormatsFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceRGBA10X6FormatsFeaturesEXT *dest);
@@ -3242,6 +3255,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceTilePropertiesFeaturesQCOM *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceAmigoProfilingFeaturesSEC *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFeatures *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceProperties *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *dest);
@@ -4373,6 +4387,14 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_QCOM_TILE_PROPERTIES_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_tile_properties_features_);
+    } else if (name == "VkPhysicalDeviceAmigoProfilingFeaturesSEC") {
+        auto support = CheckExtensionSupport(VK_SEC_AMIGO_PROFILING_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_amigo_profiling_features_);
+    } else if (name == "VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_ATTACHMENT_FEEDBACK_LOOP_LAYOUT_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_attachment_feedback_loop_layout_features_);
     }
 
     return true;
@@ -7673,6 +7695,16 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceImageCompre
     return valid;
 }
 
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT *dest) {
+    (void)dest;
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, attachmentFeedbackLoopLayout, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDevice4444FormatsFeaturesEXT *dest) {
     (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDevice4444FormatsFeaturesEXT)\n");
@@ -8080,6 +8112,16 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceTilePropert
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, tileProperties, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceAmigoProfilingFeaturesSEC *dest) {
+    (void)dest;
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceAmigoProfilingFeaturesSEC)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, amigoProfiling, WarnIfNotEqualBool);
     }
     return valid;
 }
@@ -9878,6 +9920,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     data->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ATTACHMENT_FEEDBACK_LOOP_LAYOUT_FEATURES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_ATTACHMENT_FEEDBACK_LOOP_LAYOUT_EXTENSION_NAME)) {
+                    VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT *data = (VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_attachment_feedback_loop_layout_features_;
+                    data->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_4444_FORMATS_FEATURES_EXT:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
                     VkPhysicalDevice4444FormatsFeaturesEXT *data = (VkPhysicalDevice4444FormatsFeaturesEXT *)place;
@@ -10179,6 +10229,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDeviceTilePropertiesFeaturesQCOM *data = (VkPhysicalDeviceTilePropertiesFeaturesQCOM *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_tile_properties_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_AMIGO_PROFILING_FEATURES_SEC:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_SEC_AMIGO_PROFILING_EXTENSION_NAME)) {
+                    VkPhysicalDeviceAmigoProfilingFeaturesSEC *data = (VkPhysicalDeviceAmigoProfilingFeaturesSEC *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_amigo_profiling_features_;
                     data->pNext = pNext;
                 }
                 break;
@@ -12082,6 +12140,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_image_compression_control_features_);
                 }
 
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_ATTACHMENT_FEEDBACK_LOOP_LAYOUT_EXTENSION_NAME)) {
+                    pdd.physical_device_attachment_feedback_loop_layout_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_attachment_feedback_loop_layout_features_);
+                }
+
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_4444_FORMATS_EXTENSION_NAME)) {
                     pdd.physical_device_4444_formats_features_.pNext = feature_chain.pNext;
 
@@ -12302,6 +12366,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_tile_properties_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_tile_properties_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_SEC_AMIGO_PROFILING_EXTENSION_NAME)) {
+                    pdd.physical_device_amigo_profiling_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_amigo_profiling_features_);
                 }
 
                 if (api_version_above_1_1) {
