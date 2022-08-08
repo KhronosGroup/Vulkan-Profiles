@@ -33,11 +33,7 @@
                         },
                         {
                             "key": "profile_file",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2022_subset.json"
-                        },
-                        {
-                            "key": "profile_name",
-                            "value": "VP_LUNARG_desktop_baseline_2022_subset"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2022.json"
                         },
                         {
                             "key": "simulate_capabilities",
@@ -60,10 +56,6 @@
                             "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_KHR_roadmap_2022.json"
                         },
                         {
-                            "key": "profile_name",
-                            "value": "VP_KHR_roadmap_2022"
-                        },
-                        {
                             "key": "simulate_capabilities",
                             "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
                         }
@@ -84,10 +76,6 @@
                             "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_ANDROID_baseline_2021.json"
                         },
                         {
-                            "key": "profile_name",
-                            "value": "VP_ANDROID_baseline_2021"
-                        },
-                        {
                             "key": "simulate_capabilities",
                             "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT", "SIMULATE_FORMATS_BIT" ]
                         }
@@ -104,7 +92,7 @@
                     "type": "LOAD_FILE",
                     "format": "PROFILE",
                     "filter": "*.json",
-                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2022.json",
+                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2022.json",
                     "expanded": true,
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "settings": [
