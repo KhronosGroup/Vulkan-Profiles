@@ -147,10 +147,10 @@
     defined(VK_KHR_timeline_semaphore) && \
     defined(VK_KHR_uniform_buffer_standard_layout) && \
     defined(VK_KHR_variable_pointers)
-#define VP_LUNARG_desktop_baseline_2022_subset 1
-#define VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_NAME "VP_LUNARG_desktop_baseline_2022_subset"
-#define VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_SPEC_VERSION 1
-#define VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 162)
+#define VP_LUNARG_desktop_portability_2022 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME "VP_LUNARG_desktop_portability_2022"
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 162)
 #endif
 
 #define VP_MAX_PROFILE_NAME_SIZE 256U

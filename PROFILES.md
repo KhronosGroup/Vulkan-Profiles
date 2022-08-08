@@ -14,10 +14,10 @@
 
 ## Vulkan Profiles List
 
-| Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_baseline_2022 | VP_LUNARG_desktop_baseline_2022_subset |
-|----------|---------------------|--------------------------|---------------------------------|----------------------------------------|
-| Label | Khronos Vulkan Roadmap 2022 profile | Android Vulkan Baseline 2021 profile | LunarG Vulkan Desktop Baseline 2022 profile | LunarG Vulkan Desktop Baseline 2022 Subset profile |
-| Description | This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices. | Collection of functionality that is broadly supported on Android | A baseline desktop profile that supports Vulkan Header 162 | A baseline macOS specific profile variant of VP_LUNARG_desktop_baseline_2022 |
+| Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_baseline_2022 | VP_LUNARG_desktop_portability_2022 |
+|----------|---------------------|--------------------------|---------------------------------|------------------------------------|
+| Label | Khronos Vulkan Roadmap 2022 profile | Android Vulkan Baseline 2021 profile | LunarG Vulkan Desktop Baseline 2022 profile | LunarG Vulkan Desktop Portability 2022 profile |
+| Description | This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices. | Collection of functionality that is broadly supported on Android | A baseline desktop profile that supports Vulkan Header 162 | A macOS portability specific profile variant of VP_LUNARG_desktop_baseline_2022 |
 | Version | 1 | 1 | 1 | 1 |
 | Required API version | 1.3.204 | 1.0.68 | 1.1.162 | 1.1.162 |
 | Fallback profiles | - | - | - | - |
@@ -28,8 +28,8 @@
 * "X.X Core" indicates that the extension is not defined in the profile but the extension is promoted to the specified core API version that is smaller than or equal to the minimum required API version of the profile
 * :x: indicates that the extension is neither defined in the profile nor it is promoted to a core API version that is smaller than or equal to the minimum required API version of the profile
 
-| Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_baseline_2022 | VP_LUNARG_desktop_baseline_2022_subset |
-|----------|---------------------|--------------------------|---------------------------------|----------------------------------------|
+| Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_baseline_2022 | VP_LUNARG_desktop_portability_2022 |
+|----------|---------------------|--------------------------|---------------------------------|------------------------------------|
 | **Instance extensions** |
 | [VK_KHR_android_surface](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_android_surface.html) | :x: | :heavy_check_mark: | :x: | :x: |
 | [VK_KHR_device_group_creation](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_device_group_creation.html) | 1.1 Core | :x: | 1.1 Core | 1.1 Core |
@@ -127,8 +127,8 @@
 * :warning: indicates that the feature is not defined in the profile but an equivalent feature is (hover over the symbol to view the structure and corresponding extension or core API version where the feature is defined in the profile)
 * :x: indicates that neither the feature nor an equivalent feature is defined in the profile
 
-| Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_baseline_2022 | VP_LUNARG_desktop_baseline_2022_subset |
-|----------|---------------------|--------------------------|---------------------------------|----------------------------------------|
+| Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_baseline_2022 | VP_LUNARG_desktop_portability_2022 |
+|----------|---------------------|--------------------------|---------------------------------|------------------------------------|
 | **Vulkan 1.0** |
 | [depthBiasClamp](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDeviceFeatures.html) | <span title="defined in VkPhysicalDeviceFeatures (Vulkan 1.0)">:heavy_check_mark:</span> | <span title="defined in VkPhysicalDeviceFeatures (Vulkan 1.0)">:heavy_check_mark:</span> | <span title="defined in VkPhysicalDeviceFeatures (Vulkan 1.0)">:heavy_check_mark:</span> | <span title="defined in VkPhysicalDeviceFeatures (Vulkan 1.0)">:heavy_check_mark:</span> |
 | [depthClamp](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDeviceFeatures.html) | <span title="defined in VkPhysicalDeviceFeatures (Vulkan 1.0)">:heavy_check_mark:</span> | :x: | <span title="defined in VkPhysicalDeviceFeatures (Vulkan 1.0)">:heavy_check_mark:</span> | <span title="defined in VkPhysicalDeviceFeatures (Vulkan 1.0)">:heavy_check_mark:</span> |
@@ -317,8 +317,8 @@
 * "_valueWithItalicFont_" indicates that the limit/property is not defined in the profile but an equivalent limit/property is (hover over the symbol to view the structure and corresponding extension or core API version where the limit/property is defined in the profile)
 * "-" indicates that neither the limit/property nor an equivalent limit/property is defined in the profile
 
-| Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_baseline_2022 | VP_LUNARG_desktop_baseline_2022_subset |
-|----------|---------------------|--------------------------|---------------------------------|----------------------------------------|
+| Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_baseline_2022 | VP_LUNARG_desktop_portability_2022 |
+|----------|---------------------|--------------------------|---------------------------------|------------------------------------|
 | **Vulkan 1.0** |
 | [bufferImageGranularity (min,mul)](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDeviceLimits.html) | <span title="defined in VkPhysicalDeviceProperties (Vulkan 1.0)">4096</span> | - | <span title="defined in VkPhysicalDeviceProperties (Vulkan 1.0)">65536</span> | <span title="defined in VkPhysicalDeviceProperties (Vulkan 1.0)">65536</span> |
 | [discreteQueuePriorities (max)](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkPhysicalDeviceLimits.html) | - | <span title="defined in VkPhysicalDeviceProperties (Vulkan 1.0)">2</span> | <span title="defined in VkPhysicalDeviceProperties (Vulkan 1.0)">2</span> | <span title="defined in VkPhysicalDeviceProperties (Vulkan 1.0)">2</span> |
@@ -558,8 +558,8 @@
 * "-" indicates that neither the queue family property nor an equivalent queue family property is defined in the profile
 * Empty cells next to the properties of a particular queue family definition section indicate that the profile does not have a corresponding queue family definition
 
-| Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_baseline_2022 | VP_LUNARG_desktop_baseline_2022_subset |
-|----------|---------------------|--------------------------|---------------------------------|----------------------------------------|
+| Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_baseline_2022 | VP_LUNARG_desktop_portability_2022 |
+|----------|---------------------|--------------------------|---------------------------------|------------------------------------|
 
 ## Vulkan Profile Formats
 
@@ -570,8 +570,8 @@
 * "-" indicates that neither the format property nor an equivalent format property is defined in the profile
 * Empty cells next to the properties of a particular format definition section indicate that the profile does not have a corresponding format definition
 
-| Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_baseline_2022 | VP_LUNARG_desktop_baseline_2022_subset |
-|----------|---------------------|--------------------------|---------------------------------|----------------------------------------|
+| Profiles | VP_KHR_roadmap_2022 | VP_ANDROID_baseline_2021 | VP_LUNARG_desktop_baseline_2022 | VP_LUNARG_desktop_portability_2022 |
+|----------|---------------------|--------------------------|---------------------------------|------------------------------------|
 | **VK_FORMAT_A1R5G5B5_UNORM_PACK16** |
 | [bufferFeatures](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkFormatProperties3.html) |  | <span title="defined in VkFormatProperties (Vulkan 1.0)">-</span> |  |  |
 | [linearTilingFeatures](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VkFormatProperties3.html) |  | <span title="defined in VkFormatProperties (Vulkan 1.0)">(VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT \| VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT \| VK_FORMAT_FEATURE_BLIT_DST_BIT \| VK_FORMAT_FEATURE_TRANSFER_SRC_BIT \| VK_FORMAT_FEATURE_TRANSFER_DST_BIT)</span> |  |  |
