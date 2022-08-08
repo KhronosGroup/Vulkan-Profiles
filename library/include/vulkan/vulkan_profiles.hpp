@@ -149,10 +149,10 @@
     defined(VK_KHR_timeline_semaphore) && \
     defined(VK_KHR_uniform_buffer_standard_layout) && \
     defined(VK_KHR_variable_pointers)
-#define VP_LUNARG_desktop_baseline_2022_subset 1
-#define VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_NAME "VP_LUNARG_desktop_baseline_2022_subset"
-#define VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_SPEC_VERSION 1
-#define VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 162)
+#define VP_LUNARG_desktop_portability_2022 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME "VP_LUNARG_desktop_portability_2022"
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION 1
+#define VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION VK_MAKE_VERSION(1, 1, 162)
 #endif
 
 #define VP_MAX_PROFILE_NAME_SIZE 256U
@@ -6281,8 +6281,8 @@ static const VpStructChainerDesc chainerDesc = {
 } // namespace VP_LUNARG_DESKTOP_BASELINE_2022
 #endif
 
-#ifdef VP_LUNARG_desktop_baseline_2022_subset
-namespace VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET {
+#ifdef VP_LUNARG_desktop_portability_2022
+namespace VP_LUNARG_DESKTOP_PORTABILITY_2022 {
 
 static const VkExtensionProperties deviceExtensions[] = {
     VkExtensionProperties{ VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, 2 },
@@ -9258,7 +9258,7 @@ static const VpStructChainerDesc chainerDesc = {
     },
 };
 
-} // namespace VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET
+} // namespace VP_LUNARG_DESKTOP_PORTABILITY_2022
 #endif
 
 static const VpProfileDesc vpProfiles[] = {
@@ -9316,22 +9316,22 @@ static const VpProfileDesc vpProfiles[] = {
         VP_LUNARG_DESKTOP_BASELINE_2022::chainerDesc,
     },
 #endif
-#ifdef VP_LUNARG_desktop_baseline_2022_subset
+#ifdef VP_LUNARG_desktop_portability_2022
     VpProfileDesc{
-        VpProfileProperties{ VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_SPEC_VERSION },
-        VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET_MIN_API_VERSION,
+        VpProfileProperties{ VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION },
+        VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION,
         nullptr, 0,
-        &VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::deviceExtensions[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::deviceExtensions) / sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::deviceExtensions[0])),
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::deviceExtensions[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::deviceExtensions) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::deviceExtensions[0])),
         nullptr, 0,
-        &VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::featureStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::featureStructTypes) / sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::featureStructTypes[0])),
-        VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::featureDesc,
-        &VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::propertyStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::propertyStructTypes) / sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::propertyStructTypes[0])),
-        VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::propertyDesc,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::featureStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::featureStructTypes) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::featureStructTypes[0])),
+        VP_LUNARG_DESKTOP_PORTABILITY_2022::featureDesc,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::propertyStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::propertyStructTypes) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::propertyStructTypes[0])),
+        VP_LUNARG_DESKTOP_PORTABILITY_2022::propertyDesc,
         nullptr, 0,
         nullptr, 0,
-        &VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::formatStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::formatStructTypes) / sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::formatStructTypes[0])),
-        &VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::formatDesc[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::formatDesc) / sizeof(VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::formatDesc[0])),
-        VP_LUNARG_DESKTOP_BASELINE_2022_SUBSET::chainerDesc,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::formatStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::formatStructTypes) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::formatStructTypes[0])),
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::formatDesc[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::formatDesc) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::formatDesc[0])),
+        VP_LUNARG_DESKTOP_PORTABILITY_2022::chainerDesc,
     },
 #endif
 };
