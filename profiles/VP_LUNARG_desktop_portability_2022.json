@@ -2034,19 +2034,19 @@
         }
     },
     "profiles": {
-        "VP_LUNARG_desktop_baseline_2022_subset": {
+        "VP_LUNARG_desktop_portability_2022": {
             "version": 1,
             "status": "BETA",
             "api-version": "1.1.162",
-            "label": "LunarG Vulkan Desktop Baseline 2022 Subset profile",
-            "description": "A baseline macOS specific profile variant of VP_LUNARG_desktop_baseline_2022",
+            "label": "LunarG Vulkan Desktop Portability 2022 profile",
+            "description": "A macOS portability specific profile variant of VP_LUNARG_desktop_baseline_2022",
             "contributors": {},
             "history": [
                 {
                     "revision": 1,
                     "date": "2022-08-08",
                     "author": "LunarG Profiles Merger",
-                    "comment": "A baseline macOS specific profile variant of VP_LUNARG_desktop_baseline_2022"
+                    "comment": "A macOS portability specific profile variant of VP_LUNARG_desktop_baseline_2022"
                 }
             ],
             "capabilities": [

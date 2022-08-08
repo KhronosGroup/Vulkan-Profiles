@@ -83,8 +83,8 @@ add_custom_target(VpCreateDesktopPortability2022 ALL
 		--input_dir ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022
 		--output_path ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022.json
 		--output_profile VP_LUNARG_desktop_portability_2022
-		--profile_label ${PROFILE_DESKTOP_PORTABILITY_2022_SUBSET_LABEL}
-		--profile_desc ${PROFILE_DESKTOP_PORTABILITY_2022_SUBSET_DESC}
+		--profile_label ${PROFILE_DESKTOP_PORTABILITY_2022_LABEL}
+		--profile_desc ${PROFILE_DESKTOP_PORTABILITY_2022_DESC}
 		--mode union
 	VERBATIM
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
@@ -93,7 +93,7 @@ add_custom_target(VpCreateDesktopPortability2022 ALL
 add_custom_command(
 	TARGET VpCreateDesktopPortability2022 PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
-		${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022.json
+		${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_baseline_2022.json
 		${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_portability_2022)
 
  set_target_properties(VpCreateDesktopPortability2022 PROPERTIES FOLDER "Profiles generator")
