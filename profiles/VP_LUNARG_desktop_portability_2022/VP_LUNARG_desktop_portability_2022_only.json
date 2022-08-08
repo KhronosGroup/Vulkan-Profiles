@@ -25,7 +25,7 @@
         }
     },
     "profiles": {
-        "VP_LUNARG_portability_subset": {
+        "VP_LUNARG_desktop_portability_2022_only": {
             "version": 1,
             "status": "BETA",
             "api-version": "1.1.154",
