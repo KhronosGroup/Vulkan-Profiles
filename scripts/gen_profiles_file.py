@@ -30,11 +30,12 @@ class ProfileMerger():
     def __init__(self, registry):
         self.registry = registry
 
-    def merge(self, jsons, profiles, profile_names, merged_path, merged_profile, profile_label, profile_description, mode):
+    def merge(self, jsons, profiles, profile_names, merged_path, merged_profile, profile_label, profile_description, profile_api_version, mode):
         self.mode = mode
 
         # Find the api version to use
-        self.api_version = self.get_api_version(profiles)
+        self.api_version = profile_api_version
+
         print('Building a Vulkan ' + '.'.join(self.api_version) + ' profile')
 
         # Begin constructing merged profile
@@ -590,7 +591,7 @@ class ProfileMerger():
         # Get current time
         now = datetime.now()
         revision['date'] = str(now.year) + '-' + str(now.month).zfill(2) + '-' + str(now.day).zfill(2)
-        revision['author'] = 'LunarG Profiles Merger'
+        revision['author'] = 'LunarG Profiles Generation'
         revision['comment'] = description
         profiles[profile_name]['history'].append(revision)
         profiles[profile_name]['capabilities'] = list()
@@ -648,9 +649,11 @@ if __name__ == '__main__':
     parser.add_argument('--output_profile', action='store',
                         help='Profile name of the output profile. If the argument is not set, the value is generated.')
     parser.add_argument('--profile_label', action='store',
-                        help='Label of the merged profile. If the argument is not set, the value is generated.')
+                        help='Override the Label of the generated profile. If the argument is not set, the value is generated.')
     parser.add_argument('--profile_desc', action='store',
-                        help='Description of the merged profile. If the argument is not set, the value is generated.')
+                        help='Override the Description of the generated profile. If the argument is not set, the value is generated.')
+    parser.add_argument('--profile_api_version', action='store',
+                        help='Override the Vulkan API version of the generated profile. If the argument is not set, the value is generated.')
     parser.add_argument('--mode', '-m', action='store', choices=['union', 'intersection'], default='intersection',
                         help='Mode of profile combination.')
           
@@ -682,7 +685,7 @@ if __name__ == '__main__':
     if args.profile_label is not None:
         profile_label = args.profile_label
     else:
-        profile_label = 'Merged profile'
+        profile_label = 'Generated profile'
 
     # Open file and load json
     jsons = list()
@@ -728,5 +731,10 @@ if __name__ == '__main__':
     else:
         profile_description = profile_merger.get_profile_description(profile_names, args.mode)
 
-    profile_merger.merge(jsons, profiles, profile_names, args.output_path, args.output_profile, args.profile_label, args.profile_desc, args.mode)
+    if args.profile_api_version is not None:
+        profile_api_version = profile_merger.get_api_version_list(args.profile_api_version)
+    else:
+        profile_api_version = profile_merger.get_api_version_list(profile_merger.get_api_version(profile_names))
+
+    profile_merger.merge(jsons, profiles, profile_names, args.output_path, args.output_profile, args.profile_label, args.profile_desc, profile_api_version, args.mode)
     
