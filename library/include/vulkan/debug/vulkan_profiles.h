@@ -87,7 +87,6 @@
     defined(VK_KHR_depth_stencil_resolve) && \
     defined(VK_KHR_descriptor_update_template) && \
     defined(VK_KHR_device_group) && \
-    defined(VK_KHR_device_group_creation) && \
     defined(VK_KHR_draw_indirect_count) && \
     defined(VK_KHR_driver_properties) && \
     defined(VK_KHR_dynamic_rendering) && \
