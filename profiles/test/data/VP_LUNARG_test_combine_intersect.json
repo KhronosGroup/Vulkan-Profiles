@@ -47,7 +47,6 @@
     "profiles": {
         "VP_LUNARG_test_combine_intersect": {
             "version": 1,
-            "status": "BETA",
             "api-version": "1.0.142",
             "label": null,
             "description": null,
@@ -56,7 +55,7 @@
                 {
                     "revision": 1,
                     "date": "2022-08-15",
-                    "author": "LunarG Profiles Merger",
+                    "author": "LunarG Profiles Generation",
                     "comment": null
                 }
             ],

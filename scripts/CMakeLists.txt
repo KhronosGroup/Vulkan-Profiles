@@ -89,6 +89,7 @@ add_custom_target(VpCreateDesktopPortability2022 ALL
 		--profile_label ${PROFILE_DESKTOP_PORTABILITY_2022_LABEL}
 		--profile_desc ${PROFILE_DESKTOP_PORTABILITY_2022_DESC}
 		--profile_api_version ${PROFILE_DESKTOP_PORTABILITY_2022_API_VERSION}
+		--profile_stage BETA
 		--mode union
 	VERBATIM
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
