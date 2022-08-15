@@ -30,11 +30,14 @@ class ProfileMerger():
     def __init__(self, registry):
         self.registry = registry
 
-    def merge(self, jsons, profiles, profile_names, merged_path, merged_profile, profile_label, profile_description, profile_api_version, mode):
+    def merge(self, jsons, profiles, profile_names, merged_path, merged_profile, profile_label, profile_description, profile_api_version, profile_stage, mode):
         self.mode = mode
 
         # Find the api version to use
-        self.api_version = profile_api_version
+        if args.profile_api_version is not None:
+            self.api_version = self.get_api_version_list(profile_api_version)
+        else:
+            self.api_version = self.get_api_version(profiles)
 
         print('Building a Vulkan ' + '.'.join(self.api_version) + ' profile')
 
@@ -42,7 +45,7 @@ class ProfileMerger():
         merged = dict()
         merged['$schema'] = 'https://schema.khronos.org/vulkan/profiles-0.8.0-' + self.api_version[2] + '.json#'
         merged['capabilities'] = self.merge_capabilities(jsons, profile_names, self.api_version)
-        merged['profiles'] = self.get_profiles(merged_profile, self.api_version, profile_label, profile_description)
+        merged['profiles'] = self.get_profiles(merged_profile, self.api_version, profile_label, profile_description, profile_stage)
 
         # Wite new merged profile
         with open(merged_path, 'w') as file:
@@ -576,11 +579,12 @@ class ProfileMerger():
         minor = version[underscore+1:]
         return [major, minor]
 
-    def get_profiles(self, profile_name, api_version, label, description):
+    def get_profiles(self, profile_name, api_version, label, description, stage):
         profiles = dict()
         profiles[profile_name] = dict()
         profiles[profile_name]['version'] = 1
-        profiles[profile_name]['status'] = 'BETA'
+        if stage != 'STABLE':
+            profiles[profile_name]['status'] = stage
         profiles[profile_name]['api-version'] = '.'.join(api_version)
         profiles[profile_name]['label'] = label
         profiles[profile_name]['description'] = description
@@ -654,8 +658,10 @@ if __name__ == '__main__':
                         help='Override the Description of the generated profile. If the argument is not set, the value is generated.')
     parser.add_argument('--profile_api_version', action='store',
                         help='Override the Vulkan API version of the generated profile. If the argument is not set, the value is generated.')
+    parser.add_argument('--profile_stage', action='store', choices=['ALPHA', 'BETA', 'STABLE'], default='STABLE',
+                        help='Override the development stage of the generated profile. If the argument is not set, the value is set to "stable".')
     parser.add_argument('--mode', '-m', action='store', choices=['union', 'intersection'], default='intersection',
-                        help='Mode of profile combination.')
+                        help='Mode of profile combination. If the argument is not set, the value is set to "intersection".')
           
     parser.set_defaults(mode='intersection')
 
@@ -731,10 +737,10 @@ if __name__ == '__main__':
     else:
         profile_description = profile_merger.get_profile_description(profile_names, args.mode)
 
-    if args.profile_api_version is not None:
-        profile_api_version = profile_merger.get_api_version_list(args.profile_api_version)
+    if args.profile_stage is not None:
+        profile_stage = args.profile_stage
     else:
-        profile_api_version = profile_merger.get_api_version_list(profile_merger.get_api_version(profile_names))
+        profile_stage = 'STABLE'
 
-    profile_merger.merge(jsons, profiles, profile_names, args.output_path, args.output_profile, args.profile_label, args.profile_desc, profile_api_version, args.mode)
+    profile_merger.merge(jsons, profiles, profile_names, args.output_path, args.output_profile, args.profile_label, args.profile_desc, args.profile_api_version, profile_stage, args.mode)
     
