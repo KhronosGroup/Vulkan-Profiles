@@ -32,7 +32,7 @@
 |----------|---------------------|--------------------------|---------------------------------|------------------------------------|
 | **Instance extensions** |
 | [VK_KHR_android_surface](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_android_surface.html) | :x: | :heavy_check_mark: | :x: | :x: |
-| [VK_KHR_device_group_creation](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_device_group_creation.html) | :heavy_check_mark: | :x: | 1.1 Core | 1.1 Core |
+| [VK_KHR_device_group_creation](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_device_group_creation.html) | 1.1 Core | :x: | 1.1 Core | 1.1 Core |
 | [VK_KHR_external_fence_capabilities](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_fence_capabilities.html) | :heavy_check_mark: | :heavy_check_mark: | 1.1 Core | 1.1 Core |
 | [VK_KHR_external_memory_capabilities](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_memory_capabilities.html) | :heavy_check_mark: | :heavy_check_mark: | 1.1 Core | 1.1 Core |
 | [VK_KHR_external_semaphore_capabilities](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_semaphore_capabilities.html) | :heavy_check_mark: | :heavy_check_mark: | 1.1 Core | 1.1 Core |
