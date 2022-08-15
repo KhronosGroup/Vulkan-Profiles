@@ -31,6 +31,9 @@ The *Vulkan Profiles Toolset* includes the following components:
   - A data format to exchange Vulkan capabilities: extensions, features, properties, formats and queue properties.
   - Each revision of Vulkan API is represented by a schema that supersedes older versions of Vulkan API.
   - The schema covers Vulkan 1.3 and all extensions.
+- [***The Vulkan Profiles JSON file generation***](#vulkan-profiles-json-file-generation)
+  - A `Python` script to generate profiles file by combining multiple exist profiles files.
+  - It supports both `union` and `intersection` of Vulkan capabilities.
 - [***The Vulkan Profiles API library***](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_api_library.html)
   - A header-only C++ library to use *Vulkan Profiles* in Vulkan applications.
   - The library allows checking Profiles support on a device and creating a `VkDevice` instance with the profile features and extensions enabled.
@@ -145,6 +148,21 @@ Each entry in `profiles` includes a reference name and a dictionary containing t
 * `fallback` - Optional. The list of profiles recommended if the checked profile is not supported by the platform.
 
 `profiles` may reference multiple `capabilities` which may define the same capability differently. In this case, the rule is that the last reference of that capability overrides any previously set values.
+
+## Vulkan Profiles JSON file generation
+
+The *Vulkan Profiles Toolset* includes a `Python` script to generate a profiles file by combining multiple profiles files using two modes : 
+- Intersection of Vulkan Capabilities
+- Union of Vulkan Capabilities
+
+[GPUInfo.org](https://vulkan.gpuinfo.org/) allows us downloading `device` profiles in the form of JSON files. We can use these files to create *platform* profiles.
+
+This is the approach used to create the `VP_LUNARG_desktop_baseline_2022` and `VP_LUNARG_desktop_portability_2022` profiles part of this repository.
+
+For more information about the command line arguments, please use the `--help` argument :
+```
+python ./script/gen_profiles_file.py --help
+```
 
 ## Vulkan Profiles JSON validation
 
