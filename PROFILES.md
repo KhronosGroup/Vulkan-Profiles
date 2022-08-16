@@ -32,90 +32,90 @@
 |----------|---------------------|--------------------------|---------------------------------|------------------------------------|
 | **Instance extensions** |
 | [VK_KHR_android_surface](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_android_surface.html) | :x: | :heavy_check_mark: | :x: | :x: |
-| [VK_KHR_device_group_creation](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_device_group_creation.html) | :heavy_check_mark: | :x: | 1.1 Core | 1.1 Core |
-| [VK_KHR_external_fence_capabilities](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_fence_capabilities.html) | :heavy_check_mark: | :heavy_check_mark: | 1.1 Core | 1.1 Core |
-| [VK_KHR_external_memory_capabilities](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_memory_capabilities.html) | :heavy_check_mark: | :heavy_check_mark: | 1.1 Core | 1.1 Core |
-| [VK_KHR_external_semaphore_capabilities](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_semaphore_capabilities.html) | :heavy_check_mark: | :heavy_check_mark: | 1.1 Core | 1.1 Core |
-| [VK_KHR_get_physical_device_properties2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_get_physical_device_properties2.html) | :heavy_check_mark: | :heavy_check_mark: | 1.1 Core | 1.1 Core |
+| [VK_KHR_device_group_creation](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_device_group_creation.html) | 1.1 Core | :x: | 1.1 Core | 1.1 Core |
+| [VK_KHR_external_fence_capabilities](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_fence_capabilities.html) | 1.1 Core | :heavy_check_mark: | 1.1 Core | 1.1 Core |
+| [VK_KHR_external_memory_capabilities](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_memory_capabilities.html) | 1.1 Core | :heavy_check_mark: | 1.1 Core | 1.1 Core |
+| [VK_KHR_external_semaphore_capabilities](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_semaphore_capabilities.html) | 1.1 Core | :heavy_check_mark: | 1.1 Core | 1.1 Core |
+| [VK_KHR_get_physical_device_properties2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_get_physical_device_properties2.html) | 1.1 Core | :heavy_check_mark: | 1.1 Core | 1.1 Core |
 | [VK_KHR_get_surface_capabilities2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_get_surface_capabilities2.html) | :x: | :heavy_check_mark: | :x: | :x: |
 | [VK_KHR_surface](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_surface.html) | :x: | :heavy_check_mark: | :x: | :x: |
 | [VK_EXT_swapchain_colorspace](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_swapchain_colorspace.html) | :x: | :heavy_check_mark: | :x: | :x: |
 | **Device extensions** |
-| [VK_KHR_16bit_storage](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_16bit_storage.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_8bit_storage](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_8bit_storage.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_bind_memory2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_bind_memory2.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_buffer_device_address](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_buffer_device_address.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_copy_commands2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_copy_commands2.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_create_renderpass2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_create_renderpass2.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_dedicated_allocation](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_dedicated_allocation.html) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_depth_stencil_resolve](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_depth_stencil_resolve.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_descriptor_update_template](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_descriptor_update_template.html) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_device_group](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_device_group.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_draw_indirect_count](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_draw_indirect_count.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_driver_properties](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_driver_properties.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_dynamic_rendering](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_dynamic_rendering.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_external_fence](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_fence.html) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_16bit_storage](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_16bit_storage.html) | 1.1 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_8bit_storage](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_8bit_storage.html) | 1.2 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_bind_memory2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_bind_memory2.html) | 1.1 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_buffer_device_address](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_buffer_device_address.html) | 1.2 Core | :x: | :x: | :x: |
+| [VK_KHR_copy_commands2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_copy_commands2.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_KHR_create_renderpass2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_create_renderpass2.html) | 1.2 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_dedicated_allocation](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_dedicated_allocation.html) | 1.1 Core | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_depth_stencil_resolve](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_depth_stencil_resolve.html) | 1.2 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_descriptor_update_template](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_descriptor_update_template.html) | 1.1 Core | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_device_group](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_device_group.html) | 1.1 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_draw_indirect_count](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_draw_indirect_count.html) | 1.2 Core | :x: | :x: | :x: |
+| [VK_KHR_driver_properties](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_driver_properties.html) | 1.2 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_dynamic_rendering](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_dynamic_rendering.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_KHR_external_fence](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_fence.html) | 1.1 Core | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | [VK_KHR_external_fence_fd](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_fence_fd.html) | :x: | :heavy_check_mark: | :x: | :x: |
-| [VK_KHR_external_memory](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_memory.html) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_external_semaphore](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_semaphore.html) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_external_memory](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_memory.html) | 1.1 Core | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_external_semaphore](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_semaphore.html) | 1.1 Core | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | [VK_KHR_external_semaphore_fd](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_semaphore_fd.html) | :x: | :heavy_check_mark: | :x: | :x: |
-| [VK_KHR_format_feature_flags2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_format_feature_flags2.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_get_memory_requirements2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_get_memory_requirements2.html) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_format_feature_flags2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_format_feature_flags2.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_KHR_get_memory_requirements2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_get_memory_requirements2.html) | 1.1 Core | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | [VK_KHR_global_priority](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_global_priority.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_image_format_list](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_image_format_list.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_imageless_framebuffer](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_imageless_framebuffer.html) | :heavy_check_mark: | :x: | :x: | :x: |
+| [VK_KHR_image_format_list](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_image_format_list.html) | 1.2 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_imageless_framebuffer](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_imageless_framebuffer.html) | 1.2 Core | :x: | :x: | :x: |
 | [VK_KHR_incremental_present](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_incremental_present.html) | :x: | :heavy_check_mark: | :x: | :x: |
-| [VK_KHR_maintenance1](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_maintenance1.html) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_maintenance2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_maintenance2.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_maintenance3](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_maintenance3.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_maintenance4](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_maintenance4.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_multiview](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_multiview.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_maintenance1](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_maintenance1.html) | 1.1 Core | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_maintenance2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_maintenance2.html) | 1.1 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_maintenance3](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_maintenance3.html) | 1.1 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_maintenance4](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_maintenance4.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_KHR_multiview](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_multiview.html) | 1.1 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
 | [VK_KHR_portability_subset](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_portability_subset.html) | :x: | :x: | :x: | :heavy_check_mark: |
-| [VK_KHR_relaxed_block_layout](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_relaxed_block_layout.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_sampler_mirror_clamp_to_edge](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_sampler_mirror_clamp_to_edge.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_sampler_ycbcr_conversion](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_sampler_ycbcr_conversion.html) | :heavy_check_mark: | :x: | 1.1 Core | 1.1 Core |
-| [VK_KHR_separate_depth_stencil_layouts](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_separate_depth_stencil_layouts.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_shader_atomic_int64](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_atomic_int64.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_shader_draw_parameters](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_draw_parameters.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_shader_float16_int8](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_float16_int8.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_shader_float_controls](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_float_controls.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_shader_integer_dot_product](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_integer_dot_product.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_shader_non_semantic_info](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_non_semantic_info.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_shader_subgroup_extended_types](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_subgroup_extended_types.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_shader_terminate_invocation](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_terminate_invocation.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_spirv_1_4](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_spirv_1_4.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_storage_buffer_storage_class](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_storage_buffer_storage_class.html) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_relaxed_block_layout](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_relaxed_block_layout.html) | 1.1 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_sampler_mirror_clamp_to_edge](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_sampler_mirror_clamp_to_edge.html) | 1.2 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_sampler_ycbcr_conversion](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_sampler_ycbcr_conversion.html) | 1.1 Core | :x: | 1.1 Core | 1.1 Core |
+| [VK_KHR_separate_depth_stencil_layouts](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_separate_depth_stencil_layouts.html) | 1.2 Core | :x: | :x: | :x: |
+| [VK_KHR_shader_atomic_int64](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_atomic_int64.html) | 1.2 Core | :x: | :x: | :x: |
+| [VK_KHR_shader_draw_parameters](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_draw_parameters.html) | 1.1 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_shader_float16_int8](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_float16_int8.html) | 1.2 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_shader_float_controls](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_float_controls.html) | 1.2 Core | :x: | :x: | :x: |
+| [VK_KHR_shader_integer_dot_product](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_integer_dot_product.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_KHR_shader_non_semantic_info](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_non_semantic_info.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_KHR_shader_subgroup_extended_types](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_subgroup_extended_types.html) | 1.2 Core | :x: | :x: | :x: |
+| [VK_KHR_shader_terminate_invocation](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_shader_terminate_invocation.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_KHR_spirv_1_4](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_spirv_1_4.html) | 1.2 Core | :x: | :x: | :x: |
+| [VK_KHR_storage_buffer_storage_class](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_storage_buffer_storage_class.html) | 1.1 Core | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | [VK_KHR_swapchain](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_swapchain.html) | :x: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | [VK_KHR_swapchain_mutable_format](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_swapchain_mutable_format.html) | :x: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_synchronization2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_synchronization2.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_timeline_semaphore](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_timeline_semaphore.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_uniform_buffer_standard_layout](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_uniform_buffer_standard_layout.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_variable_pointers](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_variable_pointers.html) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_KHR_vulkan_memory_model](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_vulkan_memory_model.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_KHR_zero_initialize_workgroup_memory](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_zero_initialize_workgroup_memory.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_EXT_4444_formats](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_4444_formats.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_EXT_descriptor_indexing](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_descriptor_indexing.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_EXT_extended_dynamic_state](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_extended_dynamic_state.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_EXT_extended_dynamic_state2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_extended_dynamic_state2.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_EXT_host_query_reset](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_host_query_reset.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_EXT_image_robustness](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_image_robustness.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_EXT_inline_uniform_block](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_inline_uniform_block.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_synchronization2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_synchronization2.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_KHR_timeline_semaphore](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_timeline_semaphore.html) | 1.2 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_uniform_buffer_standard_layout](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_uniform_buffer_standard_layout.html) | 1.2 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_variable_pointers](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_variable_pointers.html) | 1.1 Core | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_KHR_vulkan_memory_model](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_vulkan_memory_model.html) | 1.2 Core | :x: | :x: | :x: |
+| [VK_KHR_zero_initialize_workgroup_memory](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_zero_initialize_workgroup_memory.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_EXT_4444_formats](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_4444_formats.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_EXT_descriptor_indexing](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_descriptor_indexing.html) | 1.2 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_EXT_extended_dynamic_state](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_extended_dynamic_state.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_EXT_extended_dynamic_state2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_extended_dynamic_state2.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_EXT_host_query_reset](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_host_query_reset.html) | 1.2 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_EXT_image_robustness](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_image_robustness.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_EXT_inline_uniform_block](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_inline_uniform_block.html) | 1.3 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
 | [VK_EXT_memory_budget](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_memory_budget.html) | :x: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_EXT_pipeline_creation_cache_control](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_pipeline_creation_cache_control.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_EXT_pipeline_creation_feedback](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_pipeline_creation_feedback.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_EXT_private_data](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_private_data.html) | :heavy_check_mark: | :x: | :x: | :x: |
+| [VK_EXT_pipeline_creation_cache_control](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_pipeline_creation_cache_control.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_EXT_pipeline_creation_feedback](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_pipeline_creation_feedback.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_EXT_private_data](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_private_data.html) | 1.3 Core | :x: | :x: | :x: |
 | [VK_EXT_robustness2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_robustness2.html) | :x: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_EXT_sampler_filter_minmax](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_sampler_filter_minmax.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_EXT_scalar_block_layout](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_scalar_block_layout.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_EXT_separate_stencil_usage](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_separate_stencil_usage.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_EXT_shader_demote_to_helper_invocation](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_shader_demote_to_helper_invocation.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_EXT_shader_viewport_index_layer](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_shader_viewport_index_layer.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_EXT_subgroup_size_control](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_subgroup_size_control.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_EXT_texel_buffer_alignment](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_texel_buffer_alignment.html) | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_EXT_texture_compression_astc_hdr](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_texture_compression_astc_hdr.html) | :heavy_check_mark: | :x: | :x: | :x: |
-| [VK_EXT_tooling_info](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_tooling_info.html) | :heavy_check_mark: | :x: | :x: | :x: |
+| [VK_EXT_sampler_filter_minmax](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_sampler_filter_minmax.html) | 1.2 Core | :x: | :x: | :x: |
+| [VK_EXT_scalar_block_layout](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_scalar_block_layout.html) | 1.2 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_EXT_separate_stencil_usage](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_separate_stencil_usage.html) | 1.2 Core | :x: | :x: | :x: |
+| [VK_EXT_shader_demote_to_helper_invocation](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_shader_demote_to_helper_invocation.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_EXT_shader_viewport_index_layer](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_shader_viewport_index_layer.html) | 1.2 Core | :x: | :x: | :x: |
+| [VK_EXT_subgroup_size_control](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_subgroup_size_control.html) | 1.3 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_EXT_texel_buffer_alignment](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_texel_buffer_alignment.html) | 1.3 Core | :x: | :heavy_check_mark: | :heavy_check_mark: |
+| [VK_EXT_texture_compression_astc_hdr](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_texture_compression_astc_hdr.html) | 1.3 Core | :x: | :x: | :x: |
+| [VK_EXT_tooling_info](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_tooling_info.html) | 1.3 Core | :x: | :x: | :x: |
 | [VK_EXT_vertex_attribute_divisor](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_vertex_attribute_divisor.html) | :x: | :x: | :heavy_check_mark: | :heavy_check_mark: |
-| [VK_EXT_ycbcr_2plane_444_formats](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_ycbcr_2plane_444_formats.html) | :heavy_check_mark: | :x: | :x: | :x: |
+| [VK_EXT_ycbcr_2plane_444_formats](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_ycbcr_2plane_444_formats.html) | 1.3 Core | :x: | :x: | :x: |
 | [VK_AMD_draw_indirect_count](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_AMD_draw_indirect_count.html) | 1.2 Core | :x: | :x: | :x: |
 | [VK_GOOGLE_display_timing](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_GOOGLE_display_timing.html) | :x: | :heavy_check_mark: | :x: | :x: |
 
