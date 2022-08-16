@@ -89,6 +89,7 @@
     defined(VK_KHR_depth_stencil_resolve) && \
     defined(VK_KHR_descriptor_update_template) && \
     defined(VK_KHR_device_group) && \
+    defined(VK_KHR_device_group_creation) && \
     defined(VK_KHR_draw_indirect_count) && \
     defined(VK_KHR_driver_properties) && \
     defined(VK_KHR_dynamic_rendering) && \
@@ -3041,6 +3042,7 @@ static const VpStructChainerDesc chainerDesc = {
 namespace VP_KHR_ROADMAP_2022 {
 
 static const VkExtensionProperties instanceExtensions[] = {
+    VkExtensionProperties{ VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME, 1 },
