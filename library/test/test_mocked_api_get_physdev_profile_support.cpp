@@ -746,7 +746,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_extension) {
         "Checking device support for profile VP_KHR_roadmap_2022 "
             "(deviceName=, driverName=, driverInfo=). You may find the details "
             "of the capabilities of this device on https://vulkan.gpuinfo.org/",
-        "Unsupported extension: VK_KHR_global_priority"
+        "Unsupported extension: VK_KHR_zero_initialize_workgroup_memory"
     });
 #endif
 
@@ -802,11 +802,14 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_feature) {
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
 
-    mock.SetDeviceExtensions(mock.vkPhysicalDevice, {
-        VK_EXT(VK_KHR_GLOBAL_PRIORITY),
-    });
-
     VpProfileProperties profile{VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
+
+    uint32_t extensionsCount = 0;
+    vpGetProfileDeviceExtensionProperties(&profile, &extensionsCount, nullptr);
+
+    std::vector<VkExtensionProperties> extensions(extensionsCount);
+    vpGetProfileDeviceExtensionProperties(&profile, &extensionsCount, &extensions[0]);
+    mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
 
     VkPhysicalDeviceVulkan13Features vulkan13Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES};
     VkPhysicalDeviceVulkan12Features vulkan12Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &vulkan13Features};
@@ -847,11 +850,14 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_property) {
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
 
-    mock.SetDeviceExtensions(mock.vkPhysicalDevice, {
-        VK_EXT(VK_KHR_GLOBAL_PRIORITY),
-    });
-
     VpProfileProperties profile{VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
+
+    uint32_t extensionsCount = 0;
+    vpGetProfileDeviceExtensionProperties(&profile, &extensionsCount, nullptr);
+
+    std::vector<VkExtensionProperties> extensions(extensionsCount);
+    vpGetProfileDeviceExtensionProperties(&profile, &extensionsCount, &extensions[0]);
+    mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
 
     VkPhysicalDeviceVulkan13Features vulkan13Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES};
     VkPhysicalDeviceVulkan12Features vulkan12Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &vulkan13Features};
