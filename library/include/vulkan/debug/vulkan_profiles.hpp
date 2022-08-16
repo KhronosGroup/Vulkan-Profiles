@@ -59,77 +59,7 @@
 #endif
 
 #if defined(VK_VERSION_1_3) && \
-    defined(VK_EXT_4444_formats) && \
-    defined(VK_EXT_descriptor_indexing) && \
-    defined(VK_EXT_extended_dynamic_state) && \
-    defined(VK_EXT_extended_dynamic_state2) && \
-    defined(VK_EXT_host_query_reset) && \
-    defined(VK_EXT_image_robustness) && \
-    defined(VK_EXT_inline_uniform_block) && \
-    defined(VK_EXT_pipeline_creation_cache_control) && \
-    defined(VK_EXT_pipeline_creation_feedback) && \
-    defined(VK_EXT_private_data) && \
-    defined(VK_EXT_sampler_filter_minmax) && \
-    defined(VK_EXT_scalar_block_layout) && \
-    defined(VK_EXT_separate_stencil_usage) && \
-    defined(VK_EXT_shader_demote_to_helper_invocation) && \
-    defined(VK_EXT_shader_viewport_index_layer) && \
-    defined(VK_EXT_subgroup_size_control) && \
-    defined(VK_EXT_texel_buffer_alignment) && \
-    defined(VK_EXT_texture_compression_astc_hdr) && \
-    defined(VK_EXT_tooling_info) && \
-    defined(VK_EXT_ycbcr_2plane_444_formats) && \
-    defined(VK_KHR_16bit_storage) && \
-    defined(VK_KHR_8bit_storage) && \
-    defined(VK_KHR_bind_memory2) && \
-    defined(VK_KHR_buffer_device_address) && \
-    defined(VK_KHR_copy_commands2) && \
-    defined(VK_KHR_create_renderpass2) && \
-    defined(VK_KHR_dedicated_allocation) && \
-    defined(VK_KHR_depth_stencil_resolve) && \
-    defined(VK_KHR_descriptor_update_template) && \
-    defined(VK_KHR_device_group) && \
-    defined(VK_KHR_device_group_creation) && \
-    defined(VK_KHR_draw_indirect_count) && \
-    defined(VK_KHR_driver_properties) && \
-    defined(VK_KHR_dynamic_rendering) && \
-    defined(VK_KHR_external_fence) && \
-    defined(VK_KHR_external_fence_capabilities) && \
-    defined(VK_KHR_external_memory) && \
-    defined(VK_KHR_external_memory_capabilities) && \
-    defined(VK_KHR_external_semaphore) && \
-    defined(VK_KHR_external_semaphore_capabilities) && \
-    defined(VK_KHR_format_feature_flags2) && \
-    defined(VK_KHR_get_memory_requirements2) && \
-    defined(VK_KHR_get_physical_device_properties2) && \
-    defined(VK_KHR_global_priority) && \
-    defined(VK_KHR_image_format_list) && \
-    defined(VK_KHR_imageless_framebuffer) && \
-    defined(VK_KHR_maintenance1) && \
-    defined(VK_KHR_maintenance2) && \
-    defined(VK_KHR_maintenance3) && \
-    defined(VK_KHR_maintenance4) && \
-    defined(VK_KHR_multiview) && \
-    defined(VK_KHR_relaxed_block_layout) && \
-    defined(VK_KHR_sampler_mirror_clamp_to_edge) && \
-    defined(VK_KHR_sampler_ycbcr_conversion) && \
-    defined(VK_KHR_separate_depth_stencil_layouts) && \
-    defined(VK_KHR_shader_atomic_int64) && \
-    defined(VK_KHR_shader_draw_parameters) && \
-    defined(VK_KHR_shader_float16_int8) && \
-    defined(VK_KHR_shader_float_controls) && \
-    defined(VK_KHR_shader_integer_dot_product) && \
-    defined(VK_KHR_shader_non_semantic_info) && \
-    defined(VK_KHR_shader_subgroup_extended_types) && \
-    defined(VK_KHR_shader_terminate_invocation) && \
-    defined(VK_KHR_spirv_1_4) && \
-    defined(VK_KHR_storage_buffer_storage_class) && \
-    defined(VK_KHR_synchronization2) && \
-    defined(VK_KHR_timeline_semaphore) && \
-    defined(VK_KHR_uniform_buffer_standard_layout) && \
-    defined(VK_KHR_variable_pointers) && \
-    defined(VK_KHR_vulkan_memory_model) && \
-    defined(VK_KHR_zero_initialize_workgroup_memory)
+    defined(VK_KHR_global_priority)
 #define VP_KHR_roadmap_2022 1
 #define VP_KHR_ROADMAP_2022_NAME "VP_KHR_roadmap_2022"
 #define VP_KHR_ROADMAP_2022_SPEC_VERSION 1
@@ -3075,81 +3005,8 @@ static const VpStructChainerDesc chainerDesc = {
 #ifdef VP_KHR_roadmap_2022
 namespace VP_KHR_ROADMAP_2022 {
 
-static const VkExtensionProperties instanceExtensions[] = {
-    VkExtensionProperties{ VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, 1 },
-};
-
 static const VkExtensionProperties deviceExtensions[] = {
-    VkExtensionProperties{ VK_EXT_4444_FORMATS_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_PIPELINE_CREATION_FEEDBACK_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_PRIVATE_DATA_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_SEPARATE_STENCIL_USAGE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_TOOLING_INFO_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_16BIT_STORAGE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_8BIT_STORAGE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_BIND_MEMORY_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_COPY_COMMANDS_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_DEVICE_GROUP_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_DRAW_INDIRECT_COUNT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_FORMAT_FEATURE_FLAGS_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, 1 },
     VkExtensionProperties{ VK_KHR_GLOBAL_PRIORITY_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_MAINTENANCE_1_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_MAINTENANCE_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_MAINTENANCE_3_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_MAINTENANCE_4_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_MULTIVIEW_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SPIRV_1_4_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME, 1 },
-    VkExtensionProperties{ VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME, 1 },
 };
 
 static const VkStructureType featureStructTypes[] = {
@@ -9461,7 +9318,7 @@ static const VpProfileDesc vpProfiles[] = {
     VpProfileDesc{
         VpProfileProperties{ VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION },
         VP_KHR_ROADMAP_2022_MIN_API_VERSION,
-        &VP_KHR_ROADMAP_2022::instanceExtensions[0], static_cast<uint32_t>(sizeof(VP_KHR_ROADMAP_2022::instanceExtensions) / sizeof(VP_KHR_ROADMAP_2022::instanceExtensions[0])),
+        nullptr, 0,
         &VP_KHR_ROADMAP_2022::deviceExtensions[0], static_cast<uint32_t>(sizeof(VP_KHR_ROADMAP_2022::deviceExtensions) / sizeof(VP_KHR_ROADMAP_2022::deviceExtensions[0])),
         nullptr, 0,
         &VP_KHR_ROADMAP_2022::featureStructTypes[0], static_cast<uint32_t>(sizeof(VP_KHR_ROADMAP_2022::featureStructTypes) / sizeof(VP_KHR_ROADMAP_2022::featureStructTypes[0])),

@@ -66,23 +66,25 @@ TEST(api_get_profile_device_extension_properties, full) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(66, propertyCount);
+    EXPECT_EQ(1, propertyCount);
+
+    propertyCount = 2;
 
     std::vector<VkExtensionProperties> properties(propertyCount);
     VkResult result1 = vpGetProfileDeviceExtensionProperties(&profile, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(66, propertyCount);
+    EXPECT_EQ(1, propertyCount);
 
-    EXPECT_STREQ(VK_EXT_4444_FORMATS_EXTENSION_NAME, properties[0].extensionName);
+    EXPECT_STREQ(VK_KHR_GLOBAL_PRIORITY_EXTENSION_NAME, properties[0].extensionName);
 }
 
 TEST(api_get_profile_device_extension_properties, partial) {
-    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(66, propertyCount);
+    EXPECT_EQ(37, propertyCount);
 
     propertyCount = 5;
 
@@ -91,8 +93,8 @@ TEST(api_get_profile_device_extension_properties, partial) {
     EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(5, propertyCount);
 
-    EXPECT_STREQ(VK_EXT_4444_FORMATS_EXTENSION_NAME, properties[0].extensionName);
-    EXPECT_STREQ(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, properties[1].extensionName);
+    EXPECT_STREQ(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, properties[0].extensionName);
+    EXPECT_STREQ(VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, properties[1].extensionName);
 }
 
 TEST(api_get_profile_instance_extension_properties, full) {
