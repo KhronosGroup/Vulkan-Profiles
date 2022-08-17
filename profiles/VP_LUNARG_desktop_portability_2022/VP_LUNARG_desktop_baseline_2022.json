@@ -316,7 +316,6 @@
                             "VK_SAMPLE_COUNT_4_BIT"
                         ],
                         "sparseAddressSpaceSize": 0,
-                        "standardSampleLocations": true,
                         "storageImageSampleCounts": [
                             "VK_SAMPLE_COUNT_1_BIT"
                         ],
@@ -346,8 +345,7 @@
                         "lineWidthRange": [
                             1,
                             1
-                        ],
-                        "strictLines": true
+                        ]
                     }
                 },
                 "VkPhysicalDeviceRobustness2PropertiesEXT": {
@@ -362,9 +360,7 @@
                 },
                 "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT": {
                     "storageTexelBufferOffsetAlignmentBytes": "256",
-                    "storageTexelBufferOffsetSingleTexelAlignment": true,
-                    "uniformTexelBufferOffsetAlignmentBytes": "256",
-                    "uniformTexelBufferOffsetSingleTexelAlignment": true
+                    "uniformTexelBufferOffsetAlignmentBytes": "256"
                 },
                 "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
                     "maxTimelineSemaphoreValueDifference": "2147483647"
@@ -2029,7 +2025,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-08-15",
+                    "date": "2022-08-17",
                     "author": "LunarG Profiles Generation",
                     "comment": "A baseline desktop profile that supports Vulkan Header 139"
                 }

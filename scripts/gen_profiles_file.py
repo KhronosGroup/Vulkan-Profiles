@@ -392,8 +392,8 @@ class ProfileMerger():
 
     def merge_members(self, merged, member, entry, xmlmember):
         if xmlmember.limittype == 'exact':
-            if merged[member] != entry[member]:
-                del merged[member]
+            #if merged[member] != entry[member]:
+            del merged[member]
         elif xmlmember.limittype == 'noauto':
             del merged[member]
         elif self.mode == 'union':
