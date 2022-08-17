@@ -1966,8 +1966,8 @@ class VulkanRegistry():
             self.structs['VkPhysicalDevicePortabilitySubsetPropertiesKHR'].members['minVertexInputBindingStrideAlignment'].limittype = 'min,pot'
 
         if 'VkPhysicalDeviceFragmentShadingRatePropertiesKHR' in self.structs:
-            self.structs['VkPhysicalDeviceFragmentShadingRatePropertiesKHR'].members['maxFragmentShadingRateAttachmentTexelSizeAspectRatio'].limittype = 'max' # should be max,pot
-            self.structs['VkPhysicalDeviceFragmentShadingRatePropertiesKHR'].members['maxFragmentSizeAspectRatio'].limittype = 'max' # should be max,pot
+            self.structs['VkPhysicalDeviceFragmentShadingRatePropertiesKHR'].members['maxFragmentShadingRateAttachmentTexelSizeAspectRatio'].limittype = 'max,pot'
+            self.structs['VkPhysicalDeviceFragmentShadingRatePropertiesKHR'].members['maxFragmentSizeAspectRatio'].limittype = 'max,pot'
             self.structs['VkPhysicalDeviceFragmentShadingRatePropertiesKHR'].members['maxFragmentShadingRateCoverageSamples'].limittype = 'max'
 
         if 'VkPhysicalDeviceRayTracingPipelinePropertiesKHR' in self.structs:
@@ -1988,7 +1988,7 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['degenerateLinesRasterized'].limittype = 'exact'
 
         if 'VkPhysicalDeviceLineRasterizationPropertiesEXT' in self.structs:
-            self.structs['VkPhysicalDeviceLineRasterizationPropertiesEXT'].members['lineSubPixelPrecisionBits'].limittype = 'max' # should be 'bits'
+            self.structs['VkPhysicalDeviceLineRasterizationPropertiesEXT'].members['lineSubPixelPrecisionBits'].limittype = 'bits'
 
         if self.headerVersionNumber.patch < 213:
             if 'VkPhysicalDeviceTransformFeedbackPropertiesEXT' in self.structs:
