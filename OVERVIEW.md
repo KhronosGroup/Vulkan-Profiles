@@ -48,9 +48,8 @@ The *Vulkan Profiles Toolset* includes the following components:
 Furthermore, the *Vulkan SDK* includes implementations of some *Vulkan Profiles* using the *Vulkan Profiles JSON Schema*:
 - [VP_KHR_roadmap_2022.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/VP_KHR_roadmap_2022.json)
 - [VP_ANDROID_baseline_2021.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/VP_ANDROID_baseline_2021.json)
-- [VP_LUNARG_desktop_portability_2021.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/VP_LUNARG_desktop_portability_2021.json)
-
-Each profiles file may contain multiple variants of a profile. For example `VP_LUNARG_desktop_portability_2021.json` specifies `VP_LUNARG_desktop_portability_2021` profile for Windows and Linux but also `VP_LUNARG_desktop_portability_2021_subset` profile for macOS which has specific requirements.
+- [VP_LUNARG_desktop_baseline_2022.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/VP_LUNARG_desktop_baseline_2022.json)
+- [VP_LUNARG_desktop_portability_2022.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/VP_LUNARG_desktop_portability_2022.json)
 
 Within the *Vulkan SDK*, the Vulkan Profiles files are located at `$(VULKAN_SDK)/Config/VK_LAYER_KHRONOS_profiles`.
 
