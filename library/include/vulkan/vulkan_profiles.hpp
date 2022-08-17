@@ -3798,9 +3798,7 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.sampledImageIntegerSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT);
                     s->properties.limits.sampledImageStencilSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT);
                     s->properties.limits.sparseAddressSpaceSize = 0;
-                    s->properties.limits.standardSampleLocations = VK_TRUE;
                     s->properties.limits.storageImageSampleCounts |= (VK_SAMPLE_COUNT_1_BIT);
-                    s->properties.limits.strictLines = VK_TRUE;
                     s->properties.limits.subPixelInterpolationOffsetBits = 4;
                     s->properties.limits.subPixelPrecisionBits = 4;
                     s->properties.limits.subTexelPrecisionBits = 4;
@@ -3829,9 +3827,7 @@ static const VpPropertyDesc propertyDesc = {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT: {
                     VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT*>(static_cast<void*>(p));
                     s->storageTexelBufferOffsetAlignmentBytes = 256;
-                    s->storageTexelBufferOffsetSingleTexelAlignment = VK_TRUE;
                     s->uniformTexelBufferOffsetAlignmentBytes = 256;
-                    s->uniformTexelBufferOffsetSingleTexelAlignment = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR: {
                     VkPhysicalDeviceTimelineSemaphorePropertiesKHR* s = static_cast<VkPhysicalDeviceTimelineSemaphorePropertiesKHR*>(static_cast<void*>(p));
@@ -4010,9 +4006,7 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (vpCheckFlags(s->properties.limits.sampledImageIntegerSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (vpCheckFlags(s->properties.limits.sampledImageStencilSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (s->properties.limits.sparseAddressSpaceSize >= 0);
-                    ret = ret && (s->properties.limits.standardSampleLocations == VK_TRUE);
                     ret = ret && (vpCheckFlags(s->properties.limits.storageImageSampleCounts, (VK_SAMPLE_COUNT_1_BIT)));
-                    ret = ret && (s->properties.limits.strictLines == VK_TRUE);
                     ret = ret && (s->properties.limits.subPixelInterpolationOffsetBits >= 4);
                     ret = ret && (s->properties.limits.subPixelPrecisionBits >= 4);
                     ret = ret && (s->properties.limits.subTexelPrecisionBits >= 4);
@@ -4047,10 +4041,8 @@ static const VpPropertyDesc propertyDesc = {
                     VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT*>(static_cast<void*>(p));
                     ret = ret && (s->storageTexelBufferOffsetAlignmentBytes <= 256);
                     ret = ret && ((s->storageTexelBufferOffsetAlignmentBytes & (s->storageTexelBufferOffsetAlignmentBytes - 1)) == 0);
-                    ret = ret && (s->storageTexelBufferOffsetSingleTexelAlignment == VK_TRUE);
                     ret = ret && (s->uniformTexelBufferOffsetAlignmentBytes <= 256);
                     ret = ret && ((s->uniformTexelBufferOffsetAlignmentBytes & (s->uniformTexelBufferOffsetAlignmentBytes - 1)) == 0);
-                    ret = ret && (s->uniformTexelBufferOffsetSingleTexelAlignment == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR: {
                     VkPhysicalDeviceTimelineSemaphorePropertiesKHR* s = static_cast<VkPhysicalDeviceTimelineSemaphorePropertiesKHR*>(static_cast<void*>(p));
@@ -6771,9 +6763,7 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.sampledImageIntegerSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT);
                     s->properties.limits.sampledImageStencilSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT);
                     s->properties.limits.sparseAddressSpaceSize = 0;
-                    s->properties.limits.standardSampleLocations = VK_TRUE;
                     s->properties.limits.storageImageSampleCounts |= (VK_SAMPLE_COUNT_1_BIT);
-                    s->properties.limits.strictLines = VK_TRUE;
                     s->properties.limits.subPixelInterpolationOffsetBits = 4;
                     s->properties.limits.subPixelPrecisionBits = 4;
                     s->properties.limits.subTexelPrecisionBits = 4;
@@ -6802,9 +6792,7 @@ static const VpPropertyDesc propertyDesc = {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TEXEL_BUFFER_ALIGNMENT_PROPERTIES_EXT: {
                     VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT*>(static_cast<void*>(p));
                     s->storageTexelBufferOffsetAlignmentBytes = 256;
-                    s->storageTexelBufferOffsetSingleTexelAlignment = VK_TRUE;
                     s->uniformTexelBufferOffsetAlignmentBytes = 256;
-                    s->uniformTexelBufferOffsetSingleTexelAlignment = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR: {
                     VkPhysicalDeviceTimelineSemaphorePropertiesKHR* s = static_cast<VkPhysicalDeviceTimelineSemaphorePropertiesKHR*>(static_cast<void*>(p));
@@ -6988,9 +6976,7 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (vpCheckFlags(s->properties.limits.sampledImageIntegerSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (vpCheckFlags(s->properties.limits.sampledImageStencilSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (s->properties.limits.sparseAddressSpaceSize >= 0);
-                    ret = ret && (s->properties.limits.standardSampleLocations == VK_TRUE);
                     ret = ret && (vpCheckFlags(s->properties.limits.storageImageSampleCounts, (VK_SAMPLE_COUNT_1_BIT)));
-                    ret = ret && (s->properties.limits.strictLines == VK_TRUE);
                     ret = ret && (s->properties.limits.subPixelInterpolationOffsetBits >= 4);
                     ret = ret && (s->properties.limits.subPixelPrecisionBits >= 4);
                     ret = ret && (s->properties.limits.subTexelPrecisionBits >= 4);
@@ -7025,10 +7011,8 @@ static const VpPropertyDesc propertyDesc = {
                     VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT* s = static_cast<VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT*>(static_cast<void*>(p));
                     ret = ret && (s->storageTexelBufferOffsetAlignmentBytes <= 256);
                     ret = ret && ((s->storageTexelBufferOffsetAlignmentBytes & (s->storageTexelBufferOffsetAlignmentBytes - 1)) == 0);
-                    ret = ret && (s->storageTexelBufferOffsetSingleTexelAlignment == VK_TRUE);
                     ret = ret && (s->uniformTexelBufferOffsetAlignmentBytes <= 256);
                     ret = ret && ((s->uniformTexelBufferOffsetAlignmentBytes & (s->uniformTexelBufferOffsetAlignmentBytes - 1)) == 0);
-                    ret = ret && (s->uniformTexelBufferOffsetSingleTexelAlignment == VK_TRUE);
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_PROPERTIES_KHR: {
                     VkPhysicalDeviceTimelineSemaphorePropertiesKHR* s = static_cast<VkPhysicalDeviceTimelineSemaphorePropertiesKHR*>(static_cast<void*>(p));
