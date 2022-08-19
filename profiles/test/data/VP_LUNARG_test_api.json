@@ -3004,7 +3004,7 @@
                         ],
                         "priorityCount": 4
                     },
-                    "VkVideoQueueFamilyProperties2KHR": {
+                    "VkQueueFamilyVideoPropertiesKHR": {
                         "videoCodecOperations": [ "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT" ]
                     },
                     "VkQueueFamilyCheckpointProperties2NV": {
@@ -3019,7 +3019,7 @@
                             "VK_PIPELINE_STAGE_TRANSFER_BIT"
                         ]
                     },
-                    "VkQueueFamilyQueryResultStatusProperties2KHR": {
+                    "VkQueueFamilyQueryResultStatusPropertiesKHR": {
                         "queryResultStatusSupport": true
                     }
                 }

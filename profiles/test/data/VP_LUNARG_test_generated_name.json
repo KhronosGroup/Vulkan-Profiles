@@ -45,7 +45,7 @@
         }
     },
     "profiles": {
-        "VP_LUNARG_merged_2022_08_17_14_36": {
+        "VP_LUNARG_merged_2022_08_19_18_04": {
             "version": 1,
             "api-version": "1.0.142",
             "label": null,
@@ -54,7 +54,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-08-17",
+                    "date": "2022-08-19",
                     "author": "LunarG Profiles Generation",
                     "comment": null
                 }

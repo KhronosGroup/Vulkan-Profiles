@@ -30,7 +30,7 @@
                         ],
                         "priorityCount": 4
                     },
-                    "VkVideoQueueFamilyProperties2KHR": {
+                    "VkQueueFamilyVideoPropertiesKHR": {
                         "videoCodecOperations": [
                             "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT",
                             "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT",
@@ -72,7 +72,7 @@
                         ],
                         "priorityCount": 2
                     },
-                    "VkVideoQueueFamilyProperties2KHR": {
+                    "VkQueueFamilyVideoPropertiesKHR": {
                         "videoCodecOperations": [
                             "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT",
                             "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT",
