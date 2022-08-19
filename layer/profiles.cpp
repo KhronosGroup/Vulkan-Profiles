@@ -1518,7 +1518,7 @@ static VkQueueGlobalPriorityKHR StringToVkQueueGlobalPriorityKHR(const std::stri
 
 static VkVideoCodecOperationFlagsKHR StringToVkVideoCodecOperationFlagsKHR(const std::string &input_value) {
     static const std::unordered_map<std::string, VkVideoCodecOperationFlagsKHR> map = {
-        {"VK_VIDEO_CODEC_OPERATION_INVALID_BIT_KHR", VK_VIDEO_CODEC_OPERATION_INVALID_BIT_KHR},
+        {"VK_VIDEO_CODEC_OPERATION_NONE_KHR", VK_VIDEO_CODEC_OPERATION_NONE_KHR},
         {"VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT", VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT},
         {"VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT", VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT},
         {"VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT", VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT},
@@ -1888,18 +1888,18 @@ typedef std::vector<VkExtensionProperties> ArrayOfVkExtensionProperties;
 struct QueueFamilyProperties {
     VkQueueFamilyProperties2 properties_2 = {};
     VkQueueFamilyGlobalPriorityPropertiesKHR global_priority_properties_ = {};
-    VkVideoQueueFamilyProperties2KHR video_properties_2_ = {};
+    VkQueueFamilyVideoPropertiesKHR video_properties_ = {};
     VkQueueFamilyCheckpointPropertiesNV checkpoint_properties_ = {};
     VkQueueFamilyCheckpointProperties2NV checkpoint_properties_2_ = {};
-    VkQueueFamilyQueryResultStatusProperties2KHR query_result_status_properties_2_ = {};
+    VkQueueFamilyQueryResultStatusPropertiesKHR query_result_status_properties_ = {};
 
     QueueFamilyProperties() {
         properties_2.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2;
         global_priority_properties_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_GLOBAL_PRIORITY_PROPERTIES_EXT;
-        video_properties_2_.sType = VK_STRUCTURE_TYPE_VIDEO_QUEUE_FAMILY_PROPERTIES_2_KHR;
+        video_properties_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_VIDEO_PROPERTIES_KHR;
         checkpoint_properties_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_CHECKPOINT_PROPERTIES_NV;
         checkpoint_properties_2_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_CHECKPOINT_PROPERTIES_2_NV;
-        query_result_status_properties_2_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_QUERY_RESULT_STATUS_PROPERTIES_2_KHR;
+        query_result_status_properties_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_QUERY_RESULT_STATUS_PROPERTIES_KHR;
     }
 };
 typedef std::vector<QueueFamilyProperties> ArrayOfVkQueueFamilyProperties;
@@ -3765,6 +3765,7 @@ bool JsonLoader::WarnDuplicatedFeature(const Json::Value &parent) {
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceShaderIntegerDotProductFeatures", "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR", "VkPhysicalDeviceVulkan13Features"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceFragmentShaderBarycentricFeaturesKHR", "VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceDynamicRenderingFeatures", "VkPhysicalDeviceDynamicRenderingFeaturesKHR", "VkPhysicalDeviceVulkan13Features"});
+    valid &= WarnDuplicated(parent, {"VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesEXT", "VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM"});
     return valid;
 }
 
@@ -4333,6 +4334,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         return GetValue(feature, &pdd_->physical_device_image_view_min_lod_features_);
     } else if (name == "VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM") {
         auto support = CheckExtensionSupport(VK_ARM_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_rasterization_order_attachment_access_features_);
+    } else if (name == "VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_rasterization_order_attachment_access_features_);
     } else if (name == "VkPhysicalDeviceLinearColorAttachmentFeaturesNV") {
@@ -4922,7 +4927,7 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
             dest->global_priority_properties_.priorityCount = props["priorityCount"].asUInt();
         } else if (name == "VkVideoQueueFamilyProperties2KHR") {
             for (const auto &feature : props["videoCodecOperations"]) {
-                dest->video_properties_2_.videoCodecOperations |= StringToVkVideoCodecOperationFlagsKHR(feature.asString());
+                dest->video_properties_.videoCodecOperations |= StringToVkVideoCodecOperationFlagsKHR(feature.asString());
             }
         } else if (name == "VkQueueFamilyCheckpointProperties2NV") {
             for (const auto &feature : props["checkpointExecutionStageMask"]) {
@@ -4933,7 +4938,7 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
                 dest->checkpoint_properties_.checkpointExecutionStageMask |= StringToVkPipelineStageFlags(feature.asString());
             }
         } else if (name == "VkQueueFamilyQueryResultStatusProperties2KHR") {
-            dest->query_result_status_properties_2_.queryResultStatusSupport = props["queryResultStatusSupport"].asBool() ? VK_TRUE : VK_FALSE;
+            dest->query_result_status_properties_.queryResultStatusSupport = props["queryResultStatusSupport"].asBool() ? VK_TRUE : VK_FALSE;
         }
     }
 
@@ -4947,8 +4952,8 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
         if (!GlobalPriorityMatch(device_qfp.global_priority_properties_, dest->global_priority_properties_)) {
             continue;
         }
-        if ((device_qfp.video_properties_2_.videoCodecOperations & dest->video_properties_2_.videoCodecOperations) !=
-            dest->video_properties_2_.videoCodecOperations) {
+        if ((device_qfp.video_properties_.videoCodecOperations & dest->video_properties_.videoCodecOperations) !=
+            dest->video_properties_.videoCodecOperations) {
             continue;
         }
         if ((device_qfp.checkpoint_properties_.checkpointExecutionStageMask &
@@ -4961,7 +4966,7 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
             dest->checkpoint_properties_2_.checkpointExecutionStageMask) {
             continue;
         }
-        if (device_qfp.query_result_status_properties_2_.queryResultStatusSupport != dest->query_result_status_properties_2_.queryResultStatusSupport) {
+        if (device_qfp.query_result_status_properties_.queryResultStatusSupport != dest->query_result_status_properties_.queryResultStatusSupport) {
             continue;
         }
         supported = true;
@@ -4989,9 +4994,9 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
             message += format(", VkQueueFamilyGlobalPriorityPropertiesKHR [priorityCount: %" PRIu32 ", priorities: %s]",
                               dest->global_priority_properties_.priorityCount, priorities.c_str());
         }
-        if (dest->video_properties_2_.videoCodecOperations > 0) {
+        if (dest->video_properties_.videoCodecOperations > 0) {
             message += format(", VkVideoQueueFamilyProperties2KHR [videoCodecOperations: %s]",
-                              string_VkVideoCodecOperationFlagsKHR(dest->video_properties_2_.videoCodecOperations).c_str());
+                              string_VkVideoCodecOperationFlagsKHR(dest->video_properties_.videoCodecOperations).c_str());
         }
         if (dest->checkpoint_properties_.checkpointExecutionStageMask > 0) {
             message += format(", VkQueueFamilyCheckpointPropertiesNV [checkpointExecutionStageMask: %s]",
@@ -5001,7 +5006,7 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
             message += format(", VkQueueFamilyCheckpointProperties2NV [checkpointExecutionStageMask: %s]",
                               string_VkPipelineStageFlags2KHR(dest->checkpoint_properties_2_.checkpointExecutionStageMask).c_str());
         }
-        if (dest->query_result_status_properties_2_.queryResultStatusSupport) {
+        if (dest->query_result_status_properties_.queryResultStatusSupport) {
             message += format(", VkQueueFamilyQueryResultStatusProperties2KHR [queryResultStatusSupport: VK_TRUE]");
         }
         message += ".\n";
@@ -5019,8 +5024,8 @@ bool QueueFamilyAndExtensionsMatch(const QueueFamilyProperties &device, const Qu
     if (!GlobalPriorityMatch(device.global_priority_properties_, profile.global_priority_properties_)) {
         return false;
     }
-    if ((device.video_properties_2_.videoCodecOperations & profile.video_properties_2_.videoCodecOperations) !=
-        profile.video_properties_2_.videoCodecOperations) {
+    if ((device.video_properties_.videoCodecOperations & profile.video_properties_.videoCodecOperations) !=
+        profile.video_properties_.videoCodecOperations) {
         return false;
     }
     if ((device.checkpoint_properties_.checkpointExecutionStageMask &
@@ -5033,7 +5038,7 @@ bool QueueFamilyAndExtensionsMatch(const QueueFamilyProperties &device, const Qu
         profile.checkpoint_properties_2_.checkpointExecutionStageMask) {
         return false;
     }
-    if (device.query_result_status_properties_2_.queryResultStatusSupport != profile.query_result_status_properties_2_.queryResultStatusSupport) {
+    if (device.query_result_status_properties_.queryResultStatusSupport != profile.query_result_status_properties_.queryResultStatusSupport) {
         return false;
     }
     return true;
@@ -10273,16 +10278,16 @@ void FillQueueFamilyPropertiesPNextChain(PhysicalDeviceData *physicalDeviceData,
                     *data = physicalDeviceData->arrayof_queue_family_properties_[i].checkpoint_properties_2_;
                     data->pNext = pNext;
                 } break;
-                case VK_STRUCTURE_TYPE_VIDEO_QUEUE_FAMILY_PROPERTIES_2_KHR: {
-                    VkVideoQueueFamilyProperties2KHR *data = (VkVideoQueueFamilyProperties2KHR *)place;
+                case VK_STRUCTURE_TYPE_QUEUE_FAMILY_VIDEO_PROPERTIES_KHR: {
+                    VkQueueFamilyVideoPropertiesKHR *data = (VkQueueFamilyVideoPropertiesKHR *)place;
                     void *pNext = data->pNext;
-                    *data = physicalDeviceData->arrayof_queue_family_properties_[i].video_properties_2_;
+                    *data = physicalDeviceData->arrayof_queue_family_properties_[i].video_properties_;
                     data->pNext = pNext;
                 } break;
-                case VK_STRUCTURE_TYPE_QUEUE_FAMILY_QUERY_RESULT_STATUS_PROPERTIES_2_KHR: {
-                    VkQueueFamilyQueryResultStatusProperties2KHR *data = (VkQueueFamilyQueryResultStatusProperties2KHR *)place;
+                case VK_STRUCTURE_TYPE_QUEUE_FAMILY_QUERY_RESULT_STATUS_PROPERTIES_KHR: {
+                    VkQueueFamilyQueryResultStatusPropertiesKHR *data = (VkQueueFamilyQueryResultStatusPropertiesKHR *)place;
                     void *pNext = data->pNext;
-                    *data = physicalDeviceData->arrayof_queue_family_properties_[i].query_result_status_properties_2_;
+                    *data = physicalDeviceData->arrayof_queue_family_properties_[i].query_result_status_properties_;
                     data->pNext = pNext;
                 } break;
                 default:
@@ -11295,13 +11300,13 @@ void LoadQueueFamilyProperties(VkInstance instance, VkPhysicalDevice pd, Physica
                 pNext[i] = &pdd->device_queue_family_properties_[i].global_priority_properties_;
             }
             if (PhysicalDeviceData::HasExtension(pdd, VK_KHR_VIDEO_QUEUE_EXTENSION_NAME)) {
-                pdd->device_queue_family_properties_[i].video_properties_2_.pNext = pNext[i];
+                pdd->device_queue_family_properties_[i].video_properties_.pNext = pNext[i];
 
-                pNext[i] = &pdd->device_queue_family_properties_[i].video_properties_2_;
+                pNext[i] = &pdd->device_queue_family_properties_[i].video_properties_;
 
-                pdd->device_queue_family_properties_[i].query_result_status_properties_2_.pNext = pNext[i];
+                pdd->device_queue_family_properties_[i].query_result_status_properties_.pNext = pNext[i];
 
-                pNext[i] = &pdd->device_queue_family_properties_[i].query_result_status_properties_2_;
+                pNext[i] = &pdd->device_queue_family_properties_[i].query_result_status_properties_;
             }
             if (PhysicalDeviceData::HasExtension(pdd, VK_NV_DEVICE_DIAGNOSTIC_CHECKPOINTS_EXTENSION_NAME)) {
                 pdd->device_queue_family_properties_[i].checkpoint_properties_.pNext = pNext[i];
