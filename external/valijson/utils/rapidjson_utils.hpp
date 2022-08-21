@@ -10,8 +10,9 @@
 namespace valijson {
 namespace utils {
 
-template <typename Encoding, typename Allocator>
-inline bool loadDocument(const std::string &path, rapidjson::GenericDocument<Encoding, Allocator> &document) {
+template<typename Encoding, typename Allocator>
+inline bool loadDocument(const std::string &path, rapidjson::GenericDocument<Encoding, Allocator> &document)
+{
     // Load schema JSON from file
     std::string file;
     if (!loadFile(path, file)) {

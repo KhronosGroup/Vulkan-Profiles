@@ -7,12 +7,12 @@
 #include <boost/throw_exception.hpp>
 
 #if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wshadow"
-#include <boost/property_tree/json_parser.hpp>
-#pragma clang diagnostic pop
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wshadow"
+# include <boost/property_tree/json_parser.hpp>
+# pragma clang diagnostic pop
 #else
-#include <boost/property_tree/json_parser.hpp>
+# include <boost/property_tree/json_parser.hpp>
 #endif
 
 // Source locations were added in boost 1.73.
@@ -34,12 +34,16 @@ namespace boost {
 #if (BOOST_VERSION >= 107100)
 BOOST_NORETURN
 #endif
-void throw_exception(std::exception const &e) { valijson::throwRuntimeError(e.what()); }
+void throw_exception(std::exception const & e ) {
+ valijson::throwRuntimeError(e.what());
+}
 
 // Source location override was added in 1.73.
 #if (BOOST_VERSION >= 107300)
 BOOST_NORETURN
-void throw_exception(std::exception const &e, boost::source_location const &loc) { valijson::throwRuntimeError(e.what()); }
+void throw_exception(std::exception const & e, boost::source_location const & loc ) {
+  valijson::throwRuntimeError(e.what());
+}
 #endif
 
 }  // namespace boost
@@ -49,7 +53,8 @@ void throw_exception(std::exception const &e, boost::source_location const &loc)
 namespace valijson {
 namespace utils {
 
-inline bool loadDocument(const std::string &path, boost::property_tree::ptree &document) {
+inline bool loadDocument(const std::string &path, boost::property_tree::ptree &document)
+{
 #if !defined(BOOST_NO_EXCEPTIONS)
     try {
 #endif

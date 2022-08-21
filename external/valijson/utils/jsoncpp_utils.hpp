@@ -11,7 +11,8 @@
 namespace valijson {
 namespace utils {
 
-inline bool loadDocument(const std::string &path, Json::Value &document) {
+inline bool loadDocument(const std::string &path, Json::Value &document)
+{
     // Load schema JSON from file
     std::string file;
     if (!loadFile(path, file)) {

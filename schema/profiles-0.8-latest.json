@@ -57,27 +57,15 @@
             "maximum": 4294967295
         },
         "int64_t": {
-            "oneOf": [
-                {
-                    "type": "string"
-                },
-                {
-                    "type": "integer"
-                }
-            ]
+            "type": "integer"
         },
         "uint64_t": {
-            "oneOf": [
-                {
-                    "type": "string"
-                },
-                {
-                    "type": "integer"
-                }
-            ]
+            "type": "integer",
+            "minimum": 0
         },
         "VkDeviceSize": {
-            "$ref": "#/definitions/uint64_t"
+            "type": "integer",
+            "minimum": 0
         },
         "char": {
             "type": "string"
@@ -86,7 +74,8 @@
             "type": "number"
         },
         "size_t": {
-            "$ref": "#/definitions/uint32_t"
+            "type": "integer",
+            "minimum": 0
         },
         "VkPhysicalDeviceFeatures": {
             "type": "object",

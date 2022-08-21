@@ -11,21 +11,28 @@ class ValidationResults;
 /**
  * @brief  Class that provides validation functionality.
  */
-class Validator {
-   public:
-    enum TypeCheckingMode { kStrongTypes, kWeakTypes };
+class Validator
+{
+public:
+    enum TypeCheckingMode
+    {
+        kStrongTypes,
+        kWeakTypes
+    };
 
     /**
      * @brief  Construct a Validator that uses strong type checking by default
      */
-    Validator() : strictTypes(true) {}
+    Validator()
+      : strictTypes(true) { }
 
     /**
      * @brief  Construct a Validator using a specific type checking mode
      *
      * @param  typeCheckingMode  choice of strong or weak type checking
      */
-    Validator(TypeCheckingMode typeCheckingMode) : strictTypes(typeCheckingMode == kStrongTypes) {}
+    Validator(TypeCheckingMode typeCheckingMode)
+      : strictTypes(typeCheckingMode == kStrongTypes) { }
 
     /**
      * @brief  Validate a JSON document and optionally return the results.
@@ -46,17 +53,21 @@ class Validator {
      *
      * @returns  true if validation succeeds, false otherwise
      */
-    template <typename AdapterType>
-    bool validate(const Subschema &schema, const AdapterType &target, ValidationResults *results) {
+    template<typename AdapterType>
+    bool validate(const Subschema &schema, const AdapterType &target,
+            ValidationResults *results)
+    {
         // Construct a ValidationVisitor to perform validation at the root level
-        ValidationVisitor<AdapterType> v(target, std::vector<std::string>(1, "<root>"), strictTypes, results, regexesCache);
+        ValidationVisitor<AdapterType> v(target,
+                std::vector<std::string>(1, "<root>"), strictTypes, results, regexesCache);
 
         return v.validateSchema(schema);
     }
 
-   private:
+private:
+
     /// Flag indicating that strict type comparisons should be used
-    const bool strictTypes;
+    bool strictTypes;
 
     /// Cached regex objects for pattern constraint. Key - pattern.
     std::unordered_map<std::string, std::regex> regexesCache;

@@ -10,6 +10,7 @@ class ConstConstraint;
 class ContainsConstraint;
 class DependenciesConstraint;
 class EnumConstraint;
+class FormatConstraint;
 class LinearItemsConstraint;
 class MaxItemsConstraint;
 class MaximumConstraint;
@@ -33,8 +34,9 @@ class TypeConstraint;
 class UniqueItemsConstraint;
 
 /// Interface to allow usage of the visitor pattern with Constraints
-class ConstraintVisitor {
-   protected:
+class ConstraintVisitor
+{
+protected:
     virtual ~ConstraintVisitor() = default;
 
     // Shorten type names for derived classes outside of this namespace
@@ -45,6 +47,7 @@ class ConstraintVisitor {
     typedef constraints::ContainsConstraint ContainsConstraint;
     typedef constraints::DependenciesConstraint DependenciesConstraint;
     typedef constraints::EnumConstraint EnumConstraint;
+    typedef constraints::FormatConstraint FormatConstraint;
     typedef constraints::LinearItemsConstraint LinearItemsConstraint;
     typedef constraints::MaximumConstraint MaximumConstraint;
     typedef constraints::MaxItemsConstraint MaxItemsConstraint;
@@ -67,7 +70,8 @@ class ConstraintVisitor {
     typedef constraints::TypeConstraint TypeConstraint;
     typedef constraints::UniqueItemsConstraint UniqueItemsConstraint;
 
-   public:
+public:
+
     virtual bool visit(const AllOfConstraint &) = 0;
     virtual bool visit(const AnyOfConstraint &) = 0;
     virtual bool visit(const ConditionalConstraint &) = 0;
@@ -75,6 +79,7 @@ class ConstraintVisitor {
     virtual bool visit(const ContainsConstraint &) = 0;
     virtual bool visit(const DependenciesConstraint &) = 0;
     virtual bool visit(const EnumConstraint &) = 0;
+    virtual bool visit(const FormatConstraint &) = 0;
     virtual bool visit(const LinearItemsConstraint &) = 0;
     virtual bool visit(const MaximumConstraint &) = 0;
     virtual bool visit(const MaxItemsConstraint &) = 0;

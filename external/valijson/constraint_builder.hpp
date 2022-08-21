@@ -3,18 +3,19 @@
 namespace valijson {
 
 namespace adapters {
-class Adapter;
+    class Adapter;
 }
 
 namespace constraints {
-struct Constraint;
+    struct Constraint;
 }
 
-class ConstraintBuilder {
-   public:
+class ConstraintBuilder
+{
+public:
     virtual ~ConstraintBuilder() = default;
 
-    virtual constraints::Constraint *make(const adapters::Adapter &) const = 0;
+    virtual constraints::Constraint * make(const adapters::Adapter &) const = 0;
 };
 
 }  // namespace valijson

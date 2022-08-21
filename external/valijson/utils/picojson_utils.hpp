@@ -2,14 +2,21 @@
 
 #include <iostream>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4706)
 #include <picojson.h>
+#pragma warning(default: 4706)
+#else
+#include <picojson.h>
+#endif
 
 #include <valijson/utils/file_utils.hpp>
 
 namespace valijson {
 namespace utils {
 
-inline bool loadDocument(const std::string &path, picojson::value &document) {
+inline bool loadDocument(const std::string &path, picojson::value &document)
+{
     // Load schema JSON from file
     std::string file;
     if (!loadFile(path, file)) {
@@ -20,7 +27,8 @@ inline bool loadDocument(const std::string &path, picojson::value &document) {
     // Parse schema
     std::string err = picojson::parse(document, file);
     if (!err.empty()) {
-        std::cerr << "PicoJson failed to parse the document:" << std::endl << "Parse error: " << err << std::endl;
+        std::cerr << "PicoJson failed to parse the document:" << std::endl
+                  << "Parse error: " << err << std::endl;
         return false;
     }
 
