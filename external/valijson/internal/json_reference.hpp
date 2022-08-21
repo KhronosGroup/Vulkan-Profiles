@@ -10,14 +10,16 @@ namespace internal {
 namespace json_reference {
 
 /**
- * @brief   Extract URI from JSON Reference relative to the current schema
- *
- * @param   jsonRef  JSON Reference to extract from
- * @param   schema   Schema that JSON Reference URI is relative to
- *
- * @return  Optional string containing URI
- */
-inline opt::optional<std::string> getJsonReferenceUri(const std::string &jsonRef) {
+  * @brief   Extract URI from JSON Reference relative to the current schema
+  *
+  * @param   jsonRef  JSON Reference to extract from
+  * @param   schema   Schema that JSON Reference URI is relative to
+  *
+  * @return  Optional string containing URI
+  */
+inline opt::optional<std::string> getJsonReferenceUri(
+    const std::string &jsonRef)
+{
     const size_t ptrPos = jsonRef.find('#');
     if (ptrPos == 0) {
         // The JSON Reference does not contain a URI, but might contain a
@@ -33,13 +35,15 @@ inline opt::optional<std::string> getJsonReferenceUri(const std::string &jsonRef
 }
 
 /**
- * @brief   Extract JSON Pointer portion of a JSON Reference
- *
- * @param   jsonRef  JSON Reference to extract from
- *
- * @return  Optional string containing JSON Pointer
- */
-inline opt::optional<std::string> getJsonReferencePointer(const std::string &jsonRef) {
+  * @brief   Extract JSON Pointer portion of a JSON Reference
+  *
+  * @param   jsonRef  JSON Reference to extract from
+  *
+  * @return  Optional string containing JSON Pointer
+  */
+inline opt::optional<std::string> getJsonReferencePointer(
+    const std::string &jsonRef)
+{
     // Attempt to extract JSON Pointer if '#' character is present. Note
     // that a valid pointer would contain at least a leading forward
     // slash character.
@@ -51,6 +55,6 @@ inline opt::optional<std::string> getJsonReferencePointer(const std::string &jso
     return opt::optional<std::string>();
 }
 
-}  // namespace json_reference
-}  // namespace internal
-}  // namespace valijson
+} // namespace json_reference
+} // namespace internal
+} // namespace valijson

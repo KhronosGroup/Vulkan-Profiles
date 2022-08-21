@@ -9,7 +9,8 @@
 namespace valijson {
 namespace utils {
 
-inline bool loadDocument(const std::string &path, json11::Json &document) {
+inline bool loadDocument(const std::string &path, json11::Json &document)
+{
     // Load schema JSON from file
     std::string file;
     if (!loadFile(path, file)) {
@@ -21,7 +22,8 @@ inline bool loadDocument(const std::string &path, json11::Json &document) {
     std::string err;
     document = json11::Json::parse(file, err);
     if (!err.empty()) {
-        std::cerr << "json11 failed to parse the document:" << std::endl << "Parse error: " << err << std::endl;
+        std::cerr << "json11 failed to parse the document:" << std::endl
+                  << "Parse error: " << err << std::endl;
         return false;
     }
 

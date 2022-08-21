@@ -13,34 +13,49 @@ namespace constraints {
  *
  * @tparam  ConstraintType   name of the concrete constraint type, which must provide a copy constructor.
  */
-template <typename ConstraintType>
-struct BasicConstraint : Constraint {
+template<typename ConstraintType>
+struct BasicConstraint: Constraint
+{
     typedef internal::CustomAllocator<void *> Allocator;
 
     typedef std::basic_string<char, std::char_traits<char>, internal::CustomAllocator<char>> String;
 
-    BasicConstraint() : m_allocator() {}
+    BasicConstraint()
+      : m_allocator() { }
 
-    BasicConstraint(Allocator::CustomAlloc allocFn, Allocator::CustomFree freeFn) : m_allocator(allocFn, freeFn) {}
+    BasicConstraint(Allocator::CustomAlloc allocFn, Allocator::CustomFree freeFn)
+      : m_allocator(allocFn, freeFn) { }
 
-    BasicConstraint(const BasicConstraint &other) : m_allocator(other.m_allocator) {}
+    BasicConstraint(const BasicConstraint &other)
+      : m_allocator(other.m_allocator) { }
 
-    ~BasicConstraint<ConstraintType>() override = default;
+    ~BasicConstraint() override = default;
 
-    bool accept(ConstraintVisitor &visitor) const override { return visitor.visit(*static_cast<const ConstraintType *>(this)); }
+    bool accept(ConstraintVisitor &visitor) const override
+    {
+        return visitor.visit(*static_cast<const ConstraintType*>(this));
+    }
 
-    Constraint *clone(CustomAlloc allocFn, CustomFree) const override {
-        void *ptr = allocFn(sizeof(ConstraintType));
+    OwningPointer clone(CustomAlloc allocFn, CustomFree freeFn) const override
+    {
+        // smart pointer to automatically free raw memory on exception
+        typedef std::unique_ptr<Constraint, CustomFree> RawOwningPointer;
+        auto ptr = RawOwningPointer(static_cast<Constraint*>(allocFn(sizeof(ConstraintType))), freeFn);
         if (!ptr) {
             throwRuntimeError("Failed to allocate memory for cloned constraint");
         }
 
-        return new (ptr) ConstraintType(*static_cast<const ConstraintType *>(this));
+        // constructor might throw but the memory will be taken care of anyways
+        (void)new (ptr.get()) ConstraintType(*static_cast<const ConstraintType*>(this));
+
+        // implicitly convert to smart pointer that will also destroy object instance
+        return ptr;
     }
 
-   protected:
+protected:
+
     Allocator m_allocator;
 };
 
-}  // namespace constraints
-}  // namespace valijson
+} // namespace constraints
+} // namespace valijson

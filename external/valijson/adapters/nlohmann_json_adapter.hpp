@@ -28,9 +28,9 @@
 #include <string>
 #include <nlohmann/json.hpp>
 
-#include <valijson/adapters/adapter.hpp>
-#include <valijson/adapters/basic_adapter.hpp>
-#include <valijson/adapters/frozen_value.hpp>
+#include <valijson/internal/adapter.hpp>
+#include <valijson/internal/basic_adapter.hpp>
+#include <valijson/internal/frozen_value.hpp>
 #include <valijson/exceptions.hpp>
 #include <utility>
 
@@ -54,13 +54,16 @@ typedef std::pair<std::string, NlohmannJsonAdapter> NlohmannJsonObjectMember;
  * NlohmannJson value, assumed to be an array, so there is very little overhead
  * associated with copy construction and passing by value.
  */
-class NlohmannJsonArray {
-   public:
+class NlohmannJsonArray
+{
+public:
+
     typedef NlohmannJsonArrayValueIterator const_iterator;
     typedef NlohmannJsonArrayValueIterator iterator;
 
     /// Construct a NlohmannJsonArray referencing an empty array.
-    NlohmannJsonArray() : m_value(emptyArray()) {}
+    NlohmannJsonArray()
+      : m_value(emptyArray()) { }
 
     /**
      * @brief   Construct a NlohmannJsonArray referencing a specific NlohmannJson
@@ -71,7 +74,9 @@ class NlohmannJsonArray {
      * Note that this constructor will throw an exception if the value is not
      * an array.
      */
-    NlohmannJsonArray(const nlohmann::json &value) : m_value(value) {
+    NlohmannJsonArray(const nlohmann::json &value)
+      : m_value(value)
+    {
         if (!value.is_array()) {
             throwRuntimeError("Value is not an array.");
         }
@@ -94,15 +99,20 @@ class NlohmannJsonArray {
     NlohmannJsonArrayValueIterator end() const;
 
     /// Return the number of elements in the array
-    size_t size() const { return m_value.size(); }
+    size_t size() const
+    {
+        return m_value.size();
+    }
 
-   private:
+private:
+
     /**
      * @brief   Return a reference to a NlohmannJson value that is an empty array.
      *
      * Note that the value returned by this function is a singleton.
      */
-    static const nlohmann::json &emptyArray() {
+    static const nlohmann::json & emptyArray()
+    {
         static const nlohmann::json array = nlohmann::json::array();
         return array;
     }
@@ -122,13 +132,16 @@ class NlohmannJsonArray {
  * NlohmannJson value, assumed to be an object, so there is very little overhead
  * associated with copy construction and passing by value.
  */
-class NlohmannJsonObject {
-   public:
+class NlohmannJsonObject
+{
+public:
+
     typedef NlohmannJsonObjectMemberIterator const_iterator;
     typedef NlohmannJsonObjectMemberIterator iterator;
 
     /// Construct a NlohmannJsonObject referencing an empty object singleton.
-    NlohmannJsonObject() : m_value(emptyObject()) {}
+    NlohmannJsonObject()
+      : m_value(emptyObject()) { }
 
     /**
      * @brief   Construct a NlohmannJsonObject referencing a specific NlohmannJson
@@ -139,7 +152,9 @@ class NlohmannJsonObject {
      * Note that this constructor will throw an exception if the value is not
      * an object.
      */
-    NlohmannJsonObject(const nlohmann::json &value) : m_value(value) {
+    NlohmannJsonObject(const nlohmann::json &value)
+      : m_value(value)
+    {
         if (!value.is_object()) {
             throwRuntimeError("Value is not an object.");
         }
@@ -174,15 +189,20 @@ class NlohmannJsonObject {
     NlohmannJsonObjectMemberIterator find(const std::string &propertyName) const;
 
     /// Returns the number of members belonging to this object.
-    size_t size() const { return m_value.size(); }
+    size_t size() const
+    {
+        return m_value.size();
+    }
 
-   private:
+private:
+
     /**
      * @brief   Return a reference to a NlohmannJson value that is empty object.
      *
      * Note that the value returned by this function is a singleton.
      */
-    static const nlohmann::json &emptyObject() {
+    static const nlohmann::json & emptyObject()
+    {
         static const nlohmann::json object = nlohmann::json::object();
         return object;
     }
@@ -190,6 +210,7 @@ class NlohmannJsonObject {
     /// Reference to the contained object
     const nlohmann::json &m_value;
 };
+
 
 /**
  * @brief   Stores an independent copy of a NlohmannJson value.
@@ -200,23 +221,31 @@ class NlohmannJsonObject {
  *
  * @see FrozenValue
  */
-class NlohmannJsonFrozenValue : public FrozenValue {
-   public:
+class NlohmannJsonFrozenValue: public FrozenValue
+{
+public:
+
     /**
      * @brief  Make a copy of a NlohmannJson value
      *
      * @param  source  the NlohmannJson value to be copied
      */
-    explicit NlohmannJsonFrozenValue(nlohmann::json source) : m_value(std::move(source)) {}
+    explicit NlohmannJsonFrozenValue(nlohmann::json source)
+      : m_value(std::move(source)) { }
 
-    FrozenValue *clone() const override { return new NlohmannJsonFrozenValue(m_value); }
+    FrozenValue * clone() const override
+    {
+        return new NlohmannJsonFrozenValue(m_value);
+    }
 
     bool equalTo(const Adapter &other, bool strict) const override;
 
-   private:
+private:
+
     /// Stored NlohmannJson value
     nlohmann::json m_value;
 };
+
 
 /**
  * @brief   Light weight wrapper for a NlohmannJson value.
@@ -232,13 +261,17 @@ class NlohmannJsonFrozenValue : public FrozenValue {
  *
  * @see BasicAdapter
  */
-class NlohmannJsonValue {
-   public:
+class NlohmannJsonValue
+{
+public:
+
     /// Construct a wrapper for the empty object singleton
-    NlohmannJsonValue() : m_value(emptyObject()) {}
+    NlohmannJsonValue()
+      : m_value(emptyObject()) { }
 
     /// Construct a wrapper for a specific NlohmannJson value
-    NlohmannJsonValue(const nlohmann::json &value) : m_value(value) {}
+    NlohmannJsonValue(const nlohmann::json &value)
+      : m_value(value) { }
 
     /**
      * @brief   Create a new NlohmannJsonFrozenValue instance that contains the
@@ -247,7 +280,10 @@ class NlohmannJsonValue {
      * @returns pointer to a new NlohmannJsonFrozenValue instance, belonging to the
      *          caller.
      */
-    FrozenValue *freeze() const { return new NlohmannJsonFrozenValue(m_value); }
+    FrozenValue * freeze() const
+    {
+        return new NlohmannJsonFrozenValue(m_value);
+    }
 
     /**
      * @brief   Optionally return a NlohmannJsonArray instance.
@@ -258,7 +294,8 @@ class NlohmannJsonValue {
      *
      * Otherwise it will return an empty optional.
      */
-    opt::optional<NlohmannJsonArray> getArrayOptional() const {
+    opt::optional<NlohmannJsonArray> getArrayOptional() const
+    {
         if (m_value.is_array()) {
             return opt::make_optional(NlohmannJsonArray(m_value));
         }
@@ -277,7 +314,8 @@ class NlohmannJsonValue {
      *
      * @returns true if the number of elements was retrieved, false otherwise.
      */
-    bool getArraySize(size_t &result) const {
+    bool getArraySize(size_t &result) const
+    {
         if (m_value.is_array()) {
             result = m_value.size();
             return true;
@@ -286,7 +324,8 @@ class NlohmannJsonValue {
         return false;
     }
 
-    bool getBool(bool &result) const {
+    bool getBool(bool &result) const
+    {
         if (m_value.is_boolean()) {
             result = m_value.get<bool>();
             return true;
@@ -295,7 +334,8 @@ class NlohmannJsonValue {
         return false;
     }
 
-    bool getDouble(double &result) const {
+    bool getDouble(double &result) const
+    {
         if (m_value.is_number_float()) {
             result = m_value.get<double>();
             return true;
@@ -304,8 +344,9 @@ class NlohmannJsonValue {
         return false;
     }
 
-    bool getInteger(int64_t &result) const {
-        if (m_value.is_number_integer()) {
+    bool getInteger(int64_t &result) const
+    {
+        if(m_value.is_number_integer()) {
             result = m_value.get<int64_t>();
             return true;
         }
@@ -321,7 +362,8 @@ class NlohmannJsonValue {
      *
      * Otherwise it will return an empty optional.
      */
-    opt::optional<NlohmannJsonObject> getObjectOptional() const {
+    opt::optional<NlohmannJsonObject> getObjectOptional() const
+    {
         if (m_value.is_object()) {
             return opt::make_optional(NlohmannJsonObject(m_value));
         }
@@ -340,7 +382,8 @@ class NlohmannJsonValue {
      *
      * @returns true if the number of members was retrieved, false otherwise.
      */
-    bool getObjectSize(size_t &result) const {
+    bool getObjectSize(size_t &result) const
+    {
         if (m_value.is_object()) {
             result = m_value.size();
             return true;
@@ -349,7 +392,8 @@ class NlohmannJsonValue {
         return false;
     }
 
-    bool getString(std::string &result) const {
+    bool getString(std::string &result) const
+    {
         if (m_value.is_string()) {
             result = m_value.get<std::string>();
             return true;
@@ -358,27 +402,56 @@ class NlohmannJsonValue {
         return false;
     }
 
-    static bool hasStrictTypes() { return true; }
+    static bool hasStrictTypes()
+    {
+        return true;
+    }
 
-    bool isArray() const { return m_value.is_array(); }
+    bool isArray() const
+    {
+        return m_value.is_array();
+    }
 
-    bool isBool() const { return m_value.is_boolean(); }
+    bool isBool() const
+    {
+        return m_value.is_boolean();
+    }
 
-    bool isDouble() const { return m_value.is_number_float(); }
+    bool isDouble() const
+    {
+        return m_value.is_number_float();
+    }
 
-    bool isInteger() const { return m_value.is_number_integer(); }
+    bool isInteger() const
+    {
+        return m_value.is_number_integer();
+    }
 
-    bool isNull() const { return m_value.is_null(); }
+    bool isNull() const
+    {
+        return m_value.is_null();
+    }
 
-    bool isNumber() const { return m_value.is_number(); }
+    bool isNumber() const
+    {
+        return m_value.is_number();
+    }
 
-    bool isObject() const { return m_value.is_object(); }
+    bool isObject() const
+    {
+        return m_value.is_object();
+    }
 
-    bool isString() const { return m_value.is_string(); }
+    bool isString() const
+    {
+        return m_value.is_string();
+    }
 
-   private:
+private:
+
     /// Return a reference to an empty object singleton
-    static const nlohmann::json &emptyObject() {
+    static const nlohmann::json & emptyObject()
+    {
         static const nlohmann::json object = nlohmann::json::object();
         return object;
     }
@@ -396,14 +469,21 @@ class NlohmannJsonValue {
  * @see Adapter
  * @see BasicAdapter
  */
-class NlohmannJsonAdapter
-    : public BasicAdapter<NlohmannJsonAdapter, NlohmannJsonArray, NlohmannJsonObjectMember, NlohmannJsonObject, NlohmannJsonValue> {
-   public:
+class NlohmannJsonAdapter:
+    public BasicAdapter<NlohmannJsonAdapter,
+        NlohmannJsonArray,
+        NlohmannJsonObjectMember,
+        NlohmannJsonObject,
+        NlohmannJsonValue>
+{
+public:
     /// Construct a NlohmannJsonAdapter that contains an empty object
-    NlohmannJsonAdapter() : BasicAdapter() {}
+    NlohmannJsonAdapter()
+      : BasicAdapter() { }
 
     /// Construct a NlohmannJsonAdapter containing a specific Nlohmann Json object
-    NlohmannJsonAdapter(const nlohmann::json &value) : BasicAdapter(NlohmannJsonValue{value}) {}
+    NlohmannJsonAdapter(const nlohmann::json &value)
+      : BasicAdapter(NlohmannJsonValue{value}) { }
 };
 
 /**
@@ -415,23 +495,35 @@ class NlohmannJsonAdapter
  *
  * @see NlohmannJsonArray
  */
-class NlohmannJsonArrayValueIterator : public std::iterator<std::bidirectional_iterator_tag,  // bi-directional iterator
-                                                            NlohmannJsonAdapter>              // value type
+class NlohmannJsonArrayValueIterator
 {
-   public:
+public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = NlohmannJsonAdapter;
+    using difference_type = NlohmannJsonAdapter;
+    using pointer = NlohmannJsonAdapter*;
+    using reference = NlohmannJsonAdapter&;
+
     /**
      * @brief   Construct a new NlohmannJsonArrayValueIterator using an existing
      *          NlohmannJson iterator.
      *
      * @param   itr  NlohmannJson iterator to store
      */
-    NlohmannJsonArrayValueIterator(const nlohmann::json::const_iterator &itr) : m_itr(itr) {}
+    NlohmannJsonArrayValueIterator(const nlohmann::json::const_iterator &itr)
+      : m_itr(itr) { }
 
     /// Returns a NlohmannJsonAdapter that contains the value of the current
     /// element.
-    NlohmannJsonAdapter operator*() const { return NlohmannJsonAdapter(*m_itr); }
+    NlohmannJsonAdapter operator*() const
+    {
+        return NlohmannJsonAdapter(*m_itr);
+    }
 
-    DerefProxy<NlohmannJsonAdapter> operator->() const { return DerefProxy<NlohmannJsonAdapter>(**this); }
+    DerefProxy<NlohmannJsonAdapter> operator->() const
+    {
+        return DerefProxy<NlohmannJsonAdapter>(**this);
+    }
 
     /**
      * @brief   Compare this iterator against another iterator.
@@ -444,33 +536,46 @@ class NlohmannJsonArrayValueIterator : public std::iterator<std::bidirectional_i
      *
      * @returns true   if the iterators are equal, false otherwise.
      */
-    bool operator==(const NlohmannJsonArrayValueIterator &other) const { return m_itr == other.m_itr; }
+    bool operator==(const NlohmannJsonArrayValueIterator &other) const
+    {
+        return m_itr == other.m_itr;
+    }
 
-    bool operator!=(const NlohmannJsonArrayValueIterator &other) const { return !(m_itr == other.m_itr); }
+    bool operator!=(const NlohmannJsonArrayValueIterator &other) const
+    {
+        return !(m_itr == other.m_itr);
+    }
 
-    const NlohmannJsonArrayValueIterator &operator++() {
+    const NlohmannJsonArrayValueIterator& operator++()
+    {
         m_itr++;
 
         return *this;
     }
 
-    NlohmannJsonArrayValueIterator operator++(int) {
+    NlohmannJsonArrayValueIterator operator++(int)
+    {
         NlohmannJsonArrayValueIterator iterator_pre(m_itr);
         ++(*this);
         return iterator_pre;
     }
 
-    const NlohmannJsonArrayValueIterator &operator--() {
+    const NlohmannJsonArrayValueIterator& operator--()
+    {
         m_itr--;
 
         return *this;
     }
 
-    void advance(std::ptrdiff_t n) { m_itr += n; }
+    void advance(std::ptrdiff_t n)
+    {
+        m_itr += n;
+    }
 
-   private:
+private:
     nlohmann::json::const_iterator m_itr;
 };
+
 
 /**
  * @brief   Class for iterating over the members belonging to a JSON object.
@@ -482,24 +587,36 @@ class NlohmannJsonArrayValueIterator : public std::iterator<std::bidirectional_i
  * @see NlohmannJsonObject
  * @see NlohmannJsonObjectMember
  */
-class NlohmannJsonObjectMemberIterator : public std::iterator<std::bidirectional_iterator_tag,  // bi-directional iterator
-                                                              NlohmannJsonObjectMember>         // value type
+class NlohmannJsonObjectMemberIterator
 {
-   public:
+public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = NlohmannJsonObjectMember;
+    using difference_type = NlohmannJsonObjectMember;
+    using pointer = NlohmannJsonObjectMember*;
+    using reference = NlohmannJsonObjectMember&;
+
     /**
      * @brief   Construct an iterator from a NlohmannJson iterator.
      *
      * @param   itr  NlohmannJson iterator to store
      */
-    NlohmannJsonObjectMemberIterator(const nlohmann::json::const_iterator &itr) : m_itr(itr) {}
+    NlohmannJsonObjectMemberIterator(const nlohmann::json::const_iterator &itr)
+      : m_itr(itr) { }
 
     /**
      * @brief   Returns a NlohmannJsonObjectMember that contains the key and value
      *          belonging to the object member identified by the iterator.
      */
-    NlohmannJsonObjectMember operator*() const { return NlohmannJsonObjectMember(m_itr.key(), m_itr.value()); }
+    NlohmannJsonObjectMember operator*() const
+    {
+        return NlohmannJsonObjectMember(m_itr.key(), m_itr.value());
+    }
 
-    DerefProxy<NlohmannJsonObjectMember> operator->() const { return DerefProxy<NlohmannJsonObjectMember>(**this); }
+    DerefProxy<NlohmannJsonObjectMember> operator->() const
+    {
+        return DerefProxy<NlohmannJsonObjectMember>(**this);
+    }
 
     /**
      * @brief   Compare this iterator with another iterator.
@@ -512,54 +629,83 @@ class NlohmannJsonObjectMemberIterator : public std::iterator<std::bidirectional
      *
      * @returns true if the underlying iterators are equal, false otherwise
      */
-    bool operator==(const NlohmannJsonObjectMemberIterator &other) const { return m_itr == other.m_itr; }
+    bool operator==(const NlohmannJsonObjectMemberIterator &other) const
+    {
+        return m_itr == other.m_itr;
+    }
 
-    bool operator!=(const NlohmannJsonObjectMemberIterator &other) const { return !(m_itr == other.m_itr); }
+    bool operator!=(const NlohmannJsonObjectMemberIterator &other) const
+    {
+        return !(m_itr == other.m_itr);
+    }
 
-    const NlohmannJsonObjectMemberIterator &operator++() {
+    const NlohmannJsonObjectMemberIterator& operator++()
+    {
         m_itr++;
 
         return *this;
     }
 
-    NlohmannJsonObjectMemberIterator operator++(int) {
+    NlohmannJsonObjectMemberIterator operator++(int)
+    {
         NlohmannJsonObjectMemberIterator iterator_pre(m_itr);
         ++(*this);
         return iterator_pre;
     }
 
-    const NlohmannJsonObjectMemberIterator &operator--() {
+    const NlohmannJsonObjectMemberIterator& operator--()
+    {
         m_itr--;
 
         return *this;
     }
 
-   private:
+private:
+
     /// Iternal copy of the original NlohmannJson iterator
     nlohmann::json::const_iterator m_itr;
 };
 
 /// Specialisation of the AdapterTraits template struct for NlohmannJsonAdapter.
-template <>
-struct AdapterTraits<valijson::adapters::NlohmannJsonAdapter> {
+template<>
+struct AdapterTraits<valijson::adapters::NlohmannJsonAdapter>
+{
     typedef nlohmann::json DocumentType;
 
-    static std::string adapterName() { return "NlohmannJsonAdapter"; }
+    static std::string adapterName()
+    {
+        return "NlohmannJsonAdapter";
+    }
 };
 
-inline bool NlohmannJsonFrozenValue::equalTo(const Adapter &other, bool strict) const {
+inline bool NlohmannJsonFrozenValue::equalTo(const Adapter &other, bool strict) const
+{
     return NlohmannJsonAdapter(m_value).equalTo(other, strict);
 }
 
-inline NlohmannJsonArrayValueIterator NlohmannJsonArray::begin() const { return m_value.begin(); }
+inline NlohmannJsonArrayValueIterator NlohmannJsonArray::begin() const
+{
+    return m_value.begin();
+}
 
-inline NlohmannJsonArrayValueIterator NlohmannJsonArray::end() const { return m_value.end(); }
+inline NlohmannJsonArrayValueIterator NlohmannJsonArray::end() const
+{
+    return m_value.end();
+}
 
-inline NlohmannJsonObjectMemberIterator NlohmannJsonObject::begin() const { return m_value.begin(); }
+inline NlohmannJsonObjectMemberIterator NlohmannJsonObject::begin() const
+{
+    return m_value.begin();
+}
 
-inline NlohmannJsonObjectMemberIterator NlohmannJsonObject::end() const { return m_value.end(); }
+inline NlohmannJsonObjectMemberIterator NlohmannJsonObject::end() const
+{
+    return m_value.end();
+}
 
-inline NlohmannJsonObjectMemberIterator NlohmannJsonObject::find(const std::string &propertyName) const {
+inline NlohmannJsonObjectMemberIterator NlohmannJsonObject::find(
+        const std::string &propertyName) const
+{
     return m_value.find(propertyName);
 }
 

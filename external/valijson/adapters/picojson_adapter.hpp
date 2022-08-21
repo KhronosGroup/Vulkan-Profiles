@@ -27,11 +27,17 @@
 
 #include <string>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4706)
 #include <picojson.h>
+#pragma warning(default: 4706)
+#else
+#include <picojson.h>
+#endif
 
-#include <valijson/adapters/adapter.hpp>
-#include <valijson/adapters/basic_adapter.hpp>
-#include <valijson/adapters/frozen_value.hpp>
+#include <valijson/internal/adapter.hpp>
+#include <valijson/internal/basic_adapter.hpp>
+#include <valijson/internal/frozen_value.hpp>
 #include <valijson/exceptions.hpp>
 
 namespace valijson {
@@ -54,13 +60,16 @@ typedef std::pair<std::string, PicoJsonAdapter> PicoJsonObjectMember;
  * PicoJson value, assumed to be an array, so there is very little overhead
  * associated with copy construction and passing by value.
  */
-class PicoJsonArray {
-   public:
+class PicoJsonArray
+{
+public:
+
     typedef PicoJsonArrayValueIterator const_iterator;
     typedef PicoJsonArrayValueIterator iterator;
 
     /// Construct a PicoJsonArray referencing an empty array.
-    PicoJsonArray() : m_value(emptyArray()) {}
+    PicoJsonArray()
+      : m_value(emptyArray()) { }
 
     /**
      * @brief   Construct a PicoJsonArray referencing a specific PicoJson
@@ -71,7 +80,9 @@ class PicoJsonArray {
      * Note that this constructor will throw an exception if the value is not
      * an array.
      */
-    explicit PicoJsonArray(const picojson::value &value) : m_value(value) {
+    explicit PicoJsonArray(const picojson::value &value)
+      : m_value(value)
+    {
         if (!value.is<picojson::array>()) {
             throwRuntimeError("Value is not an array.");
         }
@@ -94,18 +105,21 @@ class PicoJsonArray {
     PicoJsonArrayValueIterator end() const;
 
     /// Return the number of elements in the array
-    size_t size() const {
+    size_t size() const
+    {
         const picojson::array &array = m_value.get<picojson::array>();
         return array.size();
     }
 
-   private:
+private:
+
     /**
      * @brief   Return a reference to a PicoJson value that is an empty array.
      *
      * Note that the value returned by this function is a singleton.
      */
-    static const picojson::value &emptyArray() {
+    static const picojson::value & emptyArray()
+    {
         static const picojson::value array(picojson::array_type, false);
         return array;
     }
@@ -125,13 +139,16 @@ class PicoJsonArray {
  * PicoJson value, assumed to be an object, so there is very little overhead
  * associated with copy construction and passing by value.
  */
-class PicoJsonObject {
-   public:
+class PicoJsonObject
+{
+public:
+
     typedef PicoJsonObjectMemberIterator const_iterator;
     typedef PicoJsonObjectMemberIterator iterator;
 
     /// Construct a PicoJsonObject referencing an empty object singleton.
-    PicoJsonObject() : m_value(emptyObject()) {}
+    PicoJsonObject()
+      : m_value(emptyObject()) { }
 
     /**
      * @brief   Construct a PicoJsonObject referencing a specific PicoJson
@@ -142,7 +159,9 @@ class PicoJsonObject {
      * Note that this constructor will throw an exception if the value is not
      * an object.
      */
-    PicoJsonObject(const picojson::value &value) : m_value(value) {
+    PicoJsonObject(const picojson::value &value)
+      : m_value(value)
+    {
         if (!value.is<picojson::object>()) {
             throwRuntimeError("Value is not an object.");
         }
@@ -177,18 +196,21 @@ class PicoJsonObject {
     PicoJsonObjectMemberIterator find(const std::string &propertyName) const;
 
     /// Returns the number of members belonging to this object.
-    size_t size() const {
+    size_t size() const
+    {
         const picojson::object &object = m_value.get<picojson::object>();
         return object.size();
     }
 
-   private:
+private:
+
     /**
      * @brief   Return a reference to a PicoJson value that is empty object.
      *
      * Note that the value returned by this function is a singleton.
      */
-    static const picojson::value &emptyObject() {
+    static const picojson::value & emptyObject()
+    {
         static const picojson::value object(picojson::object_type, false);
         return object;
     }
@@ -206,20 +228,27 @@ class PicoJsonObject {
  *
  * @see FrozenValue
  */
-class PicoJsonFrozenValue : public FrozenValue {
-   public:
+class PicoJsonFrozenValue: public FrozenValue
+{
+public:
+
     /**
      * @brief  Make a copy of a PicoJson value
      *
      * @param  source  the PicoJson value to be copied
      */
-    explicit PicoJsonFrozenValue(const picojson::value &source) : m_value(source) {}
+    explicit PicoJsonFrozenValue(const picojson::value &source)
+      : m_value(source) { }
 
-    FrozenValue *clone() const override { return new PicoJsonFrozenValue(m_value); }
+    FrozenValue * clone() const override
+    {
+        return new PicoJsonFrozenValue(m_value);
+    }
 
     bool equalTo(const Adapter &other, bool strict) const override;
 
-   private:
+private:
+
     /// Stored PicoJson value
     picojson::value m_value;
 };
@@ -238,13 +267,17 @@ class PicoJsonFrozenValue : public FrozenValue {
  *
  * @see BasicAdapter
  */
-class PicoJsonValue {
-   public:
+class PicoJsonValue
+{
+public:
+
     /// Construct a wrapper for the empty object singleton
-    PicoJsonValue() : m_value(emptyObject()) {}
+    PicoJsonValue()
+      : m_value(emptyObject()) { }
 
     /// Construct a wrapper for a specific PicoJson value
-    PicoJsonValue(const picojson::value &value) : m_value(value) {}
+    PicoJsonValue(const picojson::value &value)
+      : m_value(value) { }
 
     /**
      * @brief   Create a new PicoJsonFrozenValue instance that contains the
@@ -253,7 +286,10 @@ class PicoJsonValue {
      * @returns pointer to a new PicoJsonFrozenValue instance, belonging to the
      *          caller.
      */
-    FrozenValue *freeze() const { return new PicoJsonFrozenValue(m_value); }
+    FrozenValue * freeze() const
+    {
+        return new PicoJsonFrozenValue(m_value);
+    }
 
     /**
      * @brief   Optionally return a PicoJsonArray instance.
@@ -264,7 +300,8 @@ class PicoJsonValue {
      *
      * Otherwise it will return an empty optional.
      */
-    opt::optional<PicoJsonArray> getArrayOptional() const {
+    opt::optional<PicoJsonArray> getArrayOptional() const
+    {
         if (m_value.is<picojson::array>()) {
             return opt::make_optional(PicoJsonArray(m_value));
         }
@@ -283,9 +320,10 @@ class PicoJsonValue {
      *
      * @returns true if the number of elements was retrieved, false otherwise.
      */
-    bool getArraySize(size_t &result) const {
+    bool getArraySize(size_t &result) const
+    {
         if (m_value.is<picojson::array>()) {
-            const picojson::array &array = m_value.get<picojson::array>();
+            const picojson::array& array = m_value.get<picojson::array>();
             result = array.size();
             return true;
         }
@@ -293,7 +331,8 @@ class PicoJsonValue {
         return false;
     }
 
-    bool getBool(bool &result) const {
+    bool getBool(bool &result) const
+    {
         if (m_value.is<bool>()) {
             result = m_value.get<bool>();
             return true;
@@ -302,7 +341,8 @@ class PicoJsonValue {
         return false;
     }
 
-    bool getDouble(double &result) const {
+    bool getDouble(double &result) const
+    {
         if (m_value.is<double>()) {
             result = m_value.get<double>();
             return true;
@@ -311,7 +351,8 @@ class PicoJsonValue {
         return false;
     }
 
-    bool getInteger(int64_t &result) const {
+    bool getInteger(int64_t &result) const
+    {
         if (m_value.is<int64_t>()) {
             result = m_value.get<int64_t>();
             return true;
@@ -329,7 +370,8 @@ class PicoJsonValue {
      *
      * Otherwise it will return an empty optional.
      */
-    opt::optional<PicoJsonObject> getObjectOptional() const {
+    opt::optional<PicoJsonObject> getObjectOptional() const
+    {
         if (m_value.is<picojson::object>()) {
             return opt::make_optional(PicoJsonObject(m_value));
         }
@@ -348,7 +390,8 @@ class PicoJsonValue {
      *
      * @returns true if the number of members was retrieved, false otherwise.
      */
-    bool getObjectSize(size_t &result) const {
+    bool getObjectSize(size_t &result) const
+    {
         if (m_value.is<picojson::object>()) {
             const picojson::object &object = m_value.get<picojson::object>();
             result = object.size();
@@ -358,7 +401,8 @@ class PicoJsonValue {
         return false;
     }
 
-    bool getString(std::string &result) const {
+    bool getString(std::string &result) const
+    {
         if (m_value.is<std::string>()) {
             result = m_value.get<std::string>();
             return true;
@@ -367,13 +411,23 @@ class PicoJsonValue {
         return false;
     }
 
-    static bool hasStrictTypes() { return true; }
+    static bool hasStrictTypes()
+    {
+        return true;
+    }
 
-    bool isArray() const { return m_value.is<picojson::array>(); }
+    bool isArray() const
+    {
+        return m_value.is<picojson::array>();
+    }
 
-    bool isBool() const { return m_value.is<bool>(); }
+    bool isBool() const
+    {
+        return m_value.is<bool>();
+    }
 
-    bool isDouble() const {
+    bool isDouble() const
+    {
         if (m_value.is<int64_t>()) {
             return false;
         }
@@ -381,19 +435,36 @@ class PicoJsonValue {
         return m_value.is<double>();
     }
 
-    bool isInteger() const { return m_value.is<int64_t>(); }
+    bool isInteger() const
+    {
+        return m_value.is<int64_t>();
+    }
 
-    bool isNull() const { return m_value.is<picojson::null>(); }
+    bool isNull() const
+    {
+        return m_value.is<picojson::null>();
+    }
 
-    bool isNumber() const { return m_value.is<double>(); }
+    bool isNumber() const
+    {
+        return m_value.is<double>();
+    }
 
-    bool isObject() const { return m_value.is<picojson::object>(); }
+    bool isObject() const
+    {
+        return m_value.is<picojson::object>();
+    }
 
-    bool isString() const { return m_value.is<std::string>(); }
+    bool isString() const
+    {
+        return m_value.is<std::string>();
+    }
 
-   private:
+private:
+
     /// Return a reference to an empty object singleton
-    static const picojson::value &emptyObject() {
+    static const picojson::value & emptyObject()
+    {
         static const picojson::value object(picojson::object_type, false);
         return object;
     }
@@ -411,13 +482,22 @@ class PicoJsonValue {
  * @see Adapter
  * @see BasicAdapter
  */
-class PicoJsonAdapter : public BasicAdapter<PicoJsonAdapter, PicoJsonArray, PicoJsonObjectMember, PicoJsonObject, PicoJsonValue> {
-   public:
+class PicoJsonAdapter:
+    public BasicAdapter<PicoJsonAdapter,
+                        PicoJsonArray,
+                        PicoJsonObjectMember,
+                        PicoJsonObject,
+                        PicoJsonValue>
+{
+public:
+
     /// Construct a PicoJsonAdapter that contains an empty object
-    PicoJsonAdapter() : BasicAdapter() {}
+    PicoJsonAdapter()
+      : BasicAdapter() { }
 
     /// Construct a PicoJsonAdapter containing a specific PicoJson value
-    PicoJsonAdapter(const picojson::value &value) : BasicAdapter(value) {}
+    PicoJsonAdapter(const picojson::value &value)
+      : BasicAdapter(value) { }
 };
 
 /**
@@ -429,23 +509,35 @@ class PicoJsonAdapter : public BasicAdapter<PicoJsonAdapter, PicoJsonArray, Pico
  *
  * @see PicoJsonArray
  */
-class PicoJsonArrayValueIterator : public std::iterator<std::bidirectional_iterator_tag,  // bi-directional iterator
-                                                        PicoJsonAdapter>                  // value type
+class PicoJsonArrayValueIterator
 {
-   public:
+public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = PicoJsonAdapter;
+    using difference_type = PicoJsonAdapter;
+    using pointer = PicoJsonAdapter*;
+    using reference = PicoJsonAdapter&;
+
     /**
      * @brief   Construct a new PicoJsonArrayValueIterator using an existing
      *          PicoJson iterator.
      *
      * @param   itr  PicoJson iterator to store
      */
-    PicoJsonArrayValueIterator(const picojson::array::const_iterator &itr) : m_itr(itr) {}
+    PicoJsonArrayValueIterator(const picojson::array::const_iterator &itr)
+      : m_itr(itr) { }
 
     /// Returns a PicoJsonAdapter that contains the value of the current
     /// element.
-    PicoJsonAdapter operator*() const { return PicoJsonAdapter(*m_itr); }
+    PicoJsonAdapter operator*() const
+    {
+        return PicoJsonAdapter(*m_itr);
+    }
 
-    DerefProxy<PicoJsonAdapter> operator->() const { return DerefProxy<PicoJsonAdapter>(**this); }
+    DerefProxy<PicoJsonAdapter> operator->() const
+    {
+        return DerefProxy<PicoJsonAdapter>(**this);
+    }
 
     /**
      * @brief   Compare this iterator against another iterator.
@@ -458,31 +550,44 @@ class PicoJsonArrayValueIterator : public std::iterator<std::bidirectional_itera
      *
      * @returns true   if the iterators are equal, false otherwise.
      */
-    bool operator==(const PicoJsonArrayValueIterator &other) const { return m_itr == other.m_itr; }
+    bool operator==(const PicoJsonArrayValueIterator &other) const
+    {
+        return m_itr == other.m_itr;
+    }
 
-    bool operator!=(const PicoJsonArrayValueIterator &other) const { return !(m_itr == other.m_itr); }
+    bool operator!=(const PicoJsonArrayValueIterator &other) const
+    {
+        return !(m_itr == other.m_itr);
+    }
 
-    const PicoJsonArrayValueIterator &operator++() {
+    const PicoJsonArrayValueIterator& operator++()
+    {
         m_itr++;
 
         return *this;
     }
 
-    PicoJsonArrayValueIterator operator++(int) {
+    PicoJsonArrayValueIterator operator++(int)
+    {
         PicoJsonArrayValueIterator iterator_pre(m_itr);
         ++(*this);
         return iterator_pre;
     }
 
-    const PicoJsonArrayValueIterator &operator--() {
+    const PicoJsonArrayValueIterator& operator--()
+    {
         m_itr--;
 
         return *this;
     }
 
-    void advance(std::ptrdiff_t n) { m_itr += n; }
+    void advance(std::ptrdiff_t n)
+    {
+        m_itr += n;
+    }
 
-   private:
+private:
+
     picojson::array::const_iterator m_itr;
 };
 
@@ -496,24 +601,36 @@ class PicoJsonArrayValueIterator : public std::iterator<std::bidirectional_itera
  * @see PicoJsonObject
  * @see PicoJsonObjectMember
  */
-class PicoJsonObjectMemberIterator : public std::iterator<std::bidirectional_iterator_tag,  // bi-directional iterator
-                                                          PicoJsonObjectMember>             // value type
+class PicoJsonObjectMemberIterator
 {
-   public:
+public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = PicoJsonObjectMember;
+    using difference_type = PicoJsonObjectMember;
+    using pointer = PicoJsonObjectMember*;
+    using reference = PicoJsonObjectMember&;
+
     /**
      * @brief   Construct an iterator from a PicoJson iterator.
      *
      * @param   itr  PicoJson iterator to store
      */
-    PicoJsonObjectMemberIterator(const picojson::object::const_iterator &itr) : m_itr(itr) {}
+    PicoJsonObjectMemberIterator(const picojson::object::const_iterator &itr)
+      : m_itr(itr) { }
 
     /**
      * @brief   Returns a PicoJsonObjectMember that contains the key and value
      *          belonging to the object member identified by the iterator.
      */
-    PicoJsonObjectMember operator*() const { return PicoJsonObjectMember(m_itr->first, m_itr->second); }
+    PicoJsonObjectMember operator*() const
+    {
+        return PicoJsonObjectMember(m_itr->first, m_itr->second);
+    }
 
-    DerefProxy<PicoJsonObjectMember> operator->() const { return DerefProxy<PicoJsonObjectMember>(**this); }
+    DerefProxy<PicoJsonObjectMember> operator->() const
+    {
+        return DerefProxy<PicoJsonObjectMember>(**this);
+    }
 
     /**
      * @brief   Compare this iterator with another iterator.
@@ -526,66 +643,87 @@ class PicoJsonObjectMemberIterator : public std::iterator<std::bidirectional_ite
      *
      * @returns true if the underlying iterators are equal, false otherwise
      */
-    bool operator==(const PicoJsonObjectMemberIterator &other) const { return m_itr == other.m_itr; }
+    bool operator==(const PicoJsonObjectMemberIterator &other) const
+    {
+        return m_itr == other.m_itr;
+    }
 
-    bool operator!=(const PicoJsonObjectMemberIterator &other) const { return !(m_itr == other.m_itr); }
+    bool operator!=(const PicoJsonObjectMemberIterator &other) const
+    {
+        return !(m_itr == other.m_itr);
+    }
 
-    const PicoJsonObjectMemberIterator &operator++() {
+    const PicoJsonObjectMemberIterator& operator++()
+    {
         m_itr++;
 
         return *this;
     }
 
-    PicoJsonObjectMemberIterator operator++(int) {
+    PicoJsonObjectMemberIterator operator++(int)
+    {
         PicoJsonObjectMemberIterator iterator_pre(m_itr);
         ++(*this);
         return iterator_pre;
     }
 
-    const PicoJsonObjectMemberIterator &operator--(int) {
+    const PicoJsonObjectMemberIterator& operator--(int)
+    {
         m_itr--;
 
         return *this;
     }
 
-   private:
+private:
+
     /// Iternal copy of the original PicoJson iterator
     picojson::object::const_iterator m_itr;
 };
 
 /// Specialisation of the AdapterTraits template struct for PicoJsonAdapter.
-template <>
-struct AdapterTraits<valijson::adapters::PicoJsonAdapter> {
+template<>
+struct AdapterTraits<valijson::adapters::PicoJsonAdapter>
+{
     typedef picojson::value DocumentType;
 
-    static std::string adapterName() { return "PicoJsonAdapter"; }
+    static std::string adapterName()
+    {
+        return "PicoJsonAdapter";
+    }
 };
 
-inline bool PicoJsonFrozenValue::equalTo(const Adapter &other, bool strict) const {
+inline bool PicoJsonFrozenValue::equalTo(const Adapter &other, bool strict) const
+{
     return PicoJsonAdapter(m_value).equalTo(other, strict);
 }
 
-inline PicoJsonArrayValueIterator PicoJsonArray::begin() const {
+inline PicoJsonArrayValueIterator PicoJsonArray::begin() const
+{
     const picojson::array &array = m_value.get<picojson::array>();
     return array.begin();
 }
 
-inline PicoJsonArrayValueIterator PicoJsonArray::end() const {
+inline PicoJsonArrayValueIterator PicoJsonArray::end() const
+{
     const picojson::array &array = m_value.get<picojson::array>();
     return array.end();
 }
 
-inline PicoJsonObjectMemberIterator PicoJsonObject::begin() const {
+inline PicoJsonObjectMemberIterator PicoJsonObject::begin() const
+{
     const picojson::object &object = m_value.get<picojson::object>();
     return object.begin();
 }
 
-inline PicoJsonObjectMemberIterator PicoJsonObject::end() const {
+inline PicoJsonObjectMemberIterator PicoJsonObject::end() const
+{
     const picojson::object &object = m_value.get<picojson::object>();
     return object.end();
 }
 
-inline PicoJsonObjectMemberIterator PicoJsonObject::find(const std::string &propertyName) const {
+inline PicoJsonObjectMemberIterator PicoJsonObject::find(
+    const std::string &propertyName) const
+{
     const picojson::object &object = m_value.get<picojson::object>();
     return object.find(propertyName);
 }

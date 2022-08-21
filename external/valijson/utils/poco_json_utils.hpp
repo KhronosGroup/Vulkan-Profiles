@@ -11,20 +11,22 @@
 namespace valijson {
 namespace utils {
 
-inline bool loadDocument(const std::string &path, Poco::Dynamic::Var &document) {
+inline bool loadDocument(const std::string &path, Poco::Dynamic::Var &document)
+{
     // Load schema JSON from file
     std::string file;
     if (!loadFile(path, file)) {
-        std::cerr << "Failed to load json from file '" << path << "'." << std::endl;
+        std::cerr << "Failed to load json from file '" << path << "'."
+                  << std::endl;
         return false;
     }
 
     // Parse schema
     try {
         document = Poco::JSON::Parser().parse(file);
-    } catch (Poco::Exception const &exception) {
+    } catch (Poco::Exception const& exception) {
         std::cerr << "Poco::JSON failed to parse the document\n"
-                  << "Parse error:" << exception.what() << "\n";
+            << "Parse error:" << exception.what() << "\n";
         return false;
     }
 
