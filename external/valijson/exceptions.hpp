@@ -13,21 +13,27 @@ namespace valijson {
 #if VALIJSON_USE_EXCEPTIONS
 #include <stdexcept>
 
-VALIJSON_NORETURN inline void throwRuntimeError(const std::string& msg) { throw std::runtime_error(msg); }
+VALIJSON_NORETURN inline void throwRuntimeError(const std::string& msg) {
+  throw std::runtime_error(msg);
+}
 
-VALIJSON_NORETURN inline void throwLogicError(const std::string& msg) { throw std::logic_error(msg); }
+VALIJSON_NORETURN inline void throwLogicError(const std::string& msg) {
+  throw std::logic_error(msg);
+}
 #else
 VALIJSON_NORETURN inline void throwRuntimeError(const std::string& msg) {
-    std::cerr << msg << std::endl;
-    abort();
+  std::cerr << msg << std::endl;
+  abort();
 }
 VALIJSON_NORETURN inline void throwLogicError(const std::string& msg) {
-    std::cerr << msg << std::endl;
-    abort();
+  std::cerr << msg << std::endl;
+  abort();
 }
 
 #endif
 
-VALIJSON_NORETURN inline void throwNotSupported() { throwRuntimeError("Not supported"); }
+VALIJSON_NORETURN inline void throwNotSupported() {
+    throwRuntimeError("Not supported");
+}
 
-}  // namespace valijson
+} // namespace valijson

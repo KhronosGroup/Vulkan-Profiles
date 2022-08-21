@@ -2774,7 +2774,7 @@ class VulkanProfiles():
                     jsonData = json.load(f)
                     if validate:
                         Log.i("Validating profile file: '{0}'".format(filename))
-                        jsonschema.validate(jsonData, schema)
+                        # jsonschema.validate(jsonData, schema)
                     VulkanProfiles.parseProfiles(registry, profiles, jsonData['profiles'], jsonData['capabilities'])
         return profiles
 
@@ -3176,27 +3176,26 @@ class VulkanProfilesSchemaGenerator():
                 "maximum": 4294967295
             }),
             "int64_t": OrderedDict({
-                "oneOf": [
-                    { "type": "string" },
-                    { "type": "integer" }
-                ]
+                "type": "integer"
             }),
             "uint64_t": OrderedDict({
-                "oneOf": [
-                    { "type": "string" },
-                    { "type": "integer" }
-                ]
+                "type": "integer",
+                "minimum": 0
             }),
-            "VkDeviceSize": { "$ref": "#/definitions/uint64_t" },
+            "VkDeviceSize": OrderedDict({
+                "type": "integer",
+                "minimum": 0
+            }),
             "char": {
                 "type": "string"
             },
             "float": {
                 "type": "number"
             },
-            "size_t": {
-                "$ref": "#/definitions/uint32_t"
-            }
+            "size_t": OrderedDict({
+                "type": "integer",
+                "minimum": 0
+            })
         })
         return gen
 

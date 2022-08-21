@@ -14,7 +14,8 @@ namespace utils {
  *
  * @return  true if loaded, false otherwise
  */
-inline bool loadFile(const std::string &path, std::string &dest) {
+inline bool loadFile(const std::string &path, std::string &dest)
+{
     // Open file for reading
     std::ifstream file(path.c_str());
     if (!file.is_open()) {
@@ -33,7 +34,8 @@ inline bool loadFile(const std::string &path, std::string &dest) {
 
     // Assign file contents to destination string
     file.seekg(0, std::ios::beg);
-    dest.assign(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
+    dest.assign(std::istreambuf_iterator<char>(file),
+                std::istreambuf_iterator<char>());
 
     return true;
 }

@@ -7,9 +7,14 @@
 #include <stdexcept>
 #include <string>
 
-#include <valijson/adapters/adapter.hpp>
+#include <valijson/internal/adapter.hpp>
 #include <valijson/internal/optional.hpp>
 #include <valijson/exceptions.hpp>
+
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4702 )
+#endif
 
 namespace valijson {
 namespace internal {
@@ -22,10 +27,12 @@ namespace json_pointer {
  * @param   search   string to search
  * @param   replace  replacement string
  */
-inline void replaceAllInPlace(std::string &subject, const char *search, const char *replace) {
+inline void replaceAllInPlace(std::string& subject, const char* search,
+                                const char* replace)
+{
     size_t pos = 0;
 
-    while ((pos = subject.find(search, pos)) != std::string::npos) {
+    while((pos = subject.find(search, pos)) != std::string::npos) {
         subject.replace(pos, strlen(search), replace);
         pos += strlen(replace);
     }
@@ -39,11 +46,12 @@ inline void replaceAllInPlace(std::string &subject, const char *search, const ch
  *
  * @return  decoded char value corresponding to the hexadecimal string
  */
-inline char decodePercentEncodedChar(const std::string &digits) {
+inline char decodePercentEncodedChar(const std::string &digits)
+{
     if (digits.length() != 2) {
-        throwRuntimeError("Failed to decode %-encoded character '" + digits +
-                          "' due to unexpected number of characters; "
-                          "expected two characters");
+        throwRuntimeError("Failed to decode %-encoded character '" +
+                digits + "' due to unexpected number of characters; "
+                "expected two characters");
     }
 
     errno = 0;
@@ -51,7 +59,8 @@ inline char decodePercentEncodedChar(const std::string &digits) {
     char *end = nullptr;
     const unsigned long value = strtoul(begin, &end, 16);
     if (end != begin && *end != '\0') {
-        throwRuntimeError("Failed to decode %-encoded character '" + digits + "'");
+        throwRuntimeError("Failed to decode %-encoded character '" +
+                digits + "'");
     }
 
     return char(value);
@@ -85,7 +94,9 @@ inline char decodePercentEncodedChar(const std::string &digits) {
  * @return  string with escaped character sequences replaced
  *
  */
-inline std::string extractReferenceToken(std::string::const_iterator begin, std::string::const_iterator end) {
+inline std::string extractReferenceToken(std::string::const_iterator begin,
+        std::string::const_iterator end)
+{
     std::string token(begin, end);
 
     // Replace JSON Pointer-specific escaped character sequences
@@ -93,7 +104,9 @@ inline std::string extractReferenceToken(std::string::const_iterator begin, std:
     replaceAllInPlace(token, "~0", "~");
 
     // Replace %-encoded character sequences with their actual characters
-    for (size_t n = token.find('%'); n != std::string::npos; n = token.find('%', n + 1)) {
+    for (size_t n = token.find('%'); n != std::string::npos;
+            n = token.find('%', n + 1)) {
+
 #if VALIJSON_USE_EXCEPTIONS
         try {
 #endif
@@ -101,7 +114,8 @@ inline std::string extractReferenceToken(std::string::const_iterator begin, std:
             token.replace(n, 3, &c, 1);
 #if VALIJSON_USE_EXCEPTIONS
         } catch (const std::runtime_error &e) {
-            throwRuntimeError(std::string(e.what()) + "; in token: " + token);
+            throwRuntimeError(
+                    std::string(e.what()) + "; in token: " + token);
         }
 #endif
     }
@@ -135,9 +149,12 @@ inline std::string extractReferenceToken(std::string::const_iterator begin, std:
  *
  * @return  an instance of AdapterType that wraps the dereferenced node
  */
-template <typename AdapterType>
-inline AdapterType resolveJsonPointer(const AdapterType &node, const std::string &jsonPointer,
-                                      const std::string::const_iterator jsonPointerItr) {
+template<typename AdapterType>
+inline AdapterType resolveJsonPointer(
+        const AdapterType &node,
+        const std::string &jsonPointer,
+        const std::string::const_iterator jsonPointerItr)
+{
     // TODO: This function will probably need to implement support for
     // fetching documents referenced by JSON Pointers, similar to the
     // populateSchema function.
@@ -151,18 +168,19 @@ inline AdapterType resolveJsonPointer(const AdapterType &node, const std::string
 
     // Reference tokens must begin with a leading slash
     if (*jsonPointerItr != '/') {
-        throwRuntimeError(
-            "Expected reference token to begin with "
-            "leading slash; remaining tokens: " +
-            std::string(jsonPointerItr, jsonPointerEnd));
+        throwRuntimeError("Expected reference token to begin with "
+                "leading slash; remaining tokens: " +
+                std::string(jsonPointerItr, jsonPointerEnd));
     }
 
     // Find iterator that points to next slash or newline character; this is
     // one character past the end of the current reference token
-    std::string::const_iterator jsonPointerNext = std::find(jsonPointerItr + 1, jsonPointerEnd, '/');
+    std::string::const_iterator jsonPointerNext =
+            std::find(jsonPointerItr + 1, jsonPointerEnd, '/');
 
     // Extract the next reference token
-    const std::string referenceToken = extractReferenceToken(jsonPointerItr + 1, jsonPointerNext);
+    const std::string referenceToken = extractReferenceToken(
+            jsonPointerItr + 1, jsonPointerNext);
 
     // Empty reference tokens should be ignored
     if (referenceToken.empty()) {
@@ -170,9 +188,8 @@ inline AdapterType resolveJsonPointer(const AdapterType &node, const std::string
 
     } else if (node.isArray()) {
         if (referenceToken == "-") {
-            throwRuntimeError(
-                "Hyphens cannot be used as array indices "
-                "since the requested array element does not yet exist");
+            throwRuntimeError("Hyphens cannot be used as array indices "
+                    "since the requested array element does not yet exist");
         }
 
 #if VALIJSON_USE_EXCEPTIONS
@@ -186,18 +203,15 @@ inline AdapterType resolveJsonPointer(const AdapterType &node, const std::string
             const uint64_t arrSize = arr.size();
 
             if (arrSize == 0 || index > arrSize - 1) {
-                throwRuntimeError(
-                    "Expected reference token to identify "
-                    "an element in the current array, but array index is "
-                    "out of bounds; actual token: " +
-                    referenceToken);
+                throwRuntimeError("Expected reference token to identify "
+                        "an element in the current array, but array index is "
+                        "out of bounds; actual token: " + referenceToken);
             }
 
             if (index > static_cast<uint64_t>(std::numeric_limits<std::ptrdiff_t>::max())) {
-                throwRuntimeError(
-                    "Array index out of bounds; hard "
-                    "limit is " +
-                    std::to_string(std::numeric_limits<std::ptrdiff_t>::max()));
+                throwRuntimeError("Array index out of bounds; hard "
+                        "limit is " + std::to_string(
+                                std::numeric_limits<std::ptrdiff_t>::max()));
             }
 
             itr.advance(static_cast<std::ptrdiff_t>(index));
@@ -207,11 +221,9 @@ inline AdapterType resolveJsonPointer(const AdapterType &node, const std::string
 
 #if VALIJSON_USE_EXCEPTIONS
         } catch (std::invalid_argument &) {
-            throwRuntimeError(
-                "Expected reference token to contain a "
-                "non-negative integer to identify an element in the "
-                "current array; actual token: " +
-                referenceToken);
+            throwRuntimeError("Expected reference token to contain a "
+                    "non-negative integer to identify an element in the "
+                    "current array; actual token: " + referenceToken);
         }
 #endif
     } else if (node.maybeObject()) {
@@ -219,13 +231,12 @@ inline AdapterType resolveJsonPointer(const AdapterType &node, const std::string
         typedef typename AdapterType::Object Object;
 
         const Object object = node.asObject();
-        typename Object::const_iterator itr = object.find(referenceToken);
-        if (itr == object.end()) {
-            throwRuntimeError(
-                "Expected reference token to identify an "
-                "element in the current object; "
-                "actual token: " +
+        typename Object::const_iterator itr = object.find(
                 referenceToken);
+        if (itr == object.end()) {
+            throwRuntimeError("Expected reference token to identify an "
+                    "element in the current object; "
+                    "actual token: " + referenceToken);
             abort();
         }
 
@@ -233,10 +244,9 @@ inline AdapterType resolveJsonPointer(const AdapterType &node, const std::string
         return resolveJsonPointer(itr->second, jsonPointer, jsonPointerNext);
     }
 
-    throwRuntimeError(
-        "Expected end of JSON Pointer, but at least "
-        "one reference token has not been processed; remaining tokens: " +
-        std::string(jsonPointerNext, jsonPointerEnd));
+    throwRuntimeError("Expected end of JSON Pointer, but at least "
+            "one reference token has not been processed; remaining tokens: " +
+            std::string(jsonPointerNext, jsonPointerEnd));
     abort();
 }
 
@@ -248,11 +258,18 @@ inline AdapterType resolveJsonPointer(const AdapterType &node, const std::string
  *
  * @return  an instance AdapterType in the specified document
  */
-template <typename AdapterType>
-inline AdapterType resolveJsonPointer(const AdapterType &rootNode, const std::string &jsonPointer) {
+template<typename AdapterType>
+inline AdapterType resolveJsonPointer(
+        const AdapterType &rootNode,
+        const std::string &jsonPointer)
+{
     return resolveJsonPointer(rootNode, jsonPointer, jsonPointer.begin());
 }
 
-}  // namespace json_pointer
-}  // namespace internal
-}  // namespace valijson
+} // namespace json_pointer
+} // namespace internal
+} // namespace valijson
+
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif

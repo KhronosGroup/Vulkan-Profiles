@@ -9,11 +9,13 @@
 namespace valijson {
 namespace utils {
 
-inline bool loadDocument(const std::string &path, nlohmann::json &document) {
+inline bool loadDocument(const std::string &path, nlohmann::json &document)
+{
     // Load schema JSON from file
     std::string file;
     if (!loadFile(path, file)) {
-        std::cerr << "Failed to load json from file '" << path << "'." << std::endl;
+        std::cerr << "Failed to load json from file '" << path << "'."
+                  << std::endl;
         return false;
     }
 
@@ -21,9 +23,9 @@ inline bool loadDocument(const std::string &path, nlohmann::json &document) {
 #if VALIJSON_USE_EXCEPTION
     try {
         document = nlohmann::json::parse(file);
-    } catch (std::invalid_argument const &exception) {
+    } catch (std::invalid_argument const& exception) {
         std::cerr << "nlohmann::json failed to parse the document\n"
-                  << "Parse error:" << exception.what() << "\n";
+            << "Parse error:" << exception.what() << "\n";
         return false;
     }
 #else

@@ -11,7 +11,8 @@
 namespace valijson {
 namespace utils {
 
-inline bool loadDocument(const std::string &path, QJsonValue &root) {
+inline bool loadDocument(const std::string &path, QJsonValue &root)
+{
     // Load schema JSON from file
     QFile file(QString::fromStdString(path));
     if (!file.open(QFile::ReadOnly)) {
@@ -25,7 +26,8 @@ inline bool loadDocument(const std::string &path, QJsonValue &root) {
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(data);
     if (doc.isNull()) {
-        std::cerr << "qt failed to parse the document:" << std::endl << parseError.errorString().toStdString() << std::endl;
+        std::cerr << "qt failed to parse the document:" << std::endl
+                  << parseError.errorString().toStdString() << std::endl;
         return false;
     } else if (doc.isObject()) {
         root = QJsonValue(doc.object());

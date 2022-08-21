@@ -28,9 +28,9 @@
 #include <string>
 #include <json11.hpp>
 
-#include <valijson/adapters/adapter.hpp>
-#include <valijson/adapters/basic_adapter.hpp>
-#include <valijson/adapters/frozen_value.hpp>
+#include <valijson/internal/adapter.hpp>
+#include <valijson/internal/basic_adapter.hpp>
+#include <valijson/internal/frozen_value.hpp>
 #include <valijson/exceptions.hpp>
 
 namespace valijson {
@@ -53,13 +53,16 @@ typedef std::pair<std::string, Json11Adapter> Json11ObjectMember;
  * Json11 value, assumed to be an array, so there is very little overhead
  * associated with copy construction and passing by value.
  */
-class Json11Array {
-   public:
+class Json11Array
+{
+public:
+
     typedef Json11ArrayValueIterator const_iterator;
     typedef Json11ArrayValueIterator iterator;
 
     /// Construct a Json11Array referencing an empty array.
-    Json11Array() : m_value(emptyArray()) {}
+    Json11Array()
+      : m_value(emptyArray()) { }
 
     /**
      * @brief   Construct a Json11Array referencing a specific Json11
@@ -70,7 +73,9 @@ class Json11Array {
      * Note that this constructor will throw an exception if the value is not
      * an array.
      */
-    Json11Array(const json11::Json &value) : m_value(value) {
+    Json11Array(const json11::Json &value)
+      : m_value(value)
+    {
         if (!value.is_array()) {
             throwRuntimeError("Value is not an array.");
         }
@@ -93,15 +98,20 @@ class Json11Array {
     Json11ArrayValueIterator end() const;
 
     /// Return the number of elements in the array
-    size_t size() const { return m_value.array_items().size(); }
+    size_t size() const
+    {
+        return m_value.array_items().size();
+    }
 
-   private:
+private:
+
     /**
      * @brief   Return a reference to a Json11 value that is an empty array.
      *
      * Note that the value returned by this function is a singleton.
      */
-    static const json11::Json &emptyArray() {
+    static const json11::Json & emptyArray()
+    {
         static const json11::Json array((json11::Json::array()));
         return array;
     }
@@ -121,13 +131,16 @@ class Json11Array {
  * Json11 value, assumed to be an object, so there is very little overhead
  * associated with copy construction and passing by value.
  */
-class Json11Object {
-   public:
+class Json11Object
+{
+public:
+
     typedef Json11ObjectMemberIterator const_iterator;
     typedef Json11ObjectMemberIterator iterator;
 
     /// Construct a Json11Object referencing an empty object singleton.
-    Json11Object() : m_value(emptyObject()) {}
+    Json11Object()
+      : m_value(emptyObject()) { }
 
     /**
      * @brief   Construct a Json11Object referencing a specific Json11
@@ -138,7 +151,9 @@ class Json11Object {
      * Note that this constructor will throw an exception if the value is not
      * an object.
      */
-    Json11Object(const json11::Json &value) : m_value(value) {
+    Json11Object(const json11::Json &value)
+      : m_value(value)
+    {
         if (!value.is_object()) {
             throwRuntimeError("Value is not an object.");
         }
@@ -173,15 +188,20 @@ class Json11Object {
     Json11ObjectMemberIterator find(const std::string &propertyName) const;
 
     /// Returns the number of members belonging to this object.
-    size_t size() const { return m_value.object_items().size(); }
+    size_t size() const
+    {
+        return m_value.object_items().size();
+    }
 
-   private:
+private:
+
     /**
      * @brief   Return a reference to a Json11 value that is empty object.
      *
      * Note that the value returned by this function is a singleton.
      */
-    static const json11::Json &emptyObject() {
+    static const json11::Json & emptyObject()
+    {
         static const json11::Json object((json11::Json::object()));
         return object;
     }
@@ -199,20 +219,27 @@ class Json11Object {
  *
  * @see FrozenValue
  */
-class Json11FrozenValue : public FrozenValue {
-   public:
+class Json11FrozenValue: public FrozenValue
+{
+public:
+
     /**
      * @brief  Make a copy of a Json11 value
      *
      * @param  source  the Json11 value to be copied
      */
-    explicit Json11FrozenValue(json11::Json source) : m_value(std::move(source)) {}
+    explicit Json11FrozenValue(json11::Json source)
+      : m_value(std::move(source)) { }
 
-    FrozenValue *clone() const override { return new Json11FrozenValue(m_value); }
+    FrozenValue * clone() const override
+    {
+        return new Json11FrozenValue(m_value);
+    }
 
     bool equalTo(const Adapter &other, bool strict) const override;
 
-   private:
+private:
+
     /// Stored Json11 value
     json11::Json m_value;
 };
@@ -231,13 +258,17 @@ class Json11FrozenValue : public FrozenValue {
  *
  * @see BasicAdapter
  */
-class Json11Value {
-   public:
+class Json11Value
+{
+public:
+
     /// Construct a wrapper for the empty object singleton
-    Json11Value() : m_value(emptyObject()) {}
+    Json11Value()
+      : m_value(emptyObject()) { }
 
     /// Construct a wrapper for a specific Json11 value
-    Json11Value(const json11::Json &value) : m_value(value) {}
+    Json11Value(const json11::Json &value)
+      : m_value(value) { }
 
     /**
      * @brief   Create a new Json11FrozenValue instance that contains the
@@ -246,7 +277,10 @@ class Json11Value {
      * @returns pointer to a new Json11FrozenValue instance, belonging to the
      *          caller.
      */
-    FrozenValue *freeze() const { return new Json11FrozenValue(m_value); }
+    FrozenValue * freeze() const
+    {
+        return new Json11FrozenValue(m_value);
+    }
 
     /**
      * @brief   Optionally return a Json11Array instance.
@@ -257,7 +291,8 @@ class Json11Value {
      *
      * Otherwise it will return an empty optional.
      */
-    opt::optional<Json11Array> getArrayOptional() const {
+    opt::optional<Json11Array> getArrayOptional() const
+    {
         if (m_value.is_array()) {
             return opt::make_optional(Json11Array(m_value));
         }
@@ -276,7 +311,8 @@ class Json11Value {
      *
      * @returns true if the number of elements was retrieved, false otherwise.
      */
-    bool getArraySize(size_t &result) const {
+    bool getArraySize(size_t &result) const
+    {
         if (m_value.is_array()) {
             result = m_value.array_items().size();
             return true;
@@ -285,7 +321,8 @@ class Json11Value {
         return false;
     }
 
-    bool getBool(bool &result) const {
+    bool getBool(bool &result) const
+    {
         if (m_value.is_bool()) {
             result = m_value.bool_value();
             return true;
@@ -294,7 +331,8 @@ class Json11Value {
         return false;
     }
 
-    bool getDouble(double &result) const {
+    bool getDouble(double &result) const
+    {
         if (m_value.is_number()) {
             result = m_value.number_value();
             return true;
@@ -303,7 +341,8 @@ class Json11Value {
         return false;
     }
 
-    bool getInteger(int64_t &result) const {
+    bool getInteger(int64_t &result) const
+    {
         if (isInteger()) {
             result = m_value.int_value();
             return true;
@@ -320,7 +359,8 @@ class Json11Value {
      *
      * Otherwise it will return an empty optional.
      */
-    opt::optional<Json11Object> getObjectOptional() const {
+    opt::optional<Json11Object> getObjectOptional() const
+    {
         if (m_value.is_object()) {
             return opt::make_optional(Json11Object(m_value));
         }
@@ -339,7 +379,8 @@ class Json11Value {
      *
      * @returns true if the number of members was retrieved, false otherwise.
      */
-    bool getObjectSize(size_t &result) const {
+    bool getObjectSize(size_t &result) const
+    {
         if (m_value.is_object()) {
             result = m_value.object_items().size();
             return true;
@@ -348,7 +389,8 @@ class Json11Value {
         return false;
     }
 
-    bool getString(std::string &result) const {
+    bool getString(std::string &result) const
+    {
         if (m_value.is_string()) {
             result = m_value.string_value();
             return true;
@@ -357,27 +399,56 @@ class Json11Value {
         return false;
     }
 
-    static bool hasStrictTypes() { return true; }
+    static bool hasStrictTypes()
+    {
+        return true;
+    }
 
-    bool isArray() const { return m_value.is_array(); }
+    bool isArray() const
+    {
+        return m_value.is_array();
+    }
 
-    bool isBool() const { return m_value.is_bool(); }
+    bool isBool() const
+    {
+        return m_value.is_bool();
+    }
 
-    bool isDouble() const { return m_value.is_number(); }
+    bool isDouble() const
+    {
+        return m_value.is_number();
+    }
 
-    bool isInteger() const { return m_value.is_number() && m_value.int_value() == m_value.number_value(); }
+    bool isInteger() const
+    {
+        return m_value.is_number() && m_value.int_value() == m_value.number_value();
+    }
 
-    bool isNull() const { return m_value.is_null(); }
+    bool isNull() const
+    {
+        return m_value.is_null();
+    }
 
-    bool isNumber() const { return m_value.is_number(); }
+    bool isNumber() const
+    {
+        return m_value.is_number();
+    }
 
-    bool isObject() const { return m_value.is_object(); }
+    bool isObject() const
+    {
+        return m_value.is_object();
+    }
 
-    bool isString() const { return m_value.is_string(); }
+    bool isString() const
+    {
+        return m_value.is_string();
+    }
 
-   private:
+private:
+
     /// Return a reference to an empty object singleton
-    static const json11::Json &emptyObject() {
+    static const json11::Json & emptyObject()
+    {
         static const json11::Json object((json11::Json::object()));
         return object;
     }
@@ -395,13 +466,22 @@ class Json11Value {
  * @see Adapter
  * @see BasicAdapter
  */
-class Json11Adapter : public BasicAdapter<Json11Adapter, Json11Array, Json11ObjectMember, Json11Object, Json11Value> {
-   public:
+class Json11Adapter:
+    public BasicAdapter<Json11Adapter,
+                        Json11Array,
+                        Json11ObjectMember,
+                        Json11Object,
+                        Json11Value>
+{
+public:
+
     /// Construct a Json11Adapter that contains an empty object
-    Json11Adapter() : BasicAdapter() {}
+    Json11Adapter()
+      : BasicAdapter() { }
 
     /// Construct a Json11Adapter containing a specific Json11 value
-    Json11Adapter(const json11::Json &value) : BasicAdapter(value) {}
+    Json11Adapter(const json11::Json &value)
+      : BasicAdapter(value) { }
 };
 
 /**
@@ -413,23 +493,35 @@ class Json11Adapter : public BasicAdapter<Json11Adapter, Json11Array, Json11Obje
  *
  * @see Json11Array
  */
-class Json11ArrayValueIterator : public std::iterator<std::bidirectional_iterator_tag,  // bi-directional iterator
-                                                      Json11Adapter>                    // value type
+class Json11ArrayValueIterator
 {
-   public:
+public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = Json11Adapter;
+    using difference_type = Json11Adapter;
+    using pointer = Json11Adapter*;
+    using reference = Json11Adapter&;
+
     /**
      * @brief   Construct a new Json11ArrayValueIterator using an existing
      *          Json11 iterator.
      *
      * @param   itr  Json11 iterator to store
      */
-    Json11ArrayValueIterator(const json11::Json::array::const_iterator &itr) : m_itr(itr) {}
+    Json11ArrayValueIterator(const json11::Json::array::const_iterator &itr)
+      : m_itr(itr) { }
 
     /// Returns a Json11Adapter that contains the value of the current
     /// element.
-    Json11Adapter operator*() const { return Json11Adapter(*m_itr); }
+    Json11Adapter operator*() const
+    {
+        return Json11Adapter(*m_itr);
+    }
 
-    DerefProxy<Json11Adapter> operator->() const { return DerefProxy<Json11Adapter>(**this); }
+    DerefProxy<Json11Adapter> operator->() const
+    {
+        return DerefProxy<Json11Adapter>(**this);
+    }
 
     /**
      * @brief   Compare this iterator against another iterator.
@@ -442,31 +534,44 @@ class Json11ArrayValueIterator : public std::iterator<std::bidirectional_iterato
      *
      * @returns true   if the iterators are equal, false otherwise.
      */
-    bool operator==(const Json11ArrayValueIterator &other) const { return m_itr == other.m_itr; }
+    bool operator==(const Json11ArrayValueIterator &other) const
+    {
+        return m_itr == other.m_itr;
+    }
 
-    bool operator!=(const Json11ArrayValueIterator &other) const { return !(m_itr == other.m_itr); }
+    bool operator!=(const Json11ArrayValueIterator &other) const
+    {
+        return !(m_itr == other.m_itr);
+    }
 
-    const Json11ArrayValueIterator &operator++() {
+    const Json11ArrayValueIterator& operator++()
+    {
         m_itr++;
 
         return *this;
     }
 
-    Json11ArrayValueIterator operator++(int) {
+    Json11ArrayValueIterator operator++(int)
+    {
         Json11ArrayValueIterator iterator_pre(m_itr);
         ++(*this);
         return iterator_pre;
     }
 
-    const Json11ArrayValueIterator &operator--() {
+    const Json11ArrayValueIterator& operator--()
+    {
         m_itr--;
 
         return *this;
     }
 
-    void advance(std::ptrdiff_t n) { m_itr += n; }
+    void advance(std::ptrdiff_t n)
+    {
+        m_itr += n;
+    }
 
-   private:
+private:
+
     json11::Json::array::const_iterator m_itr;
 };
 
@@ -480,24 +585,36 @@ class Json11ArrayValueIterator : public std::iterator<std::bidirectional_iterato
  * @see Json11Object
  * @see Json11ObjectMember
  */
-class Json11ObjectMemberIterator : public std::iterator<std::bidirectional_iterator_tag,  // bi-directional iterator
-                                                        Json11ObjectMember>               // value type
+class Json11ObjectMemberIterator
 {
-   public:
+public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = Json11ObjectMember;
+    using difference_type = Json11ObjectMember;
+    using pointer = Json11ObjectMember*;
+    using reference = Json11ObjectMember&;
+
     /**
      * @brief   Construct an iterator from a Json11 iterator.
      *
      * @param   itr  Json11 iterator to store
      */
-    Json11ObjectMemberIterator(const json11::Json::object::const_iterator &itr) : m_itr(itr) {}
+    Json11ObjectMemberIterator(const json11::Json::object::const_iterator &itr)
+      : m_itr(itr) { }
 
     /**
      * @brief   Returns a Json11ObjectMember that contains the key and value
      *          belonging to the object member identified by the iterator.
      */
-    Json11ObjectMember operator*() const { return Json11ObjectMember(m_itr->first, m_itr->second); }
+    Json11ObjectMember operator*() const
+    {
+        return Json11ObjectMember(m_itr->first, m_itr->second);
+    }
 
-    DerefProxy<Json11ObjectMember> operator->() const { return DerefProxy<Json11ObjectMember>(**this); }
+    DerefProxy<Json11ObjectMember> operator->() const
+    {
+        return DerefProxy<Json11ObjectMember>(**this);
+    }
 
     /**
      * @brief   Compare this iterator with another iterator.
@@ -510,54 +627,83 @@ class Json11ObjectMemberIterator : public std::iterator<std::bidirectional_itera
      *
      * @returns true if the underlying iterators are equal, false otherwise
      */
-    bool operator==(const Json11ObjectMemberIterator &other) const { return m_itr == other.m_itr; }
+    bool operator==(const Json11ObjectMemberIterator &other) const
+    {
+        return m_itr == other.m_itr;
+    }
 
-    bool operator!=(const Json11ObjectMemberIterator &other) const { return !(m_itr == other.m_itr); }
+    bool operator!=(const Json11ObjectMemberIterator &other) const
+    {
+        return !(m_itr == other.m_itr);
+    }
 
-    const Json11ObjectMemberIterator &operator++() {
+    const Json11ObjectMemberIterator& operator++()
+    {
         m_itr++;
 
         return *this;
     }
 
-    Json11ObjectMemberIterator operator++(int) {
+    Json11ObjectMemberIterator operator++(int)
+    {
         Json11ObjectMemberIterator iterator_pre(m_itr);
         ++(*this);
         return iterator_pre;
     }
 
-    const Json11ObjectMemberIterator &operator--() {
+    const Json11ObjectMemberIterator& operator--()
+    {
         m_itr--;
 
         return *this;
     }
 
-   private:
+private:
+
     /// Iternal copy of the original Json11 iterator
     json11::Json::object::const_iterator m_itr;
 };
 
 /// Specialisation of the AdapterTraits template struct for Json11Adapter.
-template <>
-struct AdapterTraits<valijson::adapters::Json11Adapter> {
+template<>
+struct AdapterTraits<valijson::adapters::Json11Adapter>
+{
     typedef json11::Json DocumentType;
 
-    static std::string adapterName() { return "Json11Adapter"; }
+    static std::string adapterName()
+    {
+        return "Json11Adapter";
+    }
 };
 
-inline bool Json11FrozenValue::equalTo(const Adapter &other, bool strict) const {
+inline bool Json11FrozenValue::equalTo(const Adapter &other, bool strict) const
+{
     return Json11Adapter(m_value).equalTo(other, strict);
 }
 
-inline Json11ArrayValueIterator Json11Array::begin() const { return m_value.array_items().begin(); }
+inline Json11ArrayValueIterator Json11Array::begin() const
+{
+    return m_value.array_items().begin();
+}
 
-inline Json11ArrayValueIterator Json11Array::end() const { return m_value.array_items().end(); }
+inline Json11ArrayValueIterator Json11Array::end() const
+{
+    return m_value.array_items().end();
+}
 
-inline Json11ObjectMemberIterator Json11Object::begin() const { return m_value.object_items().begin(); }
+inline Json11ObjectMemberIterator Json11Object::begin() const
+{
+    return m_value.object_items().begin();
+}
 
-inline Json11ObjectMemberIterator Json11Object::end() const { return m_value.object_items().end(); }
+inline Json11ObjectMemberIterator Json11Object::end() const
+{
+    return m_value.object_items().end();
+}
 
-inline Json11ObjectMemberIterator Json11Object::find(const std::string &propertyName) const {
+inline Json11ObjectMemberIterator Json11Object::find(
+    const std::string &propertyName) const
+{
     return m_value.object_items().find(propertyName);
 }
 

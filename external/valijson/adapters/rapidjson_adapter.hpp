@@ -44,50 +44,55 @@
 #include <iterator>
 
 #ifdef VALIJSON_USE_EXCEPTIONS
-#ifdef RAPIDJSON_ASSERT
-#warning "RAPIDJSON_ASSERT already defined."
-#warning "Please include valijson/adapters/rapidjson_adapter.hpp before any RapidJSON headers."
-#else
-template <typename T>
-T rapidjson_assert(T t, const std::string &file, const int line) {
-    if (t) {
-        return t;
-    }
+    #ifdef RAPIDJSON_ASSERT
+        #warning "RAPIDJSON_ASSERT already defined."
+        #warning "Please include valijson/adapters/rapidjson_adapter.hpp before any RapidJSON headers."
+    #else
+        template<typename T>
+        T rapidjson_assert(T t, const std::string& file, const int line) {
+          if (t) {
+            return t;
+          }
 
-    throw std::runtime_error("assertion failed; file: " + file + "; line: " + std::to_string(line));
-}
+          throw std::runtime_error("assertion failed; file: " + file + "; line: " + std::to_string(line));
+        }
 
-#define RAPIDJSON_ASSERT(x) rapidjson_assert(x, __FILE__, __LINE__)
-#endif
+        #define RAPIDJSON_ASSERT(x) rapidjson_assert(x, __FILE__, __LINE__)
+    #endif
 #endif
 
 #include <rapidjson/document.h>
 
-#include <valijson/adapters/adapter.hpp>
-#include <valijson/adapters/basic_adapter.hpp>
-#include <valijson/adapters/frozen_value.hpp>
+#include <valijson/internal/adapter.hpp>
+#include <valijson/internal/basic_adapter.hpp>
+#include <valijson/internal/frozen_value.hpp>
 #include <valijson/exceptions.hpp>
 
 namespace valijson {
 namespace adapters {
 
-template <class ValueType = rapidjson::Value>
+template<class ValueType = rapidjson::Value>
 class GenericRapidJsonAdapter;
 
-template <class ValueType = rapidjson::Value>
+template<class ValueType = rapidjson::Value>
 class GenericRapidJsonArrayValueIterator;
 
-template <class ValueType = rapidjson::Value>
+template<class ValueType = rapidjson::Value>
 class GenericRapidJsonObjectMemberIterator;
 
 /// Container for a property name and an associated RapidJson value
-template <class ValueType = rapidjson::Value>
-class GenericRapidJsonObjectMember : public std::pair<std::string, GenericRapidJsonAdapter<ValueType>> {
-   private:
+template<class ValueType = rapidjson::Value>
+class GenericRapidJsonObjectMember :
+        public std::pair<std::string, GenericRapidJsonAdapter<ValueType>>
+{
+private:
     typedef std::pair<std::string, GenericRapidJsonAdapter<ValueType>> Super;
 
-   public:
-    GenericRapidJsonObjectMember(const std::string &name, const GenericRapidJsonAdapter<ValueType> &value) : Super(name, value) {}
+public:
+    GenericRapidJsonObjectMember(
+            const std::string &name,
+            const GenericRapidJsonAdapter<ValueType> &value)
+      : Super(name, value) { }
 };
 
 /**
@@ -101,14 +106,17 @@ class GenericRapidJsonObjectMember : public std::pair<std::string, GenericRapidJ
  * RapidJson value, assumed to be an array, so there is very little overhead
  * associated with copy construction and passing by value.
  */
-template <class ValueType = rapidjson::Value>
-class GenericRapidJsonArray {
-   public:
+template<class ValueType = rapidjson::Value>
+class GenericRapidJsonArray
+{
+public:
+
     typedef GenericRapidJsonArrayValueIterator<ValueType> const_iterator;
     typedef GenericRapidJsonArrayValueIterator<ValueType> iterator;
 
     /// Construct a RapidJsonArray referencing an empty array singleton.
-    GenericRapidJsonArray() : m_value(emptyArray()) {}
+    GenericRapidJsonArray()
+      : m_value(emptyArray()) { }
 
     /**
      * @brief   Construct a RapidJsonArray referencing a specific RapidJson
@@ -119,7 +127,9 @@ class GenericRapidJsonArray {
      * Note that this constructor will throw an exception if the value is not
      * an array.
      */
-    GenericRapidJsonArray(const ValueType &value) : m_value(value) {
+    GenericRapidJsonArray(const ValueType &value)
+      : m_value(value)
+    {
         if (!value.IsArray()) {
             throwRuntimeError("Value is not an array.");
         }
@@ -132,15 +142,20 @@ class GenericRapidJsonArray {
     iterator end() const;
 
     /// Return the number of elements in the array
-    size_t size() const { return m_value.Size(); }
+    size_t size() const
+    {
+        return m_value.Size();
+    }
 
-   private:
+private:
+
     /**
      * @brief   Return a reference to a RapidJson value that is an empty array.
      *
      * Note that the value returned by this function is a singleton.
      */
-    static const ValueType &emptyArray() {
+    static const ValueType & emptyArray()
+    {
         static const ValueType array(rapidjson::kArrayType);
         return array;
     }
@@ -161,13 +176,16 @@ class GenericRapidJsonArray {
  * associated with copy construction and passing by value.
  */
 template <class ValueType = rapidjson::Value>
-class GenericRapidJsonObject {
-   public:
+class GenericRapidJsonObject
+{
+public:
+
     typedef GenericRapidJsonObjectMemberIterator<ValueType> const_iterator;
     typedef GenericRapidJsonObjectMemberIterator<ValueType> iterator;
 
     /// Construct a GenericRapidJsonObject referencing an empty object singleton.
-    GenericRapidJsonObject() : m_value(emptyObject()) {}
+    GenericRapidJsonObject()
+      : m_value(emptyObject()) { }
 
     /**
      * @brief   Construct a GenericRapidJsonObject referencing a specific
@@ -178,7 +196,9 @@ class GenericRapidJsonObject {
      * Note that this constructor will throw an exception if the value is not
      * an object.
      */
-    GenericRapidJsonObject(const ValueType &value) : m_value(value) {
+    GenericRapidJsonObject(const ValueType &value)
+      : m_value(value)
+    {
         if (!value.IsObject()) {
             throwRuntimeError("Value is not an object.");
         }
@@ -213,15 +233,20 @@ class GenericRapidJsonObject {
     iterator find(const std::string &property) const;
 
     /// Returns the number of members belonging to this object.
-    size_t size() const { return m_value.MemberEnd() - m_value.MemberBegin(); }
+    size_t size() const
+    {
+        return m_value.MemberEnd() - m_value.MemberBegin();
+    }
 
-   private:
+private:
+
     /**
      * @brief   Return a reference to a RapidJson value that is empty object.
      *
      * Note that the value returned by this function is a singleton.
      */
-    static const ValueType &emptyObject() {
+    static const ValueType & emptyObject()
+    {
         static ValueType object(rapidjson::kObjectType);
         return object;
     }
@@ -241,12 +266,18 @@ class GenericRapidJsonObject {
  *
  * @see FrozenValue
  */
-template <class ValueType = rapidjson::Value>
-class GenericRapidJsonFrozenValue : public FrozenValue {
-   public:
-    explicit GenericRapidJsonFrozenValue(const char *str) { m_value.SetString(str, m_allocator); }
+template<class ValueType = rapidjson::Value>
+class GenericRapidJsonFrozenValue: public FrozenValue
+{
+public:
 
-    explicit GenericRapidJsonFrozenValue(const std::string &str) {
+    explicit GenericRapidJsonFrozenValue(const char *str)
+    {
+        m_value.SetString(str, m_allocator);
+    }
+
+    explicit GenericRapidJsonFrozenValue(const std::string &str)
+    {
         m_value.SetString(str.c_str(), (unsigned int)str.length(), m_allocator);
     }
 
@@ -255,17 +286,22 @@ class GenericRapidJsonFrozenValue : public FrozenValue {
      *
      * @param   source  the RapidJson value to be copied
      */
-    explicit GenericRapidJsonFrozenValue(const ValueType &source) {
+    explicit GenericRapidJsonFrozenValue(const ValueType &source)
+    {
         if (!copy(source, m_value, m_allocator)) {
             throwRuntimeError("Failed to copy ValueType");
         }
     }
 
-    FrozenValue *clone() const override { return new GenericRapidJsonFrozenValue(m_value); }
+    FrozenValue * clone() const override
+    {
+        return new GenericRapidJsonFrozenValue(m_value);
+    }
 
     bool equalTo(const Adapter &other, bool strict) const override;
 
-   private:
+private:
+
     /**
      * @brief   Recursively copy a RapidJson value using a separate allocator
      *
@@ -277,53 +313,56 @@ class GenericRapidJsonFrozenValue : public FrozenValue {
      *
      * @returns true if copied successfully, false otherwise.
      */
-    template <typename Allocator>
-    static bool copy(const ValueType &source, ValueType &dest, Allocator &allocator) {
+    template<typename Allocator>
+    static bool copy(const ValueType &source,
+                     ValueType &dest,
+                     Allocator &allocator)
+    {
         switch (source.GetType()) {
-            case rapidjson::kNullType:
-                dest.SetNull();
-                return true;
-            case rapidjson::kFalseType:
-                dest.SetBool(false);
-                return true;
-            case rapidjson::kTrueType:
-                dest.SetBool(true);
-                return true;
-            case rapidjson::kObjectType:
-                dest.SetObject();
-                for (typename ValueType::ConstMemberIterator itr = source.MemberBegin(); itr != source.MemberEnd(); ++itr) {
-                    ValueType name(itr->name.GetString(), itr->name.GetStringLength(), allocator);
-                    ValueType value;
-                    copy(itr->value, value, allocator);
-                    dest.AddMember(name, value, allocator);
-                }
-                return true;
-            case rapidjson::kArrayType:
-                dest.SetArray();
-                for (typename ValueType::ConstValueIterator itr = source.Begin(); itr != source.End(); ++itr) {
-                    ValueType value;
-                    copy(*itr, value, allocator);
-                    dest.PushBack(value, allocator);
-                }
-                return true;
-            case rapidjson::kStringType:
-                dest.SetString(source.GetString(), source.GetStringLength(), allocator);
-                return true;
-            case rapidjson::kNumberType:
-                if (source.IsInt()) {
-                    dest.SetInt(source.GetInt());
-                } else if (source.IsUint()) {
-                    dest.SetUint(source.GetUint());
-                } else if (source.IsInt64()) {
-                    dest.SetInt64(source.GetInt64());
-                } else if (source.IsUint64()) {
-                    dest.SetUint64(source.GetUint64());
-                } else {
-                    dest.SetDouble(source.GetDouble());
-                }
-                return true;
-            default:
-                break;
+        case rapidjson::kNullType:
+            dest.SetNull();
+            return true;
+        case rapidjson::kFalseType:
+            dest.SetBool(false);
+            return true;
+        case rapidjson::kTrueType:
+            dest.SetBool(true);
+            return true;
+        case rapidjson::kObjectType:
+            dest.SetObject();
+            for (typename ValueType::ConstMemberIterator itr = source.MemberBegin(); itr != source.MemberEnd(); ++itr) {
+                ValueType name(itr->name.GetString(), itr->name.GetStringLength(), allocator);
+                ValueType value;
+                copy(itr->value, value, allocator);
+                dest.AddMember(name, value, allocator);
+            }
+            return true;
+        case rapidjson::kArrayType:
+            dest.SetArray();
+            for (typename ValueType::ConstValueIterator itr = source.Begin(); itr != source.End(); ++itr) {
+                ValueType value;
+                copy(*itr, value, allocator);
+                dest.PushBack(value, allocator);
+            }
+            return true;
+        case rapidjson::kStringType:
+            dest.SetString(source.GetString(), source.GetStringLength(), allocator);
+            return true;
+        case rapidjson::kNumberType:
+            if (source.IsInt()) {
+                dest.SetInt(source.GetInt());
+            } else if (source.IsUint()) {
+                dest.SetUint(source.GetUint());
+            } else if (source.IsInt64()) {
+                dest.SetInt64(source.GetInt64());
+            } else if (source.IsUint64()) {
+                dest.SetUint64(source.GetUint64());
+            } else {
+                dest.SetDouble(source.GetDouble());
+            }
+            return true;
+        default:
+            break;
         }
 
         return false;
@@ -350,14 +389,17 @@ class GenericRapidJsonFrozenValue : public FrozenValue {
  *
  * @see BasicAdapter
  */
-template <class ValueType = rapidjson::Value>
-class GenericRapidJsonValue {
-   public:
+template<class ValueType = rapidjson::Value>
+class GenericRapidJsonValue
+{
+public:
     /// Construct a wrapper for the empty object singleton
-    GenericRapidJsonValue() : m_value(emptyObject()) {}
+    GenericRapidJsonValue()
+      : m_value(emptyObject()) { }
 
     /// Construct a wrapper for a specific RapidJson value
-    GenericRapidJsonValue(const ValueType &value) : m_value(value) {}
+    GenericRapidJsonValue(const ValueType &value)
+      : m_value(value) { }
 
     /**
      * @brief   Create a new GenericRapidJsonFrozenValue instance that contains
@@ -366,7 +408,10 @@ class GenericRapidJsonValue {
      * @returns pointer to a new GenericRapidJsonFrozenValue instance, belonging
      *          to the caller.
      */
-    FrozenValue *freeze() const { return new GenericRapidJsonFrozenValue<ValueType>(m_value); }
+    FrozenValue * freeze() const
+    {
+        return new GenericRapidJsonFrozenValue<ValueType>(m_value);
+    }
 
     /**
      * @brief   Optionally return a GenericRapidJsonArray instance.
@@ -377,7 +422,8 @@ class GenericRapidJsonValue {
      *
      * Otherwise it will return an empty optional.
      */
-    opt::optional<GenericRapidJsonArray<ValueType>> getArrayOptional() const {
+    opt::optional<GenericRapidJsonArray<ValueType>> getArrayOptional() const
+    {
         if (m_value.IsArray()) {
             return opt::make_optional(GenericRapidJsonArray<ValueType>(m_value));
         }
@@ -396,7 +442,8 @@ class GenericRapidJsonValue {
      *
      * @returns true if the number of elements was retrieved, false otherwise.
      */
-    bool getArraySize(size_t &result) const {
+    bool getArraySize(size_t &result) const
+    {
         if (m_value.IsArray()) {
             result = m_value.Size();
             return true;
@@ -405,7 +452,8 @@ class GenericRapidJsonValue {
         return false;
     }
 
-    bool getBool(bool &result) const {
+    bool getBool(bool &result) const
+    {
         if (m_value.IsBool()) {
             result = m_value.GetBool();
             return true;
@@ -414,7 +462,8 @@ class GenericRapidJsonValue {
         return false;
     }
 
-    bool getDouble(double &result) const {
+    bool getDouble(double &result) const
+    {
         if (m_value.IsDouble()) {
             result = m_value.GetDouble();
             return true;
@@ -423,7 +472,8 @@ class GenericRapidJsonValue {
         return false;
     }
 
-    bool getInteger(int64_t &result) const {
+    bool getInteger(int64_t &result) const
+    {
         if (m_value.IsInt()) {
             result = m_value.GetInt();
             return true;
@@ -450,7 +500,8 @@ class GenericRapidJsonValue {
      *
      * Otherwise it will return an empty optional.
      */
-    opt::optional<GenericRapidJsonObject<ValueType>> getObjectOptional() const {
+    opt::optional<GenericRapidJsonObject<ValueType>> getObjectOptional() const
+    {
         if (m_value.IsObject()) {
             return opt::make_optional(GenericRapidJsonObject<ValueType>(m_value));
         }
@@ -469,7 +520,8 @@ class GenericRapidJsonValue {
      *
      * @returns true if the number of members was retrieved, false otherwise.
      */
-    bool getObjectSize(size_t &result) const {
+    bool getObjectSize(size_t &result) const
+    {
         if (m_value.IsObject()) {
             result = m_value.MemberEnd() - m_value.MemberBegin();
             return true;
@@ -478,7 +530,8 @@ class GenericRapidJsonValue {
         return false;
     }
 
-    bool getString(std::string &result) const {
+    bool getString(std::string &result) const
+    {
         if (m_value.IsString()) {
             result.assign(m_value.GetString(), m_value.GetStringLength());
             return true;
@@ -487,27 +540,56 @@ class GenericRapidJsonValue {
         return false;
     }
 
-    static bool hasStrictTypes() { return true; }
+    static bool hasStrictTypes()
+    {
+        return true;
+    }
 
-    bool isArray() const { return m_value.IsArray(); }
+    bool isArray() const
+    {
+        return m_value.IsArray();
+    }
 
-    bool isBool() const { return m_value.IsBool(); }
+    bool isBool() const
+    {
+        return m_value.IsBool();
+    }
 
-    bool isDouble() const { return m_value.IsDouble(); }
+    bool isDouble() const
+    {
+        return m_value.IsDouble();
+    }
 
-    bool isInteger() const { return m_value.IsInt() || m_value.IsInt64() || m_value.IsUint() || m_value.IsUint64(); }
+    bool isInteger() const
+    {
+        return m_value.IsInt() || m_value.IsInt64() || m_value.IsUint() || m_value.IsUint64();
+    }
 
-    bool isNull() const { return m_value.IsNull(); }
+    bool isNull() const
+    {
+        return m_value.IsNull();
+    }
 
-    bool isNumber() const { return m_value.IsNumber(); }
+    bool isNumber() const
+    {
+        return m_value.IsNumber();
+    }
 
-    bool isObject() const { return m_value.IsObject(); }
+    bool isObject() const
+    {
+        return m_value.IsObject();
+    }
 
-    bool isString() const { return m_value.IsString(); }
+    bool isString() const
+    {
+        return m_value.IsString();
+    }
 
-   private:
+private:
+
     /// Return a reference to an empty object singleton
-    static const ValueType &emptyObject() {
+    static const ValueType & emptyObject()
+    {
         static const ValueType object(rapidjson::kObjectType);
         return object;
     }
@@ -525,52 +607,71 @@ class GenericRapidJsonValue {
  * @see Adapter
  * @see BasicAdapter
  */
-template <class ValueType>
-class GenericRapidJsonAdapter : public BasicAdapter<GenericRapidJsonAdapter<ValueType>, GenericRapidJsonArray<ValueType>,
-                                                    GenericRapidJsonObjectMember<ValueType>, GenericRapidJsonObject<ValueType>,
-                                                    GenericRapidJsonValue<ValueType>> {
-   public:
+template<class ValueType>
+class GenericRapidJsonAdapter:
+    public BasicAdapter<GenericRapidJsonAdapter<ValueType>,
+                        GenericRapidJsonArray<ValueType>,
+                        GenericRapidJsonObjectMember<ValueType>,
+                        GenericRapidJsonObject<ValueType>,
+                        GenericRapidJsonValue<ValueType>>
+{
+public:
+
     /// Construct a RapidJsonAdapter that contains an empty object
     GenericRapidJsonAdapter()
-        : BasicAdapter<GenericRapidJsonAdapter<ValueType>, GenericRapidJsonArray<ValueType>,
-                       GenericRapidJsonObjectMember<ValueType>, GenericRapidJsonObject<ValueType>,
-                       GenericRapidJsonValue<ValueType>>() {}
+      : BasicAdapter<GenericRapidJsonAdapter<ValueType>,
+                        GenericRapidJsonArray<ValueType>,
+                        GenericRapidJsonObjectMember<ValueType>,
+                        GenericRapidJsonObject<ValueType>,
+                        GenericRapidJsonValue<ValueType>>() { }
 
     /// Construct a RapidJsonAdapter containing a specific RapidJson value
     GenericRapidJsonAdapter(const ValueType &value)
-        : BasicAdapter<GenericRapidJsonAdapter<ValueType>, GenericRapidJsonArray<ValueType>,
-                       GenericRapidJsonObjectMember<ValueType>, GenericRapidJsonObject<ValueType>,
-                       GenericRapidJsonValue<ValueType>>(value) {}
+      : BasicAdapter<GenericRapidJsonAdapter<ValueType>,
+                        GenericRapidJsonArray<ValueType>,
+                        GenericRapidJsonObjectMember<ValueType>,
+                        GenericRapidJsonObject<ValueType>,
+                        GenericRapidJsonValue<ValueType>>(value) { }
 };
 
 /**
  * @brief   Class for iterating over values held in a JSON array.
  *
  * This class provides a JSON array iterator that dereferences as an instance of
- * RapidJsonAdapter representing a value stored in the array. It has been
- * implemented using the std::iterator template.
+ * RapidJsonAdapter representing a value stored in the array.
  *
  * @see RapidJsonArray
  */
-template <class ValueType>
-class GenericRapidJsonArrayValueIterator : public std::iterator<std::bidirectional_iterator_tag,     // bi-directional iterator
-                                                                GenericRapidJsonAdapter<ValueType>>  // value type
+template<class ValueType>
+class GenericRapidJsonArrayValueIterator
 {
-   public:
+public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = GenericRapidJsonAdapter<ValueType>;
+    using difference_type = GenericRapidJsonAdapter<ValueType>;
+    using pointer = GenericRapidJsonAdapter<ValueType>*;
+    using reference = GenericRapidJsonAdapter<ValueType>&;
+
     /**
      * @brief   Construct a new GenericRapidJsonArrayValueIterator using an
      *          existing RapidJson iterator.
      *
      * @param   itr  RapidJson iterator to store
      */
-    GenericRapidJsonArrayValueIterator(const typename ValueType::ConstValueIterator &itr) : m_itr(itr) {}
+    GenericRapidJsonArrayValueIterator(
+        const typename ValueType::ConstValueIterator &itr)
+      : m_itr(itr) { }
 
     /// Returns a GenericRapidJsonAdapter that contains the value of the current
     /// element.
-    GenericRapidJsonAdapter<ValueType> operator*() const { return GenericRapidJsonAdapter<ValueType>(*m_itr); }
+    GenericRapidJsonAdapter<ValueType> operator*() const
+    {
+        return GenericRapidJsonAdapter<ValueType>(*m_itr);
+    }
 
     /// Returns a proxy for the value of the current element
-    DerefProxy<GenericRapidJsonAdapter<ValueType>> operator->() const {
+    DerefProxy<GenericRapidJsonAdapter<ValueType>> operator->() const
+    {
         return DerefProxy<GenericRapidJsonAdapter<ValueType>>(**this);
     }
 
@@ -585,11 +686,18 @@ class GenericRapidJsonArrayValueIterator : public std::iterator<std::bidirection
      *
      * @returns true if the iterators are equal, false otherwise.
      */
-    bool operator==(const GenericRapidJsonArrayValueIterator<ValueType> &other) const { return m_itr == other.m_itr; }
+    bool operator==(const GenericRapidJsonArrayValueIterator<ValueType> &other) const
+    {
+        return m_itr == other.m_itr;
+    }
 
-    bool operator!=(const GenericRapidJsonArrayValueIterator<ValueType> &other) const { return m_itr != other.m_itr; }
+    bool operator!=(const GenericRapidJsonArrayValueIterator<ValueType>& other) const
+    {
+        return m_itr != other.m_itr;
+    }
 
-    GenericRapidJsonArrayValueIterator<ValueType> &operator++() {
+    GenericRapidJsonArrayValueIterator<ValueType>& operator++()
+    {
         m_itr++;
 
         return *this;
@@ -601,19 +709,25 @@ class GenericRapidJsonArrayValueIterator : public std::iterator<std::bidirection
         return iterator_pre;
     }
 
-    GenericRapidJsonArrayValueIterator<ValueType> &operator--() {
+    GenericRapidJsonArrayValueIterator<ValueType>& operator--()
+    {
         m_itr--;
 
         return *this;
     }
 
-    void advance(std::ptrdiff_t n) { m_itr += n; }
+    void advance(std::ptrdiff_t n)
+    {
+        m_itr += n;
+    }
 
-    std::ptrdiff_t difference(const GenericRapidJsonArrayValueIterator<ValueType> &other) {
+    std::ptrdiff_t difference(const GenericRapidJsonArrayValueIterator<ValueType> &other)
+    {
         return std::distance(m_itr, other.itr);
     }
 
-   private:
+private:
+
     typename ValueType::ConstValueIterator m_itr;
 };
 
@@ -622,34 +736,45 @@ class GenericRapidJsonArrayValueIterator : public std::iterator<std::bidirection
  *
  * This class provides a JSON object iterator that dereferences as an instance
  * of GenericRapidJsonObjectMember representing one of the members of the
- * object. It has been implemented using the std::iterator template.
+ * object.
  *
  * @see GenericRapidJsonObject
  * @see GenericRapidJsonObjectMember
  */
-template <class ValueType>
-class GenericRapidJsonObjectMemberIterator : public std::iterator<std::bidirectional_iterator_tag,  // bi-directional iterator
-                                                                  GenericRapidJsonObjectMember<ValueType>>  // value type
+template<class ValueType>
+class GenericRapidJsonObjectMemberIterator
 {
-   public:
+public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = GenericRapidJsonObjectMember<ValueType>;
+    using difference_type = GenericRapidJsonObjectMember<ValueType>;
+    using pointer = GenericRapidJsonObjectMember<ValueType>*;
+    using reference = GenericRapidJsonObjectMember<ValueType>&;
+
     /**
      * @brief   Construct an iterator from a RapidJson iterator.
      *
      * @param   itr  RapidJson iterator to store
      */
-    GenericRapidJsonObjectMemberIterator(const typename ValueType::ConstMemberIterator &itr) : m_itr(itr) {}
+    GenericRapidJsonObjectMemberIterator(
+        const typename ValueType::ConstMemberIterator &itr)
+      : m_itr(itr) { }
+
 
     /**
      * @brief   Returns a GenericRapidJsonObjectMember that contains the key and
      *          value belonging to the object member identified by the iterator.
      */
-    GenericRapidJsonObjectMember<ValueType> operator*() const {
-        return GenericRapidJsonObjectMember<ValueType>(std::string(m_itr->name.GetString(), m_itr->name.GetStringLength()),
-                                                       m_itr->value);
+    GenericRapidJsonObjectMember<ValueType> operator*() const
+    {
+        return GenericRapidJsonObjectMember<ValueType>(
+            std::string(m_itr->name.GetString(), m_itr->name.GetStringLength()),
+            m_itr->value);
     }
 
     /// Returns a proxy for the value of the current element
-    DerefProxy<GenericRapidJsonObjectMember<ValueType>> operator->() const {
+    DerefProxy<GenericRapidJsonObjectMember<ValueType>> operator->() const
+    {
         return DerefProxy<GenericRapidJsonObjectMember<ValueType>>(**this);
     }
 
@@ -664,61 +789,80 @@ class GenericRapidJsonObjectMemberIterator : public std::iterator<std::bidirecti
      *
      * @returns true if the underlying iterators are equal, false otherwise
      */
-    bool operator==(const GenericRapidJsonObjectMemberIterator<ValueType> &other) const { return m_itr == other.m_itr; }
+    bool operator==(const GenericRapidJsonObjectMemberIterator<ValueType> &other) const
+    {
+        return m_itr == other.m_itr;
+    }
 
-    bool operator!=(const GenericRapidJsonObjectMemberIterator<ValueType> &other) const { return m_itr != other.m_itr; }
+    bool operator!=(const GenericRapidJsonObjectMemberIterator<ValueType> &other) const
+    {
+        return m_itr != other.m_itr;
+    }
 
-    GenericRapidJsonObjectMemberIterator<ValueType> &operator++() {
+    GenericRapidJsonObjectMemberIterator<ValueType>& operator++()
+    {
         m_itr++;
         return *this;
     }
 
-    GenericRapidJsonObjectMemberIterator<ValueType> operator++(int) {
+    GenericRapidJsonObjectMemberIterator<ValueType> operator++(int)
+    {
         GenericRapidJsonObjectMemberIterator<ValueType> iterator_pre(m_itr);
         ++(*this);
         return iterator_pre;
     }
 
-    GenericRapidJsonObjectMemberIterator<ValueType> &operator--() {
+    GenericRapidJsonObjectMemberIterator<ValueType>& operator--()
+    {
         m_itr--;
         return *this;
     }
 
-    std::ptrdiff_t difference(const GenericRapidJsonObjectMemberIterator &other) { return std::distance(m_itr, other.itr); }
+    std::ptrdiff_t difference(const GenericRapidJsonObjectMemberIterator &other)
+    {
+        return std::distance(m_itr, other.itr);
+    }
 
-   private:
+private:
+
     /// Iternal copy of the original RapidJson iterator
     typename ValueType::ConstMemberIterator m_itr;
 };
 
-template <class ValueType>
-inline bool GenericRapidJsonFrozenValue<ValueType>::equalTo(const Adapter &other, bool strict) const {
+template<class ValueType>
+inline bool GenericRapidJsonFrozenValue<ValueType>::equalTo(const Adapter &other, bool strict) const
+{
     return GenericRapidJsonAdapter<ValueType>(m_value).equalTo(other, strict);
 }
 
-template <class ValueType>
-inline typename GenericRapidJsonArray<ValueType>::iterator GenericRapidJsonArray<ValueType>::begin() const {
+template<class ValueType>
+inline typename GenericRapidJsonArray<ValueType>::iterator GenericRapidJsonArray<ValueType>::begin() const
+{
     return m_value.Begin();
 }
 
-template <class ValueType>
-inline typename GenericRapidJsonArray<ValueType>::iterator GenericRapidJsonArray<ValueType>::end() const {
+template<class ValueType>
+inline typename GenericRapidJsonArray<ValueType>::iterator GenericRapidJsonArray<ValueType>::end() const
+{
     return m_value.End();
 }
 
-template <class ValueType>
-inline typename GenericRapidJsonObject<ValueType>::iterator GenericRapidJsonObject<ValueType>::begin() const {
+template<class ValueType>
+inline typename GenericRapidJsonObject<ValueType>::iterator GenericRapidJsonObject<ValueType>::begin() const
+{
     return m_value.MemberBegin();
 }
 
-template <class ValueType>
-inline typename GenericRapidJsonObject<ValueType>::iterator GenericRapidJsonObject<ValueType>::end() const {
+template<class ValueType>
+inline typename GenericRapidJsonObject<ValueType>::iterator GenericRapidJsonObject<ValueType>::end() const
+{
     return m_value.MemberEnd();
 }
 
-template <class ValueType>
-inline typename GenericRapidJsonObject<ValueType>::iterator GenericRapidJsonObject<ValueType>::find(
-    const std::string &propertyName) const {
+template<class ValueType>
+inline typename GenericRapidJsonObject<ValueType>::iterator
+        GenericRapidJsonObject<ValueType>::find(const std::string &propertyName) const
+{
     // Hack to support older versions of rapidjson where pointers are used as
     // the built in iterator type. In those versions, the FindMember function
     // would return a null pointer when the requested member could not be
@@ -737,7 +881,7 @@ inline typename GenericRapidJsonObject<ValueType>::iterator GenericRapidJsonObje
         for (typename ValueType::ConstMemberIterator itr = m_value.MemberBegin(); itr != m_value.MemberEnd(); ++itr) {
             const size_t memberNameLength = itr->name.GetStringLength();
             if (memberNameLength == propertyNameLength &&
-                strncmp(itr->name.GetString(), propertyName.c_str(), itr->name.GetStringLength()) == 0) {
+                    strncmp(itr->name.GetString(), propertyName.c_str(), itr->name.GetStringLength()) == 0) {
                 return itr;
             }
         }
@@ -745,7 +889,7 @@ inline typename GenericRapidJsonObject<ValueType>::iterator GenericRapidJsonObje
         return m_value.MemberEnd();
     }
 
-    return m_value.FindMember(propertyName.c_str());  // Times are good.
+    return m_value.FindMember(propertyName.c_str());      // Times are good.
 }
 
 typedef GenericRapidJsonAdapter<> RapidJsonAdapter;
@@ -761,11 +905,15 @@ typedef GenericRapidJsonValue<> RapidJsonValue;
  * @brief  Specialisation of the AdapterTraits template struct for a
  *         RapidJsonAdapter that uses a pool allocator
  */
-template <>
-struct AdapterTraits<valijson::adapters::RapidJsonAdapter> {
+template<>
+struct AdapterTraits<valijson::adapters::RapidJsonAdapter>
+{
     typedef rapidjson::Document DocumentType;
 
-    static std::string adapterName() { return "RapidJsonAdapter"; }
+    static std::string adapterName()
+    {
+        return "RapidJsonAdapter";
+    }
 };
 
 typedef rapidjson::GenericValue<rapidjson::UTF8<>, rapidjson::CrtAllocator> RapidJsonCrt;
@@ -774,11 +922,15 @@ typedef rapidjson::GenericValue<rapidjson::UTF8<>, rapidjson::CrtAllocator> Rapi
  * @brief  Specialisation of the AdapterTraits template struct for a
  *         RapidJsonAdapter that uses the default CRT allocator
  */
-template <>
-struct AdapterTraits<valijson::adapters::GenericRapidJsonAdapter<RapidJsonCrt>> {
+template<>
+struct AdapterTraits<valijson::adapters::GenericRapidJsonAdapter<RapidJsonCrt>>
+{
     typedef rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> DocumentType;
 
-    static std::string adapterName() { return "GenericRapidJsonAdapter (using CrtAllocator)"; }
+    static std::string adapterName()
+    {
+        return "GenericRapidJsonAdapter (using CrtAllocator)";
+    }
 };
 
 }  // namespace adapters

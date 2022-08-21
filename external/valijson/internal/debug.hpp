@@ -5,7 +5,7 @@
 namespace valijson {
 namespace internal {
 
-template <typename AdapterType>
+template<typename AdapterType>
 std::string nodeTypeAsString(const AdapterType &node) {
     if (node.isArray()) {
         return "array";
@@ -26,5 +26,5 @@ std::string nodeTypeAsString(const AdapterType &node) {
     return "unknown";
 }
 
-}  // end namespace internal
-}  // end namespace valijson
+} // end namespace internal
+} // end namespace valijson
