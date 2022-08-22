@@ -138,6 +138,7 @@
     defined(VK_KHR_maintenance2) && \
     defined(VK_KHR_maintenance3) && \
     defined(VK_KHR_multiview) && \
+    defined(VK_KHR_portability_enumeration) && \
     defined(VK_KHR_portability_subset) && \
     defined(VK_KHR_relaxed_block_layout) && \
     defined(VK_KHR_sampler_mirror_clamp_to_edge) && \
@@ -6276,6 +6277,10 @@ static const VpStructChainerDesc chainerDesc = {
 #ifdef VP_LUNARG_desktop_portability_2022
 namespace VP_LUNARG_DESKTOP_PORTABILITY_2022 {
 
+static const VkExtensionProperties instanceExtensions[] = {
+    VkExtensionProperties{ VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME, 1 },
+};
+
 static const VkExtensionProperties deviceExtensions[] = {
     VkExtensionProperties{ VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, 2 },
     VkExtensionProperties{ VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, 1 },
@@ -9304,7 +9309,7 @@ static const VpProfileDesc vpProfiles[] = {
     VpProfileDesc{
         VpProfileProperties{ VP_LUNARG_DESKTOP_PORTABILITY_2022_NAME, VP_LUNARG_DESKTOP_PORTABILITY_2022_SPEC_VERSION },
         VP_LUNARG_DESKTOP_PORTABILITY_2022_MIN_API_VERSION,
-        nullptr, 0,
+        &VP_LUNARG_DESKTOP_PORTABILITY_2022::instanceExtensions[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::instanceExtensions) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::instanceExtensions[0])),
         &VP_LUNARG_DESKTOP_PORTABILITY_2022::deviceExtensions[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::deviceExtensions) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::deviceExtensions[0])),
         nullptr, 0,
         &VP_LUNARG_DESKTOP_PORTABILITY_2022::featureStructTypes[0], static_cast<uint32_t>(sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::featureStructTypes) / sizeof(VP_LUNARG_DESKTOP_PORTABILITY_2022::featureStructTypes[0])),

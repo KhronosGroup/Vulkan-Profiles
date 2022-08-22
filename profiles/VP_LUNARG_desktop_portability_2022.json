@@ -30,6 +30,7 @@
                 "VK_KHR_maintenance2": 1,
                 "VK_KHR_maintenance3": 1,
                 "VK_KHR_multiview": 1,
+                "VK_KHR_portability_enumeration": 1,
                 "VK_KHR_portability_subset": 1,
                 "VK_KHR_relaxed_block_layout": 1,
                 "VK_KHR_sampler_mirror_clamp_to_edge": 3,
@@ -2040,7 +2041,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-08-21",
+                    "date": "2022-08-22",
                     "author": "LunarG Profiles Generation",
                     "comment": "A macOS portability specific profile variant of VP_LUNARG_desktop_baseline_2022"
                 }
