@@ -1946,7 +1946,7 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceIDProperties'].members['deviceLUIDValid'].limittype = 'noauto'
 
         if 'VkPhysicalDeviceSubgroupProperties' in self.structs:
-            self.structs['VkPhysicalDeviceSubgroupProperties'].members['subgroupSize'].limittype = 'min,pot'
+            self.structs['VkPhysicalDeviceSubgroupProperties'].members['subgroupSize'].limittype = 'pot'
 
         if 'VkPhysicalDevicePointClippingProperties' in self.structs:
             self.structs['VkPhysicalDevicePointClippingProperties'].members['pointClippingBehavior'].limittype = 'exact'
@@ -2517,6 +2517,11 @@ class VulkanProfile():
                 elif limittype == 'min':
                     # Compare min limit by checking if device value is less than or equal to profile value
                     comparePredFmt = '{0} <= {1}'
+                elif limittype == 'pot':
+                    if (membertype == 'float' or membertype == 'double'):
+                        comparePredFmt = [ 'isPowerOfTwo({0})' ]
+                    else:
+                        comparePredFmt = [ '({0} & ({0} - 1)) == 0' ]
                 elif limittype == 'min,pot' or limittype == 'pot,min':
                     # Compare min limit by checking if device value is less than or equal to profile value and if the value is a power of two
                     if (membertype == 'float' or membertype == 'double'):
