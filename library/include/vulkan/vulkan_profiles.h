@@ -136,6 +136,7 @@
     defined(VK_KHR_maintenance2) && \
     defined(VK_KHR_maintenance3) && \
     defined(VK_KHR_multiview) && \
+    defined(VK_KHR_portability_enumeration) && \
     defined(VK_KHR_portability_subset) && \
     defined(VK_KHR_relaxed_block_layout) && \
     defined(VK_KHR_sampler_mirror_clamp_to_edge) && \
