@@ -42,6 +42,26 @@
                     ]
                 },
                 {
+                    "label": "LunarG Desktop Baseline",
+                    "description": "Check the Vulkan 1.1 application will run on Windows and Linuxplatforms without exceeding ecosystem effective devices capabilities",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                    "status": "STABLE",
+                    "settings": [
+                        {
+                            "key": "emulate_portability",
+                            "value": false
+                        },
+                        {
+                            "key": "profile_file",
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2022.json"
+                        },
+                        {
+                            "key": "simulate_capabilities",
+                            "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
+                        }
+                    ]
+                },
+                {
                     "label": "Khronos Roadmap",
                     "description": "Check the Vulkan 1.3 application will run on the Khronos Roadmap 2022 Profile devices",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
