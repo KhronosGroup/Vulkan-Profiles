@@ -3649,6 +3649,8 @@ class VulkanProfilesLayerGenerator():
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', WarnIfLesser);\n'
             elif member.limittype == 'max' or member.limittype == 'bits': # enum values
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', WarnIfGreater);\n'
+            elif member.limittype == 'pot':
+                continue
             else:
                 print("ERROR: Unsupported limittype '{0}' in member '{1}' of structure '{2}'".format(member.limittype, member_name, structure))
                 
