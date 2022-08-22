@@ -78,7 +78,7 @@ add_custom_target(VpCreateDesktopBaseline2022 ALL
  
 set(PROFILE_DESKTOP_PORTABILITY_2022_LABEL "LunarG Vulkan Desktop Portability 2022 profile")
 set(PROFILE_DESKTOP_PORTABILITY_2022_DESC "A macOS portability specific profile variant of VP_LUNARG_desktop_baseline_2022")
-set(PROFILE_DESKTOP_PORTABILITY_2022_API_VERSION "1.1.154")
+set(PROFILE_DESKTOP_PORTABILITY_2022_API_VERSION "1.1.208")
 
 add_custom_target(VpCreateDesktopPortability2022 ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
