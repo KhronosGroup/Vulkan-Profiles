@@ -38,6 +38,7 @@
 | [VK_KHR_external_semaphore_capabilities](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_external_semaphore_capabilities.html) | 1.1 Core | :heavy_check_mark: | 1.1 Core | 1.1 Core |
 | [VK_KHR_get_physical_device_properties2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_get_physical_device_properties2.html) | 1.1 Core | :heavy_check_mark: | 1.1 Core | 1.1 Core |
 | [VK_KHR_get_surface_capabilities2](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_get_surface_capabilities2.html) | :x: | :heavy_check_mark: | :x: | :x: |
+| [VK_KHR_portability_enumeration](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_portability_enumeration.html) | :x: | :x: | :x: | :heavy_check_mark: |
 | [VK_KHR_surface](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_KHR_surface.html) | :x: | :heavy_check_mark: | :x: | :x: |
 | [VK_EXT_swapchain_colorspace](https://www.khronos.org/registry/vulkan/specs/1.1-extensions/man/html/VK_EXT_swapchain_colorspace.html) | :x: | :heavy_check_mark: | :x: | :x: |
 | **Device extensions** |
