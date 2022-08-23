@@ -1873,7 +1873,7 @@ class VulkanRegistry():
         self.structs['VkPhysicalDeviceLimits'].members['optimalBufferCopyOffsetAlignment'].limittype = 'min,pot'
         self.structs['VkPhysicalDeviceLimits'].members['optimalBufferCopyRowPitchAlignment'].limittype = 'min,pot'
         self.structs['VkPhysicalDeviceLimits'].members['nonCoherentAtomSize'].limittype = 'min,pot'
-        self.structs['VkPhysicalDeviceLimits'].members['timestampPeriod'].limittype = 'min,mul'
+        self.structs['VkPhysicalDeviceLimits'].members['timestampPeriod'].limittype = 'noauto'
         self.structs['VkPhysicalDeviceLimits'].members['bufferImageGranularity'].limittype = 'min,mul'
         self.structs['VkPhysicalDeviceLimits'].members['pointSizeGranularity'].limittype = 'min,mul'
         self.structs['VkPhysicalDeviceLimits'].members['lineWidthGranularity'].limittype = 'min,mul'
