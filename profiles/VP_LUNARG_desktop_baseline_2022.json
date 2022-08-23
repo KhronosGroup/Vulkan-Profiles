@@ -185,13 +185,7 @@
                     "maxMultiviewViewCount": 6
                 },
                 "VkPhysicalDeviceProperties": {
-                    "sparseProperties": {
-                        "residencyAlignedMipSize": true,
-                        "residencyNonResidentStrict": false,
-                        "residencyStandard2DBlockShape": true,
-                        "residencyStandard2DMultisampleBlockShape": true,
-                        "residencyStandard3DBlockShape": true
-                    },
+                    "sparseProperties": {},
                     "limits": {
                         "bufferImageGranularity": "65536",
                         "discreteQueuePriorities": 2,

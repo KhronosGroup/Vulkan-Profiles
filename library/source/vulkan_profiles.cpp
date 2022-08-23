@@ -3544,11 +3544,6 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.viewportBoundsRange[0] = -32768;
                     s->properties.limits.viewportBoundsRange[1] = 32767;
                     s->properties.limits.viewportSubPixelBits = 0;
-                    s->properties.sparseProperties.residencyAlignedMipSize = VK_TRUE;
-                    s->properties.sparseProperties.residencyNonResidentStrict = VK_FALSE;
-                    s->properties.sparseProperties.residencyStandard2DBlockShape = VK_TRUE;
-                    s->properties.sparseProperties.residencyStandard2DMultisampleBlockShape = VK_TRUE;
-                    s->properties.sparseProperties.residencyStandard3DBlockShape = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT: {
                     VkPhysicalDeviceRobustness2PropertiesEXT* s = static_cast<VkPhysicalDeviceRobustness2PropertiesEXT*>(static_cast<void*>(p));
@@ -3751,11 +3746,6 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (s->properties.limits.viewportBoundsRange[0] <= -32768);
                     ret = ret && (s->properties.limits.viewportBoundsRange[1] >= 32767);
                     ret = ret && (s->properties.limits.viewportSubPixelBits >= 0);
-                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyAlignedMipSize, VK_TRUE));
-                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyNonResidentStrict, VK_FALSE));
-                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyStandard2DBlockShape, VK_TRUE));
-                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyStandard2DMultisampleBlockShape, VK_TRUE));
-                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyStandard3DBlockShape, VK_TRUE));
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT: {
                     VkPhysicalDeviceRobustness2PropertiesEXT* s = static_cast<VkPhysicalDeviceRobustness2PropertiesEXT*>(static_cast<void*>(p));
@@ -6510,11 +6500,6 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.viewportBoundsRange[0] = -32768;
                     s->properties.limits.viewportBoundsRange[1] = 32767;
                     s->properties.limits.viewportSubPixelBits = 0;
-                    s->properties.sparseProperties.residencyAlignedMipSize = VK_TRUE;
-                    s->properties.sparseProperties.residencyNonResidentStrict = VK_FALSE;
-                    s->properties.sparseProperties.residencyStandard2DBlockShape = VK_TRUE;
-                    s->properties.sparseProperties.residencyStandard2DMultisampleBlockShape = VK_TRUE;
-                    s->properties.sparseProperties.residencyStandard3DBlockShape = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT: {
                     VkPhysicalDeviceRobustness2PropertiesEXT* s = static_cast<VkPhysicalDeviceRobustness2PropertiesEXT*>(static_cast<void*>(p));
@@ -6722,11 +6707,6 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (s->properties.limits.viewportBoundsRange[0] <= -32768);
                     ret = ret && (s->properties.limits.viewportBoundsRange[1] >= 32767);
                     ret = ret && (s->properties.limits.viewportSubPixelBits >= 0);
-                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyAlignedMipSize, VK_TRUE));
-                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyNonResidentStrict, VK_FALSE));
-                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyStandard2DBlockShape, VK_TRUE));
-                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyStandard2DMultisampleBlockShape, VK_TRUE));
-                    ret = ret && (vpCheckFlags(s->properties.sparseProperties.residencyStandard3DBlockShape, VK_TRUE));
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT: {
                     VkPhysicalDeviceRobustness2PropertiesEXT* s = static_cast<VkPhysicalDeviceRobustness2PropertiesEXT*>(static_cast<void*>(p));
