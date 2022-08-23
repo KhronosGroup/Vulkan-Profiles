@@ -3841,11 +3841,6 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.viewportBoundsRange[0] = -32768;
                     s->properties.limits.viewportBoundsRange[1] = 32767;
                     s->properties.limits.viewportSubPixelBits = 0;
-                    s->properties.sparseProperties.residencyAlignedMipSize = VK_TRUE;
-                    s->properties.sparseProperties.residencyNonResidentStrict = VK_FALSE;
-                    s->properties.sparseProperties.residencyStandard2DBlockShape = VK_TRUE;
-                    s->properties.sparseProperties.residencyStandard2DMultisampleBlockShape = VK_TRUE;
-                    s->properties.sparseProperties.residencyStandard3DBlockShape = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT: {
                     VkPhysicalDeviceRobustness2PropertiesEXT* s = static_cast<VkPhysicalDeviceRobustness2PropertiesEXT*>(static_cast<void*>(p));
@@ -4048,11 +4043,6 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportBoundsRange[0] <= -32768); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportBoundsRange[0] <= -32768), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.viewportBoundsRange[0] <= -32768");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportBoundsRange[1] >= 32767); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportBoundsRange[1] >= 32767), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.viewportBoundsRange[1] >= 32767");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportSubPixelBits >= 0); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportSubPixelBits >= 0), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.viewportSubPixelBits >= 0");
-                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyAlignedMipSize, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyAlignedMipSize, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyAlignedMipSize contains VK_TRUE");
-                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyNonResidentStrict, VK_FALSE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyNonResidentStrict, VK_FALSE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyNonResidentStrict contains VK_FALSE");
-                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard2DBlockShape, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard2DBlockShape, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyStandard2DBlockShape contains VK_TRUE");
-                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard2DMultisampleBlockShape, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard2DMultisampleBlockShape, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyStandard2DMultisampleBlockShape contains VK_TRUE");
-                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard3DBlockShape, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard3DBlockShape, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyStandard3DBlockShape contains VK_TRUE");
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT: {
                     VkPhysicalDeviceRobustness2PropertiesEXT* prettify_VkPhysicalDeviceRobustness2PropertiesEXT = static_cast<VkPhysicalDeviceRobustness2PropertiesEXT*>(static_cast<void*>(p));
@@ -6807,11 +6797,6 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.viewportBoundsRange[0] = -32768;
                     s->properties.limits.viewportBoundsRange[1] = 32767;
                     s->properties.limits.viewportSubPixelBits = 0;
-                    s->properties.sparseProperties.residencyAlignedMipSize = VK_TRUE;
-                    s->properties.sparseProperties.residencyNonResidentStrict = VK_FALSE;
-                    s->properties.sparseProperties.residencyStandard2DBlockShape = VK_TRUE;
-                    s->properties.sparseProperties.residencyStandard2DMultisampleBlockShape = VK_TRUE;
-                    s->properties.sparseProperties.residencyStandard3DBlockShape = VK_TRUE;
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT: {
                     VkPhysicalDeviceRobustness2PropertiesEXT* s = static_cast<VkPhysicalDeviceRobustness2PropertiesEXT*>(static_cast<void*>(p));
@@ -7019,11 +7004,6 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportBoundsRange[0] <= -32768); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportBoundsRange[0] <= -32768), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.viewportBoundsRange[0] <= -32768");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportBoundsRange[1] >= 32767); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportBoundsRange[1] >= 32767), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.viewportBoundsRange[1] >= 32767");
                     ret = ret && (prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportSubPixelBits >= 0); VP_DEBUG_COND_MSG(!(prettify_VkPhysicalDeviceProperties2KHR->properties.limits.viewportSubPixelBits >= 0), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.viewportSubPixelBits >= 0");
-                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyAlignedMipSize, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyAlignedMipSize, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyAlignedMipSize contains VK_TRUE");
-                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyNonResidentStrict, VK_FALSE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyNonResidentStrict, VK_FALSE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyNonResidentStrict contains VK_FALSE");
-                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard2DBlockShape, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard2DBlockShape, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyStandard2DBlockShape contains VK_TRUE");
-                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard2DMultisampleBlockShape, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard2DMultisampleBlockShape, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyStandard2DMultisampleBlockShape contains VK_TRUE");
-                    ret = ret && (vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard3DBlockShape, VK_TRUE)); VP_DEBUG_COND_MSG(!(vpCheckFlags(prettify_VkPhysicalDeviceProperties2KHR->properties.sparseProperties.residencyStandard3DBlockShape, VK_TRUE)), "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.sparseProperties.residencyStandard3DBlockShape contains VK_TRUE");
                 } break;
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT: {
                     VkPhysicalDeviceRobustness2PropertiesEXT* prettify_VkPhysicalDeviceRobustness2PropertiesEXT = static_cast<VkPhysicalDeviceRobustness2PropertiesEXT*>(static_cast<void*>(p));
