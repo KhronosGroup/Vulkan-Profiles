@@ -3541,7 +3541,6 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.subPixelPrecisionBits = 4;
                     s->properties.limits.subTexelPrecisionBits = 4;
                     s->properties.limits.timestampComputeAndGraphics = VK_TRUE;
-                    s->properties.limits.timestampPeriod = 83.3333f;
                     s->properties.limits.viewportBoundsRange[0] = -32768;
                     s->properties.limits.viewportBoundsRange[1] = 32767;
                     s->properties.limits.viewportSubPixelBits = 0;
@@ -3749,8 +3748,6 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (s->properties.limits.subPixelPrecisionBits >= 4);
                     ret = ret && (s->properties.limits.subTexelPrecisionBits >= 4);
                     ret = ret && (vpCheckFlags(s->properties.limits.timestampComputeAndGraphics, VK_TRUE));
-                    ret = ret && (s->properties.limits.timestampPeriod <= 83.3333);
-                    ret = ret && (isMultiple(83.3333, s->properties.limits.timestampPeriod));
                     ret = ret && (s->properties.limits.viewportBoundsRange[0] <= -32768);
                     ret = ret && (s->properties.limits.viewportBoundsRange[1] >= 32767);
                     ret = ret && (s->properties.limits.viewportSubPixelBits >= 0);
@@ -6510,7 +6507,6 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.subPixelPrecisionBits = 4;
                     s->properties.limits.subTexelPrecisionBits = 4;
                     s->properties.limits.timestampComputeAndGraphics = VK_TRUE;
-                    s->properties.limits.timestampPeriod = 83.3333f;
                     s->properties.limits.viewportBoundsRange[0] = -32768;
                     s->properties.limits.viewportBoundsRange[1] = 32767;
                     s->properties.limits.viewportSubPixelBits = 0;
@@ -6723,8 +6719,6 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (s->properties.limits.subPixelPrecisionBits >= 4);
                     ret = ret && (s->properties.limits.subTexelPrecisionBits >= 4);
                     ret = ret && (vpCheckFlags(s->properties.limits.timestampComputeAndGraphics, VK_TRUE));
-                    ret = ret && (s->properties.limits.timestampPeriod <= 83.3333);
-                    ret = ret && (isMultiple(83.3333, s->properties.limits.timestampPeriod));
                     ret = ret && (s->properties.limits.viewportBoundsRange[0] <= -32768);
                     ret = ret && (s->properties.limits.viewportBoundsRange[1] >= 32767);
                     ret = ret && (s->properties.limits.viewportSubPixelBits >= 0);

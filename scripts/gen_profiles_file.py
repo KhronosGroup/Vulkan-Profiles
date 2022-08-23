@@ -128,7 +128,9 @@ class ProfileMerger():
                 if 'properties' in capability:
                     for property in capability['properties']:
                         # Property already exists, add or overwrite members
-                        if property in merged_properties:
+                        if property == 'sparseProperties':
+                            continue
+                        elif property in merged_properties:
                             self.add_members(merged_properties[property], capability['properties'][property], property)
                         else:
                             # Check if the promoted struct of current property was already added
