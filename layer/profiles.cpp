@@ -8304,7 +8304,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceLimits *des
         GET_VALUE_FLAG_WARN(member, storageImageSampleCounts);
         GET_VALUE_WARN(member, maxSampleMaskWords, WarnIfGreater);
         GET_VALUE_WARN(member, timestampComputeAndGraphics, WarnIfNotEqualBool);
-        GET_VALUE_WARN(member, timestampPeriod, WarnIfLesserFloat);
+        WarnNotModifiable("VkPhysicalDeviceLimits", member, "timestampPeriod");
         GET_VALUE_WARN(member, maxClipDistances, WarnIfGreater);
         GET_VALUE_WARN(member, maxCullDistances, WarnIfGreater);
         GET_VALUE_WARN(member, maxCombinedClipAndCullDistances, WarnIfGreater);
