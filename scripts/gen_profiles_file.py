@@ -74,7 +74,7 @@ class ProfileMerger():
 
                     if 'properties' in capability:
                         for property in dict(merged_properties):
-                            if property not in capability['properties']:
+                            if property not in capability['properties'] or property == 'VkPhysicalDeviceSparseProperties' or property == 'sparseProperties':
                                 del merged_properties[property]
                     else:
                         merged_properties.clear()
@@ -128,7 +128,9 @@ class ProfileMerger():
                 if 'properties' in capability:
                     for property in capability['properties']:
                         # Property already exists, add or overwrite members
-                        if property in merged_properties:
+                        if property == 'sparseProperties':
+                            continue
+                        elif property in merged_properties:
                             self.add_members(merged_properties[property], capability['properties'][property], property)
                         else:
                             # Check if the promoted struct of current property was already added
@@ -329,7 +331,9 @@ class ProfileMerger():
         return 'VkPhysicalDeviceVulkan' + str(version.major) + str(version.minor) + 'Features' if feature else 'Properties'
 
     def add_struct(self, struct_name, struct, merged):
-        if struct_name in merged:
+        if struct_name == 'VkPhysicalDeviceSparseProperties':
+            return
+        elif struct_name in merged:
             # Union
             if self.mode == 'union':
                 for member in struct:
@@ -520,7 +524,9 @@ class ProfileMerger():
             elif xmlmember.limittype == 'bitmask':
                 if xmlmember.type == 'VkBool32':
                     if member in entry:
-                        merged[member] = merged[member] or entry[member]
+                        merged[member] = merged[member] and entry[member]
+                        if (not merged[member]):
+                            del merged[member]
                     else:
                         merged.remove(member)
                 else:

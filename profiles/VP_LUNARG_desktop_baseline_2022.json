@@ -185,13 +185,7 @@
                     "maxMultiviewViewCount": 6
                 },
                 "VkPhysicalDeviceProperties": {
-                    "sparseProperties": {
-                        "residencyAlignedMipSize": true,
-                        "residencyNonResidentStrict": false,
-                        "residencyStandard2DBlockShape": true,
-                        "residencyStandard2DMultisampleBlockShape": true,
-                        "residencyStandard3DBlockShape": true
-                    },
+                    "sparseProperties": {},
                     "limits": {
                         "bufferImageGranularity": "65536",
                         "discreteQueuePriorities": 2,
@@ -323,7 +317,6 @@
                         "subPixelPrecisionBits": 4,
                         "subTexelPrecisionBits": 4,
                         "timestampComputeAndGraphics": true,
-                        "timestampPeriod": 83.3333,
                         "viewportSubPixelBits": 0,
                         "maxComputeWorkGroupCount": [
                             65535,
@@ -2025,7 +2018,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-08-22",
+                    "date": "2022-08-23",
                     "author": "LunarG Profiles Generation",
                     "comment": "A baseline desktop profile that supports Vulkan Header 139"
                 }
