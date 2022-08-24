@@ -43,7 +43,7 @@
                 },
                 {
                     "label": "LunarG Desktop Baseline",
-                    "description": "Check the Vulkan 1.1 application will run on Windows and Linuxplatforms without exceeding ecosystem effective devices capabilities",
+                    "description": "Check the Vulkan 1.1 application will run on Windows and Linux platforms without exceeding ecosystem effective devices capabilities",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "status": "STABLE",
                     "settings": [
