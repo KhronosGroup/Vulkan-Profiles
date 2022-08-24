@@ -2018,7 +2018,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-09-03",
+                    "date": "2022-09-05",
                     "author": "LunarG Profiles Generation",
                     "comment": "A baseline desktop profile that supports Vulkan Header 139"
                 }
