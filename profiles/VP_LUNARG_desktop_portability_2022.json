@@ -2034,7 +2034,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-08-23",
+                    "date": "2022-08-26",
                     "author": "LunarG Profiles Generation",
                     "comment": "A macOS portability specific profile variant of VP_LUNARG_desktop_baseline_2022"
                 }

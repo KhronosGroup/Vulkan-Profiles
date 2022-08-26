@@ -3270,7 +3270,7 @@ static const VpPropertyDesc propertyDesc = {
                     VkPhysicalDeviceVulkan11Properties* s = static_cast<VkPhysicalDeviceVulkan11Properties*>(static_cast<void*>(p));
                     ret = ret && (s->maxMultiviewInstanceIndex >= 134217727);
                     ret = ret && (s->maxMultiviewViewCount >= 6);
-                    ret = ret && (s->subgroupSize <= 4);
+                    ret = ret && (s->subgroupSize >= 4);
                     ret = ret && ((s->subgroupSize & (s->subgroupSize - 1)) == 0);
                     ret = ret && (vpCheckFlags(s->subgroupSupportedOperations, (VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT | VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT | VK_SUBGROUP_FEATURE_QUAD_BIT)));
                     ret = ret && (vpCheckFlags(s->subgroupSupportedStages, (VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)));
