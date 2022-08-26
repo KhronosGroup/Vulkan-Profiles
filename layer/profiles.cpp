@@ -5751,6 +5751,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceSubgroupPro
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceSubgroupProperties)\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, subgroupSize, WarnIfGreater);
         GET_VALUE_FLAG_WARN(member, supportedStages);
         GET_VALUE_FLAG_WARN(member, supportedOperations);
         GET_VALUE_WARN(member, quadOperationsInAllStages, WarnIfNotEqualBool);
@@ -5778,7 +5779,7 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceVulkan11Pro
         WarnNotModifiable("VkPhysicalDeviceVulkan11Properties", member, "deviceLUID");
         WarnNotModifiable("VkPhysicalDeviceVulkan11Properties", member, "deviceNodeMask");
         WarnNotModifiable("VkPhysicalDeviceVulkan11Properties", member, "deviceLUIDValid");
-        GET_VALUE_WARN(member, subgroupSize, WarnIfLesser);
+        GET_VALUE_WARN(member, subgroupSize, WarnIfGreater);
         GET_VALUE_FLAG_WARN(member, subgroupSupportedStages);
         GET_VALUE_FLAG_WARN(member, subgroupSupportedOperations);
         GET_VALUE_WARN(member, subgroupQuadOperationsInAllStages, WarnIfNotEqualBool);
