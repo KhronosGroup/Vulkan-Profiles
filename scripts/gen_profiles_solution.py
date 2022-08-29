@@ -1886,7 +1886,7 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceLUID'].limittype = 'noauto'
             self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceNodeMask'].limittype = 'noauto'
             self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceLUIDValid'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['subgroupSize'].limittype = 'min,pot'
+            self.structs['VkPhysicalDeviceVulkan11Properties'].members['subgroupSize'].limittype = 'max,pot'
             self.structs['VkPhysicalDeviceVulkan11Properties'].members['pointClippingBehavior'].limittype = 'exact'
             self.structs['VkPhysicalDeviceVulkan11Properties'].members['protectedNoFault'].limittype = 'exact'
 
@@ -1946,7 +1946,7 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceIDProperties'].members['deviceLUIDValid'].limittype = 'noauto'
 
         if 'VkPhysicalDeviceSubgroupProperties' in self.structs:
-            self.structs['VkPhysicalDeviceSubgroupProperties'].members['subgroupSize'].limittype = 'pot'
+            self.structs['VkPhysicalDeviceSubgroupProperties'].members['subgroupSize'].limittype = 'max,pot'
 
         if 'VkPhysicalDevicePointClippingProperties' in self.structs:
             self.structs['VkPhysicalDevicePointClippingProperties'].members['pointClippingBehavior'].limittype = 'exact'

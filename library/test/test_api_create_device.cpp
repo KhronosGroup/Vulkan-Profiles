@@ -227,8 +227,16 @@ TEST(api_create_device_profile, with_extensions_flag) {
         EXPECT_TRUE(device != VK_NULL_HANDLE);
     }
 }
-
+/*
 TEST(api_get_profile_support, supported_version) {
+    VpProfileProperties profile{VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
+
+    VkBool32 supported = VK_FALSE;
+    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    EXPECT_EQ(VK_TRUE, supported);
+}
+*/
+TEST(api_get_profile_support, supported_desktop_baseline_2022) {
     VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
