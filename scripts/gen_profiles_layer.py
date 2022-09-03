@@ -3789,6 +3789,7 @@ class VulkanProfilesLayerGenerator():
         return False
 
     def create_var_name(self, struct):
+        nv = struct.endswith("NV")
         var_name = ''
         while struct[-1].isupper():
             struct = struct[:-1]
@@ -3811,6 +3812,8 @@ class VulkanProfilesLayerGenerator():
             var_name = 'physical_device_float_16_int_8_features_'
         if 'queue_family_' in var_name:
             var_name = 'arrayof_queue_family_properties_[i].' + var_name.replace('queue_family_', '')
+        if (var_name == 'physical_device_mesh_shader_features_' or var_name == 'physical_device_mesh_shader_properties_') and nv:
+            var_name += 'nv_'
         return var_name
     
     def get_non_aliased_list(self, list, aliases):

@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.3.225",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.226",
     "additionalProperties": true,
     "required": [
         "capabilities",
@@ -494,6 +494,15 @@
                 }
             }
         },
+        "VkPhysicalDeviceDepthClampZeroOneFeaturesEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "depthClampZeroOne": {
+                    "type": "boolean"
+                }
+            }
+        },
         "VkPhysicalDeviceDepthClipControlFeaturesEXT": {
             "type": "object",
             "additionalProperties": false,
@@ -937,6 +946,27 @@
             "additionalProperties": false,
             "properties": {
                 "memoryPriority": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceMeshShaderFeaturesEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "meshShader": {
+                    "type": "boolean"
+                },
+                "meshShaderQueries": {
+                    "type": "boolean"
+                },
+                "multiviewMeshShader": {
+                    "type": "boolean"
+                },
+                "primitiveFragmentShadingRateMeshShader": {
+                    "type": "boolean"
+                },
+                "taskShader": {
                     "type": "boolean"
                 }
             }
@@ -2540,12 +2570,14 @@
                 "VK_SHADER_STAGE_GEOMETRY_BIT",
                 "VK_SHADER_STAGE_INTERSECTION_BIT_KHR",
                 "VK_SHADER_STAGE_INTERSECTION_BIT_NV",
+                "VK_SHADER_STAGE_MESH_BIT_EXT",
                 "VK_SHADER_STAGE_MESH_BIT_NV",
                 "VK_SHADER_STAGE_MISS_BIT_KHR",
                 "VK_SHADER_STAGE_MISS_BIT_NV",
                 "VK_SHADER_STAGE_RAYGEN_BIT_KHR",
                 "VK_SHADER_STAGE_RAYGEN_BIT_NV",
                 "VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI",
+                "VK_SHADER_STAGE_TASK_BIT_EXT",
                 "VK_SHADER_STAGE_TASK_BIT_NV",
                 "VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT",
                 "VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT",
@@ -3153,6 +3185,116 @@
             "properties": {
                 "maxBufferSize": {
                     "$ref": "#/definitions/VkDeviceSize"
+                }
+            }
+        },
+        "VkPhysicalDeviceMeshShaderPropertiesEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "maxMeshMultiviewViewCount": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxMeshOutputComponents": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxMeshOutputLayers": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxMeshOutputMemorySize": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxMeshOutputPrimitives": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxMeshOutputVertices": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxMeshPayloadAndOutputMemorySize": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxMeshPayloadAndSharedMemorySize": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxMeshSharedMemorySize": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxMeshWorkGroupCount": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/uint32_t"
+                    },
+                    "uniqueItems": false,
+                    "maxItems": 3
+                },
+                "maxMeshWorkGroupInvocations": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxMeshWorkGroupSize": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/uint32_t"
+                    },
+                    "uniqueItems": false,
+                    "maxItems": 3
+                },
+                "maxMeshWorkGroupTotalCount": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxPreferredMeshWorkGroupInvocations": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxPreferredTaskWorkGroupInvocations": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxTaskPayloadAndSharedMemorySize": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxTaskPayloadSize": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxTaskSharedMemorySize": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxTaskWorkGroupCount": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/uint32_t"
+                    },
+                    "uniqueItems": false,
+                    "maxItems": 3
+                },
+                "maxTaskWorkGroupInvocations": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "maxTaskWorkGroupSize": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/uint32_t"
+                    },
+                    "uniqueItems": false,
+                    "maxItems": 3
+                },
+                "maxTaskWorkGroupTotalCount": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "meshOutputPerPrimitiveGranularity": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "meshOutputPerVertexGranularity": {
+                    "$ref": "#/definitions/uint32_t"
+                },
+                "prefersCompactPrimitiveOutput": {
+                    "type": "boolean"
+                },
+                "prefersCompactVertexOutput": {
+                    "type": "boolean"
+                },
+                "prefersLocalInvocationPrimitiveOutput": {
+                    "type": "boolean"
+                },
+                "prefersLocalInvocationVertexOutput": {
+                    "type": "boolean"
                 }
             }
         },
@@ -4489,6 +4631,7 @@
                 "VK_PIPELINE_STAGE_2_INVOCATION_MASK_BIT_HUAWEI",
                 "VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT",
                 "VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT_KHR",
+                "VK_PIPELINE_STAGE_2_MESH_SHADER_BIT_EXT",
                 "VK_PIPELINE_STAGE_2_MESH_SHADER_BIT_NV",
                 "VK_PIPELINE_STAGE_2_NONE",
                 "VK_PIPELINE_STAGE_2_NONE_KHR",
@@ -4500,6 +4643,7 @@
                 "VK_PIPELINE_STAGE_2_RESOLVE_BIT_KHR",
                 "VK_PIPELINE_STAGE_2_SHADING_RATE_IMAGE_BIT_NV",
                 "VK_PIPELINE_STAGE_2_SUBPASS_SHADING_BIT_HUAWEI",
+                "VK_PIPELINE_STAGE_2_TASK_SHADER_BIT_EXT",
                 "VK_PIPELINE_STAGE_2_TASK_SHADER_BIT_NV",
                 "VK_PIPELINE_STAGE_2_TESSELLATION_CONTROL_SHADER_BIT",
                 "VK_PIPELINE_STAGE_2_TESSELLATION_CONTROL_SHADER_BIT_KHR",
@@ -4555,12 +4699,14 @@
                 "VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT",
                 "VK_PIPELINE_STAGE_HOST_BIT",
                 "VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT",
+                "VK_PIPELINE_STAGE_MESH_SHADER_BIT_EXT",
                 "VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV",
                 "VK_PIPELINE_STAGE_NONE",
                 "VK_PIPELINE_STAGE_NONE_KHR",
                 "VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR",
                 "VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_NV",
                 "VK_PIPELINE_STAGE_SHADING_RATE_IMAGE_BIT_NV",
+                "VK_PIPELINE_STAGE_TASK_SHADER_BIT_EXT",
                 "VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV",
                 "VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT",
                 "VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT",
@@ -4784,6 +4930,9 @@
                             "VK_EXT_debug_utils": {
                                 "type": "integer"
                             },
+                            "VK_EXT_depth_clamp_zero_one": {
+                                "type": "integer"
+                            },
                             "VK_EXT_depth_clip_control": {
                                 "type": "integer"
                             },
@@ -4893,6 +5042,9 @@
                                 "type": "integer"
                             },
                             "VK_EXT_memory_priority": {
+                                "type": "integer"
+                            },
+                            "VK_EXT_mesh_shader": {
                                 "type": "integer"
                             },
                             "VK_EXT_metal_objects": {
@@ -5634,6 +5786,9 @@
                             "VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV": {
                                 "$ref": "#/definitions/VkPhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV"
                             },
+                            "VkPhysicalDeviceDepthClampZeroOneFeaturesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceDepthClampZeroOneFeaturesEXT"
+                            },
                             "VkPhysicalDeviceDepthClipControlFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceDepthClipControlFeaturesEXT"
                             },
@@ -5771,6 +5926,9 @@
                             },
                             "VkPhysicalDeviceMemoryPriorityFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceMemoryPriorityFeaturesEXT"
+                            },
+                            "VkPhysicalDeviceMeshShaderFeaturesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMeshShaderFeaturesEXT"
                             },
                             "VkPhysicalDeviceMeshShaderFeaturesNV": {
                                 "$ref": "#/definitions/VkPhysicalDeviceMeshShaderFeaturesNV"
@@ -6174,6 +6332,9 @@
                             },
                             "VkPhysicalDeviceMaintenance4PropertiesKHR": {
                                 "$ref": "#/definitions/VkPhysicalDeviceMaintenance4Properties"
+                            },
+                            "VkPhysicalDeviceMeshShaderPropertiesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMeshShaderPropertiesEXT"
                             },
                             "VkPhysicalDeviceMeshShaderPropertiesNV": {
                                 "$ref": "#/definitions/VkPhysicalDeviceMeshShaderPropertiesNV"
