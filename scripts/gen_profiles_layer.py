@@ -599,7 +599,133 @@ JsonLoader::ProfileMap JsonLoader::profile_map_;
 '''
 
 WARN_FUNCTIONS = '''
-    static bool WarnIfGreater(const char *name, const uint64_t new_value, const uint64_t old_value) {
+    static bool WarnIfNotEqualFloat(const char *name, const float new_value, const float old_value, const bool not_modifiable) {
+        if (std::abs(new_value - old_value) > 0.0001f) {
+            if (not_modifiable) {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' is not modifiable but the profile value (%3.2f) which different from the device value (%3.2f).\\n", name, new_value, old_value));
+            } else {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' profile value (%3.2f) is different from the device supported value (%3.2f).\\n", name, new_value, old_value));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfNotEqualBool(const char *name, const bool new_value, const bool old_value, const bool not_modifiable) {
+        if (new_value != old_value) {
+            if (not_modifiable) {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' is not modifiable but the profile value (%s) which different from the device value (%s)\\n", name, new_value ? "true" : "false", old_value ? "true" : "false"));
+            } else {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' profile value is enabled in the profile, but the device does not support it.\\n", name));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfNotEqualEnum(const char *name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
+        if (new_value != old_value) {
+            if (not_modifiable) {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' is not modifiable but the profile value (%" PRIu32 ") which different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
+            } else {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfNotEqual(const char *name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
+        if (new_value != old_value) {
+            if (not_modifiable) {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' is not modifiable but the profile value (%" PRIu32 ") which different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
+            } else {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfNotEqual32u(const char *name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
+        if (new_value != old_value) {
+            if (not_modifiable) {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' is not modifiable but the profile value (%" PRIu32 ") which different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
+            } else {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfNotEqual(const char *name, const int32_t new_value, const int32_t old_value, const bool not_modifiable) {
+        if (new_value != old_value) {
+            if (not_modifiable) {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' is not modifiable but the profile value (%" PRIi32 ") which different from the device value (%" PRIi32 ").\\n", name, new_value, old_value));
+            } else {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' profile value (%" PRIi32 ") is different from the device value (%" PRIi32 ").\\n", name, new_value, old_value));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfNotEqual(const char *name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
+        if (new_value != old_value) {
+            if (not_modifiable) {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' is not modifiable but the profile value (%" PRIu64 ") which different from the device value (%" PRIu64 ").\\n", name, new_value, old_value));
+            } else {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' profile value (%" PRIu64 ") is different from the device value (%" PRIu64 ").\\n", name, new_value, old_value));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfNotEquali64(const char *name, const int64_t new_value, const int64_t old_value, const bool not_modifiable) {
+        if (new_value != old_value) {
+            if (not_modifiable) {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' is not modifiable but the profile value (%" PRIi64 ") which different from the device value (%" PRIi64 ").\\n", name, new_value, old_value));
+            } else {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' profile value (%" PRIi64 ") is different from the device value (%" PRIi64 ").\\n", name, new_value, old_value));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfMissingBit(const char *name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
+        if ((old_value | new_value) != old_value) {
+            if (not_modifiable) {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' is not modifiable but the profile value (%" PRIu32 ") which different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
+            } else {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' profile value (%" PRIu32 ") has bits set that the device value (%" PRIu32 ") does not.\\n", name, new_value, old_value));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    static bool WarnIfGreater(const char *name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
         if (new_value > old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                 "'%s' profile value (%" PRIu64 ") is greater than device value (%" PRIu64 ")\\n", name, new_value, old_value));
@@ -608,7 +734,7 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfGreaterSizet(const char *name, const size_t new_value, const size_t old_value) {
+    static bool WarnIfGreaterSizet(const char *name, const size_t new_value, const size_t old_value, const bool not_modifiable) {
         if (new_value > old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                 "'%s' profile value (%" PRIuLEAST64 ") is greater than device value (%" PRIuLEAST64 ")\\n", name, new_value, old_value));
@@ -617,7 +743,7 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfGreaterFloat(const char *name, const float new_value, const float old_value) {
+    static bool WarnIfGreaterFloat(const char *name, const float new_value, const float old_value, const bool not_modifiable) {
         if (new_value > old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                 "'%s' profile value (%3.2f) is greater than device value (%3.2f)\\n", name, new_value, old_value));
@@ -626,88 +752,7 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfNotEqualFloat(const char *name, const float new_value, const float old_value) {
-        if (std::abs(new_value - old_value) > 0.0001f) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                "'%s' profile value (%3.2f) is different from but the device supported value (%3.2f).\\n", name, new_value, old_value));
-            return true;
-        }
-        return false;
-    }
-
-    static bool WarnIfNotEqualBool(const char *name, const bool new_value, const bool old_value) {
-        if (new_value != old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                "'%s' profile value is enabled in the profile, but the device does not support it.\\n", name));
-            return true;
-        }
-        return false;
-    }
-
-    static bool WarnIfNotEqualEnum(const char *name, const uint32_t new_value, const uint32_t old_value) {
-        if (new_value != old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                "'%s' profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
-            return true;
-        }
-        return false;
-    }
-
-    static bool WarnIfNotEqual(const char *name, const uint32_t new_value, const uint32_t old_value) {
-        if (new_value != old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                "'%s' profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
-            return true;
-        }
-        return false;
-    }
-
-    static bool WarnIfNotEqual32u(const char *name, const uint32_t new_value, const uint32_t old_value) {
-        if (new_value != old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                "'%s' profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
-            return true;
-        }
-        return false;
-    }
-
-    static bool WarnIfNotEqual(const char *name, const int32_t new_value, const int32_t old_value) {
-        if (new_value != old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                "'%s' profile value (%" PRIi32 ") is different from the device value (%" PRIi32 ").\\n", name, new_value, old_value));
-            return true;
-        }
-        return false;
-    }
-
-    static bool WarnIfNotEqual(const char *name, const uint64_t new_value, const uint64_t old_value) {
-        if (new_value != old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                "'%s' profile value (%" PRIu64 ") is different from the device value (%" PRIu64 ").\\n", name, new_value, old_value));
-            return true;
-        }
-        return false;
-    }
-
-    static bool WarnIfNotEquali64(const char *name, const int64_t new_value, const int64_t old_value) {
-        if (new_value != old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                "'%s' profile value (%" PRIi64 ") is different from the device value (%" PRIi64 ").\\n", name, new_value, old_value));
-            return true;
-        }
-        return false;
-    }
-
-    static bool WarnIfMissingBit(const char *name, const uint32_t new_value, const uint32_t old_value) {
-        if ((old_value | new_value) != old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                "'%s' profile value (%" PRIu32 ") has bits set that the device value (%" PRIu32 ") does not.\\n", name, new_value, old_value));
-            return true;
-        }
-        return false;
-    }
-
-    static bool WarnIfLesser(const char *name, const uint64_t new_value, const uint64_t old_value) {
+    static bool WarnIfLesser(const char *name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
         if (new_value < old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                 "'%s' profile value (%" PRIu64 ") is lesser than device value (%" PRIu64 ")\\n", name, new_value, old_value));
@@ -716,7 +761,7 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfLesserSizet(const char *name, const size_t new_value, const size_t old_value) {
+    static bool WarnIfLesserSizet(const char *name, const size_t new_value, const size_t old_value, const bool not_modifiable) {
         if (new_value < old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                 "'%s' profile value (%" PRIuLEAST64 ") is lesser than device value (%" PRIuLEAST64 ")\\n", name, new_value, old_value));
@@ -725,7 +770,7 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfLesserFloat(const char *name, const float new_value, const float old_value) {
+    static bool WarnIfLesserFloat(const char *name, const float new_value, const float old_value, const bool not_modifiable) {
         if (new_value < old_value) {
             LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                 "'%s' profile value (%3.2f) is lesser than device value (%3.2f)\\n", name, new_value, old_value));
@@ -737,7 +782,7 @@ WARN_FUNCTIONS = '''
 
 GET_VALUE_FUNCTIONS = '''
     bool GetValue(const Json::Value &parent, const std::string &member, const char *name, float *dest, bool not_modifiable,
-                  std::function<bool(const char *, float, float)> warn_func = nullptr) {
+                  std::function<bool(const char *, float, float, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -753,12 +798,7 @@ GET_VALUE_FUNCTIONS = '''
         bool valid = true;
         const float new_value = value.asFloat();
         if (warn_func) {
-            if (warn_func(name, new_value, *dest)) {
-                if (not_modifiable) {
-                    LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                        "'%s' is not modifiable but the profile value (%3.2f) which different from the device value (%3.2f)\\n", 
-                        name, new_value, *dest));
-                }
+            if (warn_func(name, new_value, *dest, not_modifiable)) {
                 valid = false;
             }
         }
@@ -770,7 +810,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const Json::Value &parent, const std::string &member, const char *name, uint8_t *dest, bool not_modifiable,
-                  std::function<bool(const char *, uint8_t, uint8_t)> warn_func = nullptr) {
+                  std::function<bool(const char *, uint8_t, uint8_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -784,11 +824,7 @@ GET_VALUE_FUNCTIONS = '''
         if (value.isBool()) {
             const bool new_value = value.asBool();
             if (warn_func) {
-                if (warn_func(name, new_value, *dest)) {
-                    if (not_modifiable) {
-                        LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                            "'%s' is not modifiable but the profile value (%" PRIu8 ") which different from the device value (%" PRIu8 ")\\n", name, new_value, *dest));
-                    }
+                if (warn_func(name, new_value, *dest, not_modifiable)) {
                     valid = false;
                 }
             }
@@ -806,11 +842,7 @@ GET_VALUE_FUNCTIONS = '''
         } else if (value.isUInt()) {
             const uint8_t new_value = static_cast<uint8_t>(value.asUInt());
             if (warn_func) {
-                if (warn_func(name, new_value, *dest)) {
-                    if (not_modifiable) {
-                        LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                            "'%s' is not modifiable but the profile value (%" PRIu8 ") which different from the device value (%" PRIu8 ")\\n", name, new_value, *dest));
-                    }
+                if (warn_func(name, new_value, *dest, not_modifiable)) {
                     valid = false;
                 }
             }
@@ -822,7 +854,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const Json::Value &parent, const std::string &member, const char *name, int32_t *dest, bool not_modifiable,
-                  std::function<bool(const char *, int32_t, int32_t)> warn_func = nullptr) {
+                  std::function<bool(const char *, int32_t, int32_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -838,11 +870,7 @@ GET_VALUE_FUNCTIONS = '''
         bool valid = true;
         const int32_t new_value = value.asInt();
         if (warn_func) {
-            if (warn_func(name, new_value, *dest)) {
-                if (not_modifiable) {
-                    LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                        "'%s' is not modifiable but the profile value (%" PRIi32 ") which different from the device value (%" PRIi32 ")\\n", name, new_value, *dest));
-                }
+            if (warn_func(name, new_value, *dest, not_modifiable)) {
                 valid = false;
             }
         }
@@ -854,7 +882,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const Json::Value &parent, const std::string &member, const char *name, int64_t *dest, bool not_modifiable,
-                  std::function<bool(const char *, int64_t, int64_t)> warn_func = nullptr) {
+                  std::function<bool(const char *, int64_t, int64_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -870,11 +898,7 @@ GET_VALUE_FUNCTIONS = '''
         bool valid = true;
         const int64_t new_value = value.asInt64();
         if (warn_func) {
-            if (warn_func(name, new_value, *dest)) {
-                if (not_modifiable) {
-                    LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                        "'%s' is not modifiable but the profile value (%" PRIi64 ") which different from the device value (%" PRIi64 ")\\n", name, new_value, *dest));
-                }
+            if (warn_func(name, new_value, *dest, not_modifiable)) {
                 valid = false;
             }
         }
@@ -886,7 +910,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const Json::Value &parent, const std::string &member, const char *name, uint32_t *dest, bool not_modifiable,
-                  std::function<bool(const char *, uint32_t, uint32_t)> warn_func = nullptr) {
+                  std::function<bool(const char *, uint32_t, uint32_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -900,11 +924,7 @@ GET_VALUE_FUNCTIONS = '''
         if (value.isBool()) {
             const bool new_value = value.asBool();
             if (warn_func) {
-                if (warn_func(name, new_value, *dest)) {
-                    if (not_modifiable) {
-                        LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                            "'%s' is not modifiable but the profile value (%" PRIu32 ") which different from the device value (%" PRIu32 ")\\n", name, new_value, *dest));
-                    }
+                if (warn_func(name, new_value, *dest, not_modifiable)) {
                     valid = false;
                 }
             }
@@ -926,11 +946,7 @@ GET_VALUE_FUNCTIONS = '''
         } else if (value.isUInt()) {
             const uint32_t new_value = value.asUInt();
             if (warn_func) {
-                if (warn_func(name, new_value, *dest)) {
-                    if (not_modifiable) {
-                        LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                            "'%s' is not modifiable but the profile value (%" PRIu32 ") which different from the device value (%" PRIu32 ")\\n", name, new_value, *dest));
-                    }
+                if (warn_func(name, new_value, *dest, not_modifiable)) {
                     valid = false;
                 }
             }
@@ -943,7 +959,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const Json::Value &parent, const std::string &member, const char *name, uint64_t *dest, bool not_modifiable,
-                  std::function<bool(const char *, uint64_t, uint64_t)> warn_func = nullptr) {
+                  std::function<bool(const char *, uint64_t, uint64_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -959,11 +975,7 @@ GET_VALUE_FUNCTIONS = '''
         bool valid = true;
         const uint64_t new_value = value.asUInt64();
         if (warn_func) {
-            if (warn_func(name, new_value, *dest)) {
-                if (not_modifiable) {
-                    LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                        "'%s' is not modifiable but the profile value (%" PRIu64 ") which different from the device value (%" PRIu64 ")\\n", name, new_value, *dest));
-                }
+            if (warn_func(name, new_value, *dest, not_modifiable)) {
                 valid = false;
             }
         }
@@ -975,7 +987,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const Json::Value &pparent, const std::string &member, const char *name, VkExtent2D *dest, bool not_modifiable,
-                  std::function<bool(const char *, uint32_t, uint32_t)> warn_func = nullptr) {
+                  std::function<bool(const char *, uint32_t, uint32_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -997,7 +1009,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const Json::Value &pparent, const std::string &member, const char *name, VkExtent3D *dest, bool not_modifiable,
-                  std::function<bool(const char *, uint32_t, uint32_t)> warn_func = nullptr) {
+                  std::function<bool(const char *, uint32_t, uint32_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -1020,7 +1032,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValueSizet(const Json::Value &parent, const std::string &member, const char *name, size_t *dest, bool not_modifiable,
-                       std::function<bool(const char *, size_t, size_t)> warn_func = nullptr) {
+                       std::function<bool(const char *, size_t, size_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -1034,11 +1046,7 @@ GET_VALUE_FUNCTIONS = '''
         if (value.isUInt()) {
             const size_t new_value = value.asUInt();
             if (warn_func) {
-                if (warn_func(name, new_value, *dest)) {
-                    if (not_modifiable) {
-                        LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                            "'%s' is not modifiable but the profile value (%" PRIuLEAST64 ") which different from the device value (%" PRIuLEAST64 ")\\n", name, new_value, *dest));
-                    }
+                if (warn_func(name, new_value, *dest, not_modifiable)) {
                     valid = false;
                 }
             }
@@ -1052,7 +1060,7 @@ GET_VALUE_FUNCTIONS = '''
 
     template <typename T>  // for Vulkan enum types
     bool GetValueFlag(const Json::Value &parent, const std::string &member, const char *name, T *dest, bool not_modifiable,
-                      std::function<bool(const char *, T, T)> warn_func = nullptr) {
+                      std::function<bool(const char *, T, T, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -1071,7 +1079,7 @@ GET_VALUE_FUNCTIONS = '''
                 }
             }
         }
-        if (WarnIfMissingBit(name, new_value, static_cast<uint32_t>(*dest))) {
+        if (WarnIfMissingBit(name, new_value, static_cast<uint32_t>(*dest), not_modifiable)) {
             valid = false;
         }
 
@@ -1083,7 +1091,7 @@ GET_VALUE_FUNCTIONS = '''
 
     template <typename T>  // for Vulkan enum types
     bool GetValueEnum(const Json::Value &parent, const std::string &member, const char *name, T *dest, bool not_modifiable,
-                      std::function<bool(const char *, std::uint32_t, std::uint32_t)> warn_func = nullptr) {
+                      std::function<bool(const char *, uint32_t, uint32_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -1099,11 +1107,11 @@ GET_VALUE_FUNCTIONS = '''
             new_value = static_cast<T>(VkStringToUint(value.asString()));
         }
         if (warn_func) {
-            if (warn_func(name, new_value, *dest)) {
+            if (warn_func(name, new_value, *dest, not_modifiable)) {
                 valid = false;
             }
         } else {
-            if (WarnIfNotEqualEnum(name, new_value, *dest)) {
+            if (WarnIfNotEqualEnum(name, new_value, *dest, not_modifiable)) {
                 valid = false;
             }
         }
@@ -1743,7 +1751,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         const auto &properties = c["properties"];
 
         if (VK_API_VERSION_PATCH(this->profile_api_version_) > VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)) {
-            LogMessage(DEBUG_REPORT_ERROR_BIT, format(
+            LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                 "Profile apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ") is greater than the device apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ").\\n",
                     VK_API_VERSION_MAJOR(this->profile_api_version_), VK_API_VERSION_MINOR(this->profile_api_version_),
                     VK_API_VERSION_PATCH(this->profile_api_version_),
@@ -2071,7 +2079,6 @@ VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
 GET_DEFINES = '''
 #define GET_VALUE(member, name, not_modifiable) GetValue(parent, member, #name, &dest->name, not_modifiable)
 #define GET_ARRAY(member, name, not_modifiable) GetArray(parent, member, #name, dest->name, not_modifiable)
-#define GET_MEMBER_VALUE(member, name, not_modifiable) GetValue(parent, member, #name, &dest->name, not_modifiable)
 
 #define GET_VALUE_WARN(member, name, not_modifiable, warn_func)                     \\
     if (!GetValue(parent, member, #name, &dest->name, not_modifiable, warn_func)) { \\
@@ -3222,8 +3229,8 @@ bool JsonLoader::GetStruct(const Json::Value &parent, VkPhysicalDeviceProperties
         GET_VALUE(prop, vendorID, true);
         GET_VALUE(prop, deviceID, true);
         GET_VALUE_ENUM_WARN(prop, deviceType, true, WarnIfNotEqualEnum);
-        GET_ARRAY(prop, deviceName, true);         // size < VK_MAX_PHYSICAL_DEVICE_NAME_SIZE
-        GET_ARRAY(prop, pipelineCacheUUID, true);  // size == VK_UUID_SIZE*/
+        GetArray(parent, prop, "deviceName", dest->deviceName, true);         // size < VK_MAX_PHYSICAL_DEVICE_NAME_SIZE
+        GetArray(parent, prop, "pipelineCacheUUID", dest->pipelineCacheUUID, true);  // size == VK_UUID_SIZE*/
     }
     return valid;
 }
@@ -3821,7 +3828,7 @@ class VulkanProfilesLayerGenerator():
             member = registry.structs[structure].members[member_name]
             not_modifiable = str(member.limittype == 'exact' or member.limittype == 'noauto').lower()
             if member.isArray:
-                gen += '        GET_ARRAY(member, ' + member_name + ', ' + not_modifiable + ');\n'
+                gen += '        GetArray(parent, member, "' + member_name + '", dest->' + member_name + ', ' + not_modifiable + ');\n'
             elif member.type in registry.enums:
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfNotEqualEnum);\n'
             elif member.type == 'VkConformanceVersion' or member.type == 'VkToolPurposeFlags':
