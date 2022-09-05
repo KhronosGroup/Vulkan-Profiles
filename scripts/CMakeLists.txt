@@ -68,6 +68,7 @@ add_custom_target(VpCreateDesktopMax2022 ALL
 		--output_profile VP_LUNARG_desktop_max_2022
 		--profile_label ${PROFILE_DESKTOP_MAX_2022_LABEL}
 		--profile_desc ${PROFILE_DESKTOP_MAX_2022_DESC}
+		--profile_stage BETA
 	VERBATIM
 	SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
 	DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
