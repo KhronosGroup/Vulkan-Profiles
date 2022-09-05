@@ -11,7 +11,13 @@
 
 # Release Notes
 
-## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/LunarG/VulkanProfiles/tree/master) - August 2022
+## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/LunarG/VulkanProfiles/tree/master) - October 2022
+
+### Improvements:
+- Improve message reports for unsupported capabilities by the device.
+- Improve message reports for unmodifiable Vulkan capabilities.
+
+## [Vulkan Profiles Toolset 1.3.224](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.224.0) - August 2022
 
 ### Features:
 - Add script to merge (union and intersection) multiple profiles

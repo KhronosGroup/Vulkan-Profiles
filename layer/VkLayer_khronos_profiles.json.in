@@ -5,7 +5,7 @@
         "type": "GLOBAL",
         "library_path": "@RELATIVE_LAYER_BINARY@",
         "api_version": "@VK_VERSION@",
-        "implementation_version": "1.0.0",
+        "implementation_version": "1.0.2",
         "status": "BETA",
         "description": "Khronos Profiles layer",
         "introduction": "The Khronos Profiles layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device.",
