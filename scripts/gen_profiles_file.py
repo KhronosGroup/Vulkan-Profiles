@@ -490,7 +490,7 @@ class ProfileMerger():
                 elif xmlmember.type == 'uint64_t' or xmlmember.type == 'VkDeviceSize':
                     if int(entry[member]) < int(merged[member]):
                         merged[member] = entry[member]
-                elif xmlmember.type == 'uint32_t' or xmlmember.type == 'int32_t'  or xmlmember.type == 'size_t' or xmlmember.type == 'float':
+                elif xmlmember.type == 'uint32_t' or xmlmember.type == 'int32_t'  or xmlmember.type == 'size_t' or xmlmember.type == 'float' or 'VkSampleCountFlagBits':
                     if entry[member] < merged[member]:
                         merged[member] = entry[member]
                 else:
@@ -516,7 +516,7 @@ class ProfileMerger():
                 elif xmlmember.type == 'uint64_t' or xmlmember.type == 'VkDeviceSize':
                     if int(entry[member]) > int(merged[member]):
                         merged[member] = entry[member]
-                elif xmlmember.type == 'uint32_t' or xmlmember.type == 'int32_t' or xmlmember.type == 'size_t' or xmlmember.type == 'float':
+                elif xmlmember.type == 'uint32_t' or xmlmember.type == 'int32_t' or xmlmember.type == 'size_t' or xmlmember.type == 'float' or 'VkSampleCountFlagBits':
                     if entry[member] > merged[member]:
                         merged[member] = entry[member]
                 else:

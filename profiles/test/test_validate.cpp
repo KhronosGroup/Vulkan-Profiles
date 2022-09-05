@@ -213,6 +213,13 @@ TEST(test_validate, VP_LUNARG_desktop_portability_2022) {
     EXPECT_TRUE(validator.Check(json_document2));
 }
 
+TEST(test_validate, VP_LUNARG_desktop_max_2022) {
+    JsonValidator validator;
+
+    const Json::Value json_document2 = ParseJsonFile("VP_LUNARG_desktop_max_2022.json");
+    EXPECT_TRUE(validator.Check(json_document2));
+}
+
 TEST(test_validate, VP_KHR_roadmap_2022) {
     JsonValidator validator;
 
