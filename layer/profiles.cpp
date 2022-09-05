@@ -1390,8 +1390,8 @@ static uint32_t VkStringToUint(const std::string &input_value) {
         {"VK_SHADER_STAGE_MISS_BIT_KHR", VK_SHADER_STAGE_MISS_BIT_KHR},
         {"VK_SHADER_STAGE_INTERSECTION_BIT_KHR", VK_SHADER_STAGE_INTERSECTION_BIT_KHR},
         {"VK_SHADER_STAGE_CALLABLE_BIT_KHR", VK_SHADER_STAGE_CALLABLE_BIT_KHR},
-        {"VK_SHADER_STAGE_TASK_BIT_NV", VK_SHADER_STAGE_TASK_BIT_NV},
-        {"VK_SHADER_STAGE_MESH_BIT_NV", VK_SHADER_STAGE_MESH_BIT_NV},
+        {"VK_SHADER_STAGE_TASK_BIT_EXT", VK_SHADER_STAGE_TASK_BIT_EXT},
+        {"VK_SHADER_STAGE_MESH_BIT_EXT", VK_SHADER_STAGE_MESH_BIT_EXT},
         {"VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI", VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI},
         {"VK_SHADER_STAGE_RAYGEN_BIT_NV", VK_SHADER_STAGE_RAYGEN_BIT_NV},
         {"VK_SHADER_STAGE_ANY_HIT_BIT_NV", VK_SHADER_STAGE_ANY_HIT_BIT_NV},
@@ -1399,6 +1399,8 @@ static uint32_t VkStringToUint(const std::string &input_value) {
         {"VK_SHADER_STAGE_MISS_BIT_NV", VK_SHADER_STAGE_MISS_BIT_NV},
         {"VK_SHADER_STAGE_INTERSECTION_BIT_NV", VK_SHADER_STAGE_INTERSECTION_BIT_NV},
         {"VK_SHADER_STAGE_CALLABLE_BIT_NV", VK_SHADER_STAGE_CALLABLE_BIT_NV},
+        {"VK_SHADER_STAGE_TASK_BIT_NV", VK_SHADER_STAGE_TASK_BIT_NV},
+        {"VK_SHADER_STAGE_MESH_BIT_NV", VK_SHADER_STAGE_MESH_BIT_NV},
         // VkSubgroupFeatureFlagBits
         {"VK_SUBGROUP_FEATURE_BASIC_BIT", VK_SUBGROUP_FEATURE_BASIC_BIT},
         {"VK_SUBGROUP_FEATURE_VOTE_BIT", VK_SUBGROUP_FEATURE_VOTE_BIT},
@@ -1555,14 +1557,16 @@ static VkPipelineStageFlags StringToVkPipelineStageFlags(const std::string &inpu
         {"VK_PIPELINE_STAGE_CONDITIONAL_RENDERING_BIT_EXT", VK_PIPELINE_STAGE_CONDITIONAL_RENDERING_BIT_EXT},
         {"VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR", VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR},
         {"VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR", VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR},
-        {"VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV", VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV},
-        {"VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV", VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV},
         {"VK_PIPELINE_STAGE_FRAGMENT_DENSITY_PROCESS_BIT_EXT", VK_PIPELINE_STAGE_FRAGMENT_DENSITY_PROCESS_BIT_EXT},
         {"VK_PIPELINE_STAGE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR", VK_PIPELINE_STAGE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR},
         {"VK_PIPELINE_STAGE_COMMAND_PREPROCESS_BIT_NV", VK_PIPELINE_STAGE_COMMAND_PREPROCESS_BIT_NV},
+        {"VK_PIPELINE_STAGE_TASK_SHADER_BIT_EXT", VK_PIPELINE_STAGE_TASK_SHADER_BIT_EXT},
+        {"VK_PIPELINE_STAGE_MESH_SHADER_BIT_EXT", VK_PIPELINE_STAGE_MESH_SHADER_BIT_EXT},
         {"VK_PIPELINE_STAGE_SHADING_RATE_IMAGE_BIT_NV", VK_PIPELINE_STAGE_SHADING_RATE_IMAGE_BIT_NV},
         {"VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_NV", VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_NV},
         {"VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_NV", VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_NV},
+        {"VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV", VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV},
+        {"VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV", VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV},
         {"VK_PIPELINE_STAGE_NONE_KHR", VK_PIPELINE_STAGE_NONE_KHR},
     };
     const auto it = map.find(input_value);
@@ -1608,8 +1612,8 @@ static VkPipelineStageFlags2 StringToVkPipelineStageFlags2(const std::string &in
         {"VK_PIPELINE_STAGE_2_ACCELERATION_STRUCTURE_BUILD_BIT_KHR", VK_PIPELINE_STAGE_2_ACCELERATION_STRUCTURE_BUILD_BIT_KHR},
         {"VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR", VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR},
         {"VK_PIPELINE_STAGE_2_FRAGMENT_DENSITY_PROCESS_BIT_EXT", VK_PIPELINE_STAGE_2_FRAGMENT_DENSITY_PROCESS_BIT_EXT},
-        {"VK_PIPELINE_STAGE_2_TASK_SHADER_BIT_NV", VK_PIPELINE_STAGE_2_TASK_SHADER_BIT_NV},
-        {"VK_PIPELINE_STAGE_2_MESH_SHADER_BIT_NV", VK_PIPELINE_STAGE_2_MESH_SHADER_BIT_NV},
+        {"VK_PIPELINE_STAGE_2_TASK_SHADER_BIT_EXT", VK_PIPELINE_STAGE_2_TASK_SHADER_BIT_EXT},
+        {"VK_PIPELINE_STAGE_2_MESH_SHADER_BIT_EXT", VK_PIPELINE_STAGE_2_MESH_SHADER_BIT_EXT},
         {"VK_PIPELINE_STAGE_2_SUBPASS_SHADING_BIT_HUAWEI", VK_PIPELINE_STAGE_2_SUBPASS_SHADING_BIT_HUAWEI},
         {"VK_PIPELINE_STAGE_2_INVOCATION_MASK_BIT_HUAWEI", VK_PIPELINE_STAGE_2_INVOCATION_MASK_BIT_HUAWEI},
         {"VK_PIPELINE_STAGE_2_ACCELERATION_STRUCTURE_COPY_BIT_KHR", VK_PIPELINE_STAGE_2_ACCELERATION_STRUCTURE_COPY_BIT_KHR},
@@ -1643,6 +1647,8 @@ static VkPipelineStageFlags2 StringToVkPipelineStageFlags2(const std::string &in
         {"VK_PIPELINE_STAGE_2_SHADING_RATE_IMAGE_BIT_NV", VK_PIPELINE_STAGE_2_SHADING_RATE_IMAGE_BIT_NV},
         {"VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_NV", VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_NV},
         {"VK_PIPELINE_STAGE_2_ACCELERATION_STRUCTURE_BUILD_BIT_NV", VK_PIPELINE_STAGE_2_ACCELERATION_STRUCTURE_BUILD_BIT_NV},
+        {"VK_PIPELINE_STAGE_2_TASK_SHADER_BIT_NV", VK_PIPELINE_STAGE_2_TASK_SHADER_BIT_NV},
+        {"VK_PIPELINE_STAGE_2_MESH_SHADER_BIT_NV", VK_PIPELINE_STAGE_2_MESH_SHADER_BIT_NV},
     };
     const auto it = map.find(input_value);
     if (it != map.end()) {
@@ -2169,8 +2175,8 @@ class PhysicalDeviceData {
     VkPhysicalDeviceComputeShaderDerivativesFeaturesNV physical_device_compute_shader_derivatives_features_;
 
     // VK_NV_mesh_shader structs
-    VkPhysicalDeviceMeshShaderPropertiesNV physical_device_mesh_shader_properties_;
-    VkPhysicalDeviceMeshShaderFeaturesNV physical_device_mesh_shader_features_;
+    VkPhysicalDeviceMeshShaderPropertiesNV physical_device_mesh_shader_properties_nv_;
+    VkPhysicalDeviceMeshShaderFeaturesNV physical_device_mesh_shader_features_nv_;
 
     // VK_NV_fragment_shader_barycentric structs
     VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV physical_device_fragment_shader_barycentric_features_;
@@ -2348,6 +2354,10 @@ class PhysicalDeviceData {
     // VK_NV_ray_tracing_motion_blur structs
     VkPhysicalDeviceRayTracingMotionBlurFeaturesNV physical_device_ray_tracing_motion_blur_features_;
 
+    // VK_EXT_mesh_shader structs
+    VkPhysicalDeviceMeshShaderPropertiesEXT physical_device_mesh_shader_properties_;
+    VkPhysicalDeviceMeshShaderFeaturesEXT physical_device_mesh_shader_features_;
+
     // VK_EXT_ycbcr_2plane_444_formats structs
     VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT physical_device_ycbcr_2_plane_444_formats_features_;
 
@@ -2444,6 +2454,9 @@ class PhysicalDeviceData {
 
     // VK_VALVE_descriptor_set_host_mapping structs
     VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE physical_device_descriptor_set_host_mapping_features_;
+
+    // VK_EXT_depth_clamp_zero_one structs
+    VkPhysicalDeviceDepthClampZeroOneFeaturesEXT physical_device_depth_clamp_zero_one_features_;
 
     // VK_EXT_non_seamless_cube_map structs
     VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT physical_device_non_seamless_cube_map_features_;
@@ -2658,8 +2671,8 @@ class PhysicalDeviceData {
         physical_device_compute_shader_derivatives_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COMPUTE_SHADER_DERIVATIVES_FEATURES_NV};
 
         // VK_NV_mesh_shader structs
-        physical_device_mesh_shader_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_NV};
-        physical_device_mesh_shader_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_NV};
+        physical_device_mesh_shader_properties_nv_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_NV};
+        physical_device_mesh_shader_features_nv_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_NV};
 
         // VK_NV_fragment_shader_barycentric structs
         physical_device_fragment_shader_barycentric_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_BARYCENTRIC_FEATURES_NV};
@@ -2837,6 +2850,10 @@ class PhysicalDeviceData {
         // VK_NV_ray_tracing_motion_blur structs
         physical_device_ray_tracing_motion_blur_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_MOTION_BLUR_FEATURES_NV};
 
+        // VK_EXT_mesh_shader structs
+        physical_device_mesh_shader_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_EXT};
+        physical_device_mesh_shader_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_EXT};
+
         // VK_EXT_ycbcr_2plane_444_formats structs
         physical_device_ycbcr_2_plane_444_formats_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_2_PLANE_444_FORMATS_FEATURES_EXT};
 
@@ -2933,6 +2950,9 @@ class PhysicalDeviceData {
 
         // VK_VALVE_descriptor_set_host_mapping structs
         physical_device_descriptor_set_host_mapping_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_SET_HOST_MAPPING_FEATURES_VALVE};
+
+        // VK_EXT_depth_clamp_zero_one structs
+        physical_device_depth_clamp_zero_one_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLAMP_ZERO_ONE_FEATURES_EXT};
 
         // VK_EXT_non_seamless_cube_map structs
         physical_device_non_seamless_cube_map_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_NON_SEAMLESS_CUBE_MAP_FEATURES_EXT};
@@ -3209,6 +3229,8 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentShadingRateEnumsFeaturesNV *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingMotionBlurFeaturesNV *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderPropertiesEXT *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2PropertiesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMap2FeaturesEXT *dest);
@@ -3244,6 +3266,7 @@ class JsonLoader {
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4PropertiesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceMaintenance4FeaturesKHR *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE *dest);
+    bool GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClampZeroOneFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM *dest);
     bool GetValue(const Json::Value &parent, VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM *dest);
@@ -3998,6 +4021,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
     } else if (name == "VkPhysicalDeviceMeshShaderFeaturesNV") {
         auto support = CheckExtensionSupport(VK_NV_MESH_SHADER_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_mesh_shader_features_nv_);
+    } else if (name == "VkPhysicalDeviceMeshShaderFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_MESH_SHADER_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_mesh_shader_features_);
     } else if (name == "VkPhysicalDeviceAccelerationStructureFeaturesKHR") {
         auto support = CheckExtensionSupport(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME, name);
@@ -4158,11 +4185,11 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
     } else if (name == "VkPhysicalDevicePipelineCreationCacheControlFeatures") {
         if (!CheckVersionSupport(VK_API_VERSION_1_3, name)) return false;
         return GetValue(feature, &pdd_->physical_device_pipeline_creation_cache_control_features_);
-    } else if (name == "VkPhysicalDeviceVulkan11Features") {
+    } // Blocks nested too deeply, break
+    if (name == "VkPhysicalDeviceVulkan11Features") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, name)) return false;
         return GetValue(feature, &pdd_->physical_device_vulkan_11_features_);
-    } // Blocks nested too deeply, break
-    if (name == "VkPhysicalDeviceVulkan12Features") {
+    } else if (name == "VkPhysicalDeviceVulkan12Features") {
         if (!CheckVersionSupport(VK_API_VERSION_1_2, name)) return false;
         return GetValue(feature, &pdd_->physical_device_vulkan_12_features_);
     } else if (name == "VkPhysicalDeviceVulkan13Features") {
@@ -4400,6 +4427,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_EXT_ATTACHMENT_FEEDBACK_LOOP_LAYOUT_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(feature, &pdd_->physical_device_attachment_feedback_loop_layout_features_);
+    } else if (name == "VkPhysicalDeviceDepthClampZeroOneFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_DEPTH_CLAMP_ZERO_ONE_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(feature, &pdd_->physical_device_depth_clamp_zero_one_features_);
     }
 
     return true;
@@ -4566,6 +4597,10 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &name) 
         return GetValue(property, &pdd_->physical_device_shading_rate_image_properties_);
     } else if (name == "VkPhysicalDeviceMeshShaderPropertiesNV") {
         auto support = CheckExtensionSupport(VK_NV_MESH_SHADER_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetValue(property, &pdd_->physical_device_mesh_shader_properties_nv_);
+    } else if (name == "VkPhysicalDeviceMeshShaderPropertiesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_MESH_SHADER_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetValue(property, &pdd_->physical_device_mesh_shader_properties_);
     } else if (name == "VkPhysicalDeviceAccelerationStructurePropertiesKHR") {
@@ -7634,6 +7669,57 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceRayTracingM
     return valid;
 }
 
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderPropertiesEXT *dest) {
+    (void)dest;
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderPropertiesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, maxTaskWorkGroupTotalCount, WarnIfGreater);
+        GET_ARRAY(maxTaskWorkGroupCount);
+        GET_VALUE_WARN(member, maxTaskWorkGroupInvocations, WarnIfGreater);
+        GET_ARRAY(maxTaskWorkGroupSize);
+        GET_VALUE_WARN(member, maxTaskPayloadSize, WarnIfGreater);
+        GET_VALUE_WARN(member, maxTaskSharedMemorySize, WarnIfGreater);
+        GET_VALUE_WARN(member, maxTaskPayloadAndSharedMemorySize, WarnIfGreater);
+        GET_VALUE_WARN(member, maxMeshWorkGroupTotalCount, WarnIfGreater);
+        GET_ARRAY(maxMeshWorkGroupCount);
+        GET_VALUE_WARN(member, maxMeshWorkGroupInvocations, WarnIfGreater);
+        GET_ARRAY(maxMeshWorkGroupSize);
+        GET_VALUE_WARN(member, maxMeshSharedMemorySize, WarnIfGreater);
+        GET_VALUE_WARN(member, maxMeshPayloadAndSharedMemorySize, WarnIfGreater);
+        GET_VALUE_WARN(member, maxMeshOutputMemorySize, WarnIfGreater);
+        GET_VALUE_WARN(member, maxMeshPayloadAndOutputMemorySize, WarnIfGreater);
+        GET_VALUE_WARN(member, maxMeshOutputComponents, WarnIfGreater);
+        GET_VALUE_WARN(member, maxMeshOutputVertices, WarnIfGreater);
+        GET_VALUE_WARN(member, maxMeshOutputPrimitives, WarnIfGreater);
+        GET_VALUE_WARN(member, maxMeshOutputLayers, WarnIfGreater);
+        GET_VALUE_WARN(member, maxMeshMultiviewViewCount, WarnIfGreater);
+        WarnNotModifiable("VkPhysicalDeviceMeshShaderPropertiesEXT", member, "meshOutputPerVertexGranularity");
+        WarnNotModifiable("VkPhysicalDeviceMeshShaderPropertiesEXT", member, "meshOutputPerPrimitiveGranularity");
+        GET_VALUE_WARN(member, maxPreferredTaskWorkGroupInvocations, WarnIfGreater);
+        GET_VALUE_WARN(member, maxPreferredMeshWorkGroupInvocations, WarnIfGreater);
+        WarnNotModifiable("VkPhysicalDeviceMeshShaderPropertiesEXT", member, "prefersLocalInvocationVertexOutput");
+        WarnNotModifiable("VkPhysicalDeviceMeshShaderPropertiesEXT", member, "prefersLocalInvocationPrimitiveOutput");
+        WarnNotModifiable("VkPhysicalDeviceMeshShaderPropertiesEXT", member, "prefersCompactVertexOutput");
+        WarnNotModifiable("VkPhysicalDeviceMeshShaderPropertiesEXT", member, "prefersCompactPrimitiveOutput");
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceMeshShaderFeaturesEXT *dest) {
+    (void)dest;
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceMeshShaderFeaturesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, taskShader, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, meshShader, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, multiviewMeshShader, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, primitiveFragmentShadingRateMeshShader, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, meshShaderQueries, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
 bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *dest) {
     (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT)\n");
@@ -8002,6 +8088,16 @@ bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDescriptorS
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, descriptorSetHostMapping, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetValue(const Json::Value &parent, VkPhysicalDeviceDepthClampZeroOneFeaturesEXT *dest) {
+    (void)dest;
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetValue(VkPhysicalDeviceDepthClampZeroOneFeaturesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, depthClampZeroOne, WarnIfNotEqualBool);
     }
     return valid;
 }
@@ -9321,7 +9417,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
                     VkPhysicalDeviceMeshShaderPropertiesNV *data = (VkPhysicalDeviceMeshShaderPropertiesNV *)place;
                     void *pNext = data->pNext;
-                    *data = physicalDeviceData->physical_device_mesh_shader_properties_;
+                    *data = physicalDeviceData->physical_device_mesh_shader_properties_nv_;
                     data->pNext = pNext;
                 }
                 break;
@@ -9329,7 +9425,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
                     VkPhysicalDeviceMeshShaderFeaturesNV *data = (VkPhysicalDeviceMeshShaderFeaturesNV *)place;
                     void *pNext = data->pNext;
-                    *data = physicalDeviceData->physical_device_mesh_shader_features_;
+                    *data = physicalDeviceData->physical_device_mesh_shader_features_nv_;
                     data->pNext = pNext;
                 }
                 break;
@@ -9877,6 +9973,22 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     data->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_MESH_SHADER_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMeshShaderPropertiesEXT *data = (VkPhysicalDeviceMeshShaderPropertiesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_mesh_shader_properties_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_MESH_SHADER_EXTENSION_NAME)) {
+                    VkPhysicalDeviceMeshShaderFeaturesEXT *data = (VkPhysicalDeviceMeshShaderFeaturesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_mesh_shader_features_;
+                    data->pNext = pNext;
+                }
+                break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_YCBCR_2_PLANE_444_FORMATS_FEATURES_EXT:
                 if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
                     VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *data = (VkPhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT *)place;
@@ -10146,6 +10258,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE *data = (VkPhysicalDeviceDescriptorSetHostMappingFeaturesVALVE *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_descriptor_set_host_mapping_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLAMP_ZERO_ONE_FEATURES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_DEPTH_CLAMP_ZERO_ONE_EXTENSION_NAME)) {
+                    VkPhysicalDeviceDepthClampZeroOneFeaturesEXT *data = (VkPhysicalDeviceDepthClampZeroOneFeaturesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_depth_clamp_zero_one_features_;
                     data->pNext = pNext;
                 }
                 break;
@@ -11722,13 +11842,13 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_MESH_SHADER_EXTENSION_NAME)) {
-                    pdd.physical_device_mesh_shader_properties_.pNext = property_chain.pNext;
+                    pdd.physical_device_mesh_shader_properties_nv_.pNext = property_chain.pNext;
 
-                    property_chain.pNext = &(pdd.physical_device_mesh_shader_properties_);
+                    property_chain.pNext = &(pdd.physical_device_mesh_shader_properties_nv_);
 
-                    pdd.physical_device_mesh_shader_features_.pNext = feature_chain.pNext;
+                    pdd.physical_device_mesh_shader_features_nv_.pNext = feature_chain.pNext;
 
-                    feature_chain.pNext = &(pdd.physical_device_mesh_shader_features_);
+                    feature_chain.pNext = &(pdd.physical_device_mesh_shader_features_nv_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_NV_FRAGMENT_SHADER_BARYCENTRIC_EXTENSION_NAME)) {
@@ -12111,6 +12231,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_ray_tracing_motion_blur_features_);
                 }
 
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_MESH_SHADER_EXTENSION_NAME)) {
+                    pdd.physical_device_mesh_shader_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_mesh_shader_properties_);
+
+                    pdd.physical_device_mesh_shader_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_mesh_shader_features_);
+                }
+
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME)) {
                     pdd.physical_device_ycbcr_2_plane_444_formats_features_.pNext = feature_chain.pNext;
 
@@ -12311,6 +12441,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_descriptor_set_host_mapping_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_descriptor_set_host_mapping_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_DEPTH_CLAMP_ZERO_ONE_EXTENSION_NAME)) {
+                    pdd.physical_device_depth_clamp_zero_one_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_depth_clamp_zero_one_features_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_NON_SEAMLESS_CUBE_MAP_EXTENSION_NAME)) {
