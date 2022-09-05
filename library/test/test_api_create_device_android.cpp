@@ -280,6 +280,10 @@ TEST(library_api, vpCreateDevice) {
 TEST(library_api, vpGetPhysicalDeviceProfileSupport) {
     TestScaffold scaffold;
 
+    __android_log_print(ANDROID_LOG_INFO, appTag, "          Test Android log system INFO");
+    __android_log_print(ANDROID_LOG_DEBUG, appTag, "          Test Android log system DEBUG");
+    __android_log_print(ANDROID_LOG_ERROR, appTag, "          Test Android log system ERROR");
+
     if (IsShieldTv(scaffold.physicalDevice)) {
         __android_log_print(ANDROID_LOG_INFO, appTag, "          Shield TV is too old to support the Android profile, skipping test");
         return;
