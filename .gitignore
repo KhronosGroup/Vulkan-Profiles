@@ -35,5 +35,8 @@ helper.cmake
 Vulkan-Headers/
 Vulkan-Tools/
 Vulkan-ValidationLayers/
-
+profiles/test/data/VP_LUNARG_test_generated_name.json
+profiles/test/data/VP_LUNARG_test_api_generated.json
+profiles/test/data/VP_LUNARG_test_combine_intersect.json
+profiles/test/data/VP_LUNARG_test_combine_union.json
 
