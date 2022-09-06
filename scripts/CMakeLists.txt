@@ -121,4 +121,4 @@ add_custom_command(
 
  set_target_properties(VpCreateDesktopPortability2022 PROPERTIES FOLDER "Profiles generator")
 
- add_dependencies(VpCreateDesktopPortability2022 VpCreateDesktopBaseline2022)
+add_dependencies(VpCreateDesktopPortability2022 VpCreateDesktopBaseline2022)

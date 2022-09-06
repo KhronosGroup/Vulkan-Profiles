@@ -37,3 +37,5 @@ target_link_libraries(${TEST_NAME} PRIVATE gtest gtest_main)
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} --gtest_catch_exceptions=0)
 
 set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles schema")
+
+add_dependencies(VpProfile_test_schema_validation VpCreateDesktopBaseline2022 VpCreateDesktopPortability2022 VpCreateDesktopMax2022)
