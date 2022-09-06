@@ -23,8 +23,6 @@ set(LAYER_TEST_FILES
     tests
     tests_promoted
     tests_mechanism
-    #tests_generated
-    #tests_desktop_2022
     tests_combine_union
     tests_combine_intersection
     # Add new test files above this line
@@ -152,9 +150,10 @@ if (NOT ANDROID)
     foreach(test_item ${LAYER_TEST_FILES})
         LayerTest(${test_item})
     endforeach()
+
+    add_dependencies(VkLayer_tests_combine_intersection VpTestIntersect)
+    add_dependencies(VkLayer_tests_combine_union VpTestUnion)
 else()
     LayerTestAndroid("VulkanProfilesLayerTests")
 endif()
 
-add_dependencies(VkLayer_tests_combine_intersection VpTestIntersect)
-add_dependencies(VkLayer_tests_combine_union VpTestUnion)
