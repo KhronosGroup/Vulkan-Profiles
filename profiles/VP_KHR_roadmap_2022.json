@@ -50,7 +50,7 @@
                         "maxDescriptorSetStorageImages": 144,
                         "maxFragmentCombinedOutputResources": 16,
                         "maxComputeWorkGroupInvocations": 256,
-                        "maxComputeWorkGroupSize": [ 1024, 1024, 64 ],
+                        "maxComputeWorkGroupSize": [ 256, 256, 64 ],
                         "subTexelPrecisionBits": 8,
                         "mipmapPrecisionBits": 6,
                         "maxSamplerLodBias": 14,

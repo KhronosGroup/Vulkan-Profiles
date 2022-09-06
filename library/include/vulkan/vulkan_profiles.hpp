@@ -3255,8 +3255,8 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.lineWidthGranularity = 0.5f;
                     s->properties.limits.maxColorAttachments = 7;
                     s->properties.limits.maxComputeWorkGroupInvocations = 256;
-                    s->properties.limits.maxComputeWorkGroupSize[0] = 1024;
-                    s->properties.limits.maxComputeWorkGroupSize[1] = 1024;
+                    s->properties.limits.maxComputeWorkGroupSize[0] = 256;
+                    s->properties.limits.maxComputeWorkGroupSize[1] = 256;
                     s->properties.limits.maxComputeWorkGroupSize[2] = 64;
                     s->properties.limits.maxDescriptorSetSampledImages = 1800;
                     s->properties.limits.maxDescriptorSetSamplers = 576;
@@ -3334,8 +3334,8 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (isMultiple(0.5, s->properties.limits.lineWidthGranularity));
                     ret = ret && (s->properties.limits.maxColorAttachments >= 7);
                     ret = ret && (s->properties.limits.maxComputeWorkGroupInvocations >= 256);
-                    ret = ret && (s->properties.limits.maxComputeWorkGroupSize[0] >= 1024);
-                    ret = ret && (s->properties.limits.maxComputeWorkGroupSize[1] >= 1024);
+                    ret = ret && (s->properties.limits.maxComputeWorkGroupSize[0] >= 256);
+                    ret = ret && (s->properties.limits.maxComputeWorkGroupSize[1] >= 256);
                     ret = ret && (s->properties.limits.maxComputeWorkGroupSize[2] >= 64);
                     ret = ret && (s->properties.limits.maxDescriptorSetSampledImages >= 1800);
                     ret = ret && (s->properties.limits.maxDescriptorSetSamplers >= 576);
