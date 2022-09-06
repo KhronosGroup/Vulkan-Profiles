@@ -68,11 +68,6 @@ function(LayerTest NAME)
     set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles layer")
 endfunction(LayerTest)
 
-#add_dependencies(VkLayer_tests_merged_intersection VpMergeIntersect)
-#add_dependencies(VkLayer_tests_merged_union VpMergeUnion)
-#add_dependencies(VkLayer_tests_combine_intersection VpTestIntersect)
-#add_dependencies(VkLayer_tests_combine_union VpTestUnion)
-
 function(LayerTestAndroid NAME)
     set(ANDROID_APK_NAME ${NAME})
 
@@ -160,3 +155,6 @@ if (NOT ANDROID)
 else()
     LayerTestAndroid("VulkanProfilesLayerTests")
 endif()
+
+add_dependencies(VkLayer_tests_combine_intersection VpTestIntersect)
+add_dependencies(VkLayer_tests_combine_union VpTestUnion)
