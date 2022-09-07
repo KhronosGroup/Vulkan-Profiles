@@ -30,7 +30,7 @@ class ProfileMerger():
     def __init__(self, registry):
         self.registry = registry
 
-    def merge(self, jsons, profiles, profile_names, merged_path, merged_profile, profile_label, profile_description, profile_api_version, profile_stage, mode):
+    def merge(self, jsons, profiles, profile_names, merged_path, merged_profile, profile_label, profile_description, profile_api_version, profile_stage, profile_date, mode):
         self.mode = mode
 
         # Find the api version to use
@@ -45,7 +45,7 @@ class ProfileMerger():
         merged = dict()
         merged['$schema'] = 'https://schema.khronos.org/vulkan/profiles-0.8.0-' + self.api_version[2] + '.json#'
         merged['capabilities'] = self.merge_capabilities(jsons, profile_names, self.api_version)
-        merged['profiles'] = self.get_profiles(merged_profile, self.api_version, profile_label, profile_description, profile_stage)
+        merged['profiles'] = self.get_profiles(merged_profile, self.api_version, profile_label, profile_description, profile_stage, profile_date)
 
         # Wite new merged profile
         with open(merged_path, 'w') as file:
@@ -585,7 +585,7 @@ class ProfileMerger():
         minor = version[underscore+1:]
         return [major, minor]
 
-    def get_profiles(self, profile_name, api_version, label, description, stage):
+    def get_profiles(self, profile_name, api_version, label, description, date, stage):
         profiles = dict()
         profiles[profile_name] = dict()
         profiles[profile_name]['version'] = 1
@@ -598,9 +598,7 @@ class ProfileMerger():
         profiles[profile_name]['history'] = list()
         revision = dict()
         revision['revision'] = 1
-        # Get current time
-        now = datetime.now()
-        revision['date'] = str(now.year) + '-' + str(now.month).zfill(2) + '-' + str(now.day).zfill(2)
+        revision['date'] = date
         revision['author'] = 'LunarG Profiles Generation'
         revision['comment'] = description
         profiles[profile_name]['history'].append(revision)
@@ -662,6 +660,8 @@ if __name__ == '__main__':
                         help='Override the Label of the generated profile. If the argument is not set, the value is generated.')
     parser.add_argument('--profile_desc', action='store',
                         help='Override the Description of the generated profile. If the argument is not set, the value is generated.')
+    parser.add_argument('--profile_date', action='store',
+                        help='Override the release date of the generated profile. If the argument is not set, the value is generated.')
     parser.add_argument('--profile_api_version', action='store',
                         help='Override the Vulkan API version of the generated profile. If the argument is not set, the value is generated.')
     parser.add_argument('--profile_stage', action='store', choices=['ALPHA', 'BETA', 'STABLE'], default='STABLE',
@@ -748,5 +748,12 @@ if __name__ == '__main__':
     else:
         profile_stage = 'STABLE'
 
-    profile_merger.merge(jsons, profiles, profile_names, args.output_path, args.output_profile, args.profile_label, args.profile_desc, args.profile_api_version, profile_stage, args.mode)
+    if args.profile_date is not None:
+        profile_date = args.profile_date
+    else:
+        # Get current time
+        now = datetime.now()
+        profile_date = str(now.year) + '-' + str(now.month).zfill(2) + '-' + str(now.day).zfill(2)
+
+    profile_merger.merge(jsons, profiles, profile_names, args.output_path, args.output_profile, args.profile_label, args.profile_desc, args.profile_api_version, profile_stage, profile_date, args.mode)
     
