@@ -14,6 +14,6 @@ using valijson::ValidationResults;
 using valijson::Validator;
 using valijson::adapters::JsonCppAdapter;
 
-int main(int argc, char argv[]) { 
+int main(int argc, char* argv[]) { 
 	return 0; 
 }

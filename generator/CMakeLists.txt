@@ -15,5 +15,7 @@ set(FILES_ALL ${FILES_SOURCE} ${FILES_HEADER} ${FILES_DOCS} ${jsoncpp_generated_
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 add_executable(vp-generator ${FILES_ALL})
+target_include_directories(vp-generator PRIVATE ../external/)
+target_include_directories(vp-generator PRIVATE ../external/generated-jsoncpp)
 
 set_target_properties(vp-generator PROPERTIES FOLDER "Profiles generator")
