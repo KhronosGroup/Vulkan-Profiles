@@ -20,3 +20,5 @@ target_include_directories(vp-generator PRIVATE ../external/)
 target_include_directories(vp-generator PRIVATE ../external/generated-jsoncpp)
 
 set_target_properties(vp-generator PROPERTIES FOLDER "Profiles generator")
+add_custom_command(TARGET vp-generator POST_BUILD
+    COMMAND vp-generator --registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml)
