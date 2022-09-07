@@ -9,7 +9,6 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment ve
 set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION_MAXIMUM FALSE) # Workaround to fix C.I. build on VS2015
 
 project(VULKAN_PROFILES)
-set(VULKAN_TAG v1.3.204)
 
 # Define GNU standard installation directories.
 include(GNUInstallDirs)
@@ -72,6 +71,13 @@ if(REGENERATE_JSONCPP)
         GIT_TAG 1.9.4
     )
 endif()
+
+FetchContent_Declare(
+    tinyxml2
+    GIT_REPOSITORY https://github.com/leethomason/tinyxml2.git
+    GIT_TAG 9.0.0
+)
+FetchContent_MakeAvailable(tinyxml2)
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_OBJECT_LIBS OFF CACHE BOOL "" FORCE)
@@ -218,10 +224,13 @@ if(FATAL_WARNINGS)
 endif()
 
 include_directories(external)
+include_directories(external/generated-jsoncpp)
 
 set(API_NAME "Vulkan" CACHE STRING "API name to use when building")
 string(TOLOWER ${API_NAME} API_LOWERCASE)
 add_definitions(-DAPI_NAME="${API_NAME}")
+
+add_subdirectory(generator)
 
 # The scripts directory regenerates the Profiles source and headers.
 if(REGENERATE_PROFILES)
@@ -267,4 +276,3 @@ if(PROFILES_BUILD_TESTS)
     add_subdirectory(profiles/test)
 endif()
 
-include_directories(external)
