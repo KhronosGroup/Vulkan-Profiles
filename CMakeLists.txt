@@ -229,7 +229,9 @@ set(API_NAME "Vulkan" CACHE STRING "API name to use when building")
 string(TOLOWER ${API_NAME} API_LOWERCASE)
 add_definitions(-DAPI_NAME="${API_NAME}")
 
-add_subdirectory(generator)
+if (NOT ANDROID)
+    add_subdirectory(generator)
+endif()
 
 # The scripts directory regenerates the Profiles source and headers.
 if(REGENERATE_PROFILES)
