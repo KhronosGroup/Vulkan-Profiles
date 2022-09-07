@@ -8,6 +8,8 @@
 #include <valijson/validation_results.hpp>
 #include <valijson/validator.hpp>
 
+#include <tinyxml2.h>
+
 using valijson::Schema;
 using valijson::SchemaParser;
 using valijson::ValidationResults;
@@ -15,5 +17,5 @@ using valijson::Validator;
 using valijson::adapters::JsonCppAdapter;
 
 int main(int argc, char* argv[]) { 
-	return 0; 
+	return 0;
 }
