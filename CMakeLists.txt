@@ -224,7 +224,6 @@ if(FATAL_WARNINGS)
 endif()
 
 include_directories(external)
-include_directories(external/generated-jsoncpp)
 
 set(API_NAME "Vulkan" CACHE STRING "API name to use when building")
 string(TOLOWER ${API_NAME} API_LOWERCASE)
