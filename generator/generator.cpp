@@ -16,6 +16,9 @@ using valijson::ValidationResults;
 using valijson::Validator;
 using valijson::adapters::JsonCppAdapter;
 
-int main(int argc, char* argv[]) { 
+int main(int argc, char* argv[]) {
+    tinyxml2::XMLDocument doc;
+    //doc.LoadFile();
+
 	return 0;
 }
