@@ -71,7 +71,7 @@ function(LayerTest NAME)
     endif()
 
     set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "${run_environment}")
-    set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles layer")
+    set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles layer/Tests")
 endfunction(LayerTest)
 
 function(LayerTestAndroid NAME)
@@ -151,7 +151,7 @@ function(LayerTestAndroid NAME)
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
     set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "${run_environment}")
-    set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles layer")
+    set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles layer/Tests")
 endfunction(LayerTestAndroid)
 
 if (NOT ANDROID)
