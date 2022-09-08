@@ -585,7 +585,7 @@ class ProfileMerger():
         minor = version[underscore+1:]
         return [major, minor]
 
-    def get_profiles(self, profile_name, api_version, label, description, date, stage):
+    def get_profiles(self, profile_name, api_version, label, description, stage, date):
         profiles = dict()
         profiles[profile_name] = dict()
         profiles[profile_name]['version'] = 1
