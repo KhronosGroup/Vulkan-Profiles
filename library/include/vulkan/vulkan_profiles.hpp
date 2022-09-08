@@ -478,7 +478,6 @@ static const VpPropertyDesc propertyDesc = {
                     s->properties.limits.framebufferDepthSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT);
                     s->properties.limits.framebufferNoAttachmentsSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT);
                     s->properties.limits.framebufferStencilSampleCounts |= (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT);
-                    s->properties.limits.lineWidthGranularity = 1;
                     s->properties.limits.maxBoundDescriptorSets = 4;
                     s->properties.limits.maxColorAttachments = 4;
                     s->properties.limits.maxComputeSharedMemorySize = 16384;
@@ -571,8 +570,6 @@ static const VpPropertyDesc propertyDesc = {
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferDepthSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferNoAttachmentsSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
                     ret = ret && (vpCheckFlags(s->properties.limits.framebufferStencilSampleCounts, (VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT)));
-                    ret = ret && (s->properties.limits.lineWidthGranularity <= 1);
-                    ret = ret && (isMultiple(1, s->properties.limits.lineWidthGranularity));
                     ret = ret && (s->properties.limits.maxBoundDescriptorSets >= 4);
                     ret = ret && (s->properties.limits.maxColorAttachments >= 4);
                     ret = ret && (s->properties.limits.maxComputeSharedMemorySize >= 16384);
