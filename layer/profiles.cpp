@@ -2541,6 +2541,9 @@ class PhysicalDeviceData {
     VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT physical_device_shader_module_identifier_properties_;
     VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT physical_device_shader_module_identifier_features_;
 
+    // VK_EXT_legacy_dithering structs
+    VkPhysicalDeviceLegacyDitheringFeaturesEXT physical_device_legacy_dithering_features_;
+
     // VK_QCOM_tile_properties structs
     VkPhysicalDeviceTilePropertiesFeaturesQCOM physical_device_tile_properties_features_;
 
@@ -3037,6 +3040,9 @@ class PhysicalDeviceData {
         physical_device_shader_module_identifier_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_MODULE_IDENTIFIER_PROPERTIES_EXT};
         physical_device_shader_module_identifier_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_MODULE_IDENTIFIER_FEATURES_EXT};
 
+        // VK_EXT_legacy_dithering structs
+        physical_device_legacy_dithering_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LEGACY_DITHERING_FEATURES_EXT};
+
         // VK_QCOM_tile_properties structs
         physical_device_tile_properties_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TILE_PROPERTIES_FEATURES_QCOM};
 
@@ -3330,6 +3336,7 @@ class JsonLoader {
     bool GetStruct(const Json::Value &parent, VkPhysicalDeviceSubpassMergeFeedbackFeaturesEXT *dest);
     bool GetStruct(const Json::Value &parent, VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT *dest);
     bool GetStruct(const Json::Value &parent, VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT *dest);
+    bool GetStruct(const Json::Value &parent, VkPhysicalDeviceLegacyDitheringFeaturesEXT *dest);
     bool GetStruct(const Json::Value &parent, VkPhysicalDeviceTilePropertiesFeaturesQCOM *dest);
     bool GetStruct(const Json::Value &parent, VkPhysicalDeviceAmigoProfilingFeaturesSEC *dest);
     bool GetStruct(const Json::Value &parent, VkPhysicalDeviceFeatures *dest);
@@ -4630,6 +4637,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_EXT_PRIMITIVES_GENERATED_QUERY_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetStruct(feature, &pdd_->physical_device_primitives_generated_query_features_);
+    } else if (name == "VkPhysicalDeviceLegacyDitheringFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_LEGACY_DITHERING_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetStruct(feature, &pdd_->physical_device_legacy_dithering_features_);
     } else if (name == "VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT") {
         auto support = CheckExtensionSupport(VK_EXT_MULTISAMPLED_RENDER_TO_SINGLE_SAMPLED_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
@@ -8452,6 +8463,16 @@ bool JsonLoader::GetStruct(const Json::Value &parent, VkPhysicalDeviceShaderModu
     return valid;
 }
 
+bool JsonLoader::GetStruct(const Json::Value &parent, VkPhysicalDeviceLegacyDitheringFeaturesEXT *dest) {
+    (void)dest;
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetStruct(VkPhysicalDeviceLegacyDitheringFeaturesEXT)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, legacyDithering, false, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
 bool JsonLoader::GetStruct(const Json::Value &parent, VkPhysicalDeviceTilePropertiesFeaturesQCOM *dest) {
     (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetStruct(VkPhysicalDeviceTilePropertiesFeaturesQCOM)\n");
@@ -10591,6 +10612,14 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT *data = (VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT *)place;
                     void *pNext = data->pNext;
                     *data = physicalDeviceData->physical_device_shader_module_identifier_features_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LEGACY_DITHERING_FEATURES_EXT:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_EXT_LEGACY_DITHERING_EXTENSION_NAME)) {
+                    VkPhysicalDeviceLegacyDitheringFeaturesEXT *data = (VkPhysicalDeviceLegacyDitheringFeaturesEXT *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_legacy_dithering_features_;
                     data->pNext = pNext;
                 }
                 break;
@@ -12746,6 +12775,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_shader_module_identifier_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_shader_module_identifier_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_LEGACY_DITHERING_EXTENSION_NAME)) {
+                    pdd.physical_device_legacy_dithering_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_legacy_dithering_features_);
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_QCOM_TILE_PROPERTIES_EXTENSION_NAME)) {
