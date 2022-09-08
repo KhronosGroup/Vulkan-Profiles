@@ -2026,7 +2026,7 @@
     "profiles": {
         "VP_LUNARG_desktop_portability_2022": {
             "version": 1,
-            "status": "2022-08-26",
+            "status": "BETA",
             "api-version": "1.1.208",
             "label": "LunarG Vulkan Desktop Portability 2022 profile",
             "description": "A variant of VP_LUNARG_desktop_baseline_2022 that includes portability extensions to work on macOS devices.",
@@ -2034,7 +2034,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "BETA",
+                    "date": "2022-08-26",
                     "author": "LunarG Profiles Generation",
                     "comment": "A variant of VP_LUNARG_desktop_baseline_2022 that includes portability extensions to work on macOS devices."
                 }
