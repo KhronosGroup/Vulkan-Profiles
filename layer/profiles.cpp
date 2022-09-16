@@ -4112,6 +4112,7 @@ bool JsonLoader::WarnDuplicatedFeature(const Json::Value &parent) {
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures", "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR", "VkPhysicalDeviceVulkan13Features"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceImageRobustnessFeatures", "VkPhysicalDeviceImageRobustnessFeaturesEXT", "VkPhysicalDeviceVulkan13Features"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceShaderTerminateInvocationFeatures", "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR", "VkPhysicalDeviceVulkan13Features"});
+    valid &= WarnDuplicated(parent, {"VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT", "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceSynchronization2Features", "VkPhysicalDeviceSynchronization2FeaturesKHR", "VkPhysicalDeviceVulkan13Features"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceShaderIntegerDotProductFeatures", "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR", "VkPhysicalDeviceVulkan13Features"});
     valid &= WarnDuplicated(parent, {"VkPhysicalDeviceFragmentShaderBarycentricFeaturesKHR", "VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV"});
@@ -4608,6 +4609,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         return GetStruct(feature, &pdd_->physical_device_image_2_dview_of_3_dfeatures_);
     } else if (name == "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE") {
         auto support = CheckExtensionSupport(VK_VALVE_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetStruct(feature, &pdd_->physical_device_mutable_descriptor_type_features_);
+    } else if (name == "VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT") {
+        auto support = CheckExtensionSupport(VK_EXT_MUTABLE_DESCRIPTOR_TYPE_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetStruct(feature, &pdd_->physical_device_mutable_descriptor_type_features_);
     } else if (name == "VkPhysicalDeviceDepthClipControlFeaturesEXT") {

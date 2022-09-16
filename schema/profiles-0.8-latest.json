@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.3.227",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.228",
     "additionalProperties": true,
     "required": [
         "capabilities",
@@ -1025,7 +1025,7 @@
                 }
             }
         },
-        "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE": {
+        "VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -5071,6 +5071,9 @@
                             "VK_EXT_multisampled_render_to_single_sampled": {
                                 "type": "integer"
                             },
+                            "VK_EXT_mutable_descriptor_type": {
+                                "type": "integer"
+                            },
                             "VK_EXT_non_seamless_cube_map": {
                                 "type": "integer"
                             },
@@ -5960,8 +5963,11 @@
                             "VkPhysicalDeviceMultiviewFeaturesKHR": {
                                 "$ref": "#/definitions/VkPhysicalDeviceMultiviewFeatures"
                             },
+                            "VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT"
+                            },
                             "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE": {
-                                "$ref": "#/definitions/VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE"
+                                "$ref": "#/definitions/VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT"
                             },
                             "VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT"
