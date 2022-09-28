@@ -648,23 +648,23 @@ if __name__ == '__main__':
 
     parser.add_argument('--registry', '-r', action='store', required=True,
                         help='Use specified registry file instead of vk.xml.')
-    parser.add_argument('--input_dir', '-i', action='store', required=True,
+    parser.add_argument('--input-dir', '-i', action='store', required=True,
                         help='Path to directory with profiles.')
-    parser.add_argument('--input_profiles', action='store',
+    parser.add_argument('--input-profiles', action='store',
                         help='Comma separated list of profiles.')
-    parser.add_argument('--output_path', '-o', action='store', required=True,
+    parser.add_argument('--output-path', '-o', action='store', required=True,
                         help='Path to output profile.')
-    parser.add_argument('--output_profile', action='store',
+    parser.add_argument('--output-profile', action='store',
                         help='Profile name of the output profile. If the argument is not set, the value is generated.')
-    parser.add_argument('--profile_label', action='store',
+    parser.add_argument('--profile-label', action='store',
                         help='Override the Label of the generated profile. If the argument is not set, the value is generated.')
-    parser.add_argument('--profile_desc', action='store',
+    parser.add_argument('--profile-desc', action='store',
                         help='Override the Description of the generated profile. If the argument is not set, the value is generated.')
-    parser.add_argument('--profile_date', action='store',
+    parser.add_argument('--profile-date', action='store',
                         help='Override the release date of the generated profile. If the argument is not set, the value is generated.')
-    parser.add_argument('--profile_api_version', action='store',
+    parser.add_argument('--profile-api-version', action='store',
                         help='Override the Vulkan API version of the generated profile. If the argument is not set, the value is generated.')
-    parser.add_argument('--profile_stage', action='store', choices=['ALPHA', 'BETA', 'STABLE'], default='STABLE',
+    parser.add_argument('--profile-stage', action='store', choices=['ALPHA', 'BETA', 'STABLE'], default='STABLE',
                         help='Override the development stage of the generated profile. If the argument is not set, the value is set to "stable".')
     parser.add_argument('--mode', '-m', action='store', choices=['union', 'intersection'], default='intersection',
                         help='Mode of profile combination. If the argument is not set, the value is set to "intersection".')
