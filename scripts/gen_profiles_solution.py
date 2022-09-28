@@ -2472,7 +2472,7 @@ class VulkanProfile():
                         isEnum = isinstance(value[0], str)
                         if isEnum:
                             # For enums we only add bits
-                            genAssign = '{0}{1} |= '.format(var, member)
+                            genAssign = '{0}{1} = '.format(var, member)
                         else:
                             genAssign = '{0}{1} = '.format(var, member)
                         genAssign += '{0}'.format(self.gen_listValue(value, isEnum))
