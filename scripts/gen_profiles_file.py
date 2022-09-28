@@ -648,7 +648,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--registry', '-r', action='store', required=True,
                         help='Use specified registry file instead of vk.xml.')
-    parser.add_argument('--input-dir', '-i', action='store', required=True,
+    parser.add_argument('--input', '-i', action='store', required=True,
                         help='Path to directory with profiles.')
     parser.add_argument('--input-profiles', action='store',
                         help='Comma separated list of profiles.')
@@ -674,7 +674,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.registry is None:
-        gen_profiles_solution.Log.e('Merging the profiles requires specifying -registry')
+        gen_profiles_solution.Log.e('Merging the profiles requires specifying --registry')
         parser.print_help()
         exit()
 
@@ -702,10 +702,10 @@ if __name__ == '__main__':
     # Open file and load json
     jsons = list()
     profiles = list()
-    if args.input_dir is not None:
+    if args.input is not None:
         profiles_not_found = profile_names.copy()
         # Find all jsons in the folder
-        paths = [args.input_dir + '/' + pos_json for pos_json in os.listdir(args.input_dir) if pos_json.endswith('.json')]
+        paths = [args.input + '/' + pos_json for pos_json in os.listdir(args.input) if pos_json.endswith('.json')]
         json_files = list()
         for i in range(len(paths)):
             print('Opening: ' + paths[i])
@@ -722,7 +722,7 @@ if __name__ == '__main__':
                         profiles_not_found.remove(profile_name)
                         break
             if profiles_not_found:
-                print('Profiles: ' + ' '.join(profiles_not_found) + ' not found in directory ' + args.input_dir)
+                print('Profiles: ' + ' '.join(profiles_not_found) + ' not found in directory ' + args.input)
                 exit()
         else:
             for json_file in json_files:
@@ -732,7 +732,7 @@ if __name__ == '__main__':
                         profiles.append(json_file['profiles'][profile])
                         profile_names.append(profile)
     else:
-        print('ERROR: Not input directory set, use -input_dir')
+        print('ERROR: Not input directory set, use --input')
         exit()
 
     registry = gen_profiles_solution.VulkanRegistry(args.registry)
