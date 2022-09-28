@@ -2460,7 +2460,13 @@ class VulkanProfile():
                                   "(currently only 1D non-dynamic arrays are supported in this context)")
                         # If it's an array we have to generate per-element assignment code
                         for i, v in enumerate(value):
-                            gen += fmt.format('{0}{1}[{2}] = {3}'.format(var, member, i, v))
+                            if type(v) == float:
+                                if structDef.members[member].type == 'double':
+                                    gen += fmt.format('{0}{1}[{2}] = {3}'.format(var, member, i, v))
+                                else:
+                                    gen += fmt.format('{0}{1}[{2}] = {3}f'.format(var, member, i, v))
+                            else:
+                                gen += fmt.format('{0}{1}[{2}] = {3}'.format(var, member, i, v))
                     else:
                         # For enums and struct initialization, most of the code can be shared
                         isEnum = isinstance(value[0], str)
@@ -2472,7 +2478,10 @@ class VulkanProfile():
                         genAssign += '{0}'.format(self.gen_listValue(value, isEnum))
                         gen += fmt.format(genAssign)
                 elif type(value) == float:
-                    gen += fmt.format('{0}{1} = {2}f'.format(var, member, value))
+                    if structDef.members[member].type == 'double':
+                        gen += fmt.format('{0}{1} = {2}'.format(var, member, value))
+                    else:
+                        gen += fmt.format('{0}{1} = {2}f'.format(var, member, value))
                 elif type(value) == bool:
                     # Boolean
                     gen += fmt.format('{0}{1} = {2}'.format(var, member, 'VK_TRUE' if value else 'VK_FALSE'))
