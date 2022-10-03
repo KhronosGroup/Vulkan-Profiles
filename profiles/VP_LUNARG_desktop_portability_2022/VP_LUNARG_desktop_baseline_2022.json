@@ -283,10 +283,10 @@
                         "minTexelBufferOffsetAlignment": 256,
                         "minTexelGatherOffset": -8,
                         "minTexelOffset": -8,
-                        "minUniformBufferOffsetAlignment": "256",
+                        "minUniformBufferOffsetAlignment": 256,
                         "mipmapPrecisionBits": 4,
-                        "nonCoherentAtomSize": "256",
-                        "optimalBufferCopyOffsetAlignment": "256",
+                        "nonCoherentAtomSize": 256,
+                        "optimalBufferCopyOffsetAlignment": 256,
                         "optimalBufferCopyRowPitchAlignment": 128,
                         "pointSizeGranularity": 1,
                         "sampledImageColorSampleCounts": [
