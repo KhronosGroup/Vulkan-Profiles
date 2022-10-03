@@ -489,7 +489,7 @@ class ProfileMerger():
                         merged[member][1] = entry[member][1]
                 elif xmlmember.type == 'uint64_t' or xmlmember.type == 'VkDeviceSize':
                     if int(entry[member]) < int(merged[member]):
-                        merged[member] = entry[member]
+                        merged[member] = int(entry[member])
                 elif xmlmember.type == 'uint32_t' or xmlmember.type == 'int32_t'  or xmlmember.type == 'size_t' or xmlmember.type == 'float' or 'VkSampleCountFlagBits':
                     if entry[member] < merged[member]:
                         merged[member] = entry[member]
@@ -515,7 +515,7 @@ class ProfileMerger():
                         merged[member][1] = entry[member][1]
                 elif xmlmember.type == 'uint64_t' or xmlmember.type == 'VkDeviceSize':
                     if int(entry[member]) > int(merged[member]):
-                        merged[member] = entry[member]
+                        merged[member] = int(entry[member])
                 elif xmlmember.type == 'uint32_t' or xmlmember.type == 'int32_t' or xmlmember.type == 'size_t' or xmlmember.type == 'float' or 'VkSampleCountFlagBits':
                     if entry[member] > merged[member]:
                         merged[member] = entry[member]
@@ -600,7 +600,7 @@ class ProfileMerger():
         revision['revision'] = 1
         revision['date'] = date
         revision['author'] = 'LunarG Profiles Generation'
-        revision['comment'] = description
+        revision['comment'] = 'Generated profile'
         profiles[profile_name]['history'].append(revision)
         profiles[profile_name]['capabilities'] = list()
         profiles[profile_name]['capabilities'].append('baseline')

@@ -189,7 +189,7 @@
                     "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4
                 },
                 "VkPhysicalDeviceMaintenance3PropertiesKHR": {
-                    "maxMemoryAllocationSize": "2147483648",
+                    "maxMemoryAllocationSize": 2147483648,
                     "maxPerSetDescriptors": 700
                 },
                 "VkPhysicalDeviceMultiviewPropertiesKHR": {
@@ -202,7 +202,7 @@
                 "VkPhysicalDeviceProperties": {
                     "sparseProperties": {},
                     "limits": {
-                        "bufferImageGranularity": "65536",
+                        "bufferImageGranularity": 65536,
                         "discreteQueuePriorities": 2,
                         "framebufferColorSampleCounts": [
                             "VK_SAMPLE_COUNT_1_BIT",
@@ -294,15 +294,15 @@
                         "maxViewports": 16,
                         "minInterpolationOffset": -0.5,
                         "minMemoryMapAlignment": 4096,
-                        "minStorageBufferOffsetAlignment": "64",
-                        "minTexelBufferOffsetAlignment": "256",
+                        "minStorageBufferOffsetAlignment": 64,
+                        "minTexelBufferOffsetAlignment": 256,
                         "minTexelGatherOffset": -8,
                         "minTexelOffset": -8,
                         "minUniformBufferOffsetAlignment": "256",
                         "mipmapPrecisionBits": 4,
                         "nonCoherentAtomSize": "256",
                         "optimalBufferCopyOffsetAlignment": "256",
-                        "optimalBufferCopyRowPitchAlignment": "128",
+                        "optimalBufferCopyRowPitchAlignment": 128,
                         "pointSizeGranularity": 1,
                         "sampledImageColorSampleCounts": [
                             "VK_SAMPLE_COUNT_1_BIT",
@@ -357,8 +357,8 @@
                     }
                 },
                 "VkPhysicalDeviceRobustness2PropertiesEXT": {
-                    "robustStorageBufferAccessSizeAlignment": "4",
-                    "robustUniformBufferAccessSizeAlignment": "256"
+                    "robustStorageBufferAccessSizeAlignment": 4,
+                    "robustUniformBufferAccessSizeAlignment": 256
                 },
                 "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT": {
                     "maxComputeWorkgroupSubgroups": 16,
@@ -367,11 +367,11 @@
                     "requiredSubgroupSizeStages": []
                 },
                 "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT": {
-                    "storageTexelBufferOffsetAlignmentBytes": "256",
-                    "uniformTexelBufferOffsetAlignmentBytes": "256"
+                    "storageTexelBufferOffsetAlignmentBytes": 256,
+                    "uniformTexelBufferOffsetAlignmentBytes": 256
                 },
                 "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
-                    "maxTimelineSemaphoreValueDifference": "2147483647"
+                    "maxTimelineSemaphoreValueDifference": 2147483647
                 },
                 "VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT": {
                     "maxVertexAttribDivisor": 268435455
@@ -2036,7 +2036,7 @@
                     "revision": 1,
                     "date": "2022-08-26",
                     "author": "LunarG Profiles Generation",
-                    "comment": "A variant of VP_LUNARG_desktop_baseline_2022 that includes portability extensions to work on macOS devices."
+                    "comment": "Generated profile"
                 }
             ],
             "capabilities": [
