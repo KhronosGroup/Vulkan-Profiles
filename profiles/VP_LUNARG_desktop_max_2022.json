@@ -399,7 +399,7 @@
                         "minTexelOffset": -8,
                         "minUniformBufferOffsetAlignment": 64,
                         "mipmapPrecisionBits": 8,
-                        "nonCoherentAtomSize": "128",
+                        "nonCoherentAtomSize": 128,
                         "optimalBufferCopyOffsetAlignment": 128,
                         "optimalBufferCopyRowPitchAlignment": 128,
                         "pointSizeGranularity": 0.125,
@@ -487,7 +487,7 @@
                     "maxMultiviewViewCount": 6,
                     "maxMultiviewInstanceIndex": 134217727,
                     "maxPerSetDescriptors": 1024,
-                    "maxMemoryAllocationSize": "2147483648"
+                    "maxMemoryAllocationSize": 2147483648
                 },
                 "VkPhysicalDeviceVulkan12Properties": {
                     "shaderSignedZeroInfNanPreserveFloat16": true,

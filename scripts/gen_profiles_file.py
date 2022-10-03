@@ -393,7 +393,10 @@ class ProfileMerger():
                                 self.merge_members(merged[member], smember, entry[member], s[smember])
                         #elif self.mode == 'union' and smember in entry[member]:
                         elif smember in entry[member]:
-                            merged[member][smember] = entry[member][smember]
+                            if xmlmember.type == 'uint64_t' or xmlmember.type == 'VkDeviceSize':
+                                merged[member][smember] = int(entry[member][smember])
+                            else:
+                                merged[member][smember] = entry[member][smember]
                 else:
                     self.merge_members(merged, member, entry, xmlmember)
 
