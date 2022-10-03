@@ -378,7 +378,10 @@ class ProfileMerger():
                 if xmlmember.limittype == 'noauto':
                     continue
                 elif self.mode == 'union' or self.first is True:
-                    merged[member] = entry[member]
+                    if xmlmember.type == 'uint64_t' or xmlmember.type == 'VkDeviceSize':
+                        merged[member] = int(entry[member])
+                    else:
+                        merged[member] = entry[member]
             else:
                 # Merge properties
                 xmlmember = self.registry.structs[property].members[member]
@@ -490,6 +493,8 @@ class ProfileMerger():
                 elif xmlmember.type == 'uint64_t' or xmlmember.type == 'VkDeviceSize':
                     if int(entry[member]) < int(merged[member]):
                         merged[member] = int(entry[member])
+                    else:
+                        merged[member] = int(merged[member])
                 elif xmlmember.type == 'uint32_t' or xmlmember.type == 'int32_t'  or xmlmember.type == 'size_t' or xmlmember.type == 'float' or 'VkSampleCountFlagBits':
                     if entry[member] < merged[member]:
                         merged[member] = entry[member]
@@ -516,6 +521,8 @@ class ProfileMerger():
                 elif xmlmember.type == 'uint64_t' or xmlmember.type == 'VkDeviceSize':
                     if int(entry[member]) > int(merged[member]):
                         merged[member] = int(entry[member])
+                    else:
+                        merged[member] = int(merged[member])
                 elif xmlmember.type == 'uint32_t' or xmlmember.type == 'int32_t' or xmlmember.type == 'size_t' or xmlmember.type == 'float' or 'VkSampleCountFlagBits':
                     if entry[member] > merged[member]:
                         merged[member] = entry[member]
