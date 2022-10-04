@@ -188,7 +188,7 @@
                             "description": "Indicates whether this implementation supports constant alpha Blend Factors used as source or destination color Blending.",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -205,7 +205,7 @@
                             "description": "Indicates whether this implementation supports synchronization using Events",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -222,7 +222,7 @@
                             "description": "Indicates whether this implementation supports a VkImageView being created with a texel format containing a different number of components, or a different number of bits in each component, than the texel format of the underlying VkImage.",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -239,7 +239,7 @@
                             "description": "Indicates whether this implementation supports remapping format components using VkImageViewCreateInfo::components.",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -256,7 +256,7 @@
                             "description": "Indicates whether this implementation supports a VkImage being created with the VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT flag set, permitting a 2D or 2D array image view to be created on a 3D VkImage.",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -273,7 +273,7 @@
                             "description": "Indicates whether this implementation supports a VkImage being created as a 2D array with multiple samples per texel.",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -290,7 +290,7 @@
                             "description": "Indicates whether this implementation allows descriptors with comparison samplers to be updated.",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -307,7 +307,7 @@
                             "description": "Indicates whether this implementation supports Rasterization using a point Polygon Mode.",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -324,7 +324,7 @@
                             "description": "Indicates whether this implementation supports setting a mipmap LOD bias value when creating a sampler.",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -341,7 +341,7 @@
                             "description": "Indicates whether this implementation supports separate front and back Stencil Test reference values.",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -358,7 +358,7 @@
                             "description": "Indicates whether this implementation supports fragment shaders which use the InterpolationFunction capability.",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -375,7 +375,7 @@
                             "description": "Indicates whether this implementation supports isoline output from the Tessellation stage of a graphics pipeline. This member is only meaningful if tessellationShader are supported.",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -392,7 +392,7 @@
                             "description": "Indicates whether this implementation supports Triangle Fans primitive topology.",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -409,7 +409,7 @@
                             "description": "Indicates whether this implementation supports accessing a vertex input attribute beyond the stride of the corresponding vertex input binding.",
                             "type": "BOOL",
                             "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "platforms": [ "WINDOWS", "LINUX" ],
                             "dependence": {
                                 "mode": "ALL",
                                 "settings": [
@@ -418,24 +418,26 @@
                                         "value": true
                                     }
                                 ]
-                            }
-                        },
-                        {
-                            "key": "minVertexInputBindingStrideAlignment",
-                            "label": "minVertexInputBindingStrideAlignment",
-                            "description": "Indicates whether this implementation supports accessing a vertex input attribute beyond the stride of the corresponding vertex input binding.",
-                            "type": "INT",
-                            "default": 4,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                            "dependence": {
-                                "mode": "ALL",
-                                "settings": [
-                                    {
-                                        "key": "emulate_portability",
-                                        "value": true
+                            },
+                            "settings": [
+                                {
+                                    "key": "minVertexInputBindingStrideAlignment",
+                                    "label": "minVertexInputBindingStrideAlignment",
+                                    "description": "Indicates whether this implementation supports accessing a vertex input attribute beyond the stride of the corresponding vertex input binding.",
+                                    "type": "INT",
+                                    "default": 4,
+                                    "platforms": [ "WINDOWS", "LINUX" ],
+                                    "dependence": {
+                                        "mode": "ALL",
+                                        "settings": [
+                                            {
+                                                "key": "vertexAttributeAccessBeyondStride",
+                                                "value": false
+                                            }
+                                        ]
                                     }
-                                ]
-                            }
+                                }
+                            ]
                         }
                     ]
                 },
