@@ -13,9 +13,16 @@
 
 ## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/LunarG/VulkanProfiles/tree/master) - October 2022
 
+### Features:
+- Add layer settings to override portability subset. #295
+
 ### Improvements:
 - Improve message reports for unsupported capabilities by the device.
 - Improve message reports for unmodifiable Vulkan capabilities.
+
+### Bugfixes:
+- Fix handling of 64 bits properties by the merge tool. #294
+- Fix float build warnings. #291
 
 ## [Vulkan Profiles Toolset 1.3.224](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.224.0) - August 2022
 
