@@ -22,27 +22,59 @@
         "features": {
             "presets": [
                 {
-                    "label": "LunarG Desktop Portability",
+                    "label": "LunarG Desktop Portability 2022",
                     "description": "Check the Vulkan 1.1 application will run on Windows, Linux and macOS platforms without exceeding ecosystem effective devices capabilities",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "status": "STABLE",
                     "settings": [
                         {
-                            "key": "emulate_portability",
-                            "value": true
-                        },
-                        {
                             "key": "profile_file",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2022.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2022.json"
                         },
                         {
                             "key": "simulate_capabilities",
                             "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
+                        },
+                        {
+                            "key": "emulate_portability",
+                            "value": true
+                        },
+                        {
+                            "key": "vertexAttributeAccessBeyondStride",
+                            "value": true
+                        },
+                        {
+                            "key": "separateStencilMaskRef",
+                            "value": true
+                        },
+                        {
+                            "key": "mutableComparisonSamplers",
+                            "value": true
+                        },
+                        {
+                            "key": "multisampleArrayImage",
+                            "value": true
+                        },
+                        {
+                            "key": "imageViewFormatSwizzle",
+                            "value": true
+                        },
+                        {
+                            "key": "imageViewFormatReinterpretation",
+                            "value": true
+                        },
+                        {
+                            "key": "events",
+                            "value": true
+                        },
+                        {
+                            "key": "constantAlphaColorBlendFactors",
+                            "value": true
                         }
                     ]
                 },
                 {
-                    "label": "LunarG Desktop Baseline",
+                    "label": "LunarG Desktop Baseline 2022",
                     "description": "Check the Vulkan 1.1 application will run on Windows and Linux platforms without exceeding ecosystem effective devices capabilities",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "status": "STABLE",
@@ -62,7 +94,7 @@
                     ]
                 },
                 {
-                    "label": "Khronos Roadmap",
+                    "label": "Khronos Roadmap 2022",
                     "description": "Check the Vulkan 1.3 application will run on the Khronos Roadmap 2022 Profile devices",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "status": "STABLE",
@@ -82,7 +114,7 @@
                     ]
                 },
                 {
-                    "label": "Android Baseline",
+                    "label": "Android Baseline 2021",
                     "description": "Check the Vulkan 1.0 application will run on the Android Baseline 2022 Profile devices",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "status": "STABLE",
@@ -148,7 +180,264 @@
                         "LINUX"
                     ],
                     "type": "BOOL",
-                    "default": true
+                    "default": true,
+                    "settings": [
+                        {
+                            "key": "constantAlphaColorBlendFactors",
+                            "label": "constantAlphaColorBlendFactors",
+                            "description": "Indicates whether this implementation supports constant alpha Blend Factors used as source or destination color Blending.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "events",
+                            "label": "events",
+                            "description": "Indicates whether this implementation supports synchronization using Events",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "imageViewFormatReinterpretation",
+                            "label": "imageViewFormatReinterpretation",
+                            "description": "Indicates whether this implementation supports a VkImageView being created with a texel format containing a different number of components, or a different number of bits in each component, than the texel format of the underlying VkImage.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "imageViewFormatSwizzle",
+                            "label": "imageViewFormatSwizzle",
+                            "description": "Indicates whether this implementation supports remapping format components using VkImageViewCreateInfo::components.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "imageView2DOn3DImage",
+                            "label": "imageView2DOn3DImage",
+                            "description": "Indicates whether this implementation supports a VkImage being created with the VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT flag set, permitting a 2D or 2D array image view to be created on a 3D VkImage.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "multisampleArrayImage",
+                            "label": "multisampleArrayImage",
+                            "description": "Indicates whether this implementation supports a VkImage being created as a 2D array with multiple samples per texel.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "mutableComparisonSamplers",
+                            "label": "mutableComparisonSamplers",
+                            "description": "Indicates whether this implementation allows descriptors with comparison samplers to be updated.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "pointPolygons",
+                            "label": "pointPolygons",
+                            "description": "Indicates whether this implementation supports Rasterization using a point Polygon Mode.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "samplerMipLodBias",
+                            "label": "samplerMipLodBias",
+                            "description": "Indicates whether this implementation supports setting a mipmap LOD bias value when creating a sampler.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "separateStencilMaskRef",
+                            "label": "separateStencilMaskRef",
+                            "description": "Indicates whether this implementation supports separate front and back Stencil Test reference values.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "shaderSampleRateInterpolationFunctions",
+                            "label": "shaderSampleRateInterpolationFunctions",
+                            "description": "Indicates whether this implementation supports fragment shaders which use the InterpolationFunction capability.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "tessellationIsolines",
+                            "label": "tessellationIsolines",
+                            "description": "Indicates whether this implementation supports isoline output from the Tessellation stage of a graphics pipeline. This member is only meaningful if tessellationShader are supported.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "triangleFans",
+                            "label": "triangleFans",
+                            "description": "Indicates whether this implementation supports Triangle Fans primitive topology.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "vertexAttributeAccessBeyondStride",
+                            "label": "vertexAttributeAccessBeyondStride",
+                            "description": "Indicates whether this implementation supports accessing a vertex input attribute beyond the stride of the corresponding vertex input binding.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "key": "minVertexInputBindingStrideAlignment",
+                            "label": "minVertexInputBindingStrideAlignment",
+                            "description": "Indicates whether this implementation supports accessing a vertex input attribute beyond the stride of the corresponding vertex input binding.",
+                            "type": "INT",
+                            "default": 4,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "emulate_portability",
+                                        "value": true
+                                    }
+                                ]
+                            }
+                        }
+                    ]
                 },
                 {
                     "key": "simulate_capabilities",
