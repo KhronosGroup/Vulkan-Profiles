@@ -153,6 +153,22 @@ const char *const kLayerSettingsProfileFile = "profile_file";
 const char *const kLayerSettingsProfileName = "profile_name";
 const char *const kLayerSettingsProfileValidation = "profile_validation";
 const char *const kLayerSettingsEmulatePortability = "emulate_portability";
+const char *const kLayerSettings_constantAlphaColorBlendFactors = "constantAlphaColorBlendFactors";
+const char *const kLayerSettings_events = "events";
+const char *const kLayerSettings_imageViewFormatReinterpretation = "imageViewFormatReinterpretation";
+const char *const kLayerSettings_imageViewFormatSwizzle = "imageViewFormatSwizzle";
+const char *const kLayerSettings_imageView2DOn3DImage = "imageView2DOn3DImage";
+const char *const kLayerSettings_multisampleArrayImage = "multisampleArrayImage";
+const char *const kLayerSettings_mutableComparisonSamplers = "mutableComparisonSamplers";
+const char *const kLayerSettings_pointPolygons = "pointPolygons";
+const char *const kLayerSettings_samplerMipLodBias = "samplerMipLodBias";
+const char *const kLayerSettings_separateStencilMaskRef = "separateStencilMaskRef";
+const char *const kLayerSettings_shaderSampleRateInterpolationFunctions = "shaderSampleRateInterpolationFunctions";
+const char *const kLayerSettings_tessellationIsolines = "tessellationIsolines";
+const char *const kLayerSettings_tessellationPointMode = "tessellationPointMode";
+const char *const kLayerSettings_triangleFans = "triangleFans";
+const char *const kLayerSettings_vertexAttributeAccessBeyondStride = "vertexAttributeAccessBeyondStride";
+const char *const kLayerSettings_minVertexInputBindingStrideAlignment = "minVertexInputBindingStrideAlignment";
 const char *const kLayerSettingsSimulateCapabilities = "simulate_capabilities";
 const char *const kLayerSettingsDebugActions = "debug_actions";
 const char *const kLayerSettingsDebugFilename = "debug_filename";
@@ -9106,6 +9122,76 @@ static void InitSettings(const void *pnext) {
             layer_settings->emulate_portability = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsEmulatePortability);
         }
 
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_constantAlphaColorBlendFactors)) {
+            layer_settings->constantAlphaColorBlendFactors =
+                vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_constantAlphaColorBlendFactors);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_events)) {
+            layer_settings->events = vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_events);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_imageViewFormatReinterpretation)) {
+            layer_settings->imageViewFormatReinterpretation =
+                vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_imageViewFormatReinterpretation);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_imageViewFormatSwizzle)) {
+            layer_settings->imageViewFormatSwizzle = vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_imageViewFormatSwizzle);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_imageView2DOn3DImage)) {
+            layer_settings->imageView2DOn3DImage = vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_imageView2DOn3DImage);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_multisampleArrayImage)) {
+            layer_settings->multisampleArrayImage = vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_multisampleArrayImage);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_mutableComparisonSamplers)) {
+            layer_settings->mutableComparisonSamplers =
+                vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_mutableComparisonSamplers);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_pointPolygons)) {
+            layer_settings->pointPolygons = vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_pointPolygons);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_samplerMipLodBias)) {
+            layer_settings->samplerMipLodBias = vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_samplerMipLodBias);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_separateStencilMaskRef)) {
+            layer_settings->separateStencilMaskRef = vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_separateStencilMaskRef);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_shaderSampleRateInterpolationFunctions)) {
+            layer_settings->shaderSampleRateInterpolationFunctions =
+                vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_shaderSampleRateInterpolationFunctions);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_tessellationIsolines)) {
+            layer_settings->tessellationIsolines = vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_tessellationIsolines);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_tessellationPointMode)) {
+            layer_settings->tessellationPointMode = vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_tessellationPointMode);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_triangleFans)) {
+            layer_settings->triangleFans = vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_triangleFans);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_vertexAttributeAccessBeyondStride)) {
+            layer_settings->vertexAttributeAccessBeyondStride = static_cast<std::uint32_t>(
+                vku::GetLayerSettingInt(kOurLayerName, kLayerSettings_vertexAttributeAccessBeyondStride));
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_minVertexInputBindingStrideAlignment)) {
+            layer_settings->minVertexInputBindingStrideAlignment =
+                vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_minVertexInputBindingStrideAlignment);
+        }
+
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsSimulateCapabilities)) {
             layer_settings->simulate_capabilities =
                 GetSimulateCapabilityFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsSimulateCapabilities));
@@ -9171,6 +9257,35 @@ static void InitSettings(const void *pnext) {
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileName, layer_settings->profile_name.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileValidation, layer_settings->profile_validation ? "true" : "false");
     settings_log += format("\t%s: %s\n", kLayerSettingsEmulatePortability, layer_settings->emulate_portability ? "true" : "false");
+    if (layer_settings->emulate_portability) {
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_constantAlphaColorBlendFactors,
+                               layer_settings->constantAlphaColorBlendFactors ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_events, layer_settings->events ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageViewFormatReinterpretation,
+                               layer_settings->imageViewFormatReinterpretation ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageViewFormatSwizzle,
+                               layer_settings->imageViewFormatSwizzle ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageView2DOn3DImage,
+                               layer_settings->imageView2DOn3DImage ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_multisampleArrayImage,
+                               layer_settings->multisampleArrayImage ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_mutableComparisonSamplers,
+                               layer_settings->mutableComparisonSamplers ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_pointPolygons, layer_settings->pointPolygons ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_samplerMipLodBias,
+                               layer_settings->samplerMipLodBias ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_separateStencilMaskRef,
+                               layer_settings->separateStencilMaskRef ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_shaderSampleRateInterpolationFunctions,
+                               layer_settings->shaderSampleRateInterpolationFunctions ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_tessellationIsolines,
+                               layer_settings->tessellationIsolines ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_triangleFans, layer_settings->triangleFans ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_vertexAttributeAccessBeyondStride,
+                               layer_settings->vertexAttributeAccessBeyondStride ? "true" : "false");
+        settings_log += format("\t\t%s: %d\n", kLayerSettings_minVertexInputBindingStrideAlignment,
+                               static_cast<int>(layer_settings->minVertexInputBindingStrideAlignment));
+    }
     settings_log += format("\t%s: %s\n", kLayerSettingsSimulateCapabilities, simulation_capabilities_log.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugActions, debug_actions_log.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugFilename, layer_settings->debug_filename.c_str());
@@ -9412,7 +9527,7 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     VkPhysicalDevicePortabilitySubsetPropertiesKHR *psp = (VkPhysicalDevicePortabilitySubsetPropertiesKHR *)place;
                     void *pNext = psp->pNext;
                     *psp = physicalDeviceData->physical_device_portability_subset_properties_;
-                    psp->pNext = pNext;
+                    if (layer_settings->vertexAttributeAccessBeyondStride) {                        psp->minVertexInputBindingStrideAlignment = layer_settings->minVertexInputBindingStrideAlignment;                    }                    psp->pNext = pNext;
                 }
                 break;
             case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES:
@@ -12129,25 +12244,25 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     feature_chain.pNext = &(pdd.physical_device_portability_subset_features_);
                 } else if (layer_settings->emulate_portability) {
                     pdd.physical_device_portability_subset_properties_ = {
-                        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR, nullptr, 1};
+                        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR, nullptr, layer_settings->minVertexInputBindingStrideAlignment};
                     pdd.physical_device_portability_subset_features_ = {
                         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR,
                         nullptr,
-                        VK_TRUE,
-                        VK_TRUE,
-                        VK_TRUE,
-                        VK_TRUE,
-                        VK_TRUE,
-                        VK_TRUE,
-                        VK_TRUE,
-                        VK_TRUE,
-                        VK_TRUE,
-                        VK_TRUE,
-                        VK_TRUE,
-                        VK_TRUE,
-                        VK_TRUE,
-                        VK_TRUE,
-                        VK_TRUE};
+                        layer_settings->constantAlphaColorBlendFactors,
+                        layer_settings->events,
+                        layer_settings->imageViewFormatReinterpretation,
+                        layer_settings->imageViewFormatSwizzle,
+                        layer_settings->imageView2DOn3DImage,
+                        layer_settings->multisampleArrayImage,
+                        layer_settings->mutableComparisonSamplers,
+                        layer_settings->pointPolygons,
+                        layer_settings->samplerMipLodBias,
+                        layer_settings->separateStencilMaskRef,
+                        layer_settings->shaderSampleRateInterpolationFunctions,
+                        layer_settings->tessellationIsolines,
+                        layer_settings->tessellationPointMode,
+                        layer_settings->triangleFans,
+                        layer_settings->vertexAttributeAccessBeyondStride};
                 }
 
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_EXT_TRANSFORM_FEEDBACK_EXTENSION_NAME)) {
