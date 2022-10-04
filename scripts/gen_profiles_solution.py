@@ -3126,7 +3126,18 @@ class VulkanProfilesSchemaGenerator():
                                     "type": "array",
                                     "uniqueItems": True,
                                     "items": OrderedDict({
-                                        "type": "string"
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "array",
+                                                "uniqueItems": True,
+                                                "items": OrderedDict({
+                                                    "type": "string"
+                                                })
+                                            }
+                                        ]
                                     })
                                 }),
                                 "fallback": OrderedDict({
