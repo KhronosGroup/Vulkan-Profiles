@@ -3122,7 +3122,26 @@ class VulkanProfilesSchemaGenerator():
                                     })
                                 }),
                                 "capabilities": OrderedDict({
-                                    "description": "The list of capability sets that can be reference by a profile.",
+                                    "description": "The list of required capability sets that can be reference by a profile.",
+                                    "type": "array",
+                                    "uniqueItems": True,
+                                    "items": OrderedDict({
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "array",
+                                                "uniqueItems": True,
+                                                "items": OrderedDict({
+                                                    "type": "string"
+                                                })
+                                            }
+                                        ]
+                                    })
+                                }),
+                                "optionals": OrderedDict({
+                                    "description": "The list of optioanl capability sets that can be reference by a profile.",
                                     "type": "array",
                                     "uniqueItems": True,
                                     "items": OrderedDict({
