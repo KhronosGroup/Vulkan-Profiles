@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
+    "$id": "https://schema.khronos.org/vulkan/profiles-0.8.1-230.json#",
     "title": "Vulkan Profiles Schema for Vulkan 1.3.230",
     "additionalProperties": true,
     "required": [
@@ -7804,7 +7804,7 @@
                             }
                         },
                         "capabilities": {
-                            "description": "The list of required capability sets that can be reference by a profile.",
+                            "description": "The list of required capability sets that can be referenced by a profile.",
                             "type": "array",
                             "uniqueItems": true,
                             "items": {
@@ -7823,7 +7823,7 @@
                             }
                         },
                         "optionals": {
-                            "description": "The list of optioanl capability sets that can be reference by a profile.",
+                            "description": "The list of optional capability sets that can be referenced by a profile.",
                             "type": "array",
                             "uniqueItems": true,
                             "items": {

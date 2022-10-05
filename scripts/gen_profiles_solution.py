@@ -2993,7 +2993,7 @@ class VulkanProfilesSchemaGenerator():
 
         return OrderedDict({
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "$id": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
+            "$id": "https://schema.khronos.org/vulkan/profiles-0.8.1-{0}.json#".format(str(self.registry.headerVersionNumber.patch)),
             "title": "Vulkan Profiles Schema for Vulkan {0}".format(versionStr),
             "additionalProperties": True,
             "required": [
@@ -3122,7 +3122,7 @@ class VulkanProfilesSchemaGenerator():
                                     })
                                 }),
                                 "capabilities": OrderedDict({
-                                    "description": "The list of required capability sets that can be reference by a profile.",
+                                    "description": "The list of required capability sets that can be referenced by a profile.",
                                     "type": "array",
                                     "uniqueItems": True,
                                     "items": OrderedDict({
@@ -3141,7 +3141,7 @@ class VulkanProfilesSchemaGenerator():
                                     })
                                 }),
                                 "optionals": OrderedDict({
-                                    "description": "The list of optioanl capability sets that can be reference by a profile.",
+                                    "description": "The list of optional capability sets that can be referenced by a profile.",
                                     "type": "array",
                                     "uniqueItems": True,
                                     "items": OrderedDict({
