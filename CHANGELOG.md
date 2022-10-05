@@ -16,6 +16,7 @@
 ### Features:
 - Add layer settings to override portability subset. #295
 - Add OR of capabilities to profile schema, version 0.8.1 #274
+- Add optional capabilities to profile schema, version 0.8.1 #274
 
 ### Improvements:
 - Improve message reports for unsupported capabilities by the device.
