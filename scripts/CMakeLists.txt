@@ -64,7 +64,7 @@ add_custom_target(VpCreateDesktopMax2022 ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
 		--registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
 		--input ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_max_2022
-		--output-path ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_max_2022.json
+		--output-path ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_desktop_max_2022.json
 		--output-profile VP_LUNARG_desktop_max_2022
 		--profile-label ${PROFILE_DESKTOP_MAX_2022_LABEL}
 		--profile-desc ${PROFILE_DESKTOP_MAX_2022_DESC}
