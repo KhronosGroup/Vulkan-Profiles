@@ -5,12 +5,13 @@ file(GLOB PROFILES_FILES ${CMAKE_SOURCE_DIR}/profiles)
 source_group("Python Files" FILES ${MERGE_PYTHON_FILES} ${LAYER_PYTHON_FILES})
 
 add_custom_target(VpGenerated
+	COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/schema
 	COMMAND ${PYTHON_EXECUTABLE} ${LAYER_PYTHON_FILES}
 		--registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
 		--input ${CMAKE_SOURCE_DIR}/profiles
 		--output-library-inc ${CMAKE_SOURCE_DIR}/library/include/vulkan
 		--output-library-src ${CMAKE_SOURCE_DIR}/library/source
-		--output-schema ${CMAKE_SOURCE_DIR}/${PROFILES_SCHEMA_FILENAME}
+		--output-schema ${CMAKE_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}
 		--output-doc ${CMAKE_SOURCE_DIR}/PROFILES.md
 		--validate
 		--debug
