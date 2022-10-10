@@ -42,6 +42,8 @@ profiles/test/data/VP_LUNARG_test_combine_union.json
 profiles/VP_LUNARG_desktop_baseline_2022.json
 profiles/VP_LUNARG_desktop_portability_2022.json
 PROFILES.md
-schema/
-library/include/vulkan/
-library/include/vulkan/debug
+profiles-0.8-latest.json
+library/include/vulkan/*
+library/include/vulkan/debug/*
+library/source/*
+library/source/debug/*
