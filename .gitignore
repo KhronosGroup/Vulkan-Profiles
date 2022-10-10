@@ -43,6 +43,8 @@ profiles/VP_LUNARG_desktop_baseline_2022.json
 profiles/VP_LUNARG_desktop_portability_2022.json
 PROFILES.md
 schema/profiles-0.8-latest.json
+library/include/
+library/source/
 library/include/vulkan/vulkan_profiles.h
 library/include/vulkan/vulkan_profiles.hpp
 library/include/vulkan/debug/vulkan_profiles.h
