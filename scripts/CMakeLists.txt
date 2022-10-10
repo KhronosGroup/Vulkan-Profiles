@@ -10,7 +10,7 @@ add_custom_target(VpGenerated
 		--input ${CMAKE_SOURCE_DIR}/profiles
 		--output-library-inc ${CMAKE_SOURCE_DIR}/library/include/vulkan
 		--output-library-src ${CMAKE_SOURCE_DIR}/library/source
-		--output-schema ${CMAKE_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}
+		--output-schema ${CMAKE_SOURCE_DIR}/${PROFILES_SCHEMA_FILENAME}
 		--output-doc ${CMAKE_SOURCE_DIR}/PROFILES.md
 		--validate
 		--debug
@@ -19,6 +19,8 @@ add_custom_target(VpGenerated
 	DEPENDS ${LAYER_PYTHON_FILES} ${PROFILES_FILES})
 
 set_target_properties(VpGenerated PROPERTIES FOLDER "Profiles generator")
+
+add_dependencies(VpGenerated VpCreateDesktopBaseline2022)
 
 add_custom_target(VpTestIntersect ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
