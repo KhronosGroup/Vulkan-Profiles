@@ -3058,8 +3058,6 @@ class VulkanProfilesSchemaGenerator():
                                 "description",
                                 "version",
                                 "api-version",
-                                "contributors",
-                                "history",
                                 "capabilities"
                             ],
                             "properties": OrderedDict({
@@ -3167,7 +3165,44 @@ class VulkanProfilesSchemaGenerator():
                                     "items": OrderedDict({
                                         "type": "string"
                                     })
-                                })
+                                }),
+                                "contributors": OrderedDict({
+                                    "type": "object",
+                                    "description": "The list of contributors of the profile.",
+                                    "additionalProperties": OrderedDict({
+                                        "$ref": "#/definitions/contributor"
+                                    })
+                                }),
+                                "history": OrderedDict({
+                                    "description": "The version history of the profile file",
+                                    "type": "array",
+                                    "uniqueItems": True,
+                                    "minItems": 1,
+                                    "items": OrderedDict({
+                                        "type": "object",
+                                        "required": [
+                                            "revision",
+                                            "date",
+                                            "author",
+                                            "comment"
+                                        ],
+                                        "properties": OrderedDict({
+                                            "revision": OrderedDict({
+                                                "type": "integer"
+                                            }),
+                                            "date": OrderedDict({
+                                                "type": "string",
+                                                "pattern": "((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])"
+                                            }),
+                                            "author": OrderedDict({
+                                                "type": "string"
+                                            }),
+                                            "comment": OrderedDict({
+                                                "type": "string"
+                                            })
+                                        })
+                                    })
+                                }),
                             })
                         })
                     })
