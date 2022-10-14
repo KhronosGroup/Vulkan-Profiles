@@ -2615,6 +2615,10 @@ class PhysicalDeviceData {
     // VK_SEC_amigo_profiling structs
     VkPhysicalDeviceAmigoProfilingFeaturesSEC physical_device_amigo_profiling_features_;
 
+    // VK_ARM_shader_core_builtins structs
+    VkPhysicalDeviceShaderCoreBuiltinsPropertiesARM physical_device_shader_core_builtins_properties_;
+    VkPhysicalDeviceShaderCoreBuiltinsFeaturesARM physical_device_shader_core_builtins_features_;
+
   private:
     PhysicalDeviceData() = delete;
     PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
@@ -3137,6 +3141,10 @@ class PhysicalDeviceData {
 
         // VK_SEC_amigo_profiling structs
         physical_device_amigo_profiling_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_AMIGO_PROFILING_FEATURES_SEC};
+
+        // VK_ARM_shader_core_builtins structs
+        physical_device_shader_core_builtins_properties_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_BUILTINS_PROPERTIES_ARM};
+        physical_device_shader_core_builtins_features_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_BUILTINS_FEATURES_ARM};
     }
 
     const VkInstance instance_;
@@ -3438,6 +3446,8 @@ class JsonLoader {
     bool GetStruct(const Json::Value &parent, VkPhysicalDevicePipelineProtectedAccessFeaturesEXT *dest);
     bool GetStruct(const Json::Value &parent, VkPhysicalDeviceTilePropertiesFeaturesQCOM *dest);
     bool GetStruct(const Json::Value &parent, VkPhysicalDeviceAmigoProfilingFeaturesSEC *dest);
+    bool GetStruct(const Json::Value &parent, VkPhysicalDeviceShaderCoreBuiltinsPropertiesARM *dest);
+    bool GetStruct(const Json::Value &parent, VkPhysicalDeviceShaderCoreBuiltinsFeaturesARM *dest);
     bool GetStruct(const Json::Value &parent, VkPhysicalDeviceFeatures *dest);
     bool GetStruct(const Json::Value &parent, VkPhysicalDeviceProperties *dest);
     bool GetStruct(const Json::Value &parent, VkPhysicalDeviceLimits *dest);
@@ -4895,6 +4905,10 @@ bool JsonLoader::GetFeature(const Json::Value &features, const std::string &name
         auto support = CheckExtensionSupport(VK_EXT_DEVICE_FAULT_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetStruct(feature, &pdd_->physical_device_fault_features_);
+    } else if (name == "VkPhysicalDeviceShaderCoreBuiltinsFeaturesARM") {
+        auto support = CheckExtensionSupport(VK_ARM_SHADER_CORE_BUILTINS_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetStruct(feature, &pdd_->physical_device_shader_core_builtins_features_);
     }
 
     return true;
@@ -5206,6 +5220,10 @@ bool JsonLoader::GetProperty(const Json::Value &props, const std::string &name) 
         auto support = CheckExtensionSupport(VK_NV_OPTICAL_FLOW_EXTENSION_NAME, name);
         if (support != ExtensionSupport::SUPPORTED) return valid(support);
         return GetStruct(property, &pdd_->physical_device_optical_flow_properties_);
+    } else if (name == "VkPhysicalDeviceShaderCoreBuiltinsPropertiesARM") {
+        auto support = CheckExtensionSupport(VK_ARM_SHADER_CORE_BUILTINS_EXTENSION_NAME, name);
+        if (support != ExtensionSupport::SUPPORTED) return valid(support);
+        return GetStruct(property, &pdd_->physical_device_shader_core_builtins_properties_);
     }
 
     return true;
@@ -8781,6 +8799,27 @@ bool JsonLoader::GetStruct(const Json::Value &parent, VkPhysicalDeviceAmigoProfi
     return valid;
 }
 
+bool JsonLoader::GetStruct(const Json::Value &parent, VkPhysicalDeviceShaderCoreBuiltinsPropertiesARM *dest) {
+    (void)dest;
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetStruct(VkPhysicalDeviceShaderCoreBuiltinsPropertiesARM)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderCoreCount, false, WarnIfGreater);
+        GET_VALUE_WARN(member, shaderWarpsPerCore, false, WarnIfGreater);
+    }
+    return valid;
+}
+
+bool JsonLoader::GetStruct(const Json::Value &parent, VkPhysicalDeviceShaderCoreBuiltinsFeaturesARM *dest) {
+    (void)dest;
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetStruct(VkPhysicalDeviceShaderCoreBuiltinsFeaturesARM)\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, shaderCoreBuiltins, false, WarnIfNotEqualBool);
+    }
+    return valid;
+}
+
 bool JsonLoader::GetStruct(const Json::Value &parent, VkPhysicalDeviceFeatures *dest) {
     (void)dest;
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "\tJsonLoader::GetStruct(VkPhysicalDeviceFeatures)\n");
@@ -11106,6 +11145,22 @@ void FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {
                     data->pNext = pNext;
                 }
                 break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_BUILTINS_PROPERTIES_ARM:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_ARM_SHADER_CORE_BUILTINS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderCoreBuiltinsPropertiesARM *data = (VkPhysicalDeviceShaderCoreBuiltinsPropertiesARM *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_shader_core_builtins_properties_;
+                    data->pNext = pNext;
+                }
+                break;
+            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CORE_BUILTINS_FEATURES_ARM:
+                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_ARM_SHADER_CORE_BUILTINS_EXTENSION_NAME)) {
+                    VkPhysicalDeviceShaderCoreBuiltinsFeaturesARM *data = (VkPhysicalDeviceShaderCoreBuiltinsFeaturesARM *)place;
+                    void *pNext = data->pNext;
+                    *data = physicalDeviceData->physical_device_shader_core_builtins_features_;
+                    data->pNext = pNext;
+                }
+                break;
             default:
                 break;
         }
@@ -13315,6 +13370,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     pdd.physical_device_amigo_profiling_features_.pNext = feature_chain.pNext;
 
                     feature_chain.pNext = &(pdd.physical_device_amigo_profiling_features_);
+                }
+
+                if (PhysicalDeviceData::HasExtension(&pdd, VK_ARM_SHADER_CORE_BUILTINS_EXTENSION_NAME)) {
+                    pdd.physical_device_shader_core_builtins_properties_.pNext = property_chain.pNext;
+
+                    property_chain.pNext = &(pdd.physical_device_shader_core_builtins_properties_);
+
+                    pdd.physical_device_shader_core_builtins_features_.pNext = feature_chain.pNext;
+
+                    feature_chain.pNext = &(pdd.physical_device_shader_core_builtins_features_);
                 }
 
                 if (api_version_above_1_1) {
