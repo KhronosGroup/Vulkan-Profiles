@@ -20,6 +20,8 @@ include(GNUInstallDirs)
 option(REGENERATE_PROFILES "Regenerate profiles source and headers" ON)
 option(REGENERATE_JSONCPP "Regenerate jsoncpp source and headers" ON)
 option(REGENERATE_LAYER "Regenerate profiles layer source" ON)
+option(DISABLE_TINYXML2_FETCH "Disable tinyxml2 repository fetch" OFF)
+
 if(REGENERATE_PROFILES)
     find_package(PythonInterp 3.7.2 REQUIRED)
 elseif(REGENERATE_JSONCPP OR REGENERATE_LAYER)
@@ -72,12 +74,14 @@ if(REGENERATE_JSONCPP)
     )
 endif()
 
-FetchContent_Declare(
-    tinyxml2
-    GIT_REPOSITORY https://github.com/leethomason/tinyxml2.git
-    GIT_TAG 9.0.0
-)
-FetchContent_MakeAvailable(tinyxml2)
+if(NOT DISABLE_TINYXML2_FETCH)
+    FetchContent_Declare(
+        tinyxml2
+        GIT_REPOSITORY https://github.com/leethomason/tinyxml2.git
+        GIT_TAG 9.0.0
+    )
+    FetchContent_MakeAvailable(tinyxml2)
+endif()
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_OBJECT_LIBS OFF CACHE BOOL "" FORCE)
