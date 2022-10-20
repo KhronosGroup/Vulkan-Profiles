@@ -2293,13 +2293,13 @@ static void InitSettings(const void *pnext) {
         }
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_vertexAttributeAccessBeyondStride)) {
-            layer_settings->vertexAttributeAccessBeyondStride = static_cast<std::uint32_t>(
-                vku::GetLayerSettingInt(kOurLayerName, kLayerSettings_vertexAttributeAccessBeyondStride));
+            layer_settings->vertexAttributeAccessBeyondStride = 
+                vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_vertexAttributeAccessBeyondStride);
         }
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_minVertexInputBindingStrideAlignment)) {
-            layer_settings->minVertexInputBindingStrideAlignment =
-                vku::GetLayerSettingBool(kOurLayerName, kLayerSettings_minVertexInputBindingStrideAlignment);
+            layer_settings->minVertexInputBindingStrideAlignment = static_cast<uint32_t>(
+                vku::GetLayerSettingInt(kOurLayerName, kLayerSettings_minVertexInputBindingStrideAlignment));
         }
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsSimulateCapabilities)) {
@@ -3697,9 +3697,9 @@ class VulkanProfilesLayerGenerator():
         gen += '                    VkPhysicalDevicePortabilitySubsetPropertiesKHR *psp = (VkPhysicalDevicePortabilitySubsetPropertiesKHR *)place;\n'
         gen += '                    void *pNext = psp->pNext;\n'
         gen += '                    *psp = physicalDeviceData->physical_device_portability_subset_properties_;\n'
-        gen += '                    if (layer_settings->vertexAttributeAccessBeyondStride) {'
-        gen += '                        psp->minVertexInputBindingStrideAlignment = layer_settings->minVertexInputBindingStrideAlignment;'
-        gen += '                    }'
+        gen += '                    if (layer_settings->vertexAttributeAccessBeyondStride) {\n'
+        gen += '                        psp->minVertexInputBindingStrideAlignment = layer_settings->minVertexInputBindingStrideAlignment;\n'
+        gen += '                    }\n'
         gen += '                    psp->pNext = pNext;\n'
         gen += '                }\n'
         gen += '                break;\n'
