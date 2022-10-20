@@ -51,3 +51,4 @@ library/include/vulkan/debug/vulkan_profiles.h
 library/include/vulkan/debug/vulkan_profiles.hpp
 library/source/vulkan_profiles.cpp
 library/source/debug/vulkan_profiles.cpp
+layer/profiles.cpp
