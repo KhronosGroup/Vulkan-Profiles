@@ -2,6 +2,8 @@ if(PROFILES_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
+execute_process(COMMAND ${CMAKE_COMMAND} -E touch  ${CMAKE_SOURCE_DIR}/layer/profiles.cpp)
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions(-DVK_USE_PLATFORM_WIN32_KHR -DVK_USE_PLATFORM_WIN32_KHX -DWIN32_LEAN_AND_MEAN -DNOMINMAX)
     set(DisplayServer Win32)
