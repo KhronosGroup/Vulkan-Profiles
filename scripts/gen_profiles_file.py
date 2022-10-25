@@ -166,6 +166,9 @@ class ProfileMerger():
 
                         if (format in merged_formats):
                             for prop_name in ['VkFormatProperties', 'VkFormatProperties3', 'VkFormatProperties3KHR']:
+                                #if prop_name not in capability['formats'][format]:
+                                #    capability['formats'][format][prop_name] = dict()
+
                                 self.merge_format_features(merged_formats, format, capability, prop_name, 'linearTilingFeatures')
                                 self.merge_format_features(merged_formats, format, capability, prop_name, 'optimalTilingFeatures')
                                 self.merge_format_features(merged_formats, format, capability, prop_name, 'bufferFeatures')
@@ -278,22 +281,23 @@ class ProfileMerger():
                     merged_formats[format][prop_name].remove(feature)
 
         # Iterate all format features in current json
-        if features in capability['formats'][format][prop_name]:
-            # If mode is union or this is the first json when using intersect add the features if not already in merged features
-            if features not in merged_formats[format][prop_name]:
-                if self.mode == 'union' or self.first == True:
-                    merged_formats[format][prop_name][features] = capability['formats'][format][prop_name][features]
-            else:
-                # In union add all aditional features
-                if self.mode == 'union':
-                    for feature in capability['formats'][format][prop_name][features]:
-                        if feature not in merged_formats[format][prop_name][features]:
-                            merged_formats[format][prop_name][features].append(feature)
-                # In intersect removed features which are not set in the current json
+        if prop_name in capability['formats'][format]:
+            if features in capability['formats'][format][prop_name]:
+                # If mode is union or this is the first json when using intersect add the features if not already in merged features
+                if features not in merged_formats[format][prop_name]:
+                    if self.mode == 'union' or self.first == True:
+                        merged_formats[format][prop_name][features] = capability['formats'][format][prop_name][features]
                 else:
-                    for feature in list(merged_formats[format][prop_name][features]):
-                        if feature not in capability['formats'][format][prop_name][features]:
-                            merged_formats[format][prop_name][features].remove(feature)
+                    # In union add all aditional features
+                    if self.mode == 'union':
+                        for feature in capability['formats'][format][prop_name][features]:
+                            if feature not in merged_formats[format][prop_name][features]:
+                                merged_formats[format][prop_name][features].append(feature)
+                    # In intersect removed features which are not set in the current json
+                    else:
+                        for feature in list(merged_formats[format][prop_name][features]):
+                            if feature not in capability['formats'][format][prop_name][features]:
+                                merged_formats[format][prop_name][features].remove(feature)
 
     def promote_structs(self, promoted, merged, feature):
         for struct in dict(merged):
