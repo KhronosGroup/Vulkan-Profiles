@@ -61,13 +61,13 @@
                 },
                 "VK_FORMAT_B4G4R4A4_UNORM_PACK16": {
                     "VkFormatProperties3": {
-                        "linearTilingFeatures": [ "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT", "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT" ],
+                        "linearTilingFeatures": [ "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT" ],
                         "optimalTilingFeatures": [ ],
                         "bufferFeatures": [ "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT" ]
                     },
                     "VkFormatProperties3KHR": {
                         "linearTilingFeatures": [ "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT" ],
-                        "optimalTilingFeatures": [ ],
+                        "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT" ],
                         "bufferFeatures": [ "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT" ]
                     }
                 },
