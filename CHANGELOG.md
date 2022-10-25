@@ -11,7 +11,12 @@
 
 # Release Notes
 
-## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/LunarG/VulkanProfiles/tree/master) - October 2022
+## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/LunarG/VulkanProfiles/tree/master) - December 2022
+
+### Features:
+- Add merge script support of `VkFormatProperties3` #304 #237
+
+## [Vulkan Profiles Toolset 1.3.231](https://github.com/LunarG/VulkanProfiles/tree/master) - October 2022
 
 ### Features:
 - Add layer settings to override portability subset. #295
