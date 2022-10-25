@@ -25,8 +25,6 @@ import os
 import collections
 
 class ProfileMerger():
-
-
     def __init__(self, registry):
         self.registry = registry
 
@@ -166,16 +164,12 @@ class ProfileMerger():
 
                         if (format in merged_formats):
                             for prop_name in ['VkFormatProperties', 'VkFormatProperties3', 'VkFormatProperties3KHR']:
-                                #if prop_name not in capability['formats'][format]:
-                                #    capability['formats'][format][prop_name] = dict()
-
-                                self.merge_format_features(merged_formats, format, capability, prop_name, 'linearTilingFeatures')
-                                self.merge_format_features(merged_formats, format, capability, prop_name, 'optimalTilingFeatures')
-                                self.merge_format_features(merged_formats, format, capability, prop_name, 'bufferFeatures')
+                                for features in ['linearTilingFeatures', 'optimalTilingFeatures', 'bufferFeatures']:
+                                    self.merge_format_features(merged_formats, format, capability, prop_name, features)
 
                             # Remove empty entries (can occur when using intersect)
-                            if not dict(merged_formats[format]['VkFormatProperties']) and not dict(merged_formats[format]['VkFormatProperties3']) and not dict(merged_formats[format]['VkFormatProperties3KHR']):
-                                del merged_formats[format]
+                            #if not dict(merged_formats[format]['VkFormatProperties']) and not dict(merged_formats[format]['VkFormatProperties3']) and not dict(merged_formats[format]['VkFormatProperties3KHR']):
+                            #    del merged_formats[format]
 
                 if 'queueFamiliesProperties' in capability:
                     if self.mode == 'intersection':
@@ -260,6 +254,25 @@ class ProfileMerger():
         if merged_formats:
             sorted_formats = collections.OrderedDict(sorted(merged_formats.items()))
             capabilities['baseline']['formats'] = dict(sorted_formats)
+
+            # remove all empty elements
+            formatsToRemove = list()
+
+            for format in capabilities['baseline']['formats']:
+                for prop_name in ['VkFormatProperties', 'VkFormatProperties3', 'VkFormatProperties3KHR']:
+                    for features in ['linearTilingFeatures', 'optimalTilingFeatures', 'bufferFeatures']:
+                        if features in capabilities['baseline']['formats'][format][prop_name]:
+                            if not capabilities['baseline']['formats'][format][prop_name][features]:
+                                del capabilities['baseline']['formats'][format][prop_name][features]
+                    if prop_name in capabilities['baseline']['formats'][format]:
+                        if not capabilities['baseline']['formats'][format][prop_name]:
+                            del capabilities['baseline']['formats'][format][prop_name]
+                if not capabilities['baseline']['formats'][format]:
+                    formatsToRemove.append(format)
+
+            for format in formatsToRemove:
+                del capabilities['baseline']['formats'][format]
+
         if merged_qfp:
             capabilities['baseline']['queueFamiliesProperties'] = merged_qfp
 
