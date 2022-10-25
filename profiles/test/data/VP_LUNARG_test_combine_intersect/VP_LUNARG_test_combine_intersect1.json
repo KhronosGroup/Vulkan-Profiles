@@ -67,7 +67,7 @@
                     },
                     "VkFormatProperties3KHR": {
                         "linearTilingFeatures": [ "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT" ],
-                        "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT" ],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [ "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT" ]
                     }
                 },
