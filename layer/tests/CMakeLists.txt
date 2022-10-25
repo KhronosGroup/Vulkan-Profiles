@@ -91,7 +91,7 @@ function(LayerTestAndroid NAME)
                 ${jsoncpp_generated_source})
 
     add_test(NAME ${ANDROID_APK_NAME} COMMAND profiles_${NAME})
-    add_dependencies(${ANDROID_APK_NAME} VkLayer_khronos_profiles)
+    add_dependencies(${ANDROID_APK_NAME} VkLayer_khronos_profiles VpCreateDesktopBaseline2022 VpCreateDesktopPortability2022)
 
     if (NOT ANDROID_SDK_HOME)
         set(ANDROID_SDK_HOME $ENV{ANDROID_SDK_HOME})
