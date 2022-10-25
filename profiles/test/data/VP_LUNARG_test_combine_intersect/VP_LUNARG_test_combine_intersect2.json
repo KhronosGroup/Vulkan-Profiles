@@ -41,6 +41,38 @@
                     "deviceID": 7676,
                     "deviceName": "LunarG Toolset"
                 }
+            },
+            "formats": {
+                "VK_FORMAT_R4G4_UNORM_PACK8": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [ "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT" ],
+                        "optimalTilingFeatures": [ ],
+                        "bufferFeatures": [ "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT" ]
+                    }
+                },
+                "VK_FORMAT_R4G4B4A4_UNORM_PACK16": {
+                    "VkFormatProperties2": {
+                        "formatProperties": {
+                            "linearTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT" ],
+                            "optimalTilingFeatures": [ ],
+                            "bufferFeatures": [ "VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR" ]
+                        }
+                    }
+                },
+                "VK_FORMAT_B4G4R4A4_UNORM_PACK16": {
+                    "VkFormatProperties3": {
+                        "linearTilingFeatures": [ "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT", "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT" ],
+                        "optimalTilingFeatures": [ ],
+                        "bufferFeatures": [ "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT" ]
+                    },
+                    "VkFormatProperties3KHR": {
+                        "linearTilingFeatures": [ "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT" ],
+                        "optimalTilingFeatures": [ ],
+                        "bufferFeatures": [ "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT" ]
+                    }
+                },
+                "VK_FORMAT_R5G6B5_UNORM_PACK16": {
+                }
             }
         }
     },
