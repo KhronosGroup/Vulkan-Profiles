@@ -109,16 +109,39 @@ TEST_F(TestsIntersection, Noauto) {
 }
 
 TEST_F(TestsIntersection, Format_Properties) {
-    const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+    const VkFormat format = VK_FORMAT_R4G4_UNORM_PACK8;
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    const VkFormatFeatureFlags linear_tiling_features = static_cast<VkFormatFeatureFlags>(0);
+    const VkFormatFeatureFlags linear_tiling_features = static_cast<VkFormatFeatureFlags>(VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT);
     const VkFormatFeatureFlags optimal_tiling_features = static_cast<VkFormatFeatureFlags>(0);
-    const VkFormatFeatureFlags buffer_features =
-        VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    const VkFormatFeatureFlags buffer_features = static_cast<VkFormatFeatureFlags>(VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT);
 
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
 }
+
+TEST_F(TestsIntersection, Format_Properties3) {
+    const VkFormat format = VK_FORMAT_R4G4B4A4_UNORM_PACK16;
+
+    VkFormatProperties3 format_properties3;
+    format_properties3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3;
+    format_properties3.pNext = nullptr;
+
+    VkFormatProperties2 format_properties2;
+    format_properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+    format_properties2.pNext = &format_properties3;
+
+    vkGetPhysicalDeviceFormatProperties2(gpu_profile, format, &format_properties2);
+
+    const VkFormatFeatureFlags linear_tiling_features = static_cast<VkFormatFeatureFlags>(0);
+    const VkFormatFeatureFlags optimal_tiling_features = static_cast<VkFormatFeatureFlags>(0);
+    const VkFormatFeatureFlags buffer_features = static_cast<VkFormatFeatureFlags>(VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT);
+
+    EXPECT_EQ(format_properties3.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
+    EXPECT_EQ(format_properties3.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
+    EXPECT_EQ(format_properties3.bufferFeatures & buffer_features, buffer_features);
+}
+
+

@@ -39,6 +39,7 @@ profiles/test/data/VP_LUNARG_test_generated_name.json
 profiles/test/data/VP_LUNARG_test_api_generated.json
 profiles/test/data/VP_LUNARG_test_combine_intersect.json
 profiles/test/data/VP_LUNARG_test_combine_union.json
+profiles/test/data/VP_LUNARG_desktop_max_2022.json
 profiles/VP_LUNARG_desktop_baseline_2022.json
 profiles/VP_LUNARG_desktop_portability_2022.json
 profiles/VP_LUNARG_desktop_portability_2022/VP_LUNARG_desktop_baseline_2022.json
