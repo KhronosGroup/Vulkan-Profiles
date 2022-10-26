@@ -222,11 +222,12 @@ TEST(test_library_util, GetDeviceExtensions) {
     info.pNext = nullptr;
     info.pEnabledFeatures = nullptr;
 
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
+    const char* profile = VP_LUNARG_DESKTOP_BASELINE_2022_NAME;
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
+    profileInfo.enabledProfileCount = 1;
+    profileInfo.ppEnabledProfileNames = &profile;
 
     {
         info.enabledExtensionCount = 0;

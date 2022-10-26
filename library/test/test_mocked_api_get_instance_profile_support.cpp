@@ -44,10 +44,8 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_supported) {
         VK_EXT(VK_EXT_SWAPCHAIN_COLOR_SPACE),
     });
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
-
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(nullptr, VP_ANDROID_BASELINE_2021_NAME, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -75,10 +73,8 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_no_gpdp2) {
         VK_EXT(VK_EXT_SWAPCHAIN_COLOR_SPACE),
     });
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
-
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(nullptr, VP_ANDROID_BASELINE_2021_NAME, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -102,10 +98,8 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_unsupported_version) {
         VK_EXT(VK_KHR_EXTERNAL_FENCE_CAPABILITIES),
     });
 
-    const VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
-
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(nullptr, VP_LUNARG_DESKTOP_BASELINE_2022_NAME, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -132,10 +126,8 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_unsupported_extension) {
         VK_EXT(VK_EXT_SWAPCHAIN_COLOR_SPACE),
     });
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
-
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(nullptr, VP_ANDROID_BASELINE_2021_NAME, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -159,10 +151,8 @@ TEST(mocked_api_get_instance_profile_support, vulkan11_supported) {
         VK_EXT(VK_EXT_SWAPCHAIN_COLOR_SPACE),
     });
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
-
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(nullptr, VP_ANDROID_BASELINE_2021_NAME, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -188,10 +178,8 @@ TEST(mocked_api_get_instance_profile_support, vulkan11_unsupported_version) {
         VK_EXT(VK_KHR_EXTERNAL_FENCE_CAPABILITIES),
     });
 
-    VpProfileProperties profile{ VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION };
-
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(nullptr, VP_KHR_ROADMAP_2022_NAME, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -220,10 +208,8 @@ TEST(mocked_api_get_instance_profile_support, vulkan11_unsupported_extension) {
         VK_EXT(VK_EXT_SWAPCHAIN_COLOR_SPACE),
     });
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
-
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(nullptr, VP_ANDROID_BASELINE_2021_NAME, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -247,10 +233,8 @@ TEST(mocked_api_get_instance_profile_support, layer_supported) {
         VK_EXT(VK_EXT_SWAPCHAIN_COLOR_SPACE),
     });
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
-
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetInstanceProfileSupport("VK_DUMMY_layer1", &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport("VK_DUMMY_layer1", VP_ANDROID_BASELINE_2021_NAME, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -290,10 +274,8 @@ TEST(mocked_api_get_instance_profile_support, layer_unsupported) {
         VK_EXT(VK_KHR_SURFACE),
     });
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
-
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetInstanceProfileSupport("VK_DUMMY_layer2", &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport("VK_DUMMY_layer2", VP_ANDROID_BASELINE_2021_NAME, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
