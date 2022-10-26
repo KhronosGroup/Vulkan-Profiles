@@ -6,7 +6,7 @@
         "library_path": "@RELATIVE_LAYER_BINARY@",
         "api_version": "@VK_VERSION@",
         "implementation_version": "1.0.2",
-        "status": "BETA",
+        "status": "STABLE",
         "description": "Khronos Profiles layer",
         "introduction": "The Khronos Profiles layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device.",
         "url": "https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html",
