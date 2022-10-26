@@ -9,7 +9,7 @@
 [3]: https://i.creativecommons.org/l/by-nd/4.0/88x31.png "Creative Commons License"
 [4]: https://creativecommons.org/licenses/by-nd/4.0/
 
-# Vulkan Profiles Toolset (BETA)
+# Vulkan Profiles Toolset
 
 The *Vulkan Profiles Toolset* is a collection of tools delivered with the [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/) for Vulkan application developers to leverage *Vulkan Profiles* while developing a Vulkan application.
 

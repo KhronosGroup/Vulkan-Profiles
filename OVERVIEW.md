@@ -22,7 +22,7 @@ The *Vulkan Profiles Toolset* is a collection of components for Vulkan applicati
 
 Conceptually, *Vulkan Profiles* can be understood as the explicit expression and formalization of Vulkan requirements and provides clear communication of these requirements within the *Vulkan Community*.
 
-*The Vulkan Profiles Toolset* delivered in the [***Vulkan SDK***](https://www.lunarg.com/vulkan-sdk/) is still under development at the **BETA** stage.
+*The Vulkan Profiles Toolset* delivered in the [***Vulkan SDK***](https://www.lunarg.com/vulkan-sdk/).
 
 ## Vulkan Profiles Toolset Components
 
