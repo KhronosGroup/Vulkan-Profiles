@@ -292,14 +292,14 @@ TEST_F(LayerTests, TestExcludingFormats) {
     ASSERT_EQ(format_properties.bufferFeatures, 0);
 }
 
-TEST_F(LayerTests, TestMissingPhysDevProps2) {
+TEST_F(LayerTests, TestProfileLayerSettingsEXT_EnumerateExtensions) {
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
     VkProfileLayerSettingsEXT settings;
-    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_desktop_baseline_2022.json";
-    settings.profile_name = "VP_LUNARG_desktop_baseline_2022";
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_extensions.json";
+    settings.profile_name = "VP_LUNARG_test_device_extensions";
     settings.emulate_portability = false;
     settings.debug_fail_on_error = false;
     settings.simulate_capabilities = SIMULATE_MAX_ENUM;
@@ -312,7 +312,7 @@ TEST_F(LayerTests, TestMissingPhysDevProps2) {
 
     uint32_t count = 0;
     vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
-    ASSERT_EQ(count, 43);
+    ASSERT_EQ(count, 1);
 }
 
 TEST_F(LayerTests, TestNotSettingProfileFile) {
