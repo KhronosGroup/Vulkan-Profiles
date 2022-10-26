@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 }
 
 TEST(api_create_device_profile, overrite_with_profile_only) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
+    const char* profile = VP_LUNARG_DESKTOP_BASELINE_2022_NAME;
 
     VkDeviceCreateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -62,7 +62,8 @@ TEST(api_create_device_profile, overrite_with_profile_only) {
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
+    profileInfo.enabledProfileCount = 1;
+    profileInfo.ppEnabledProfileNames = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
@@ -71,7 +72,7 @@ TEST(api_create_device_profile, overrite_with_profile_only) {
 }
 
 TEST(api_create_device_profile, overrite_with_supported_extensions) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
+    const char* profile = VP_LUNARG_DESKTOP_BASELINE_2022_NAME;
 
     static const char* extensions[] = {"VK_KHR_image_format_list", "VK_KHR_maintenance3", "VK_KHR_imageless_framebuffer"};
 
@@ -86,7 +87,8 @@ TEST(api_create_device_profile, overrite_with_supported_extensions) {
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
+    profileInfo.enabledProfileCount = 1;
+    profileInfo.ppEnabledProfileNames = &profile;
     profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
     VkDevice device = VK_NULL_HANDLE;
@@ -96,7 +98,7 @@ TEST(api_create_device_profile, overrite_with_supported_extensions) {
 }
 
 TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
+    const char* profile = VP_LUNARG_DESKTOP_BASELINE_2022_NAME;
 
     static const char* extensions[] = {"VK_LUNARG_doesnot_exist", "VK_GTRUC_automagic_rendering",
                                        "VK_GTRUC_portability_everywhere"};
@@ -112,7 +114,8 @@ TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
+    profileInfo.enabledProfileCount = 1;
+    profileInfo.ppEnabledProfileNames = &profile;
     profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
 
     VkDevice device = VK_NULL_HANDLE;
@@ -123,7 +126,7 @@ TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
 
 
 TEST(api_create_device_profile, overrite_with_enabled_features) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
+    const char* profile = VP_LUNARG_DESKTOP_BASELINE_2022_NAME;
 
     VkPhysicalDeviceFeatures enabledFeatures = {};
     enabledFeatures.robustBufferAccess = VK_TRUE;
@@ -139,7 +142,8 @@ TEST(api_create_device_profile, overrite_with_enabled_features) {
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
+    profileInfo.enabledProfileCount = 1;
+    profileInfo.ppEnabledProfileNames = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
@@ -148,7 +152,7 @@ TEST(api_create_device_profile, overrite_with_enabled_features) {
 }
 
 TEST(api_create_device_profile, overrite_with_pnext_features) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
+    const char* profile = VP_LUNARG_DESKTOP_BASELINE_2022_NAME;
 
     VkPhysicalDeviceSubgroupSizeControlFeaturesEXT deviceFeatures = {};
     deviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES_EXT;
@@ -167,7 +171,8 @@ TEST(api_create_device_profile, overrite_with_pnext_features) {
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
+    profileInfo.enabledProfileCount = 1;
+    profileInfo.ppEnabledProfileNames = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
@@ -176,7 +181,7 @@ TEST(api_create_device_profile, overrite_with_pnext_features) {
 }
 
 TEST(api_create_device_profile, with_extensions_flag) {
-    const VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
+    const char* profile = VP_LUNARG_DESKTOP_BASELINE_2022_NAME;
 
     static const char* extensions[] = {VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME};
 
@@ -189,7 +194,8 @@ TEST(api_create_device_profile, with_extensions_flag) {
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
+    profileInfo.enabledProfileCount = 1;
+    profileInfo.ppEnabledProfileNames = &profile;
 
     // override profile extensions
     {
@@ -227,43 +233,27 @@ TEST(api_create_device_profile, with_extensions_flag) {
         EXPECT_TRUE(device != VK_NULL_HANDLE);
     }
 }
-/*
-TEST(api_get_profile_support, supported_version) {
-    VpProfileProperties profile{VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
-    VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
-    EXPECT_EQ(VK_TRUE, supported);
-}
-*/
 TEST(api_get_profile_support, supported_desktop_baseline_2022) {
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
+    const char* profile = VP_LUNARG_DESKTOP_BASELINE_2022_NAME;
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, profile, &supported);
     EXPECT_EQ(VK_TRUE, supported);
 }
 
 TEST(api_get_profile_support, unsupported_name) {
-    VpProfileProperties profile{"Bouuahhhh", VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
+    const char* profile = "Bouuahhhh";
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
-    EXPECT_EQ(VK_FALSE, supported);
-}
-
-TEST(api_get_profile_support, unsupported_version) {
-    VpProfileProperties profile{VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION + 1};
-
-    VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, profile, &supported);
     EXPECT_EQ(VK_FALSE, supported);
 }
 
 TEST(api_get_profile_support, empty) {
-    VpProfileProperties profile = {};
+    const char* profile = nullptr;
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, profile, &supported);
     EXPECT_EQ(VK_FALSE, supported);
 }

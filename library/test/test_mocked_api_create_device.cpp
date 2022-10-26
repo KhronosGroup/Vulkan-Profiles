@@ -563,7 +563,7 @@ TEST(mocked_api_create_device, disable_robust_buffer_access) {
 TEST(mocked_api_create_device, disable_robust_image_access) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION };
+    const char* profile = VP_KHR_ROADMAP_2022_NAME;
 
     VkDeviceQueueCreateInfo queueCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
     queueCreateInfo.queueFamilyIndex = 0;
@@ -610,7 +610,7 @@ TEST(mocked_api_create_device, disable_robust_image_access) {
 TEST(mocked_api_create_device, disable_robust_access) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION };
+    const char *profile = VP_KHR_ROADMAP_2022_NAME;
 
     VkDeviceQueueCreateInfo queueCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
     queueCreateInfo.queueFamilyIndex = 0;
@@ -646,7 +646,7 @@ TEST(mocked_api_create_device, disable_robust_access) {
         VK_STRUCT(outFeatures13)
     });
 
-    VpDeviceCreateInfo createInfo{ &inCreateInfo, &profile, VP_DEVICE_CREATE_DISABLE_ROBUST_ACCESS };
+    VpDeviceCreateInfo createInfo{ &inCreateInfo, 1, &profile, VP_DEVICE_CREATE_DISABLE_ROBUST_ACCESS };
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
