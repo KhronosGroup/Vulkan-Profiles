@@ -25,7 +25,7 @@
 TEST(mocked_api_create_instance, vulkan10_no_app_info) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
+    const char* profile = VP_ANDROID_BASELINE_2021_NAME;
 
     std::vector<const char*> dummyLayerNames{ "VK_DUMMY_layer1", "VK_DUMMY_layer2" };
 
@@ -45,7 +45,7 @@ TEST(mocked_api_create_instance, vulkan10_no_app_info) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 1, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -57,7 +57,7 @@ TEST(mocked_api_create_instance, vulkan10_no_app_info) {
 TEST(mocked_api_create_instance, vulkan10_with_app_info) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
+    const char* profile = VP_ANDROID_BASELINE_2021_NAME;
 
     std::vector<const char*> dummyLayerNames{ "VK_DUMMY_layer1" };
 
@@ -81,7 +81,7 @@ TEST(mocked_api_create_instance, vulkan10_with_app_info) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 1, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -93,7 +93,7 @@ TEST(mocked_api_create_instance, vulkan10_with_app_info) {
 TEST(mocked_api_create_instance, vulkan11) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
+    const char* profile = VP_ANDROID_BASELINE_2021_NAME;
 
     std::vector<const char*> dummyLayerNames{ "VK_DUMMY_layer1", "VK_DUMMY_layer2", "VK_DUMMY_layer3" };
 
@@ -113,7 +113,7 @@ TEST(mocked_api_create_instance, vulkan11) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 1, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -125,7 +125,7 @@ TEST(mocked_api_create_instance, vulkan11) {
 TEST(mocked_api_create_instance, default_extensions) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
+    const char* profile = VP_ANDROID_BASELINE_2021_NAME;
 
     VkApplicationInfo inAppInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
     inAppInfo.apiVersion = VK_API_VERSION_1_1;
@@ -145,7 +145,7 @@ TEST(mocked_api_create_instance, default_extensions) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, 0 };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 1, &profile, 0 };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -157,7 +157,7 @@ TEST(mocked_api_create_instance, default_extensions) {
 TEST(mocked_api_create_instance, default_extensions_negative) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
+    const char* profile = VP_ANDROID_BASELINE_2021_NAME;
 
     VkApplicationInfo inAppInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
     inAppInfo.apiVersion = VK_API_VERSION_1_1;
@@ -185,7 +185,7 @@ TEST(mocked_api_create_instance, default_extensions_negative) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, 0 };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 1, &profile, 0 };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -200,7 +200,7 @@ TEST(mocked_api_create_instance, default_extensions_negative) {
 TEST(mocked_api_create_instance, override_extensions) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
+    const char* profile = VP_ANDROID_BASELINE_2021_NAME;
 
     VkApplicationInfo inAppInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
     inAppInfo.apiVersion = VK_API_VERSION_1_1;
@@ -220,7 +220,7 @@ TEST(mocked_api_create_instance, override_extensions) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 1, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -232,7 +232,7 @@ TEST(mocked_api_create_instance, override_extensions) {
 TEST(mocked_api_create_instance, merge_extensions) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
+    const char* profile = VP_ANDROID_BASELINE_2021_NAME;
 
     VkApplicationInfo inAppInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
     inAppInfo.apiVersion = VK_API_VERSION_1_1;
@@ -261,7 +261,7 @@ TEST(mocked_api_create_instance, merge_extensions) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 1, &profile, VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -274,7 +274,7 @@ TEST(mocked_api_create_instance, merge_extensions) {
 TEST(mocked_api_create_instance, retain_chained_structs) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
+    const char* profile = VP_ANDROID_BASELINE_2021_NAME;
 
     int dummyData;
     VkValidationFlagsEXT validationFlags{ VK_STRUCTURE_TYPE_VALIDATION_FLAGS_EXT };
@@ -301,7 +301,7 @@ TEST(mocked_api_create_instance, retain_chained_structs) {
         VK_STRUCT(debugReportCallback),
     });
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 1, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
