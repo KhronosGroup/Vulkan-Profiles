@@ -24,7 +24,7 @@
 TEST(mocked_api_create_device, default_extensions) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION };
+    const char* profile = VP_KHR_ROADMAP_2022_NAME;
 
     VkDeviceQueueCreateInfo queueCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
     queueCreateInfo.queueFamilyIndex = 0;
@@ -48,7 +48,7 @@ TEST(mocked_api_create_device, default_extensions) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, &outFeatures);
+    vpGetProfileFeatures(VP_KHR_ROADMAP_2022_NAME, &outFeatures);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(outFeatures),
@@ -57,7 +57,7 @@ TEST(mocked_api_create_device, default_extensions) {
         VK_STRUCT(outFeatures13)
     });
 
-    VpDeviceCreateInfo createInfo{ &inCreateInfo, &profile, 0 };
+    VpDeviceCreateInfo createInfo{ &inCreateInfo, 1, &profile, 0 };
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
@@ -69,7 +69,8 @@ TEST(mocked_api_create_device, default_extensions) {
 TEST(mocked_api_create_device, default_extensions_negative) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION };
+    const char *profile = VP_KHR_ROADMAP_2022_NAME;
+};
 
     VkDeviceQueueCreateInfo queueCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
     queueCreateInfo.queueFamilyIndex = 0;
@@ -100,7 +101,7 @@ TEST(mocked_api_create_device, default_extensions_negative) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, &outFeatures);
+    vpGetProfileFeatures(profile, &outFeatures);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(outFeatures),
@@ -109,7 +110,7 @@ TEST(mocked_api_create_device, default_extensions_negative) {
         VK_STRUCT(outFeatures13)
     });
 
-    VpDeviceCreateInfo createInfo{ &inCreateInfo, &profile, 0 };
+    VpDeviceCreateInfo createInfo{ &inCreateInfo, 1, &profile, 0 };
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
@@ -124,7 +125,7 @@ TEST(mocked_api_create_device, default_extensions_negative) {
 TEST(mocked_api_create_device, override_extensions) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION };
+    const char* profile = VP_KHR_ROADMAP_2022_NAME;
 
     VkDeviceQueueCreateInfo queueCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
     queueCreateInfo.queueFamilyIndex = 0;
@@ -156,7 +157,7 @@ TEST(mocked_api_create_device, override_extensions) {
         VK_STRUCT(outFeatures13)
     });
 
-    VpDeviceCreateInfo createInfo{ &inCreateInfo, &profile, VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT };
+    VpDeviceCreateInfo createInfo{ &inCreateInfo, 1, &profile, VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT };
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
@@ -597,7 +598,7 @@ TEST(mocked_api_create_device, disable_robust_image_access) {
         VK_STRUCT(outFeatures13)
     });
 
-    VpDeviceCreateInfo createInfo{ &inCreateInfo, &profile, VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT };
+    VpDeviceCreateInfo createInfo{ &inCreateInfo, 1, &profile, VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT };
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);

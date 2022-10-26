@@ -158,7 +158,8 @@ typedef VkFlags VpInstanceCreateFlags;
 
 typedef struct VpInstanceCreateInfo {
     const VkInstanceCreateInfo* pCreateInfo;
-    const VpProfileProperties*  pProfile;
+    uint32_t                    enabledProfileCount;
+    const char* const*          ppEnabledProfileNames;
     VpInstanceCreateFlags       flags;
 } VpInstanceCreateInfo;
 
@@ -201,7 +202,8 @@ typedef VkFlags VpDeviceCreateFlags;
 
 typedef struct VpDeviceCreateInfo {
     const VkDeviceCreateInfo*   pCreateInfo;
-    const VpProfileProperties*  pProfile;
+    uint32_t                    enabledProfileCount;
+    const char* const*          ppEnabledProfileNames;
     VpDeviceCreateFlags         flags;
 } VpDeviceCreateInfo;
 
@@ -209,10 +211,10 @@ typedef struct VpDeviceCreateInfo {
 VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // List the recommended fallback profiles of a profile
-VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+VPAPI_ATTR VkResult vpGetProfileFallbacks(const char* pProfileName, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
 // Check whether a profile is supported at the instance level
-VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported);
+VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const char* pProfileName, VkBool32 *pSupported);
 
 // Create a VkInstance with the profile instance extensions enabled
 VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
@@ -220,50 +222,50 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
 
 // Check whether a profile is supported by the physical device
 VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhysicalDevice physicalDevice,
-                                                      const VpProfileProperties *pProfile, VkBool32 *pSupported);
+                                                      const char* pProfileName, VkBool32 *pSupported);
 
 // Create a VkDevice with the profile features and device extensions enabled
 VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
                                    const VkAllocationCallbacks *pAllocator, VkDevice *pDevice);
 
 // Query the list of instance extensions of a profile
-VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const char* pProfileName, uint32_t *pPropertyCount,
                                                             VkExtensionProperties *pProperties);
 
 // Query the list of device extensions of a profile
-VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const char* pProfileName, uint32_t *pPropertyCount,
                                                           VkExtensionProperties *pProperties);
 
 // Fill the feature structures with the requirements of a profile
-VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
+VPAPI_ATTR void vpGetProfileFeatures(const char* pProfileName, void *pNext);
 
 // Query the list of feature structure types specified by the profile
-VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const char* pProfileName, uint32_t *pStructureTypeCount,
                                                       VkStructureType *pStructureTypes);
 
 // Fill the property structures with the requirements of a profile
-VPAPI_ATTR void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext);
+VPAPI_ATTR void vpGetProfileProperties(const char* pProfileName, void *pNext);
 
 // Query the list of property structure types specified by the profile
-VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const char* pProfileName, uint32_t *pStructureTypeCount,
                                                        VkStructureType *pStructureTypes);
 
 // Query the requirements of queue families by a profile
-VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const char* pProfileName, uint32_t *pPropertyCount,
                                                       VkQueueFamilyProperties2KHR *pProperties);
 
 // Query the list of query family structure types specified by the profile
-VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const char* pProfileName, uint32_t *pStructureTypeCount,
                                                           VkStructureType *pStructureTypes);
 
 // Query the list of formats with specified requirements by a profile
-VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
+VPAPI_ATTR VkResult vpGetProfileFormats(const char* pProfileName, uint32_t *pFormatCount, VkFormat *pFormats);
 
 // Query the requirements of a format for a profile
-VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
+VPAPI_ATTR void vpGetProfileFormatProperties(const char* pProfileName, VkFormat format, void *pNext);
 
 // Query the list of format structure types specified by the profile
-VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const char* pProfileName, uint32_t *pStructureTypeCount,
                                                      VkStructureType *pStructureTypes);
 '''
 
@@ -447,10 +449,10 @@ VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties 
     return result;
 }
 
-VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
+VPAPI_ATTR VkResult vpGetProfileFallbacks(const char* pProfileName, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
     VkResult result = VK_SUCCESS;
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     if (pProperties == nullptr) {
@@ -468,7 +470,7 @@ VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, u
     return result;
 }
 
-VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported) {
+VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const char* pProfileName, VkBool32 *pSupported) {
     VkResult result = VK_SUCCESS;
 
     uint32_t apiVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -492,15 +494,10 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
         return result;
     }
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     *pSupported = VK_TRUE;
-
-    if (pDesc->props.specVersion < pProfile->specVersion) {
-        VP_DEBUG_MSGF("Unsupported profile version: %u", pProfile->specVersion);
-        *pSupported = VK_FALSE;
-    }
 
     if (!detail::vpCheckVersion(apiVersion, pDesc->minApiVersion)) {
         VP_DEBUG_MSGF("Unsupported API version: %u.%u.%u", VK_API_VERSION_MAJOR(pDesc->minApiVersion), VK_API_VERSION_MINOR(pDesc->minApiVersion), VK_API_VERSION_PATCH(pDesc->minApiVersion));
@@ -543,69 +540,71 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
         createInfo = *pCreateInfo->pCreateInfo;
         pInstanceCreateInfo = &createInfo;
 
-        const detail::VpProfileDesc* pDesc = nullptr;
-        if (pCreateInfo->pProfile != nullptr) {
-            pDesc = detail::vpGetProfileDesc(pCreateInfo->pProfile->profileName);
-            if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
-        }
-
-        if (createInfo.pApplicationInfo == nullptr) {
-            appInfo.apiVersion = pDesc->minApiVersion;
-            createInfo.pApplicationInfo = &appInfo;
-        }
-
-        if (pDesc != nullptr && pDesc->pInstanceExtensions != nullptr) {
-            bool merge = (pCreateInfo->flags & VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT) != 0;
-            bool override = (pCreateInfo->flags & VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0;
-
-            if (!merge && !override && pCreateInfo->pCreateInfo->enabledExtensionCount > 0) {
-                // If neither merge nor override is used then the application must not specify its
-                // own extensions
-                return VK_ERROR_UNKNOWN;
+        for (uint32_t profileIndex = 0; profileIndex < pCreateInfo->enabledProfileCount; ++profileIndex) {
+            const detail::VpProfileDesc* pDesc = nullptr;
+            if (pCreateInfo->ppEnabledProfileNames[profileIndex] != nullptr) {
+                pDesc = detail::vpGetProfileDesc(pCreateInfo->ppEnabledProfileNames[profileIndex]);
+                if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
             }
 
-            detail::vpGetExtensions(pCreateInfo->pCreateInfo->enabledExtensionCount,
-                                    pCreateInfo->pCreateInfo->ppEnabledExtensionNames,
-                                    pDesc->instanceExtensionCount,
-                                    pDesc->pInstanceExtensions,
-                                    extensions, merge, override);
-            {
-                bool foundPortEnum = false;
-                for (size_t i = 0; i < extensions.size(); ++i) {
-                    if (strcmp(extensions[i], VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME) == 0) {
-                        foundPortEnum = true;
-                        break;
+            if (createInfo.pApplicationInfo == nullptr) {
+                appInfo.apiVersion = pDesc->minApiVersion;
+                createInfo.pApplicationInfo = &appInfo;
+            }
+
+            if (pDesc != nullptr && pDesc->pInstanceExtensions != nullptr) {
+                bool merge = (pCreateInfo->flags & VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT) != 0;
+                bool override = (pCreateInfo->flags & VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0;
+
+                if (!merge && !override && pCreateInfo->pCreateInfo->enabledExtensionCount > 0) {
+                    // If neither merge nor override is used then the application must not specify its
+                    // own extensions
+                    return VK_ERROR_UNKNOWN;
+                }
+
+                detail::vpGetExtensions(pCreateInfo->pCreateInfo->enabledExtensionCount,
+                                        pCreateInfo->pCreateInfo->ppEnabledExtensionNames,
+                                        pDesc->instanceExtensionCount,
+                                        pDesc->pInstanceExtensions,
+                                        extensions, merge, override);
+                {
+                    bool foundPortEnum = false;
+                    for (size_t i = 0; i < extensions.size(); ++i) {
+                        if (strcmp(extensions[i], VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME) == 0) {
+                            foundPortEnum = true;
+                            break;
+                        }
+                    }
+                    if (foundPortEnum) {
+                        createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
                     }
                 }
-                if (foundPortEnum) {
-                    createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
-                }
-            }
 
-            // Need to include VK_KHR_get_physical_device_properties2 if we are on Vulkan 1.0
-            if (createInfo.pApplicationInfo->apiVersion < VK_API_VERSION_1_1) {
-                bool foundGPDP2 = false;
-                for (size_t i = 0; i < extensions.size(); ++i) {
-                    if (strcmp(extensions[i], VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME) == 0) {
-                        foundGPDP2 = true;
-                        break;
+                // Need to include VK_KHR_get_physical_device_properties2 if we are on Vulkan 1.0
+                if (createInfo.pApplicationInfo->apiVersion < VK_API_VERSION_1_1) {
+                    bool foundGPDP2 = false;
+                    for (size_t i = 0; i < extensions.size(); ++i) {
+                        if (strcmp(extensions[i], VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME) == 0) {
+                            foundGPDP2 = true;
+                            break;
+                        }
+                    }
+                    if (!foundGPDP2) {
+                        extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
                     }
                 }
-                if (!foundGPDP2) {
-                    extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-                }
             }
-
-            createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-            createInfo.ppEnabledExtensionNames = extensions.data();
         }
+
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+        createInfo.ppEnabledExtensionNames = extensions.data();
     }
 
     return vkCreateInstance(pInstanceCreateInfo, pAllocator, pInstance);
 }
 
 VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhysicalDevice physicalDevice,
-                                                      const VpProfileProperties *pProfile, VkBool32 *pSupported) {
+                                                      const char* pProfileName, VkBool32 *pSupported) {
     VkResult result = VK_SUCCESS;
 
     uint32_t extCount = 0;
@@ -627,7 +626,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
         ext.resize(extCount);
     }
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     struct GPDP2EntryPoints {
@@ -985,11 +984,11 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
     return userData.result;
 }
 
-VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const char* pProfileName, uint32_t *pPropertyCount,
                                                             VkExtensionProperties *pProperties) {
     VkResult result = VK_SUCCESS;
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     if (pProperties == nullptr) {
@@ -1007,11 +1006,11 @@ VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfilePrope
     return result;
 }
 
-VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const char* pProfileName, uint32_t *pPropertyCount,
                                                           VkExtensionProperties *pProperties) {
     VkResult result = VK_SUCCESS;
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     if (pProperties == nullptr) {
@@ -1029,7 +1028,7 @@ VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfilePropert
     return result;
 }
 
-VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext) {
+VPAPI_ATTR void vpGetProfileFeatures(const char* pProfileName, void *pNext) {
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
     if (pDesc != nullptr && pDesc->feature.pfnFiller != nullptr) {
         VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
@@ -1040,11 +1039,11 @@ VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *
     }
 }
 
-VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const char* pProfileName, uint32_t *pStructureTypeCount,
                                                       VkStructureType *pStructureTypes) {
     VkResult result = VK_SUCCESS;
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     if (pStructureTypes == nullptr) {
@@ -1062,8 +1061,8 @@ VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties 
     return result;
 }
 
-VPAPI_ATTR void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext) {
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+VPAPI_ATTR void vpGetProfileProperties(const char* pProfileName, void *pNext) {
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfileName);
     if (pDesc != nullptr && pDesc->property.pfnFiller != nullptr) {
         VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
         while (p != nullptr) {
@@ -1073,11 +1072,11 @@ VPAPI_ATTR void vpGetProfileProperties(const VpProfileProperties *pProfile, void
     }
 }
 
-VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const char* pProfileName, uint32_t *pStructureTypeCount,
                                                        VkStructureType *pStructureTypes) {
     VkResult result = VK_SUCCESS;
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     if (pStructureTypes == nullptr) {
@@ -1095,11 +1094,11 @@ VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties
     return result;
 }
 
-VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const char* pProfileName, uint32_t *pPropertyCount,
                                                       VkQueueFamilyProperties2KHR *pProperties) {
     VkResult result = VK_SUCCESS;
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     if (pProperties == nullptr) {
@@ -1121,11 +1120,11 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties 
     return result;
 }
 
-VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const char* pProfileName, uint32_t *pStructureTypeCount,
                                                           VkStructureType *pStructureTypes) {
     VkResult result = VK_SUCCESS;
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     if (pStructureTypes == nullptr) {
@@ -1143,10 +1142,10 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfilePropert
     return result;
 }
 
-VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats) {
+VPAPI_ATTR VkResult vpGetProfileFormats(const char* pProfileName, uint32_t *pFormatCount, VkFormat *pFormats) {
     VkResult result = VK_SUCCESS;
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     if (pFormats == nullptr) {
@@ -1164,8 +1163,8 @@ VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uin
     return result;
 }
 
-VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext) {
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+VPAPI_ATTR void vpGetProfileFormatProperties(const char* pProfileName, VkFormat format, void *pNext) {
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfileName);
     if (pDesc == nullptr) return;
 
     for (uint32_t i = 0; i < pDesc->formatCount; ++i) {
@@ -1199,11 +1198,11 @@ VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile
     }
 }
 
-VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
+VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const char* pProfileName, uint32_t *pStructureTypeCount,
                                                      VkStructureType *pStructureTypes) {
     VkResult result = VK_SUCCESS;
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfileName);
     if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     if (pStructureTypes == nullptr) {
