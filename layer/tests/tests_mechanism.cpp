@@ -674,6 +674,23 @@ TEST_F(TestsMechanism, reading_duplicated_members) {
     ASSERT_EQ(err, VK_ERROR_INITIALIZATION_FAILED);
 }
 
+TEST_F(TestsMechanism, capabilities_or) {
+    TEST_DESCRIPTION("Test profile using capabilities or");
+
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    VkProfileLayerSettingsEXT settings;
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_capabilities.json";
+    settings.emulate_portability = true;
+    settings.profile_name = "VP_LUNARG_test_capabilities_or";
+    settings.simulate_capabilities = SIMULATE_MAX_ENUM;
+    settings.debug_fail_on_error = true;
+
+    err = inst_builder.init(&settings);
+    EXPECT_EQ(err, VK_SUCCESS);
+}
 
 TEST_F(TestsMechanism, TestParsingAllFormatProperties) {
     TEST_DESCRIPTION("Test all different ways of setting image formats");
