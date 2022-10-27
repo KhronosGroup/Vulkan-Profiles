@@ -417,6 +417,8 @@ TEST_F(TestsMechanism, api_versions) {
 }
 
 TEST_F(TestsMechanism, selecting_profile) {
+    TEST_DESCRIPTION("Test selecting profile from a profiles file with multiple profiles");
+
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
@@ -583,6 +585,8 @@ TEST_F(TestsMechanism, selecting_profile) {
 }
 
 TEST_F(TestsMechanism, reading_flags) {
+    TEST_DESCRIPTION("Test profile specifying flags bits");
+
 #if defined(VK_NV_fragment_shading_rate_enums) && defined(VK_KHR_fragment_shading_rate) && defined(VK_KHR_shader_float_controls)
     VkResult err = VK_SUCCESS;
 
@@ -649,6 +653,8 @@ TEST_F(TestsMechanism, reading_flags) {
 }
 
 TEST_F(TestsMechanism, reading_duplicated_members) {
+    TEST_DESCRIPTION("Test profile using duplicated members");
+
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
@@ -670,6 +676,8 @@ TEST_F(TestsMechanism, reading_duplicated_members) {
 
 
 TEST_F(TestsMechanism, TestParsingAllFormatProperties) {
+    TEST_DESCRIPTION("Test all different ways of setting image formats");
+
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;

@@ -36,6 +36,8 @@ class LayerTests : public VkTestFramework {
 };
 
 TEST_F(LayerTests, TestSetCombinationMode) {
+    TEST_DESCRIPTION("Test different profile capabilities settings");
+
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
@@ -170,6 +172,8 @@ TEST_F(LayerTests, TestSetCombinationMode) {
 }
 
 TEST_F(LayerTests, TestExtensionNotSupported) {
+    TEST_DESCRIPTION("Test using a profile with an unsupported extension for the device");
+
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
@@ -207,6 +211,8 @@ TEST_F(LayerTests, TestExtensionNotSupported) {
 }
 
 TEST_F(LayerTests, TestExcludingDeviceExtensions) {
+    TEST_DESCRIPTION("Test specifying device extensions to be excluded from being reported by the device");
+
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
@@ -264,6 +270,8 @@ TEST_F(LayerTests, TestExcludingDeviceExtensions) {
 }
 
 TEST_F(LayerTests, TestExcludingFormats) {
+    TEST_DESCRIPTION("Test specifying image formats to be excluded from being reported by the device");
+
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
@@ -503,6 +511,8 @@ TEST_F(LayerTests, TestQueueFamilyPropertiesGlobalPriorityProperties) {
 }
 
 TEST_F(LayerTests, TestQueueFamilyCheckpointProperties) {
+    TEST_DESCRIPTION("Test profile with VK_NV_device_diagnostic_checkpoints extension");
+
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
@@ -534,6 +544,8 @@ TEST_F(LayerTests, TestQueueFamilyCheckpointProperties) {
 }
 
 TEST_F(LayerTests, TestQueueFamilyCheckpointProperties2) {
+    TEST_DESCRIPTION("Test profile with VK_NV_device_diagnostic_checkpoints extension");
+
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
@@ -567,6 +579,8 @@ TEST_F(LayerTests, TestQueueFamilyCheckpointProperties2) {
 }
 
 TEST_F(LayerTests, TestQueueFamilyPropertiesPartial) {
+    TEST_DESCRIPTION("Test profile with queue family properties that does not specify all members");
+
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
