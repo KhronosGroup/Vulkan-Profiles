@@ -699,7 +699,7 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfNotEqual(const char *name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
+    static bool WarnIfNotEqual64u(const char *name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
         if (new_value != old_value) {
             if (not_modifiable) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
@@ -3967,7 +3967,10 @@ class VulkanProfilesLayerGenerator():
                 elif 'max' in member.limittype or 'bits' in member.limittype:
                     gen += '        GET_VALUE_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfGreater);\n'
                 else:
-                    gen += '        GET_VALUE_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfNotEqual);\n'
+                    if member.type == 'uint64_t':
+                        gen += '        GET_VALUE_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfNotEqual64u);\n'
+                    else:
+                        gen += '        GET_VALUE_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfNotEqual);\n'
             elif member.type == 'int64_t':
                 if 'min' in member.limittype:
                     gen += '        GET_VALUE_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfLesser);\n'
