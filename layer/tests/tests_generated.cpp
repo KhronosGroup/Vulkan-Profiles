@@ -2057,8 +2057,9 @@ TEST_F(TestsCapabilitiesGenerated, TestShaderCoreBuiltinsPropertiesARM) {
     gpu_props_profile.pNext = &shader_core_builtins_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(shader_core_builtins_properties_profile.shaderCoreCount, 213);
-    EXPECT_EQ(shader_core_builtins_properties_profile.shaderWarpsPerCore, 214);
+    EXPECT_EQ(shader_core_builtins_properties_profile.shaderCoreMask, 213);
+    EXPECT_EQ(shader_core_builtins_properties_profile.shaderCoreCount, 214);
+    EXPECT_EQ(shader_core_builtins_properties_profile.shaderWarpsPerCore, 215);
 #endif
 }
 
@@ -2067,7 +2068,7 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_UNDEFINED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
     VkFormatFeatureFlags optimal_tiling_features = 0;
     VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
