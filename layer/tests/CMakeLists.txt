@@ -57,7 +57,7 @@ function(LayerTest NAME)
         )
     target_link_libraries(${TEST_NAME} gtest gtest_main)
     target_link_libraries(${TEST_NAME} Vulkan::Vulkan)
-    target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="${CMAKE_BINARY_DIR}/profiles/test/")
+    target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/test/data/")
 
     target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="${CMAKE_BINARY_DIR}/")
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
