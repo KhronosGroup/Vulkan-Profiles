@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.1-204.json#",
     "capabilities": {
         "block0": {
         },
@@ -17,6 +17,22 @@
             "capabilities": [
                 "block0",
                 "block1"
+            ],
+            "contributors": {
+                "Christophe Riccio": {
+                    "company": "LunarG",
+                    "email": "christophe@lunarg.com",
+                    "github": "christophe-lunarg",
+                    "contact": true
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2021-12-08",
+                    "author": "Christophe Riccio",
+                    "comment": "Initial revision"
+                }
             ]
         },
         "VP_LUNARG_test_capabilities_or": {
@@ -25,27 +41,24 @@
             "label": "Device extensions",
             "description": "Unit test file",
             "capabilities": [
-                [
-                    "block0",
-                    "block1"
-                ]
+                [ "block0", "block1" ]
+            ],
+            "contributors": {
+                "Christophe Riccio": {
+                    "company": "LunarG",
+                    "email": "christophe@lunarg.com",
+                    "github": "christophe-lunarg",
+                    "contact": true
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2021-12-08",
+                    "author": "Christophe Riccio",
+                    "comment": "Initial revision"
+                }
             ]
         }
-    },
-    "contributors": {
-        "Christophe Riccio": {
-            "company": "LunarG",
-            "email": "christophe@lunarg.com",
-            "github": "christophe-lunarg",
-            "contact": true
-        }
-    },
-    "history": [
-        {
-            "revision": 1,
-            "date": "2021-12-08",
-            "author": "Christophe Riccio",
-            "comment": "Initial revision"
-        }
-    ]
+    }
 }
