@@ -55,6 +55,12 @@ adb shell setprop debug.vulkan.khronos_profiles.debug_reports DEBUG_REPORT_DEBUG
 adb shell setprop debug.vulkan.khronos_profiles.debug_fail_on_error true
 ```
 
+#### Settings File
+Layer options may also be specified through a layer settings file on Android using the `debug.vulkan.khronos_profiles.settings_path` system property.
+```
+adb shell setprop debug.vulkan.khronos_profiles.settings_path </path/to/vk_layer_settings.txt>
+```
+
 ## Technical Details
 
 The *Profiles Layer* is a Vulkan layer that can modify the results of Vulkan PhysicalDevice queries based on a profiles file (JSON format), thus simulating some of the capabilities of a device by overriding the capabilities of the actual device under test.

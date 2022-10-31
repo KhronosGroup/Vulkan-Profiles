@@ -51,6 +51,10 @@
 #define GetCurrentDir getcwd
 #endif
 
+#ifdef __ANDROID__
+#include <sys/system_properties.h>
+#endif
+
 namespace vku {
 
 static std::string format(const char *message, ...) {
@@ -130,17 +134,25 @@ class LayerSettings {
 
 static LayerSettings vk_layer_settings;
 
+#if defined(__ANDROID__)
+std::string GetAndroidProperty(const char* name) {
+    std::string output;
+    const prop_info* pi = __system_property_find(name);
+    if (pi) {
+        __system_property_read_callback(
+            pi,
+            [](void* cookie, const char* name, const char* value, uint32_t serial) {
+                reinterpret_cast<std::string*>(cookie)->assign(value);
+            },
+            reinterpret_cast<void*>(&output));
+    }
+    return output;
+}
+#endif
+
 static bool IsEnvironment(const char *variable) {
 #if defined(__ANDROID__)
-    std::string command = "getprop " + std::string(variable);
-    FILE *pPipe = popen(command.c_str(), "r");
-    if (pPipe != nullptr) {
-        pclose(pPipe);
-
-        return true;
-    } else {
-        return false;
-    }
+    return !GetAndroidProperty(variable).empty();
 #else
     return std::getenv(variable) != NULL;
 #endif
@@ -148,22 +160,7 @@ static bool IsEnvironment(const char *variable) {
 
 static std::string GetEnvironment(const char *variable) {
 #if defined(__ANDROID__)
-    std::string command = "getprop " + std::string(variable);
-    FILE *pPipe = popen(command.c_str(), "r");
-    if (pPipe != nullptr) {
-        char value[256];
-        fgets(value, 256, pPipe);
-        pclose(pPipe);
-
-        // Make sure its not an empty line
-        if (strcspn(value, "\r\n") == 0) {
-            return "";
-        } else {
-            return std::string(value);
-        }
-    } else {
-        return "";
-    }
+    return GetAndroidProperty(variable);
 #else
     const char *output = std::getenv(variable);
     return output == NULL ? "" : output;
@@ -571,8 +568,13 @@ std::string LayerSettings::FindSettings() {
     }
 
 #endif
-    // Look for an enviornment variable override for the settings file location
+
+#ifdef __ANDROID__
+    std::string env_path = GetEnvironment("debug.vulkan.khronos_profiles.settings_path");
+#else
+    // Look for an environment variable override for the settings file location
     std::string env_path = GetEnvironment("VK_LAYER_SETTINGS_PATH");
+#endif
 
     // If the path exists use it, else use vk_layer_settings
     if (stat(env_path.c_str(), &info) == 0) {
