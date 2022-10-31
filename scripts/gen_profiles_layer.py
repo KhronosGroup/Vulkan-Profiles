@@ -2897,9 +2897,9 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
                 *pFormatProperties = device_format;
             }
 
-            if (!HasFlags(pFormatProperties->linearTilingFeatures, device_format.linearTilingFeatures) ||
-                !HasFlags(pFormatProperties->optimalTilingFeatures, device_format.optimalTilingFeatures) ||
-                !HasFlags(pFormatProperties->bufferFeatures, device_format.bufferFeatures)) {
+            if (!HasFlags(device_format.linearTilingFeatures, pFormatProperties->linearTilingFeatures) ||
+                !HasFlags(device_format.optimalTilingFeatures, pFormatProperties->optimalTilingFeatures) ||
+                !HasFlags(device_format.bufferFeatures, pFormatProperties->bufferFeatures)) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT,
                            ::format("format %s is simulating unsupported features!\\n", vkFormatToString(format).c_str()));
             }
