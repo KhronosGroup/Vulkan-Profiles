@@ -17,22 +17,6 @@
             "capabilities": [
                 "block0",
                 "block1"
-            ],
-            "contributors": {
-                "Christophe Riccio": {
-                    "company": "LunarG",
-                    "email": "christophe@lunarg.com",
-                    "github": "christophe-lunarg",
-                    "contact": true
-                }
-            },
-            "history": [
-                {
-                    "revision": 1,
-                    "date": "2021-12-08",
-                    "author": "Christophe Riccio",
-                    "comment": "Initial revision"
-                }
             ]
         },
         "VP_LUNARG_test_capabilities_or": {
@@ -42,23 +26,23 @@
             "description": "Unit test file",
             "capabilities": [
                 [ "block0", "block1" ]
-            ],
-            "contributors": {
-                "Christophe Riccio": {
-                    "company": "LunarG",
-                    "email": "christophe@lunarg.com",
-                    "github": "christophe-lunarg",
-                    "contact": true
-                }
-            },
-            "history": [
-                {
-                    "revision": 1,
-                    "date": "2021-12-08",
-                    "author": "Christophe Riccio",
-                    "comment": "Initial revision"
-                }
             ]
         }
-    }
+    },
+    "contributors": {
+        "Christophe Riccio": {
+            "company": "LunarG",
+            "email": "christophe@lunarg.com",
+            "github": "christophe-lunarg",
+            "contact": true
+        }
+    },
+    "history": [
+        {
+            "revision": 1,
+            "date": "2021-12-08",
+            "author": "Christophe Riccio",
+            "comment": "Initial revision"
+        }
+    ]
 }
