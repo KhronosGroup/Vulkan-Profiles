@@ -44,15 +44,15 @@ To use the Profiles Layer Vulkan version 1.1 is required.
 Example of a *Profiles layer* JSON profiles file: [VP_LUNARG_test_structure_simple.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/test/data/VP_LUNARG_test_structure_simple.json)
 
 ### Android
-To enable, use a setting with the path of the profiles file to load:
+To enable, use a system property with the path of the profiles file to load:
 ```
-adb shell settings put global debug.vulkan.khronos_profiles.profile_file <path/to/profiles/JSON/file>
+adb shell setprop debug.vulkan.khronos_profiles.profile_file <path/to/profiles/JSON/file>
 ```
 
-Optional: use settings to enable debugging output and exit-on-error:
+Optional: use system properties to enable debugging output and exit-on-error:
 ```
-adb shell settings put global debug.vulkan.khronos_profiles.debug_reports DEBUG_REPORT_DEBUG_BIT
-adb shell settings put global debug.vulkan.khronos_profiles.debug_fail_on_error true
+adb shell setprop debug.vulkan.khronos_profiles.debug_reports DEBUG_REPORT_DEBUG_BIT
+adb shell setprop debug.vulkan.khronos_profiles.debug_fail_on_error true
 ```
 
 ## Technical Details
