@@ -2148,11 +2148,14 @@ class VulkanProfileCapabilities():
         self.formats = dict()
         self.queueFamiliesProperties = []
         for capName in data['capabilities']:
-            if capName in caps:
+            # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
+            if type(capName).__name__ == 'list':
+                for capNameCase in capName:
+                    self.mergeCaps(registry, caps[capNameElement])
+            elif capName in caps:
                 self.mergeCaps(registry, caps[capName])
             else:
                 Log.f("Capability '{0}' needed by profile '{1}' is missing".format(capName, data['name']))
-
 
     def mergeCaps(self, registry, caps):
         self.mergeProfileExtensions(registry, caps)
