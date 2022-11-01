@@ -216,6 +216,8 @@ std::string format(const char *message, ...) {
     return buffer;
 }
 
+#define countof(arr) sizeof(arr) / sizeof(arr[0])
+
 // Various small utility functions ///////////////////////////////////////////////////////////////////////////////////////////////
 
 #if defined(__ANDROID__)
@@ -1792,6 +1794,12 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
                         break;
                     }
                 }
+
+                if (IsInstanceExtension(e.c_str())) {
+                    LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, 
+                        format("Required %s extension is an instance extension. The Profiles layer can't override instance extension, the extension is ignored.\\n", e.c_str()).c_str());
+                }
+
                 if (!found) {
                     bool supported_on_device = false;
                     for (const auto &device_extension : pdd_->device_extensions_) {
@@ -3374,6 +3382,7 @@ class VulkanProfilesLayerGenerator():
             f.write(ENUMERATE_ALL)
             f.write(GLOBAL_VARS2)
             f.write(FORMAT_UTILS)
+            f.write(self.generate_is_instance_extension())
             f.write(self.generate_physical_device_data())
             f.write(self.generate_json_loader())
             f.write(self.generate_is_format_functions())
@@ -3460,6 +3469,34 @@ class VulkanProfilesLayerGenerator():
                 gen += '        ' + self.create_var_name(feature) + ' = {' + registry.structs[feature].sType +  '};\n'
 
         gen += PHYSICAL_DEVICE_DATA_END
+
+        return gen
+
+    def generate_is_instance_extension(self):
+        gen = 'static bool IsInstanceExtension(const char* name) {\n'
+        
+        gen += '\t const char* table[] = {\n'
+
+        first = True
+        for extension in registry.extensions.values():
+            if (extension.type == 'instance'):
+                if not first:
+                    gen += ',\n'
+                first = False
+
+                gen += '          "' + extension.name + '"'
+
+        gen += '\n     };\n\n'
+
+        gen += '     bool result = false;\n'
+        gen += '     for (std::size_t i = 0, n = countof(table); i < n; ++i) {\n'
+        gen += '           if (strcmp(table[i], name) == 0) {\n'
+        gen += '               result = true;\n'
+        gen += '               break;\n'
+        gen += '           }\n'
+        gen += '     }\n\n'
+        gen += '     return result;\n'
+        gen += '}\n'
 
         return gen
 
