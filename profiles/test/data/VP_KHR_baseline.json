@@ -2,6 +2,9 @@
     "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.latest.json#",
     "capabilities": {
         "vulkan10requirements": {
+            "extensions": {
+
+            },
             "features": {
                 "VkPhysicalDeviceFeatures": {
                     "robustBufferAccess": true
@@ -109,21 +112,104 @@
                         "lineWidthRange": [ 1.0, 1.0 ],
                         "pointSizeGranularity": 0.0,
                         "lineWidthGranularity": 0.0,
-                        "nonCoherentAtomSize":  256
+                        "nonCoherentAtomSize": 256
                     }
                 }
             }
         },
         "vulkan10optionals": {
+            "extensions": {
+                "VK_KHR_push_descriptor": 2,
+                "VK_KHR_multiview": 1,
+                "VK_KHR_maintenance3": 1,
+                "VK_EXT_descriptor_indexing": 2,
+                "VK_EXT_inline_uniform_block": 1,
+                "VK_KHR_timeline_semaphore": 2
+            },
+            "features": {
+                "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                    "multiview": true,
+                    "multiviewGeometryShader": true,
+                    "multiviewTessellationShader": true
+                },
+                "VkPhysicalDeviceDescriptorIndexingFeaturesEXT": {
+
+                },
+                "VkPhysicalDeviceInlineUniformBlockFeaturesEXT": {
+
+                },
+                "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR": {
+
+                },
+                "VkPhysicalDeviceFragmentShadingRateFeaturesKHR": {
+
+                }
+            },
             "properties": {
                 "VkPhysicalDeviceProperties": {
                     "limits": {
                         "sparseAddressSpaceSize": 2147483648
                     }
+                },
+                "VkPhysicalDevicePushDescriptorPropertiesKHR": {
+                    "maxPushDescriptors": 32
+                },
+                "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                    "maxMultiviewViewCount": 6,
+                    "maxMultiviewInstanceIndex": 134217727
+                },
+                "VkPhysicalDeviceMaintenance3PropertiesKHR": {
+                    "maxPerSetDescriptors": 1024,
+                    "maxMemoryAllocationSize": 1073741824
+                },
+                "VkPhysicalDeviceDescriptorIndexingPropertiesEXT": {
+                    "maxUpdateAfterBindDescriptorsInAllPools": 500000,
+                    "shaderUniformBufferArrayNonUniformIndexingNative": false,
+                    "shaderSampledImageArrayNonUniformIndexingNative": false,
+                    "shaderStorageBufferArrayNonUniformIndexingNative": false,
+                    "shaderStorageImageArrayNonUniformIndexingNative": false,
+                    "shaderInputAttachmentArrayNonUniformIndexingNative": false,
+                    "maxPerStageDescriptorUpdateAfterBindSamplers": 500000,
+                    "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 12,
+                    "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 500000,
+                    "maxPerStageDescriptorUpdateAfterBindSampledImages": 500000,
+                    "maxPerStageDescriptorUpdateAfterBindStorageImages": 500000,
+                    "maxPerStageDescriptorUpdateAfterBindInputAttachments": 4,
+                    "maxPerStageUpdateAfterBindResources": 500000,
+                    "maxDescriptorSetUpdateAfterBindSamplers": 500000,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffers": 72,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 8,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffers": 500000,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 4,
+                    "maxDescriptorSetUpdateAfterBindSampledImages": 500000,
+                    "maxDescriptorSetUpdateAfterBindStorageImages": 500000,
+                    "maxDescriptorSetUpdateAfterBindInputAttachments": 4
+                },
+                "VkPhysicalDeviceInlineUniformBlockPropertiesEXT": {
+                    "maxInlineUniformBlockSize": 256,
+                    "maxPerStageDescriptorInlineUniformBlocks": 4,
+                    "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4,
+                    "maxDescriptorSetInlineUniformBlocks": 4,
+                    "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 4
+                },
+                "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
+                    "maxTimelineSemaphoreValueDifference": 2147483647
+                },
+                "VkPhysicalDeviceFragmentShadingRatePropertiesKHR": {
+                    "minFragmentShadingRateAttachmentTexelSize": [ 0, 0 ],
+                    "maxFragmentShadingRateAttachmentTexelSize": [ 0, 0 ],
+                    "maxFragmentShadingRateAttachmentTexelSizeAspectRatio": 0,
+                    "maxFragmentSize": [ 2, 2 ],
+                    "maxFragmentSizeAspectRatio": 2,
+                    "maxFragmentShadingRateCoverageSamples": 16,
+                    "maxFragmentShadingRateRasterizationSamples": "VK_SAMPLE_COUNT_4_BIT"
                 }
             }
         },
         "vulkan11requirements": {
+            "extensions": {
+
+            },
             "features": {
                 "VkPhysicalDeviceVulkan11Features": {
                     "multiview": true
@@ -137,9 +223,47 @@
             }
         },
         "vulkan11optionals": {
+            "extensions": {
+                "VK_KHR_maintenance4": 2,
+                "VK_KHR_ray_tracing_pipeline": 1
+            },
+            "features": {
+                "VkPhysicalDeviceMaintenance4FeaturesKHR": {
 
+                },
+                "VkPhysicalDeviceRayTracingPipelineFeaturesKHR": {
+
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceMaintenance4PropertiesKHR": {
+                    "maxBufferSize": 1073741824
+                },
+                "VkPhysicalDeviceRayTracingPipelinePropertiesKHR": {
+                    "maxRayRecursionDepth": 1,
+                    "maxShaderGroupStride": 4096,
+                    "shaderGroupBaseAlignment": 64,
+                    "shaderGroupHandleCaptureReplaySize": 64,
+                    "maxRayDispatchInvocationCount": 1073741824,
+                    "shaderGroupHandleAlignment": 32,
+                    "maxRayHitAttributeSize": 32
+                },
+                "VkPhysicalDeviceAccelerationStructurePropertiesKHR": {
+                    "maxGeometryCount": 16777215,
+                    "maxInstanceCount": 16777215,
+                    "maxPrimitiveCount": 536870911,
+                    "maxPerStageDescriptorAccelerationStructures": 16,
+                    "maxPerStageDescriptorUpdateAfterBindAccelerationStructures": 500000,
+                    "maxDescriptorSetAccelerationStructures": 16,
+                    "maxDescriptorSetUpdateAfterBindAccelerationStructures": 500000,
+                    "minAccelerationStructureScratchOffsetAlignment": 256
+                }
+            }
         },
         "vulkan12requirements": {
+            "extensions": {
+
+            },
             "features": {
                 "VkPhysicalDeviceVulkan12Features": {
                     "uniformBufferStandardLayout": true,
@@ -158,9 +282,20 @@
             }
         },
         "vulkan12optionals": {
+            "extensions": {
 
+            },
+            "features": {
+
+            },
+            "properties": {
+
+            }
         },
         "vulkan13requirements": {
+            "extensions": {
+
+            },
             "features": {
                 "VkPhysicalDeviceVulkan12Features": {
                     "vulkanMemoryModel": true,
@@ -180,6 +315,9 @@
                     "shaderDemoteToHelperInvocation": true,
                     "inlineUniformBlock": true,
                     "dynamicRendering": true
+                },
+                "VkPhysicalDeviceInlineUniformBlockFeatures": {
+                    "inlineUniformBlock": true
                 }
             },
             "properties": {
@@ -190,12 +328,27 @@
                     "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4,
                     "maxDescriptorSetInlineUniformBlocks": 4,
                     "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 4,
-                    "maxInlineUniformTotalSize": 4
+                    "maxInlineUniformTotalSize": 256
+                },
+                "VkPhysicalDeviceInlineUniformBlockProperties": {
+                    "maxInlineUniformBlockSize": 256,
+                    "maxPerStageDescriptorInlineUniformBlocks": 4,
+                    "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4,
+                    "maxDescriptorSetInlineUniformBlocks": 4,
+                    "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 4
                 }
             }
         },
         "vulkan13optionals": {
+            "extensions": {
 
+            },
+            "features": {
+
+            },
+            "properties": {
+
+            }
         }
     },
     "profiles": {
