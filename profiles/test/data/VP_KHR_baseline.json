@@ -1,0 +1,277 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.latest.json#",
+    "capabilities": {
+        "vulkan10requirements": {
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "robustBufferAccess": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 4096,
+                        "maxImageDimension2D": 4096,
+                        "maxImageDimension3D": 256,
+                        "maxImageDimensionCube": 4096,
+                        "maxImageArrayLayers": 256,
+                        "maxTexelBufferElements": 65536,
+                        "maxUniformBufferRange": 16384,
+                        "maxStorageBufferRange": 134217728,
+                        "maxPushConstantsSize": 128,
+                        "maxMemoryAllocationCount": 4096,
+                        "maxSamplerAllocationCount": 4000,
+                        "bufferImageGranularity": 4096,
+                        "sparseAddressSpaceSize": 0,
+                        "maxPerStageDescriptorSamplers": 16,
+                        "maxPerStageDescriptorUniformBuffers": 12,
+                        "maxPerStageDescriptorStorageBuffers": 4,
+                        "maxPerStageDescriptorSampledImages": 16,
+                        "maxPerStageDescriptorStorageImages": 4,
+                        "maxPerStageDescriptorInputAttachments": 4,
+                        "maxPerStageResources": 128,
+                        "maxDescriptorSetSamplers": 16,
+                        "maxDescriptorSetUniformBuffers": 12,
+                        "maxDescriptorSetUniformBuffersDynamic": 8,
+                        "maxDescriptorSetStorageBuffers": 4,
+                        "maxDescriptorSetStorageBuffersDynamic": 4,
+                        "maxDescriptorSetSampledImages": 16,
+                        "maxDescriptorSetStorageImages": 4,
+                        "maxDescriptorSetInputAttachments": 4,
+                        "maxVertexInputAttributes": 16,
+                        "maxVertexInputBindings": 16,
+                        "maxVertexInputAttributeOffset": 2047,
+                        "maxVertexInputBindingStride": 2048,
+                        "maxVertexOutputComponents": 64,
+                        "maxTessellationGenerationLevel": 0,
+                        "maxTessellationPatchSize": 0,
+                        "maxTessellationControlPerVertexInputComponents": 0,
+                        "maxTessellationControlPerVertexOutputComponents": 0,
+                        "maxTessellationControlPerPatchOutputComponents": 0,
+                        "maxTessellationControlTotalOutputComponents": 0,
+                        "maxTessellationEvaluationInputComponents": 0,
+                        "maxTessellationEvaluationOutputComponents": 0,
+                        "maxGeometryShaderInvocations": 0,
+                        "maxGeometryInputComponents": 0,
+                        "maxGeometryOutputComponents": 0,
+                        "maxGeometryOutputVertices": 0,
+                        "maxGeometryTotalOutputComponents": 0,
+                        "maxFragmentInputComponents": 64,
+                        "maxFragmentOutputAttachments": 4,
+                        "maxFragmentDualSrcAttachments": 0,
+                        "maxFragmentCombinedOutputResources": 4,
+                        "maxComputeSharedMemorySize": 16384,
+                        "maxComputeWorkGroupCount": [ 65535, 65535, 65535 ],
+                        "maxComputeWorkGroupInvocations": 128,
+                        "maxComputeWorkGroupSize": [ 128, 128, 64 ],
+                        "subPixelPrecisionBits": 4,
+                        "subTexelPrecisionBits": 4,
+                        "mipmapPrecisionBits": 4,
+                        "maxDrawIndexedIndexValue": 16777215,
+                        "maxDrawIndirectCount": 1,
+                        "maxSamplerLodBias": 2,
+                        "maxSamplerAnisotropy": 1,
+                        "maxViewports": 1,
+                        "maxViewportDimensions": [ 4096, 4096 ],
+                        "viewportBoundsRange": [ -8192, 8192 ],
+                        "viewportSubPixelBits": 0,
+                        "minMemoryMapAlignment": 64,
+                        "minTexelBufferOffsetAlignment": 256,
+                        "minUniformBufferOffsetAlignment": 256,
+                        "minStorageBufferOffsetAlignment": 256,
+                        "minTexelOffset": -8,
+                        "maxTexelOffset": 7,
+                        "minTexelGatherOffset": 0,
+                        "maxTexelGatherOffset": 0,
+                        "minInterpolationOffset": 0.0,
+                        "maxInterpolationOffset": 0.0,
+                        "subPixelInterpolationOffsetBits": 0,
+                        "maxFramebufferWidth": 4096,
+                        "maxFramebufferHeight": 4096,
+                        "maxFramebufferLayers": 256,
+                        "framebufferColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "framebufferIntegerColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
+                        "framebufferDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "framebufferStencilSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "framebufferNoAttachmentsSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "maxColorAttachments": "4",
+                        "sampledImageColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "sampledImageIntegerSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
+                        "sampledImageDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "sampledImageStencilSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "storageImageSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
+                        "maxSampleMaskWords": 1,
+                        "maxClipDistances": 0,
+                        "maxCullDistances": 0,
+                        "maxCombinedClipAndCullDistances": 0,
+                        "discreteQueuePriorities": 2,
+                        "pointSizeRange": [ 1.0, 1.0 ],
+                        "lineWidthRange": [ 1.0, 1.0 ],
+                        "pointSizeGranularity": 0.0,
+                        "lineWidthGranularity": 0.0,
+                        "nonCoherentAtomSize":  256
+                    }
+                }
+            }
+        },
+        "vulkan10optionals": {
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "sparseAddressSpaceSize": 2147483648
+                    }
+                }
+            }
+        },
+        "vulkan11requirements": {
+            "features": {
+                "VkPhysicalDeviceVulkan11Features": {
+                    "multiview": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceVulkan11Properties": {
+                    "maxMultiviewViewCount": 6,
+                    "maxMultiviewInstanceIndex": 134217727
+                }
+            }
+        },
+        "vulkan11optionals": {
+
+        },
+        "vulkan12requirements": {
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "uniformBufferStandardLayout": true,
+                    "subgroupBroadcastDynamicId": true,
+                    "imagelessFramebuffer": true,
+                    "separateDepthStencilLayouts": true,
+                    "hostQueryReset": true,
+                    "timelineSemaphore": true,
+                    "shaderSubgroupExtendedTypes": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceVulkan12Properties": {
+                    "maxTimelineSemaphoreValueDifference": 2147483647
+                }
+            }
+        },
+        "vulkan12optionals": {
+
+        },
+        "vulkan13requirements": {
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "vulkanMemoryModel": true,
+                    "vulkanMemoryModelDeviceScope": true,
+                    "bufferDeviceAddress": true
+                },
+                "VkPhysicalDeviceVulkan13Features": {
+                    "robustImageAccess": true,
+                    "shaderTerminateInvocation": true,
+                    "shaderZeroInitializeWorkgroupMemory": true,
+                    "synchronization2": true,
+                    "shaderIntegerDotProduct": true,
+                    "maintenance4": true,
+                    "pipelineCreationCacheControl": true,
+                    "subgroupSizeControl": true,
+                    "computeFullSubgroups": true,
+                    "shaderDemoteToHelperInvocation": true,
+                    "inlineUniformBlock": true,
+                    "dynamicRendering": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceVulkan13Properties": {
+                    "maxBufferSize": 1073741824,
+                    "maxInlineUniformBlockSize": 256,
+                    "maxPerStageDescriptorInlineUniformBlocks": 4,
+                    "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4,
+                    "maxDescriptorSetInlineUniformBlocks": 4,
+                    "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 4,
+                    "maxInlineUniformTotalSize": 4
+                }
+            }
+        },
+        "vulkan13optionals": {
+
+        }
+    },
+    "profiles": {
+        "VP_KHR_baseline_1_0": {
+            "version": 1,
+            "api-version": "1.0.232",
+            "label": "Khronos Vulkan 1.0 Baseline profile",
+            "description": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices.",
+            "capabilities": [
+                "vulkan10requirements"
+            ],
+            "optionals": [
+                "vulkan10optionals"
+            ]
+        },
+        "VP_KHR_baseline_1_1": {
+            "version": 1,
+            "api-version": "1.1.232",
+            "label": "Khronos Vulkan 1.1 Baseline profile",
+            "description": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices.",
+            "capabilities": [
+                "vulkan10requirements",
+                "vulkan11requirements"
+            ],
+            "optionals": [
+                "vulkan10optionals",
+                "vulkan11optionals"
+            ]
+        },
+        "VP_KHR_baseline_1_2": {
+            "version": 1,
+            "api-version": "1.2.232",
+            "label": "Khronos Vulkan 1.2 Baseline profile",
+            "description": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices.",
+            "capabilities": [
+                "vulkan10requirements",
+                "vulkan11requirements",
+                "vulkan12requirements"
+            ],
+            "optionals": [
+                "vulkan10optionals",
+                "vulkan11optionals",
+                "vulkan12optionals"
+            ]
+        },
+        "VP_KHR_baseline_1_3": {
+            "version": 1,
+            "api-version": "1.3.232",
+            "label": "Khronos Vulkan 1.3 Baseline profile",
+            "description": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices.",
+            "capabilities": [
+                "vulkan10requirements",
+                "vulkan11requirements",
+                "vulkan12requirements",
+                "vulkan13requirements"
+            ],
+            "optionals": [
+                "vulkan10optionals",
+                "vulkan11optionals",
+                "vulkan12optionals",
+                "vulkan13optionals"
+            ]
+        }
+    },
+    "contributors": {
+        "Christophe Riccio": {
+            "company": "LunarG",
+            "email": "christophe@lunarg.com"
+        }
+    },
+    "history": [
+        {
+            "revision": 1,
+            "date": "2022-11-01",
+            "author": "Christophe Riccio",
+            "comment": "Initial revision"
+        }
+    ]
+}
