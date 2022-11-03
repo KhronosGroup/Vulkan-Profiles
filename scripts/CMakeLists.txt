@@ -75,6 +75,7 @@ add_dependencies(VpCreateDesktopPortability2022 VpCreateDesktopBaseline2022)
 
 add_custom_target(VpGenerated
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/schema
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${vulkan-headers_SOURCE_DIR}/registry/profiles ${CMAKE_SOURCE_DIR}/profiles
 	COMMAND ${PYTHON_EXECUTABLE} ${LAYER_PYTHON_FILES}
 		--registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
 		--input ${CMAKE_SOURCE_DIR}/profiles
