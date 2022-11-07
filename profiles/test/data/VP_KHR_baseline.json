@@ -93,11 +93,10 @@
                         "maxFramebufferHeight": 4096,
                         "maxFramebufferLayers": 256,
                         "framebufferColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                        "framebufferIntegerColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
                         "framebufferDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
                         "framebufferStencilSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
                         "framebufferNoAttachmentsSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                        "maxColorAttachments": "4",
+                        "maxColorAttachments": 4,
                         "sampledImageColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
                         "sampledImageIntegerSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
                         "sampledImageDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
@@ -196,10 +195,19 @@
                     "maxTimelineSemaphoreValueDifference": 2147483647
                 },
                 "VkPhysicalDeviceFragmentShadingRatePropertiesKHR": {
-                    "minFragmentShadingRateAttachmentTexelSize": [ 0, 0 ],
-                    "maxFragmentShadingRateAttachmentTexelSize": [ 0, 0 ],
+                    "minFragmentShadingRateAttachmentTexelSize": {
+                        "width": 0,
+                        "height": 0
+                    },
+                    "maxFragmentShadingRateAttachmentTexelSize": {
+                        "width": 0,
+                        "height": 0
+                    },
                     "maxFragmentShadingRateAttachmentTexelSizeAspectRatio": 0,
-                    "maxFragmentSize": [ 2, 2 ],
+                    "maxFragmentSize": {
+                        "width": 2,
+                        "height": 2
+                    },
                     "maxFragmentSizeAspectRatio": 2,
                     "maxFragmentShadingRateCoverageSamples": 16,
                     "maxFragmentShadingRateRasterizationSamples": "VK_SAMPLE_COUNT_4_BIT"
@@ -277,7 +285,8 @@
             },
             "properties": {
                 "VkPhysicalDeviceVulkan12Properties": {
-                    "maxTimelineSemaphoreValueDifference": 2147483647
+                    "maxTimelineSemaphoreValueDifference": 2147483647,
+                    "framebufferIntegerColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ]
                 }
             }
         },
