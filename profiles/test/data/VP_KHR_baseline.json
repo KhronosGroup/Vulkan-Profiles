@@ -118,12 +118,41 @@
         },
         "vulkan10optionals": {
             "extensions": {
+                "VK_KHR_variable_pointers": 1,
+                "VK_KHR_8bit_storage": 1,
                 "VK_KHR_push_descriptor": 2,
                 "VK_KHR_multiview": 1,
                 "VK_KHR_maintenance3": 1,
                 "VK_EXT_descriptor_indexing": 2,
                 "VK_EXT_inline_uniform_block": 1,
-                "VK_KHR_timeline_semaphore": 2
+                "VK_KHR_timeline_semaphore": 2,
+                "VK_EXT_scalar_block_layout": 1,
+                "VK_EXT_subgroup_size_control": 1,
+                "VK_EXT_device_memory_report": 1,
+                "VK_EXT_global_priority_query": 1,
+                "VK_KHR_global_priority": 1,
+                "VK_KHR_imageless_framebuffer": 1,
+                "VK_KHR_separate_depth_stencil_layouts": 1,
+                "VK_EXT_host_query_reset": 1,
+                "VK_KHR_uniform_buffer_standard_layout": 1,
+                "VK_EXT_pipeline_creation_cache_control": 1,
+                "VK_KHR_sampler_ycbcr_conversion": 14,
+                "VK_KHR_pipeline_executable_properties": 1,
+                "VK_EXT_texture_compression_astc_hdr": 1,
+                "VK_EXT_depth_clip_enable": 1,
+                "VK_EXT_memory_priority": 1,
+                "VK_EXT_ycbcr_image_arrays": 1,
+                "VK_EXT_index_type_uint8": 1,
+                "VK_EXT_primitive_topology_list_restart": 1,
+                "VK_EXT_shader_demote_to_helper_invocation": 1,
+                "VK_EXT_texel_buffer_alignment": 1,
+                "VK_KHR_vulkan_memory_model": 3,
+                "VK_KHR_buffer_device_address": 1,
+                "VK_KHR_performance_query": 1,
+                "VK_EXT_transform_feedback": 1,
+                "VK_EXT_conditional_rendering": 2,
+                "VK_EXT_vertex_attribute_divisor": 3,
+                "VK_EXT_fragment_density_map": 2
             },
             "features": {
                 "VkPhysicalDeviceMultiviewFeaturesKHR": {
@@ -132,16 +161,119 @@
                     "multiviewTessellationShader": true
                 },
                 "VkPhysicalDeviceDescriptorIndexingFeaturesEXT": {
-
+                    "shaderSampledImageArrayDynamicIndexing": true,
+                    "shaderStorageBufferArrayDynamicIndexing": true,
+                    "shaderUniformTexelBufferArrayDynamicIndexing": true,
+                    "shaderStorageTexelBufferArrayDynamicIndexing": true,
+                    "shaderSampledImageArrayNonUniformIndexing": true,
+                    "shaderStorageBufferArrayNonUniformIndexing": true,
+                    "shaderUniformTexelBufferArrayNonUniformIndexing": true,
+                    "descriptorBindingSampledImageUpdateAfterBind": true,
+                    "descriptorBindingStorageImageUpdateAfterBind": true,
+                    "descriptorBindingStorageBufferUpdateAfterBind": true,
+                    "descriptorBindingUniformTexelBufferUpdateAfterBind": true,
+                    "descriptorBindingStorageTexelBufferUpdateAfterBind": true,
+                    "descriptorBindingUpdateUnusedWhilePending": true,
+                    "descriptorBindingPartiallyBound": true,
+                    "runtimeDescriptorArray": true
+                },
+                "VkPhysicalDeviceVariablePointersFeaturesKHR": {
+                    "variablePointersStorageBuffer": true
+                },
+                "VkPhysicalDevice8BitStorageFeaturesKHR": {
+                    "storageBuffer8BitAccess": true
+                },
+                "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR": {
+                    "uniformBufferStandardLayout": true
                 },
                 "VkPhysicalDeviceInlineUniformBlockFeaturesEXT": {
-
+                    "inlineUniformBlock": true,
+                    "descriptorBindingInlineUniformBlockUpdateAfterBind": true
+                },
+                "VkPhysicalDeviceScalarBlockLayoutFeaturesEXT": {
+                    "scalarBlockLayout": true
                 },
                 "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR": {
 
                 },
                 "VkPhysicalDeviceFragmentShadingRateFeaturesKHR": {
 
+                },
+                "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT": {
+                    "subgroupSizeControl": true,
+                    "computeFullSubgroups": true
+                },
+                "VkPhysicalDeviceDeviceMemoryReportFeaturesEXT": {
+                    "deviceMemoryReport": true
+                },
+                "VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT": {
+                    "globalPriorityQuery": true
+                },
+                "VkPhysicalDeviceGlobalPriorityQueryFeaturesKHR": {
+                    "globalPriorityQuery": true
+                },
+                "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
+                    "imagelessFramebuffer": true
+                },
+                "VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR": {
+                    "separateDepthStencilLayouts": true
+                },
+                "VkPhysicalDeviceHostQueryResetFeaturesEXT": {
+                    "hostQueryReset": true
+                },
+                "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT": {
+                    "pipelineCreationCacheControl": true
+                },
+                "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
+                    "samplerYcbcrConversion": true
+                },
+                "VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR": {
+                    "pipelineExecutableInfo": true
+                },
+                "VkPhysicalDeviceTextureCompressionASTCHDRFeaturesEXT": {
+                    "textureCompressionASTC_HDR": true
+                },
+                "VkPhysicalDeviceDepthClipEnableFeaturesEXT": {
+                    "depthClipEnable": true
+                },
+                "VkPhysicalDeviceMemoryPriorityFeaturesEXT": {
+                    "memoryPriority": true
+                },
+                "VkPhysicalDeviceYcbcrImageArraysFeaturesEXT": {
+                    "ycbcrImageArrays": true
+                },
+                "VkPhysicalDeviceIndexTypeUint8FeaturesEXT": {
+                    "indexTypeUint8": true
+                },
+                "VkPhysicalDevicePrimitiveTopologyListRestartFeaturesEXT": {
+                    "primitiveTopologyListRestart": true
+                },
+                "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT": {
+                    "shaderDemoteToHelperInvocation": true
+                },
+                "VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT": {
+                    "texelBufferAlignment": true
+                },
+                "VkPhysicalDeviceVulkanMemoryModelFeaturesKHR": {
+                    "vulkanMemoryModel": true
+                },
+                "VkPhysicalDeviceBufferDeviceAddressFeaturesKHR": {
+                    "bufferDeviceAddress": true
+                },
+                "VkPhysicalDevicePerformanceQueryFeaturesKHR": {
+                    "performanceCounterQueryPools": true
+                },
+                "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
+                    "transformFeedback": true
+                },
+                "VkPhysicalDeviceConditionalRenderingFeaturesEXT": {
+                    "conditionalRendering": true
+                },
+                "VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT": {
+                    "vertexAttributeInstanceRateDivisor": true
+                },
+                "VkPhysicalDeviceFragmentDensityMapFeaturesEXT": {
+                    "fragmentDensityMap": true
                 }
             },
             "properties": {
@@ -233,14 +365,34 @@
         "vulkan11optionals": {
             "extensions": {
                 "VK_KHR_maintenance4": 2,
-                "VK_KHR_ray_tracing_pipeline": 1
+                "VK_KHR_ray_tracing_pipeline": 1,
+                "VK_KHR_acceleration_structure": 13,
+                "VK_KHR_buffer_device_address": 2,
+                "VK_KHR_pipeline_library": 1,
+                "VK_KHR_ray_query": 1,
+                "VK_KHR_shader_subgroup_extended_types": 1
             },
             "features": {
                 "VkPhysicalDeviceMaintenance4FeaturesKHR": {
 
                 },
                 "VkPhysicalDeviceRayTracingPipelineFeaturesKHR": {
+                    "rayTracingPipeline": true,
+                    "rayTracingPipelineShaderGroupHandleCaptureReplay": true
 
+                },
+                "VkPhysicalDeviceAccelerationStructureFeaturesKHR": {
+                    "accelerationStructure": true,
+                    "descriptorBindingAccelerationStructureUpdateAfterBind": true
+                },
+                "VkPhysicalDeviceBufferDeviceAddressFeaturesEXT": {
+                    "bufferDeviceAddress": true
+                },
+                "VkPhysicalDeviceRayQueryFeaturesKHR": {
+                    "rayQuery": true
+                },
+                "VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR": {
+                    "shaderSubgroupExtendedTypes": true
                 }
             },
             "properties": {
@@ -281,12 +433,21 @@
                     "hostQueryReset": true,
                     "timelineSemaphore": true,
                     "shaderSubgroupExtendedTypes": true
+                },
+                "VkPhysicalDeviceHostQueryResetFeatures": {
+                    "hostQueryReset": true
+                },
+                "VkPhysicalDeviceTimelineSemaphoreFeatures": {
+                    "timelineSemaphore": true
                 }
             },
             "properties": {
                 "VkPhysicalDeviceVulkan12Properties": {
                     "maxTimelineSemaphoreValueDifference": 2147483647,
                     "framebufferIntegerColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ]
+                },
+                "VkPhysicalDeviceTimelineSemaphoreProperties": {
+                    "maxTimelineSemaphoreValueDifference": 2147483647
                 }
             }
         },
