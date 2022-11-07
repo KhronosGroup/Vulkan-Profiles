@@ -365,7 +365,7 @@
             "version": 1,
             "api-version": "1.0.232",
             "label": "Khronos Vulkan 1.0 Baseline profile",
-            "description": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices.",
+            "description": "All the required capabilities and optionals capabilities for Vulkan 1.0.",
             "capabilities": [
                 "vulkan10requirements"
             ],
@@ -377,7 +377,7 @@
             "version": 1,
             "api-version": "1.1.232",
             "label": "Khronos Vulkan 1.1 Baseline profile",
-            "description": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices.",
+            "description": "All the required capabilities and optionals capabilities for Vulkan 1.1.",
             "capabilities": [
                 "vulkan10requirements",
                 "vulkan11requirements"
@@ -391,7 +391,7 @@
             "version": 1,
             "api-version": "1.2.232",
             "label": "Khronos Vulkan 1.2 Baseline profile",
-            "description": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices.",
+            "description": "All the required capabilities and optionals capabilities for Vulkan 1.2.",
             "capabilities": [
                 "vulkan10requirements",
                 "vulkan11requirements",
@@ -407,7 +407,7 @@
             "version": 1,
             "api-version": "1.3.232",
             "label": "Khronos Vulkan 1.3 Baseline profile",
-            "description": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices.",
+            "description": "All the required capabilities and optionals capabilities for Vulkan 1.3.",
             "capabilities": [
                 "vulkan10requirements",
                 "vulkan11requirements",
