@@ -67,7 +67,7 @@ static std::string format(const char *message, ...) {
     va_list list;
 
     va_start(list, message);
-    vsprintf(buffer, message, list);
+    vsnprintf(buffer, STRING_BUFFER, message, list);
     va_end(list);
 
     return buffer;
