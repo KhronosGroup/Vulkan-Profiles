@@ -152,9 +152,64 @@
                 "VK_EXT_transform_feedback": 1,
                 "VK_EXT_conditional_rendering": 2,
                 "VK_EXT_vertex_attribute_divisor": 3,
-                "VK_EXT_fragment_density_map": 2
+                "VK_EXT_fragment_density_map": 2,
+                "VK_KHR_shader_clock": 1,
+                "VK_KHR_shader_atomic_int64": 1,
+                "VK_KHR_shader_float16_int8": 1,
+                "VK_EXT_fragment_shader_interlock": 1,
+                "VK_KHR_16bit_storage": 1,
+                "VK_EXT_image_robustness": 1,
+                "VK_EXT_4444_formats": 1,
+                "VK_EXT_mutable_descriptor_type": 1,
+                "VK_VALVE_mutable_descriptor_type": 1,
+                "VK_EXT_shader_image_atomic_int64": 1,
+                "VK_EXT_primitives_generated_query": 1,
+                "VK_KHR_fragment_shading_rate": 2,
+                "VK_EXT_pipeline_protected_access": 1,
+                "VK_EXT_legacy_dithering": 1,
+                "VK_KHR_shader_terminate_invocation": 1,
+                "VK_KHR_zero_initialize_workgroup_memory": 1,
+                "VK_KHR_workgroup_memory_explicit_layout": 1,
+                "VK_EXT_vertex_input_dynamic_state": 2,
+                "VK_KHR_synchronization2": 1,
+                "VK_EXT_provoking_vertex": 1,
+                "VK_KHR_shader_subgroup_uniform_control_flow": 1,
+                "VK_EXT_border_color_swizzle": 1,
+                "VK_EXT_multi_draw": 1,
+                "VK_KHR_present_id": 1,
+                "VK_KHR_present_wait": 1,
+                "VK_KHR_shader_integer_dot_product": 1,
+                "VK_EXT_image_2d_view_of_3d": 1,
+                "VK_EXT_private_data": 1,
+                "VK_EXT_extended_dynamic_state": 1,
+                "VK_EXT_extended_dynamic_state2": 1,
+                "VK_EXT_depth_clip_control": 1,
+                "VK_EXT_image_view_min_lod": 1,
+                "VK_NV_linear_color_attachment": 1,
+                "VK_NV_present_barrier": 1,
+                "VK_EXT_graphics_pipeline_library": 1,
+                "VK_KHR_dynamic_rendering": 1,
+                "VK_EXT_mesh_shader": 1,
+                "VK_EXT_subpass_merge_feedback": 2,
+                "VK_EXT_color_write_enable": 1,
+                "VK_EXT_multisampled_render_to_single_sampled": 1,
+                "VK_EXT_image_compression_control": 1,
+                "VK_EXT_image_compression_control_swapchain": 1,
+                "VK_AMD_shader_early_and_late_fragment_tests": 1,
+                "VK_EXT_non_seamless_cube_map": 1,
+                "VK_EXT_shader_module_identifier": 1,
+                "VK_EXT_pipeline_robustness": 1,
+                "VK_QCOM_image_processing": 1,
+                "VK_QCOM_tile_properties": 1,
+                "VK_EXT_attachment_feedback_loop_layout": 2,
+                "VK_EXT_depth_clamp_zero_one": 1,
+                "VK_EXT_device_fault": 1,
+                "VK_EXT_device_address_binding_report": 1
             },
             "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "shaderInt64": true
+                },
                 "VkPhysicalDeviceMultiviewFeaturesKHR": {
                     "multiview": true,
                     "multiviewGeometryShader": true,
@@ -194,10 +249,7 @@
                     "scalarBlockLayout": true
                 },
                 "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR": {
-
-                },
-                "VkPhysicalDeviceFragmentShadingRateFeaturesKHR": {
-
+                    "timelineSemaphore": true
                 },
                 "VkPhysicalDeviceSubgroupSizeControlFeaturesEXT": {
                     "subgroupSizeControl": true,
@@ -274,6 +326,159 @@
                 },
                 "VkPhysicalDeviceFragmentDensityMapFeaturesEXT": {
                     "fragmentDensityMap": true
+                },
+                "VkPhysicalDeviceShaderClockFeaturesKHR": {
+                    "shaderSubgroupClock": true
+                },
+                "VkPhysicalDeviceShaderAtomicInt64FeaturesKHR": {
+                    "shaderBufferInt64Atomics": true
+                },
+                "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                    "storageBuffer16BitAccess": true
+                },
+                "VkPhysicalDeviceImageRobustnessFeaturesEXT": {
+                    "robustImageAccess": true
+                },
+                "VkPhysicalDevice4444FormatsFeaturesEXT": {
+                    "formatA4R4G4B4": true
+                },
+                "VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT": {
+                    "mutableDescriptorType": true
+                },
+                "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE": {
+                    "mutableDescriptorType": true
+                },
+                "VkPhysicalDeviceShaderImageAtomicInt64FeaturesEXT": {
+                    "shaderImageInt64Atomics": true
+                },
+                "VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT": {
+                    "primitivesGeneratedQuery": true
+                },
+                "VkPhysicalDeviceFragmentShadingRateFeaturesKHR": {
+                    "pipelineFragmentShadingRate": true
+                },
+                "VkPhysicalDevicePipelineProtectedAccessFeaturesEXT": {
+                    "pipelineProtectedAccess": true
+                },
+                "VkPhysicalDeviceLegacyDitheringFeaturesEXT": {
+                    "legacyDithering": true
+                },
+                "VkPhysicalDeviceShaderTerminateInvocationFeaturesKHR": {
+                    "shaderTerminateInvocation": true
+                },
+                "VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR": {
+                    "shaderZeroInitializeWorkgroupMemory": true
+                },
+                "VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR": {
+                    "workgroupMemoryExplicitLayout": true
+                },
+                "VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT": {
+                    "vertexInputDynamicState": true
+                },
+                "VkPhysicalDeviceSynchronization2FeaturesKHR": {
+                    "synchronization2": true
+                },
+                "VkPhysicalDeviceProvokingVertexFeaturesEXT": {
+                    "provokingVertexLast": true
+                },
+                "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR": {
+                    "shaderSubgroupUniformControlFlow": true
+                },
+                "VkPhysicalDeviceBorderColorSwizzleFeaturesEXT": {
+                    "borderColorSwizzle": true
+                },
+                "VkPhysicalDeviceMultiDrawFeaturesEXT": {
+                    "multiDraw": true
+                },
+                "VkPhysicalDevicePresentIdFeaturesKHR": {
+                    "presentId": true
+                },
+                "VkPhysicalDevicePresentWaitFeaturesKHR": {
+                    "presentWait": true
+                },
+                "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR": {
+                    "shaderIntegerDotProduct": true
+                },
+                "VkPhysicalDeviceImage2DViewOf3DFeaturesEXT": {
+                    "image2DViewOf3D": true
+                },
+                "VkPhysicalDevicePrivateDataFeaturesEXT": {
+                    "privateData": true
+                },
+                "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT": {
+                    "extendedDynamicState": true
+                },
+                "VkPhysicalDeviceExtendedDynamicState2FeaturesEXT": {
+                    "extendedDynamicState2": true
+                },
+                "VkPhysicalDeviceDepthClipControlFeaturesEXT": {
+                    "depthClipControl": true
+                },
+                "VkPhysicalDeviceImageViewMinLodFeaturesEXT": {
+                    "minLod": true
+                },
+                "VkPhysicalDeviceLinearColorAttachmentFeaturesNV": {
+                    "linearColorAttachment": true
+                },
+                "VkPhysicalDevicePresentBarrierFeaturesNV": {
+                    "presentBarrier": true
+                },
+                "VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT": {
+                    "graphicsPipelineLibrary": true
+                },
+                "VkPhysicalDeviceDynamicRenderingFeaturesKHR": {
+                    "dynamicRendering": true
+                },
+                "VkPhysicalDeviceMeshShaderFeaturesEXT": {
+                    "taskShader": true,
+                    "meshShader": true
+                },
+                "VkPhysicalDeviceSubpassMergeFeedbackFeaturesEXT": {
+                    "subpassMergeFeedback": true
+                },
+                "VkPhysicalDeviceColorWriteEnableFeaturesEXT": {
+                    "colorWriteEnable": true
+                },
+                "VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT": {
+                    "multisampledRenderToSingleSampled": true
+                },
+                "VkPhysicalDeviceImageCompressionControlFeaturesEXT": {
+                    "imageCompressionControl": true
+                },
+                "VkPhysicalDeviceImageCompressionControlSwapchainFeaturesEXT": {
+                    "imageCompressionControlSwapchain": true
+                },
+                "VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD": {
+                    "shaderEarlyAndLateFragmentTests": true
+                },
+                "VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT": {
+                    "nonSeamlessCubeMap": true
+                },
+                "VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT": {
+                    "shaderModuleIdentifier": true
+                },
+                "VkPhysicalDevicePipelineRobustnessFeaturesEXT": {
+                    "pipelineRobustness": true
+                },
+                "VkPhysicalDeviceImageProcessingFeaturesQCOM": {
+                    "textureSampleWeighted": true,
+                    "textureBoxFilter": true,
+                    "textureBlockMatch": true
+                },
+                "VkPhysicalDeviceTilePropertiesFeaturesQCOM": {
+                    "tileProperties": true
+                },
+                "VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT": {
+                    "attachmentFeedbackLoopLayout": true
+                },
+                "VkPhysicalDeviceDepthClampZeroOneFeaturesEXT": {
+                    "depthClampZeroOne": true
+                },
+                "VkPhysicalDeviceFaultFeaturesEXT": {
+                    "deviceFault": true
+                },
+                "VkPhysicalDeviceAddressBindingReportFeaturesEXT": {
+                    "reportAddressBinding": true
                 }
             },
             "properties": {
@@ -370,11 +575,13 @@
                 "VK_KHR_buffer_device_address": 2,
                 "VK_KHR_pipeline_library": 1,
                 "VK_KHR_ray_query": 1,
-                "VK_KHR_shader_subgroup_extended_types": 1
+                "VK_KHR_shader_subgroup_extended_types": 1,
+                "VK_KHR_ray_tracing_maintenance1": 1,
+                "VK_EXT_opacity_micromap": 2
             },
             "features": {
                 "VkPhysicalDeviceMaintenance4FeaturesKHR": {
-
+                    "maintenance4": true
                 },
                 "VkPhysicalDeviceRayTracingPipelineFeaturesKHR": {
                     "rayTracingPipeline": true,
@@ -393,6 +600,12 @@
                 },
                 "VkPhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR": {
                     "shaderSubgroupExtendedTypes": true
+                },
+                "VkPhysicalDeviceRayTracingMaintenance1FeaturesKHR": {
+                    "rayTracingMaintenance1": true
+                },
+                "VkPhysicalDeviceOpacityMicromapFeaturesEXT": {
+                    "micromap": true
                 }
             },
             "properties": {
@@ -480,6 +693,7 @@
                     "shaderIntegerDotProduct": true,
                     "maintenance4": true,
                     "pipelineCreationCacheControl": true,
+                    "privateData": true,
                     "subgroupSizeControl": true,
                     "computeFullSubgroups": true,
                     "shaderDemoteToHelperInvocation": true,
@@ -488,6 +702,12 @@
                 },
                 "VkPhysicalDeviceInlineUniformBlockFeatures": {
                     "inlineUniformBlock": true
+                },
+                "VkPhysicalDeviceImageRobustnessFeatures": {
+                    "robustImageAccess": true
+                },
+                "VkPhysicalDevicePrivateDataFeatures": {
+                    "privateData": true
                 }
             },
             "properties": {
