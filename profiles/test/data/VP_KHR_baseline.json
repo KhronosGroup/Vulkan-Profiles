@@ -521,6 +521,27 @@
             "extensions": {
 
             },
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "vulkanMemoryModel": true,
+                    "vulkanMemoryModelDeviceScope": true,
+                    "bufferDeviceAddress": true
+                },
+                "VkPhysicalDeviceVulkan13Features": {
+                    "robustImageAccess": true,
+                    "shaderTerminateInvocation": true,
+                    "shaderZeroInitializeWorkgroupMemory": true,
+                    "synchronization2": true,
+                    "shaderIntegerDotProduct": true,
+                    "maintenance4": true,
+                    "pipelineCreationCacheControl": true,
+                    "subgroupSizeControl": true,
+                    "computeFullSubgroups": true,
+                    "shaderDemoteToHelperInvocation": true,
+                    "inlineUniformBlock": true,
+                    "dynamicRendering": true
+                }
+            },
             "properties": {
                 "VkPhysicalDeviceVulkan13Properties": {
                     "maxBufferSize": 1073741824,
