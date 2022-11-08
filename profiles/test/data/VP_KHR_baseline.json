@@ -118,23 +118,43 @@
         },
         "vulkan10optionals": {
             "extensions": {
+                "29 VK_EXT_transform_feedback": 1,
                 "54 VK_KHR_multiview": 1,
                 "81 VK_KHR_push_descriptor": 2,
                 "100 VK_EXT_discard_rectangles": 1,
+                "102 VK_EXT_conservative_rasterization": 1,
                 "139 VK_EXT_inline_uniform_block": 1,
                 "144 VK_EXT_sample_locations": 1,
                 "149 VK_EXT_blend_operation_advanced": 2,
                 "162 VK_EXT_descriptor_indexing": 2,
                 "169 VK_KHR_maintenance3": 1,
                 "179 VK_EXT_external_memory_host": 1,
+                "191 VK_EXT_vertex_attribute_divisor": 3,
+                "203 VK_NV_mesh_shader": 1,
                 "208 VK_KHR_timeline_semaphore": 2,
-                "227 VK_KHR_fragment_shading_rate": 2
+                "219 VK_EXT_fragment_density_map": 2,
+                "227 VK_KHR_fragment_shading_rate": 2,
+                "329 VK_EXT_mesh_shader": 1,
+                "333 VK_EXT_fragment_density_map2": 1,
+                "426 VK_QCOM_fragment_density_map_offset": 1
             },
             "properties": {
                 "VkPhysicalDeviceProperties": {
                     "limits": {
                         "sparseAddressSpaceSize": 2147483648
                     }
+                },
+                "VkPhysicalDeviceTransformFeedbackPropertiesEXT": {
+                    "maxTransformFeedbackStreams": 1,
+                    "maxTransformFeedbackBuffers": 1,
+                    "maxTransformFeedbackBufferSize": 134217728,
+                    "maxTransformFeedbackStreamDataSize": 512,
+                    "maxTransformFeedbackBufferDataSize": 512,
+                    "maxTransformFeedbackBufferDataStride": 512,
+                    "transformFeedbackQueries": false,
+                    "transformFeedbackStreamsLinesTriangles": false,
+                    "transformFeedbackRasterizationStreamSelect": false,
+                    "transformFeedbackDraw": false
                 },
                 "VkPhysicalDeviceMultiviewPropertiesKHR": {
                     "maxMultiviewViewCount": 6,
@@ -164,7 +184,12 @@
                     "variableSampleLocations": false
                 },
                 "VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT": {
-                    "advancedBlendMaxColorAttachments": 1
+                    "advancedBlendMaxColorAttachments": 1,
+                    "advancedBlendIndependentBlend": false,
+                    "advancedBlendNonPremultipliedSrcColor": false,
+                    "advancedBlendNonPremultipliedDstColor": false,
+                    "advancedBlendCorrelatedOverlap": false,
+                    "advancedBlendAllOperations": false
                 },
                 "VkPhysicalDeviceDescriptorIndexingPropertiesEXT": {
                     "maxUpdateAfterBindDescriptorsInAllPools": 500000,
@@ -196,8 +221,34 @@
                 "VkPhysicalDeviceExternalMemoryHostPropertiesEXT": {
                     "minImportedHostPointerAlignment": 65536
                 },
+                "VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT": {
+                    "maxVertexAttribDivisor": 65535
+                },
+                "VkPhysicalDeviceMeshShaderPropertiesNV": {
+                    "maxDrawMeshTasksCount": 65535,
+                    "maxTaskWorkGroupInvocations": 32,
+                    "maxTaskWorkGroupSize": [ 32, 1, 1 ],
+                    "maxTaskTotalMemorySize": 16384,
+                    "maxTaskOutputCount": 65535,
+                    "maxMeshWorkGroupInvocations": 32,
+                    "maxMeshWorkGroupSize": [ 32, 1, 1 ],
+                    "maxMeshTotalMemorySize": 16384,
+                    "maxMeshOutputVertices": 256,
+                    "maxMeshOutputPrimitives": 256,
+                    "maxMeshMultiviewViewCount": 1
+                },
                 "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
                     "maxTimelineSemaphoreValueDifference": 2147483647
+                },
+                "VkPhysicalDeviceFragmentDensityMapPropertiesEXT": {
+                    "minFragmentDensityTexelSize": {
+                        "width": 1,
+                        "height": 1
+                    },
+                    "maxFragmentDensityTexelSize": {
+                        "width": 1,
+                        "height": 1
+                    }
                 },
                 "VkPhysicalDeviceFragmentShadingRatePropertiesKHR": {
                     "minFragmentShadingRateAttachmentTexelSize": {
@@ -216,6 +267,53 @@
                     "maxFragmentSizeAspectRatio": 2,
                     "maxFragmentShadingRateCoverageSamples": 16,
                     "maxFragmentShadingRateRasterizationSamples": "VK_SAMPLE_COUNT_4_BIT"
+                },
+                "VkPhysicalDeviceConservativeRasterizationPropertiesEXT": {
+                    "primitiveOverestimationSize": 0.0,
+                    "maxExtraPrimitiveOverestimationSize": 0.0,
+                    "extraPrimitiveOverestimationSizeGranularity": 0.0,
+                    "primitiveUnderestimation": false,
+                    "conservativePointAndLineRasterization": false,
+                    "degenerateTrianglesRasterized": false,
+                    "degenerateLinesRasterized": false,
+                    "fullyCoveredFragmentShaderInputVariable": false,
+                    "conservativeRasterizationPostDepthCoverage": false
+                },
+                "VkPhysicalDeviceMeshShaderPropertiesEXT": {
+                    "maxTaskWorkGroupTotalCount": 4194304,
+                    "maxTaskWorkGroupCount": [ 65535, 65535, 65535 ],
+                    "maxTaskWorkGroupInvocations": 128,
+                    "maxTaskWorkGroupSize": [ 128, 128, 128 ],
+                    "maxTaskPayloadSize": 16384,
+                    "maxTaskSharedMemorySize": 32768,
+                    "maxTaskPayloadAndSharedMemorySize": 32768,
+                    "maxMeshWorkGroupTotalCount": 4194304,
+                    "maxMeshWorkGroupCount": [ 65535, 65535, 65535 ],
+                    "maxMeshWorkGroupInvocations": 128,
+                    "maxMeshWorkGroupSize": [ 128, 128, 128 ],
+                    "maxMeshSharedMemorySize": 28672,
+                    "maxMeshPayloadAndSharedMemorySize": 28672,
+                    "maxMeshOutputMemorySize": 32768,
+                    "maxMeshPayloadAndOutputMemorySize": 42128,
+                    "maxMeshOutputComponents": 128,
+                    "maxMeshOutputVertices": 256,
+                    "maxMeshOutputPrimitives": 256,
+                    "maxMeshOutputLayers": 8,
+                    "maxMeshMultiviewViewCount": 1,
+                    "meshOutputPerVertexGranularity": 32,
+                    "meshOutputPerPrimitiveGranularity": 32
+                },
+                "VkPhysicalDeviceFragmentDensityMap2PropertiesEXT": {
+                    "subsampledLoads": false,
+                    "subsampledCoarseReconstructionEarlyAccess": false,
+                    "maxSubsampledArrayLayers": 2,
+                    "maxDescriptorSetSubsampledSamplers": 1
+                },
+                "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM": {
+                    "fragmentDensityOffsetGranularity": {
+                        "width": 1024,
+                        "height": 1024
+                    }
                 }
             }
         },
