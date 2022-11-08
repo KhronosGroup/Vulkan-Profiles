@@ -127,6 +127,7 @@
                 "144 VK_EXT_sample_locations": 1,
                 "149 VK_EXT_blend_operation_advanced": 2,
                 "162 VK_EXT_descriptor_indexing": 2,
+                "166 VK_NV_ray_tracing": 3,
                 "169 VK_KHR_maintenance3": 1,
                 "179 VK_EXT_external_memory_host": 1,
                 "191 VK_EXT_vertex_attribute_divisor": 3,
@@ -134,9 +135,17 @@
                 "208 VK_KHR_timeline_semaphore": 2,
                 "219 VK_EXT_fragment_density_map": 2,
                 "227 VK_KHR_fragment_shading_rate": 2,
+                "260 VK_EXT_line_rasterization": 1,
+                "287 VK_EXT_robustness2": 1,
+                "288 VK_EXT_custom_border_color": 12,
+                "323 VK_KHR_fragment_shader_barycentric": 1,
+                "327 VK_NV_fragment_shading_rate_enums": 1,
                 "329 VK_EXT_mesh_shader": 1,
                 "333 VK_EXT_fragment_density_map2": 1,
-                "426 VK_QCOM_fragment_density_map_offset": 1
+                "370 VK_HUAWEI_subpass_shading": 2,
+                "393 VK_EXT_multi_draw": 1,
+                "426 VK_QCOM_fragment_density_map_offset": 1,
+                "441 VK_QCOM_image_processing": 1
             },
             "properties": {
                 "VkPhysicalDeviceProperties": {
@@ -252,21 +261,31 @@
                 },
                 "VkPhysicalDeviceFragmentShadingRatePropertiesKHR": {
                     "minFragmentShadingRateAttachmentTexelSize": {
-                        "width": 0,
-                        "height": 0
+                        "width": 32,
+                        "height": 32
                     },
                     "maxFragmentShadingRateAttachmentTexelSize": {
-                        "width": 0,
-                        "height": 0
+                        "width": 8,
+                        "height": 8
                     },
-                    "maxFragmentShadingRateAttachmentTexelSizeAspectRatio": 0,
+                    "maxFragmentShadingRateAttachmentTexelSizeAspectRatio": 1,
+                    "primitiveFragmentShadingRateWithMultipleViewports": false,
+                    "layeredShadingRateAttachments": false,
+                    "fragmentShadingRateNonTrivialCombinerOps": false,
                     "maxFragmentSize": {
                         "width": 2,
                         "height": 2
                     },
                     "maxFragmentSizeAspectRatio": 2,
                     "maxFragmentShadingRateCoverageSamples": 16,
-                    "maxFragmentShadingRateRasterizationSamples": "VK_SAMPLE_COUNT_4_BIT"
+                    "maxFragmentShadingRateRasterizationSamples": "VK_SAMPLE_COUNT_4_BIT",
+                    "fragmentShadingRateWithShaderDepthStencilWrites": false,
+                    "fragmentShadingRateWithSampleMask": false,
+                    "fragmentShadingRateWithShaderSampleMask": false,
+                    "fragmentShadingRateWithConservativeRasterization": false,
+                    "fragmentShadingRateWithFragmentShaderInterlock": false,
+                    "fragmentShadingRateWithCustomSampleLocations": false,
+                    "fragmentShadingRateStrictMultiplyCombiner": false
                 },
                 "VkPhysicalDeviceConservativeRasterizationPropertiesEXT": {
                     "primitiveOverestimationSize": 0.0,
@@ -278,6 +297,22 @@
                     "degenerateLinesRasterized": false,
                     "fullyCoveredFragmentShaderInputVariable": false,
                     "conservativeRasterizationPostDepthCoverage": false
+                },
+                "VkPhysicalDeviceLineRasterizationPropertiesEXT": {
+                    "lineSubPixelPrecisionBits": 4
+                },
+                "VkPhysicalDeviceRobustness2PropertiesEXT": {
+                    "robustStorageBufferAccessSizeAlignment": 4,
+                    "robustUniformBufferAccessSizeAlignment": 256
+                },
+                "VkPhysicalDeviceCustomBorderColorPropertiesEXT": {
+                    "maxCustomBorderColorSamplers": 32
+                },
+                "VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR": {
+                    "triStripVertexOrderIndependentOfProvokingVertex": false
+                },
+                "VkPhysicalDeviceFragmentShadingRateEnumsPropertiesNV": {
+                    "maxFragmentShadingRateInvocationCount": "VK_SAMPLE_COUNT_4_BIT"
                 },
                 "VkPhysicalDeviceMeshShaderPropertiesEXT": {
                     "maxTaskWorkGroupTotalCount": 4194304,
@@ -309,10 +344,42 @@
                     "maxSubsampledArrayLayers": 2,
                     "maxDescriptorSetSubsampledSamplers": 1
                 },
+                "VkPhysicalDeviceSubpassShadingPropertiesHUAWEI": {
+                    "maxSubpassShadingWorkgroupSizeAspectRatio": 1
+                },
+                "VkPhysicalDeviceMultiDrawPropertiesEXT": {
+                    "maxMultiDrawCount": 1024
+                },
                 "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM": {
                     "fragmentDensityOffsetGranularity": {
                         "width": 1024,
                         "height": 1024
+                    }
+                },
+                "VkPhysicalDeviceRayTracingPropertiesNV": {
+                    "shaderGroupHandleSize": 16,
+                    "maxRecursionDepth": 31,
+                    "maxShaderGroupStride": 4096,
+                    "shaderGroupBaseAlignment": 64,
+                    "maxGeometryCount": 16777215,
+                    "maxInstanceCount": 16777215,
+                    "maxTriangleCount": 536870911,
+                    "maxPerStageDescriptorAccelerationStructures": 16,
+                    "maxDescriptorSetAccelerationStructures": 16
+                },
+                "VkPhysicalDeviceImageProcessingPropertiesQCOM": {
+                    "maxWeightFilterPhases": 1024,
+                    "maxWeightFilterDimension": {
+                        "width": 64,
+                        "height": 64
+                    },
+                    "maxBlockMatchRegion": {
+                        "width": 64,
+                        "height": 64
+                    },
+                    "maxBoxFilterBlockSize": {
+                        "width": 64,
+                        "height": 64
                     }
                 }
             }
@@ -335,29 +402,20 @@
         },
         "vulkan11optionals": {
             "extensions": {
-                "VK_KHR_maintenance4": 2,
-                "VK_KHR_ray_tracing_pipeline": 1,
-                "VK_KHR_acceleration_structure": 13,
-                "VK_KHR_buffer_device_address": 2,
-                "VK_KHR_pipeline_library": 1,
-                "VK_KHR_ray_query": 1,
-                "VK_KHR_shader_subgroup_extended_types": 1,
-                "VK_KHR_ray_tracing_maintenance1": 1,
-                "VK_EXT_opacity_micromap": 2
+                "151 VK_KHR_acceleration_structure": 13,
+                "176 VK_KHR_shader_subgroup_extended_types": 1,
+                "258 VK_KHR_buffer_device_address": 2,
+                "278 VK_NV_device_generated_commands": 3,
+                "291 VK_KHR_pipeline_library": 1,
+                "321 VK_EXT_graphics_pipeline_library": 1,
+                "348 VK_KHR_ray_tracing_pipeline": 1,
+                "349 VK_KHR_ray_query": 1,
+                "387 VK_KHR_ray_tracing_maintenance1": 1,
+                "397 VK_EXT_opacity_micromap": 2,
+                "414 VK_KHR_maintenance4": 2,
+                "428 VK_NV_memory_decompression": 1
             },
             "properties": {
-                "VkPhysicalDeviceMaintenance4PropertiesKHR": {
-                    "maxBufferSize": 1073741824
-                },
-                "VkPhysicalDeviceRayTracingPipelinePropertiesKHR": {
-                    "maxRayRecursionDepth": 1,
-                    "maxShaderGroupStride": 4096,
-                    "shaderGroupBaseAlignment": 64,
-                    "shaderGroupHandleCaptureReplaySize": 64,
-                    "maxRayDispatchInvocationCount": 1073741824,
-                    "shaderGroupHandleAlignment": 32,
-                    "maxRayHitAttributeSize": 32
-                },
                 "VkPhysicalDeviceAccelerationStructurePropertiesKHR": {
                     "maxGeometryCount": 16777215,
                     "maxInstanceCount": 16777215,
@@ -367,6 +425,41 @@
                     "maxDescriptorSetAccelerationStructures": 16,
                     "maxDescriptorSetUpdateAfterBindAccelerationStructures": 500000,
                     "minAccelerationStructureScratchOffsetAlignment": 256
+                },
+                "VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV": {
+                    "maxGraphicsShaderGroupCount": 4096,
+                    "maxIndirectSequenceCount": 1048576,
+                    "maxIndirectCommandsTokenCount": 16,
+                    "maxIndirectCommandsStreamCount": 16,
+                    "maxIndirectCommandsTokenOffset": 2047,
+                    "maxIndirectCommandsStreamStride": 2048,
+                    "minSequencesCountBufferOffsetAlignment": 256,
+                    "minSequencesIndexBufferOffsetAlignment": 256,
+                    "minIndirectCommandsBufferOffsetAlignment": 256
+                },
+                "VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT": {
+                    "graphicsPipelineLibraryFastLinking": false,
+                    "graphicsPipelineLibraryIndependentInterpolationDecoration": false
+                },
+                "VkPhysicalDeviceRayTracingPipelinePropertiesKHR": {
+                    "shaderGroupHandleSize": 32,
+                    "maxRayRecursionDepth": 1,
+                    "maxShaderGroupStride": 4096,
+                    "shaderGroupBaseAlignment": 64,
+                    "shaderGroupHandleCaptureReplaySize": 64,
+                    "maxRayDispatchInvocationCount": 1073741824,
+                    "shaderGroupHandleAlignment": 32,
+                    "maxRayHitAttributeSize": 32
+                },
+                "VkPhysicalDeviceOpacityMicromapPropertiesEXT": {
+                    "maxOpacity2StateSubdivisionLevel": 3,
+                    "maxOpacity4StateSubdivisionLevel": 3
+                },
+                "VkPhysicalDeviceMaintenance4PropertiesKHR": {
+                    "maxBufferSize": 1073741824
+                },
+                "VkPhysicalDeviceMemoryDecompressionPropertiesNV": {
+                    "maxDecompressionIndirectCount": 65536
                 }
             }
         },
@@ -384,11 +477,23 @@
                     "timelineSemaphore": true,
                     "shaderSubgroupExtendedTypes": true
                 },
+                "VkPhysicalDeviceUniformBufferStandardLayoutFeatures": {
+                    "uniformBufferStandardLayout": true
+                },
+                "VkPhysicalDeviceImagelessFramebufferFeatures": {
+                    "imagelessFramebuffer": true
+                },
+                "VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures": {
+                    "separateDepthStencilLayouts": true
+                },
                 "VkPhysicalDeviceHostQueryResetFeatures": {
                     "hostQueryReset": true
                 },
                 "VkPhysicalDeviceTimelineSemaphoreFeatures": {
                     "timelineSemaphore": true
+                },
+                "VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures": {
+                    "shaderSubgroupExtendedTypes": true
                 }
             },
             "properties": {
