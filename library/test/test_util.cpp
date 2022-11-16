@@ -30,11 +30,12 @@ TEST(test_library_util, isMultiple) {
     EXPECT_TRUE((4 % 2) == 0);
     EXPECT_TRUE((4 % 1) == 0);
 
-    EXPECT_TRUE(detail::isMultiple(4.0, 2.0));
-    EXPECT_TRUE(detail::isMultiple(4.0, 0.5));
-    EXPECT_TRUE(detail::isMultiple(4.0, 1.0));
+    EXPECT_TRUE(detail::isMultipleOrZero(4.0, 0.0));
+    EXPECT_TRUE(detail::isMultipleOrZero(4.0, 2.0));
+    EXPECT_TRUE(detail::isMultipleOrZero(4.0, 0.5));
+    EXPECT_TRUE(detail::isMultipleOrZero(4.0, 1.0));
     
-    EXPECT_FALSE(detail::isMultiple(4.0, 3.0));
+    EXPECT_FALSE(detail::isMultipleOrZero(4.0, 3.0));
 }
 
 TEST(test_library_util, isPowerOfTwo) {

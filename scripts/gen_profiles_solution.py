@@ -268,7 +268,10 @@ VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *
 '''
 
 PRIVATE_DEFS = '''
-VPAPI_ATTR bool isMultiple(double source, double multiple) {
+VPAPI_ATTR bool isMultipleOrZero(double source, double multiple) {
+    if (std::abs(multiple) < 0.0001) {
+        return true;
+    }
     double mod = std::fmod(source, multiple);
     return std::abs(mod) < 0.0001; 
 }
@@ -2545,7 +2548,7 @@ class VulkanProfile():
                 elif limittype == 'min,mul' or limittype == 'mul,min':
                     # Compare min limit by checking if device value is less than or equal to profile value and a multiple of profile value
                     if (membertype == 'float' or membertype == 'double'):
-                        comparePredFmt = [ '{0} <= {1}', 'isMultiple({1}, {0})' ]
+                        comparePredFmt = [ '{0} <= {1}', 'isMultipleOrZero({1}, {0})' ]
                     else:
                         comparePredFmt = [ '{0} <= {1}', '({1} % {0}) == 0' ]
                 elif limittype == 'range':
