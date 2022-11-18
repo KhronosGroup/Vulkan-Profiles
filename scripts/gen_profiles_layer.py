@@ -729,6 +729,20 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
+    static bool WarnIfNotEqualSizet(const char *name, const size_t new_value, const size_t old_value, const bool not_modifiable) {
+        if (new_value != old_value) {
+            if (not_modifiable) {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' is not modifiable but the profile value (%" PRIuLEAST64 ") which different from the device value (%" PRIuLEAST64 ").\\n", name, new_value, old_value));
+            } else {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "'%s' profile value (%" PRIuLEAST64 ") is different from the device value (%" PRIuLEAST64 ").\\n", name, new_value, old_value));
+            }
+            return true;
+        }
+        return false;
+    }
+
     static bool WarnIfMissingBit(const char *name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
         if ((old_value | new_value) != old_value) {
             if (not_modifiable) {
@@ -3446,11 +3460,11 @@ class VulkanProfilesLayerGenerator():
         for feature in self.non_extension_features:
             gen += '    ' + feature + ' ' + self.create_var_name(feature) + ';\n'
 
-        for ext, property, feature in self.extension_structs:
+        for ext, properties, features in self.extension_structs:
             gen += '\n    // ' + ext + ' structs\n'
-            if property:
+            for property in properties:
                 gen += '    ' + property + ' ' + self.create_var_name(property) + ';\n'
-            if feature:
+            for feature in features:
                 gen += '    ' + feature + ' ' + self.create_var_name(feature) + ';\n'
 
         gen += PHYSICAL_DEVICE_DATA_CONSTRUCTOR_BEGIN
@@ -3461,11 +3475,11 @@ class VulkanProfilesLayerGenerator():
         gen += '\n        // Core features\n'
         for feature in self.non_extension_features:
             gen += '        ' + self.create_var_name(feature) + ' = { ' + registry.structs[feature].sType +  ' };\n'
-        for ext, property, feature in self.extension_structs:
+        for ext, properties, features in self.extension_structs:
             gen += '\n        // ' + ext + ' structs\n'
-            if property:
+            for property in properties:
                 gen += '        ' + self.create_var_name(property) + ' = {' + registry.structs[property].sType +  '};\n'
-            if feature:
+            for feature in features:
                 gen += '        ' + self.create_var_name(feature) + ' = {' + registry.structs[feature].sType +  '};\n'
 
         gen += PHYSICAL_DEVICE_DATA_END
@@ -3705,10 +3719,10 @@ class VulkanProfilesLayerGenerator():
             gen += self.generate_get_value_function(property)
         for feature in self.non_extension_features:
             gen += self.generate_get_value_function(feature)
-        for ext, property, feature in self.extension_structs:
-            if property:
+        for ext, properties, features in self.extension_structs:
+            for property in properties:
                 gen += self.generate_get_value_function(property)
-            if feature:
+            for feature in features:
                 gen += self.generate_get_value_function(feature)
         for struct in self.additional_features:
             gen += self.generate_get_value_function(struct)
@@ -3745,13 +3759,13 @@ class VulkanProfilesLayerGenerator():
             gen += self.generate_fill_case(property)
         for feature in self.non_extension_features:
             gen += self.generate_fill_case(feature)
-        for ext, property, feature in self.extension_structs:
-            if property:
+        for ext, properties, features in self.extension_structs:
+            for property in properties:
                 # exception, already handled above
                 if property == 'VkPhysicalDevicePortabilitySubsetPropertiesKHR':
                     continue
                 gen += self.generate_fill_case(property)
-            if feature:
+            for feature in features:
                 # Currently a bug in the spec, skip
                 if feature == 'VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM':
                     continue
@@ -3801,8 +3815,8 @@ class VulkanProfilesLayerGenerator():
                 minor = str(j + 1)
                 gen += '\n\n// VK_VULKAN_' + major + '_' + minor + '\n'
 
-                for ext, property_name, feature_name in self.extension_structs:
-                    if property_name:
+                for ext, property_names, feature_names in self.extension_structs:
+                    for property_name in property_names:
                         property = registry.structs[property_name]
                         version = None
                         if property.definedByVersion:
@@ -3816,7 +3830,7 @@ class VulkanProfilesLayerGenerator():
                         if version and version.major == int(major) and version.minor == int(minor):
                             gen += self.generate_transfer_function(major, minor, 'Properties', property_name)
 
-                    if feature_name:
+                    for feature_name in feature_names:
                         feature = registry.structs[feature_name]
                         version = None
                         if feature.definedByVersion:
@@ -3862,17 +3876,17 @@ class VulkanProfilesLayerGenerator():
     def generate_enumerate_physical_device(self):
         gen = ENUMERATE_PHYSICAL_DEVICES_BEGIN
 
-        for ext, property, feature in self.extension_structs:
+        for ext, properties, features in self.extension_structs:
             if ext == 'VK_KHR_portability_subset': # portability subset can be emulated and is handled differently
                 continue
-            gen += self.generate_physical_device_chain_case(ext, None, property, feature)
+            gen += self.generate_physical_device_chain_case(ext, None, properties, features)
             
         for property in self.non_extension_properties:
             version = registry.structs[property].definedByVersion
-            gen += self.generate_physical_device_chain_case(None, version, property, None)
+            gen += self.generate_physical_device_chain_case(None, version, [property], [])
         for feature in self.non_extension_features:
             version = registry.structs[feature].definedByVersion
-            gen += self.generate_physical_device_chain_case(None, version, None, feature)
+            gen += self.generate_physical_device_chain_case(None, version, [], [feature])
 
         gen += ENUMERATE_PHYSICAL_DEVICES_MIDDLE
 
@@ -3883,8 +3897,8 @@ class VulkanProfilesLayerGenerator():
                 version_minor = j + 1
                 minor = str(version_minor)
                 gen += '\n            // VK_VULKAN_' + str(major) + '_' + str(minor) + '\n'
-                for ext, property_name, feature_name in self.extension_structs:
-                    if property_name:
+                for ext, property_names, feature_names in self.extension_structs:
+                    for property_name in property_names:
                         property = registry.structs[property_name]
                         promoted_version = None
                         if property.definedByVersion:
@@ -3897,7 +3911,7 @@ class VulkanProfilesLayerGenerator():
                                     break
                         if promoted_version and version_major == promoted_version.major and version_minor == promoted_version.minor:
                             gen += '            TransferValue(&(pdd.physical_device_vulkan_' + major + minor + '_properties_), &(pdd.' + self.create_var_name(property_name) + '), pdd.vulkan_' + major + '_' + minor + '_properties_written_);\n'
-                    if feature_name:
+                    for feature_name in feature_names:
                         feature = registry.structs[feature_name]
                         promoted_version = None
                         if feature.definedByVersion:
@@ -3915,19 +3929,18 @@ class VulkanProfilesLayerGenerator():
 
         return gen
 
-    def generate_physical_device_chain_case(self, ext, version, property_name, feature_name):
+    def generate_physical_device_chain_case(self, ext, version, property_names, feature_names):
         if ext:
             ext_name = registry.extensions[ext].upperCaseName
             gen = '\n                if (PhysicalDeviceData::HasExtension(&pdd, ' + ext_name + '_EXTENSION_NAME)) {\n'
         else:
             gen = '\n                if (api_version_above_' + str(version.major) + '_' + str(version.minor) + ') {\n'
-        if property_name:
+        for property_name in property_names:
             name = self.create_var_name(property_name)
             gen += '                    pdd.' + name + '.pNext = property_chain.pNext;\n\n'
             gen += '                    property_chain.pNext = &(pdd.' + name + ');\n'
-            if feature_name:
-                gen += '\n'
-        if feature_name:
+            gen += '\n'
+        for feature_name in feature_names:
             name = self.create_var_name(feature_name)
             gen += '                    pdd.' + name + '.pNext = feature_chain.pNext;\n\n'
             gen += '                    feature_chain.pNext = &(pdd.' + name + ');\n'
@@ -3997,17 +4010,14 @@ class VulkanProfilesLayerGenerator():
                     gen += '        GET_VALUE_SIZE_T_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfGreaterSizet);\n'
                 #elif member.limittype == 'pot':
                 else:
-                    gen += '        GET_VALUE_SIZE_T_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfNotEqual);\n'
+                    gen += '        GET_VALUE_SIZE_T_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfNotEqualSizet);\n'
             elif member.type == 'uint64_t' or member.type == 'int32_t' or member.type == 'VkDeviceSize':
                 if 'min' in member.limittype:
                     gen += '        GET_VALUE_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfLesser);\n'
                 elif 'max' in member.limittype or 'bits' in member.limittype:
                     gen += '        GET_VALUE_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfGreater);\n'
                 else:
-                    if member.type == 'uint64_t':
-                        gen += '        GET_VALUE_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfNotEqual64u);\n'
-                    else:
-                        gen += '        GET_VALUE_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfNotEqual);\n'
+                    gen += '        GET_VALUE_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfNotEqual64u);\n'
             elif member.type == 'int64_t':
                 if 'min' in member.limittype:
                     gen += '        GET_VALUE_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfLesser);\n'
@@ -4077,10 +4087,10 @@ class VulkanProfilesLayerGenerator():
             gen += '    bool GetStruct(const Json::Value &parent, ' + property + ' *dest);\n'
         for feature in self.non_extension_features:
             gen += '    bool GetStruct(const Json::Value &parent, ' + feature + ' *dest);\n'
-        for ext, property, feature in self.extension_structs:
-            if property:
+        for ext, properties, features in self.extension_structs:
+            for property in properties:
                 gen += '    bool GetStruct(const Json::Value &parent, ' + property + ' *dest);\n'
-            if feature:
+            for feature in features:
                 gen += '    bool GetStruct(const Json::Value &parent, ' + feature + ' *dest);\n'
         for struct in self.additional_features:
             gen += '    bool GetStruct(const Json::Value &parent, ' + struct + ' *dest);\n'
@@ -4135,18 +4145,16 @@ class VulkanProfilesLayerGenerator():
 
         self.extension_structs = []
         for extension in registry.extensions:
-            feature_name = None
-            property_name = None
+            feature_names = []
+            property_names = []
             for property in properties:
                 if property[1] and property[1][0] == extension:
-                    property_name = property[0]
-                    break
+                    property_names.append(property[0])
             for feature in features:
                 if feature[1] and feature[1][0] == extension:
-                    feature_name = feature[0]
-                    break
-            if feature_name or property_name:
-                self.extension_structs.append((extension, property_name, feature_name))
+                    feature_names.append(feature[0])
+            if feature_names or property_names:
+                self.extension_structs.append((extension, property_names, feature_names))
 
     def get_ext(self, extension):
         i = 3
