@@ -2821,7 +2821,7 @@ class VulkanProfile():
                         '        {0},\n'
                         '        [](VkBaseOutStructure* p) {{\n').format(formatName)
                 gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structFill, fillFmt)
-                gen += ('        },\n'
+                gen += ('        {0},\n'
                         '        [](VkBaseOutStructure* p) {{\n').format(formatName)
                 gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structFill, fillFmt)
                 gen += ('        },\n'
