@@ -720,7 +720,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                                                                static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p)));
                 pUserData->supported = true;
                 while (p != nullptr) {
-                    if (!pUserData->pDesc->feature.pfnComparator(p)) {
+                    if (!pUserData->pDesc->feature.pfnComparatorRequired(p) && !pUserData->pDesc->feature.pfnComparatorOptional(p)) {
                         pUserData->supported = false;
                     }
                     p = p->pNext;
@@ -741,7 +741,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                                                                  static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p)));
                 pUserData->supported = true;
                 while (p != nullptr) {
-                    if (!pUserData->pDesc->property.pfnComparator(p)) {
+                    if (!pUserData->pDesc->property.pfnComparatorRequired(p) && !pUserData->pDesc->feature.pfnComparatorOptional(p)) {
                         pUserData->supported = false;
                     }
                     p = p->pNext;
@@ -764,7 +764,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                                                                        static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p)));
                 pUserData->supported = true;
                 while (p != nullptr) {
-                    if (!pUserData->pDesc->pFormats[pUserData->index].pfnComparator(p)) {
+                    if (!pUserData->pDesc->pFormats[pUserData->index].pfnComparatorRequired(p) && !pUserData->pDesc->pFormats[pUserData->index].pfnComparatorOptional(p)) {
                         pUserData->supported = false;
                     }
                     p = p->pNext;
@@ -801,7 +801,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                         bool propsMatch = true;
                         p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProps[j]));
                         while (p != nullptr) {
-                            if (!pUserData->pDesc->pQueueFamilies[i].pfnComparator(p)) {
+                            if (!pUserData->pDesc->pQueueFamilies[i].pfnComparatorRequired(p) && !pUserData->pDesc->pQueueFamilies[i].pfnComparatorOptional(p)) {
                                 propsMatch = false;
                                 break;
                             }
@@ -832,7 +832,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                     for (uint32_t i = 0; i < pUserData->pDesc->queueFamilyCount && propsMatch; ++i) {
                         p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProps[permutation[i]]));
                         while (p != nullptr) {
-                            if (!pUserData->pDesc->pQueueFamilies[i].pfnComparator(p)) {
+                            if (!pUserData->pDesc->pQueueFamilies[i].pfnComparatorRequired(p) && !pUserData->pDesc->pQueueFamilies[i].pfnComparatorOptional(p)) {
                                 propsMatch = false;
                                 break;
                             }
@@ -919,7 +919,7 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
                 }
             }
 
-            if (pCreateInfo->flags & VP_DEVICE_CREATE_INCLUDE_OPTIONALS_BIT)
+            if (pCreateInfo->flags & VP_DEVICE_CREATE_INCLUDE_OPTIONALS_BIT) {
                 if (pDesc->feature.pfnFillerOptional != nullptr) {
                     while (p != nullptr) {
                         pDesc->feature.pfnFillerOptional(p);
@@ -1149,7 +1149,7 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties 
         for (uint32_t i = 0; i < *pPropertyCount; ++i) {
             VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProperties[i]));
             while (p != nullptr) {
-                pDesc->pQueueFamilies[i].pfnFiller(p);
+                pDesc->pQueueFamilies[i].pfnFillerRequired(p);
                 p = p->pNext;
             }
         }
@@ -1208,7 +1208,7 @@ VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile
         if (pDesc->pFormats[i].format == format) {
             VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pNext));
             while (p != nullptr) {
-                pDesc->pFormats[i].pfnFiller(p);
+                pDesc->pFormats[i].pfnFillerRequired(p);
                 p = p->pNext;
             }
 #if defined(VK_VERSION_1_3) || defined(VK_KHR_format_feature_flags2)
@@ -1218,14 +1218,14 @@ VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile
                 detail::vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR));
             if (fp3 != nullptr) {
                 VkFormatProperties2KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-                pDesc->pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
+                pDesc->pFormats[i].pfnFillerRequired(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
                 fp3->linearTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->linearTilingFeatures | fp.formatProperties.linearTilingFeatures);
                 fp3->optimalTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->optimalTilingFeatures | fp.formatProperties.optimalTilingFeatures);
                 fp3->bufferFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->bufferFeatures | fp.formatProperties.bufferFeatures);
             }
             if (fp2 != nullptr) {
                 VkFormatProperties3KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR };
-                pDesc->pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
+                pDesc->pFormats[i].pfnFillerRequired(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
                 fp2->formatProperties.linearTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.linearTilingFeatures | fp.linearTilingFeatures);
                 fp2->formatProperties.optimalTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.optimalTilingFeatures | fp.optimalTilingFeatures);
                 fp2->formatProperties.bufferFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.bufferFeatures | fp.bufferFeatures);
@@ -2821,8 +2821,8 @@ class VulkanProfile():
                         '        {0},\n'
                         '        [](VkBaseOutStructure* p) {{\n').format(formatName)
                 gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structFill, fillFmt)
-                gen += ('        {0},\n'
-                        '        [](VkBaseOutStructure* p) {{\n').format(formatName)
+                gen += ('        },\n'
+                        '        [](VkBaseOutStructure* p) {\n')
                 gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structFill, fillFmt)
                 gen += ('        },\n'
                         '        [](VkBaseOutStructure* p) -> bool {\n'
