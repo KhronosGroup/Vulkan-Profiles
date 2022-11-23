@@ -1,0 +1,63 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.1-204.json#",
+    "capabilities": {
+        "block0": {
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "textureCompressionBC": false,
+                    "imageCubeArray": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension2D": 8192
+                    }
+                }
+            }
+        },
+        "block1": {
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "textureCompressionBC": true,
+                    "samplerAnisotropy": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension2D": 16384
+                    }
+                }
+            }
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_test_capabilities_optional": {
+            "version": 1,
+            "api-version": "1.0.198",
+            "label": "Device extensions",
+            "description": "Unit test file",
+            "capabilities": [
+                "block0",
+                "block1"
+            ]
+        }
+    },
+    "contributors": {
+        "Christophe Riccio": {
+            "company": "LunarG",
+            "email": "christophe@lunarg.com",
+            "github": "christophe-lunarg",
+            "contact": true
+        }
+    },
+    "history": [
+        {
+            "revision": 1,
+            "date": "2022-11-23",
+            "author": "Christophe Riccio",
+            "comment": "Initial revision"
+        }
+    ]
+}

@@ -164,6 +164,20 @@ TEST(test_validate, VP_LUNARG_test_vkqueuefamilyproperties) {
     EXPECT_TRUE(validator.Check(document));
 }
 
+TEST(test_validate, VP_LUNARG_test_capabilities) {
+    JsonValidator validator;
+
+    const Json::Value document = ParseJsonFile("VP_LUNARG_test_capabilities.json");
+    EXPECT_TRUE(validator.Check(document));
+}
+
+TEST(test_validate, VP_LUNARG_test_capabilities_optional) {
+    JsonValidator validator;
+
+    const Json::Value document = ParseJsonFile("VP_LUNARG_test_capabilities_optional.json");
+    EXPECT_TRUE(validator.Check(document));
+}
+
 TEST(test_validate, VP_LUNARG_test_api) {
     JsonValidator validator;
 
