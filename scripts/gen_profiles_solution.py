@@ -47,6 +47,7 @@ COPYRIGHT_HEADER = '''/**
 
 DEBUG_MSG_CB_DEFINE = '''
 #include <stdio.h>
+#include <assert.h>
 
 #ifndef VP_DEBUG_MESSAGE_CALLBACK
 #if defined(ANDROID) || defined(__ANDROID__)
@@ -140,6 +141,7 @@ API_DEFS = '''
 typedef struct VpProfileProperties {
     char        profileName[VP_MAX_PROFILE_NAME_SIZE];
     uint32_t    specVersion;
+    bool        includeOptionals;
 } VpProfileProperties;
 
 typedef enum VpInstanceCreateFlagBits {
@@ -194,9 +196,6 @@ typedef enum VpDeviceCreateFlagBits {
     VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT = 0x00000040,
     VP_DEVICE_CREATE_DISABLE_ROBUST_ACCESS =
         VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT | VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT,
-
-    // Add optionals capabilities of a profile to the requirements
-    VP_DEVICE_CREATE_INCLUDE_OPTIONALS_BIT = 0x00000080,
 
     VP_DEVICE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
 } VpDeviceCreateFlagBits;
@@ -919,7 +918,7 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
                 }
             }
 
-            if (pCreateInfo->flags & VP_DEVICE_CREATE_INCLUDE_OPTIONALS_BIT) {
+            if (pCreateInfo->pProfile->includeOptionals) {
                 if (pDesc->feature.pfnFillerOptional != nullptr) {
                     while (p != nullptr) {
                         pDesc->feature.pfnFillerOptional(p);
@@ -1050,6 +1049,8 @@ VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfilePropert
 }
 
 VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext) {
+    assert(pProfile != nullptr);
+
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
     if (pDesc != nullptr && pDesc->feature.pfnFillerRequired != nullptr) {
         VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
@@ -1058,7 +1059,8 @@ VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *
             p = p->pNext;
         }
     }
-    if (pDesc != nullptr && pDesc->feature.pfnFillerOptional != nullptr) {
+
+    if (pProfile->includeOptionals && pDesc != nullptr && pDesc->feature.pfnFillerOptional != nullptr) {
         VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
         while (p != nullptr) {
             pDesc->feature.pfnFillerOptional(p);
@@ -1069,6 +1071,8 @@ VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *
 
 VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
                                                       VkStructureType *pStructureTypes) {
+    assert(pProfile != nullptr);
+
     VkResult result = VK_SUCCESS;
 
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
@@ -1100,7 +1104,7 @@ VPAPI_ATTR void vpGetProfileProperties(const VpProfileProperties *pProfile, void
         }
     }
 
-    if (pDesc != nullptr && pDesc->property.pfnFillerOptional != nullptr) {
+    if (pProfile->includeOptionals && pDesc != nullptr && pDesc->property.pfnFillerOptional != nullptr) {
         VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
         while (p != nullptr) {
             pDesc->property.pfnFillerOptional(p);
@@ -1148,9 +1152,18 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties 
         }
         for (uint32_t i = 0; i < *pPropertyCount; ++i) {
             VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProperties[i]));
-            while (p != nullptr) {
-                pDesc->pQueueFamilies[i].pfnFillerRequired(p);
-                p = p->pNext;
+            VkBaseOutStructure* pRequired = p;
+            while (pRequired != nullptr) {
+                pDesc->pQueueFamilies[i].pfnFillerRequired(pRequired);
+                pRequired = pRequired->pNext;
+            }
+
+            if (pProfile->includeOptionals) {
+                VkBaseOutStructure* pOptional = p;
+                while (pOptional != nullptr) {
+                    pDesc->pQueueFamilies[i].pfnFillerOptional(pOptional);
+                    pOptional = pOptional->pNext;
+                }
             }
         }
     }
@@ -1206,11 +1219,20 @@ VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile
 
     for (uint32_t i = 0; i < pDesc->formatCount; ++i) {
         if (pDesc->pFormats[i].format == format) {
-            VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pNext));
-            while (p != nullptr) {
-                pDesc->pFormats[i].pfnFillerRequired(p);
-                p = p->pNext;
+            VkBaseOutStructure* pRequired = static_cast<VkBaseOutStructure*>(static_cast<void*>(pNext));
+            while (pRequired != nullptr) {
+                pDesc->pFormats[i].pfnFillerRequired(pRequired);
+                pRequired = pRequired->pNext;
             }
+
+            if (pProfile->includeOptionals) {
+                VkBaseOutStructure* pOptional = static_cast<VkBaseOutStructure*>(static_cast<void*>(pNext));
+                while (pOptional != nullptr) {
+                    pDesc->pFormats[i].pfnFillerOptional(pOptional);
+                    pOptional = pOptional->pNext;
+                }
+            }
+
 #if defined(VK_VERSION_1_3) || defined(VK_KHR_format_feature_flags2)
             VkFormatProperties2KHR* fp2 = static_cast<VkFormatProperties2KHR*>(
                 detail::vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR));
@@ -1219,6 +1241,9 @@ VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile
             if (fp3 != nullptr) {
                 VkFormatProperties2KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
                 pDesc->pFormats[i].pfnFillerRequired(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
+                if (pProfile->includeOptionals) {
+                    pDesc->pFormats[i].pfnFillerOptional(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
+                }
                 fp3->linearTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->linearTilingFeatures | fp.formatProperties.linearTilingFeatures);
                 fp3->optimalTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->optimalTilingFeatures | fp.formatProperties.optimalTilingFeatures);
                 fp3->bufferFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->bufferFeatures | fp.formatProperties.bufferFeatures);
@@ -1226,6 +1251,9 @@ VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile
             if (fp2 != nullptr) {
                 VkFormatProperties3KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR };
                 pDesc->pFormats[i].pfnFillerRequired(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
+                if (pProfile->includeOptionals) {
+                    pDesc->pFormats[i].pfnFillerOptional(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
+                }
                 fp2->formatProperties.linearTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.linearTilingFeatures | fp.linearTilingFeatures);
                 fp2->formatProperties.optimalTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.optimalTilingFeatures | fp.optimalTilingFeatures);
                 fp2->formatProperties.bufferFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.bufferFeatures | fp.bufferFeatures);
