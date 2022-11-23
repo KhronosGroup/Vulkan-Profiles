@@ -140,6 +140,7 @@ API_DEFS = '''
 typedef struct VpProfileProperties {
     char        profileName[VP_MAX_PROFILE_NAME_SIZE];
     uint32_t    specVersion;
+    bool        enableOptionals;
 } VpProfileProperties;
 
 typedef enum VpInstanceCreateFlagBits {
