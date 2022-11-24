@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 # Copyright 2017 The Glslang Authors. All rights reserved.
-# Copyright (c) 2018 Valve Corporation
-# Copyright (c) 2018-2021 LunarG, Inc.
+# Copyright (c) 2018-2023 Valve Corporation
+# Copyright (c) 2018-2023 LunarG, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -206,11 +206,6 @@ A list of options to pass to CMake during the generation phase.
 A list of environment variables where one must be set to "true"
 (case-insensitive) in order for this repo to be fetched and built.
 This list can be used to specify repos that should be built only in CI.
-Typically, this list might contain "TRAVIS" and/or "APPVEYOR" because
-each of these CI systems sets an environment variable with its own
-name to "true".  Note that this could also be (ab)used to control
-the processing of the repo with any environment variable.  The default
-is an empty list, which means that the repo is always processed.
 
 - build_step (optional)
 
@@ -225,6 +220,7 @@ Legal options include:
 "windows"
 "linux"
 "darwin"
+"android"
 
 Builds on all platforms by default.
 
@@ -265,6 +261,12 @@ VERBOSE = False
 
 DEVNULL = open(os.devnull, 'wb')
 
+# Spported build platforms.  All are lower-case.
+LINUX = 'linux'
+WINDOWS = 'windows'
+DARWIN = 'darwin'
+ANDROID = 'android'
+PLATFORMS = [LINUX, WINDOWS, DARWIN, ANDROID]
 
 def on_rm_error( func, path, exc_info):
     """Error handler for recursively removing a directory. The
@@ -327,18 +329,17 @@ class GoodRepo(object):
             self.build_dir = os.path.normpath(json['build_dir'])
         if json.get('install_dir'):
             self.install_dir = os.path.normpath(json['install_dir'])
-        self.deps = json['deps'] if ('deps' in json) else []
-        self.prebuild = json['prebuild'] if ('prebuild' in json) else []
-        self.prebuild_linux = json['prebuild_linux'] if (
-            'prebuild_linux' in json) else []
-        self.prebuild_windows = json['prebuild_windows'] if (
-            'prebuild_windows' in json) else []
-        self.custom_build = json['custom_build'] if ('custom_build' in json) else []
-        self.cmake_options = json['cmake_options'] if (
-            'cmake_options' in json) else []
-        self.ci_only = json['ci_only'] if ('ci_only' in json) else []
-        self.build_step = json['build_step'] if ('build_step' in json) else 'build'
-        self.build_platforms = json['build_platforms'] if ('build_platforms' in json) else []
+        self.deps = json.get('deps', [])
+        self.prebuild = json.get('prebuild', [])
+        self.prebuild_linux = json.get('prebuild_linux', [])
+        self.prebuild_windows = json.get('prebuild_windows', [])
+        self.prebuild_darwin = json.get('prebuild_darwin', [])
+        self.prebuild_android = json.get('prebuild_android', [])
+        self.custom_build = json.get('custom_build', [])
+        self.cmake_options = json.get('cmake_options', [])
+        self.ci_only = json.get('ci_only', [])
+        self.build_step = json.get('build_step', 'build')
+        self.build_platforms = json.get('build_platforms', [])
         self.optional = set(json.get('optional', []))
         # Absolute paths for a repo's directories
         dir_top = os.path.abspath(args.dir)
@@ -348,9 +349,11 @@ class GoodRepo(object):
         if self.install_dir:
             self.install_dir = os.path.join(dir_top, self.install_dir)
 	    # Check if platform is one to build on
-        self.on_build_platform = False
-        if self.build_platforms == [] or platform.system().lower() in self.build_platforms:
-            self.on_build_platform = True
+        self.platform = args.platform
+        self.on_build_platform = not self.build_platforms or args.platform in self.build_platforms
+
+    def __repr__(self):
+        return '({}({})'.format(self.__class__.__name__, self.name)
 
     def Clone(self, retries=10, retry_seconds=60):
         print('Cloning {n} into {d}'.format(n=self.name, d=self.repo_dir))
@@ -414,12 +417,10 @@ class GoodRepo(object):
         """Execute any prebuild steps from the repo root"""
         for p in self.prebuild:
             command_output(shlex.split(p), self.repo_dir)
-        if platform.system() == 'Linux' or platform.system() == 'Darwin':
-            for p in self.prebuild_linux:
-                command_output(shlex.split(p), self.repo_dir)
-        if platform.system() == 'Windows':
-            for p in self.prebuild_windows:
-                command_output(shlex.split(p), self.repo_dir)
+
+        # If there's a platform-specific entry, use that too.
+        for p in getattr(self, 'prebuild_{}'.format(self.platform), []):
+            command_output(shlex.split(p), self.repo_dir)
 
     def CustomBuild(self, repo_dict):
         """Execute any custom_build steps from the repo root"""
@@ -440,8 +441,13 @@ class GoodRepo(object):
 
         cmake_cmd = [
             'cmake', self.repo_dir,
-            '-DCMAKE_INSTALL_PREFIX=' + self.install_dir
+            '-DCMAKE_INSTALL_PREFIX=' + self.install_dir,
         ]
+
+        # Allow users to pass in arbitrary cache variables
+        for cmake_var in self._args.cmake_var:
+            pieces = cmake_var.split('=', 1)
+            cmake_cmd.append('-D{}={}'.format(pieces[0], pieces[1]))
 
         # For each repo this repo depends on, generate a CMake variable
         # definitions for "...INSTALL_DIR" that points to that dependent
@@ -458,13 +464,13 @@ class GoodRepo(object):
             cmake_cmd.append(escape(option.format(**self.__dict__)))
 
         # Set build config for single-configuration generators
-        if platform.system() == 'Linux' or platform.system() == 'Darwin':
+        if self.platform in [LINUX, DARWIN]:
             cmake_cmd.append('-DCMAKE_BUILD_TYPE={config}'.format(
                 config=CONFIG_MAP[self._args.config]))
 
         # Use the CMake -A option to select the platform architecture
         # without needing a Visual Studio generator.
-        if platform.system() == 'Windows' and self._args.generator != "Ninja":
+        if self.platform == WINDOWS and self._args.generator != "Ninja":
             if self._args.arch.lower() == '64' or self._args.arch == 'x64' or self._args.arch == 'win64':
                 cmake_cmd.append('-A')
                 cmake_cmd.append('x64')
@@ -487,29 +493,19 @@ class GoodRepo(object):
 
     def CMakeBuild(self):
         """Build CMake command for the build phase and execute it"""
-        cmake_cmd = ['cmake', '--build', self.build_dir, '--target', 'install']
+        cmake_cmd = [
+            'cmake',
+            '--build', self.build_dir,
+            '--target', 'install',
+            '--config', CONFIG_MAP[self._args.config],
+        ]
         if self._args.do_clean:
             cmake_cmd.append('--clean-first')
 
-        if platform.system() == 'Windows':
-            cmake_cmd.append('--config')
-            cmake_cmd.append(CONFIG_MAP[self._args.config])
-
-        # Speed up the build.
-        if platform.system() == 'Linux' or platform.system() == 'Darwin':
-            cmake_cmd.append('--')
-            num_make_jobs = multiprocessing.cpu_count()
-            env_make_jobs = os.environ.get('MAKE_JOBS', None)
-            if env_make_jobs is not None:
-                try:
-                    num_make_jobs = min(num_make_jobs, int(env_make_jobs))
-                except ValueError:
-                    print('warning: environment variable MAKE_JOBS has non-numeric value "{}".  '
-                          'Using {} (CPU count) instead.'.format(env_make_jobs, num_make_jobs))
-            cmake_cmd.append('-j{}'.format(num_make_jobs))
-        if platform.system() == 'Windows' and self._args.generator != "Ninja":
-            cmake_cmd.append('--')
-            cmake_cmd.append('/maxcpucount')
+        # Ninja is parallel by default
+        if self._args.generator != "Ninja":
+            cmake_cmd.append('--parallel')
+            cmake_cmd.append(format(multiprocessing.cpu_count()))
 
         if VERBOSE:
             print("CMake command: " + " ".join(cmake_cmd))
@@ -538,8 +534,7 @@ class GoodRepo(object):
         self.CMakeBuild()
 
     def IsOptional(self, opts):
-        if len(self.optional.intersection(opts)) > 0: return True
-        else: return False
+        return len(self.optional.intersection(opts)) > 0
 
 def GetGoodRepos(args):
     """Returns the latest list of GoodRepo objects.
@@ -619,7 +614,7 @@ def main():
         '--ref',
         dest='ref',
         default='',
-        help="Override 'commit' with git reference. E.g., 'origin/master'")
+        help="Override 'commit' with git reference. E.g., 'origin/main'")
     parser.add_argument(
         '--no-build',
         dest='do_build',
@@ -652,11 +647,23 @@ def main():
         help="Delete install directory before building",
         default=False)
     parser.add_argument(
+        '--skip-existing-install',
+        dest='skip_existing_install',
+        action='store_true',
+        help="Skip build if install directory exists",
+        default=False)
+    parser.add_argument(
+        '--platform',
+        dest='platform',
+        type=str.lower,
+        help='Select build platform to use; generally only useful for "android"',
+        default=platform.system().lower())
+    parser.add_argument(
         '--arch',
         dest='arch',
         choices=['32', '64', 'x86', 'x64', 'win32', 'win64'],
         type=str.lower,
-        help="Set build files architecture (Windows)",
+        help="Set build files architecture (Visual Studio Generator Only)",
         default='64')
     parser.add_argument(
         '--config',
@@ -676,6 +683,13 @@ def main():
         type=lambda a: set(a.lower().split(',')),
         help="Comma-separated list of 'optional' resources that may be skipped. Only 'tests' is currently supported as 'optional'",
         default=set())
+    parser.add_argument(
+        '--cmake_var',
+        dest='cmake_var',
+        action='append',
+        metavar='VAR[=VALUE]',
+        help="Add CMake command line option -D'VAR'='VALUE' to the CMake generation command line; may be used multiple times",
+        default=[])
 
     args = parser.parse_args()
     save_cwd = os.getcwd()
@@ -692,6 +706,14 @@ def main():
         # If the repo has a platform whitelist, skip the repo
         # unless we are building on a whitelisted platform.
         if not repo.on_build_platform:
+            continue
+
+        # Skip building the repo if its install directory already exists
+        # and requested via an option.  This is useful for cases where the
+        # install directory is restored from a cache that is known to be up
+        # to date.
+        if args.skip_existing_install and os.path.isdir(repo.install_dir):
+            print('Skipping build for repo {n} due to existing install directory'.format(n=repo.name))
             continue
 
         # Skip test-only repos if the --tests option was not passed in

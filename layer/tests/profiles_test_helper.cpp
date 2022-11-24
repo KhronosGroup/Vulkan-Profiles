@@ -25,7 +25,7 @@
 
 #ifdef _WIN32
 #include <Windows.h>
-#elif ANDROID
+#elif __ANDROID__
 #include <android/log.h>
 #endif
 
