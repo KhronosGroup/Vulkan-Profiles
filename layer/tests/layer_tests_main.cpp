@@ -16,16 +16,15 @@
 #include "layer_tests_main.h"
 #include "vktestframework.h"
 
-
 void print_android(const char *c) {
-#ifdef VK_USE_PLATFORM_ANDROID_KHR
+#ifdef __ANDROID__
     __android_log_print(ANDROID_LOG_INFO, "VulkanProfilesLayerTests", "%s", c);
 #else
     (void)c;
-#endif  // VK_USE_PLATFORM_ANDROID_KHR
+#endif  // __ANDROID__
 }
 
-#if defined(ANDROID) && defined(PROFILES_LAYER_APK)
+#if defined(__ANDROID__) && defined(PROFILES_LAYER_APK)
 const char *appTag = "VulkanProfilesLayerTests";
 static bool initialized = false;
 static bool active = false;

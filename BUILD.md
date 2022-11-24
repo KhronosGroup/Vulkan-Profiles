@@ -163,6 +163,8 @@ ctest -C Debug --output-on-failure --parallel 16
     cd Vulkan-Profiles
     mkdir build
     cd build
+    python ../scripts/update_deps.py --dir ../external
+    cmake -C ../external/helper.cmake ..
     cmake ..
     cmake --build . --parallel
 ```

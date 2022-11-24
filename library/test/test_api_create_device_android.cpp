@@ -268,7 +268,7 @@ TEST(library_api, vpCreateDevice) {
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
-#if defined(ANDROID)
+#if defined(__ANDROID__)
     EXPECT_TRUE(res == VK_SUCCESS);
     EXPECT_TRUE(device != VK_NULL_HANDLE);
 #else

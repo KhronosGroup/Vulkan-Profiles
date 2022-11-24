@@ -15,7 +15,7 @@
 
 #pragma once
 
-#ifdef ANDROID
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
 #include "vulkan_wrapper.h"
 #else
 #include <vulkan/vulkan.h>
@@ -23,7 +23,7 @@
 
 #include "gtest/gtest.h"
 
-#if defined(ANDROID)
+#if defined(VK_USE_PLATFORM_ANDROID_KHR)
 #include <android/log.h>
 #if defined(PROFILES_LAYER_APK)
 #include <android_native_app_glue.h>
@@ -34,6 +34,6 @@ static const char kSkipPrefix[] = "             TEST SKIPPED:";
 
 void print_android(const char *c);
 
-#if defined(ANDROID)
+#if defined(VK_USE_PLATFORM_ANDROID_KHR)
 void ReadAssetFile(android_app *app);
 #endif

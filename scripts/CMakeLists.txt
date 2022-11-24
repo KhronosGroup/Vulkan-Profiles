@@ -29,7 +29,7 @@ set(PROFILE_DESKTOP_BASELINE_2023_API_VERSION "1.2.148")
 
 add_custom_target(VpCreateDesktopBaseline2023 ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${MERGE_PYTHON_FILES}
-		--registry ${vulkan-headers_SOURCE_DIR}/registry/vk.xml
+		--registry ${VULKAN_HEADER_REGISTRY}/vk.xml
 		--input ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_baseline_2023
 		--output-path ${CMAKE_SOURCE_DIR}/profiles/VP_LUNARG_desktop_baseline_2023.json
 		--output-profile VP_LUNARG_desktop_baseline_2023
@@ -155,4 +155,3 @@ add_custom_target(VpTestGeneratedName ALL
 set_target_properties(VpTestGeneratedName PROPERTIES FOLDER "Profiles generator/Tests")
 
 add_dependencies(VpTestGeneratedName VpGenerated)
-

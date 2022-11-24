@@ -25,6 +25,7 @@ add_library(vku STATIC ${FILES_SOURCE} ${FILES_HEADER})
 if(WIN32)
    target_compile_definitions(vku PUBLIC _CRT_SECURE_NO_WARNINGS)
 endif()
+
 install(TARGETS vku DESTINATION ${CMAKE_INSTALL_LIBDIR})
 set_target_properties(vku PROPERTIES LINKER_LANGUAGE CXX)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}

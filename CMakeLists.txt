@@ -7,22 +7,29 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment ve
 
 project(VULKAN_PROFILES LANGUAGES CXX C)
 
-set(PROFILES_CPP_STANDARD 17 CACHE STRING "Set the C++ standard to build against.")
-set(CMAKE_CXX_STANDARD ${PROFILES_CPP_STANDARD})
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 # Regenerating profiles requires Python 3.7.2 or better (for typing.OrderedDict).
 # Regeneration jsoncpp requires Python 3.
 # Otherwise Python is not required, as checked-in generated code and
 # headers will be used.
-option(REGENERATE_PROFILES "Regenerate profiles source and headers" ON)
-option(REGENERATE_JSONCPP "Regenerate jsoncpp source and headers" ON)
-option(REGENERATE_LAYER "Regenerate profiles layer source" ON)
+option(PROFILES_BUILD_TESTS "Build profile tests" ON)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Archive output dir.")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Library output dir.")
+set(CMAKE_PDB_OUTPUT_DIRECTORY     "${CMAKE_BINARY_DIR}/bin" CACHE PATH "PDB (MSVC debug symbol)output dir.")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" CACHE PATH "Executable/dll output dir.")
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
+set(CMAKE_C_VISIBILITY_PRESET "hidden")
+set(CMAKE_VISIBILITY_INLINES_HIDDEN "YES")
+
+if(${CMAKE_C_COMPILER_ID} MATCHES "(GNU|Clang)")
+set(CMAKE_CXX_FLAGS "-fPIC")
+endif()
+
+find_package(PythonInterp 3.7.2 REQUIRED)
 
 if (UPDATE_DEPS)
-    find_package(PythonInterp 3 REQUIRED)
-
     if (CMAKE_GENERATOR_PLATFORM)
         set(_target_arch ${CMAKE_GENERATOR_PLATFORM})
     else()
@@ -104,6 +111,21 @@ find_package(VulkanHeaders REQUIRED CONFIG QUIET)
 set(VULKAN_HEADER_REGISTRY ${CMAKE_CURRENT_SOURCE_DIR}/external/Vulkan-Headers/registry)
 
 include_directories(external/Vulkan-Headers/include)
+include_directories(${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/include/vulkan)
+set(Vulkan-ValidationLayers_INCLUDE_DIR "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/include/vulkan")
+set(Vulkan-ValidationLayers_LIBRARY_DIR "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/lib")
+
+
+find_package(valijson REQUIRED CONFIG)
+
+set(BUILD_SHARED_LIBS false)
+find_package(jsoncpp REQUIRED CONFIG)
+target_compile_options(jsoncpp_static INTERFACE "-fPIC")
+
+if(PROFILES_BUILD_TESTS)
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    add_subdirectory(external/googletest)
+endif()
 
 if (NOT ANDROID)
     # The vulkan loader search is:
@@ -121,10 +143,10 @@ if (NOT ANDROID)
     find_package(Vulkan)
 endif()
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
-set(CMAKE_C_VISIBILITY_PRESET "hidden")
-set(CMAKE_VISIBILITY_INLINES_HIDDEN "YES")
+set(PROFILES_CPP_STANDARD 17 CACHE STRING "Set the C++ standard to build against.")
+set(CMAKE_CXX_STANDARD ${PROFILES_CPP_STANDARD})
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Define GNU standard installation directories.
 include(GNUInstallDirs)
@@ -172,54 +194,6 @@ elseif(MSVC)
         add_compile_options(/wd4100 /wd4505 /wd4702 /wd4389 /wd4245 /wd4305 /wd4018)
 endif()
 
-# NOTE: jsoncpp is located in SUBPROJECTS_DIR.
-set (SUBPROJECTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external)
-
-find_path(JSONCPP_INCLUDE_DIR json/json.h HINTS "${SUBPROJECTS_DIR}/jsoncpp/dist"
-                                                   "${SUBPROJECTS_DIR}/JsonCpp/dist"
-                                                   "${SUBPROJECTS_DIR}/JsonCPP/dist"
-                                                   "${SUBPROJECTS_DIR}/JSONCPP/dist"
-                                                   "${CMAKE_SOURCE_DIR}/../jsoncpp/dist"
-                                             DOC "Path to jsoncpp/dist/json/json.h")
-
-find_path(JSONCPP_SOURCE_DIR jsoncpp.cpp HINTS "${SUBPROJECTS_DIR}/jsoncpp/dist"
-                                                   "${SUBPROJECTS_DIR}/JsonCpp/dist"
-                                                   "${SUBPROJECTS_DIR}/JsonCPP/dist"
-                                                   "${SUBPROJECTS_DIR}/JSONCPP/dist"
-                                                   "${CMAKE_SOURCE_DIR}/../jsoncpp/dist"
-                                             DOC "Path to jsoncpp/dist/jsoncpp.cpp")
-
-find_library(JSONCPP_LIB NAMES jsoncpp HINTS ${JSONCPP_SEARCH_PATH} )
-
-if (WIN32)
-    add_library(jsoncpp         STATIC IMPORTED)
-    find_library(JSONCPP_DLIB NAMES jsoncpp
-                 HINTS ${JSONCPP_DEBUG_SEARCH_PATH} )
-    set_target_properties(jsoncpp PROPERTIES
-                         IMPORTED_LOCATION       "${JSONCPP_LIB}"
-                         IMPORTED_LOCATION_DEBUG "${JSONCPP_DLIB}")
-endif()
-
-find_package(jsoncpp REQUIRED CONFIG)
-find_package(valijson REQUIRED CONFIG)
-
-# Always need C++2011 throughout the project.
-set(CMAKE_CXX_STANDARD 17)
-
-# FetchContent_MakeAvailable(jsoncpp) will set these values (which
-# affect the whole build).  Make sure they're set even if we
-# don't regenerate jsoncpp.
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Archive output dir.")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Library output dir.")
-set(CMAKE_PDB_OUTPUT_DIRECTORY     "${CMAKE_BINARY_DIR}/bin" CACHE PATH "PDB (MSVC debug symbol)output dir.")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" CACHE PATH "Executable/dll output dir.")
-
-
-#set(jsoncpp_generated_dir ${CMAKE_SOURCE_DIR}/external/generated-jsoncpp)
-#set(jsoncpp_generated_source ${jsoncpp_generated_dir}/jsoncpp.cpp)
-#set(jsoncpp_generated_include_dir ${jsoncpp_generated_dir})
-#set(jsoncpp_generated_header ${jsoncpp_generated_include_dir}/json/json.h)
-
 # Vulkan-ValidationLayers settings
 set(UPDATE_DEPS ON)
 set(BUILD_TESTS OFF)
@@ -237,9 +211,7 @@ string(TOLOWER ${API_NAME} API_LOWERCASE)
 add_definitions(-DAPI_NAME="${API_NAME}")
 
 # The scripts directory regenerates the Profiles source and headers.
-if(REGENERATE_PROFILES)
-    add_subdirectory(scripts)
-endif()
+add_subdirectory(scripts)
 
 add_subdirectory(library)
 
@@ -256,13 +228,13 @@ if (WIN32)
         set_target_properties(VkLayer_copy-${target}-def-file PROPERTIES FOLDER "Profiles layer")
 
         add_library(VkLayer_${target} SHARED ${ARGN} VkLayer_${target}.def)
-        target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} vku)
+        target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} jsoncpp_static vku)
         set_target_properties(VkLayer_${target} PROPERTIES FOLDER "Profiles layer")
     endmacro()
 else()
     macro(add_vk_layer target)
         add_library(VkLayer_${target} SHARED ${ARGN})
-        target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} vku)
+        target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} jsoncpp_static vku)
         if(ANDROID)
             # Android needs -llog for __android_print_log()
             target_link_Libraries(VkLayer_${target} log)
@@ -276,10 +248,7 @@ else()
 endif()
 add_subdirectory(layer)
 
-if (PROFILES_BUILD_TESTS)
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    add_subdirectory(external/googletest)
-
+if (PROFILES_BUILD_TESTS AND NOT ANDROID)
     add_subdirectory(profiles/test)
 endif()
 
