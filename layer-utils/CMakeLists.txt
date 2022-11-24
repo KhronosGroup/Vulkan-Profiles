@@ -29,5 +29,5 @@ install(TARGETS vku DESTINATION ${CMAKE_INSTALL_LIBDIR})
 set_target_properties(vku PROPERTIES LINKER_LANGUAGE CXX)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_SOURCE_DIR}/generated
-                    ${vulkan-headers_SOURCE_DIR}/include)
+                    ${CMAKE_CURRENT_SOURCE_DIR}/external/Vulkan-Headers/include)
 

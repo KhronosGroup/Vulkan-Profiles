@@ -146,25 +146,15 @@ On OSX:
     cd Vulkan-Profiles
     mkdir build
     cd build
-    cmake -A x64 ..
-    cmake --build . --parallel
-```
-
-### 32-bit Windows Build 
-```
-    git clone git@github.com:KhronosGroup/Vulkan-Profiles.git
-    cd Vulkan-Profiles
-    mkdir build
-    cd build
-    cmake -A Win32 ..
-    cmake --build . --parallel
+    python ../scripts/update_deps.py --dir ../external --arch x64 --config debug
+    cmake -A x64 -C ../external/helper.cmake -DCMAKE_BUILD_TYPE=Debug ..
+    cmake --build . --parallel --config Debug
 ```
 
 ### Windows Unit Tests
 
 ```
 ctest -C Debug --output-on-failure --parallel 16
-ctest -C Release  --output-on-failure --parallel 16
 ```
 
 ### Linux and macOS Build

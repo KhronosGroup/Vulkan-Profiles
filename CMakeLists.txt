@@ -1,17 +1,11 @@
 cmake_minimum_required(VERSION 3.14.0)
-
-set (CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/scripts")
-include(known_good)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 enable_testing()
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
-set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION_MAXIMUM FALSE) # Workaround to fix C.I. build on VS2015
 
-project(VULKAN_PROFILES)
-
-# Define GNU standard installation directories.
-include(GNUInstallDirs)
+project(VULKAN_PROFILES LANGUAGES CXX C)
 
 set(PROFILES_CPP_STANDARD 17 CACHE STRING "Set the C++ standard to build against.")
 set(CMAKE_CXX_STANDARD ${PROFILES_CPP_STANDARD})
@@ -25,177 +19,140 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(REGENERATE_PROFILES "Regenerate profiles source and headers" ON)
 option(REGENERATE_JSONCPP "Regenerate jsoncpp source and headers" ON)
 option(REGENERATE_LAYER "Regenerate profiles layer source" ON)
-if(REGENERATE_PROFILES)
-    find_package(PythonInterp 3.7.2 REQUIRED)
-elseif(REGENERATE_JSONCPP OR REGENERATE_LAYER)
+
+if (UPDATE_DEPS)
     find_package(PythonInterp 3 REQUIRED)
-endif()
 
-# Third-party libraries
-include(FetchContent)
-
-# FetchContent_MakeAvailable(jsoncpp) will set these values (which
-# affect the whole build).  Make sure they're set even if we
-# don't regenerate jsoncpp.
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Archive output dir.")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Library output dir.")
-set(CMAKE_PDB_OUTPUT_DIRECTORY     "${CMAKE_BINARY_DIR}/bin" CACHE PATH "PDB (MSVC debug symbol)output dir.")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" CACHE PATH "Executable/dll output dir.")
-
-# Declare all content before making available, to ensure that these
-# settings are used instead of any settings that may be encountered
-# inside these projects.
-#
-# Names should be lower-case, since FetchContent always sets
-# <lowercaseName>_* variables.  Sometimes (only when using
-# FetchContent_MakeAvailable) it will also set <givenName>_*
-# variables, but this isn't consistent and isn't guaranteed
-# by the documentation.
-
-# Allow the user to configure to not build tests if desired.
-option(PROFILES_BUILD_TESTS "Build the profiles tests" ON)
-if(PROFILES_BUILD_TESTS)
-    FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest
-        GIT_TAG release-1.11.0
-    )
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-endif()
-
-# Allow the user to not regenerate jsoncpp if desired, using checked-in
-# generated source instead.  This can make downstream projects easier
-# to build (as they don't require Python).
-if(REGENERATE_JSONCPP)
-    FetchContent_Declare(
-        jsoncpp
-        GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp
-        GIT_TAG 1.9.5
-    )
-endif()
-
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-set(BUILD_OBJECT_LIBS OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(
-	vulkan-headers
-	GIT_REPOSITORY ${GIT_VULKAN_HEADER_REPOSITORY}
-	GIT_TAG ${GIT_VULKAN_HEADER_COMMIT}
-)
-FetchContent_Declare(
-	vulkan-validationlayers
-	GIT_REPOSITORY ${GIT_VULKAN_VALIDATION_REPOSITORY}
-	GIT_TAG ${GIT_VULKAN_VALIDATION_COMMIT}
-)
-# Desktop builds link against the loader vulkan library.  Android
-# builds just link against the system vulkan library.
-if (NOT ANDROID)
-    FetchContent_Declare(
-        vulkan-loader
-        GIT_REPOSITORY ${GIT_VULKAN_LOADER_REPOSITORY}
-        GIT_TAG ${GIT_VULKAN_LOADER_COMMIT}
-    )
-endif()
-
-# After all the content is declared, it can safely be made available.
-# For SDK (flat) builds, we'll receive pointers to our dependency repository builds.
-# Otherwise, we'll fetch and build ourselves.  Other repositories also respect environment
-# variables, so we're doing it here too.
-if(PROFILES_BUILD_TESTS)
-    FetchContent_MakeAvailable(googletest)
-endif()
-
-set(jsoncpp_generated_dir ${CMAKE_SOURCE_DIR}/external/generated-jsoncpp)
-set(jsoncpp_generated_source ${jsoncpp_generated_dir}/jsoncpp.cpp)
-set(jsoncpp_generated_include_dir ${jsoncpp_generated_dir})
-set(jsoncpp_generated_header ${jsoncpp_generated_include_dir}/json/json.h)
-if(REGENERATE_JSONCPP)
-    message(STATUS "Fetching jsoncpp source and regenerating in ${jsoncpp_generated_dir}")
-    set(JSONCPP_WITH_TESTS OFF CACHE BOOL "" FORCE)
-    set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "" FORCE)
-    set(JSONCPP_WITH_WARNING_AS_ERROR OFF CACHE BOOL "" FORCE)
-    set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(jsoncpp)
-    # This will create all three generated files.
-    execute_process(COMMAND ${PYTHON_EXECUTABLE} ${jsoncpp_SOURCE_DIR}/amalgamate.py
-        -s ${jsoncpp_generated_source}
-        WORKING_DIRECTORY ${jsoncpp_SOURCE_DIR})
-endif()
-
-# Vulkan-ValidationLayers settings
-set(UPDATE_DEPS ON)
-set(BUILD_TESTS OFF)
-set(_build_type ${CMAKE_BUILD_TYPE})
-set(VVL_CPP_STANDARD 11)
-set(_build_type ${CMAKE_BUILD_TYPE})
-set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
-
-# FetchContent() doesn't seem to actually do a Vulkan-Headers build at all.
-# Consequently, we're really only interested in the source.
-if(VULKAN_HEADERS_SOURCE_DIR)
-    message(STATUS "Using Vulkan-Headers source located at ${VULKAN_HEADERS_SOURCE_DIR}")
-    set(vulkan-headers_SOURCE_DIR ${VULKAN_HEADERS_SOURCE_DIR})
-elseif(DEFINED ENV{VULKAN_HEADERS_SOURCE_DIR})
-    message(STATUS "Using Vulkan-Headers source from environment VULKAN_HEADERS_SOURCE_DIR=$ENV{VULKAN_HEADERS_SOURCE_DIR}")
-    set(vulkan-headers_SOURCE_DIR $ENV{VULKAN_HEADERS_SOURCE_DIR})
-else()
-    message(STATUS "Fetching Vulkan-Headers source")
-    FetchContent_MakeAvailable(vulkan-headers)
-endif()
-
-# We really only want source for Vulkan-ValidationLayers.  We do not want or need
-# a CMake sub-build (which would in turn pull in all VVL dependencies).
-if(VULKAN_VALIDATIONLAYERS_SOURCE_DIR)
-    message(STATUS "Using Vulkan-ValidationLayers source located at ${VULKAN_VALIDATIONLAYERS_SOURCE_DIR}")
-    set(vulkan-validationlayers_SOURCE_DIR ${VULKAN_VALIDATIONLAYERS_SOURCE_DIR})
-elseif(DEFINED ENV{VULKAN_VALIDATIONLAYERS_SOURCE_DIR})
-    message(STATUS "Using Vulkan-ValidationLayers source from environment VULKAN_VALIDATIONLAYERS_SOURCE_DIR=$ENV{VULKAN_VALIDATIONLAYERS_SOURCE_DIR}")
-    set(vulkan-validationlayers_SOURCE_DIR $ENV{VULKAN_VALIDATIONLAYERS_SOURCE_DIR})
-else()
-    # We use FetchContent_Populate() instead of FetchContent_MakeAvailable()
-    # because we don't want to pull in dependencies and do a build.
-    # We protect the FetchContent_Populate() call as a best practice,
-    # in case this project is a dependency of a higher-level project
-    # that also directly populates Vulkan-ValidationLayers.
-    message(STATUS "Fetching Vulkan-ValidationLayers source")
-    FetchContent_GetProperties(vulkan-validationlayers)
-    if(NOT vulkan-validationlayers_POPULATED)
-        FetchContent_Populate(vulkan-validationlayers)
-    endif()
-endif()
-
-# We don't need to build a loader on Android, but we do everywhere else.
-if (NOT ANDROID)
-    if(VULKAN_LOADER_INSTALL_DIR OR DEFINED ENV{VULKAN_LOADER_INSTALL_DIR})
-        if(VULKAN_LOADER_INSTALL_DIR)
-            message(STATUS "Using Vulkan-Loader build located at ${VULKAN_LOADER_INSTALL_DIR}")
-        else()
-            message(STATUS "Using Vulkan-Loader build from environment VULKAN_LOADER_INSTALL_DIR=$ENV{VULKAN_LOADER_INSTALL_DIR}")
-            set(VULKAN_LOADER_INSTALL_DIR $ENV{VULKAN_LOADER_INSTALL_DIR})
-        endif()
-
-        find_file(VULKAN_LOADER
-            # Don't search any system paths
-            NO_DEFAULT_PATH
-            # vulkan-1.lib on Windows, libvulkan.so on Linux, libvulkan.1.dylib on Mac
-            NAMES vulkan-1.lib libvulkan.so.1 libvulkan.1.dylib
-            PATHS ${VULKAN_LOADER_INSTALL_DIR}
-            # lib subdirectory on Windows, Linux, and Mac
-            PATH_SUFFIXES lib
-        )
-        message(STATUS "Using Vulkan-Loader library ${VULKAN_LOADER}")
-        # Sub-builds look for Vulkan::Vulkan to link the loader.
-        add_library(Vulkan::Vulkan STATIC IMPORTED)
-        set_target_properties(Vulkan::Vulkan PROPERTIES IMPORTED_LOCATION "${VULKAN_LOADER}")
+    if (CMAKE_GENERATOR_PLATFORM)
+        set(_target_arch ${CMAKE_GENERATOR_PLATFORM})
     else()
-        message(STATUS "Fetching and building Vulkan-Loader")
-        FetchContent_MakeAvailable(vulkan-loader)
+        if (MSVC_IDE)
+            message(WARNING "CMAKE_GENERATOR_PLATFORM not set. Using x64 as target architecture.")
+        endif()
+        set(_target_arch x64)
     endif()
+
+    if (NOT CMAKE_BUILD_TYPE)
+        message(WARNING "CMAKE_BUILD_TYPE not set. Using Debug for dependency build type")
+        set(_build_type Debug)
+    else()
+        set(_build_type ${CMAKE_BUILD_TYPE})
+    endif()
+
+    message("********************************************************************************")
+    message("* NOTE: Adding target profile_update_deps to run as needed for updating        *")
+    message("*       dependencies.                                                          *")
+    message("********************************************************************************")
+
+    set(optional_args)
+    if (NOT BUILD_TESTS)
+        set(optional_args "--optional=tests")
+    endif()
+
+    if (UPDATE_DEPS_SKIP_EXISTING_INSTALL)
+        set(optional_args ${optional_args} "--skip-existing-install")
+    endif()
+
+    if (DEFINED CMAKE_TOOLCHAIN_FILE)
+        set(optional_args ${optional_args} "--cmake_var")
+        set(optional_args ${optional_args} "CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+    endif()
+
+    # Add a target so that update_deps.py will run when necessary
+    # NOTE: This is triggered off of the timestamps of known_good.json and helper.cmake
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_LIST_DIR}/external/helper.cmake
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/update_deps.py 
+            --dir ${CMAKE_CURRENT_LIST_DIR}/external --arch ${_target_arch} --config ${_build_type} --generator "${CMAKE_GENERATOR}" ${optional_args}
+        DEPENDS ${CMAKE_CURRENT_LIST_DIR}/scripts/known_good.json
+    )
+
+    # Check if update_deps.py needs to be run on first cmake run
+    if (${CMAKE_CURRENT_LIST_DIR}/scripts/known_good.json IS_NEWER_THAN ${CMAKE_CURRENT_LIST_DIR}/external/helper.cmake)
+        execute_process(
+            COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/update_deps.py
+                --dir ${CMAKE_CURRENT_LIST_DIR}/external --arch ${_target_arch} --config ${_build_type} --generator "${CMAKE_GENERATOR}" ${optional_args}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+            RESULT_VARIABLE _update_deps_result
+        )
+        if (NOT (${_update_deps_result} EQUAL 0))
+            message(FATAL_ERROR "Could not run update_deps.py which is necessary to download dependencies.")
+        endif()
+    endif()
+    include(${CMAKE_CURRENT_LIST_DIR}/external/helper.cmake)
+else()
+    message("********************************************************************************")
+    message("* NOTE: Not adding target to run update_deps.py automatically.                 *")
+    message("********************************************************************************")
+    find_package(PythonInterp 3 QUIET)
 endif()
 
-# For our own code, turn on warnings-are-errors if set.
-option(FATAL_WARNINGS "Fail builds if there are warnings" ON)
-if(FATAL_WARNINGS)
-    if(MSVC)
+if (JSONCPP_INSTALL_DIR)
+    list(APPEND CMAKE_PREFIX_PATH ${JSONCPP_INSTALL_DIR})
+endif()
+if (VALIJSON_INSTALL_DIR)
+    list(APPEND CMAKE_PREFIX_PATH ${VALIJSON_INSTALL_DIR})
+endif()
+if (GOOGLETEST_INSTALL_DIR)
+    list(APPEND CMAKE_PREFIX_PATH ${GOOGLETEST_INSTALL_DIR})
+endif()
+if (VULKAN_HEADERS_INSTALL_DIR)
+    list(APPEND CMAKE_PREFIX_PATH ${VULKAN_HEADERS_INSTALL_DIR})
+endif()
+
+find_package(VulkanHeaders REQUIRED CONFIG QUIET)
+set(VULKAN_HEADER_REGISTRY ${CMAKE_CURRENT_SOURCE_DIR}/external/Vulkan-Headers/registry)
+
+include_directories(external/Vulkan-Headers/include)
+
+if (NOT ANDROID)
+    # The vulkan loader search is:
+    #     User-supplied setting of CMAKE_PREFIX_PATH
+    #     VULKAN_LOADER_INSTALL_DIR defined via cmake option
+    #     VULKAN_LOADER_INSTALL_DIR defined via environment variable
+    #     Default findVulkan operation if the VULKAN_SDK environment variable is defined
+    set(VULKAN_LOADER_INSTALL_DIR "LOADER-NOTFOUND" CACHE PATH "Absolute path to a Vulkan-Loader install directory")
+    if (VULKAN_LOADER_INSTALL_DIR)
+        message(STATUS "VULKAN_LOADER_INSTALL_DIR specified, using find_package to locate Vulkan")
+    elseif(ENV{VULKAN_LOADER_INSTALL_DIR})
+        message(STATUS "VULKAN_LOADER_INSTALL_DIR environment variable specified, using find_package to locate Vulkan")
+    endif()
+    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};${VULKAN_LOADER_INSTALL_DIR};${VULKAN_HEADERS_INSTALL_DIR};$ENV{VULKAN_LOADER_INSTALL_DIR};$ENV{VULKAN_HEADERS_INSTALL_DIR})
+    find_package(Vulkan)
+endif()
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
+set(CMAKE_C_VISIBILITY_PRESET "hidden")
+set(CMAKE_VISIBILITY_INLINES_HIDDEN "YES")
+
+# Define GNU standard installation directories.
+include(GNUInstallDirs)
+
+if(WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    # Windows: if install locations not set by user, set install prefix to "<build_dir>\install".
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "default install path" FORCE)
+endif()
+
+# Enable GUI folders
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+# "Helper" targets that don't have interesting source code should set their FOLDER property to this
+set(LAYERS_HELPER_FOLDER "Helper Targets")
+
+# NOTE: The idiom for open source projects is to not enable warnings as errors.
+# This reduces problems for users who simply want to build the repository.
+option(BUILD_WERROR "Treat compiler warnings as errors" OFF)
+if (BUILD_WERROR)
+    add_compile_options("$<IF:$<CXX_COMPILER_ID:MSVC>,/WX,-Werror>")
+endif()
+
+# Platform-specific compiler switches
+if(${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
+    add_compile_options(-Werror)
+endif()
+if(${CMAKE_C_COMPILER_ID} MATCHES "(GNU|Clang)")
+    add_compile_options(-Werror)
+elseif(MSVC)
         add_compile_options(/W4 /WX)
         add_link_options(/WX)
         # Ignore some warnings that we know we'll generate.  In the future the
@@ -213,12 +170,67 @@ if(FATAL_WARNINGS)
     #    warning C4245: '=': conversion from 'int' to 'uint64_t', signed/unsigned mismatch
     #    warning C4305: '=': truncation from 'double' to 'float'
         add_compile_options(/wd4100 /wd4505 /wd4702 /wd4389 /wd4245 /wd4305 /wd4018)
-    else()
-        add_compile_options(-Werror)
-    endif()
 endif()
 
+# NOTE: jsoncpp is located in SUBPROJECTS_DIR.
+set (SUBPROJECTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external)
+
+find_path(JSONCPP_INCLUDE_DIR json/json.h HINTS "${SUBPROJECTS_DIR}/jsoncpp/dist"
+                                                   "${SUBPROJECTS_DIR}/JsonCpp/dist"
+                                                   "${SUBPROJECTS_DIR}/JsonCPP/dist"
+                                                   "${SUBPROJECTS_DIR}/JSONCPP/dist"
+                                                   "${CMAKE_SOURCE_DIR}/../jsoncpp/dist"
+                                             DOC "Path to jsoncpp/dist/json/json.h")
+
+find_path(JSONCPP_SOURCE_DIR jsoncpp.cpp HINTS "${SUBPROJECTS_DIR}/jsoncpp/dist"
+                                                   "${SUBPROJECTS_DIR}/JsonCpp/dist"
+                                                   "${SUBPROJECTS_DIR}/JsonCPP/dist"
+                                                   "${SUBPROJECTS_DIR}/JSONCPP/dist"
+                                                   "${CMAKE_SOURCE_DIR}/../jsoncpp/dist"
+                                             DOC "Path to jsoncpp/dist/jsoncpp.cpp")
+
+find_library(JSONCPP_LIB NAMES jsoncpp HINTS ${JSONCPP_SEARCH_PATH} )
+
+if (WIN32)
+    add_library(jsoncpp         STATIC IMPORTED)
+    find_library(JSONCPP_DLIB NAMES jsoncpp
+                 HINTS ${JSONCPP_DEBUG_SEARCH_PATH} )
+    set_target_properties(jsoncpp PROPERTIES
+                         IMPORTED_LOCATION       "${JSONCPP_LIB}"
+                         IMPORTED_LOCATION_DEBUG "${JSONCPP_DLIB}")
+endif()
+
+find_package(jsoncpp REQUIRED CONFIG)
+find_package(valijson REQUIRED CONFIG)
+
+# Always need C++2011 throughout the project.
+set(CMAKE_CXX_STANDARD 17)
+
+# FetchContent_MakeAvailable(jsoncpp) will set these values (which
+# affect the whole build).  Make sure they're set even if we
+# don't regenerate jsoncpp.
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Archive output dir.")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Library output dir.")
+set(CMAKE_PDB_OUTPUT_DIRECTORY     "${CMAKE_BINARY_DIR}/bin" CACHE PATH "PDB (MSVC debug symbol)output dir.")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" CACHE PATH "Executable/dll output dir.")
+
+
+#set(jsoncpp_generated_dir ${CMAKE_SOURCE_DIR}/external/generated-jsoncpp)
+#set(jsoncpp_generated_source ${jsoncpp_generated_dir}/jsoncpp.cpp)
+#set(jsoncpp_generated_include_dir ${jsoncpp_generated_dir})
+#set(jsoncpp_generated_header ${jsoncpp_generated_include_dir}/json/json.h)
+
+# Vulkan-ValidationLayers settings
+set(UPDATE_DEPS ON)
+set(BUILD_TESTS OFF)
+set(_build_type ${CMAKE_BUILD_TYPE})
+set(VVL_CPP_STANDARD 11)
+set(_build_type ${CMAKE_BUILD_TYPE})
+set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
+
 include_directories(external)
+include_directories(external/valijson/include)
+include_directories(external/jsoncpp/include)
 
 set(API_NAME "Vulkan" CACHE STRING "API name to use when building")
 string(TOLOWER ${API_NAME} API_LOWERCASE)
@@ -264,7 +276,11 @@ else()
 endif()
 add_subdirectory(layer)
 
-if(PROFILES_BUILD_TESTS)
+if (PROFILES_BUILD_TESTS)
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    add_subdirectory(external/googletest)
+
     add_subdirectory(profiles/test)
 endif()
+
 
