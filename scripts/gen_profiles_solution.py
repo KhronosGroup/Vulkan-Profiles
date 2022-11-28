@@ -288,7 +288,8 @@ using PFN_vpStructChainerCb =  void(*)(VkBaseOutStructure* p, void* pUser);
 using PFN_vpStructChainer = void(*)(VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb);
 
 struct VpFeatureDesc {
-    PFN_vpStructFiller              pfnFiller;
+    PFN_vpStructFiller              pfnFillerRequired;
+    PFN_vpStructFiller              pfnFillerOptional;
     PFN_vpStructComparator          pfnComparator;
     PFN_vpStructChainer             pfnChainer;
 };
@@ -902,9 +903,12 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
             VkBaseOutStructure profileStructList;
             profileStructList.pNext = p;
             VkPhysicalDeviceFeatures2KHR* pFeatures = static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p));
-            if (pDesc->feature.pfnFiller != nullptr) {
+            if (pDesc->feature.pfnFillerRequired != nullptr) {
                 while (p != nullptr) {
-                    pDesc->feature.pfnFiller(p);
+                    pDesc->feature.pfnFillerRequired(p);
+                    if (pCreateInfo->pProfile->enableOptionals) {
+                        pDesc->feature.pfnFillerOptional(p);
+                    }
                     p = p->pNext;
                 }
             }
@@ -1032,11 +1036,17 @@ VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfilePropert
 
 VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext) {
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc != nullptr && pDesc->feature.pfnFiller != nullptr) {
+    if (pDesc != nullptr) {
         VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
         while (p != nullptr) {
-            pDesc->feature.pfnFiller(p);
-            p = p->pNext;
+            if (pDesc->feature.pfnFillerRequired != nullptr) {
+                pDesc->feature.pfnFillerRequired(p);
+                p = p->pNext;
+            }
+            if (pDesc->feature.pfnFillerOptional != nullptr) {
+                pDesc->feature.pfnFillerOptional(p);
+                p = p->pNext;
+            }
         }
     }
 }
@@ -2140,7 +2150,7 @@ class VulkanRegistry():
 
 
 class VulkanProfileCapabilities():
-    def __init__(self, registry, data, caps):
+    def __init__(self, registry, json_profile_data, json_caps_data):
         self.extensions = dict()
         self.instanceExtensions = dict()
         self.deviceExtensions = dict()
@@ -2148,22 +2158,22 @@ class VulkanProfileCapabilities():
         self.properties = dict()
         self.formats = dict()
         self.queueFamiliesProperties = []
-        for capName in data['capabilities']:
+        for capName in json_profile_data['capabilities']:
             # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
             if type(capName).__name__ == 'list':
                 for capNameCase in capName:
-                    self.mergeCaps(registry, caps[capNameElement])
-            elif capName in caps:
-                self.mergeCaps(registry, caps[capName])
+                    self.mergeCaps(registry, json_caps_data[capNameElement])
+            elif capName in json_caps_data:
+                self.mergeCaps(registry, json_caps_data[capName])
             else:
-                Log.f("Capability '{0}' needed by profile '{1}' is missing".format(capName, data['name']))
+                Log.f("Capability '{0}' needed by profile '{1}' is missing".format(capName, json_profile_data['name']))
 
-    def mergeCaps(self, registry, caps):
-        self.mergeProfileExtensions(registry, caps)
-        self.mergeProfileFeatures(caps)
-        self.mergeProfileProperties(caps)
-        self.mergeProfileFormats(caps)
-        self.mergeProfileQueueFamiliesProperties(caps)
+    def mergeCaps(self, registry, json_caps_data):
+        self.mergeProfileExtensions(registry, json_caps_data)
+        self.mergeProfileFeatures(json_caps_data)
+        self.mergeProfileProperties(json_caps_data)
+        self.mergeProfileFormats(json_caps_data)
+        self.mergeProfileQueueFamiliesProperties(json_caps_data)
 
 
     def mergeProfileCapData(self, dst, src):
@@ -2290,18 +2300,18 @@ class VulkanProfileStructs():
 
 
 class VulkanProfile():
-    def __init__(self, registry, name, data, caps):
+    def __init__(self, registry, json_profile_name, json_profile_data, json_caps_data):
         self.registry = registry
-        self.name = name
-        self.label = data['label']
-        self.description = data['description']
-        self.version = data['version']
-        self.apiVersion = data['api-version']
+        self.name = json_profile_name
+        self.label = json_profile_data['label']
+        self.description = json_profile_data['description']
+        self.version = json_profile_data['version']
+        self.apiVersion = json_profile_data['api-version']
         self.apiVersionNumber = VulkanVersionNumber(self.apiVersion)
-        self.fallback = data.get('fallback')
+        self.fallback = json_profile_data.get('fallback')
         self.versionRequirements = []
         self.extensionRequirements = []
-        self.capabilities = VulkanProfileCapabilities(registry, data, caps)
+        self.capabilities = VulkanProfileCapabilities(registry, json_profile_data, json_caps_data)
         self.structs = VulkanProfileStructs(registry, self.capabilities)
         self.collectCompileTimeRequirements()
         self.validate()
@@ -2697,6 +2707,14 @@ class VulkanProfile():
                 '    [](VkBaseOutStructure* p) {\n')
         gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structFill, fillFmt)
         gen += ('    },\n'
+                '    [](VkBaseOutStructure* p) {\n')
+        gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structFill, fillFmt)
+        gen += ('    },\n'
+                '    [](VkBaseOutStructure* p) -> bool {\n'
+                '        bool ret = true;\n')
+        gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structCompare, cmpFmtFeatures, debugMessages)
+        gen += ('        return ret;\n'
+                '    },\n'
                 '    [](VkBaseOutStructure* p) -> bool {\n'
                 '        bool ret = true;\n')
         gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structCompare, cmpFmtFeatures, debugMessages)
@@ -2799,10 +2817,10 @@ class VulkanProfiles():
         return profiles
 
 
-    def parseProfiles(registry, profiles, json, caps):
-        for name, data in json.items():
-            Log.i("Registering profile '{0}'".format(name))
-            profiles[name] = VulkanProfile(registry, name, data, caps)
+    def parseProfiles(registry, profiles, json_profiles_data, json_caps_data):
+        for json_profile_name, json_profile_data in json_profiles_data.items():
+            Log.i("Registering profile '{0}'".format(json_profile_name))
+            profiles[json_profile_name] = VulkanProfile(registry, json_profile_name, json_profile_data, json_caps_data)
 
 
 class VulkanProfilesLibraryGenerator():
