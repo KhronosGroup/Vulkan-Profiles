@@ -295,7 +295,8 @@ struct VpFeatureDesc {
 };
 
 struct VpPropertyDesc {
-    PFN_vpStructFiller              pfnFiller;
+    PFN_vpStructFiller              pfnFillerRequired;
+    PFN_vpStructFiller              pfnFillerOptional;
     PFN_vpStructComparator          pfnComparator;
     PFN_vpStructChainer             pfnChainer;
 };
@@ -1077,11 +1078,17 @@ VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties 
 
 VPAPI_ATTR void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext) {
     const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc != nullptr && pDesc->property.pfnFiller != nullptr) {
+    if (pDesc != nullptr) {
         VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
         while (p != nullptr) {
-            pDesc->property.pfnFiller(p);
-            p = p->pNext;
+            if (pProfile->enableOptionals && pDesc->property.pfnFillerOptional != nullptr) {
+                pDesc->property.pfnFillerOptional(p);
+                p = p->pNext;
+            }
+            else if (pDesc->property.pfnFillerRequired != nullptr) {
+                pDesc->property.pfnFillerRequired(p);
+                p = p->pNext;
+            }
         }
     }
 }
@@ -2750,6 +2757,9 @@ class VulkanProfile():
                 'static const VpPropertyDesc propertyDesc = {\n'
                 '    [](VkBaseOutStructure* p) {\n')
         gen += self.gen_structFunc(self.structsRequired.property, self.capabilitiesRequired.properties, self.gen_structFill, fillFmt)
+        gen += ('    },\n'
+                '    [](VkBaseOutStructure* p) {\n')
+        gen += self.gen_structFunc(self.structsOptional.property, self.capabilitiesOptional.properties, self.gen_structFill, fillFmt)
         gen += ('    },\n'
                 '    [](VkBaseOutStructure* p) -> bool {\n'
                 '        bool ret = true;\n')
