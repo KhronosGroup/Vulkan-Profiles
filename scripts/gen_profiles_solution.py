@@ -1043,7 +1043,7 @@ VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *
                 pDesc->feature.pfnFillerRequired(p);
                 p = p->pNext;
             }
-            if (pDesc->feature.pfnFillerOptional != nullptr) {
+            if (pProfile->enableOptionals && pDesc->feature.pfnFillerOptional != nullptr) {
                 pDesc->feature.pfnFillerOptional(p);
                 p = p->pNext;
             }
