@@ -2714,11 +2714,6 @@ class VulkanProfile():
                 '        bool ret = true;\n')
         gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structCompare, cmpFmtFeatures, debugMessages)
         gen += ('        return ret;\n'
-                '    },\n'
-                '    [](VkBaseOutStructure* p) -> bool {\n'
-                '        bool ret = true;\n')
-        gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structCompare, cmpFmtFeatures, debugMessages)
-        gen += ('        return ret;\n'
                 '    }\n'
                 '};\n')
 
