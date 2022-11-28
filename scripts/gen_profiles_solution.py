@@ -2840,7 +2840,7 @@ class VulkanProfiles():
                     jsonData = json.load(f)
                     if validate:
                         Log.i("Validating profile file: '{0}'".format(filename))
-                        # jsonschema.validate(jsonData, schema)
+                        jsonschema.validate(jsonData, schema)
                     VulkanProfiles.parseProfiles(registry, profiles, jsonData['profiles'], jsonData['capabilities'])
         return profiles
 
