@@ -3371,13 +3371,66 @@ bool JsonLoader::GetStruct(const Json::Value &parent, VkPhysicalDeviceProperties
     }
     return valid;
 }
+'''
 
+GET_VALUE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES = '''
+bool JsonLoader::GetStruct(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(VkPhysicalDevicePortabilitySubsetPropertiesKHR)\\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        GET_VALUE_WARN(member, minVertexInputBindingStrideAlignment, false, WarnIfLesser);
+    }
+    return valid;
+}
+'''
+
+GET_VALUE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES = '''
+bool JsonLoader::GetStruct(const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
+    LogMessage(DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\\n");
+    bool valid = true;
+    for (const auto &member : parent.getMemberNames()) {
+        if (layer_settings->emulate_portability) {
+            dest->constantAlphaColorBlendFactors = layer_settings->constantAlphaColorBlendFactors;
+            dest->events = layer_settings->events;
+            dest->imageViewFormatReinterpretation = layer_settings->imageViewFormatReinterpretation;
+            dest->imageViewFormatSwizzle = layer_settings->imageViewFormatSwizzle;
+            dest->imageView2DOn3DImage = layer_settings->imageView2DOn3DImage;
+            dest->multisampleArrayImage = layer_settings->multisampleArrayImage;
+            dest->mutableComparisonSamplers = layer_settings->mutableComparisonSamplers;
+            dest->pointPolygons = layer_settings->pointPolygons;
+            dest->samplerMipLodBias = layer_settings->samplerMipLodBias;
+            dest->separateStencilMaskRef = layer_settings->separateStencilMaskRef;
+            dest->shaderSampleRateInterpolationFunctions = layer_settings->shaderSampleRateInterpolationFunctions;
+            dest->tessellationIsolines = layer_settings->tessellationIsolines;
+            dest->tessellationPointMode = layer_settings->tessellationPointMode;
+            dest->triangleFans = layer_settings->triangleFans;
+            dest->vertexAttributeAccessBeyondStride = layer_settings->vertexAttributeAccessBeyondStride;
+        } else {
+            GET_VALUE_WARN(member, constantAlphaColorBlendFactors, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, events, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, imageViewFormatReinterpretation, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, imageViewFormatSwizzle, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, imageView2DOn3DImage, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, multisampleArrayImage, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, mutableComparisonSamplers, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, pointPolygons, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, samplerMipLodBias, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, separateStencilMaskRef, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, shaderSampleRateInterpolationFunctions, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, tessellationIsolines, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, tessellationPointMode, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, triangleFans, false, WarnIfNotEqualBool);
+            GET_VALUE_WARN(member, vertexAttributeAccessBeyondStride, false, WarnIfNotEqualBool);
+        }
+    }
+    return valid;
+}
 '''
 
 class VulkanProfilesLayerGenerator():
     emulated_extensions = ['VK_KHR_portability_subset']
-    additional_features = ['VkPhysicalDeviceFeatures']
-    additional_properties = ['VkPhysicalDeviceProperties', 'VkPhysicalDeviceLimits', 'VkPhysicalDeviceSparseProperties', 'VkPhysicalDeviceToolProperties']
+    additional_features = ['VkPhysicalDeviceFeatures', 'VkPhysicalDevicePortabilitySubsetFeaturesKHR']
+    additional_properties = ['VkPhysicalDeviceProperties', 'VkPhysicalDeviceLimits', 'VkPhysicalDeviceSparseProperties', 'VkPhysicalDeviceToolProperties', 'VkPhysicalDevicePortabilitySubsetPropertiesKHR']
 
     def generate(self, path, registry):
         self.registry = registry
@@ -3721,14 +3774,21 @@ class VulkanProfilesLayerGenerator():
             gen += self.generate_get_value_function(feature)
         for ext, properties, features in self.extension_structs:
             for property in properties:
-                gen += self.generate_get_value_function(property)
+                if property != 'VkPhysicalDevicePortabilitySubsetPropertiesKHR':
+                    gen += self.generate_get_value_function(property)
             for feature in features:
-                gen += self.generate_get_value_function(feature)
+                if feature != 'VkPhysicalDevicePortabilitySubsetFeaturesKHR':
+                    gen += self.generate_get_value_function(feature)
         for struct in self.additional_features:
-            gen += self.generate_get_value_function(struct)
+            if struct == 'VkPhysicalDevicePortabilitySubsetFeaturesKHR':
+                gen += GET_VALUE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES
+            else:
+                gen += self.generate_get_value_function(struct)
         for struct in self.additional_properties:
             if struct == 'VkPhysicalDeviceProperties':
                 gen += GET_VALUE_PHYSICAL_DEVICE_PROPERTIES
+            elif struct == 'VkPhysicalDevicePortabilitySubsetPropertiesKHR':
+                gen += GET_VALUE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES
             else:
                 gen += self.generate_get_value_function(struct)
 
@@ -4089,9 +4149,11 @@ class VulkanProfilesLayerGenerator():
             gen += '    bool GetStruct(const Json::Value &parent, ' + feature + ' *dest);\n'
         for ext, properties, features in self.extension_structs:
             for property in properties:
-                gen += '    bool GetStruct(const Json::Value &parent, ' + property + ' *dest);\n'
+                if property != 'VkPhysicalDevicePortabilitySubsetPropertiesKHR':
+                    gen += '    bool GetStruct(const Json::Value &parent, ' + property + ' *dest);\n'
             for feature in features:
-                gen += '    bool GetStruct(const Json::Value &parent, ' + feature + ' *dest);\n'
+                if feature != 'VkPhysicalDevicePortabilitySubsetFeaturesKHR':
+                    gen += '    bool GetStruct(const Json::Value &parent, ' + feature + ' *dest);\n'
         for struct in self.additional_features:
             gen += '    bool GetStruct(const Json::Value &parent, ' + struct + ' *dest);\n'
         for struct in self.additional_properties:
