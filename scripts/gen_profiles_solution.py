@@ -25,6 +25,46 @@ from typing import OrderedDict
 import xml.etree.ElementTree as etree
 import json
 import jsonschema
+from collections import deque
+
+def apiNameMatch(str, supported):
+    """Return whether a required api name matches a pattern specified for an
+    XML <feature> 'api' attribute or <extension> 'supported' attribute.
+    - str - API name such as 'vulkan' or 'openxr'. May be None, in which
+        case it never matches (this should not happen).
+    - supported - comma-separated list of XML API names. May be None, in
+        which case str always matches (this is the usual case)."""
+
+    if str is not None:
+        return supported is None or str in supported.split(',')
+
+    # Fallthrough case - either str is None or the test failed
+    return False
+
+def stripNonmatchingAPIs(tree, apiName, actuallyDelete = True):
+    """Remove tree Elements with 'api' attributes matching apiName.
+        tree - Element at the root of the hierarchy to strip. Only its
+            children can actually be removed, not the tree itself.
+        apiName - string which much match a command-separated component of
+            the 'api' attribute.
+        actuallyDelete - only delete matching elements if True."""
+
+    stack = deque()
+    stack.append(tree)
+
+    while len(stack) > 0:
+        parent = stack.pop()
+
+        for child in parent.findall('*'):
+            api = child.get('api')
+
+            if apiNameMatch(apiName, api):
+                # Add child to the queue
+                stack.append(child)
+            elif not apiNameMatch(apiName, api):
+                # Child does not match requested api. Remove it.
+                if actuallyDelete:
+                    parent.remove(child)
 
 COPYRIGHT_HEADER = '''/**
  * Copyright (c) 2021-2022 LunarG, Inc.
@@ -1393,6 +1433,8 @@ class VulkanRegistry():
     def __init__(self, registryFile):
         Log.i("Loading registry file: '{0}'".format(registryFile))
         xml = etree.parse(registryFile)
+        stripNonmatchingAPIs(xml.getroot(), 'vulkan', actuallyDelete = True)
+
         self.parsePlatformInfo(xml)
         self.parseVersionInfo(xml)
         self.parseExtensionInfo(xml)
