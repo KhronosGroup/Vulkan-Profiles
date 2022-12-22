@@ -185,8 +185,8 @@
                 "VK_EXT_validation_cache": 1,
                 "VK_EXT_vertex_attribute_divisor": 3,
                 "VK_EXT_vertex_input_dynamic_state": 2,
-                "VK_EXT_video_decode_h264": 3,
-                "VK_EXT_video_decode_h265": 1,
+                "VK_KHR_video_decode_h264": 3,
+                "VK_KHR_video_decode_h265": 1,
                 "VK_EXT_video_encode_h264": 2,
                 "VK_EXT_video_encode_h265": 2,
                 "VK_EXT_ycbcr_2plane_444_formats": 1,
@@ -3005,7 +3005,7 @@
                         "priorityCount": 4
                     },
                     "VkQueueFamilyVideoPropertiesKHR": {
-                        "videoCodecOperations": [ "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT" ]
+                        "videoCodecOperations": [ "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_KHR", "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR", "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT", "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT" ]
                     },
                     "VkQueueFamilyCheckpointProperties2NV": {
                         "checkpointExecutionStageMask": [

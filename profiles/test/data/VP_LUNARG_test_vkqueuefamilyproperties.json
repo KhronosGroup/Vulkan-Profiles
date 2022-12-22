@@ -32,8 +32,8 @@
                     },
                     "VkQueueFamilyVideoPropertiesKHR": {
                         "videoCodecOperations": [
-                            "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT",
-                            "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT",
+                            "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_KHR",
+                            "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR",
                             "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT",
                             "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT"
                         ]
@@ -74,8 +74,8 @@
                     },
                     "VkQueueFamilyVideoPropertiesKHR": {
                         "videoCodecOperations": [
-                            "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_EXT",
-                            "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_EXT",
+                            "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_KHR",
+                            "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR",
                             "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT",
                             "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT"
                         ]
