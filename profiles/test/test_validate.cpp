@@ -240,3 +240,10 @@ TEST(test_validate, VP_ANDROID_baseline_2021) {
     const Json::Value json_document3 = ParseJsonFile("VP_ANDROID_baseline_2021.json");
     EXPECT_TRUE(validator.Check(json_document3));
 }
+
+TEST(test_validate, VP_ANDROID_baseline_2022) {
+    JsonValidator validator;
+
+    const Json::Value json_document3 = ParseJsonFile("VP_ANDROID_baseline_2022.json");
+    EXPECT_TRUE(validator.Check(json_document3));
+}

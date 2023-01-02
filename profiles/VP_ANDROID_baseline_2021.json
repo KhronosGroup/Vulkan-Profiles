@@ -35,7 +35,6 @@
                     "independentBlend": true,
                     "robustBufferAccess": true,
                     "sampleRateShading": true,
-                    "shaderImageGatherExtended": true,
                     "shaderSampledImageArrayDynamicIndexing": true,
                     "shaderStorageImageArrayDynamicIndexing": true,
                     "shaderUniformBufferArrayDynamicIndexing": true,
@@ -101,8 +100,6 @@
                         "minStorageBufferOffsetAlignment": 256,
                         "minTexelOffset": -8,
                         "maxTexelOffset": 7,
-                        "minTexelGatherOffset": -8,
-                        "maxTexelGatherOffset": 7,
                         "minInterpolationOffset": -0.5,
                         "maxInterpolationOffset": 0.4375,
                         "subPixelInterpolationOffsetBits": 4,
@@ -755,7 +752,7 @@
     },
     "profiles": {
         "VP_ANDROID_baseline_2021": {
-            "version": 1,
+            "version": 2,
             "api-version": "1.0.68",
             "label": "Android Vulkan Baseline 2021 profile",
             "description": "Collection of functionality that is broadly supported on Android",
@@ -772,11 +769,16 @@
                 },
                 "Frank Yang": {
                     "company": "Google",
-                    "email": "lfy@google.com",
-                    "contact": true
+                    "contact": false
                 }
             },
             "history": [
+                {
+                    "revision": 2,
+                    "date": "2023-01-10",
+                    "author": "Trevor David Black",
+                    "comment": "Remove shaderImageGatherExtended and limits"
+                },
                 {
                     "revision": 1,
                     "date": "2022-01-11",
