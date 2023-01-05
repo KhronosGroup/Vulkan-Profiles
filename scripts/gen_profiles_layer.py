@@ -1528,7 +1528,7 @@ bool JsonLoader::GetQueueFamilyProperties(const Json::Value &qf_props, QueueFami
                 if (i > 0) {
                     priorities += ", ";
                 }
-                priorities += string_VkQueueGlobalPriorityEXT(dest->global_priority_properties_.priorities[i]);
+                priorities += string_VkQueueGlobalPriorityKHR(dest->global_priority_properties_.priorities[i]);
             }
             priorities += "]";
 
