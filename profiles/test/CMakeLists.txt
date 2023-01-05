@@ -15,22 +15,10 @@ include_directories(${jsoncpp_generated_include_dir})
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 add_executable(${TEST_NAME} ${TEST_FILE} ${jsoncpp_generated_source} ${jsoncpp_generated_header} ${FILES_PROFILE} ${FILES_UNIT_TEST} ${SCHEMA_PROFILE})
-target_compile_definitions(${TEST_NAME} PRIVATE PROFILES_SCHEMA_FILENAME="${PROFILES_SCHEMA_FILENAME}")
-add_custom_command(
-	TARGET ${TEST_NAME} POST_BUILD
-	DEPENDS ${FILES_PROFILE}
-	COMMAND ${CMAKE_COMMAND} -E copy_directory  ${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_BINARY_DIR}
-	VERBATIM)
-add_custom_command(
-	TARGET ${TEST_NAME} POST_BUILD 
-	DEPENDS ${FILES_UNIT_TEST}
-	COMMAND ${CMAKE_COMMAND} -E copy_directory  ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}
-	VERBATIM)
-add_custom_command(
-	TARGET ${TEST_NAME} POST_BUILD
-	DEPENDS ${SCHEMA_PROFILE}
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different  ${CMAKE_CURRENT_SOURCE_DIR}/../../schema/${PROFILES_SCHEMA_FILENAME} ${CMAKE_CURRENT_BINARY_DIR}
-	VERBATIM)
+target_compile_definitions(${TEST_NAME} PRIVATE 
+	PROFILES_SCHEMA_FILENAME="${CMAKE_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}" 
+	JSON_TEST_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/test/data/"
+	PROFILE_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/")
 add_dependencies(${TEST_NAME} VpGenerated)
 
 target_link_libraries(${TEST_NAME} PRIVATE gtest gtest_main)

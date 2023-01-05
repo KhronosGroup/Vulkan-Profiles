@@ -132,111 +132,127 @@ struct JsonValidator {
 TEST(test_validate, VP_LUNARG_test_structure_simple) {
     JsonValidator validator;
 
-    const Json::Value document = ParseJsonFile("VP_LUNARG_test_structure_simple.json");
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_structure_simple.json";
+    const Json::Value document = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(document));
 }
 
 TEST(test_validate, VP_LUNARG_test_structure_complex) {
     JsonValidator validator;
 
-    const Json::Value document = ParseJsonFile("VP_LUNARG_test_structure_complex.json");
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_structure_complex.json";
+    const Json::Value document = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(document));
 }
 
 TEST(test_validate, VP_LUNARG_test_structure_fallback) {
     JsonValidator validator;
 
-    const Json::Value document = ParseJsonFile("VP_LUNARG_test_structure_fallback.json");
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_structure_fallback.json";
+    const Json::Value document = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(document));
 }
 
 TEST(test_validate, VP_LUNARG_test_vkformatproperties) {
     JsonValidator validator;
 
-    const Json::Value document = ParseJsonFile("VP_LUNARG_test_vkformatproperties.json");
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_vkformatproperties.json";
+    const Json::Value document = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(document));
 }
 
 TEST(test_validate, VP_LUNARG_test_vkqueuefamilyproperties) {
     JsonValidator validator;
 
-    const Json::Value document = ParseJsonFile("VP_LUNARG_test_vkqueuefamilyproperties.json");
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_vkqueuefamilyproperties.json";
+    const Json::Value document = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(document));
 }
 
 TEST(test_validate, VP_LUNARG_test_api) {
     JsonValidator validator;
 
-    const Json::Value document = ParseJsonFile("VP_LUNARG_test_api.json");
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_api.json";
+    const Json::Value document = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(document));
 }
 
 TEST(test_validate, VP_LUNARG_test_api_alternate) {
     JsonValidator validator;
 
-    const Json::Value document = ParseJsonFile("VP_LUNARG_test_api_alternate.json");
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_api_alternate.json";
+    const Json::Value document = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(document));
 }
 
 TEST(test_validate, VP_LUNARG_test_promoted_api) {
     JsonValidator validator;
 
-    const Json::Value document = ParseJsonFile("VP_LUNARG_test_promoted_api.json");
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_promoted_api.json";
+    const Json::Value document = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(document));
 }
 
 TEST(test_validate, VP_LUNARG_test_duplicated) {
     JsonValidator validator;
 
-    const Json::Value document = ParseJsonFile("VP_LUNARG_test_duplicated.json");
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_duplicated.json";
+    const Json::Value document = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(document));
 }
 
 TEST(test_validate, VP_LUNARG_test_formats) {
     JsonValidator validator;
 
-    const Json::Value document = ParseJsonFile("VP_LUNARG_test_formats.json");
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_formats.json";
+    const Json::Value document = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(document));
 }
 
 TEST(test_validate, VP_KHR_baseline) {
     JsonValidator validator;
 
-    const Json::Value json_document2 = ParseJsonFile("VP_KHR_baseline.json");
-    EXPECT_TRUE(validator.Check(json_document2));
-}
-
-TEST(test_validate, VP_LUNARG_desktop_baseline_2022) {
-    JsonValidator validator;
-
-    const Json::Value json_document2 = ParseJsonFile("VP_LUNARG_desktop_baseline_2022.json");
-    EXPECT_TRUE(validator.Check(json_document2));
-}
-
-TEST(test_validate, VP_LUNARG_desktop_portability_2022) {
-    JsonValidator validator;
-
-    const Json::Value json_document2 = ParseJsonFile("VP_LUNARG_desktop_portability_2022.json");
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_KHR_baseline.json";
+    const Json::Value json_document2 = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(json_document2));
 }
 
 TEST(test_validate, VP_LUNARG_desktop_max_2022) {
     JsonValidator validator;
 
-    const Json::Value json_document2 = ParseJsonFile("test/data/VP_LUNARG_desktop_max_2022.json");
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_desktop_max_2022.json";
+    const Json::Value json_document2 = ParseJsonFile(path.c_str());
+    EXPECT_TRUE(validator.Check(json_document2));
+}
+
+TEST(test_validate, VP_LUNARG_desktop_baseline_2022) {
+    JsonValidator validator;
+
+    const std::string path = std::string(PROFILE_FILES_PATH) + "VP_LUNARG_desktop_baseline_2022.json";
+    const Json::Value json_document2 = ParseJsonFile(path.c_str());
+    EXPECT_TRUE(validator.Check(json_document2));
+}
+
+TEST(test_validate, VP_LUNARG_desktop_portability_2022) {
+    JsonValidator validator;
+
+    const std::string path = std::string(PROFILE_FILES_PATH) + "VP_LUNARG_desktop_portability_2022.json";
+    const Json::Value json_document2 = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(json_document2));
 }
 
 TEST(test_validate, VP_KHR_roadmap_2022) {
     JsonValidator validator;
 
-    const Json::Value json_document3 = ParseJsonFile("VP_KHR_roadmap_2022.json");
+    const std::string path = std::string(PROFILE_FILES_PATH) + "VP_KHR_roadmap_2022.json";
+    const Json::Value json_document3 = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(json_document3));
 }
 
 TEST(test_validate, VP_ANDROID_baseline_2021) {
     JsonValidator validator;
 
-    const Json::Value json_document3 = ParseJsonFile("VP_ANDROID_baseline_2021.json");
+    const std::string path = std::string(PROFILE_FILES_PATH) + "VP_ANDROID_baseline_2021.json";
+    const Json::Value json_document3 = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(json_document3));
 }
