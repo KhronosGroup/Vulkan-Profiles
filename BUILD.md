@@ -79,10 +79,6 @@ macOS 10.11.4 have been tested with this repo.
 - [CMake 3.14.0](https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0-Darwin-x86_64.tar.gz) is recommended.
 
 Setup Homebrew and components
-- Follow instructions on [brew.sh](http://brew.sh) to get homebrew installed.
-```
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-```
 
 - Ensure Homebrew is at the beginning of your PATH:
 ```
