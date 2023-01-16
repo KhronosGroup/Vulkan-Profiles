@@ -716,53 +716,138 @@ TEST_F(TestsMechanism, TestParsingAllFormatProperties) {
     }
 
     {
-        VkFormat format = VK_FORMAT_R4G4_UNORM_PACK8;
-        VkFormatProperties format_properties;
-        vkGetPhysicalDeviceFormatProperties(gpu, format, &format_properties);
-
         VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
         VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
         VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
 
+        VkFormat format = VK_FORMAT_R4G4_UNORM_PACK8;
+        VkFormatProperties format_properties;
+        vkGetPhysicalDeviceFormatProperties(gpu, format, &format_properties);
+
         EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
         EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
         EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
-    }
 
-    {
-        VkFormat format = VK_FORMAT_R4G4B4A4_UNORM_PACK16;
         VkFormatProperties2 format_properties2 = {};
         format_properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
         vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
 
-        const VkFormatProperties& format_properties = format_properties2.formatProperties;
-
-        VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-        VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
-        VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
-
-        EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
-        EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
-        EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
-    }
+        EXPECT_EQ(format_properties2.formatProperties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
+        EXPECT_EQ(format_properties2.formatProperties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
+        EXPECT_EQ(format_properties2.formatProperties.bufferFeatures & buffer_features, buffer_features);
 
 #ifdef VK_KHR_format_feature_flags2
-    {
-        VkFormat format = VK_FORMAT_B4G4R4A4_UNORM_PACK16;
-        VkFormatProperties2 format_properties2 = {};
-        format_properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
         VkFormatProperties3 format_properties3 = {};
         format_properties3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3;
         format_properties2.pNext = &format_properties3;
         vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
 
-        VkFormatFeatureFlags2KHR linear_tiling_features = VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT_KHR;
+        VkFormatFeatureFlags2KHR linear_tiling_features2 = VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT;
+        VkFormatFeatureFlags2KHR optimal_tiling_features2 = VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT;
+        VkFormatFeatureFlags2KHR buffer_features2 = VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT;
+
+        EXPECT_EQ(format_properties3.linearTilingFeatures & linear_tiling_features2, linear_tiling_features2);
+        EXPECT_EQ(format_properties3.optimalTilingFeatures & optimal_tiling_features2, optimal_tiling_features2);
+        EXPECT_EQ(format_properties3.bufferFeatures & buffer_features2, buffer_features2);
+#endif
+    }
+
+    {
+        VkFormat format = VK_FORMAT_R4G4B4A4_UNORM_PACK16;
+
+        VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+        VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
+        VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+
+        VkFormatProperties format_properties;
+        vkGetPhysicalDeviceFormatProperties(gpu, format, &format_properties);
+
+        EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
+        EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
+        EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
+
+        VkFormatProperties2 format_properties2 = {};
+        format_properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
+
+        EXPECT_EQ(format_properties2.formatProperties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
+        EXPECT_EQ(format_properties2.formatProperties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
+        EXPECT_EQ(format_properties2.formatProperties.bufferFeatures & buffer_features, buffer_features);
+
+#ifdef VK_KHR_format_feature_flags2
+        VkFormatProperties3 format_properties3 = {};
+        format_properties3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3;
+        format_properties2.pNext = &format_properties3;
+        vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
+
+        VkFormatFeatureFlags2KHR linear_tiling_features2 = VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT;
+        VkFormatFeatureFlags2KHR optimal_tiling_features2 = VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT;
+        VkFormatFeatureFlags2KHR buffer_features2 = VK_FORMAT_FEATURE_2_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+
+        EXPECT_EQ(format_properties3.linearTilingFeatures & linear_tiling_features2, linear_tiling_features2);
+        EXPECT_EQ(format_properties3.optimalTilingFeatures & optimal_tiling_features2, optimal_tiling_features2);
+        EXPECT_EQ(format_properties3.bufferFeatures & buffer_features2, buffer_features2);
+#endif
+    }
+
+#ifdef VK_KHR_format_feature_flags2
+    {
+        VkFormat format = VK_FORMAT_B4G4R4A4_UNORM_PACK16;
+
+        VkFormatProperties3 format_properties3 = {};
+        format_properties3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3;
+        VkFormatProperties2 format_properties2 = {};
+        format_properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        format_properties2.pNext = &format_properties3;
+        vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
+
+        VkFormatFeatureFlags2KHR linear_tiling_features = VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT_KHR |
+                                                          VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT |
+                                                          VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
         VkFormatFeatureFlags2KHR optimal_tiling_features = VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT_KHR;
         VkFormatFeatureFlags2KHR buffer_features = VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT_KHR;
 
         EXPECT_EQ(format_properties3.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
         EXPECT_EQ(format_properties3.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
         EXPECT_EQ(format_properties3.bufferFeatures & buffer_features, buffer_features);
+    }
+#endif
+
+    {
+        VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+
+        VkFormatProperties format_properties;
+        vkGetPhysicalDeviceFormatProperties(gpu, format, &format_properties);
+
+        VkFormatFeatureFlags linear_tiling_features =
+            VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+        VkFormatFeatureFlags optimal_tiling_features =
+            VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+        VkFormatFeatureFlags buffer_features =
+            VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
+
+        EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
+        EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
+        EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
+
+#ifdef VK_KHR_format_feature_flags2
+        VkFormatProperties3KHR format_properties3 = {};
+        format_properties3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR;
+        VkFormatProperties2 format_properties2 = {};
+        format_properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        format_properties2.pNext = &format_properties3;
+        vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
+
+        VkFormatFeatureFlags2KHR linear_tiling_features2 =
+            VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT_KHR | VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+        VkFormatFeatureFlags2KHR optimal_tiling_features2 =
+            VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT_KHR | VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT;
+        VkFormatFeatureFlags2KHR buffer_features2 =
+            VK_FORMAT_FEATURE_2_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT;
+
+        EXPECT_EQ(format_properties3.linearTilingFeatures & linear_tiling_features2, linear_tiling_features2);
+        EXPECT_EQ(format_properties3.optimalTilingFeatures & optimal_tiling_features2, optimal_tiling_features2);
+        EXPECT_EQ(format_properties3.bufferFeatures & buffer_features2, buffer_features2);
     }
 #endif
 }

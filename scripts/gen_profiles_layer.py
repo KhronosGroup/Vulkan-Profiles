@@ -1261,17 +1261,18 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
             for (const auto &feature : props["bufferFeatures"]) {
                 profile_properties.bufferFeatures |= StringToVkFormatFeatureFlags(feature.asString());
             }
-        } else if (name == "VkFormatProperties2") {
-            for (const auto &feature : props["formatProperties"]["linearTilingFeatures"]) {
+        } else if (name == "VkFormatProperties2" || name == "VkFormatProperties2KHR") {
+            const auto &formatProperties = props["formatProperties"];
+            for (const auto &feature : formatProperties["linearTilingFeatures"]) {
                 profile_properties.linearTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
             }
-            for (const auto &feature : props["formatProperties"]["optimalTilingFeatures"]) {
+            for (const auto &feature : formatProperties["optimalTilingFeatures"]) {
                 profile_properties.optimalTilingFeatures |= StringToVkFormatFeatureFlags(feature.asString());
             }
-            for (const auto &feature : props["formatProperties"]["bufferFeatures"]) {
+            for (const auto &feature : formatProperties["bufferFeatures"]) {
                 profile_properties.bufferFeatures |= StringToVkFormatFeatureFlags(feature.asString());
             }
-        } else if (name == "VkFormatProperties3") {
+        } else if (name == "VkFormatProperties3" || name == "VkFormatProperties3KHR") {
             for (const auto &feature : props["linearTilingFeatures"]) {
                 profile_properties_3.linearTilingFeatures |= StringToVkFormatFeatureFlags2(feature.asString());
             }
@@ -1283,6 +1284,14 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
             }
         }
     }
+
+    profile_properties_3.linearTilingFeatures |= profile_properties.linearTilingFeatures;
+    profile_properties_3.optimalTilingFeatures |= profile_properties.optimalTilingFeatures;
+    profile_properties_3.bufferFeatures |= profile_properties.bufferFeatures;
+
+    profile_properties.linearTilingFeatures |= static_cast<VkFormatFeatureFlags>(profile_properties_3.linearTilingFeatures);
+    profile_properties.optimalTilingFeatures |= static_cast<VkFormatFeatureFlags>(profile_properties_3.optimalTilingFeatures);
+    profile_properties.bufferFeatures |= static_cast<VkFormatFeatureFlags>(profile_properties_3.bufferFeatures);
 
     (*dest)[format] = profile_properties;
     (*dest3)[format] = profile_properties_3;
