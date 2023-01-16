@@ -32,7 +32,7 @@ The Profiles Layer can also be enabled and configured using *Vulkan Configurator
 ### Using the Profiles layer with Vulkan Configurator
 The *Profiles Layer* can be controlled using environment variables or more intuitively using the *Vulkan Configurator* GUI application.
 
-![Vulkan Configurator](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/images/vkconfig.png)
+![Vulkan Configurator](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/images/vkconfig.png)
 *The built-in Portability layers configurations in Vulkan Configurator using the Validation and the Profiles layers*
 
 The *Portability* layers configuration in *Vulkan Configurator* checks that a Vulkan application follows the requirements of a *Vulkan Profile*. This layers configuration relies on the *Vulkan Profiles* layer to override the Vulkan device capabilities and the *Vulkan Validation Layer* to check that the Vulkan application doesn't rely on capabilities not supported by the selected profile.
@@ -41,7 +41,7 @@ The input to the *Profiles layer* is a profiles file that is using the flexible 
 
 To use the Profiles Layer Vulkan version 1.1 is required.
 
-Example of a *Profiles layer* JSON profiles file: [VP_LUNARG_test_structure_simple.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/profiles/test/data/VP_LUNARG_test_structure_simple.json)
+Example of a *Profiles layer* JSON profiles file: [VP_LUNARG_test_structure_simple.json](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/test/data/VP_LUNARG_test_structure_simple.json)
 
 ### Android
 To enable, use a system property with the path of the profiles file to load:
@@ -89,7 +89,7 @@ If you find issues, please report to [Khronos' Vulkan-Profiles GitHub repository
 ### Profiles Layer operation and profiles file
 At application startup, during `vkEnumeratePhysicalDevices()`, the *Profiles layer* initializes its internal tables from the actual physical device in the system, then loads the profiles file, which specifies override values to apply to those internal tables.
 
-JSON file formats consumed by the Profiles layer are specified by the following JSON schema https://github.com/KhronosGroup/Vulkan-Profiles/blob/master/schema/profile_schema.json
+JSON file formats consumed by the Profiles layer are specified by the following JSON schema https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/schema/profile_schema.json
 
 The schema permits additional top-level sections to be optionally included in profiles files;
 any additional top-level sections will be ignored by the *Profiles layer*.
