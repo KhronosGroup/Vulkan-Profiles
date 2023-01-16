@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD041 -->
 <p align="left"><img src="https://vulkan.lunarg.com/img/NewLunarGLogoBlack.png" alt="LunarG" width="263" height="113" /></p>
-<p align="left">Copyright © 2015-2022 LunarG, Inc.</p>
+<p align="left">Copyright © 2015-2023 LunarG, Inc.</p>
 
 [![Creative Commons][3]][4]
 
@@ -11,7 +11,12 @@
 
 # Release Notes
 
-## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/LunarG/VulkanProfiles/tree/master) - December 2022
+## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/LunarG/VulkanProfiles/tree/master) - February 2023
+
+### Improvements:
+- Improve handling of `VkFormatProperties*` from profile data which can be query with any Vulkan functions
+
+## [Vulkan Profiles Toolset 1.3.236](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.236.0) - December 2022
 
 ### Features:
 - Add merge script support of `VkFormatProperties3` #304 #237
