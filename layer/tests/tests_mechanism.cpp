@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2021-2022 Valve Corporation
- * Copyright (C) 2021-2022 LunarG, Inc.
+ * Copyright (C) 2021-2023 Valve Corporation
+ * Copyright (C) 2021-2023 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
