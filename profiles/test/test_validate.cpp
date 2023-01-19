@@ -193,6 +193,14 @@ TEST(test_validate, VP_LUNARG_test_promoted_api) {
     EXPECT_TRUE(validator.Check(document));
 }
 
+TEST(test_validate, VP_LUNARG_test_api_generated) {
+    JsonValidator validator;
+
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_api_generated.json";
+    const Json::Value document = ParseJsonFile(path.c_str());
+    EXPECT_TRUE(validator.Check(document));
+}
+
 TEST(test_validate, VP_LUNARG_test_duplicated) {
     JsonValidator validator;
 
