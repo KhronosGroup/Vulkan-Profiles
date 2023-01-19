@@ -325,7 +325,7 @@ class ProfileGenerator():
                         if property_size > 1:
                             gen += " ]"
                         self.i += 1
-                    elif property_type == "uint32_t" or property_type == "uint64_t" or property_type == "int64_t" or property_type == "VkDeviceSize":
+                    elif property_type == "uint32_t" or property_type == "uint64_t" or property_type == "int64_t" or property_type == "VkDeviceSize" or property_type == "size_t":
                         self.test_values[name][property] = list()
                         if property_size > 1:
                             gen += "[ "
