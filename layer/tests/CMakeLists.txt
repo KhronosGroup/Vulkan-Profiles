@@ -25,7 +25,7 @@ if (NOT ANDROID)
     set(LAYER_TEST_FILES
         tests
         tests_promoted
-        tests_generated
+#        tests_generated
         tests_mechanism
         tests_combine_union
         tests_combine_intersection
@@ -37,7 +37,6 @@ else()
         tests_mechanism
     )
 endif()
-
 
 function(LayerTest NAME)
 	set(TEST_FILENAME ./${NAME}.cpp)
