@@ -375,6 +375,16 @@ class ProfileGenerator():
                         gen += enum[0]
                         self.test_values[name][property] = enum[1]
                         self.i += 1
+                    elif property_type == "VkQueueFlags":
+                        enum = self.get_enum('VkQueueFlagBits', True)
+                        gen += enum[0]
+                        self.test_values[name][property] = enum[1]
+                        self.i += 1
+                    elif property_type == "VkMemoryDecompressionMethodFlagsNV":
+                        enum = self.get_enum('VkMemoryDecompressionMethodFlagBitsNV', True)
+                        gen += enum[0]
+                        self.test_values[name][property] = enum[1]
+                        self.i += 1
                     elif property_type == "VkShaderStageFlags":
                         enum = self.get_enum('VkShaderStageFlagBits', True)
                         gen += enum[0]

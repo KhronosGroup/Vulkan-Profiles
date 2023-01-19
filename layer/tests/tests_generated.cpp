@@ -970,6 +970,7 @@ TEST_F(TestsCapabilitiesGenerated, TestCopyMemoryIndirectPropertiesNV) {
     gpu_props_profile.pNext = &copy_memory_indirect_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
+    EXPECT_EQ(copy_memory_indirect_properties_profile.supportedQueues, VK_QUEUE_SPARSE_BINDING_BIT);
 #endif
 }
 
@@ -994,7 +995,8 @@ TEST_F(TestsCapabilitiesGenerated, TestMemoryDecompressionPropertiesNV) {
     gpu_props_profile.pNext = &memory_decompression_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(memory_decompression_properties_profile.maxDecompressionIndirectCount, 91);
+    EXPECT_EQ(memory_decompression_properties_profile.decompressionMethods, VK_MEMORY_DECOMPRESSION_METHOD_GDEFLATE_1_0_BIT_NV);
+    EXPECT_EQ(memory_decompression_properties_profile.maxDecompressionIndirectCount, 93);
 #endif
 }
 
@@ -1024,8 +1026,8 @@ TEST_F(TestsCapabilitiesGenerated, TestShadingRateImagePropertiesNV) {
     EXPECT_EQ(shading_rate_image_properties_profile.shadingRateTexelSize.height, shading_rate_image_properties_native.shadingRateTexelSize.height);
     }
 
-    EXPECT_EQ(shading_rate_image_properties_profile.shadingRatePaletteSize, 94);
-    EXPECT_EQ(shading_rate_image_properties_profile.shadingRateMaxCoarseSamples, 95);
+    EXPECT_EQ(shading_rate_image_properties_profile.shadingRatePaletteSize, 96);
+    EXPECT_EQ(shading_rate_image_properties_profile.shadingRateMaxCoarseSamples, 97);
 #endif
 }
 
@@ -1050,23 +1052,23 @@ TEST_F(TestsCapabilitiesGenerated, TestMeshShaderPropertiesNV) {
     gpu_props_profile.pNext = &mesh_shader_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(mesh_shader_properties_profile.maxDrawMeshTasksCount, 96);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupInvocations, 97);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupSize[0], 98);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupSize[1], 98);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupSize[2], 98);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskTotalMemorySize, 99);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskOutputCount, 100);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupInvocations, 101);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupSize[0], 102);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupSize[1], 102);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupSize[2], 102);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshTotalMemorySize, 103);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputVertices, 104);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputPrimitives, 105);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshMultiviewViewCount, 106);
-    EXPECT_EQ(mesh_shader_properties_profile.meshOutputPerVertexGranularity, 107);
-    EXPECT_EQ(mesh_shader_properties_profile.meshOutputPerPrimitiveGranularity, 108);
+    EXPECT_EQ(mesh_shader_properties_profile.maxDrawMeshTasksCount, 98);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupInvocations, 99);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupSize[0], 100);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupSize[1], 100);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupSize[2], 100);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskTotalMemorySize, 101);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskOutputCount, 102);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupInvocations, 103);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupSize[0], 104);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupSize[1], 104);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupSize[2], 104);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshTotalMemorySize, 105);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputVertices, 106);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputPrimitives, 107);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshMultiviewViewCount, 108);
+    EXPECT_EQ(mesh_shader_properties_profile.meshOutputPerVertexGranularity, 109);
+    EXPECT_EQ(mesh_shader_properties_profile.meshOutputPerPrimitiveGranularity, 110);
 #endif
 }
 
@@ -1091,34 +1093,34 @@ TEST_F(TestsCapabilitiesGenerated, TestMeshShaderPropertiesEXT) {
     gpu_props_profile.pNext = &mesh_shader_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupTotalCount, 109);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupCount[0], 110);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupCount[1], 110);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupCount[2], 110);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupInvocations, 111);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupSize[0], 112);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupSize[1], 112);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupSize[2], 112);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskPayloadSize, 113);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskSharedMemorySize, 114);
-    EXPECT_EQ(mesh_shader_properties_profile.maxTaskPayloadAndSharedMemorySize, 115);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupTotalCount, 116);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupCount[0], 117);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupCount[1], 117);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupCount[2], 117);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupInvocations, 118);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupSize[0], 119);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupSize[1], 119);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupSize[2], 119);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshSharedMemorySize, 120);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshPayloadAndSharedMemorySize, 121);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputMemorySize, 122);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshPayloadAndOutputMemorySize, 123);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputComponents, 124);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputVertices, 125);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputPrimitives, 126);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputLayers, 127);
-    EXPECT_EQ(mesh_shader_properties_profile.maxMeshMultiviewViewCount, 128);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupTotalCount, 111);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupCount[0], 112);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupCount[1], 112);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupCount[2], 112);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupInvocations, 113);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupSize[0], 114);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupSize[1], 114);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskWorkGroupSize[2], 114);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskPayloadSize, 115);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskSharedMemorySize, 116);
+    EXPECT_EQ(mesh_shader_properties_profile.maxTaskPayloadAndSharedMemorySize, 117);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupTotalCount, 118);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupCount[0], 119);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupCount[1], 119);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupCount[2], 119);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupInvocations, 120);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupSize[0], 121);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupSize[1], 121);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshWorkGroupSize[2], 121);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshSharedMemorySize, 122);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshPayloadAndSharedMemorySize, 123);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputMemorySize, 124);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshPayloadAndOutputMemorySize, 125);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputComponents, 126);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputVertices, 127);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputPrimitives, 128);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshOutputLayers, 129);
+    EXPECT_EQ(mesh_shader_properties_profile.maxMeshMultiviewViewCount, 130);
     if (supported) {
     EXPECT_EQ(mesh_shader_properties_profile.meshOutputPerVertexGranularity, mesh_shader_properties_native.meshOutputPerVertexGranularity);
     }
@@ -1127,8 +1129,8 @@ TEST_F(TestsCapabilitiesGenerated, TestMeshShaderPropertiesEXT) {
     EXPECT_EQ(mesh_shader_properties_profile.meshOutputPerPrimitiveGranularity, mesh_shader_properties_native.meshOutputPerPrimitiveGranularity);
     }
 
-    EXPECT_EQ(mesh_shader_properties_profile.maxPreferredTaskWorkGroupInvocations, 131);
-    EXPECT_EQ(mesh_shader_properties_profile.maxPreferredMeshWorkGroupInvocations, 132);
+    EXPECT_EQ(mesh_shader_properties_profile.maxPreferredTaskWorkGroupInvocations, 133);
+    EXPECT_EQ(mesh_shader_properties_profile.maxPreferredMeshWorkGroupInvocations, 134);
     if (supported) {
     EXPECT_EQ(mesh_shader_properties_profile.prefersLocalInvocationVertexOutput, mesh_shader_properties_native.prefersLocalInvocationVertexOutput);
     }
@@ -1169,14 +1171,14 @@ TEST_F(TestsCapabilitiesGenerated, TestAccelerationStructurePropertiesKHR) {
     gpu_props_profile.pNext = &acceleration_structure_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(acceleration_structure_properties_profile.maxGeometryCount, 133);
-    EXPECT_EQ(acceleration_structure_properties_profile.maxInstanceCount, 134);
-    EXPECT_EQ(acceleration_structure_properties_profile.maxPrimitiveCount, 135);
-    EXPECT_EQ(acceleration_structure_properties_profile.maxPerStageDescriptorAccelerationStructures, 136);
-    EXPECT_EQ(acceleration_structure_properties_profile.maxPerStageDescriptorUpdateAfterBindAccelerationStructures, 137);
-    EXPECT_EQ(acceleration_structure_properties_profile.maxDescriptorSetAccelerationStructures, 138);
-    EXPECT_EQ(acceleration_structure_properties_profile.maxDescriptorSetUpdateAfterBindAccelerationStructures, 139);
-    EXPECT_EQ(acceleration_structure_properties_profile.minAccelerationStructureScratchOffsetAlignment, 140);
+    EXPECT_EQ(acceleration_structure_properties_profile.maxGeometryCount, 135);
+    EXPECT_EQ(acceleration_structure_properties_profile.maxInstanceCount, 136);
+    EXPECT_EQ(acceleration_structure_properties_profile.maxPrimitiveCount, 137);
+    EXPECT_EQ(acceleration_structure_properties_profile.maxPerStageDescriptorAccelerationStructures, 138);
+    EXPECT_EQ(acceleration_structure_properties_profile.maxPerStageDescriptorUpdateAfterBindAccelerationStructures, 139);
+    EXPECT_EQ(acceleration_structure_properties_profile.maxDescriptorSetAccelerationStructures, 140);
+    EXPECT_EQ(acceleration_structure_properties_profile.maxDescriptorSetUpdateAfterBindAccelerationStructures, 141);
+    EXPECT_EQ(acceleration_structure_properties_profile.minAccelerationStructureScratchOffsetAlignment, 142);
 #endif
 }
 
@@ -1205,8 +1207,8 @@ TEST_F(TestsCapabilitiesGenerated, TestRayTracingPipelinePropertiesKHR) {
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupHandleSize, ray_tracing_pipeline_properties_native.shaderGroupHandleSize);
     }
 
-    EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxRayRecursionDepth, 142);
-    EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxShaderGroupStride, 143);
+    EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxRayRecursionDepth, 144);
+    EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxShaderGroupStride, 145);
     if (supported) {
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupBaseAlignment, ray_tracing_pipeline_properties_native.shaderGroupBaseAlignment);
     }
@@ -1215,9 +1217,9 @@ TEST_F(TestsCapabilitiesGenerated, TestRayTracingPipelinePropertiesKHR) {
     EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupHandleCaptureReplaySize, ray_tracing_pipeline_properties_native.shaderGroupHandleCaptureReplaySize);
     }
 
-    EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxRayDispatchInvocationCount, 146);
-    EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupHandleAlignment, 147);
-    EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxRayHitAttributeSize, 148);
+    EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxRayDispatchInvocationCount, 148);
+    EXPECT_EQ(ray_tracing_pipeline_properties_profile.shaderGroupHandleAlignment, 149);
+    EXPECT_EQ(ray_tracing_pipeline_properties_profile.maxRayHitAttributeSize, 150);
 #endif
 }
 
@@ -1246,16 +1248,16 @@ TEST_F(TestsCapabilitiesGenerated, TestRayTracingPropertiesNV) {
     EXPECT_EQ(ray_tracing_properties_profile.shaderGroupHandleSize, ray_tracing_properties_native.shaderGroupHandleSize);
     }
 
-    EXPECT_EQ(ray_tracing_properties_profile.maxRecursionDepth, 150);
-    EXPECT_EQ(ray_tracing_properties_profile.maxShaderGroupStride, 151);
+    EXPECT_EQ(ray_tracing_properties_profile.maxRecursionDepth, 152);
+    EXPECT_EQ(ray_tracing_properties_profile.maxShaderGroupStride, 153);
     if (supported) {
     EXPECT_EQ(ray_tracing_properties_profile.shaderGroupBaseAlignment, ray_tracing_properties_native.shaderGroupBaseAlignment);
     }
 
-    EXPECT_EQ(ray_tracing_properties_profile.maxGeometryCount, 153);
-    EXPECT_EQ(ray_tracing_properties_profile.maxInstanceCount, 154);
-    EXPECT_EQ(ray_tracing_properties_profile.maxTriangleCount, 155);
-    EXPECT_EQ(ray_tracing_properties_profile.maxDescriptorSetAccelerationStructures, 156);
+    EXPECT_EQ(ray_tracing_properties_profile.maxGeometryCount, 155);
+    EXPECT_EQ(ray_tracing_properties_profile.maxInstanceCount, 156);
+    EXPECT_EQ(ray_tracing_properties_profile.maxTriangleCount, 157);
+    EXPECT_EQ(ray_tracing_properties_profile.maxDescriptorSetAccelerationStructures, 158);
 #endif
 }
 
@@ -1280,10 +1282,10 @@ TEST_F(TestsCapabilitiesGenerated, TestFragmentDensityMapPropertiesEXT) {
     gpu_props_profile.pNext = &fragment_density_map_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(fragment_density_map_properties_profile.minFragmentDensityTexelSize.width, 157);
-    EXPECT_EQ(fragment_density_map_properties_profile.minFragmentDensityTexelSize.height, 158);
-    EXPECT_EQ(fragment_density_map_properties_profile.maxFragmentDensityTexelSize.width, 159);
-    EXPECT_EQ(fragment_density_map_properties_profile.maxFragmentDensityTexelSize.height, 160);
+    EXPECT_EQ(fragment_density_map_properties_profile.minFragmentDensityTexelSize.width, 159);
+    EXPECT_EQ(fragment_density_map_properties_profile.minFragmentDensityTexelSize.height, 160);
+    EXPECT_EQ(fragment_density_map_properties_profile.maxFragmentDensityTexelSize.width, 161);
+    EXPECT_EQ(fragment_density_map_properties_profile.maxFragmentDensityTexelSize.height, 162);
     EXPECT_EQ(fragment_density_map_properties_profile.fragmentDensityInvocations, VK_TRUE);
 #endif
 }
@@ -1317,8 +1319,8 @@ TEST_F(TestsCapabilitiesGenerated, TestFragmentDensityMap2PropertiesEXT) {
     EXPECT_EQ(fragment_density_map_2_properties_profile.subsampledCoarseReconstructionEarlyAccess, fragment_density_map_2_properties_native.subsampledCoarseReconstructionEarlyAccess);
     }
 
-    EXPECT_EQ(fragment_density_map_2_properties_profile.maxSubsampledArrayLayers, 161);
-    EXPECT_EQ(fragment_density_map_2_properties_profile.maxDescriptorSetSubsampledSamplers, 162);
+    EXPECT_EQ(fragment_density_map_2_properties_profile.maxSubsampledArrayLayers, 163);
+    EXPECT_EQ(fragment_density_map_2_properties_profile.maxDescriptorSetSubsampledSamplers, 164);
 #endif
 }
 
@@ -1343,8 +1345,8 @@ TEST_F(TestsCapabilitiesGenerated, TestFragmentDensityMapOffsetPropertiesQCOM) {
     gpu_props_profile.pNext = &fragment_density_map_offset_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(fragment_density_map_offset_properties_profile.fragmentDensityOffsetGranularity.width, 163);
-    EXPECT_EQ(fragment_density_map_offset_properties_profile.fragmentDensityOffsetGranularity.height, 164);
+    EXPECT_EQ(fragment_density_map_offset_properties_profile.fragmentDensityOffsetGranularity.width, 165);
+    EXPECT_EQ(fragment_density_map_offset_properties_profile.fragmentDensityOffsetGranularity.height, 166);
 #endif
 }
 
@@ -1369,7 +1371,7 @@ TEST_F(TestsCapabilitiesGenerated, TestCooperativeMatrixPropertiesNV) {
     gpu_props_profile.pNext = &cooperative_matrix_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(cooperative_matrix_properties_profile.cooperativeMatrixSupportedStages, VK_SHADER_STAGE_MESH_BIT_EXT);
+    EXPECT_EQ(cooperative_matrix_properties_profile.cooperativeMatrixSupportedStages, VK_SHADER_STAGE_RAYGEN_BIT_NV);
 #endif
 }
 
@@ -1419,8 +1421,8 @@ TEST_F(TestsCapabilitiesGenerated, TestShaderSMBuiltinsPropertiesNV) {
     gpu_props_profile.pNext = &shader_smbuiltins_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(shader_smbuiltins_properties_profile.shaderSMCount, 166);
-    EXPECT_EQ(shader_smbuiltins_properties_profile.shaderWarpsPerSM, 167);
+    EXPECT_EQ(shader_smbuiltins_properties_profile.shaderSMCount, 168);
+    EXPECT_EQ(shader_smbuiltins_properties_profile.shaderWarpsPerSM, 169);
 #endif
 }
 
@@ -1445,12 +1447,12 @@ TEST_F(TestsCapabilitiesGenerated, TestTexelBufferAlignmentPropertiesEXT) {
     gpu_props_profile.pNext = &texel_buffer_alignment_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(texel_buffer_alignment_properties_profile.storageTexelBufferOffsetAlignmentBytes, 168);
+    EXPECT_EQ(texel_buffer_alignment_properties_profile.storageTexelBufferOffsetAlignmentBytes, 170);
     if (supported) {
     EXPECT_EQ(texel_buffer_alignment_properties_profile.storageTexelBufferOffsetSingleTexelAlignment, texel_buffer_alignment_properties_native.storageTexelBufferOffsetSingleTexelAlignment);
     }
 
-    EXPECT_EQ(texel_buffer_alignment_properties_profile.uniformTexelBufferOffsetAlignmentBytes, 169);
+    EXPECT_EQ(texel_buffer_alignment_properties_profile.uniformTexelBufferOffsetAlignmentBytes, 171);
     if (supported) {
     EXPECT_EQ(texel_buffer_alignment_properties_profile.uniformTexelBufferOffsetSingleTexelAlignment, texel_buffer_alignment_properties_native.uniformTexelBufferOffsetSingleTexelAlignment);
     }
@@ -1479,10 +1481,10 @@ TEST_F(TestsCapabilitiesGenerated, TestSubgroupSizeControlPropertiesEXT) {
     gpu_props_profile.pNext = &subgroup_size_control_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(subgroup_size_control_properties_profile.minSubgroupSize, 170);
-    EXPECT_EQ(subgroup_size_control_properties_profile.maxSubgroupSize, 171);
-    EXPECT_EQ(subgroup_size_control_properties_profile.maxComputeWorkgroupSubgroups, 172);
-    EXPECT_EQ(subgroup_size_control_properties_profile.requiredSubgroupSizeStages, VK_SHADER_STAGE_TASK_BIT_NV);
+    EXPECT_EQ(subgroup_size_control_properties_profile.minSubgroupSize, 172);
+    EXPECT_EQ(subgroup_size_control_properties_profile.maxSubgroupSize, 173);
+    EXPECT_EQ(subgroup_size_control_properties_profile.maxComputeWorkgroupSubgroups, 174);
+    EXPECT_EQ(subgroup_size_control_properties_profile.requiredSubgroupSizeStages, VK_SHADER_STAGE_VERTEX_BIT);
 #endif
 }
 
@@ -1507,7 +1509,7 @@ TEST_F(TestsCapabilitiesGenerated, TestSubpassShadingPropertiesHUAWEI) {
     gpu_props_profile.pNext = &subpass_shading_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(subpass_shading_properties_profile.maxSubpassShadingWorkgroupSizeAspectRatio, 174);
+    EXPECT_EQ(subpass_shading_properties_profile.maxSubpassShadingWorkgroupSizeAspectRatio, 176);
 #endif
 }
 
@@ -1532,7 +1534,7 @@ TEST_F(TestsCapabilitiesGenerated, TestLineRasterizationPropertiesEXT) {
     gpu_props_profile.pNext = &line_rasterization_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(line_rasterization_properties_profile.lineSubPixelPrecisionBits, 175);
+    EXPECT_EQ(line_rasterization_properties_profile.lineSubPixelPrecisionBits, 177);
 #endif
 }
 
@@ -1557,7 +1559,7 @@ TEST_F(TestsCapabilitiesGenerated, TestCustomBorderColorPropertiesEXT) {
     gpu_props_profile.pNext = &custom_border_color_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(custom_border_color_properties_profile.maxCustomBorderColorSamplers, 176);
+    EXPECT_EQ(custom_border_color_properties_profile.maxCustomBorderColorSamplers, 178);
 #endif
 }
 
@@ -1607,8 +1609,8 @@ TEST_F(TestsCapabilitiesGenerated, TestRobustness2PropertiesEXT) {
     gpu_props_profile.pNext = &robustness_2_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(robustness_2_properties_profile.robustStorageBufferAccessSizeAlignment, 177);
-    EXPECT_EQ(robustness_2_properties_profile.robustUniformBufferAccessSizeAlignment, 178);
+    EXPECT_EQ(robustness_2_properties_profile.robustStorageBufferAccessSizeAlignment, 179);
+    EXPECT_EQ(robustness_2_properties_profile.robustUniformBufferAccessSizeAlignment, 180);
 #endif
 }
 
@@ -1633,7 +1635,7 @@ TEST_F(TestsCapabilitiesGenerated, TestPortabilitySubsetPropertiesKHR) {
     gpu_props_profile.pNext = &portability_subset_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(portability_subset_properties_profile.minVertexInputBindingStrideAlignment, 179);
+    EXPECT_EQ(portability_subset_properties_profile.minVertexInputBindingStrideAlignment, 181);
 #endif
 }
 
@@ -1658,19 +1660,19 @@ TEST_F(TestsCapabilitiesGenerated, TestFragmentShadingRatePropertiesKHR) {
     gpu_props_profile.pNext = &fragment_shading_rate_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(fragment_shading_rate_properties_profile.minFragmentShadingRateAttachmentTexelSize.width, 180);
-    EXPECT_EQ(fragment_shading_rate_properties_profile.minFragmentShadingRateAttachmentTexelSize.height, 181);
-    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentShadingRateAttachmentTexelSize.width, 182);
-    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentShadingRateAttachmentTexelSize.height, 183);
-    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentShadingRateAttachmentTexelSizeAspectRatio, 184);
+    EXPECT_EQ(fragment_shading_rate_properties_profile.minFragmentShadingRateAttachmentTexelSize.width, 182);
+    EXPECT_EQ(fragment_shading_rate_properties_profile.minFragmentShadingRateAttachmentTexelSize.height, 183);
+    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentShadingRateAttachmentTexelSize.width, 184);
+    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentShadingRateAttachmentTexelSize.height, 185);
+    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentShadingRateAttachmentTexelSizeAspectRatio, 186);
     EXPECT_EQ(fragment_shading_rate_properties_profile.primitiveFragmentShadingRateWithMultipleViewports, VK_TRUE);
     EXPECT_EQ(fragment_shading_rate_properties_profile.layeredShadingRateAttachments, VK_TRUE);
     EXPECT_EQ(fragment_shading_rate_properties_profile.fragmentShadingRateNonTrivialCombinerOps, VK_TRUE);
-    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentSize.width, 185);
-    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentSize.height, 186);
-    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentSizeAspectRatio, 187);
-    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentShadingRateCoverageSamples, 188);
-    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentShadingRateRasterizationSamples, VK_SAMPLE_COUNT_1_BIT);
+    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentSize.width, 187);
+    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentSize.height, 188);
+    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentSizeAspectRatio, 189);
+    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentShadingRateCoverageSamples, 190);
+    EXPECT_EQ(fragment_shading_rate_properties_profile.maxFragmentShadingRateRasterizationSamples, VK_SAMPLE_COUNT_4_BIT);
     EXPECT_EQ(fragment_shading_rate_properties_profile.fragmentShadingRateWithShaderDepthStencilWrites, VK_TRUE);
     EXPECT_EQ(fragment_shading_rate_properties_profile.fragmentShadingRateWithSampleMask, VK_TRUE);
     EXPECT_EQ(fragment_shading_rate_properties_profile.fragmentShadingRateWithShaderSampleMask, VK_TRUE);
@@ -1702,7 +1704,7 @@ TEST_F(TestsCapabilitiesGenerated, TestFragmentShadingRateEnumsPropertiesNV) {
     gpu_props_profile.pNext = &fragment_shading_rate_enums_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(fragment_shading_rate_enums_properties_profile.maxFragmentShadingRateInvocationCount, VK_SAMPLE_COUNT_2_BIT);
+    EXPECT_EQ(fragment_shading_rate_enums_properties_profile.maxFragmentShadingRateInvocationCount, VK_SAMPLE_COUNT_8_BIT);
 #endif
 }
 
@@ -1769,11 +1771,11 @@ TEST_F(TestsCapabilitiesGenerated, TestDescriptorBufferPropertiesEXT) {
     EXPECT_EQ(descriptor_buffer_properties_profile.descriptorBufferOffsetAlignment, descriptor_buffer_properties_native.descriptorBufferOffsetAlignment);
     }
 
-    EXPECT_EQ(descriptor_buffer_properties_profile.maxDescriptorBufferBindings, 192);
-    EXPECT_EQ(descriptor_buffer_properties_profile.maxResourceDescriptorBufferBindings, 193);
-    EXPECT_EQ(descriptor_buffer_properties_profile.maxSamplerDescriptorBufferBindings, 194);
-    EXPECT_EQ(descriptor_buffer_properties_profile.maxEmbeddedImmutableSamplerBindings, 195);
-    EXPECT_EQ(descriptor_buffer_properties_profile.maxEmbeddedImmutableSamplers, 196);
+    EXPECT_EQ(descriptor_buffer_properties_profile.maxDescriptorBufferBindings, 194);
+    EXPECT_EQ(descriptor_buffer_properties_profile.maxResourceDescriptorBufferBindings, 195);
+    EXPECT_EQ(descriptor_buffer_properties_profile.maxSamplerDescriptorBufferBindings, 196);
+    EXPECT_EQ(descriptor_buffer_properties_profile.maxEmbeddedImmutableSamplerBindings, 197);
+    EXPECT_EQ(descriptor_buffer_properties_profile.maxEmbeddedImmutableSamplers, 198);
     if (supported) {
     EXPECT_EQ(descriptor_buffer_properties_profile.bufferCaptureReplayDescriptorDataSize, descriptor_buffer_properties_native.bufferCaptureReplayDescriptorDataSize);
     }
@@ -1794,25 +1796,25 @@ TEST_F(TestsCapabilitiesGenerated, TestDescriptorBufferPropertiesEXT) {
     EXPECT_EQ(descriptor_buffer_properties_profile.accelerationStructureCaptureReplayDescriptorDataSize, descriptor_buffer_properties_native.accelerationStructureCaptureReplayDescriptorDataSize);
     }
 
-    EXPECT_EQ(descriptor_buffer_properties_profile.samplerDescriptorSize, 202);
-    EXPECT_EQ(descriptor_buffer_properties_profile.combinedImageSamplerDescriptorSize, 203);
-    EXPECT_EQ(descriptor_buffer_properties_profile.sampledImageDescriptorSize, 204);
-    EXPECT_EQ(descriptor_buffer_properties_profile.storageImageDescriptorSize, 205);
-    EXPECT_EQ(descriptor_buffer_properties_profile.uniformTexelBufferDescriptorSize, 206);
-    EXPECT_EQ(descriptor_buffer_properties_profile.robustUniformTexelBufferDescriptorSize, 207);
-    EXPECT_EQ(descriptor_buffer_properties_profile.storageTexelBufferDescriptorSize, 208);
-    EXPECT_EQ(descriptor_buffer_properties_profile.robustStorageTexelBufferDescriptorSize, 209);
-    EXPECT_EQ(descriptor_buffer_properties_profile.uniformBufferDescriptorSize, 210);
-    EXPECT_EQ(descriptor_buffer_properties_profile.robustUniformBufferDescriptorSize, 211);
-    EXPECT_EQ(descriptor_buffer_properties_profile.storageBufferDescriptorSize, 212);
-    EXPECT_EQ(descriptor_buffer_properties_profile.robustStorageBufferDescriptorSize, 213);
-    EXPECT_EQ(descriptor_buffer_properties_profile.inputAttachmentDescriptorSize, 214);
-    EXPECT_EQ(descriptor_buffer_properties_profile.accelerationStructureDescriptorSize, 215);
-    EXPECT_EQ(descriptor_buffer_properties_profile.maxSamplerDescriptorBufferRange, 216);
-    EXPECT_EQ(descriptor_buffer_properties_profile.maxResourceDescriptorBufferRange, 217);
-    EXPECT_EQ(descriptor_buffer_properties_profile.samplerDescriptorBufferAddressSpaceSize, 218);
-    EXPECT_EQ(descriptor_buffer_properties_profile.resourceDescriptorBufferAddressSpaceSize, 219);
-    EXPECT_EQ(descriptor_buffer_properties_profile.descriptorBufferAddressSpaceSize, 220);
+    EXPECT_EQ(descriptor_buffer_properties_profile.samplerDescriptorSize, 204);
+    EXPECT_EQ(descriptor_buffer_properties_profile.combinedImageSamplerDescriptorSize, 205);
+    EXPECT_EQ(descriptor_buffer_properties_profile.sampledImageDescriptorSize, 206);
+    EXPECT_EQ(descriptor_buffer_properties_profile.storageImageDescriptorSize, 207);
+    EXPECT_EQ(descriptor_buffer_properties_profile.uniformTexelBufferDescriptorSize, 208);
+    EXPECT_EQ(descriptor_buffer_properties_profile.robustUniformTexelBufferDescriptorSize, 209);
+    EXPECT_EQ(descriptor_buffer_properties_profile.storageTexelBufferDescriptorSize, 210);
+    EXPECT_EQ(descriptor_buffer_properties_profile.robustStorageTexelBufferDescriptorSize, 211);
+    EXPECT_EQ(descriptor_buffer_properties_profile.uniformBufferDescriptorSize, 212);
+    EXPECT_EQ(descriptor_buffer_properties_profile.robustUniformBufferDescriptorSize, 213);
+    EXPECT_EQ(descriptor_buffer_properties_profile.storageBufferDescriptorSize, 214);
+    EXPECT_EQ(descriptor_buffer_properties_profile.robustStorageBufferDescriptorSize, 215);
+    EXPECT_EQ(descriptor_buffer_properties_profile.inputAttachmentDescriptorSize, 216);
+    EXPECT_EQ(descriptor_buffer_properties_profile.accelerationStructureDescriptorSize, 217);
+    EXPECT_EQ(descriptor_buffer_properties_profile.maxSamplerDescriptorBufferRange, 218);
+    EXPECT_EQ(descriptor_buffer_properties_profile.maxResourceDescriptorBufferRange, 219);
+    EXPECT_EQ(descriptor_buffer_properties_profile.samplerDescriptorBufferAddressSpaceSize, 220);
+    EXPECT_EQ(descriptor_buffer_properties_profile.resourceDescriptorBufferAddressSpaceSize, 221);
+    EXPECT_EQ(descriptor_buffer_properties_profile.descriptorBufferAddressSpaceSize, 222);
 #endif
 }
 
@@ -1837,7 +1839,7 @@ TEST_F(TestsCapabilitiesGenerated, TestDescriptorBufferDensityMapPropertiesEXT) 
     gpu_props_profile.pNext = &descriptor_buffer_density_map_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(descriptor_buffer_density_map_properties_profile.combinedImageSamplerDensityMapDescriptorSize, 221);
+    EXPECT_EQ(descriptor_buffer_density_map_properties_profile.combinedImageSamplerDensityMapDescriptorSize, 223);
 #endif
 }
 
@@ -2058,8 +2060,8 @@ TEST_F(TestsCapabilitiesGenerated, TestOpacityMicromapPropertiesEXT) {
     gpu_props_profile.pNext = &opacity_micromap_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(opacity_micromap_properties_profile.maxOpacity2StateSubdivisionLevel, 227);
-    EXPECT_EQ(opacity_micromap_properties_profile.maxOpacity4StateSubdivisionLevel, 228);
+    EXPECT_EQ(opacity_micromap_properties_profile.maxOpacity2StateSubdivisionLevel, 229);
+    EXPECT_EQ(opacity_micromap_properties_profile.maxOpacity4StateSubdivisionLevel, 230);
 #endif
 }
 
@@ -2124,13 +2126,13 @@ TEST_F(TestsCapabilitiesGenerated, TestImageProcessingPropertiesQCOM) {
     gpu_props_profile.pNext = &image_processing_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(image_processing_properties_profile.maxWeightFilterPhases, 233);
-    EXPECT_EQ(image_processing_properties_profile.maxWeightFilterDimension.width, 234);
-    EXPECT_EQ(image_processing_properties_profile.maxWeightFilterDimension.height, 235);
-    EXPECT_EQ(image_processing_properties_profile.maxBlockMatchRegion.width, 236);
-    EXPECT_EQ(image_processing_properties_profile.maxBlockMatchRegion.height, 237);
-    EXPECT_EQ(image_processing_properties_profile.maxBoxFilterBlockSize.width, 238);
-    EXPECT_EQ(image_processing_properties_profile.maxBoxFilterBlockSize.height, 239);
+    EXPECT_EQ(image_processing_properties_profile.maxWeightFilterPhases, 235);
+    EXPECT_EQ(image_processing_properties_profile.maxWeightFilterDimension.width, 236);
+    EXPECT_EQ(image_processing_properties_profile.maxWeightFilterDimension.height, 237);
+    EXPECT_EQ(image_processing_properties_profile.maxBlockMatchRegion.width, 238);
+    EXPECT_EQ(image_processing_properties_profile.maxBlockMatchRegion.height, 239);
+    EXPECT_EQ(image_processing_properties_profile.maxBoxFilterBlockSize.width, 240);
+    EXPECT_EQ(image_processing_properties_profile.maxBoxFilterBlockSize.height, 241);
 #endif
 }
 
@@ -2215,9 +2217,9 @@ TEST_F(TestsCapabilitiesGenerated, TestShaderCoreBuiltinsPropertiesARM) {
     gpu_props_profile.pNext = &shader_core_builtins_properties_profile;
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props_profile);
 
-    EXPECT_EQ(shader_core_builtins_properties_profile.shaderCoreMask, 245);
-    EXPECT_EQ(shader_core_builtins_properties_profile.shaderCoreCount, 246);
-    EXPECT_EQ(shader_core_builtins_properties_profile.shaderWarpsPerCore, 247);
+    EXPECT_EQ(shader_core_builtins_properties_profile.shaderCoreMask, 247);
+    EXPECT_EQ(shader_core_builtins_properties_profile.shaderCoreCount, 248);
+    EXPECT_EQ(shader_core_builtins_properties_profile.shaderWarpsPerCore, 249);
 #endif
 }
 
@@ -2250,9 +2252,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_UNDEFINED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2263,9 +2265,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R4G4_UNORM_PACK8) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2276,9 +2278,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R4G4B4A4_UNORM_PACK16) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2289,9 +2291,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B4G4R4A4_UNORM_PACK16) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2302,9 +2304,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R5G6B5_UNORM_PACK16) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2315,9 +2317,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B5G6R5_UNORM_PACK16) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2329,8 +2331,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R5G5B5A1_UNORM_PACK16) {
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
     VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2341,9 +2343,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B5G5R5A1_UNORM_PACK16) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2354,9 +2356,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A1R5G5B5_UNORM_PACK16) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2367,9 +2369,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2380,9 +2382,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8_SNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2393,9 +2395,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8_USCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2406,9 +2408,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8_SSCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2419,9 +2421,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2445,9 +2447,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8_SRGB) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2458,9 +2460,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2471,9 +2473,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8_SNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
     VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2484,9 +2486,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8_USCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2497,9 +2499,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8_SSCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2510,8 +2512,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
     VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
@@ -2523,9 +2525,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2536,9 +2538,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8_SRGB) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2549,9 +2551,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2564,7 +2566,7 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8_SNORM) {
 
     VkFormatFeatureFlags linear_tiling_features = 0;
     VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2575,9 +2577,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8_USCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2588,9 +2590,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8_SSCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2601,9 +2603,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2614,9 +2616,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2627,9 +2629,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8_SRGB) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2640,9 +2642,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2653,9 +2655,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8_SNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2666,9 +2668,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8_USCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2679,9 +2681,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8_SSCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2692,9 +2694,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2705,9 +2707,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2718,9 +2720,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8_SRGB) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2731,9 +2733,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8A8_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2744,9 +2746,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8A8_SNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2757,9 +2759,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8A8_USCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2770,9 +2772,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8A8_SSCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2783,9 +2785,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8A8_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2796,9 +2798,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8A8_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2809,9 +2811,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R8G8B8A8_SRGB) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2822,9 +2824,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8A8_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2835,9 +2837,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8A8_SNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2848,9 +2850,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8A8_USCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2861,9 +2863,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8A8_SSCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2874,8 +2876,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8A8_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
     VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
@@ -2887,9 +2889,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8A8_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2900,9 +2902,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8A8_SRGB) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2913,9 +2915,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A8B8G8R8_UNORM_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2926,9 +2928,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A8B8G8R8_SNORM_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2939,9 +2941,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A8B8G8R8_USCALED_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2952,9 +2954,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A8B8G8R8_SSCALED_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2965,9 +2967,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A8B8G8R8_UINT_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2978,9 +2980,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A8B8G8R8_SINT_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -2991,9 +2993,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A8B8G8R8_SRGB_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3004,9 +3006,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A2R10G10B10_UNORM_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3017,9 +3019,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A2R10G10B10_SNORM_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3030,9 +3032,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A2R10G10B10_USCALED_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3043,9 +3045,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A2R10G10B10_SSCALED_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3056,9 +3058,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A2R10G10B10_UINT_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3069,9 +3071,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A2R10G10B10_SINT_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3082,8 +3084,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A2B10G10R10_UNORM_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
     VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
@@ -3095,9 +3097,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A2B10G10R10_SNORM_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3108,9 +3110,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A2B10G10R10_USCALED_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3121,9 +3123,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A2B10G10R10_SSCALED_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3134,9 +3136,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A2B10G10R10_UINT_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3147,9 +3149,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A2B10G10R10_SINT_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
     VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3160,9 +3162,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3173,9 +3175,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16_SNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3186,9 +3188,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16_USCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
     VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3199,9 +3201,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16_SSCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3212,9 +3214,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3225,8 +3227,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
     VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
@@ -3238,9 +3240,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16_SFLOAT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3251,9 +3253,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3264,9 +3266,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16_SNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3277,9 +3279,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16_USCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3290,9 +3292,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16_SSCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3303,9 +3305,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3316,9 +3318,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3329,9 +3331,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16_SFLOAT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3342,9 +3344,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3355,9 +3357,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16_SNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3368,9 +3370,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16_USCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
     VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3381,9 +3383,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16_SSCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3394,9 +3396,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3407,9 +3409,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3420,9 +3422,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16_SFLOAT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3433,9 +3435,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16A16_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3446,9 +3448,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16A16_SNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3459,9 +3461,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16A16_USCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3472,9 +3474,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16A16_SSCALED) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3485,9 +3487,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16A16_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3498,9 +3500,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16A16_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3511,9 +3513,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16B16A16_SFLOAT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3524,9 +3526,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R32_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3537,9 +3539,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R32_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3550,9 +3552,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R32_SFLOAT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3563,9 +3565,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R32G32_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3576,9 +3578,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R32G32_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3589,9 +3591,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R32G32_SFLOAT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3602,9 +3604,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R32G32B32_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3616,8 +3618,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R32G32B32_SINT) {
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
     VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3628,9 +3630,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R32G32B32_SFLOAT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3641,9 +3643,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R32G32B32A32_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3654,9 +3656,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R32G32B32A32_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3667,9 +3669,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R32G32B32A32_SFLOAT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3680,9 +3682,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R64_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3693,9 +3695,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R64_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3706,9 +3708,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R64_SFLOAT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3719,9 +3721,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R64G64_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3732,9 +3734,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R64G64_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3745,9 +3747,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R64G64_SFLOAT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3758,9 +3760,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R64G64B64_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3771,9 +3773,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R64G64B64_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3784,9 +3786,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R64G64B64_SFLOAT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3797,9 +3799,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R64G64B64A64_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3810,9 +3812,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R64G64B64A64_SINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3823,9 +3825,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R64G64B64A64_SFLOAT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3836,9 +3838,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B10G11R11_UFLOAT_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3849,9 +3851,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_E5B9G9R9_UFLOAT_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3862,9 +3864,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_D16_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3875,8 +3877,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_X8_D24_UNORM_PACK32) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
     VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
@@ -3888,9 +3890,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_D32_SFLOAT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_DST_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_DST_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3901,9 +3903,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_S8_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3914,9 +3916,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_D16_UNORM_S8_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3927,9 +3929,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_D24_UNORM_S8_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3940,9 +3942,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_D32_SFLOAT_S8_UINT) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3953,9 +3955,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC1_RGB_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3966,9 +3968,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC1_RGB_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3979,9 +3981,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC1_RGBA_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -3992,9 +3994,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC1_RGBA_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4005,9 +4007,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC2_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4018,9 +4020,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC2_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4031,9 +4033,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC3_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4044,9 +4046,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC3_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4057,9 +4059,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC4_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4070,9 +4072,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC4_SNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4083,9 +4085,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC5_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4096,9 +4098,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC5_SNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4109,9 +4111,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC6H_UFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4122,9 +4124,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC6H_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
     VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4135,9 +4137,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC7_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4148,9 +4150,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_BC7_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4161,9 +4163,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ETC2_R8G8B8_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4174,9 +4176,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ETC2_R8G8B8_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4187,9 +4189,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4200,9 +4202,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4213,9 +4215,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4226,9 +4228,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4239,9 +4241,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_EAC_R11_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4252,9 +4254,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_EAC_R11_SNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4265,9 +4267,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_EAC_R11G11_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4278,9 +4280,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_EAC_R11G11_SNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4291,9 +4293,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_4x4_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4304,9 +4306,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_4x4_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4317,8 +4319,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_5x4_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
     VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
@@ -4330,9 +4332,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_5x4_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4343,9 +4345,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_5x5_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4356,9 +4358,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_5x5_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4369,9 +4371,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_6x5_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4382,9 +4384,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_6x5_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4395,9 +4397,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_6x6_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4408,9 +4410,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_6x6_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4421,9 +4423,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_8x5_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4434,8 +4436,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_8x5_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
     VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
@@ -4447,9 +4449,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_8x6_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4460,9 +4462,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_8x6_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4473,9 +4475,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_8x8_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4486,9 +4488,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_8x8_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4499,9 +4501,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_10x5_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4512,9 +4514,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_10x5_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4525,9 +4527,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_10x6_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4538,9 +4540,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_10x6_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4551,8 +4553,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_10x8_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
     VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
@@ -4565,8 +4567,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_10x8_SRGB_BLOCK) {
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
     VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4577,9 +4579,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_10x10_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4590,9 +4592,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_10x10_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4603,9 +4605,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_12x10_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
     VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4616,9 +4618,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_12x10_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4629,9 +4631,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_12x12_UNORM_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4642,9 +4644,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_12x12_SRGB_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4655,9 +4657,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G8B8G8R8_422_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4668,9 +4670,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B8G8R8G8_422_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4681,9 +4683,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G8_B8_R8_3PLANE_420_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4694,9 +4696,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G8_B8R8_2PLANE_420_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4707,9 +4709,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G8_B8_R8_3PLANE_422_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4720,9 +4722,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G8_B8R8_2PLANE_422_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4733,9 +4735,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G8_B8_R8_3PLANE_444_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4746,9 +4748,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R10X6_UNORM_PACK16) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4759,9 +4761,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R10X6G10X6_UNORM_2PACK16) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4772,9 +4774,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R10X6G10X6B10X6A10X6_UNORM_4PACK1
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4785,9 +4787,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G10X6B10X6G10X6R10X6_422_UNORM_4P
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4798,9 +4800,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B10X6G10X6R10X6G10X6_422_UNORM_4P
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4811,9 +4813,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G10X6_B10X6_R10X6_3PLANE_420_UNOR
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_SRC_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4825,8 +4827,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G10X6_B10X6R10X6_2PLANE_420_UNORM
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
     VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4837,9 +4839,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G10X6_B10X6_R10X6_3PLANE_422_UNOR
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4850,9 +4852,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G10X6_B10X6R10X6_2PLANE_422_UNORM
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4863,9 +4865,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G10X6_B10X6_R10X6_3PLANE_444_UNOR
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4876,9 +4878,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R12X4_UNORM_PACK16) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4889,9 +4891,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R12X4G12X4_UNORM_2PACK16) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4902,9 +4904,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R12X4G12X4B12X4A12X4_UNORM_4PACK1
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4916,8 +4918,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G12X4B12X4G12X4R12X4_422_UNORM_4P
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
     VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4928,8 +4930,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B12X4G12X4R12X4G12X4_422_UNORM_4P
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
     VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
@@ -4955,8 +4957,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G12X4_B12X4R12X4_2PLANE_420_UNORM
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
     VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4967,9 +4969,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G12X4_B12X4_R12X4_3PLANE_422_UNOR
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT;
     VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4980,9 +4982,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G12X4_B12X4R12X4_2PLANE_422_UNORM
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -4993,9 +4995,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G12X4_B12X4_R12X4_3PLANE_444_UNOR
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5006,9 +5008,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G16B16G16R16_422_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_DISJOINT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT | VK_FORMAT_FEATURE_DISJOINT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5019,9 +5021,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_B16G16R16G16_422_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5032,9 +5034,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G16_B16_R16_3PLANE_420_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5045,9 +5047,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G16_B16R16_2PLANE_420_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5058,9 +5060,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G16_B16_R16_3PLANE_422_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5071,9 +5073,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G16_B16R16_2PLANE_422_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
     VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5084,9 +5086,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G16_B16_R16_3PLANE_444_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5097,9 +5099,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G8_B8R8_2PLANE_444_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5110,9 +5112,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G10X6_B10X6R10X6_2PLANE_444_UNORM
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5123,9 +5125,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G12X4_B12X4R12X4_2PLANE_444_UNORM
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5136,9 +5138,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_G16_B16R16_2PLANE_444_UNORM) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5149,9 +5151,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A4R4G4B4_UNORM_PACK16) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT_KHR | VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5162,9 +5164,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_A4B4G4R4_UNORM_PACK16) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5176,8 +5178,8 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_4x4_SFLOAT_BLOCK) {
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
     VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5188,9 +5190,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_5x4_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5201,9 +5203,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_5x5_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5214,9 +5216,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_6x5_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5227,9 +5229,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_6x6_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5240,9 +5242,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_8x5_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5253,9 +5255,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_8x6_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5266,9 +5268,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_8x8_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5279,9 +5281,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_10x5_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5292,9 +5294,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_10x6_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5305,9 +5307,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_10x8_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5318,9 +5320,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_10x10_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_FRAGMENT_DENSITY_MAP_BIT_EXT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5331,7 +5333,7 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_12x10_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT;
     VkFormatFeatureFlags optimal_tiling_features = 0;
     VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
@@ -5344,9 +5346,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_ASTC_12x12_SFLOAT_BLOCK) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5357,9 +5359,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5370,9 +5372,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5383,9 +5385,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_PVRTC2_2BPP_UNORM_BLOCK_IMG) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = 0;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT;
+    VkFormatFeatureFlags buffer_features = 0;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5396,9 +5398,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_PVRTC2_4BPP_UNORM_BLOCK_IMG) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_BLIT_DST_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5409,9 +5411,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_DPB_BIT_KHR | VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_DISJOINT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_MINMAX_BIT_EXT | VK_FORMAT_FEATURE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR | VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT_KHR | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT | VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5422,9 +5424,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
-    VkFormatFeatureFlags buffer_features = 0;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_TRANSFER_DST_BIT_KHR;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5435,9 +5437,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_PVRTC2_2BPP_SRGB_BLOCK_IMG) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
+    VkFormatFeatureFlags linear_tiling_features = 0;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_IMG | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5448,9 +5450,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_PVRTC2_4BPP_SRGB_BLOCK_IMG) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = 0;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT_KHR;
+    VkFormatFeatureFlags optimal_tiling_features = 0;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_CUBIC_BIT_EXT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
@@ -5461,9 +5463,9 @@ TEST_F(TestsCapabilitiesGenerated, Test_FORMAT_R16G16_S10_5_NV) {
     VkFormatProperties format_properties;
     vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);
 
-    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
-    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_DISJOINT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+    VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
+    VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR | VK_FORMAT_FEATURE_VIDEO_DECODE_OUTPUT_BIT_KHR | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
     EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
