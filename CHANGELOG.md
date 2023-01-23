@@ -13,6 +13,9 @@
 
 ## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/LunarG/VulkanProfiles/tree/main) - February 2023
 
+### Features:
+- Add Android Baseline 2022 profile
+
 ### Improvements:
 - Improve handling of `VkFormatProperties*` from profile data which can be query with any Vulkan functions
 
