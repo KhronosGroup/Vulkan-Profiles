@@ -115,7 +115,7 @@
                 },
                 {
                     "label": "Android Baseline 2021",
-                    "description": "Check the Vulkan 1.0 application will run on the Android Baseline 2022 Profile devices",
+                    "description": "Check the Vulkan 1.0 application will run on the Android Baseline 2021 Profile devices",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "status": "STABLE",
                     "settings": [
@@ -126,6 +126,26 @@
                         {
                             "key": "profile_file",
                             "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_ANDROID_baseline_2021.json"
+                        },
+                        {
+                            "key": "simulate_capabilities",
+                            "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT", "SIMULATE_FORMATS_BIT" ]
+                        }
+                    ]
+                },
+                {
+                    "label": "Android Baseline 2022",
+                    "description": "Check the Vulkan 1.1 application will run on the Android Baseline 2022 Profile devices",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                    "status": "STABLE",
+                    "settings": [
+                        {
+                            "key": "emulate_portability",
+                            "value": false
+                        },
+                        {
+                            "key": "profile_file",
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_ANDROID_baseline_2022.json"
                         },
                         {
                             "key": "simulate_capabilities",
