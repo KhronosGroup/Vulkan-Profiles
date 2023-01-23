@@ -3508,7 +3508,7 @@ class VulkanProfilesLayerGenerator():
         gen += self.generate_format_to_string(registry.enums['VkFormat'].values, registry.enums['VkFormat'].aliasValues)
         gen += self.generate_string_to_format(registry.enums['VkFormat'].values)
 
-        gen += self.generate_string_to_uint(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior'), registry.enums)
+        gen += self.generate_string_to_uint(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits'), registry.enums)
 
         gen += self.generate_string_to_flag_functions(('VkToolPurposeFlags', 'VkFormatFeatureFlags', 'VkQueueFlags', 'VkQueueGlobalPriorityKHR', 'VkVideoCodecOperationFlagsKHR', 'VkPipelineStageFlags', 'VkPipelineStageFlags2', 'VkFormatFeatureFlags2'))
 
