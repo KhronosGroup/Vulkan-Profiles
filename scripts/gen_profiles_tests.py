@@ -385,6 +385,11 @@ class ProfileGenerator():
                         gen += enum[0]
                         self.test_values[name][property] = enum[1]
                         self.i += 1
+                    elif property_type == "VkOpticalFlowGridSizeFlagsNV":
+                        enum = self.get_enum('VkOpticalFlowGridSizeFlagBitsNV', True)
+                        gen += enum[0]
+                        self.test_values[name][property] = enum[1]
+                        self.i += 1
                     elif property_type == "VkShaderStageFlags":
                         enum = self.get_enum('VkShaderStageFlagBits', True)
                         gen += enum[0]
@@ -430,6 +435,11 @@ class ProfileGenerator():
                         self.i += 1
                     elif property_type == "VkPipelineRobustnessImageBehaviorEXT":
                         enum = self.get_enum('VkPipelineRobustnessImageBehaviorEXT', False)
+                        gen += enum[0]
+                        self.test_values[name][property] = enum[1]
+                        self.i += 1
+                    elif property_type == "VkRayTracingInvocationReorderModeNV":
+                        enum = self.get_enum('VkRayTracingInvocationReorderModeNV', False)
                         gen += enum[0]
                         self.test_values[name][property] = enum[1]
                         self.i += 1
