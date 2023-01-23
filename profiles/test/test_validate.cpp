@@ -34,6 +34,13 @@
 
 #include <gtest/gtest.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#endif  // _WIN32
+
 using valijson::Schema;
 using valijson::SchemaParser;
 using valijson::ValidationResults;
@@ -78,7 +85,14 @@ static Json::Value ParseJsonFile(const char *filename) {
 }
 
 struct JsonValidator {
-    JsonValidator() {}
+    JsonValidator() {
+#ifdef _WIN32
+        _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+        SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
+        _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+        _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
+#endif  // _WIN32
+    }
 
     bool Check(const Json::Value& json_document) {
         assert(!json_document.empty());

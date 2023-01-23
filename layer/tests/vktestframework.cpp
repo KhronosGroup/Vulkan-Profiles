@@ -46,7 +46,14 @@
     } while (0)
 #endif  // _WIN32
 
-VkTestFramework::VkTestFramework() {}
+VkTestFramework::VkTestFramework() {
+#ifdef _WIN32
+    _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+    SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
+    _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+    _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
+#endif  // _WIN32
+}
 VkTestFramework::~VkTestFramework() {}
 
 #ifdef __ANDROID__
