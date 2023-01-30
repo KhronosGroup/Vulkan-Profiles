@@ -44,6 +44,7 @@ profiles/VP_KHR_roadmap_2022.json
 profiles/VP_LUNARG_desktop_baseline_2022.json
 profiles/VP_LUNARG_desktop_portability_2022.json
 profiles/VP_LUNARG_desktop_portability_2022/VP_LUNARG_desktop_baseline_2022.json
+VP_LUNARG_desktop_baseline_2023.json
 PROFILES.md
 schema/profiles-0.8-latest.json
 library/include/

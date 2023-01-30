@@ -29,14 +29,14 @@ TEST(api_get_profiles_beta, full) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfiles(&propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(3, propertyCount);
+    EXPECT_EQ(4, propertyCount);
 
-    propertyCount = 4;
+    propertyCount = 5;
 
     std::vector<VpProfileProperties> properties(propertyCount);
     VkResult result1 = vpGetProfiles(&propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(3, propertyCount);
+    EXPECT_EQ(4, propertyCount);
 
     EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, properties[0].profileName);
     EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, properties[0].specVersion);
@@ -46,7 +46,7 @@ TEST(api_get_profiles_beta, partial) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfiles(&propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(3, propertyCount);
+    EXPECT_EQ(4, propertyCount);
 
     propertyCount = 1;
 
