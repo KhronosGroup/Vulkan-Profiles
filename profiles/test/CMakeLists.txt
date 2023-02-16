@@ -10,8 +10,6 @@ file(GLOB SCHEMA_PROFILE ${CMAKE_CURRENT_SOURCE_DIR}/../../schema/${PROFILES_SCH
 source_group("JSON Files" FILES ${FILES_PROFILE} ${FILES_UNIT_TEST})
 source_group("JSON Schema" FILES ${SCHEMA_PROFILE})
 
-include_directories(${jsoncpp_generated_include_dir})
-
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 add_executable(${TEST_NAME} ${TEST_FILE} ${jsoncpp_generated_source} ${jsoncpp_generated_header} ${FILES_PROFILE} ${FILES_UNIT_TEST} ${SCHEMA_PROFILE})
@@ -21,7 +19,7 @@ target_compile_definitions(${TEST_NAME} PRIVATE
 	PROFILE_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/")
 add_dependencies(${TEST_NAME} VpGenerated)
 
-target_link_libraries(${TEST_NAME} PRIVATE gtest gtest_main jsoncpp_static)
+target_link_libraries(${TEST_NAME} PRIVATE gtest gtest_main jsoncpp_static valijson)
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} --gtest_catch_exceptions=0)
 
 set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles schema")
