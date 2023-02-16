@@ -5,7 +5,7 @@ enable_testing()
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
 
-project(VULKAN_PROFILES LANGUAGES CXX C)
+project(VULKAN_PROFILES LANGUAGES CXX)
 
 # Regenerating profiles requires Python 3.7.2 or better (for typing.OrderedDict).
 # Regeneration jsoncpp requires Python 3.
@@ -20,7 +20,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" CACHE PATH "Executa
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
-set(CMAKE_C_VISIBILITY_PRESET "hidden")
 set(CMAKE_VISIBILITY_INLINES_HIDDEN "YES")
 
 find_package(PythonInterp 3.7.2 REQUIRED)
@@ -157,29 +156,24 @@ if (BUILD_WERROR)
 endif()
 
 # Platform-specific compiler switches
-if(${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
-    add_compile_options(-Werror)
-endif()
-if(${CMAKE_C_COMPILER_ID} MATCHES "(GNU|Clang)")
-    add_compile_options(-Werror)
-elseif(MSVC)
-        add_compile_options(/W4 /WX)
-        add_link_options(/WX)
-        # Ignore some warnings that we know we'll generate.  In the future the
-        # code that generates these warnings should be fixed properly.
-        # vk_layer_logging.h provokes:
-        #    warning C4100: 'default_flag_is_spec': unreferenced formal parameter
-        # vk_loader_platform.h provokes:
-        #    warning C4505: unreferenced local function has been removed
-        # jsoncpp.cpp provokes:
-        #    warning C4702: unreachable code
-        # gtest.h provokes:
-        #    warning C4389: '==': signed/unsigned mismatch
-        #    warning C4018: '>=': signed/unsigned mismatch
+if(MSVC)
+    add_compile_options(/W4)
+    add_link_options(/WX)
+    # Ignore some warnings that we know we'll generate.  In the future the
+    # code that generates these warnings should be fixed properly.
+    # vk_layer_logging.h provokes:
+    #    warning C4100: 'default_flag_is_spec': unreferenced formal parameter
+    # vk_loader_platform.h provokes:
+    #    warning C4505: unreferenced local function has been removed
+    # jsoncpp.cpp provokes:
+    #    warning C4702: unreachable code
+    # gtest.h provokes:
+    #    warning C4389: '==': signed/unsigned mismatch
+    #    warning C4018: '>=': signed/unsigned mismatch
     # vulkan_profiles.hpp provokes: 
     #    warning C4245: '=': conversion from 'int' to 'uint64_t', signed/unsigned mismatch
     #    warning C4305: '=': truncation from 'double' to 'float'
-        add_compile_options(/wd4100 /wd4505 /wd4702 /wd4389 /wd4245 /wd4305 /wd4018)
+    add_compile_options(/wd4100 /wd4505 /wd4702 /wd4389 /wd4245 /wd4305 /wd4018)
 endif()
 
 # Vulkan-ValidationLayers settings
