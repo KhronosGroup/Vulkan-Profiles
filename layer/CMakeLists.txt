@@ -50,7 +50,6 @@ if (APPLE)
         ${CMAKE_CURRENT_SOURCE_DIR}/../layer-utils
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_BINARY_DIR}
-        ${vulkan-headers_SOURCE_DIR}/include
         ${vulkan-validationlayers_SOURCE_DIR}/layers
         ${vulkan-validationlayers_SOURCE_DIR}/layers/generated
     )
@@ -60,7 +59,6 @@ else ()
         ${CMAKE_CURRENT_SOURCE_DIR}/../layer-utils
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_BINARY_DIR}
-        ${vulkan-headers_SOURCE_DIR}/include
         ${vulkan-validationlayers_SOURCE_DIR}/layers
         ${vulkan-validationlayers_SOURCE_DIR}/layers/generated
     )
