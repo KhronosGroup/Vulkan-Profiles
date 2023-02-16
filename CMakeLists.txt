@@ -115,7 +115,6 @@ set(BUILD_SHARED_LIBS false)
 find_package(jsoncpp REQUIRED CONFIG)
 
 if(PROFILES_BUILD_TESTS)
-    #set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     find_package(GTest REQUIRED CONFIG)
 endif()
 
