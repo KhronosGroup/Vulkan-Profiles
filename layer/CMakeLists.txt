@@ -44,15 +44,6 @@ add_definitions(-DVK_ENABLE_BETA_EXTENSIONS)
 
 set(TARGET_NAME khronos_profiles)
 
-#include_directories(
-#    ${CMAKE_CURRENT_SOURCE_DIR}
-#    ${CMAKE_CURRENT_SOURCE_DIR}/../layer-utils
-#    ${CMAKE_CURRENT_BINARY_DIR}
-#    ${CMAKE_BINARY_DIR}
-#    ${vulkan-validationlayers_SOURCE_DIR}/layers
-#    ${vulkan-validationlayers_SOURCE_DIR}/layers/generated
-#)
-
 if (WIN32)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS /bigobj")
     set (CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -D_CRT_SECURE_NO_WARNINGS /bigobj")
