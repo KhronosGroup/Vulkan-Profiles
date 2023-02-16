@@ -49,8 +49,7 @@ function(LayerTest NAME)
                    profiles_test_helper.h
                    profiles_test_helper.cpp
                    layer_tests_main.cpp
-                   vktestframework.cpp
-                   ${jsoncpp_generated_source})
+                   vktestframework.cpp)
     add_dependencies(${TEST_NAME} VkLayer_khronos_profiles ${TEST_JSON_FILES})
 
     target_include_directories(${TEST_NAME} PUBLIC
@@ -87,8 +86,7 @@ function(LayerTestAndroid NAME)
                 profiles_test_helper.h
                 profiles_test_helper.cpp
                 layer_tests_main.cpp
-                vktestframework.cpp
-                ${jsoncpp_generated_source})
+                vktestframework.cpp)
 
     add_test(NAME ${ANDROID_APK_NAME} COMMAND profiles_${NAME})
     add_dependencies(${ANDROID_APK_NAME} VkLayer_khronos_profiles VpCreateDesktopBaseline2022 VpCreateDesktopPortability2022)

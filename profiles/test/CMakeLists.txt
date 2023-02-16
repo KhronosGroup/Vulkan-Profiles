@@ -12,7 +12,7 @@ source_group("JSON Schema" FILES ${SCHEMA_PROFILE})
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
-add_executable(${TEST_NAME} ${TEST_FILE} ${jsoncpp_generated_source} ${jsoncpp_generated_header} ${FILES_PROFILE} ${FILES_UNIT_TEST} ${SCHEMA_PROFILE})
+add_executable(${TEST_NAME} ${TEST_FILE} ${FILES_PROFILE} ${FILES_UNIT_TEST} ${SCHEMA_PROFILE})
 target_compile_definitions(${TEST_NAME} PRIVATE 
 	PROFILES_SCHEMA_FILENAME="${CMAKE_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}" 
 	JSON_TEST_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/test/data/"
