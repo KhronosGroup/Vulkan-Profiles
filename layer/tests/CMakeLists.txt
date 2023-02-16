@@ -136,7 +136,7 @@ function(LayerTestAndroid NAME)
     target_sources(${ANDROID_APK_NAME} PRIVATE ${_app_glue_dir}/android_native_app_glue.c)
     target_link_libraries(${ANDROID_APK_NAME} "-u ANativeActivity_onCreate")
     target_link_libraries(${ANDROID_APK_NAME} log android dl vulkan)
-    target_link_libraries(${ANDROID_APK_NAME} GTest::gtest GTest::gtest_main)
+    target_link_libraries(${ANDROID_APK_NAME} Vulkan::Headers GTest::gtest GTest::gtest_main)
 
     set(_android_jar ${ANDROID_SDK_HOME}/platforms/android-${ANDROID_PLATFORM}/android.jar)
     set(_aapt ${ANDROID_SDK_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/aapt)
