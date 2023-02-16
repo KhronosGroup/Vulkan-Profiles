@@ -106,8 +106,6 @@ endif()
 find_package(VulkanHeaders REQUIRED CONFIG QUIET)
 
 include_directories(${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/include/vulkan)
-set(Vulkan-ValidationLayers_INCLUDE_DIR "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/include/vulkan")
-set(Vulkan-ValidationLayers_LIBRARY_DIR "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/lib")
 
 find_package(valijson REQUIRED CONFIG)
 
