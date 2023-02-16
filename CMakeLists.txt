@@ -23,10 +23,6 @@ set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
 set(CMAKE_C_VISIBILITY_PRESET "hidden")
 set(CMAKE_VISIBILITY_INLINES_HIDDEN "YES")
 
-if(${CMAKE_C_COMPILER_ID} MATCHES "(GNU|Clang)")
-set(CMAKE_CXX_FLAGS "-fPIC")
-endif()
-
 find_package(PythonInterp 3.7.2 REQUIRED)
 
 if (UPDATE_DEPS)
@@ -118,7 +114,6 @@ find_package(valijson REQUIRED CONFIG)
 
 set(BUILD_SHARED_LIBS false)
 find_package(jsoncpp REQUIRED CONFIG)
-target_compile_options(jsoncpp_static INTERFACE "-fPIC")
 
 if(PROFILES_BUILD_TESTS)
     #set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
