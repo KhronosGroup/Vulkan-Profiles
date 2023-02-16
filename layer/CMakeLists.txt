@@ -79,18 +79,18 @@ source_group("Python Files" FILES ${LAYER_PYTHON_FILES})
 
 add_custom_target(VpLayer_generate ALL
     COMMAND ${PYTHON_EXECUTABLE} ${LAYER_PYTHON_FILES}
-        -registry ${VULKAN_HEADER_REGISTRY}/vk.xml
+        -registry ${VULKAN_HEADERS_REGISTRY_DIRECTORY}/vk.xml
         -outLayer ${CMAKE_SOURCE_DIR}/layer/profiles.cpp
     VERBATIM
     SOURCES ${LAYER_PYTHON_FILES}
-    DEPENDS ${VULKAN_HEADER_REGISTRY}/vk.xml)
+    DEPENDS ${VULKAN_HEADERS_REGISTRY_DIRECTORY}/vk.xml)
 set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
 add_dependencies(VkLayer_${TARGET_NAME} VpLayer_generate)
 	
 source_group("Python Files" FILES ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_tests.py)
 add_custom_target(VpLayer_generate_tests ALL
 	COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_tests.py
-		-registry ${VULKAN_HEADER_REGISTRY}/vk.xml
+		-registry ${VULKAN_HEADERS_REGISTRY_DIRECTORY}/vk.xml
 		-outProfile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
 		-outTests ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
 	VERBATIM
