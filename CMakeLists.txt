@@ -110,11 +110,9 @@ endif()
 find_package(VulkanHeaders REQUIRED CONFIG QUIET)
 set(VULKAN_HEADER_REGISTRY ${VULKAN_HEADERS_INSTALL_DIR}/share/vulkan/registry)
 
-include_directories(${VULKAN_HEADERS_INSTALL_DIR}/include)
 include_directories(${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/include/vulkan)
 set(Vulkan-ValidationLayers_INCLUDE_DIR "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/include/vulkan")
 set(Vulkan-ValidationLayers_LIBRARY_DIR "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/lib")
-
 
 find_package(valijson REQUIRED CONFIG)
 
@@ -123,8 +121,8 @@ find_package(jsoncpp REQUIRED CONFIG)
 target_compile_options(jsoncpp_static INTERFACE "-fPIC")
 
 if(PROFILES_BUILD_TESTS)
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    add_subdirectory(external/googletest)
+    #set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    find_package(GTest REQUIRED CONFIG)
 endif()
 
 if (NOT ANDROID)
@@ -224,13 +222,13 @@ if (WIN32)
         set_target_properties(VkLayer_copy-${target}-def-file PROPERTIES FOLDER "Profiles layer")
 
         add_library(VkLayer_${target} SHARED ${ARGN} VkLayer_${target}.def)
-        target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} jsoncpp_static valijson vku)
+        target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} Vulkan::Headers jsoncpp_static valijson vku)
         set_target_properties(VkLayer_${target} PROPERTIES FOLDER "Profiles layer")
     endmacro()
 else()
     macro(add_vk_layer target)
         add_library(VkLayer_${target} SHARED ${ARGN})
-        target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} jsoncpp_static valijson vku)
+        target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} Vulkan::Headers jsoncpp_static valijson vku)
         if(ANDROID)
             # Android needs -llog for __android_print_log()
             target_link_Libraries(VkLayer_${target} log)

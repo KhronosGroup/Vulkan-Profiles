@@ -1,5 +1,5 @@
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(test_libraries gtest gtest_main Vulkan::Profiles)
+set(test_libraries GTest::gtest GTest::gtest_main Vulkan::Profiles)
 if(ANDROID)
     list(APPEND test_libraries log android dl vulkan)
 else()
