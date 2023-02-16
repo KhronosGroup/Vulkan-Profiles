@@ -50,7 +50,6 @@ if (APPLE)
         ${CMAKE_CURRENT_SOURCE_DIR}/../layer-utils
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_BINARY_DIR}
-        ${jsoncpp_generated_include_dir}
         ${vulkan-headers_SOURCE_DIR}/include
         ${vulkan-validationlayers_SOURCE_DIR}/layers
         ${vulkan-validationlayers_SOURCE_DIR}/layers/generated
@@ -61,7 +60,6 @@ else ()
         ${CMAKE_CURRENT_SOURCE_DIR}/../layer-utils
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_BINARY_DIR}
-        ${jsoncpp_generated_include_dir}
         ${vulkan-headers_SOURCE_DIR}/include
         ${vulkan-validationlayers_SOURCE_DIR}/layers
         ${vulkan-validationlayers_SOURCE_DIR}/layers/generated
@@ -76,7 +74,7 @@ else()
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wpointer-arith")
 endif()
 
-add_vk_layer(${TARGET_NAME} profiles.cpp vk_layer_table.cpp ${jsoncpp_generated_source} ${jsoncpp_generated_header})
+add_vk_layer(${TARGET_NAME} profiles.cpp vk_layer_table.cpp)
 
 set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_layer.py)
 source_group("Python Files" FILES ${LAYER_PYTHON_FILES})
