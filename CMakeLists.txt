@@ -111,7 +111,6 @@ set(Vulkan-ValidationLayers_LIBRARY_DIR "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/
 
 find_package(valijson REQUIRED CONFIG)
 
-set(BUILD_SHARED_LIBS false)
 find_package(jsoncpp REQUIRED CONFIG)
 
 if(PROFILES_BUILD_TESTS)
