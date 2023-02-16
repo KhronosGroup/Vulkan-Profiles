@@ -108,9 +108,9 @@ if (VULKAN_HEADERS_INSTALL_DIR)
 endif()
 
 find_package(VulkanHeaders REQUIRED CONFIG QUIET)
-set(VULKAN_HEADER_REGISTRY ${CMAKE_CURRENT_SOURCE_DIR}/external/Vulkan-Headers/registry)
+set(VULKAN_HEADER_REGISTRY ${VULKAN_HEADERS_INSTALL_DIR}/share/vulkan/registry)
 
-include_directories(external/Vulkan-Headers/include)
+include_directories(${VULKAN_HEADERS_INSTALL_DIR}/include)
 include_directories(${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/include/vulkan)
 set(Vulkan-ValidationLayers_INCLUDE_DIR "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/include/vulkan")
 set(Vulkan-ValidationLayers_LIBRARY_DIR "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/lib")
