@@ -54,11 +54,9 @@ function(LayerTest NAME)
     add_dependencies(${TEST_NAME} VkLayer_khronos_profiles ${TEST_JSON_FILES})
 
     target_include_directories(${TEST_NAME} PUBLIC
-        "${vulkan-headers_SOURCE_DIR}/include"
         ${CMAKE_CURRENT_SOURCE_DIR}/../../layer-utils
         )
-    target_link_libraries(${TEST_NAME} GTest::gtest GTest::gtest_main)
-    target_link_libraries(${TEST_NAME} Vulkan::Vulkan)
+    target_link_libraries(${TEST_NAME} Vulkan::Headers Vulkan::Vulkan GTest::gtest GTest::gtest_main)
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/test/data/")
 
     target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="${CMAKE_BINARY_DIR}/")
